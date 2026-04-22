@@ -1,5 +1,19 @@
 <script setup lang="ts">
     import { IconUserCircle, IconBrandGithub, IconDatabaseStar, IconHome, IconSitemap, IconBug, IconFileAnalytics, IconSettings } from '@tabler/icons-vue';
+
+    import { ref } from 'vue'
+
+    const isDark = ref(false)
+
+    const toggleTheme = () => {
+        isDark.value = !isDark.value
+
+        document.documentElement.setAttribute(
+            'data-bs-theme',
+            isDark.value ? 'dark' : 'light'
+        )
+    };
+
 </script>
 
 <template>
@@ -28,8 +42,8 @@
                 </div>
                 <div class="d-none d-md-flex">
                     <div class="nav-item">
-                        <a href="?theme=dark" class="nav-link px-0 hide-theme-dark" data-bs-toggle="tooltip"
-                            data-bs-placement="bottom" aria-label="Enable dark mode"
+                        <a href="#" class="nav-link px-0 hide-theme-dark" data-bs-toggle="tooltip"
+                            data-bs-placement="bottom" aria-label="Enable dark mode" @click.prevent="toggleTheme"
                             data-bs-original-title="Enable dark mode">
                             <!-- Download SVG icon from http://tabler.io/icons/icon/moon -->
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -40,8 +54,8 @@
                                 </path>
                             </svg>
                         </a>
-                        <a href="?theme=light" class="nav-link px-0 hide-theme-light" data-bs-toggle="tooltip"
-                            data-bs-placement="bottom" aria-label="Enable light mode"
+                        <a href="#" class="nav-link px-0 hide-theme-light" data-bs-toggle="tooltip"
+                            data-bs-placement="bottom" aria-label="Enable light mode" @click.prevent="toggleTheme"
                             data-bs-original-title="Enable light mode">
                             <!-- Download SVG icon from http://tabler.io/icons/icon/sun -->
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -87,45 +101,45 @@
                         <div class="col">
                             <!-- BEGIN NAVBAR MENU -->
                             <ul class="navbar-nav">
-                                <li class="nav-item active">
-                                    <a class="nav-link" href="./">
+                                <li class="nav-item" :class="{ 'active': $route.name == 'home' }">
+                                    <RouterLink to="/home" class="nav-link">
                                         <span class="nav-link-icon d-md-none d-lg-inline-block">
                                             <IconHome />
                                         </span>
                                         <span class="nav-link-title"> Home </span>
-                                    </a>
+                                    </RouterLink>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="./">
+                                <li class="nav-item" :class="{ 'active': $route.name == 'projects' }">
+                                    <RouterLink to="/projects" class="nav-link">
                                         <span class="nav-link-icon d-md-none d-lg-inline-block">
                                             <IconSitemap />
                                         </span>
                                         <span class="nav-link-title"> Projects </span>
-                                    </a>
+                                    </RouterLink>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="./">
+                                <li class="nav-item" :class="{ 'active': $route.name == 'tasks' }">
+                                    <RouterLink to="/tasks" class="nav-link">
                                         <span class="nav-link-icon d-md-none d-lg-inline-block">
                                             <IconBug />
                                         </span>
                                         <span class="nav-link-title"> Tasks </span>
-                                    </a>
+                                    </RouterLink>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="./">
+                                <li class="nav-item" :class="{ 'active': $route.name == 'reports' }">
+                                    <RouterLink to="/reports" class="nav-link">
                                         <span class="nav-link-icon d-md-none d-lg-inline-block">
                                             <IconFileAnalytics />
                                         </span>
                                         <span class="nav-link-title"> Reports </span>
-                                    </a>
+                                    </RouterLink>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="./">
+                                <li class="nav-item" :class="{ 'active': $route.name == 'settings' }">
+                                    <RouterLink to="/settings" class="nav-link">
                                         <span class="nav-link-icon d-md-none d-lg-inline-block">
                                             <IconSettings />
                                         </span>
                                         <span class="nav-link-title"> Settings </span>
-                                    </a>
+                                    </RouterLink>
                                 </li>
                             </ul>
                             <!-- END NAVBAR MENU -->
