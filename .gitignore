@@ -31,6 +31,6 @@ go.work.sum
 # .idea/
 # .vscode/
 
-/data/*.sqlite3
-/data/*.sqlite3-shm
-/data/*.sqlite3-wal
+golang-backend/data/*.sqlite3
+golang-backend/data/*.sqlite3-shm
+golang-backend/data/*.sqlite3-wal
