@@ -3,12 +3,18 @@ package database
 import (
 	"database/sql"
 	"log"
+	"os"
+	"path/filepath"
 
 	_ "modernc.org/sqlite"
 )
 
 func InitDB() *sql.DB {
-	db, err := sql.Open("sqlite", "file:data/gotask.sqlite3")
+
+	databaseDir := filepath.Join(".", "data")
+	err := os.MkdirAll(databaseDir, os.ModePerm)
+	databasePath := filepath.Join(databaseDir, "gotask.sqlite3")
+	db, err := sql.Open("sqlite", "file:"+databasePath)
 	if err != nil {
 		log.Fatal(err)
 	}
