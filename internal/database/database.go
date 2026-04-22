@@ -13,7 +13,13 @@ func InitDB(path string) *sql.DB {
 		log.Fatal(err)
 	}
 
-	schema := `PRAGMA foreign_keys = ON;`
+	schema := `PRAGMA journal_mode = WAL;`
+
+	if _, err := db.Exec(schema); err != nil {
+		log.Fatal(err)
+	}
+
+	schema = `PRAGMA foreign_keys = ON;`
 
 	if _, err := db.Exec(schema); err != nil {
 		log.Fatal(err)
