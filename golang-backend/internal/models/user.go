@@ -7,7 +7,8 @@ type UserBase struct {
 
 type User struct {
 	UserBase
-	Email        string `json:"email"`
-	CreatedAt    int64  `json:"createdAt"`
-	LastUpdateAt *int64 `json:"lastUpdateAt"`
+	Email        string  `json:"email"`
+	Password     *string `json:"string"`
+	CreatedAt    int64   `json:"createdAt"`
+	LastUpdateAt *int64  `json:"lastUpdateAt"`
 }
