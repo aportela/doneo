@@ -1,24 +1,29 @@
 package repositories
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/aportela/gotask/internal/models"
+	"github.com/aportela/gotask/internal/utils"
 )
 
 type ProjectRepository struct {
-	db *sql.DB
+	database *sql.DB
 }
 
-func NewProjectRepository(db *sql.DB) *ProjectRepository {
+func NewProjectRepository(database *sql.DB) *ProjectRepository {
 	return &ProjectRepository{
-		db: db,
+		database: database,
 	}
 }
 
-func (r *ProjectRepository) GetByID(id string) (models.Project, error) {
-	var p models.Project
-	err := r.db.QueryRow(
+func (projectRepository *ProjectRepository) Get(ctx context.Context, id string) (models.Project, error) {
+	var project models.Project
+	var lmtime, stime, ftime, dtime sql.NullInt64
+	var description sql.NullString
+	err := projectRepository.database.QueryRowContext(
+		ctx,
 		`
             SELECT
                 P.id, P.key, P.summary, P.description, P.ctime, P.lmtime, P.stime, P.ftime, P.dtime, P.type, PT.name
@@ -26,17 +31,24 @@ func (r *ProjectRepository) GetByID(id string) (models.Project, error) {
 			LEFT JOIN PROJECT_TYPE PT ON PT.id = P.type
             WHERE P.id = ?
         `,
-		id).Scan(&p.ID, &p.Key, &p.Summary, &p.Description, &p.CreatedAt, &p.LastModifiedAt, &p.StartedAt, &p.FinishedAt, &p.DueAt, &p.Type.ID, &p.Type.Name)
+		id).Scan(&project.ID, &project.Key, &project.Summary, &description, &project.CreatedAt, &lmtime, &stime, &ftime, &dtime, &project.Type.ID, &project.Type.Name)
+	project.Description = utils.StrPtr(description)
+	project.LastModifiedAt = utils.Int64Ptr(lmtime)
+	project.StartedAt = utils.Int64Ptr(stime)
+	project.FinishedAt = utils.Int64Ptr(ftime)
+	project.DueAt = utils.Int64Ptr(dtime)
 
-	return p, err
+	return project, err
 }
 
-func (r *ProjectRepository) Search() ([]models.Project, error) {
-	rows, err := r.db.Query(
+func (projectRepository *ProjectRepository) Search(ctx context.Context) ([]models.Project, error) {
+	rows, err := projectRepository.database.QueryContext(
+		ctx,
 		`
         SELECT
-            id, summary
-        FROM PROJECT
+                P.id, P.key, P.summary, P.description, P.ctime, P.lmtime, P.stime, P.ftime, P.dtime, P.type, PT.name
+		FROM PROJECT P
+		LEFT JOIN PROJECT_TYPE PT ON PT.id = P.type
         `,
 	)
 
@@ -48,11 +60,25 @@ func (r *ProjectRepository) Search() ([]models.Project, error) {
 	var projects []models.Project
 
 	for rows.Next() {
-		var t models.Project
-		if err := rows.Scan(&t.ID, &t.Summary); err != nil {
+		var project models.Project
+		var lmtime, stime, ftime, dtime sql.NullInt64
+		var description sql.NullString
+
+		if err := rows.Scan(
+			&project.ID, &project.Key, &project.Summary, &description,
+			&project.CreatedAt, &lmtime, &stime, &ftime, &dtime,
+			&project.Type.ID, &project.Type.Name,
+		); err != nil {
 			return nil, err
 		}
-		projects = append(projects, t)
+
+		project.Description = utils.StrPtr(description)
+		project.LastModifiedAt = utils.Int64Ptr(lmtime)
+		project.StartedAt = utils.Int64Ptr(stime)
+		project.FinishedAt = utils.Int64Ptr(ftime)
+		project.DueAt = utils.Int64Ptr(dtime)
+
+		projects = append(projects, project)
 	}
 
 	return projects, nil
