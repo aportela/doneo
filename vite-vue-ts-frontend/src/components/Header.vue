@@ -6,12 +6,14 @@
     const isDark = ref(false)
 
     const toggleTheme = () => {
-        isDark.value = !isDark.value
+        isDark.value = !isDark.value;
 
         document.documentElement.setAttribute(
             'data-bs-theme',
             isDark.value ? 'dark' : 'light'
-        )
+        );
+
+        localStorage.setItem("theme", isDark.value ? 'dark' : 'light');
     };
 
 </script>
