@@ -1,6 +1,7 @@
 package router
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 	"os"
@@ -11,16 +12,21 @@ import (
 
 	"github.com/aportela/gotask/internal/fileserver"
 	"github.com/aportela/gotask/internal/handlers"
+	"github.com/aportela/gotask/internal/repositories"
+	"github.com/aportela/gotask/internal/services"
 )
 
-func NewRouter() http.Handler {
+func NewRouter(db *sql.DB) http.Handler {
 	baseRouter := chi.NewRouter()
 
 	baseRouter.Use(middleware.Logger)
 
 	apiRouter := chi.NewRouter()
 	apiRouter.Get("/hello", handlers.DefaultHandler)
-	apiRouter.Get("/projects", handlers.SearchProjectsHandler)
+	projectRepository := repositories.NewProjectRepository(db)
+	projectService := services.NewProjectService(projectRepository)
+	projectHandler := handlers.NewProjectHandler(projectService)
+	apiRouter.Get("/project/{id}", projectHandler.GetProject)
 	apiRouter.Get("/tasks", handlers.SearchTasksHandler)
 	baseRouter.Mount("/api", apiRouter)
 
