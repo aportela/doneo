@@ -15,9 +15,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	} else {
-		db.Close()
+		//db.Close()
 
-		r := router.NewRouter()
+		r := router.NewRouter(db)
 
 		log.Println("Listening over http://localhost:3000/static")
 
