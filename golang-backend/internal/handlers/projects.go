@@ -4,24 +4,28 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/aportela/gotask/internal/models"
+	"github.com/aportela/gotask/internal/services"
+	"github.com/go-chi/chi/v5"
 )
 
-type ProjectsResponse struct {
-	Success  bool             `json:"success"`
-	Projects []models.Project `json:"projects"`
+type ProjectHandler struct {
+	service *services.ProjectService
 }
 
-func SearchProjectsHandler(w http.ResponseWriter, r *http.Request) {
+func NewProjectHandler(service *services.ProjectService) *ProjectHandler {
+	return &ProjectHandler{service: service}
+}
+
+func (h *ProjectHandler) GetProject(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	resp := ProjectsResponse{
-		Success: true,
-		Projects: []models.Project{
-			{ID: 1, Summary: "Project 1"},
-			{ID: 2, Summary: "Proyect 2"},
-		},
+	id := chi.URLParam(r, "id")
+
+	project, err := h.service.Get(id)
+	if err != nil {
+		http.Error(w, "error"+err.Error(), 500)
+		return
 	}
 
-	json.NewEncoder(w).Encode(resp)
+	json.NewEncoder(w).Encode(project)
 
 }
