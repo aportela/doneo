@@ -35,6 +35,18 @@ func NewRouter(db *sql.DB) http.Handler {
 		})
 	})
 
+	apiRouter.Route("/project_types", func(r chi.Router) {
+		projectTypeRepository := repositories.NewProjectTypeRepository(db)
+		projectTypeService := services.NewProjectTypeService(projectTypeRepository)
+		projectTypeHandler := handlers.NewProjectTypeHandler(projectTypeService)
+		r.Post("/", projectTypeHandler.AddProjectType)
+		r.Get("/", projectTypeHandler.SearchProjectTypes)
+		r.Route("/{id}", func(r chi.Router) {
+			r.Put("/", projectTypeHandler.UpdateProjectType)
+			r.Delete("/", projectTypeHandler.DeleteProjectType)
+		})
+	})
+
 	baseRouter.Mount("/api", apiRouter)
 
 	workDir, err := os.Getwd()
