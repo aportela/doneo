@@ -8,7 +8,7 @@ import (
 )
 
 type TaskResponse struct {
-	ID      int    `json:"id"`
+	ID      string `json:"id"`
 	Summary string `json:"summary"`
 }
 
@@ -29,8 +29,8 @@ func SearchTasksHandler(w http.ResponseWriter, r *http.Request) {
 	resp := TasksResponse{
 		Success: true,
 		Tasks: []TaskResponse{
-			toTaskResponse(models.Task{ID: 1, Summary: "Task 1"}),
-			toTaskResponse(models.Task{ID: 2, Summary: "Task 2"}),
+			toTaskResponse(models.Task{ID: "1", Summary: "Task 1"}),
+			toTaskResponse(models.Task{ID: "2", Summary: "Task 2"}),
 		},
 	}
 
