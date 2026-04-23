@@ -14,9 +14,9 @@ type Task struct {
 	Priority    TaskPriority `json:"priority"`
 	CreatedBy   User         `json:"createdBy"`
 	CreatedAt   int64        `json:"createdAt"`
-	StartedAt   int64        `json:"startedAt"`
-	FinishedAt  int64        `json:"finishedAt"`
-	DueAt       int64        `json:"dueAt"`
+	StartedAt   *int64       `json:"startedAt"`
+	FinishedAt  *int64       `json:"finishedAt"`
+	DueAt       *int64       `json:"dueAt"`
 	Tags        []string     `json:"tags"`
 	Notes       []Note       `json:"notes"`
 	Attachments []Attachment `json:"attachments"`
