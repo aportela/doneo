@@ -4,6 +4,7 @@ type TaskBase struct {
 	ID      int    `json:"id"`
 	Summary string `json:"summary"`
 }
+
 type Task struct {
 	ID          int          `json:"id"`
 	Summary     string       `json:"summary"`
