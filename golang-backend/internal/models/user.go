@@ -1,9 +1,13 @@
 package models
 
+type UserBase struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
 type User struct {
-	ID           string `json:"id"`
+	UserBase
 	Email        string `json:"email"`
-	Name         string `json:"name"`
 	CreatedAt    int64  `json:"createdAt"`
 	LastUpdateAt *int64 `json:"lastUpdateAt"`
 }
