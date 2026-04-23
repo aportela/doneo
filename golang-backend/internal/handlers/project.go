@@ -25,17 +25,10 @@ func (h *ProjectHandler) AddProject(w http.ResponseWriter, r *http.Request) {
 
 	err := h.service.AddProject(ctx, project)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			utils.ToJSONResponse(w, http.StatusNotFound, map[string]string{
-				"debugErrorMessage": err.Error(),
-			})
-			return
-		} else {
-			utils.ToJSONResponse(w, http.StatusInternalServerError, map[string]string{
-				"debugErrorMessage": err.Error(),
-			})
-			return
-		}
+		utils.ToJSONResponse(w, http.StatusInternalServerError, map[string]string{
+			"debugErrorMessage": err.Error(),
+		})
+		return
 	}
 	utils.ToJSONResponse(w, http.StatusOK, project)
 
