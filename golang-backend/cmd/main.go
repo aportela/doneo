@@ -9,16 +9,18 @@ import (
 )
 
 func main() {
-
 	log.Println("starting GOTask v0.1alpha...")
 
-	db := database.InitDB()
-	db.Close()
+	db, err := database.Open(true)
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		db.Close()
 
-	r := router.NewRouter()
+		r := router.NewRouter()
 
-	log.Println("Listening over http://localhost:3000/static")
+		log.Println("Listening over http://localhost:3000/static")
 
-	http.ListenAndServe(":3000", r)
-
+		http.ListenAndServe(":3000", r)
+	}
 }
