@@ -22,12 +22,11 @@ func NewRouter(db *sql.DB) http.Handler {
 	baseRouter.Use(middleware.Logger)
 
 	apiRouter := chi.NewRouter()
-	apiRouter.Get("/hello", handlers.DefaultHandler)
 	projectRepository := repositories.NewProjectRepository(db)
 	projectService := services.NewProjectService(projectRepository)
 	projectHandler := handlers.NewProjectHandler(projectService)
 	apiRouter.Get("/project/{id}", projectHandler.GetProject)
-	apiRouter.Get("/tasks", handlers.SearchTasksHandler)
+	apiRouter.Get("/projects", projectHandler.SearchProjects)
 	baseRouter.Mount("/api", apiRouter)
 
 	workDir, err := os.Getwd()
@@ -35,7 +34,7 @@ func NewRouter(db *sql.DB) http.Handler {
 		log.Fatal(err)
 	}
 	publicWebPath := http.Dir(filepath.Join(workDir, "public"))
-	fileserver.FileServer(baseRouter, "/static", publicWebPath)
+	fileserver.FileServer(baseRouter, "/", publicWebPath)
 
 	return baseRouter
 }
