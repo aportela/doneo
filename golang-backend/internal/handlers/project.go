@@ -1,10 +1,11 @@
 package handlers
 
 import (
-	"encoding/json"
+	"database/sql"
 	"net/http"
 
 	"github.com/aportela/gotask/internal/services"
+	"github.com/aportela/gotask/internal/utils"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -17,15 +18,40 @@ func NewProjectHandler(service *services.ProjectService) *ProjectHandler {
 }
 
 func (h *ProjectHandler) GetProject(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	w.Header().Set("Content-Type", "application/json")
 	id := chi.URLParam(r, "id")
 
-	project, err := h.service.Get(id)
+	project, err := h.service.GetProject(ctx, id)
 	if err != nil {
-		http.Error(w, "error"+err.Error(), 500)
+		if err == sql.ErrNoRows {
+			utils.ToJSONResponse(w, http.StatusNotFound, map[string]string{
+				"debugErrorMessage": err.Error(),
+			})
+			return
+		} else {
+			utils.ToJSONResponse(w, http.StatusInternalServerError, map[string]string{
+				"debugErrorMessage": err.Error(),
+			})
+			return
+		}
+	}
+	utils.ToJSONResponse(w, http.StatusOK, project)
+
+}
+
+func (h *ProjectHandler) SearchProjects(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	w.Header().Set("Content-Type", "application/json")
+
+	projects, err := h.service.SearchProjects(ctx)
+	if err != nil {
+		utils.ToJSONResponse(w, http.StatusInternalServerError, map[string]string{
+			"debugErrorMessage": err.Error(),
+		})
 		return
 	}
 
-	json.NewEncoder(w).Encode(project)
+	utils.ToJSONResponse(w, http.StatusOK, projects)
 
 }
