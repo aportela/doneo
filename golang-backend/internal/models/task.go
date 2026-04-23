@@ -1,12 +1,12 @@
 package models
 
 type TaskBase struct {
-	ID   int    `json:"id"`
+	ID   string `json:"id"`
 	Slug string `json:"slug"`
 }
 
 type Task struct {
-	ID          int          `json:"id"`
+	ID          string       `json:"id"`
 	Slug        string       `json:"slug"`
 	Summary     string       `json:"summary"`
 	Description string       `json:"description"`
