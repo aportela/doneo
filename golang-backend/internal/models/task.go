@@ -1,21 +1,24 @@
 package models
 
 type TaskBase struct {
-	ID      int    `json:"id"`
-	Summary string `json:"summary"`
+	ID   int    `json:"id"`
+	Slug string `json:"slug"`
 }
 
 type Task struct {
 	ID          int          `json:"id"`
+	Slug        string       `json:"slug"`
 	Summary     string       `json:"summary"`
-	Status      Status       `json:"status"`
-	Priority    Priority     `json:"priority"`
+	Description string       `json:"description"`
+	Status      TaskStatus   `json:"status"`
+	Priority    TaskPriority `json:"priority"`
 	CreatedBy   User         `json:"createdBy"`
 	CreatedAt   int64        `json:"createdAt"`
+	StartedAt   int64        `json:"startedAt"`
 	FinishedAt  int64        `json:"finishedAt"`
-	StartDate   int64        `json:"startDate"`
-	DueDate     int64        `json:"dueDate"`
+	DueAt       int64        `json:"dueAt"`
 	Tags        []string     `json:"tags"`
 	Notes       []Note       `json:"notes"`
 	Attachments []Attachment `json:"attachments"`
+	LinkedTasks []TaskBase   `json:"linkedTasks"`
 }
