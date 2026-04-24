@@ -5,10 +5,12 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 
 	"github.com/aportela/gotask/internal/cli"
 	"github.com/aportela/gotask/internal/configuration"
+	"github.com/aportela/gotask/internal/data"
 	"github.com/aportela/gotask/internal/database"
 	"github.com/aportela/gotask/internal/router"
 	"github.com/aportela/gotask/internal/seed"
@@ -17,13 +19,32 @@ import (
 func main() {
 	log.Println("starting GOTask v0.1alpha...")
 
-	configuration.Init()
+	err := data.CreateDataPathIfRequired()
+	if err != nil {
+		log.Fatal("Error checking/creating data path:", err)
+	}
 
-	db, err := database.Open(true)
+	configuration, err := configuration.Open()
+
+	if err != nil {
+		log.Fatal("Error opening configuration:", err)
+	}
+
+	db, err := database.Open(configuration.Database.Path)
 	if err != nil {
 		log.Fatal(err)
 	} else {
 		defer db.Close()
+		createSchema := true
+		if createSchema {
+			log.Println("Creating database schema...")
+			err = database.InitSchema(db)
+
+			if err != nil {
+				log.Fatal("Error creating database schema:", err)
+			}
+		}
+
 		params, err := cli.HandleFlags()
 		if err != nil {
 			log.Fatal(err)
@@ -39,8 +60,9 @@ func main() {
 		signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
 		go func() {
-			if err := http.ListenAndServe(":3000", r); err != nil {
-				log.Fatal("Error opening HTTP server at port 3000:", err)
+			log.Println("Starting web server at port " + strconv.Itoa(configuration.Server.Port))
+			if err := http.ListenAndServe(":"+strconv.Itoa(configuration.Server.Port), r); err != nil {
+				log.Fatal("Error", err)
 			}
 		}()
 
