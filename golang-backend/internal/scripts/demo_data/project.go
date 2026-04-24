@@ -97,33 +97,35 @@ func getRandomProjectDescription() string {
 
 func getRandomProjectKey() string {
 	const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-
-	// La longitud del Project Key
 	keyLength := 6
 	result := make([]byte, keyLength)
-
 	for i := 0; i < keyLength; i++ {
 		result[i] = letters[rand.Intn(len(letters))]
 	}
-
 	return string(result)
 }
 
 func getRandomProject(userIds []string, projectTypeIds []string) models.Project {
 	projectID := func() string { u, _ := uuid.NewV7(); return u.String() }()
 	projectDescription := getRandomProjectDescription()
-
+	startOffset := rand.Int63n(48)
+	finishOffset := rand.Int63n(96)
+	dueOffset := rand.Int63n(144)
+	ctime := utils.GetRandomMSTimestamp(time.Now().AddDate(-5, 0, 0), time.Now())
+	stime := ctime + startOffset*int64(time.Hour/time.Millisecond)
+	ftime := stime + finishOffset*int64(time.Hour/time.Millisecond)
+	dtime := ftime + dueOffset*int64(time.Hour/time.Millisecond)
 	return models.Project{
 		ID:             projectID,
 		Key:            getRandomProjectKey(),
 		Summary:        getRandomProjectSummary(),
 		Description:    &projectDescription,
 		CreatedBy:      models.UserBase{ID: userIds[rand.Intn(len(userIds))]},
-		CreatedAt:      utils.GetRandomMSTimestamp(time.Now().AddDate(-5, 0, 0), time.Now()),
-		LastModifiedAt: nil,
-		StartedAt:      nil,
-		FinishedAt:     nil,
-		DueAt:          nil,
+		CreatedAt:      ctime,
+		LastModifiedAt: &ftime,
+		StartedAt:      &stime,
+		FinishedAt:     &ftime,
+		DueAt:          &dtime,
 		Type:           models.ProjectType{ID: projectTypeIds[rand.Intn(len(projectTypeIds))]},
 	}
 }
