@@ -12,20 +12,6 @@ import (
 const configurationType = "yaml"
 const configurationFilename = "configuration." + configurationType
 
-type DatabaseConfig struct {
-	Type string `mapstructure:"type"`
-	Path string `mapstructure:"path"`
-}
-
-type ServerConfig struct {
-	port int8 `mapstructure:"port"`
-}
-
-type Config struct {
-	Database DatabaseConfig `mapstructure:"database"`
-	Server   ServerConfig   `mapstructure:"server"`
-}
-
 func getDataPath() string {
 	pwd, err := os.Getwd()
 	if err != nil {
