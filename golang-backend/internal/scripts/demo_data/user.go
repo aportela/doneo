@@ -42,29 +42,34 @@ func generateRandomEmail(fullName string) string {
 	return email
 }
 
+func getRandomUser() models.User {
+	userID := func() string { u, _ := uuid.NewV7(); return u.String() }()
+	password := userID
+	name := getRandomUserName()
+	return models.User{
+		UserBase: models.UserBase{
+			ID:   userID,
+			Name: name,
+		},
+		Email:           generateRandomEmail(name),
+		Password:        &password,
+		CreatedAt:       utils.GetRandomMSTimestamp(time.Now().AddDate(-5, 0, 0), time.Now()),
+		LastUpdateAt:    nil,
+		IsAdministrator: false,
+	}
+}
+
 func createUsers(database database.Database, count int) []string {
 	var newUserIds []string
 	userRepository := repositories.NewUserRepository(database)
 	userService := services.NewUserService(userRepository)
 	for i := 1; i <= count; i++ {
-		userID := func() string { u, _ := uuid.NewV7(); return u.String() }()
-		password := userID
-		name := getRandomUserName()
-		err := userService.AddUser(context.Background(), models.User{
-			UserBase: models.UserBase{
-				ID:   userID,
-				Name: name,
-			},
-			Email:           generateRandomEmail(name),
-			Password:        &password,
-			CreatedAt:       utils.GetRandomMSTimestamp(time.Now().AddDate(-5, 0, 0), time.Now()),
-			LastUpdateAt:    nil,
-			IsAdministrator: false,
-		})
+		newUser := getRandomUser()
+		err := userService.AddUser(context.Background(), newUser)
 		if err != nil {
 			fmt.Printf("Error creating user %s\n", err.Error())
 		}
-		newUserIds = append(newUserIds, userID)
+		newUserIds = append(newUserIds, newUser.ID)
 	}
 	return newUserIds
 }
