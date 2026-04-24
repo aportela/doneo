@@ -21,22 +21,22 @@ func NewUserHandler(service *services.UserService) *UserHandler {
 func (h *UserHandler) AddUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	w.Header().Set("Content-Type", "application/json")
-	project := models.Project{}
-	err := h.service.AddUser(ctx, project)
+	user := models.User{}
+	err := h.service.AddUser(ctx, user)
 	if err != nil {
 		utils.ToJSONResponse(w, http.StatusInternalServerError, map[string]string{
 			"debugErrorMessage": err.Error(),
 		})
 		return
 	}
-	utils.ToJSONResponse(w, http.StatusOK, project)
+	utils.ToJSONResponse(w, http.StatusOK, user)
 }
 
 func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	w.Header().Set("Content-Type", "application/json")
-	project := models.Project{}
-	err := h.service.UpdateUser(ctx, project)
+	user := models.User{}
+	err := h.service.UpdateUser(ctx, user)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			utils.ToJSONResponse(w, http.StatusNotFound, map[string]string{
@@ -50,15 +50,15 @@ func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	utils.ToJSONResponse(w, http.StatusOK, project)
+	utils.ToJSONResponse(w, http.StatusOK, user)
 
 }
 
 func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "id")
-	err := h.service.DeleteUser(ctx, projectId)
+	userId := chi.URLParam(r, "id")
+	err := h.service.DeleteUser(ctx, userId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			utils.ToJSONResponse(w, http.StatusNotFound, map[string]string{
@@ -78,8 +78,8 @@ func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "id")
-	project, err := h.service.GetProject(ctx, projectId)
+	userId := chi.URLParam(r, "id")
+	user, err := h.service.GetUser(ctx, userId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			utils.ToJSONResponse(w, http.StatusNotFound, map[string]string{
@@ -93,18 +93,18 @@ func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	utils.ToJSONResponse(w, http.StatusOK, project)
+	utils.ToJSONResponse(w, http.StatusOK, user)
 }
 
-func (h *UserHandler) SearchProjects(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) SearchUsers(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	w.Header().Set("Content-Type", "application/json")
-	projects, err := h.service.SearchProjects(ctx)
+	users, err := h.service.SearchUsers(ctx)
 	if err != nil {
 		utils.ToJSONResponse(w, http.StatusInternalServerError, map[string]string{
 			"debugErrorMessage": err.Error(),
 		})
 		return
 	}
-	utils.ToJSONResponse(w, http.StatusOK, projects)
+	utils.ToJSONResponse(w, http.StatusOK, users)
 }
