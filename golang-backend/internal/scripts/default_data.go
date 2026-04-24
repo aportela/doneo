@@ -23,10 +23,11 @@ func CreateDefaultData(db database.Database) {
 			ID:   userID,
 			Name: "administrator",
 		},
-		Email:        "admin@localhost",
-		Password:     &password,
-		CreatedAt:    utils.CurrentTimestamp(),
-		LastUpdateAt: nil,
+		Email:           "admin@localhost",
+		Password:        &password,
+		CreatedAt:       utils.CurrentTimestamp(),
+		LastUpdateAt:    nil,
+		IsAdministrator: true,
 	})
 	if err != nil {
 		fmt.Printf("Error creating user %s\n", err.Error())
