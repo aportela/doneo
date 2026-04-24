@@ -3,10 +3,14 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/aportela/gotask/internal/cli"
 	"github.com/aportela/gotask/internal/database"
 	"github.com/aportela/gotask/internal/router"
+	"github.com/aportela/gotask/internal/seed"
 )
 
 func main() {
@@ -16,43 +20,28 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	} else {
-
-		//db.Close()
-
+		defer db.Close()
 		params, err := cli.HandleFlags()
 		if err != nil {
 			log.Fatal(err)
 		}
 
 		if params.InsertBulkData {
-			// TODO
-			/*
-				projectRepository := repositories.NewProjectRepository(db)
-				projectService := services.NewProjectService(projectRepository)
-				err := projectService.AddProject(context.Background(), models.Project{
-					ID:             func() string { u, _ := uuid.NewV7(); return u.String() }(),
-					Key:            "AA",
-					Summary:        "Summary",
-					Description:    nil,
-					CreatedBy:      models.UserBase{ID: "019dba5d-83a4-7f97-bdf1-97a5fb3d5869"},
-					CreatedAt:      utils.CurrentTimestamp(),
-					LastModifiedAt: nil,
-					StartedAt:      nil,
-					FinishedAt:     nil,
-					DueAt:          nil,
-					Type:           models.ProjectType{ID: "019dba85-0669-7fd4-86ed-dbe36df285af"},
-				})
-				if err != nil {
-					fmt.Println(err.Error())
-				}
-			*/
-
+			seed.CreateDemoData(db)
 		}
 
 		r := router.NewRouter(db)
 
-		log.Println("Listening over http://localhost:3000/")
+		sigChan := make(chan os.Signal, 1)
+		signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
-		http.ListenAndServe(":3000", r)
+		go func() {
+			if err := http.ListenAndServe(":3000", r); err != nil {
+				log.Fatal("Error en el servidor HTTP:", err)
+			}
+		}()
+
+		sigReceived := <-sigChan
+		log.Printf("%v SIG received... closing app", sigReceived)
 	}
 }
