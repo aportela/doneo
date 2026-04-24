@@ -1,15 +1,15 @@
 package configuration
 
-type DatabaseConfig struct {
+type DatabaseConfiguration struct {
 	Type string `mapstructure:"type"`
 	Path string `mapstructure:"path"`
 }
 
-type ServerConfig struct {
-	port int8 `mapstructure:"port"`
+type ServerConfiguration struct {
+	Port int `mapstructure:"port"`
 }
 
-type Config struct {
-	Database DatabaseConfig `mapstructure:"database"`
-	Server   ServerConfig   `mapstructure:"server"`
+type Configuration struct {
+	Database DatabaseConfiguration `mapstructure:"database"`
+	Server   ServerConfiguration   `mapstructure:"server"`
 }
