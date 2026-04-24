@@ -13,7 +13,7 @@ import (
 	"github.com/aportela/gotask/internal/data"
 	"github.com/aportela/gotask/internal/database"
 	"github.com/aportela/gotask/internal/router"
-	"github.com/aportela/gotask/internal/seed"
+	"github.com/aportela/gotask/internal/scripts"
 )
 
 func main() {
@@ -43,7 +43,7 @@ func main() {
 			if err != nil {
 				log.Fatal("Error creating database schema:", err)
 			}
-			seed.CreateDefaultData(databaseHandler)
+			scripts.CreateDefaultData(databaseHandler)
 		}
 
 		params, err := cli.HandleFlags()
@@ -53,7 +53,7 @@ func main() {
 
 		if params.InsertBulkData {
 			log.Println("Inserting bulk/demo data...")
-			seed.CreateDemoData(databaseHandler)
+			scripts.CreateDemoData(databaseHandler)
 		}
 
 		r := router.NewRouter(databaseHandler)
