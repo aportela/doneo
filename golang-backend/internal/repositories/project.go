@@ -31,7 +31,7 @@ func (projectRepository *ProjectRepository) Add(ctx context.Context, project mod
 		project.Summary,
 		utils.NullableStringToSQL(project.Description),
 		project.CreatedBy.ID,
-		utils.CurrentMSTimestamp(),
+		project.CreatedAt,
 		utils.NullableInt64ToSQL(project.LastModifiedAt),
 		utils.NullableInt64ToSQL(project.StartedAt),
 		utils.NullableInt64ToSQL(project.FinishedAt),
@@ -85,16 +85,19 @@ func (projectRepository *ProjectRepository) Get(ctx context.Context, id string) 
 	var project models.Project
 	var mtime, stime, ftime, dtime sql.NullInt64
 	var description sql.NullString
+	var creatorID, creatorName string
 	err := projectRepository.database.QueryRowContext(
 		ctx,
 		`
             SELECT
-                P.id, P.key, P.summary, P.description, P.ctime, P.mtime, P.stime, P.ftime, P.dtime, P.type, PT.name
+                P.id, P.key, P.summary, P.description, P.ctime, P.mtime, P.stime, P.ftime, P.dtime, P.type, PT.name, P.cuser, U.name
             FROM PROJECT P
 			LEFT JOIN PROJECT_TYPE PT ON PT.id = P.type
+			INNER JOIN USER U ON U.ID = P.cuser
             WHERE P.id = ?
         `,
-		id).Scan(&project.ID, &project.Key, &project.Summary, &description, &project.CreatedAt, &mtime, &stime, &ftime, &dtime, &project.Type.ID, &project.Type.Name)
+		id).Scan(&project.ID, &project.Key, &project.Summary, &description, &project.CreatedAt, &mtime, &stime, &ftime, &dtime, &project.Type.ID, &project.Type.Name, &creatorID, &creatorName)
+	project.CreatedBy = models.UserBase{ID: creatorID, Name: creatorName}
 	project.Description = utils.StrPtr(description)
 	project.LastModifiedAt = utils.Int64Ptr(mtime)
 	project.StartedAt = utils.Int64Ptr(stime)
@@ -109,9 +112,10 @@ func (projectRepository *ProjectRepository) Search(ctx context.Context) ([]model
 		ctx,
 		`
         SELECT
-                P.id, P.key, P.summary, P.description, P.ctime, P.mtime, P.stime, P.ftime, P.dtime, P.type, PT.name
+                P.id, P.key, P.summary, P.description, P.ctime, P.mtime, P.stime, P.ftime, P.dtime, P.type, PT.name, P.cuser, U.name
 		FROM PROJECT P
 		LEFT JOIN PROJECT_TYPE PT ON PT.id = P.type
+		INNER JOIN USER U ON U.ID = P.cuser
         `,
 	)
 
@@ -126,15 +130,17 @@ func (projectRepository *ProjectRepository) Search(ctx context.Context) ([]model
 		var project models.Project
 		var mtime, stime, ftime, dtime sql.NullInt64
 		var description sql.NullString
+		var creatorID, creatorName string
 
 		if err := rows.Scan(
 			&project.ID, &project.Key, &project.Summary, &description,
 			&project.CreatedAt, &mtime, &stime, &ftime, &dtime,
-			&project.Type.ID, &project.Type.Name,
+			&project.Type.ID, &project.Type.Name, &creatorID, &creatorName,
 		); err != nil {
 			return nil, err
 		}
 
+		project.CreatedBy = models.UserBase{ID: creatorID, Name: creatorName}
 		project.Description = utils.StrPtr(description)
 		project.LastModifiedAt = utils.Int64Ptr(mtime)
 		project.StartedAt = utils.Int64Ptr(stime)
