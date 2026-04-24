@@ -1,0 +1,144 @@
+package demodatascripts
+
+import (
+	"context"
+	"fmt"
+	"math/rand"
+	"time"
+
+	"github.com/aportela/gotask/internal/database"
+	"github.com/aportela/gotask/internal/models"
+	"github.com/aportela/gotask/internal/repositories"
+	"github.com/aportela/gotask/internal/services"
+	"github.com/aportela/gotask/internal/utils"
+	"github.com/gofrs/uuid"
+)
+
+func getRandomProjectSummary() string {
+	actions := []string{
+		"Develop a solution",
+		"Implement a system",
+		"Conduct a market study",
+		"Create a marketing strategy",
+		"Build a new product",
+		"Design a user interface",
+		"Optimize existing workflows",
+		"Enhance customer service",
+	}
+
+	results := []string{
+		"to increase efficiency",
+		"with the goal of improving customer experience",
+		"to optimize internal processes",
+		"to expand market presence",
+		"to enhance user engagement",
+		"to boost sales conversion rates",
+		"to improve operational performance",
+		"to maximize ROI",
+	}
+
+	goals := []string{
+		"with a focus on sustainability",
+		"to achieve long-term growth",
+		"to reduce operational costs",
+		"to improve brand awareness",
+		"to support business scalability",
+		"to foster innovation",
+		"to enhance employee productivity",
+		"to improve time-to-market",
+	}
+
+	action := actions[rand.Intn(len(actions))]
+	result := results[rand.Intn(len(results))]
+	goal := goals[rand.Intn(len(goals))]
+	return fmt.Sprintf("%s %s %s.", action, result, goal)
+}
+
+func getRandomProjectDescription() string {
+	approaches := []string{
+		"Adopt a user-centric approach",
+		"Implement agile methodologies",
+		"Utilize machine learning to enhance features",
+		"Focus on automation and process improvement",
+		"Leverage cloud technologies for scalability",
+		"Create an intuitive and responsive interface",
+		"Optimize existing systems for greater efficiency",
+		"Use data-driven insights to make decisions",
+	}
+
+	challenges := []string{
+		"Handling large volumes of data",
+		"Meeting tight deadlines with limited resources",
+		"Overcoming integration issues with legacy systems",
+		"Addressing scalability challenges",
+		"Ensuring security and privacy compliance",
+		"Managing stakeholder expectations",
+		"Reducing system downtime during migration",
+		"Ensuring smooth cross-functional collaboration",
+	}
+
+	solutions := []string{
+		"By implementing robust data processing pipelines",
+		"Using cutting-edge technologies like AI and cloud services",
+		"Through a phased rollout and comprehensive testing",
+		"By improving collaboration tools and communication channels",
+		"By introducing automated workflows and continuous integration",
+		"By providing comprehensive training and user support",
+		"By leveraging analytics for real-time decision-making",
+		"By prioritizing security throughout the project lifecycle",
+	}
+
+	approach := approaches[rand.Intn(len(approaches))]
+	challenge := challenges[rand.Intn(len(challenges))]
+	solution := solutions[rand.Intn(len(solutions))]
+
+	return fmt.Sprintf("Approach: %s.\nChallenge: %s.\nSolution: %s.", approach, challenge, solution)
+}
+
+func getRandomProjectKey() string {
+	const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+	// La longitud del Project Key
+	keyLength := 6
+	result := make([]byte, keyLength)
+
+	for i := 0; i < keyLength; i++ {
+		result[i] = letters[rand.Intn(len(letters))]
+	}
+
+	return string(result)
+}
+
+func getRandomProject(userIds []string, projectTypeIds []string) models.Project {
+	projectID := func() string { u, _ := uuid.NewV7(); return u.String() }()
+	projectDescription := getRandomProjectDescription()
+
+	return models.Project{
+		ID:             projectID,
+		Key:            getRandomProjectKey(),
+		Summary:        getRandomProjectSummary(),
+		Description:    &projectDescription,
+		CreatedBy:      models.UserBase{ID: userIds[rand.Intn(len(userIds))]},
+		CreatedAt:      utils.GetRandomMSTimestamp(time.Now().AddDate(-5, 0, 0), time.Now()),
+		LastModifiedAt: nil,
+		StartedAt:      nil,
+		FinishedAt:     nil,
+		DueAt:          nil,
+		Type:           models.ProjectType{ID: projectTypeIds[rand.Intn(len(projectTypeIds))]},
+	}
+}
+
+func createProjects(database database.Database, projectTypeIds []string, userIds []string, count int) []string {
+	var newProjectIds []string
+	projectRepository := repositories.NewProjectRepository(database)
+	projectService := services.NewProjectService(projectRepository)
+	for i := 1; i <= count; i++ {
+		newProject := getRandomProject(userIds, projectTypeIds)
+		err := projectService.AddProject(context.Background(), newProject)
+		if err != nil {
+			fmt.Printf("Error creating project %s\n", err.Error())
+		}
+		newProjectIds = append(newProjectIds, newProject.ID)
+	}
+	return newProjectIds
+}
