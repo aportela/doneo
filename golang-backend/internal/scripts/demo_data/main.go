@@ -7,4 +7,5 @@ import (
 func CreateDemoData(database database.Database) {
 
 	createUsers(database, 32)
+	createProjectTypes(database)
 }
