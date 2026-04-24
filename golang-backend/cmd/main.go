@@ -43,6 +43,7 @@ func main() {
 			if err != nil {
 				log.Fatal("Error creating database schema:", err)
 			}
+			seed.CreateDefaultData(databaseHandler)
 		}
 
 		params, err := cli.HandleFlags()
