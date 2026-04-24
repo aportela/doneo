@@ -17,6 +17,8 @@ import (
 func main() {
 	log.Println("starting GOTask v0.1alpha...")
 
+	configuration.Init()
+
 	db, err := database.Open(true)
 	if err != nil {
 		log.Fatal(err)
@@ -27,7 +29,6 @@ func main() {
 			log.Fatal(err)
 		}
 
-		configuration.Init()
 		if params.InsertBulkData {
 			seed.CreateDemoData(db)
 		}
