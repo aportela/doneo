@@ -22,7 +22,7 @@ func NewUserRepository(database database.Database) *UserRepository {
 
 func (userRepository *UserRepository) Add(ctx context.Context, user models.User) error {
 
-	hashedPassword, hashErr := bcrypt.GenerateFromPassword([]byte(*user.Password), bcrypt.DefaultCost)
+	hashedPasswordBytes, hashErr := bcrypt.GenerateFromPassword([]byte(*user.Password), bcrypt.DefaultCost)
 	if hashErr != nil {
 		return hashErr
 	}
@@ -35,7 +35,7 @@ func (userRepository *UserRepository) Add(ctx context.Context, user models.User)
 		user.ID,
 		user.Email,
 		user.Name,
-		hashedPassword,
+		string(hashedPasswordBytes),
 		utils.CurrentTimestamp(),
 	)
 	return err
@@ -44,7 +44,7 @@ func (userRepository *UserRepository) Add(ctx context.Context, user models.User)
 func (userRepository *UserRepository) Update(ctx context.Context, user models.User) error {
 
 	if user.Password != nil {
-		hashedPassword, hashErr := bcrypt.GenerateFromPassword([]byte(*user.Password), bcrypt.DefaultCost)
+		hashedPasswordBytes, hashErr := bcrypt.GenerateFromPassword([]byte(*user.Password), bcrypt.DefaultCost)
 		if hashErr != nil {
 			return hashErr
 		}
@@ -60,7 +60,7 @@ func (userRepository *UserRepository) Update(ctx context.Context, user models.Us
         `,
 			user.Email,
 			user.Name,
-			hashedPassword,
+			string(hashedPasswordBytes),
 			utils.CurrentTimestamp(),
 			user.ID,
 		)
