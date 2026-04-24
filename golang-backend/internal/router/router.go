@@ -22,6 +22,20 @@ func NewRouter(db *sql.DB) http.Handler {
 	baseRouter.Use(middleware.Logger)
 
 	apiRouter := chi.NewRouter()
+
+	apiRouter.Route("/users", func(r chi.Router) {
+		userRepository := repositories.NewUserRepository(db)
+		userService := services.NewUserService(userRepository)
+		userHandler := handlers.NewUserHandler(userService)
+		r.Post("/", userHandler.AddUser)
+		r.Get("/", userHandler.SearchUsers)
+		r.Route("/{id}", func(r chi.Router) {
+			r.Get("/", userHandler.GetUser)
+			r.Put("/", userHandler.UpdateUser)
+			r.Delete("/", userHandler.DeleteUser)
+		})
+	})
+
 	apiRouter.Route("/projects", func(r chi.Router) {
 		projectRepository := repositories.NewProjectRepository(db)
 		projectService := services.NewProjectService(projectRepository)
