@@ -13,8 +13,54 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-func CreateDemoData(db database.Database) {
-	projectRepository := repositories.NewProjectRepository(db)
+func getRandomUserName() string {
+	names := []string{
+		"James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Charles", "Thomas",
+		"Mary", "Jennifer", "Linda", "Patricia", "Elizabeth", "Susan", "Jessica", "Sarah", "Karen", "Nancy",
+	}
+
+	surnames := []string{
+		"Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor",
+		"Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez", "Roberts",
+	}
+
+	name := names[rand.Intn(len(names))]
+	surname1 := surnames[rand.Intn(len(surnames))]
+	surname2 := surnames[rand.Intn(len(surnames))]
+
+	return name + " " + surname1 + " " + surname2
+}
+
+func createUsers(database database.Database, count int) [] string {
+	newUserIds []string
+	userRepository := repositories.NewUserRepository(database)
+	userService := services.NewUserService(userRepository)
+	for i := 1; i <= count; i++ {
+		userID := func() string { u, _ := uuid.NewV7(); return u.String() }()
+		password := userID
+		err := userService.AddUser(context.Background(), models.User{
+			UserBase: models.UserBase{
+				ID:   userID,
+				Name: getRandomUserName(),
+			},
+			Email:           userID + "@localhost",
+			Password:        &password,
+			CreatedAt:       utils.CurrentMSTimestamp(),
+			LastUpdateAt:    nil,
+			IsAdministrator: true,
+		})
+		if err != nil {
+			fmt.Printf("Error creating user %s\n", err.Error())
+		}
+		append(newUserIds, userID)
+	}
+	return newUserIds
+}
+
+func CreateDemoData(database database.Database) {
+
+	userIds := createUsers(database, 32)
+	projectRepository := repositories.NewProjectRepository(database)
 	projectService := services.NewProjectService(projectRepository)
 
 	projectNames := []string{
