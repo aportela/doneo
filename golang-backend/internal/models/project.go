@@ -12,5 +12,6 @@ type Project struct {
 	FinishedAt     *int64      `json:"finishedAt"`
 	DueAt          *int64      `json:"dueAt"`
 	Type           ProjectType `json:"type"`
-	//lead, asignee, priority, status
+	Participants   []UserBase  `json:"participants"`
+	//lead, asignee, priority, status, participants
 }
