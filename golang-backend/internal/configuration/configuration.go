@@ -6,69 +6,47 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/aportela/gotask/internal/data"
 	"github.com/spf13/viper"
 )
 
-const configurationType = "yaml"
-const configurationFilename = "configuration." + configurationType
+const configurationFilename = "configuration.yaml"
 
-func getDataPath() string {
-	pwd, err := os.Getwd()
-	if err != nil {
-		log.Fatal("Error getting data directory:", err)
-	}
-	return filepath.Join(pwd, "data")
-}
-
-func createDataPathIfRequired() error {
-	if err := os.MkdirAll(getDataPath(), os.ModePerm); err != nil {
-		return err
-	}
-	return nil
-}
+// configuration default values
+const databaseType = "sqlite"
+const sqliteDatabaseFilename = "gotask.sqlite3"
+const httpServerPort = 3000
 
 func initViper() {
-	viper.SetConfigType(configurationType)
-	viper.SetConfigFile(filepath.Join(getDataPath(), configurationFilename))
-
+	configFile := filepath.Join(data.GetDataPath(), configurationFilename)
+	viper.SetConfigFile(configFile)
 }
-func Init() {
-	// TODO: return error (replace log.Fatal)
-	err := createDataPathIfRequired()
-	if err != nil {
-		log.Fatal("Error checking data path:", err)
-	}
+
+func createDefaultConfiguration() error {
+	viper.Set("database.type", databaseType)
+	viper.Set("database.path", filepath.Join(data.GetDataPath(), sqliteDatabaseFilename))
+	viper.Set("server.port", httpServerPort)
+
+	return viper.WriteConfigAs(filepath.Join(data.GetDataPath(), configurationFilename))
+}
+
+func Open() (*Configuration, error) {
 	initViper()
 
-	err = viper.ReadInConfig()
+	err := viper.ReadInConfig()
 	if err != nil {
-		var notFoundErr viper.ConfigFileNotFoundError
-		if errors.As(err, &notFoundErr) {
+		if errors.Is(err, os.ErrNotExist) {
 			log.Println("Configuration file not found, creating new with default values")
 			viper.SetDefault("database.path", "test")
-			err := writeDefaultConfig()
+			err := createDefaultConfiguration()
 			if err != nil {
-				log.Fatal("Error creating configuration file:", err)
+				return nil, err
 			}
 		} else {
-			log.Fatal("Error reading configuration file:", err)
+			return nil, err
 		}
 	}
-	var cfg Config
-	if err := viper.Unmarshal(&cfg); err != nil {
-		log.Fatal("Error decoding configuration file:", err)
-	}
-}
-
-func writeDefaultConfig() error {
-	viper.Set("database.type", "sqlite")
-	viper.Set("database.path", filepath.Join(getDataPath(), "gotask.sqlite3"))
-	viper.Set("server.port", 3000)
-
-	err := viper.SafeWriteConfig()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	var cfg *Configuration
+	err = viper.Unmarshal(&cfg)
+	return cfg, err
 }
