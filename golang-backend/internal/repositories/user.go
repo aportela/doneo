@@ -4,16 +4,17 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/aportela/gotask/internal/database"
 	"github.com/aportela/gotask/internal/models"
 	"github.com/aportela/gotask/internal/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserRepository struct {
-	database *sql.DB
+	database database.Database
 }
 
-func NewUserRepository(database *sql.DB) *UserRepository {
+func NewUserRepository(database database.Database) *UserRepository {
 	return &UserRepository{
 		database: database,
 	}

@@ -30,15 +30,15 @@ func main() {
 		log.Fatal("Error opening configuration:", err)
 	}
 
-	db, err := database.Open(configuration.Database.Path)
+	databaseHandler, err := database.Open(configuration.Database)
 	if err != nil {
 		log.Fatal(err)
 	} else {
-		defer db.Close()
+		defer databaseHandler.Close()
 		createSchema := true
 		if createSchema {
 			log.Println("Creating database schema...")
-			err = database.InitSchema(db)
+			err = databaseHandler.CreateSchema()
 
 			if err != nil {
 				log.Fatal("Error creating database schema:", err)
@@ -51,10 +51,10 @@ func main() {
 		}
 
 		if params.InsertBulkData {
-			seed.CreateDemoData(db)
+			seed.CreateDemoData(databaseHandler)
 		}
 
-		r := router.NewRouter(db)
+		r := router.NewRouter(databaseHandler)
 
 		sigChan := make(chan os.Signal, 1)
 		signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)

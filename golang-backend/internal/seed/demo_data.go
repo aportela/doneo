@@ -1,8 +1,10 @@
 package seed
 
-import "database/sql"
+import (
+	"github.com/aportela/gotask/internal/database"
+)
 
-func CreateDemoData(db *sql.DB) {
+func CreateDemoData(db database.Database) {
 	// TODO
 	/*
 		projectRepository := repositories.NewProjectRepository(db)

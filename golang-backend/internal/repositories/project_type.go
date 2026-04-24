@@ -2,16 +2,16 @@ package repositories
 
 import (
 	"context"
-	"database/sql"
 
+	"github.com/aportela/gotask/internal/database"
 	"github.com/aportela/gotask/internal/models"
 )
 
 type ProjectTypeRepository struct {
-	database *sql.DB
+	database database.Database
 }
 
-func NewProjectTypeRepository(database *sql.DB) *ProjectTypeRepository {
+func NewProjectTypeRepository(database database.Database) *ProjectTypeRepository {
 	return &ProjectTypeRepository{
 		database: database,
 	}

@@ -1,7 +1,6 @@
 package router
 
 import (
-	"database/sql"
 	"log"
 	"net/http"
 	"os"
@@ -10,13 +9,14 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
+	"github.com/aportela/gotask/internal/database"
 	"github.com/aportela/gotask/internal/fileserver"
 	"github.com/aportela/gotask/internal/handlers"
 	"github.com/aportela/gotask/internal/repositories"
 	"github.com/aportela/gotask/internal/services"
 )
 
-func NewRouter(db *sql.DB) http.Handler {
+func NewRouter(db database.Database) http.Handler {
 	baseRouter := chi.NewRouter()
 
 	baseRouter.Use(middleware.Logger)

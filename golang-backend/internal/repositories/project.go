@@ -4,15 +4,16 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/aportela/gotask/internal/database"
 	"github.com/aportela/gotask/internal/models"
 	"github.com/aportela/gotask/internal/utils"
 )
 
 type ProjectRepository struct {
-	database *sql.DB
+	database database.Database
 }
 
-func NewProjectRepository(database *sql.DB) *ProjectRepository {
+func NewProjectRepository(database database.Database) *ProjectRepository {
 	return &ProjectRepository{
 		database: database,
 	}
