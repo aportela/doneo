@@ -26,7 +26,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: path.resolve(__dirname, "../golang-backend/public"),
+    outDir: path.resolve(__dirname, "../golang-backend/internal/ui/dist"),
     emptyOutDir: true,
     rollupOptions: {
       output: {
@@ -35,6 +35,9 @@ export default defineConfig({
             return "vendor";
           }
         },
+        // golang embed FS ignore files starting with _
+        // (i have at least _plugin-vue-export-helper-hashjs)
+        chunkFileNames: "assets/gotask-[name]-[hash].js",
       },
     },
   },
