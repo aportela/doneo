@@ -1,10 +1,20 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
+import checker from "vite-plugin-checker";
 import path from "path";
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    checker({
+      typescript: {
+        tsconfigPath: "./tsconfig.app.json",
+      },
+      vueTsc: {
+        tsconfigPath: "./tsconfig.app.json",
+      },
+    }),
+  ],
   server: {
     port: 6502,
     open: true,
@@ -17,7 +27,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: path.resolve(__dirname, "../golang-backend/public"), // 👈 muy común con Go
+    outDir: path.resolve(__dirname, "../golang-backend/public"),
     emptyOutDir: true,
     rollupOptions: {
       output: {
