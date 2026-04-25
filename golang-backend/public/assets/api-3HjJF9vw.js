@@ -1,0 +1,1 @@
+import{t as e}from"./vendor-D8Yhtuvn.js";var t=e.create({baseURL:`api`}),n={user:{search:()=>t.get(`/api/users`)},project:{search:()=>t.get(`/api/projects`)}};export{n as t};
