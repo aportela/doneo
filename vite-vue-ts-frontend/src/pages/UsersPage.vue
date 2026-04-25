@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { ref, onMounted, shallowRef, reactive } from 'vue';
     import { api } from '../composables/api';
-    import { IconUser, IconUserKey } from '@tabler/icons-vue';
+    import { IconEdit, IconTrash, IconUser, IconUserKey } from '@tabler/icons-vue';
 
     interface UserInterface {
         id: string;
@@ -88,31 +88,33 @@
                                 <th>Email</th>
                                 <th>Created at</th>
                                 <th>Last update</th>
-                                <th></th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="user in users" v-bind:key="user.id">
-                                <td><span class="text-secondary">
-                                        {{ user.isAdministrator ? 'Administrator' : 'User'
-                                        }}
-                                    </span></td>
+                                <td>
+                                    {{ user.isAdministrator ? 'Administrator' : 'User'
+                                    }}
+                                </td>
                                 <td class="text-center">
                                     <span class="avatar" :style="'background-image: url(' + user.avatar + ')'"></span>
                                 </td>
-                                <td><span class="text-secondary">{{ user.name }}</span></td>
-                                <td>{{ user.email }}</td>
-                                <td>{{ new Date(user.createdAt).toDateString() }}</td>
-                                <td>{{ user.lastUpdateAt ? new Date(user.lastUpdateAt).toDateString() : null }}</td>
-                                <td class="text-end">
-                                    <span class="dropdown">
-                                        <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport"
-                                            data-bs-toggle="dropdown">Actions</button>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item" href="#"> Action </a>
-                                            <a class="dropdown-item" href="#"> Another action </a>
-                                        </div>
-                                    </span>
+                                <td>{{ user.name }}</td>
+                                <td><a :href="'mailto:' + user.email">{{ user.email }}</a></td>
+                                <td><span class="text-secondary">{{ new Date(user.createdAt).toDateString() }}</span>
+                                </td>
+                                <td><span class="text-secondary" v-if="user.lastUpdateAt">{{ new
+                                    Date(user.lastUpdateAt).toDateString() }}</span></td>
+                                <td>
+                                    <div class="btn-actions">
+                                        <a href="#" class="btn btn-action btn-icon" aria-label="Button">
+                                            <IconEdit /> Edit
+                                        </a>
+                                        <a href="#" class="btn btn-action btn-icon ms-2" aria-label="Button">
+                                            <IconTrash /> Remove
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
 
