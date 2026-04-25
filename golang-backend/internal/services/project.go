@@ -29,7 +29,7 @@ func (s *ProjectService) DeleteProject(ctx context.Context, id string) error {
 	return s.repository.Delete(ctx, id)
 }
 
-func (s *ProjectService) GetProject(ctx context.Context, id string) (models.Project, error) {
+func (s *ProjectService) GetProject(ctx context.Context, id string) (*models.Project, error) {
 	return s.repository.Get(ctx, id)
 }
 

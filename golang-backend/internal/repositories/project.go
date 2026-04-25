@@ -19,7 +19,20 @@ func NewProjectRepository(database database.Database) *ProjectRepository {
 	}
 }
 
-func (projectRepository *ProjectRepository) Add(ctx context.Context, project models.Project) error {
+func (projectRepository *ProjectRepository) AddParticipant(ctx context.Context, projectId string, userId string) error {
+	_, err := projectRepository.database.ExecContext(
+		ctx,
+		`
+            INSERT INTO PROJECT_PARTICIPANT (project_id, user_id)
+			VALUES (?, ?)
+        `,
+		projectId,
+		userId,
+	)
+	return err
+}
+
+func (projectRepository *ProjectRepository) add(ctx context.Context, project models.Project) error {
 	_, err := projectRepository.database.ExecContext(
 		ctx,
 		`
@@ -39,6 +52,21 @@ func (projectRepository *ProjectRepository) Add(ctx context.Context, project mod
 		project.Type.ID,
 	)
 	return err
+}
+
+func (projectRepository *ProjectRepository) Add(ctx context.Context, project models.Project) error {
+	// TODO: transaction
+	err := projectRepository.add(ctx, project)
+	if err != nil {
+		return err
+	}
+	for _, projectParticipant := range project.Participants {
+		err = projectRepository.AddParticipant(ctx, project.ID, projectParticipant.ID)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (projectRepository *ProjectRepository) Update(ctx context.Context, project models.Project) error {
@@ -81,7 +109,43 @@ func (projectRepository *ProjectRepository) Delete(ctx context.Context, id strin
 	return err
 }
 
-func (projectRepository *ProjectRepository) Get(ctx context.Context, id string) (models.Project, error) {
+func (projectRepository *ProjectRepository) getParticipants(ctx context.Context, projectId string) ([]models.UserBase, error) {
+	rows, err := projectRepository.database.QueryContext(
+		ctx,
+		`
+        SELECT
+                U.id, U.name
+		FROM PROJECT_PARTICIPANT PP
+		INNER JOIN USER U ON U.id = PP.user_id
+		WHERE PP.project_id = ?
+		ORDER BY U.name
+        `,
+		projectId,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var participants []models.UserBase
+
+	for rows.Next() {
+		var user models.UserBase
+
+		if err := rows.Scan(
+			&user.ID, &user.Name,
+		); err != nil {
+			return nil, err
+		}
+
+		participants = append(participants, user)
+	}
+
+	return participants, nil
+}
+
+func (projectRepository *ProjectRepository) get(ctx context.Context, id string) (*models.Project, error) {
 	var project models.Project
 	var mtime, stime, ftime, dtime sql.NullInt64
 	var description sql.NullString
@@ -104,7 +168,21 @@ func (projectRepository *ProjectRepository) Get(ctx context.Context, id string) 
 	project.FinishedAt = utils.Int64Ptr(ftime)
 	project.DueAt = utils.Int64Ptr(dtime)
 
-	return project, err
+	return &project, err
+}
+
+func (projectRepository *ProjectRepository) Get(ctx context.Context, id string) (*models.Project, error) {
+	project, err := projectRepository.get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	var participants []models.UserBase
+	participants, err = projectRepository.getParticipants(ctx, project.ID)
+	if err != nil {
+		return nil, err
+	}
+	project.Participants = participants
+	return project, nil
 }
 
 func (projectRepository *ProjectRepository) Search(ctx context.Context) ([]models.Project, error) {

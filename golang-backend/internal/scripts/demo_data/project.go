@@ -115,6 +115,14 @@ func getRandomProject(userIds []string, projectTypeIds []string) models.Project 
 	stime := ctime + startOffset*int64(time.Hour/time.Millisecond)
 	ftime := stime + finishOffset*int64(time.Hour/time.Millisecond)
 	dtime := ftime + dueOffset*int64(time.Hour/time.Millisecond)
+	rand.Shuffle(len(userIds), func(i, j int) {
+		userIds[i], userIds[j] = userIds[j], userIds[i]
+	})
+	numParticipants := rand.Intn(3) + 1
+	var participants []models.UserBase
+	for i := 0; i < numParticipants; i++ {
+		participants = append(participants, models.UserBase{ID: userIds[i]})
+	}
 	return models.Project{
 		ID:             projectID,
 		Key:            getRandomProjectKey(),
@@ -127,6 +135,7 @@ func getRandomProject(userIds []string, projectTypeIds []string) models.Project 
 		FinishedAt:     &ftime,
 		DueAt:          &dtime,
 		Type:           models.ProjectType{ID: projectTypeIds[rand.Intn(len(projectTypeIds))]},
+		Participants:   participants,
 	}
 }
 

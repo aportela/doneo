@@ -39,6 +39,15 @@ var installSchemaQueries = []string{
 		) STRICT;
 	`,
 	`
+		CREATE TABLE IF NOT EXISTS PROJECT_PARTICIPANT (
+			project_id TEXT NOT NULL CHECK(length(project_id) == 36),
+			user_id TEXT NOT NULL CHECK(length(user_id) == 36),
+			PRIMARY KEY (project_id, user_id),
+			FOREIGN KEY(project_id) REFERENCES PROJECT(id) ON DELETE CASCADE,
+			FOREIGN KEY(user_id) REFERENCES USER(id) ON DELETE CASCADE
+		) STRICT;
+	`,
+	`
 		CREATE TABLE IF NOT EXISTS PROJECT_TASK_STATUS (
 			id TEXT NOT NULL CHECK(length(id) == 36),
 			project_id TEXT NOT NULL CHECK(length(id) == 36),
