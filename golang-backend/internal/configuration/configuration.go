@@ -15,7 +15,7 @@ const configurationFilename = "configuration.yaml"
 // configuration default values
 const databaseType = "sqlite"
 const sqliteDatabaseFilename = "gotask.sqlite3"
-const httpServerPort = 3000
+const httpServerPort = 8086
 
 func initViper() {
 	configFile := filepath.Join(data.GetDataPath(), configurationFilename)
