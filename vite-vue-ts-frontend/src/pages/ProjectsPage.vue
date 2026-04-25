@@ -1,36 +1,77 @@
 <script setup lang="ts">
-
     import { ref, onMounted, shallowRef, reactive } from 'vue';
     import { api } from '../composables/api';
+    import { IconEdit, IconTrash, IconUser, IconUserKey } from '@tabler/icons-vue';
+
+    interface ProjectTypeInterface {
+        id: string;
+        name: string;
+    }
+
+    class ProjectType implements ProjectTypeInterface {
+        id: string;
+        name: string;
+        constructor(item: ProjectTypeInterface) {
+            this.id = item.id;
+            this.name = item.name;
+        }
+    }
+
+    interface UserBaseInterface {
+        id: string;
+        name: string;
+    }
+
+    class UserBase implements UserBaseInterface {
+        id: string;
+        name: string;
+        constructor(item: UserBaseInterface) {
+            this.id = item.id;
+            this.name = item.name;
+        }
+    }
 
     interface ProjectInterface {
         id: string;
+        key: string;
+        type: ProjectType;
         summary: string;
         status: string;
         taskCount: number;
-
+        createdBy: UserBase;
+        createdAt: number;
     };
 
     class Project implements ProjectInterface {
         id: string;
+        key: string;
+        type: ProjectType;
         summary: string;
         status: string;
         taskCount: number;
+        createdBy: UserBase;
+        createdAt: number;
 
         constructor(item: ProjectInterface) {
-            this.id = "0031";
-            this.summary = "test";
-            this.status = "closed";
-            this.taskCount = 3;
+            this.id = item.id;
+            this.key = item.key;
+            this.type = item.type;
+            this.summary = item.summary;
+            this.status = item.status;
+            this.taskCount = item.taskCount;
+            this.createdBy = item.createdBy;
+            this.createdAt = item.createdAt;
         }
 
     }
 
-
-    const projects = shallowRef<Project[]>([new Project({})]);
+    const projects = shallowRef<Project[]>([]);
     onMounted(() => {
-
-        api.project.search()
+        api.project.search().then((successResponse: any) => {
+            projects.value = successResponse.data;
+        }).catch((errorResponse: any) => {
+            console.log(errorResponse);
+        });
     });
 
 </script>
@@ -65,7 +106,7 @@
                         <thead>
                             <tr>
                                 <th class="w-1">
-                                    No.
+                                    KEY
                                     <!-- Download SVG icon from http://tabler.io/icons/icon/chevron-up -->
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -73,29 +114,38 @@
                                         <path d="M6 15l6 -6l6 6"></path>
                                     </svg>
                                 </th>
+                                <th>Type</th>
                                 <th>Summary</th>
+                                <th>Creator</th>
                                 <th>Created</th>
-                                <th>Task count</th>
+                                <!--
+                                <th>Last update</th>
                                 <th>Status</th>
-                                <th></th>
+                                -->
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="project in projects" v-bind:key="project.id">
-                                <td><span class="text-secondary">{{ project.id }}</span></td>
+                                <td><span class="text-secondary">{{ project.key }}</span></td>
+                                <td><span class="text-secondary">{{ project.type.name }}</span></td>
                                 <td><span class="text-secondary">{{ project.summary }}</span></td>
-                                <td>4 Feb 2018</td>
+                                <td>{{ project.createdBy.name }}</td>
+                                <td><span class="text-secondary">{{ new Date(project.createdAt).toDateString() }}</span>
+                                </td>
+                                <!--
                                 <td>{{ project.taskCount }}</td>
                                 <td><span class="badge bg-success me-1"></span> {{ project.status }}</td>
-                                <td class="text-end">
-                                    <span class="dropdown">
-                                        <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport"
-                                            data-bs-toggle="dropdown">Actions</button>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item" href="#"> Action </a>
-                                            <a class="dropdown-item" href="#"> Another action </a>
-                                        </div>
-                                    </span>
+                                -->
+                                <td>
+                                    <div class="btn-actions">
+                                        <a href="#" class="btn btn-action btn-icon" aria-label="Button">
+                                            <IconEdit /> Edit
+                                        </a>
+                                        <a href="#" class="btn btn-action btn-icon ms-2" aria-label="Button">
+                                            <IconTrash /> Remove
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
 
