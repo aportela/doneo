@@ -1,7 +1,7 @@
 <script setup lang="ts">
-    import { ref, onMounted, shallowRef, reactive } from 'vue';
+    import { onMounted, shallowRef } from 'vue';
     import { api } from '../composables/api';
-    import { IconEdit, IconTrash, IconUser, IconUserKey } from '@tabler/icons-vue';
+    import { IconEdit, IconTrash } from '@tabler/icons-vue';
 
     interface UserInterface {
         id: string;

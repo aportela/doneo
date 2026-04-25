@@ -200,7 +200,7 @@
                                 <td class="w-1 pe-0">
                                     <input type="checkbox"
                                         class="form-check-input m-0 align-middle table-selectable-check"
-                                        aria-label="Select task" checked="">
+                                        aria-label="Select task" checked>
                                 </td>
                                 <td class="w-100">
                                     <a href="#" class="text-reset">Extend the data model.</a>
@@ -365,7 +365,7 @@
                                 <td class="w-1 pe-0">
                                     <input type="checkbox"
                                         class="form-check-input m-0 align-middle table-selectable-check"
-                                        aria-label="Select task" checked="">
+                                        aria-label="Select task" checked>
                                 </td>
                                 <td class="w-100">
                                     <a href="#" class="text-reset">Identify the implementation team.</a>
@@ -475,7 +475,7 @@
                                 <td class="w-1 pe-0">
                                     <input type="checkbox"
                                         class="form-check-input m-0 align-middle table-selectable-check"
-                                        aria-label="Select task" checked="">
+                                        aria-label="Select task" checked>
                                 </td>
                                 <td class="w-100">
                                     <a href="#" class="text-reset">Check Pull Requests</a>
