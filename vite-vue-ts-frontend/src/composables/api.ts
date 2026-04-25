@@ -2,10 +2,10 @@ import { axiosInstance } from "./axios";
 
 const api = {
   user: {
-    search: () => axiosInstance.get("/api/users"),
+    search: () => axiosInstance.get("/users"),
   },
   project: {
-    search: () => axiosInstance.get("/api/projects"),
+    search: () => axiosInstance.get("/projects"),
   },
 };
 
