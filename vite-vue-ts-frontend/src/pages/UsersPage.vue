@@ -10,6 +10,7 @@
         isAdministrator: boolean;
         createdAt: number;
         lastUpdateAt: number;
+        avatar: string;
     };
 
     class User implements UserInterface {
@@ -19,6 +20,7 @@
         isAdministrator: boolean;
         createdAt: number;
         lastUpdateAt: number;
+        avatar: string;
 
         constructor(item: UserInterface) {
             this.id = item.id;
@@ -27,15 +29,13 @@
             this.isAdministrator = item.isAdministrator;
             this.createdAt = item.createdAt;
             this.lastUpdateAt = item.lastUpdateAt;
+            this.avatar = item.avatar;
         }
-
     }
-
 
     const users = shallowRef<User[]>([]);
 
     onMounted(() => {
-
         api.user.search().then((successResponse: any) => {
             users.value = successResponse.data;
         }).catch((errorResponse: any) => {
@@ -98,8 +98,7 @@
                                         }}
                                     </span></td>
                                 <td class="text-center">
-                                    <span class="avatar "
-                                        :style="'background-image: url(https://i.pravatar.cc/48?id=' + user.id + ')'"></span>
+                                    <span class="avatar" :style="'background-image: url(' + user.avatar + ')'"></span>
                                 </td>
                                 <td><span class="text-secondary">{{ user.name }}</span></td>
                                 <td>{{ user.email }}</td>

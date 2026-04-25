@@ -12,4 +12,5 @@ type User struct {
 	CreatedAt       int64   `json:"createdAt"`
 	LastUpdateAt    *int64  `json:"lastUpdateAt"`
 	IsAdministrator bool    `json:"isAdministrator"`
+	Avatar          string  `json:"avatar"`
 }

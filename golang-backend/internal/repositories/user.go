@@ -118,6 +118,7 @@ func (userRepository *UserRepository) Get(ctx context.Context, id string) (model
 		id).Scan(&user.ID, &user.Email, &user.Name, &user.CreatedAt, &mtime, &flagIsAdmin)
 	user.LastUpdateAt = utils.Int64Ptr(mtime)
 	user.IsAdministrator = flagIsAdmin.Valid && flagIsAdmin.Byte == 1
+	user.Avatar = "https://i.pravatar.cc/48?id=" + user.ID
 
 	return user, err
 }
@@ -150,6 +151,7 @@ func (userRepository *UserRepository) Search(ctx context.Context) ([]models.User
 
 		user.LastUpdateAt = utils.Int64Ptr(mtime)
 		user.IsAdministrator = flagIsAdmin.Valid && flagIsAdmin.Byte == 1
+		user.Avatar = "https://i.pravatar.cc/48?id=" + user.ID
 		users = append(users, user)
 	}
 
