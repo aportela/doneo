@@ -101,10 +101,7 @@ func (h *UserHandler) SearchUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	users, err := h.service.SearchUsers(ctx)
 	if err != nil {
-		utils.ToJSONResponse(w, http.StatusInternalServerError, map[string]string{
-			"debugErrorMessage": err.Error(),
-		})
-		return
+		utils.ToJSONErrorResponse(w, err)
 	}
 	utils.ToJSONResponse(w, http.StatusOK, users)
 }

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/aportela/doneo/internal/database"
+	"github.com/aportela/doneo/internal/errors"
 	"github.com/aportela/doneo/internal/models"
 	"github.com/aportela/doneo/internal/utils"
 	"golang.org/x/crypto/bcrypt"
@@ -149,4 +150,41 @@ func (userRepository *UserRepository) Search(ctx context.Context) ([]models.User
 	}
 
 	return users, nil
+}
+
+func (userRepository *UserRepository) SignIn(ctx context.Context, email string, password string) (*models.User, error) {
+	var user models.User
+	var hashedPassword string
+	var updatedAt sql.NullInt64
+	var isSuperUser sql.NullByte
+	err := userRepository.database.QueryRowContext(
+		ctx,
+		`
+            SELECT
+                U.id, U.email, U.password_hash, U.name, U.created_at, U.updated_at, U.is_super_user
+            FROM users U
+            WHERE U.email = ?
+        `,
+		email).Scan(&user.ID, &user.Email, &hashedPassword, &user.Name, &user.CreatedAt, &updatedAt, &isSuperUser)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.EntityNotFound
+		} else {
+			return nil, err
+		}
+	}
+	err = bcrypt.CompareHashAndPassword(
+		[]byte(hashedPassword),
+		[]byte(password),
+	)
+
+	if err != nil {
+		return nil, err
+	} else {
+		user.UpdatedAt = utils.Int64Ptr(updatedAt)
+		user.IsSuperUser = isSuperUser.Valid && isSuperUser.Byte == 1
+		user.AvatarURL = "https://i.pravatar.cc/48?id=" + user.ID
+		return &user, err
+	}
 }
