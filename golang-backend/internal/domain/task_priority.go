@@ -1,6 +1,6 @@
-package models
+package domain
 
-type TaskStatus struct {
+type TaskPriority struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	Index    int    `json:"index"`

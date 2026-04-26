@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/aportela/doneo/internal/database"
-	"github.com/aportela/doneo/internal/models"
+	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories"
 	"github.com/aportela/doneo/internal/services"
 	"github.com/aportela/doneo/internal/utils"
@@ -42,12 +42,12 @@ func generateRandomEmail(fullName string) string {
 	return email
 }
 
-func getRandomUser() models.User {
+func getRandomUser() domain.User {
 	userID := func() string { u, _ := uuid.NewV7(); return u.String() }()
 	password := userID
 	name := getRandomUserName()
-	return models.User{
-		UserBase: models.UserBase{
+	return domain.User{
+		UserBase: domain.UserBase{
 			ID:   userID,
 			Name: name,
 		},

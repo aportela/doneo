@@ -1,4 +1,4 @@
-package models
+package domain
 
 type TaskBase struct {
 	ID   string `json:"id"`

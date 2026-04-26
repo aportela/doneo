@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/aportela/doneo/internal/models"
+	"github.com/aportela/doneo/internal/domain"
 )
 
 type TaskResponse struct {
@@ -17,7 +17,7 @@ type TasksResponse struct {
 	Tasks   []TaskResponse `json:"tasks"`
 }
 
-func toTaskResponse(task models.Task) TaskResponse {
+func toTaskResponse(task domain.Task) TaskResponse {
 	return TaskResponse{
 		ID:      task.ID,
 		Summary: task.Summary,
@@ -29,8 +29,8 @@ func SearchTasksHandler(w http.ResponseWriter, r *http.Request) {
 	resp := TasksResponse{
 		Success: true,
 		Tasks: []TaskResponse{
-			toTaskResponse(models.Task{ID: "1", Summary: "Task 1"}),
-			toTaskResponse(models.Task{ID: "2", Summary: "Task 2"}),
+			toTaskResponse(domain.Task{ID: "1", Summary: "Task 1"}),
+			toTaskResponse(domain.Task{ID: "2", Summary: "Task 2"}),
 		},
 	}
 

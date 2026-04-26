@@ -3,25 +3,32 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 
 	"github.com/aportela/doneo/internal/database"
-	"github.com/aportela/doneo/internal/errors"
-	"github.com/aportela/doneo/internal/models"
+	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserRepository struct {
+type UserRepository interface {
+	Add(ctx context.Context, user domain.User) error
+	Update(ctx context.Context, user domain.User) error
+	Delete(ctx context.Context, id string) error
+	Get(ctx context.Context, id string) (domain.User, error)
+	Search(ctx context.Context) ([]domain.User, error)
+}
+
+type userRepository struct {
 	database database.Database
 }
 
-func NewUserRepository(database database.Database) *UserRepository {
-	return &UserRepository{
-		database: database,
-	}
+func NewUserRepository(database database.Database) UserRepository {
+	return &userRepository{database: database}
 }
 
-func (userRepository *UserRepository) Add(ctx context.Context, user models.User) error {
+func (userRepository *userRepository) Add(ctx context.Context, user domain.User) error {
 
 	hashedPasswordBytes, hashErr := bcrypt.GenerateFromPassword([]byte(*user.Password), bcrypt.DefaultCost)
 	if hashErr != nil {
@@ -47,50 +54,26 @@ func (userRepository *UserRepository) Add(ctx context.Context, user models.User)
 	return err
 }
 
-func (userRepository *UserRepository) Update(ctx context.Context, user models.User) error {
+func (userRepository *userRepository) Update(ctx context.Context, user domain.User) error {
 
+	var query string
+	var args []interface{}
 	if user.Password != nil {
 		hashedPasswordBytes, hashErr := bcrypt.GenerateFromPassword([]byte(*user.Password), bcrypt.DefaultCost)
 		if hashErr != nil {
 			return hashErr
 		}
-		_, err := userRepository.database.ExecContext(
-			ctx,
-			`
-            UPDATE users SET
-				email = ?,
-				name = ?,
-				password_hash = ?,
-				updated_at = ?
-			WHERE id = ?
-        `,
-			user.Email,
-			user.Name,
-			string(hashedPasswordBytes),
-			user.UpdatedAt,
-			user.ID,
-		)
-		return err
+		query = `UPDATE users SET email = ?, name = ?, password_hash = ?, updated_at = ? WHERE id = ?`
+		args = append(args, user.Email, user.Name, string(hashedPasswordBytes), user.UpdatedAt, user.ID)
 	} else {
-		_, err := userRepository.database.ExecContext(
-			ctx,
-			`
-            UPDATE users SET
-				email = ?,
-				name = ?,
-				updated_at = ?
-			WHERE id = ?
-        `,
-			user.Email,
-			user.Name,
-			user.UpdatedAt,
-			user.ID,
-		)
-		return err
+		query = `UPDATE users SET email = ?, name = ?, updated_at = ? WHERE id = ?`
+		args = append(args, user.Email, user.Name, user.UpdatedAt, user.ID)
 	}
+	_, err := userRepository.database.ExecContext(ctx, query, args...)
+	return err
 }
 
-func (userRepository *UserRepository) Delete(ctx context.Context, id string) error {
+func (userRepository *userRepository) Delete(ctx context.Context, id string) error {
 	_, err := userRepository.database.ExecContext(
 		ctx,
 		`
@@ -102,8 +85,8 @@ func (userRepository *UserRepository) Delete(ctx context.Context, id string) err
 	return err
 }
 
-func (userRepository *UserRepository) Get(ctx context.Context, id string) (models.User, error) {
-	var user models.User
+func (userRepository *userRepository) Get(ctx context.Context, id string) (domain.User, error) {
+	var user domain.User
 	var updatedAt sql.NullInt64
 	var isSuperUser sql.NullByte
 	err := userRepository.database.QueryRowContext(
@@ -115,13 +98,19 @@ func (userRepository *UserRepository) Get(ctx context.Context, id string) (model
             WHERE U.id = ?
         `,
 		id).Scan(&user.ID, &user.Email, &user.Name, &user.CreatedAt, &updatedAt, &isSuperUser)
+	if errors.Is(err, sql.ErrNoRows) {
+		return user, domain.ErrNotFound
+	}
+	if err != nil {
+		return user, err
+	}
 	user.UpdatedAt = utils.Int64Ptr(updatedAt)
 	user.IsSuperUser = isSuperUser.Valid && isSuperUser.Byte == 1
 	user.AvatarURL = "https://i.pravatar.cc/48?id=" + user.ID
 	return user, err
 }
 
-func (userRepository *UserRepository) Search(ctx context.Context) ([]models.User, error) {
+func (userRepository *userRepository) Search(ctx context.Context) ([]domain.User, error) {
 	rows, err := userRepository.database.QueryContext(
 		ctx,
 		`
@@ -131,16 +120,16 @@ func (userRepository *UserRepository) Search(ctx context.Context) ([]models.User
         `,
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Database error: %w", err)
 	}
 	defer rows.Close()
-	var users []models.User
+	var users []domain.User
 	for rows.Next() {
-		var user models.User
+		var user domain.User
 		var updatedAt sql.NullInt64
 		var isSuperUser sql.NullByte
 		if err := rows.Scan(&user.ID, &user.Email, &user.Name, &user.CreatedAt, &updatedAt, &isSuperUser); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
 
 		user.UpdatedAt = utils.Int64Ptr(updatedAt)
@@ -148,43 +137,9 @@ func (userRepository *UserRepository) Search(ctx context.Context) ([]models.User
 		user.AvatarURL = "https://i.pravatar.cc/48?id=" + user.ID
 		users = append(users, user)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows iteration error: %w", err)
+	}
 
 	return users, nil
-}
-
-func (userRepository *UserRepository) SignIn(ctx context.Context, email string, password string) (*models.User, error) {
-	var user models.User
-	var hashedPassword string
-	var updatedAt sql.NullInt64
-	var isSuperUser sql.NullByte
-	err := userRepository.database.QueryRowContext(
-		ctx,
-		`
-            SELECT
-                U.id, U.email, U.password_hash, U.name, U.created_at, U.updated_at, U.is_super_user
-            FROM users U
-            WHERE U.email = ?
-        `,
-		email).Scan(&user.ID, &user.Email, &hashedPassword, &user.Name, &user.CreatedAt, &updatedAt, &isSuperUser)
-
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, errors.EntityNotFound
-		} else {
-			return nil, err
-		}
-	}
-	err = bcrypt.CompareHashAndPassword(
-		[]byte(hashedPassword),
-		[]byte(password),
-	)
-
-	if err != nil {
-		return nil, err
-	} else {
-		user.UpdatedAt = utils.Int64Ptr(updatedAt)
-		user.IsSuperUser = isSuperUser.Valid && isSuperUser.Byte == 1
-		user.AvatarURL = "https://i.pravatar.cc/48?id=" + user.ID
-		return &user, err
-	}
 }

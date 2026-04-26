@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 
-	"github.com/aportela/doneo/internal/models"
+	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories"
 )
 
@@ -17,11 +17,11 @@ func NewProjectService(repository *repositories.ProjectRepository) *ProjectServi
 	}
 }
 
-func (s *ProjectService) AddProject(ctx context.Context, project models.Project) error {
+func (s *ProjectService) AddProject(ctx context.Context, project domain.Project) error {
 	return s.repository.Add(ctx, project)
 }
 
-func (s *ProjectService) UpdateProject(ctx context.Context, project models.Project) error {
+func (s *ProjectService) UpdateProject(ctx context.Context, project domain.Project) error {
 	return s.repository.Update(ctx, project)
 }
 
@@ -29,10 +29,10 @@ func (s *ProjectService) DeleteProject(ctx context.Context, id string) error {
 	return s.repository.Delete(ctx, id)
 }
 
-func (s *ProjectService) GetProject(ctx context.Context, id string) (*models.Project, error) {
+func (s *ProjectService) GetProject(ctx context.Context, id string) (*domain.Project, error) {
 	return s.repository.Get(ctx, id)
 }
 
-func (s *ProjectService) SearchProjects(ctx context.Context) ([]models.Project, error) {
+func (s *ProjectService) SearchProjects(ctx context.Context) ([]domain.Project, error) {
 	return s.repository.Search(ctx)
 }

@@ -2,37 +2,63 @@ package services
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/aportela/doneo/internal/models"
+	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories"
 )
 
-type UserService struct {
-	repository *repositories.UserRepository
+type UserService interface {
+	AddUser(ctx context.Context, user domain.User) error
+	UpdateUser(ctx context.Context, user domain.User) error
+	DeleteUser(ctx context.Context, id string) error
+	GetUser(ctx context.Context, id string) (domain.User, error)
+	SearchUsers(ctx context.Context) ([]domain.User, error)
 }
 
-func NewUserService(repository *repositories.UserRepository) *UserService {
-	return &UserService{
+type userService struct {
+	repository repositories.UserRepository
+}
+
+func NewUserService(repository repositories.UserRepository) UserService {
+	return &userService{
 		repository: repository,
 	}
 }
 
-func (s *UserService) AddUser(ctx context.Context, user models.User) error {
-	return s.repository.Add(ctx, user)
+func (s *userService) AddUser(ctx context.Context, user domain.User) error {
+	if err := s.repository.Add(ctx, user); err != nil {
+		return fmt.Errorf("[UserService] failed to add user with ID %s: %w", user.ID, err)
+	}
+	return nil
 }
 
-func (s *UserService) UpdateUser(ctx context.Context, user models.User) error {
-	return s.repository.Update(ctx, user)
+func (s *userService) UpdateUser(ctx context.Context, user domain.User) error {
+	if err := s.repository.Update(ctx, user); err != nil {
+		return fmt.Errorf("[UserService] failed to update user with ID %s: %w", user.ID, err)
+	}
+	return nil
 }
 
-func (s *UserService) DeleteUser(ctx context.Context, id string) error {
-	return s.repository.Delete(ctx, id)
+func (s *userService) DeleteUser(ctx context.Context, id string) error {
+	if err := s.repository.Delete(ctx, id); err != nil {
+		return fmt.Errorf("[UserService] failed to delete user with ID %s: %w", id, err)
+	}
+	return nil
 }
 
-func (s *UserService) GetUser(ctx context.Context, id string) (models.User, error) {
-	return s.repository.Get(ctx, id)
+func (s *userService) GetUser(ctx context.Context, id string) (domain.User, error) {
+	user, err := s.repository.Get(ctx, id)
+	if err != nil {
+		return user, fmt.Errorf("[UserService] failed to get user with ID %s: %w", id, err)
+	}
+	return user, nil
 }
 
-func (s *UserService) SearchUsers(ctx context.Context) ([]models.User, error) {
-	return s.repository.Search(ctx)
+func (s *userService) SearchUsers(ctx context.Context) ([]domain.User, error) {
+	users, err := s.repository.Search(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("[UserService] failed to search users: %w", err)
+	}
+	return users, nil
 }

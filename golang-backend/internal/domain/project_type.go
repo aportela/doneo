@@ -1,4 +1,4 @@
-package models
+package domain
 
 type ProjectType struct {
 	ID   string `json:"id"`

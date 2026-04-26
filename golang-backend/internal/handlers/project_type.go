@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 
-	"github.com/aportela/doneo/internal/models"
+	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/services"
 	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
@@ -21,7 +21,7 @@ func NewProjectTypeHandler(service *services.ProjectTypeService) *ProjectTypeHan
 func (h *ProjectTypeHandler) AddProjectType(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	w.Header().Set("Content-Type", "application/json")
-	projectType := models.ProjectType{}
+	projectType := domain.ProjectType{}
 	err := h.service.AddProjectType(ctx, projectType)
 	if err != nil {
 		utils.ToJSONResponse(w, http.StatusInternalServerError, map[string]string{
@@ -35,7 +35,7 @@ func (h *ProjectTypeHandler) AddProjectType(w http.ResponseWriter, r *http.Reque
 func (h *ProjectTypeHandler) UpdateProjectType(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	w.Header().Set("Content-Type", "application/json")
-	projectType := models.ProjectType{}
+	projectType := domain.ProjectType{}
 	err := h.service.UpdateProjectType(ctx, projectType)
 	if err != nil {
 		if err == sql.ErrNoRows {

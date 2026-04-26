@@ -5,7 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/aportela/doneo/internal/database"
-	"github.com/aportela/doneo/internal/models"
+	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/utils"
 )
 
@@ -32,7 +32,7 @@ func (projectRepository *ProjectRepository) AddParticipant(ctx context.Context, 
 	return err
 }
 
-func (projectRepository *ProjectRepository) add(ctx context.Context, project models.Project) error {
+func (projectRepository *ProjectRepository) add(ctx context.Context, project domain.Project) error {
 	_, err := projectRepository.database.ExecContext(
 		ctx,
 		`
@@ -54,7 +54,7 @@ func (projectRepository *ProjectRepository) add(ctx context.Context, project mod
 	return err
 }
 
-func (projectRepository *ProjectRepository) Add(ctx context.Context, project models.Project) error {
+func (projectRepository *ProjectRepository) Add(ctx context.Context, project domain.Project) error {
 	// TODO: transaction
 	err := projectRepository.add(ctx, project)
 	if err != nil {
@@ -69,7 +69,7 @@ func (projectRepository *ProjectRepository) Add(ctx context.Context, project mod
 	return nil
 }
 
-func (projectRepository *ProjectRepository) Update(ctx context.Context, project models.Project) error {
+func (projectRepository *ProjectRepository) Update(ctx context.Context, project domain.Project) error {
 	_, err := projectRepository.database.ExecContext(
 		ctx,
 		`
@@ -109,7 +109,7 @@ func (projectRepository *ProjectRepository) Delete(ctx context.Context, id strin
 	return err
 }
 
-func (projectRepository *ProjectRepository) getParticipants(ctx context.Context, projectId string) ([]models.UserBase, error) {
+func (projectRepository *ProjectRepository) getParticipants(ctx context.Context, projectId string) ([]domain.UserBase, error) {
 	rows, err := projectRepository.database.QueryContext(
 		ctx,
 		`
@@ -128,10 +128,10 @@ func (projectRepository *ProjectRepository) getParticipants(ctx context.Context,
 	}
 	defer rows.Close()
 
-	var participants []models.UserBase
+	var participants []domain.UserBase
 
 	for rows.Next() {
-		var user models.UserBase
+		var user domain.UserBase
 
 		if err := rows.Scan(
 			&user.ID, &user.Name,
@@ -145,8 +145,8 @@ func (projectRepository *ProjectRepository) getParticipants(ctx context.Context,
 	return participants, nil
 }
 
-func (projectRepository *ProjectRepository) get(ctx context.Context, id string) (*models.Project, error) {
-	var project models.Project
+func (projectRepository *ProjectRepository) get(ctx context.Context, id string) (*domain.Project, error) {
+	var project domain.Project
 	var mtime, stime, ftime, dtime sql.NullInt64
 	var description sql.NullString
 	var creatorID, creatorName string
@@ -161,7 +161,7 @@ func (projectRepository *ProjectRepository) get(ctx context.Context, id string) 
             WHERE P.id = ?
         `,
 		id).Scan(&project.ID, &project.Key, &project.Summary, &description, &project.CreatedAt, &mtime, &stime, &ftime, &dtime, &project.Type.ID, &project.Type.Name, &creatorID, &creatorName)
-	project.CreatedBy = models.UserBase{ID: creatorID, Name: creatorName}
+	project.CreatedBy = domain.UserBase{ID: creatorID, Name: creatorName}
 	project.Description = utils.StrPtr(description)
 	project.LastModifiedAt = utils.Int64Ptr(mtime)
 	project.StartedAt = utils.Int64Ptr(stime)
@@ -171,12 +171,12 @@ func (projectRepository *ProjectRepository) get(ctx context.Context, id string) 
 	return &project, err
 }
 
-func (projectRepository *ProjectRepository) Get(ctx context.Context, id string) (*models.Project, error) {
+func (projectRepository *ProjectRepository) Get(ctx context.Context, id string) (*domain.Project, error) {
 	project, err := projectRepository.get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	var participants []models.UserBase
+	var participants []domain.UserBase
 	participants, err = projectRepository.getParticipants(ctx, project.ID)
 	if err != nil {
 		return nil, err
@@ -185,7 +185,7 @@ func (projectRepository *ProjectRepository) Get(ctx context.Context, id string) 
 	return project, nil
 }
 
-func (projectRepository *ProjectRepository) Search(ctx context.Context) ([]models.Project, error) {
+func (projectRepository *ProjectRepository) Search(ctx context.Context) ([]domain.Project, error) {
 	rows, err := projectRepository.database.QueryContext(
 		ctx,
 		`
@@ -202,10 +202,10 @@ func (projectRepository *ProjectRepository) Search(ctx context.Context) ([]model
 	}
 	defer rows.Close()
 
-	var projects []models.Project
+	var projects []domain.Project
 
 	for rows.Next() {
-		var project models.Project
+		var project domain.Project
 		var mtime, stime, ftime, dtime sql.NullInt64
 		var description sql.NullString
 		var creatorID, creatorName string
@@ -218,7 +218,7 @@ func (projectRepository *ProjectRepository) Search(ctx context.Context) ([]model
 			return nil, err
 		}
 
-		project.CreatedBy = models.UserBase{ID: creatorID, Name: creatorName}
+		project.CreatedBy = domain.UserBase{ID: creatorID, Name: creatorName}
 		project.Description = utils.StrPtr(description)
 		project.LastModifiedAt = utils.Int64Ptr(mtime)
 		project.StartedAt = utils.Int64Ptr(stime)

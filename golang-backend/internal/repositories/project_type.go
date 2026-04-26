@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/aportela/doneo/internal/database"
-	"github.com/aportela/doneo/internal/models"
+	"github.com/aportela/doneo/internal/domain"
 )
 
 type ProjectTypeRepository struct {
@@ -17,7 +17,7 @@ func NewProjectTypeRepository(database database.Database) *ProjectTypeRepository
 	}
 }
 
-func (projectTypeRepository *ProjectTypeRepository) Add(ctx context.Context, projectType models.ProjectType) error {
+func (projectTypeRepository *ProjectTypeRepository) Add(ctx context.Context, projectType domain.ProjectType) error {
 	_, err := projectTypeRepository.database.ExecContext(
 		ctx,
 		`
@@ -29,7 +29,7 @@ func (projectTypeRepository *ProjectTypeRepository) Add(ctx context.Context, pro
 	return err
 }
 
-func (projectTypeRepository *ProjectTypeRepository) Update(ctx context.Context, projectType models.ProjectType) error {
+func (projectTypeRepository *ProjectTypeRepository) Update(ctx context.Context, projectType domain.ProjectType) error {
 	_, err := projectTypeRepository.database.ExecContext(
 		ctx,
 		`
@@ -53,7 +53,7 @@ func (projectTypeRepository *ProjectTypeRepository) Delete(ctx context.Context, 
 	return err
 }
 
-func (ProjectTypeRepository *ProjectTypeRepository) Search(ctx context.Context) ([]models.ProjectType, error) {
+func (ProjectTypeRepository *ProjectTypeRepository) Search(ctx context.Context) ([]domain.ProjectType, error) {
 	rows, err := ProjectTypeRepository.database.QueryContext(
 		ctx,
 		`
@@ -69,10 +69,10 @@ func (ProjectTypeRepository *ProjectTypeRepository) Search(ctx context.Context) 
 	}
 	defer rows.Close()
 
-	var projectTypes []models.ProjectType
+	var projectTypes []domain.ProjectType
 
 	for rows.Next() {
-		var projectType models.ProjectType
+		var projectType domain.ProjectType
 
 		if err := rows.Scan(
 			&projectType.ID, &projectType.Name,

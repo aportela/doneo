@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 
 	"github.com/aportela/doneo/internal/database"
-	"github.com/aportela/doneo/internal/handlers"
+	handlers "github.com/aportela/doneo/internal/handlers/user"
 	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories"
 	"github.com/aportela/doneo/internal/services"
@@ -38,30 +38,33 @@ func NewRouter(db database.Database) http.Handler {
 		})
 	})
 
-	apiRouter.Route("/projects", func(r chi.Router) {
-		projectRepository := repositories.NewProjectRepository(db)
-		projectService := services.NewProjectService(projectRepository)
-		projectHandler := handlers.NewProjectHandler(projectService)
-		r.Post("/", projectHandler.AddProject)
-		r.Get("/", projectHandler.SearchProjects)
-		r.Route("/{id}", func(r chi.Router) {
-			r.Get("/", projectHandler.GetProject)
-			r.Put("/", projectHandler.UpdateProject)
-			r.Delete("/", projectHandler.DeleteProject)
+	/*
+		apiRouter.Route("/projects", func(r chi.Router) {
+			projectRepository := repositories.NewProjectRepository(db)
+			projectService := services.NewProjectService(projectRepository)
+			projectHandler := handlers.NewProjectHandler(projectService)
+			r.Post("/", projectHandler.AddProject)
+			r.Get("/", projectHandler.SearchProjects)
+			r.Route("/{id}", func(r chi.Router) {
+				r.Get("/", projectHandler.GetProject)
+				r.Put("/", projectHandler.UpdateProject)
+				r.Delete("/", projectHandler.DeleteProject)
+			})
 		})
-	})
 
-	apiRouter.Route("/project_types", func(r chi.Router) {
-		projectTypeRepository := repositories.NewProjectTypeRepository(db)
-		projectTypeService := services.NewProjectTypeService(projectTypeRepository)
-		projectTypeHandler := handlers.NewProjectTypeHandler(projectTypeService)
-		r.Post("/", projectTypeHandler.AddProjectType)
-		r.Get("/", projectTypeHandler.SearchProjectTypes)
-		r.Route("/{id}", func(r chi.Router) {
-			r.Put("/", projectTypeHandler.UpdateProjectType)
-			r.Delete("/", projectTypeHandler.DeleteProjectType)
+		apiRouter.Route("/project_types", func(r chi.Router) {
+			projectTypeRepository := repositories.NewProjectTypeRepository(db)
+			projectTypeService := services.NewProjectTypeService(projectTypeRepository)
+			projectTypeHandler := handlers.NewProjectTypeHandler(projectTypeService)
+			r.Post("/", projectTypeHandler.AddProjectType)
+			r.Get("/", projectTypeHandler.SearchProjectTypes)
+			r.Route("/{id}", func(r chi.Router) {
+				r.Put("/", projectTypeHandler.UpdateProjectType)
+				r.Delete("/", projectTypeHandler.DeleteProjectType)
+			})
 		})
-	})
+
+	*/
 
 	baseRouter.Mount("/api", apiRouter)
 

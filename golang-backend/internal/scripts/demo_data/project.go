@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/aportela/doneo/internal/database"
-	"github.com/aportela/doneo/internal/models"
+	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories"
 	"github.com/aportela/doneo/internal/services"
 	"github.com/aportela/doneo/internal/utils"
@@ -105,7 +105,7 @@ func getRandomProjectKey() string {
 	return string(result)
 }
 
-func getRandomProject(userIds []string, projectTypeIds []string) models.Project {
+func getRandomProject(userIds []string, projectTypeIds []string) domain.Project {
 	projectID := func() string { u, _ := uuid.NewV7(); return u.String() }()
 	projectDescription := getRandomProjectDescription()
 	startOffset := rand.Int63n(48)
@@ -119,22 +119,22 @@ func getRandomProject(userIds []string, projectTypeIds []string) models.Project 
 		userIds[i], userIds[j] = userIds[j], userIds[i]
 	})
 	numParticipants := rand.Intn(3) + 1
-	var participants []models.UserBase
+	var participants []domain.UserBase
 	for i := 0; i < numParticipants; i++ {
-		participants = append(participants, models.UserBase{ID: userIds[i]})
+		participants = append(participants, domain.UserBase{ID: userIds[i]})
 	}
-	return models.Project{
+	return domain.Project{
 		ID:             projectID,
 		Key:            getRandomProjectKey(),
 		Summary:        getRandomProjectSummary(),
 		Description:    &projectDescription,
-		CreatedBy:      models.UserBase{ID: userIds[rand.Intn(len(userIds))]},
+		CreatedBy:      domain.UserBase{ID: userIds[rand.Intn(len(userIds))]},
 		CreatedAt:      ctime,
 		LastModifiedAt: &ftime,
 		StartedAt:      &stime,
 		FinishedAt:     &ftime,
 		DueAt:          &dtime,
-		Type:           models.ProjectType{ID: projectTypeIds[rand.Intn(len(projectTypeIds))]},
+		Type:           domain.ProjectType{ID: projectTypeIds[rand.Intn(len(projectTypeIds))]},
 		Participants:   participants,
 	}
 }
