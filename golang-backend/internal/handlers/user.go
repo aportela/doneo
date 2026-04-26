@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"net/http"
 
-	"github.com/aportela/gotask/internal/models"
-	"github.com/aportela/gotask/internal/services"
-	"github.com/aportela/gotask/internal/utils"
+	"github.com/aportela/doneo/internal/models"
+	"github.com/aportela/doneo/internal/services"
+	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
 )
 

@@ -3,8 +3,8 @@ package services
 import (
 	"context"
 
-	"github.com/aportela/gotask/internal/models"
-	"github.com/aportela/gotask/internal/repositories"
+	"github.com/aportela/doneo/internal/models"
+	"github.com/aportela/doneo/internal/repositories"
 )
 
 type UserService struct {

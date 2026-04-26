@@ -6,11 +6,11 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/aportela/gotask/internal/database"
-	"github.com/aportela/gotask/internal/models"
-	"github.com/aportela/gotask/internal/repositories"
-	"github.com/aportela/gotask/internal/services"
-	"github.com/aportela/gotask/internal/utils"
+	"github.com/aportela/doneo/internal/database"
+	"github.com/aportela/doneo/internal/models"
+	"github.com/aportela/doneo/internal/repositories"
+	"github.com/aportela/doneo/internal/services"
+	"github.com/aportela/doneo/internal/utils"
 	"github.com/gofrs/uuid"
 )
 

@@ -8,11 +8,11 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	"github.com/aportela/gotask/internal/database"
-	"github.com/aportela/gotask/internal/handlers"
-	"github.com/aportela/gotask/internal/repositories"
-	"github.com/aportela/gotask/internal/services"
-	"github.com/aportela/gotask/internal/ui"
+	"github.com/aportela/doneo/internal/database"
+	"github.com/aportela/doneo/internal/handlers"
+	"github.com/aportela/doneo/internal/repositories"
+	"github.com/aportela/doneo/internal/services"
+	"github.com/aportela/doneo/internal/ui"
 )
 
 func NewRouter(db database.Database) http.Handler {

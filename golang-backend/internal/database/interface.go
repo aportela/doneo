@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/aportela/gotask/internal/configuration"
+	"github.com/aportela/doneo/internal/configuration"
 )
 
 type Database interface {

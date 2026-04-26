@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/aportela/gotask/internal/data"
+	"github.com/aportela/doneo/internal/data"
 	"github.com/spf13/viper"
 )
 
@@ -14,7 +14,7 @@ const configurationFilename = "configuration.yaml"
 
 // configuration default values
 const databaseType = "sqlite"
-const sqliteDatabaseFilename = "gotask.sqlite3"
+const sqliteDatabaseFilename = "doneo.sqlite3"
 const httpServerPort = 8086
 
 func initViper() {

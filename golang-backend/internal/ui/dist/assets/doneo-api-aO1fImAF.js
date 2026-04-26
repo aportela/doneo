@@ -1,0 +1,1 @@
+import{t as e}from"./doneo-vendor-BZYy2M4o.js";var t=e.create({baseURL:`api`}),n={user:{search:()=>t.get(`/users`)},project:{search:()=>t.get(`/projects`)}};export{n as t};

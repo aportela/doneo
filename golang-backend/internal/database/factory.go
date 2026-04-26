@@ -3,8 +3,8 @@ package database
 import (
 	"errors"
 
-	"github.com/aportela/gotask/internal/configuration"
-	sqliteWrapper "github.com/aportela/gotask/internal/database/sqlite"
+	"github.com/aportela/doneo/internal/configuration"
+	sqliteWrapper "github.com/aportela/doneo/internal/database/sqlite"
 )
 
 func Open(cfg configuration.DatabaseConfiguration) (Database, error) {

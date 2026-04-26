@@ -37,7 +37,7 @@ export default defineConfig({
         },
         // golang embed FS ignore files starting with _
         // (i have at least _plugin-vue-export-helper-hashjs)
-        chunkFileNames: "assets/gotask-[name]-[hash].js",
+        chunkFileNames: "assets/doneo-[name]-[hash].js",
       },
     },
   },

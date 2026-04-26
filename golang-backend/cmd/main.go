@@ -8,17 +8,17 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/aportela/gotask/internal/cli"
-	"github.com/aportela/gotask/internal/configuration"
-	"github.com/aportela/gotask/internal/data"
-	"github.com/aportela/gotask/internal/database"
-	"github.com/aportela/gotask/internal/router"
-	"github.com/aportela/gotask/internal/scripts"
-	demodatascripts "github.com/aportela/gotask/internal/scripts/demo_data"
+	"github.com/aportela/doneo/internal/cli"
+	"github.com/aportela/doneo/internal/configuration"
+	"github.com/aportela/doneo/internal/data"
+	"github.com/aportela/doneo/internal/database"
+	"github.com/aportela/doneo/internal/router"
+	"github.com/aportela/doneo/internal/scripts"
+	demodatascripts "github.com/aportela/doneo/internal/scripts/demo_data"
 )
 
 func main() {
-	log.Println("starting GOTask v0.1alpha...")
+	log.Println("starting Doneo v0.1alpha...")
 
 	err := data.CreateDataPathIfRequired()
 	if err != nil {

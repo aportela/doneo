@@ -1,7 +1,7 @@
 package demodatascripts
 
 import (
-	"github.com/aportela/gotask/internal/database"
+	"github.com/aportela/doneo/internal/database"
 )
 
 func CreateDemoData(database database.Database) {

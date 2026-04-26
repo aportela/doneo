@@ -1,0 +1,1 @@
+import{j as e,k as t,x as n}from"./doneo-vendor-BZYy2M4o.js";import{t as r}from"./doneo-_plugin-vue_export-helper-uDSMePtF.js";var i={};function a(r,i){let a=e(`router-view`);return t(),n(a)}var o=r(i,[[`render`,a]]);export{o as default};

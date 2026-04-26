@@ -41,13 +41,13 @@
             <!-- BEGIN NAVBAR LOGO -->
             <div class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
                 <IconDatabaseStar />
-                GoTask
+                Doneo
             </div>
             <!-- END NAVBAR LOGO -->
             <div class="navbar-nav flex-row order-md-last">
                 <div class="nav-item d-none d-md-flex ">
                     <div class="btn-list">
-                        <a href="https://github.com/aportela/gotask" class="nav-link px-0" target="_blank"
+                        <a href="https://github.com/aportela/doneo" class="nav-link px-0" target="_blank"
                             rel="noreferrer">
                             <IconBrandGithub />
                         </a>

@@ -3,8 +3,8 @@ package repositories
 import (
 	"context"
 
-	"github.com/aportela/gotask/internal/database"
-	"github.com/aportela/gotask/internal/models"
+	"github.com/aportela/doneo/internal/database"
+	"github.com/aportela/doneo/internal/models"
 )
 
 type ProjectTypeRepository struct {

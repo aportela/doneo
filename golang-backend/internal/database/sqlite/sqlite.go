@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/aportela/gotask/internal/configuration"
+	"github.com/aportela/doneo/internal/configuration"
 
 	_ "modernc.org/sqlite"
 )

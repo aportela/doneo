@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/aportela/gotask/internal/models"
+	"github.com/aportela/doneo/internal/models"
 )
 
 type TaskResponse struct {

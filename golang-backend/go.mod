@@ -1,4 +1,4 @@
-module github.com/aportela/gotask
+module github.com/aportela/doneo
 
 go 1.26.2
 
