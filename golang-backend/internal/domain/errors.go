@@ -6,8 +6,9 @@ import (
 )
 
 var (
-	ErrNotFound         = fmt.Errorf("entity not found")
-	ErrSQLDatabaseError = errors.New("SQL database error: ")
+	ErrInvalidCredentials = fmt.Errorf("invalid credentials")
+	ErrNotFound           = fmt.Errorf("entity not found")
+	ErrSQLDatabaseError   = errors.New("SQL database error: ")
 )
 
 func WrapSQLError(err error) error {

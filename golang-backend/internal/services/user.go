@@ -6,6 +6,8 @@ import (
 
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories"
+	"github.com/aportela/doneo/internal/utils"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService interface {
@@ -27,6 +29,13 @@ func NewUserService(repository repositories.UserRepository) UserService {
 }
 
 func (s *userService) AddUser(ctx context.Context, user domain.User) error {
+	hashedPasswordBytes, hashErr := bcrypt.GenerateFromPassword([]byte(*user.Password), bcrypt.DefaultCost)
+	if hashErr != nil {
+		return hashErr
+	}
+	hashedPassword := string(hashedPasswordBytes)
+	user.PasswordHash = &hashedPassword
+	user.CreatedAt = utils.CurrentMSTimestamp()
 	if err := s.repository.Add(ctx, user); err != nil {
 		return fmt.Errorf("[UserService] failed to add user with ID %s: %w", user.ID, err)
 	}
@@ -34,6 +43,15 @@ func (s *userService) AddUser(ctx context.Context, user domain.User) error {
 }
 
 func (s *userService) UpdateUser(ctx context.Context, user domain.User) error {
+	if user.Password != nil {
+		hashedPasswordBytes, hashErr := bcrypt.GenerateFromPassword([]byte(*user.Password), bcrypt.DefaultCost)
+		if hashErr != nil {
+			return hashErr
+		}
+		hashedPassword := string(hashedPasswordBytes)
+		user.PasswordHash = &hashedPassword
+	}
+	user.UpdatedAt = utils.CurrentMSTimestampPtr()
 	if err := s.repository.Update(ctx, user); err != nil {
 		return fmt.Errorf("[UserService] failed to update user with ID %s: %w", user.ID, err)
 	}
@@ -48,7 +66,7 @@ func (s *userService) DeleteUser(ctx context.Context, id string) error {
 }
 
 func (s *userService) GetUser(ctx context.Context, id string) (domain.User, error) {
-	user, err := s.repository.Get(ctx, id)
+	user, err := s.repository.GetById(ctx, id)
 	if err != nil {
 		return user, fmt.Errorf("[UserService] failed to get user with ID %s: %w", id, err)
 	}

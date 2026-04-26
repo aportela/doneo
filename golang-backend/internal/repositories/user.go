@@ -4,19 +4,18 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/utils"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type UserRepository interface {
 	Add(ctx context.Context, user domain.User) error
 	Update(ctx context.Context, user domain.User) error
 	Delete(ctx context.Context, id string) error
-	Get(ctx context.Context, id string) (domain.User, error)
+	GetById(ctx context.Context, id string) (domain.User, error)
+	GetByEmailForVerifyCredentials(ctx context.Context, email string, password string) (domain.User, error)
 	Search(ctx context.Context) ([]domain.User, error)
 }
 
@@ -28,12 +27,12 @@ func NewUserRepository(database database.Database) UserRepository {
 	return &userRepository{database: database}
 }
 
+func getAvatar(userId string) string {
+	return "https://i.pravatar.cc/48?id=" + userId
+}
+
 func (userRepository *userRepository) Add(ctx context.Context, user domain.User) error {
 
-	hashedPasswordBytes, hashErr := bcrypt.GenerateFromPassword([]byte(*user.Password), bcrypt.DefaultCost)
-	if hashErr != nil {
-		return hashErr
-	}
 	adminFlag := 0
 	if user.IsSuperUser {
 		adminFlag = 1
@@ -47,7 +46,7 @@ func (userRepository *userRepository) Add(ctx context.Context, user domain.User)
 		user.ID,
 		user.Email,
 		user.Name,
-		string(hashedPasswordBytes),
+		user.PasswordHash,
 		user.CreatedAt,
 		adminFlag,
 	)
@@ -58,13 +57,9 @@ func (userRepository *userRepository) Update(ctx context.Context, user domain.Us
 
 	var query string
 	var args []interface{}
-	if user.Password != nil {
-		hashedPasswordBytes, hashErr := bcrypt.GenerateFromPassword([]byte(*user.Password), bcrypt.DefaultCost)
-		if hashErr != nil {
-			return hashErr
-		}
+	if user.PasswordHash != nil {
 		query = `UPDATE users SET email = ?, name = ?, password_hash = ?, updated_at = ? WHERE id = ?`
-		args = append(args, user.Email, user.Name, string(hashedPasswordBytes), user.UpdatedAt, user.ID)
+		args = append(args, user.Email, user.Name, user.PasswordHash, user.UpdatedAt, user.ID)
 	} else {
 		query = `UPDATE users SET email = ?, name = ?, updated_at = ? WHERE id = ?`
 		args = append(args, user.Email, user.Name, user.UpdatedAt, user.ID)
@@ -85,7 +80,7 @@ func (userRepository *userRepository) Delete(ctx context.Context, id string) err
 	return err
 }
 
-func (userRepository *userRepository) Get(ctx context.Context, id string) (domain.User, error) {
+func (userRepository *userRepository) GetById(ctx context.Context, id string) (domain.User, error) {
 	var user domain.User
 	var updatedAt sql.NullInt64
 	var isSuperUser sql.NullByte
@@ -98,15 +93,42 @@ func (userRepository *userRepository) Get(ctx context.Context, id string) (domai
             WHERE U.id = ?
         `,
 		id).Scan(&user.ID, &user.Email, &user.Name, &user.CreatedAt, &updatedAt, &isSuperUser)
-	if errors.Is(err, sql.ErrNoRows) {
-		return user, domain.ErrNotFound
-	}
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return user, domain.ErrNotFound
+		}
 		return user, err
 	}
-	user.UpdatedAt = utils.Int64Ptr(updatedAt)
+	user.UpdatedAt = utils.SQLInt64Ptr(updatedAt)
 	user.IsSuperUser = isSuperUser.Valid && isSuperUser.Byte == 1
-	user.AvatarURL = "https://i.pravatar.cc/48?id=" + user.ID
+	user.AvatarURL = getAvatar(user.ID)
+	return user, err
+}
+
+func (userRepository *userRepository) GetByEmailForVerifyCredentials(ctx context.Context, email string, password string) (domain.User, error) {
+	var user domain.User
+	var updatedAt sql.NullInt64
+	var isSuperUser sql.NullByte
+	var passwordHash string
+	err := userRepository.database.QueryRowContext(
+		ctx,
+		`
+            SELECT
+                U.id, U.email, U.name, U.password_hash, U.created_at, U.updated_at, U.is_super_user
+            FROM users U
+            WHERE U.email = ?
+        `,
+		email).Scan(&user.ID, &user.Email, &user.Name, &passwordHash, &user.CreatedAt, &updatedAt, &isSuperUser)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return user, domain.ErrNotFound
+		}
+		return user, err
+	}
+	user.PasswordHash = &passwordHash
+	user.UpdatedAt = utils.SQLInt64Ptr(updatedAt)
+	user.IsSuperUser = isSuperUser.Valid && isSuperUser.Byte == 1
+	user.AvatarURL = getAvatar(user.ID)
 	return user, err
 }
 
@@ -120,7 +142,7 @@ func (userRepository *userRepository) Search(ctx context.Context) ([]domain.User
         `,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("Database error: %w", err)
+		return nil, err
 	}
 	defer rows.Close()
 	var users []domain.User
@@ -129,16 +151,16 @@ func (userRepository *userRepository) Search(ctx context.Context) ([]domain.User
 		var updatedAt sql.NullInt64
 		var isSuperUser sql.NullByte
 		if err := rows.Scan(&user.ID, &user.Email, &user.Name, &user.CreatedAt, &updatedAt, &isSuperUser); err != nil {
-			return nil, fmt.Errorf("failed to scan row: %w", err)
+			return nil, err
 		}
 
-		user.UpdatedAt = utils.Int64Ptr(updatedAt)
+		user.UpdatedAt = utils.SQLInt64Ptr(updatedAt)
 		user.IsSuperUser = isSuperUser.Valid && isSuperUser.Byte == 1
-		user.AvatarURL = "https://i.pravatar.cc/48?id=" + user.ID
+		user.AvatarURL = getAvatar(user.ID)
 		users = append(users, user)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("rows iteration error: %w", err)
+		return nil, err
 	}
 
 	return users, nil

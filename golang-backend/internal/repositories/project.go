@@ -162,11 +162,11 @@ func (projectRepository *ProjectRepository) get(ctx context.Context, id string) 
         `,
 		id).Scan(&project.ID, &project.Key, &project.Summary, &description, &project.CreatedAt, &mtime, &stime, &ftime, &dtime, &project.Type.ID, &project.Type.Name, &creatorID, &creatorName)
 	project.CreatedBy = domain.UserBase{ID: creatorID, Name: creatorName}
-	project.Description = utils.StrPtr(description)
-	project.LastModifiedAt = utils.Int64Ptr(mtime)
-	project.StartedAt = utils.Int64Ptr(stime)
-	project.FinishedAt = utils.Int64Ptr(ftime)
-	project.DueAt = utils.Int64Ptr(dtime)
+	project.Description = utils.SQLStrPtr(description)
+	project.LastModifiedAt = utils.SQLInt64Ptr(mtime)
+	project.StartedAt = utils.SQLInt64Ptr(stime)
+	project.FinishedAt = utils.SQLInt64Ptr(ftime)
+	project.DueAt = utils.SQLInt64Ptr(dtime)
 
 	return &project, err
 }
@@ -219,11 +219,11 @@ func (projectRepository *ProjectRepository) Search(ctx context.Context) ([]domai
 		}
 
 		project.CreatedBy = domain.UserBase{ID: creatorID, Name: creatorName}
-		project.Description = utils.StrPtr(description)
-		project.LastModifiedAt = utils.Int64Ptr(mtime)
-		project.StartedAt = utils.Int64Ptr(stime)
-		project.FinishedAt = utils.Int64Ptr(ftime)
-		project.DueAt = utils.Int64Ptr(dtime)
+		project.Description = utils.SQLStrPtr(description)
+		project.LastModifiedAt = utils.SQLInt64Ptr(mtime)
+		project.StartedAt = utils.SQLInt64Ptr(stime)
+		project.FinishedAt = utils.SQLInt64Ptr(ftime)
+		project.DueAt = utils.SQLInt64Ptr(dtime)
 
 		projects = append(projects, project)
 	}

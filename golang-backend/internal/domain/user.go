@@ -7,10 +7,11 @@ type UserBase struct {
 
 type User struct {
 	UserBase
-	Email       string
-	Password    *string
-	CreatedAt   int64
-	UpdatedAt   *int64
-	IsSuperUser bool
-	AvatarURL   string
+	Email        string
+	Password     *string
+	PasswordHash *string
+	CreatedAt    int64
+	UpdatedAt    *int64
+	IsSuperUser  bool
+	AvatarURL    string
 }

@@ -22,8 +22,11 @@ func ToHandlerJSONResponse(w http.ResponseWriter, data any, err error, statusCod
 		case errors.Is(err, domain.ErrNotFound):
 			message = "not found"
 			httpResponseCode = http.StatusNotFound
+		case errors.Is(err, domain.ErrInvalidCredentials):
+			message = "invalid credentials"
+			httpResponseCode = http.StatusUnauthorized
 		default:
-			message = "Uncaught error"
+			message = "uncaught error"
 			httpResponseCode = http.StatusInternalServerError
 		}
 		w.WriteHeader(httpResponseCode)

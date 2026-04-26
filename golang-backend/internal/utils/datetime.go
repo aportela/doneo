@@ -6,7 +6,12 @@ import (
 )
 
 func CurrentMSTimestamp() int64 {
-	return time.Now().UnixNano() / int64(time.Millisecond)
+	return time.Now().UnixMilli()
+}
+
+func CurrentMSTimestampPtr() *int64 {
+	currentTimeMS := time.Now().UnixMilli()
+	return &currentTimeMS
 }
 
 func GetRandomMSTimestamp(start, end time.Time) int64 {
