@@ -1,0 +1,1 @@
+import{j as e,k as t,x as n}from"./gotask-vendor-C4SLapea.js";import{t as r}from"./gotask-_plugin-vue_export-helper-CSCLP7kY.js";var i={};function a(r,i){let a=e(`router-view`);return t(),n(a)}var o=r(i,[[`render`,a]]);export{o as default};

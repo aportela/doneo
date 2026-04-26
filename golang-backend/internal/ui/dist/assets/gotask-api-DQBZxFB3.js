@@ -1,0 +1,1 @@
+import{t as e}from"./gotask-vendor-C4SLapea.js";var t=e.create({baseURL:`api`}),n={user:{search:()=>t.get(`/users`)},project:{search:()=>t.get(`/projects`)}};export{n as t};
