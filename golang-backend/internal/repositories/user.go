@@ -27,13 +27,13 @@ func (userRepository *UserRepository) Add(ctx context.Context, user models.User)
 		return hashErr
 	}
 	adminFlag := 0
-	if user.IsAdministrator {
+	if user.IsSuperUser {
 		adminFlag = 1
 	}
 	_, err := userRepository.database.ExecContext(
 		ctx,
 		`
-            INSERT INTO USER (id, email, name, password_hash, ctime, mtime, flag_is_admin)
+            INSERT INTO users (id, email, name, password_hash, created_at, updated_at, is_super_user)
 			VALUES (?, ?, ?, ?, ?, NULL, ?)
         `,
 		user.ID,
@@ -56,37 +56,35 @@ func (userRepository *UserRepository) Update(ctx context.Context, user models.Us
 		_, err := userRepository.database.ExecContext(
 			ctx,
 			`
-            UPDATE USER SET
+            UPDATE users SET
 				email = ?,
 				name = ?,
 				password_hash = ?,
-				mtime = ?
+				updated_at = ?
 			WHERE id = ?
         `,
 			user.Email,
 			user.Name,
 			string(hashedPasswordBytes),
-			user.CreatedAt,
+			user.UpdatedAt,
 			user.ID,
 		)
-
 		return err
 	} else {
 		_, err := userRepository.database.ExecContext(
 			ctx,
 			`
-            UPDATE USER SET
+            UPDATE users SET
 				email = ?,
 				name = ?,
-				mtime = ?
+				updated_at = ?
 			WHERE id = ?
         `,
 			user.Email,
 			user.Name,
-			user.CreatedAt,
+			user.UpdatedAt,
 			user.ID,
 		)
-
 		return err
 	}
 }
@@ -95,7 +93,7 @@ func (userRepository *UserRepository) Delete(ctx context.Context, id string) err
 	_, err := userRepository.database.ExecContext(
 		ctx,
 		`
-            DELETE FROM USER
+            DELETE FROM users
 			WHERE id = ?
         `,
 		id,
@@ -105,21 +103,20 @@ func (userRepository *UserRepository) Delete(ctx context.Context, id string) err
 
 func (userRepository *UserRepository) Get(ctx context.Context, id string) (models.User, error) {
 	var user models.User
-	var mtime sql.NullInt64
-	var flagIsAdmin sql.NullByte
+	var updatedAt sql.NullInt64
+	var isSuperUser sql.NullByte
 	err := userRepository.database.QueryRowContext(
 		ctx,
 		`
             SELECT
-                U.id, U.email, U.name, U.ctime, U.mtime, U.flag_is_admin
-            FROM USER U
+                U.id, U.email, U.name, U.created_at, U.updated_at, U.is_super_user
+            FROM users U
             WHERE U.id = ?
         `,
-		id).Scan(&user.ID, &user.Email, &user.Name, &user.CreatedAt, &mtime, &flagIsAdmin)
-	user.LastUpdateAt = utils.Int64Ptr(mtime)
-	user.IsAdministrator = flagIsAdmin.Valid && flagIsAdmin.Byte == 1
-	user.Avatar = "https://i.pravatar.cc/48?id=" + user.ID
-
+		id).Scan(&user.ID, &user.Email, &user.Name, &user.CreatedAt, &updatedAt, &isSuperUser)
+	user.UpdatedAt = utils.Int64Ptr(updatedAt)
+	user.IsSuperUser = isSuperUser.Valid && isSuperUser.Byte == 1
+	user.AvatarURL = "https://i.pravatar.cc/48?id=" + user.ID
 	return user, err
 }
 
@@ -128,30 +125,26 @@ func (userRepository *UserRepository) Search(ctx context.Context) ([]models.User
 		ctx,
 		`
 			SELECT
-				U.id, U.email, U.name, U.ctime, U.mtime, U.flag_is_admin
-			FROM USER U
+				U.id, U.email, U.name, U.created_at, U.updated_at, U.is_super_user
+			FROM users U
         `,
 	)
-
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-
 	var users []models.User
-
 	for rows.Next() {
 		var user models.User
-		var mtime sql.NullInt64
-		var flagIsAdmin sql.NullByte
-
-		if err := rows.Scan(&user.ID, &user.Email, &user.Name, &user.CreatedAt, &mtime, &flagIsAdmin); err != nil {
+		var updatedAt sql.NullInt64
+		var isSuperUser sql.NullByte
+		if err := rows.Scan(&user.ID, &user.Email, &user.Name, &user.CreatedAt, &updatedAt, &isSuperUser); err != nil {
 			return nil, err
 		}
 
-		user.LastUpdateAt = utils.Int64Ptr(mtime)
-		user.IsAdministrator = flagIsAdmin.Valid && flagIsAdmin.Byte == 1
-		user.Avatar = "https://i.pravatar.cc/48?id=" + user.ID
+		user.UpdatedAt = utils.Int64Ptr(updatedAt)
+		user.IsSuperUser = isSuperUser.Valid && isSuperUser.Byte == 1
+		user.AvatarURL = "https://i.pravatar.cc/48?id=" + user.ID
 		users = append(users, user)
 	}
 

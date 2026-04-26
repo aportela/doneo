@@ -7,10 +7,10 @@ type UserBase struct {
 
 type User struct {
 	UserBase
-	Email           string  `json:"email"`
-	Password        *string `json:"password"`
-	CreatedAt       int64   `json:"createdAt"`
-	LastUpdateAt    *int64  `json:"lastUpdateAt"`
-	IsAdministrator bool    `json:"isAdministrator"`
-	Avatar          string  `json:"avatar"`
+	Email       string  `json:"email"`
+	Password    *string `json:"password"`
+	CreatedAt   int64   `json:"createdAt"`
+	UpdatedAt   *int64  `json:"updatedAt"`
+	IsSuperUser bool    `json:"isSuperUser"`
+	AvatarURL   string  `json:"avatar"`
 }

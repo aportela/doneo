@@ -51,11 +51,11 @@ func getRandomUser() models.User {
 			ID:   userID,
 			Name: name,
 		},
-		Email:           generateRandomEmail(name),
-		Password:        &password,
-		CreatedAt:       utils.GetRandomMSTimestamp(time.Now().AddDate(-5, 0, 0), time.Now()),
-		LastUpdateAt:    nil,
-		IsAdministrator: false,
+		Email:       generateRandomEmail(name),
+		Password:    &password,
+		CreatedAt:   utils.GetRandomMSTimestamp(time.Now().AddDate(-5, 0, 0), time.Now()),
+		UpdatedAt:   nil,
+		IsSuperUser: false,
 	}
 }
 

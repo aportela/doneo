@@ -13,6 +13,7 @@ import (
 	"github.com/aportela/doneo/internal/data"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/router"
+	"github.com/aportela/doneo/internal/scripts"
 	demodatascripts "github.com/aportela/doneo/internal/scripts/demo_data"
 )
 
@@ -48,7 +49,7 @@ func main() {
 			if err != nil {
 				log.Fatal("Error creating database schema:", err)
 			}
-			//scripts.CreateDefaultData(databaseHandler)
+			scripts.CreateDefaultData(databaseHandler)
 		}
 
 		params, err := cli.HandleFlags()
