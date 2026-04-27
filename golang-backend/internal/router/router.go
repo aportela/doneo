@@ -16,7 +16,7 @@ import (
 	"github.com/aportela/doneo/internal/ui"
 )
 
-func NewRouter(db database.Database, config config.Configuration) http.Handler {
+func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 	baseRouter := chi.NewRouter()
 
 	baseRouter.Use(middleware.Logger)
@@ -24,7 +24,7 @@ func NewRouter(db database.Database, config config.Configuration) http.Handler {
 	apiRouter := chi.NewRouter()
 
 	apiRouter.Route("/auth", func(r chi.Router) {
-		userHandler := authhandler.NewAuthHandler(db, config.Auth.SecretKey, config.Auth.AccessTokenExpirationHours, config.Auth.RefreshTokenExpirationDays)
+		userHandler := authhandler.NewAuthHandler(db, cfg.Auth.SecretKey, cfg.Auth.AccessTokenExpirationHours, cfg.Auth.RefreshTokenExpirationDays)
 		r.Post("/signup", userHandler.SignUp)
 		r.Post("/signin", userHandler.SignIn)
 		r.Post("/signout", userHandler.SignOut)
@@ -33,7 +33,7 @@ func NewRouter(db database.Database, config config.Configuration) http.Handler {
 	})
 
 	apiRouter.Route("/users", func(r chi.Router) {
-		r.Use(middlewares.CheckJWT(config.Auth.SecretKey))
+		r.Use(middlewares.CheckJWT(cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireAuthentication)
 		r.Use(middlewares.RequireSuperUser)
 		userHandler := userhandler.NewUserHandler(db)
