@@ -121,14 +121,6 @@
                         <div class="col">
                             <!-- BEGIN NAVBAR MENU -->
                             <ul class="navbar-nav">
-                                <li class="nav-item" :class="{ 'active': $route.name == 'login' }">
-                                    <RouterLink to="/auth/login" class="nav-link">
-                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                            <IconHome />
-                                        </span>
-                                        <span class="nav-link-title"> LOGIN </span>
-                                    </RouterLink>
-                                </li>
                                 <li class="nav-item" :class="{ 'active': $route.name == 'home' }">
                                     <RouterLink to="/home" class="nav-link">
                                         <span class="nav-link-icon d-md-none d-lg-inline-block">
