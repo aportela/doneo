@@ -7,6 +7,7 @@ import (
 	sqliteWrapper "github.com/aportela/doneo/internal/database/sqlite"
 )
 
+// TODO: DSN
 func Open(cfg configuration.DatabaseConfiguration) (Database, error) {
 	switch cfg.Type {
 

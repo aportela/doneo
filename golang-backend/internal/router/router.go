@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
+	"github.com/aportela/doneo/internal/configuration"
 	"github.com/aportela/doneo/internal/database"
 	authHandlers "github.com/aportela/doneo/internal/handlers/auth"
 	userHandlers "github.com/aportela/doneo/internal/handlers/user"
@@ -15,23 +16,25 @@ import (
 	"github.com/aportela/doneo/internal/ui"
 )
 
-func NewRouter(db database.Database) http.Handler {
+func NewRouter(db database.Database, config configuration.Configuration) http.Handler {
 	baseRouter := chi.NewRouter()
 
 	baseRouter.Use(middleware.Logger)
 
-	//baseRouter.Use(middlewares.RequireAuthentication)
-	//baseRouter.Use(middlewares.RequireSuperUser)
 	apiRouter := chi.NewRouter()
 
 	apiRouter.Route("/auth", func(r chi.Router) {
-		userHandler := authHandlers.NewAuthHandler(db, "secret")
+		userHandler := authHandlers.NewAuthHandler(db, config.Auth.SecretKey, config.Auth.AccessTokenExpirationDays, config.Auth.RefreshTokenExpirationDays)
 		r.Post("/signup", userHandler.SignUp)
-		r.Get("/signin", userHandler.SignIn)
+		r.Post("/signin", userHandler.SignIn)
+		r.Post("/signout", userHandler.SignOut)
+		r.Post("/renew_access_token", userHandler.RenewAccessToken)
+
 	})
 
 	apiRouter.Route("/users", func(r chi.Router) {
 		r.Use(middlewares.RequireAuthentication)
+		baseRouter.Use(middlewares.RequireSuperUser)
 		userHandler := userHandlers.NewUserHandler(db)
 		r.Post("/", userHandler.AddUser)
 		r.Get("/", userHandler.SearchUsers)

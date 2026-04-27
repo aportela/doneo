@@ -16,14 +16,18 @@ type AuthService interface {
 }
 
 type authService struct {
-	repository repositories.UserRepository
-	secretKey  string
+	repository                 repositories.UserRepository
+	secretKey                  string
+	accessTokenExpirationDays  int
+	refreshTokenExpirationDays int
 }
 
-func NewAuthService(repository repositories.UserRepository, secretKey string) AuthService {
+func NewAuthService(repository repositories.UserRepository, secretKey string, accessTokenExpirationDays int, refreshTokenExpirationDays int) AuthService {
 	return &authService{
-		repository: repository,
-		secretKey:  secretKey,
+		repository:                 repository,
+		secretKey:                  secretKey,
+		accessTokenExpirationDays:  accessTokenExpirationDays,
+		refreshTokenExpirationDays: refreshTokenExpirationDays,
 	}
 }
 

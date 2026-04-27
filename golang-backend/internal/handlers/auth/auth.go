@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/handlers"
@@ -16,9 +17,9 @@ type AuthHandler struct {
 	service services.AuthService
 }
 
-func NewAuthHandler(db database.Database, secretKey string) *AuthHandler {
+func NewAuthHandler(db database.Database, secretKey string, accessTokenExpirationDays int, refreshTokenExpirationDays int) *AuthHandler {
 	userRepository := repositories.NewUserRepository(db)
-	authService := services.NewAuthService(userRepository, secretKey)
+	authService := services.NewAuthService(userRepository, secretKey, accessTokenExpirationDays, refreshTokenExpirationDays)
 	return &AuthHandler{service: authService}
 }
 
@@ -54,7 +55,25 @@ func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 		Secure:   true,
 		SameSite: http.SameSiteStrictMode,
+		Expires:  time.Now().Add(365 * 24 * time.Hour),
 	}
 	http.SetCookie(w, &cookie)
 	utils.ToJSONResponse(w, http.StatusOK, SuccessSignInResponse{AccessToken: accessToken, RefreshToken: refreshToken})
+}
+
+func (h *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
+	cookie := http.Cookie{
+		Name:     "refresh_token",
+		Value:    "",
+		Path:     "/api/auth/renew_access_token",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		Expires:  time.Now().Add(365 * 24 * time.Hour),
+	}
+	http.SetCookie(w, &cookie)
+	utils.ToJSONResponse(w, http.StatusOK, handlers.ToEmptyResponse())
+}
+
+func (h *AuthHandler) RenewAccessToken(w http.ResponseWriter, r *http.Request) {
 }
