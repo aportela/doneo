@@ -1,19 +1,42 @@
 <script setup lang="ts">
-    import { api } from '../composables/api';
     import { ref } from 'vue';
+    import { useRouter } from "vue-router";
+    import { api } from '../composables/api';
 
+    const invalidEmailField = ref(false);
+    const invalidEmailFeedbackMessage = ref<string>("");
+    const invalidPasswordField = ref(false);
+    const invalidPasswordFeedbackMessage = ref<string>("");
+
+    const router = useRouter();
     const email = ref("admin@localhost");
     const password = ref("secret");
+
+
     const onSubmit = () => {
+        invalidEmailField.value = false;
+        invalidPasswordField.value = false;
         if (email.value && password.value) {
-            api.auth.signIn(email.value, password.value).then((successResponse: any) => {
-                console.log(successResponse);
-                //sessionStore.setAccessToken(successResponse.data.accessToken.token, successResponse.data.accessToken.expiresAtTimestamp);
-                //lastUsedEmail.set(profile.email);
-                //emit("success", successResponse.data);
-            })
+            api.auth.signIn(email.value, password.value)
+                .then((successResponse: any) => {
+                    console.log(successResponse);
+                    router.push(
+                        { name: "home" }
+                    ).catch((e) => {
+                        console.error(e);
+                    });;
+                })
                 .catch((errorResponse) => {
-                    console.error(errorResponse);
+                    switch (errorResponse.status) {
+                        case 404:
+                            invalidEmailField.value = true;
+                            invalidEmailFeedbackMessage.value = "Email not found";
+                            break;
+                        case 401:
+                            invalidPasswordField.value = true;
+                            invalidPasswordFeedbackMessage.value = "Invalid password";
+                            break;
+                    }
                 });
         }
     }
@@ -21,7 +44,7 @@
 
 <template>
     <div class="row g-0 flex-fill">
-        <div class="col-12 col-lg-6 col-xl-4 border-top-wide border-primary d-flex flex-column justify-content-center">
+        <div class="col-12 col-lg-6 col-xl-4 d-flex flex-column justify-content-center">
             <div class="container container-tight my-5 px-lg-5">
                 <div class="text-center mb-4">
                     <!-- BEGIN NAVBAR LOGO --><a href="." aria-label="Tabler"
@@ -39,8 +62,10 @@
                 <form action="/api/auth/signin" method="post" autocomplete="off" @submit.prevent="onSubmit">
                     <div class="mb-3">
                         <label class="form-label">Email address</label>
-                        <input type="email" v-model.trim="email" class="form-control" placeholder="your@email.com"
-                            autocomplete="off" required>
+                        <input type="email" v-model.trim="email" class="form-control"
+                            :class="{ 'is-invalid': invalidEmailField }" placeholder="your@email.com" autocomplete="off"
+                            required>
+                        <div class="invalid-feedback" v-if="invalidEmailField">{{ invalidEmailFeedbackMessage }}</div>
                     </div>
                     <div class="mb-2">
                         <label class="form-label">
@@ -50,35 +75,23 @@
                             </span>
                         </label>
                         <div class="input-group input-group-flat">
-                            <input type="password" class="form-control" placeholder="Your password" autocomplete="off"
-                                v-model="password" required>
-                            <span class="input-group-text">
-                                <a href="#" class="link-secondary" data-bs-toggle="tooltip" aria-label="Show password"
-                                    data-bs-original-title="Show password"><!-- Download SVG icon from http://tabler.io/icons/icon/eye -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" class="icon icon-1">
-                                        <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
-                                        <path
-                                            d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6">
-                                        </path>
-                                    </svg></a>
-                            </span>
+                            <input type="password" class="form-control" :class="{ 'is-invalid': invalidPasswordField }"
+                                placeholder="Your password" autocomplete="off" v-model="password" required
+                                minlength="5">
+                            <div class="invalid-feedback" v-if="invalidPasswordField">{{ invalidPasswordFeedbackMessage
+                                }}
+                            </div>
                         </div>
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-check">
-                            <input type="checkbox" class="form-check-input">
-                            <span class="form-check-label">Remember me on this device</span>
-                        </label>
                     </div>
                     <div class="form-footer">
                         <button type="submit" class="btn btn-primary w-100">Sign in</button>
                     </div>
                 </form>
+                <!--
                 <div class="text-center text-secondary mt-3">Don't have account yet? <router-link
                         to="/auth/register">Sign up</router-link>
                 </div>
+                -->
             </div>
         </div>
         <div class="col-12 col-lg-6 col-xl-8 d-none d-lg-block">
