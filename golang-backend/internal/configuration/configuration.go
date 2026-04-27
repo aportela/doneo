@@ -1,6 +1,8 @@
 package configuration
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"errors"
 	"log"
 	"os"
@@ -25,6 +27,15 @@ func initViper() {
 	viper.SetConfigFile(configFile)
 }
 
+func generateSecretKey(length int) (string, error) {
+	key := make([]byte, length)
+	_, err := rand.Read(key)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(key), nil
+}
+
 func createDefaultConfiguration() error {
 	viper.Set("database.type", databaseType)
 	viper.Set("database.path", filepath.Join(data.GetDataPath(), sqliteDatabaseFilename))
@@ -32,6 +43,11 @@ func createDefaultConfiguration() error {
 
 	viper.Set("auth.access_token_expiration_days", accessTokenExpirationDays)
 	viper.Set("auth.refresh_token_expiration_days", refreshTokenExpirationDays)
+	secretKey, err := generateSecretKey(128)
+	if err != nil {
+		return err
+	}
+	viper.Set("auth.secret_key", secretKey)
 
 	return viper.WriteConfigAs(filepath.Join(data.GetDataPath(), configurationFilename))
 }

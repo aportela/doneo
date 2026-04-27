@@ -15,6 +15,7 @@ type Configuration struct {
 }
 
 type Auth struct {
-	AccessTokenExpirationDays  int `mapstructure:"access_token_expiration_days"`
-	RefreshTokenExpirationDays int `mapstructure:"refresh_token_expiration_days"`
+	AccessTokenExpirationDays  int    `mapstructure:"access_token_expiration_days"`
+	RefreshTokenExpirationDays int    `mapstructure:"refresh_token_expiration_days"`
+	secretKey                  string `mapstructure:"secret_key"`
 }
