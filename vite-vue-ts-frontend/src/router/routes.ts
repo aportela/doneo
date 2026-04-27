@@ -2,6 +2,23 @@ import type { RouteRecordRaw } from "vue-router";
 
 const routes: RouteRecordRaw[] = [
   {
+    path: "/auth",
+    component: () => import("../layouts/LoginRegisterLayout.vue"),
+    children: [
+      {
+        name: "login",
+        path: "login",
+        component: () => import("../pages/LoginPage.vue"),
+      },
+      {
+        name: "register",
+        path: "register",
+        component: () => import("../pages/RegisterPage.vue"),
+      },
+    ],
+  },
+
+  {
     path: "/",
     name: "root",
     redirect: "/home",
