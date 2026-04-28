@@ -25,7 +25,6 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 
 	apiRouter.Route("/auth", func(r chi.Router) {
 		userHandler := authhandler.NewAuthHandler(db, cfg.Auth.SecretKey, cfg.Auth.AccessTokenExpirationHours, cfg.Auth.RefreshTokenExpirationDays)
-		r.Post("/signup", userHandler.SignUp)
 		r.Post("/signin", userHandler.SignIn)
 		r.Post("/signout", userHandler.SignOut)
 		r.Post("/renew_access_token", userHandler.RenewAccessToken)
