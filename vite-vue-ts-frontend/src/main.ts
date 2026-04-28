@@ -1,16 +1,16 @@
 import { createApp } from "vue";
-import "@tabler/core/dist/css/tabler.min.css";
-import "@tabler/core/dist/js/tabler.min.js";
-
 import { router } from "./router/index";
 import { createPinia } from "pinia";
 import App from "./App.vue";
+import AppNaiveUI from "./App-NaiveUI.vue";
 
 import { useSessionStore } from "./stores/session";
 
 const pinia = createPinia();
 
-const app = createApp(App);
+const useNaiveUI = true;
+
+const app = createApp(useNaiveUI ? AppNaiveUI : App);
 app.use(pinia);
 const sessionStore = useSessionStore();
 const accessTokenCheckInterval = 300; // check every 5 min (300 seconds)

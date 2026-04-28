@@ -1,4 +1,7 @@
 <script setup lang="ts">
+  import "@tabler/core/dist/css/tabler.min.css";
+  import "@tabler/core/dist/js/tabler.min.js";
+
   const theme = localStorage.getItem("theme");
   if (theme === "dark") {
     document.documentElement.setAttribute(
