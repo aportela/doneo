@@ -3,9 +3,12 @@
 
     import { ref } from 'vue'
     import { useRouter } from "vue-router";
+    import { useSessionStore } from "../stores/session";
     import { api } from '../composables/api';
 
     const router = useRouter();
+    const sessionStore = useSessionStore();
+
     const isDark = ref(false)
 
     const toggleTheme = () => {
@@ -32,12 +35,16 @@
 
     const onSignOut = () => {
         api.auth.signOut().then(() => {
+            sessionStore.removeAccessToken();
+
             router.push(
                 { name: "login" }
             ).catch((e) => {
                 console.error(e);
             });
         }).catch(() => {
+            sessionStore.removeAccessToken();
+
             router.push(
                 { name: "login" }
             ).catch((e) => {

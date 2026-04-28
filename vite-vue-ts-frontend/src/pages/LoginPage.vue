@@ -23,13 +23,16 @@
         if (email.value && password.value) {
             api.auth.signIn(email.value, password.value)
                 .then((successResponse: any) => {
-                    console.log(successResponse);
-                    sessionStore.setAccessToken(successResponse.data.accessToken.token, successResponse.data.accessToken.expiresAtTimestamp);
-                    router.push(
-                        { name: "home" }
-                    ).catch((e) => {
-                        console.error(e);
-                    });
+                    if (successResponse.data.accessToken) {
+                        sessionStore.setAccessToken(successResponse.data.accessToken.token, successResponse.data.accessToken.expiresAtTimestamp);
+                        router.push(
+                            { name: "home" }
+                        ).catch((e) => {
+                            console.error(e);
+                        });
+                    } else {
+                        console.error("Invalid response");
+                    }
                 })
                 .catch((errorResponse) => {
                     switch (errorResponse.status) {
@@ -84,7 +87,7 @@
                                 placeholder="Your password" autocomplete="off" v-model="password" required
                                 minlength="5">
                             <div class="invalid-feedback" v-if="invalidPasswordField">{{ invalidPasswordFeedbackMessage
-                                }}
+                            }}
                             </div>
                         </div>
                     </div>
