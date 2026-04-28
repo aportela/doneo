@@ -1,96 +1,69 @@
 <script setup lang="ts">
-    import { ref, reactive } from 'vue';
-    import { useRouter } from "vue-router";
-    import { api } from '../../composables/api';
-    import { useSessionStore } from "../../stores/session";
-    import { type AjaxState as AjaxStateInterface, defaultAjaxState } from "../../types/ajaxState";
+    import { ref } from 'vue';
+
+    import { NIcon, NForm, NFormItem, NInput, NButton, type FormInst } from 'naive-ui'
+    import { IconEye, IconEyeCancel } from '@tabler/icons-vue';
 
 
-    const invalidEmailField = ref(false);
-    const invalidEmailFeedbackMessage = ref<string>("");
-    const invalidPasswordField = ref(false);
-    const invalidPasswordFeedbackMessage = ref<string>("");
+    const signInFormRef = ref<FormInst | null>(null)
 
-    const router = useRouter();
+    const rules = {
 
-    const sessionStore = useSessionStore();
-
-    const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
-
-
-    const email = ref("admin@localhost");
-    const password = ref("secret");
-
-
-    const onSubmit = () => {
-        invalidEmailField.value = false;
-        invalidPasswordField.value = false;
-        if (email.value && password.value) {
-            state.ajaxRunning = true;
-            api.auth.signIn(email.value, password.value)
-                .then((successResponse: any) => {
-                    if (successResponse.data.accessToken) {
-                        sessionStore.setAccessToken(successResponse.data.accessToken.token, successResponse.data.accessToken.expiresAtTimestamp);
-                        router.push(
-                            { name: "home" }
-                        ).catch((e) => {
-                            console.error(e);
-                        });
-                    } else {
-                        console.error("Invalid response");
-                    }
-                })
-                .catch((errorResponse) => {
-                    state.ajaxErrors = true;
-                    switch (errorResponse.status) {
-                        case 404:
-                            invalidEmailField.value = true;
-                            invalidEmailFeedbackMessage.value = "Email not found";
-                            break;
-                        case 401:
-                            invalidPasswordField.value = true;
-                            invalidPasswordFeedbackMessage.value = "Invalid password";
-                            break;
-                    }
-                })
-                .finally(() => {
-                    state.ajaxRunning = false;
-                });
+        formData: {
+            email: {
+                required: true,
+                trigger: ['input', 'blur'],
+                message: 'Email is required'
+            },
+            password: {
+                required: true,
+                trigger: ['input', 'blur'],
+                message: 'password is required'
+            }
         }
+    };
+
+    const formData = ref({
+        email: '',
+        password: ''
+    });
+
+    const validateForm = () => {
+        signInFormRef.value?.validate((valid: any) => {
+            if (valid) {
+                alert('Formulario válido')
+            } else {
+                alert('Hay errores en el formulario')
+            }
+        })
     }
+
 </script>
 
 <template>
-    <form action="/api/auth/signin" method="post" autocomplete="off" @submit.prevent="onSubmit">
-        <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="email" v-model.trim="email" :disabled="state.ajaxRunning" class="form-control"
-                :class="{ 'is-invalid': invalidEmailField }" placeholder="your@email.com" autocomplete="off" required>
-            <div class="invalid-feedback" v-if="invalidEmailField">{{ invalidEmailFeedbackMessage }}</div>
-        </div>
-        <div class="mb-2">
-            <label class="form-label">
-                Password
-                <!--
-                            <span class="form-label-description">
-                                <a href="./forgot-password.html">I forgot password</a>
-                            </span>
-                            -->
-            </label>
-            <div class="input-group input-group-flat">
-                <input type="password" class="form-control" :class="{ 'is-invalid': invalidPasswordField }"
-                    placeholder="Your password" autocomplete="off" v-model="password" :disabled="state.ajaxRunning"
-                    required minlength="5">
-                <div class="invalid-feedback" v-if="invalidPasswordField">{{ invalidPasswordFeedbackMessage
-                    }}
-                </div>
-            </div>
-        </div>
-        <div class="form-footer">
-            <button type="submit" :disabled="state.ajaxRunning" class="btn btn-primary w-100">Sign
-                in</button>
-        </div>
-    </form>
+
+    <n-form ref="signInFormRef" :model="formData" label-width="100px" @submit.prevent="validateForm" :rules="rules">
+        <n-form-item label="Email" prop="email" show-feedback>
+            <n-input v-model:value="formData.email" placeholder="Enter your email address" />
+        </n-form-item>
+
+        <n-form-item label="Password" prop="password" show-feedback>
+            <n-input v-model="formData.password" type="password" placeholder="Enter your password"
+                show-password-on="click">
+                <template #password-visible-icon>
+                    <n-icon :size="16" :component="IconEyeCancel" />
+                </template>
+                <template #password-invisible-icon>
+                    <n-icon :size="16" :component="IconEye" />
+                </template>
+            </n-input>
+        </n-form-item>
+
+        <n-form-item>
+            <n-button secondary @click="validateForm" block>Sign in</n-button>
+        </n-form-item>
+    </n-form>
+
 </template>
 
 <style lang="css" scoped></style>

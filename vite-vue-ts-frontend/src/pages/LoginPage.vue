@@ -1,9 +1,10 @@
 <script setup lang="ts">
-    import { useRouter } from "vue-router";
+    //import { useRouter } from "vue-router";
     import { default as LoginForm } from "../components/forms/LoginForm.vue"
     import { NCard } from 'naive-ui'
     import { IconDatabaseStar } from '@tabler/icons-vue';
 
+    /*
     const router = useRouter();
 
     const onSuccessLogin = () => {
@@ -13,6 +14,8 @@
             console.error(e);
         });
     };
+    */
+
 </script>
 
 <template>
@@ -20,7 +23,7 @@
         <div class="left">
             <n-card class="login-card" bordered>
                 <h2 class="title">Login to your account</h2>
-                <LoginForm @success="onSuccessLogin" />
+                <LoginForm />
             </n-card>
         </div>
         <div class="right">
