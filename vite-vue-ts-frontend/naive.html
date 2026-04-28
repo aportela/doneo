@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <script src="https://unpkg.com/vue"></script>
+    <!-- Would use latest version, you'd better specify a version -->
+    <script src="https://unpkg.com/naive-ui"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        .header {
+            padding: 0 24px;
+        }
+
+        .header-xl {
+            max-width: 1320px;
+            margin: 0 auto;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+        }
+
+        .left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo {
+            height: 32px;
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .right {
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <n-layout>
+            <n-layout-header class="header header-xl">
+                <div class="header-content" :class="headerClass">
+
+                    <!-- IZQUIERDA -->
+                    <div class="left">
+                        <img src="src/assets/hero.png" style="width: 32px; height: 32px;"/>
+                        <!--
+                        <n-icon><i data-feather="database"></i></n-icon>
+                        -->
+                        <span class="title">Doneo</span>
+                    </div>
+
+                    <!-- DERECHA -->
+                    <n-space class="right" size="large">
+                        <n-button quaternary >
+                            <template #icon>
+                                <n-icon><i data-feather="github"></i></n-icon>
+                            </template>
+                        </n-button>
+
+                        <n-button quaternary >
+                            <template #icon>
+                                <n-icon><i data-feather="maximize-2"></i></n-icon>
+                            </template>
+                        </n-button>
+
+                        <n-button quaternary >
+                            <template #icon>
+                                <n-icon><i data-feather="moon"></i></n-icon>
+                            </template>
+                        </n-button>
+
+
+                        <n-dropdown trigger="hover" :options="userOptions">
+                            <n-button quaternary>
+                                <template #icon>
+                                    <n-icon><i data-feather="user"></i></n-icon>
+                                </template>
+                                <n-space align="center" size="small">
+                                    <!--
+                                    <n-icon><i data-feather="user"></i></n-icon>
+                                    -->
+                                    <span>Administrator</span>
+                                </n-space>
+                            </n-button>
+                        </n-dropdown>
+
+                    </n-space>
+
+                </div>
+            </n-layout-header>
+        </n-layout>
+    </div>
+    <script>
+        const App = {
+            setup() {
+                return {
+                    message: 'naive',
+                    userOptions: [
+                        {
+                            label: 'Profile',
+                            key: 'profile'
+                        },
+                        {
+                            label: 'Logout',
+                            key: 'logout'
+                        }
+                    ],
+                }
+            }
+        }
+        const app = Vue.createApp(App)
+        app.use(naive)
+        app.mount('#app')
+
+
+        feather.replace();
+    </script>
+</body>
+
+</html>
