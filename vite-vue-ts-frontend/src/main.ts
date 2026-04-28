@@ -43,23 +43,24 @@ setInterval(() => {
     .finally(() => {});
 }, accessTokenCheckInterval * 1000);
 
+/*
 router.beforeEach((to, _from) => {
   if (!to.matched.length) {
     return { name: "notFound" };
   }
   const loggedIn = sessionStore.hasAccessToken;
   if (loggedIn) {
-    if (to.name === "login" || to.name === "register") {
+    if (to.name === "login") {
       return { name: "home" };
     }
     return true;
   } else {
-    if (to.name === "login" || to.name === "register") {
+    if (to.name === "login") {
       return true;
     }
     return { name: "login" };
   }
 });
-
+*/
 app.use(router);
 app.mount("#app");
