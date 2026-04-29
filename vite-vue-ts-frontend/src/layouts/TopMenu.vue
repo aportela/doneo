@@ -11,9 +11,9 @@
 </script>
 
 <template>
-
     <n-layout-header bordered class="header">
-        <div :class="{ 'header-content-xl': !userSettingsStore.hasFluidLayout }">
+        <div class="header__container"
+            :class="`header__container--${userSettingsStore.hasFluidLayout ? 'fluid' : 'contained'}`">
             <n-tabs type="line" v-model:value="currentTab" animated>
                 <n-tab name="home" tab="Home">
                     <RouterLink to="/home" class="nav-link">
@@ -54,36 +54,27 @@
     .header {
         height: 64px;
         display: flex;
+        justify-content: center;
         align-items: center;
-        padding: 0 20px;
+        padding: 0 10px;
+        box-sizing: border-box;
+        width: 100%;
     }
 
-    .header-content {
+    .header__container {
         width: 100%;
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
         align-items: center;
     }
 
-    .header-content-xl {
+    .header__container--contained {
         max-width: 1320px;
-        margin: 0px auto;
+        margin: 0 auto;
     }
 
-    .actions {
-        display: flex;
-        gap: 6px;
-        align-items: center;
-    }
-
-    .logo {
-        display: flex;
-        align-items: center;
-    }
-
-    .title {
-        margin-left: 8px;
-        font-size: 18px;
-        font-weight: 600;
+    .header__container--fluid {
+        max-width: 100%;
+        margin: 0;
     }
 </style>
