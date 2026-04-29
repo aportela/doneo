@@ -33,7 +33,7 @@ export const useColorSchemeStore = defineStore("colorSchemeStore", {
       localStorageColorScheme.set(this.colorScheme);
     },
     toggle(): void {
-      this.set(this.light ? "dark" : "light");
+      this.set(this.colorScheme === "light" ? "dark" : "light");
     },
     initSystemListener(): void {
       const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
