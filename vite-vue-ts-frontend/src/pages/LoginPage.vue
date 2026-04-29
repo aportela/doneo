@@ -2,8 +2,9 @@
     //import { useRouter } from "vue-router";
     import { default as LoginForm } from "../components/forms/LoginForm.vue"
     import { NCard, NSpace, NButton } from 'naive-ui'
-    import { IconDatabaseStar, IconBrandGithub, IconMoon } from '@tabler/icons-vue';
+    import { IconDatabaseStar, IconMoon } from '@tabler/icons-vue';
 
+    import { default as GithubButton } from "../components/buttons/GithubButton.vue";
     import { default as SwitchLocaleButton } from "../components/buttons/SwitchLocaleButton.vue";
 
     /*
@@ -28,9 +29,7 @@
                 <LoginForm />
                 <template #action>
                     <n-space justify="space-around">
-                        <n-button quaternary>
-                            <IconBrandGithub :size="20" />
-                        </n-button>
+                        <GithubButton :size="20" />
                         <n-button quaternary>
                             <IconMoon :size="20" />
                         </n-button>
