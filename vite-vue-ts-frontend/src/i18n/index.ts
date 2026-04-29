@@ -11,18 +11,18 @@ const messages = {
 const availableSystemLocales: string[] = Object.keys(messages);
 
 const localeSelectorOptionItems = [
-  { shortLabel: "EN", label: "English", value: "en-US" },
-  { shortLabel: "ES", label: "Español", value: "es-ES" },
-  { shortLabel: "GL", label: "Galego", value: "gl-GL" },
+  { shortLabel: "EN", label: "English", key: "en-US" },
+  { shortLabel: "ES", label: "Español", key: "es-ES" },
+  { shortLabel: "GL", label: "Galego", key: "gl-GL" },
 ];
 
 const availableLocaleSelectorOptionItems = localeSelectorOptionItems.filter(
-  (l) => availableSystemLocales.includes(l.value),
+  (l) => availableSystemLocales.includes(l.key),
 );
 
 const getlocaleSelectorOptionItem = (locale: string) => {
   const currentIndex = availableLocaleSelectorOptionItems.findIndex(
-    (l) => l.value === locale,
+    (l) => l.key === locale,
   );
   return availableLocaleSelectorOptionItems[
     currentIndex >= 0 ? currentIndex : 0

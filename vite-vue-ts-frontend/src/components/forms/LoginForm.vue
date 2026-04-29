@@ -8,6 +8,7 @@
     import { useSessionStore } from "../../stores/session";
     import { type AjaxState as AjaxStateInterface, defaultAjaxState } from "../../types/ajaxState";
 
+    import { useI18n } from "vue-i18n";
 
     import { createStorageEntry } from '../../composables/localStorage';
 
@@ -16,6 +17,8 @@
     const lastUsedEmail = localStorageLastUsedEmail.get();
 
     const router = useRouter();
+
+    const { t } = useI18n();
 
     const sessionStore = useSessionStore();
 
@@ -110,6 +113,16 @@
 </script>
 
 <template>
+    <!--
+    <h4 class="q-mt-sm q-mb-md text-h4 text-weight-bolder">{{
+        t(!!lastUsedEmail ? "Glad to see you again!" : "Welcome aboard!")
+        }}</h4>
+    <div class="text-color-secondary">{{
+        t(!!lastUsedEmail ? "Let's get back to organizing." : "Let's start organizing.")
+        }}
+    </div>
+    -->
+
     <n-spin :show="state.ajaxRunning" stroke="pink">
         <n-form ref="signInFormRef" :model="formValues" label-width="100px" :rules="rules">
             <n-form-item label="Email" path="email" show-feedback>
@@ -129,7 +142,9 @@
                 </n-input>
             </n-form-item>
             <n-form-item>
-                <n-button secondary @click="validateForm" block :disabled="state.ajaxRunning">Sign in</n-button>
+                <n-button secondary @click="validateForm" block :disabled="state.ajaxRunning">{{
+                    t("Sign in")
+                    }}</n-button>
             </n-form-item>
         </n-form>
     </n-spin>

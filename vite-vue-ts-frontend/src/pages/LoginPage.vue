@@ -1,8 +1,10 @@
 <script setup lang="ts">
     //import { useRouter } from "vue-router";
     import { default as LoginForm } from "../components/forms/LoginForm.vue"
-    import { NCard } from 'naive-ui'
-    import { IconDatabaseStar } from '@tabler/icons-vue';
+    import { NCard, NSpace, NButton } from 'naive-ui'
+    import { IconDatabaseStar, IconBrandGithub, IconMoon } from '@tabler/icons-vue';
+
+    import { default as SwitchLocaleButton } from "../components/buttons/SwitchLocaleButton.vue";
 
     /*
     const router = useRouter();
@@ -24,6 +26,17 @@
             <n-card class="login-card" bordered>
                 <h2 class="title">Login to your account</h2>
                 <LoginForm />
+                <template #action>
+                    <n-space justify="space-around">
+                        <n-button quaternary>
+                            <IconBrandGithub :size="20" />
+                        </n-button>
+                        <n-button quaternary>
+                            <IconMoon :size="20" />
+                        </n-button>
+                        <SwitchLocaleButton />
+                    </n-space>
+                </template>
             </n-card>
         </div>
         <div class="right">
