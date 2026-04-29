@@ -3,13 +3,20 @@
     import { IconLayout } from '@tabler/icons-vue';
     import { useUserSettingsStore } from '../../stores/userSettings';
 
-    const userSettingsStore = useUserSettingsStore();
+    interface SwitchFluidLayoutButtonProps {
+        size?: number,
+    };
 
+    withDefaults(defineProps<SwitchFluidLayoutButtonProps>(), {
+        size: 20
+    });
+
+    const userSettingsStore = useUserSettingsStore();
 </script>
 
 <template>
     <n-button quaternary @click="userSettingsStore.toggleFluidLayout" @mousedown.prevent>
-        <IconLayout />
+        <IconLayout :size="size" />
     </n-button>
 </template>
 

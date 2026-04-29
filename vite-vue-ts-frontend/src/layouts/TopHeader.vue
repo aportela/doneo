@@ -11,8 +11,11 @@
 
     const userSettingsStore = useUserSettingsStore();
 
+    const commonIconSize = 18;
+
     function renderIcon(icon: Component) {
         return () => {
+            // TODO: size prop
             return h(NIcon, null, {
                 default: () => h(icon)
             })
@@ -30,24 +33,25 @@
             key: 'logout',
             icon: renderIcon(IconLogout)
         }
-    ]
+    ];
 
 </script>
 
 <template>
-    <n-layout-header bordered class="header">
-        <div class="header-content" :class="userSettingsStore.hasFluidLayout ? 'fluid' : 'contained'">
-            <div class="logo">
-                <IconDatabaseStar />
-                <span class="title">Doneo</span>
+    <n-layout-header bordered class="top-header-layout-container">
+        <div class="top-header-container"
+            :class="userSettingsStore.hasFluidLayout ? 'header-fluid' : 'header-contained'">
+            <div class="brand-container">
+                <IconDatabaseStar :size="commonIconSize" />
+                <span class="brand-name">Doneo</span>
             </div>
             <n-space>
-                <GithubButton />
-                <SwitchColorSchemeButton />
-                <SwitchFluidLayoutButton />
+                <GithubButton :size="commonIconSize" />
+                <SwitchColorSchemeButton :size="commonIconSize" />
+                <SwitchFluidLayoutButton :size="commonIconSize" />
                 <n-dropdown :options="userDropdownOptions" placement="bottom-end" trigger="hover">
                     <n-button quaternary>
-                        <IconUserCircle :size="20" />
+                        <IconUserCircle :size="commonIconSize" />
                         Administrator
                     </n-button>
                 </n-dropdown>
@@ -58,42 +62,35 @@
 </template>
 
 <style lang="css" scoped>
-    .header {
+    .top-header-layout-container {
         height: 64px;
         display: flex;
         align-items: center;
         padding: 0 20px;
     }
 
-    .header-content {
+    .top-header-container {
         width: 100%;
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
 
-    .fluid {
+    .header-fluid {
         max-width: 100%;
-        margin: 0px auto;
     }
 
-    .contained {
+    .header-contained {
         max-width: 1320px;
         margin: 0px auto;
     }
 
-    .actions {
-        display: flex;
-        gap: 6px;
-        align-items: center;
-    }
-
-    .logo {
+    .brand-container {
         display: flex;
         align-items: center;
     }
 
-    .title {
+    .brand-name {
         margin-left: 8px;
         font-size: 18px;
         font-weight: 600;
