@@ -4,7 +4,6 @@ import { createPinia } from "pinia";
 import { createI18n } from "vue-i18n";
 import { messages } from "./i18n";
 import App from "./App.vue";
-import AppNaiveUI from "./App-NaiveUI.vue";
 
 import { useI18nStore } from "./stores/i18n";
 import { useSessionStore } from "./stores/session";
@@ -13,9 +12,7 @@ import { useUserSettingsStore } from "./stores/userSettings";
 
 const pinia = createPinia();
 
-const useNaiveUI = true;
-
-const app = createApp(useNaiveUI ? AppNaiveUI : App);
+const app = createApp(App);
 app.use(pinia);
 
 export type MessageLanguages = keyof typeof messages;

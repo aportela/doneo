@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { NLayoutHeader, NButton, NDropdown } from 'naive-ui'
+    import { NButton, NDropdown } from 'naive-ui'
     import { NIcon, NFlex } from 'naive-ui'
     import { IconUserCircle, IconDatabaseStar, IconId, IconLogout } from '@tabler/icons-vue';
     import type { Component } from 'vue'
@@ -36,7 +36,7 @@
 </script>
 
 <template>
-    <n-layout-header bordered class="top-header">
+    <div class="top-header">
         <div class="top-header__container"
             :class="`top-header__container--${userSettingsStore.hasFluidLayout ? 'fluid' : 'contained'}`">
             <div class="brand-container">
@@ -55,7 +55,7 @@
                 </n-dropdown>
             </n-flex>
         </div>
-    </n-layout-header>
+    </div>
 </template>
 
 <style lang="css" scoped>
@@ -67,6 +67,7 @@
         padding: 0px 10px;
         box-sizing: border-box;
         width: 100%;
+        border-bottom: 1px solid rgb(239, 239, 245)
     }
 
     .top-header__container {
