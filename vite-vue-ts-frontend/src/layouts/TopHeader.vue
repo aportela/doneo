@@ -14,27 +14,25 @@
     const commonIconSize = 18;
 
     function renderIcon(icon: Component) {
-        return () => {
-            // TODO: size prop
-            return h(NIcon, null, {
-                default: () => h(icon)
-            })
-        }
+        return (size = commonIconSize) =>
+            () =>
+                h(NIcon, { size }, {
+                    default: () => h(icon)
+                })
     }
 
     const userDropdownOptions = [
         {
             label: 'Profile',
             key: 'profile',
-            icon: renderIcon(IconId)
+            icon: renderIcon(IconId)(commonIconSize)
         },
         {
             label: 'Logout',
             key: 'logout',
-            icon: renderIcon(IconLogout)
+            icon: renderIcon(IconLogout)(commonIconSize)
         }
     ];
-
 </script>
 
 <template>
