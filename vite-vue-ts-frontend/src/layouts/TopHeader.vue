@@ -50,7 +50,7 @@
                 <n-dropdown :options="userDropdownOptions" placement="bottom-end" trigger="hover">
                     <n-button quaternary>
                         <IconUserCircle :size="commonIconSize" />
-                        Administrator
+                        <span class="username">Administrator</span>
                     </n-button>
                 </n-dropdown>
             </n-space>
@@ -94,5 +94,9 @@
         margin-left: 8px;
         font-size: 18px;
         font-weight: 600;
+    }
+
+    .username {
+        margin-left: 8px;
     }
 </style>
