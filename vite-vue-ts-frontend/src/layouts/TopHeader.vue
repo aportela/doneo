@@ -38,9 +38,9 @@
 </script>
 
 <template>
-    <n-layout-header bordered class="top-header-layout-container">
-        <div class="top-header-container"
-            :class="userSettingsStore.hasFluidLayout ? 'header-fluid' : 'header-contained'">
+    <n-layout-header bordered class="top-header">
+        <div class="top-header__container"
+            :class="`top-header__container--${userSettingsStore.hasFluidLayout ? 'fluid' : 'contained'}`">
             <div class="brand-container">
                 <IconDatabaseStar :size="commonIconSize" />
                 <span class="brand-name">Doneo</span>
@@ -58,31 +58,33 @@
             </n-space>
         </div>
     </n-layout-header>
-
 </template>
 
 <style lang="css" scoped>
-    .top-header-layout-container {
-        height: 64px;
+    .top-header {
         display: flex;
+        justify-content: center;
         align-items: center;
-        padding: 0 20px;
+        height: 48px;
+        box-sizing: border-box;
+        width: 100%;
     }
 
-    .top-header-container {
+    .top-header__container {
         width: 100%;
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
 
-    .header-fluid {
-        max-width: 100%;
+    .top-header__container--contained {
+        max-width: 1320px;
+        margin: 0 auto;
     }
 
-    .header-contained {
-        max-width: 1320px;
-        margin: 0px auto;
+    .top-header__container--fluid {
+        max-width: 100%;
+        margin: 0;
     }
 
     .brand-container {
