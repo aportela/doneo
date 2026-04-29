@@ -1,15 +1,16 @@
 <script setup lang="ts">
     import { NLayoutHeader, NButton, NDropdown } from 'naive-ui'
-    import { NIcon } from 'naive-ui'
-    import { IconUserCircle, IconBrandGithub, IconDatabaseStar, IconMoon, IconId, IconLogout } from '@tabler/icons-vue';
+    import { NIcon, NSpace } from 'naive-ui'
+    import { IconUserCircle, IconDatabaseStar, IconId, IconLogout } from '@tabler/icons-vue';
     import type { Component } from 'vue'
     import { h } from 'vue'
     import { default as SwitchFluidLayoutButton } from '../components/buttons/SwitchFluidLayoutButton.vue';
+    import { default as GithubButton } from '../components/buttons/GithubButton.vue';
+    import { default as SwitchColorSchemeButton } from '../components/buttons/SwitchColorSchemeButton.vue';
     import { useUserSettingsStore } from '../stores/userSettings';
 
     const userSettingsStore = useUserSettingsStore();
 
-    console.log(userSettingsStore.hasFluidLayout);
     function renderIcon(icon: Component) {
         return () => {
             return h(NIcon, null, {
@@ -40,13 +41,9 @@
                 <IconDatabaseStar />
                 <span class="title">Doneo</span>
             </div>
-            <div class="actions">
-                <n-button quaternary>
-                    <IconBrandGithub :size="20" />
-                </n-button>
-                <n-button quaternary>
-                    <IconMoon :size="20" />
-                </n-button>
+            <n-space>
+                <GithubButton />
+                <SwitchColorSchemeButton />
                 <SwitchFluidLayoutButton />
                 <n-dropdown :options="userDropdownOptions" placement="bottom-end" trigger="hover">
                     <n-button quaternary>
@@ -54,7 +51,7 @@
                         Administrator
                     </n-button>
                 </n-dropdown>
-            </div>
+            </n-space>
         </div>
     </n-layout-header>
 
