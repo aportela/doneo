@@ -7,6 +7,7 @@
     import { required, minLength, validEmail, runValidators } from '../../composables/form-validators';
     import { useSessionStore } from "../../stores/session";
     import { type AjaxState as AjaxStateInterface, defaultAjaxState } from "../../types/ajaxState";
+    import { default as RemoteAPIAlert } from '../alerts/RemoteAPIAlert.vue';
 
     import { useI18n } from "vue-i18n";
 
@@ -65,6 +66,7 @@
     const onSubmit = () => {
         serverErrors.value = {}
         if (formValues.value.email && formValues.value.password) {
+            Object.assign(state, defaultAjaxState);
             state.ajaxRunning = true;
             api.auth.signIn(formValues.value.email, formValues.value.password)
                 .then((successResponse: any) => {
@@ -77,21 +79,32 @@
                             console.error(e);
                         });
                     } else {
-                        console.error("Invalid response");
+                        state.ajaxErrorMessage = "Invalid response";
                     }
                 })
                 .catch((errorResponse) => {
                     state.ajaxErrors = true;
-                    switch (errorResponse.status) {
-                        case 404:
-                            serverErrors.value.email = "Email not found";
-                            break;
-                        case 401:
-                            serverErrors.value.password = "Invalid password";
-                            break;
+                    if (errorResponse.isAPIError) {
+                        state.ajaxAPIErrorDetails = errorResponse.customAPIErrorDetails;
+                        switch (errorResponse.status) {
+                            case 404:
+                                serverErrors.value.email = "Email not found";
+                                break;
+                            case 401:
+                                serverErrors.value.password = "Invalid password";
+                                break;
+                            default:
+                                state.ajaxErrorMessage = "API Error: fatal error";
+                                break;
+
+                        }
+                        signInFormRef.value?.restoreValidation();
+                        signInFormRef.value?.validate().catch(() => { });
                     }
-                    signInFormRef.value?.restoreValidation();
-                    signInFormRef.value?.validate().catch(() => { });
+                    else {
+                        state.ajaxErrorMessage = `Uncaught exception (${errorResponse.status})\n\n${errorResponse}`;
+                        console.error(errorResponse);
+                    }
                 })
                 .finally(() => {
                     state.ajaxRunning = false;
@@ -144,10 +157,11 @@
             <n-form-item>
                 <n-button secondary @click="validateForm" block :disabled="state.ajaxRunning">{{
                     t("Sign in")
-                    }}</n-button>
+                }}</n-button>
             </n-form-item>
         </n-form>
     </n-spin>
+    <RemoteAPIAlert v-if="state.ajaxErrorMessage" type="error" title="Login error" :message="state.ajaxErrorMessage" />
 </template>
 
 <style lang="css" scoped></style>
