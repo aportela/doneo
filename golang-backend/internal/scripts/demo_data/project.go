@@ -9,7 +9,7 @@ import (
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
-	"github.com/aportela/doneo/internal/services"
+	"github.com/aportela/doneo/internal/services/projectservice"
 	"github.com/aportela/doneo/internal/utils"
 	"github.com/gofrs/uuid"
 )
@@ -105,7 +105,7 @@ func getRandomProjectKey() string {
 	return string(result)
 }
 
-func getRandomProject(userIds []string, projectTypeIds []string) domain.Project {
+func getRandomProject(workspaceId string, userIds []string, projectTypeIds []string) domain.Project {
 	projectID := func() string { u, _ := uuid.NewV7(); return u.String() }()
 	projectDescription := getRandomProjectDescription()
 	startOffset := rand.Int63n(48)
@@ -118,32 +118,35 @@ func getRandomProject(userIds []string, projectTypeIds []string) domain.Project 
 	rand.Shuffle(len(userIds), func(i, j int) {
 		userIds[i], userIds[j] = userIds[j], userIds[i]
 	})
-	numParticipants := rand.Intn(3) + 1
-	var participants []domain.UserBase
-	for i := 0; i < numParticipants; i++ {
-		participants = append(participants, domain.UserBase{ID: userIds[i]})
-	}
+	/*
+		numParticipants := rand.Intn(3) + 1
+		var participants []domain.UserBase
+		for i := 0; i < numParticipants; i++ {
+			participants = append(participants, domain.UserBase{ID: userIds[i]})
+		}
+	*/
 	return domain.Project{
-		ID:           projectID,
-		Key:          getRandomProjectKey(),
-		Summary:      getRandomProjectSummary(),
-		Description:  &projectDescription,
-		CreatedBy:    domain.UserBase{ID: userIds[rand.Intn(len(userIds))]},
-		CreatedAt:    ctime,
-		UpdatedAt:    &ftime,
-		StartedAt:    &stime,
-		DueAt:        &dtime,
-		Type:         domain.ProjectType{ID: projectTypeIds[rand.Intn(len(projectTypeIds))]},
-		Participants: participants,
+		ID:          projectID,
+		WorkspaceId: workspaceId,
+		Key:         getRandomProjectKey(),
+		Summary:     getRandomProjectSummary(),
+		Description: &projectDescription,
+		CreatedBy:   domain.UserBase{ID: userIds[rand.Intn(len(userIds))]},
+		CreatedAt:   ctime,
+		UpdatedAt:   &ftime,
+		StartedAt:   &stime,
+		DueAt:       &dtime,
+		Type:        domain.ProjectType{ID: projectTypeIds[rand.Intn(len(projectTypeIds))]},
 	}
 }
 
-func createProjects(database database.Database, projectTypeIds []string, userIds []string, count int) []string {
+func createProjects(database database.Database, workspaceId string, projectTypeIds []string, userIds []string, count int) []string {
 	var newProjectIds []string
 	projectRepository := projectrepository.NewProjectRepository(database)
-	projectService := services.NewProjectService(projectRepository)
+
+	projectService := projectservice.NewProjectService(projectRepository)
 	for i := 1; i <= count; i++ {
-		newProject := getRandomProject(userIds, projectTypeIds)
+		newProject := getRandomProject(workspaceId, userIds, projectTypeIds)
 		err := projectService.AddProject(context.Background(), newProject)
 		if err != nil {
 			fmt.Printf("Error creating project %s\n", err.Error())

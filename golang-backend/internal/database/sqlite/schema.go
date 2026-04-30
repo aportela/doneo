@@ -55,21 +55,21 @@ var installSchemaQueries = []string{
 	`
 		CREATE TABLE IF NOT EXISTS projects (
 			id TEXT NOT NULL CHECK(length(id) == 36),
-			workspace_id TEXT NOT NULL CHECK(length(id) == 36),
+			workspace_id TEXT NOT NULL CHECK(length(workspace_id) == 36),
 			key TEXT NOT NULL CHECK(length(key) <= 8),
 			summary TEXT NOT NULL CHECK(length(summary) <= 128),
 			description TEXT,
-			creator_id TEXT NOT NULL CHECK(length(id) == 36),
+			creator_id TEXT NOT NULL CHECK(length(creator_id) == 36),
 			created_at INTEGER NOT NULL,
 			updated_at INTEGER,
 			started_at INTEGER,
 			finished_at INTEGER,
 			due_at INTEGER,
-			type TEXT NOT NULL CHECK(length(id) == 36),
+			type_id TEXT NOT NULL CHECK(length(type_id) == 36),
 			PRIMARY KEY (id),
 			FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,
 			FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE,
-			FOREIGN KEY(type) REFERENCES project_types(id) ON DELETE CASCADE
+			FOREIGN KEY(type_id) REFERENCES project_types(id) ON DELETE CASCADE
 		) STRICT;
 	`,
 	`

@@ -10,15 +10,12 @@ import (
 
 	"github.com/aportela/doneo/internal/config"
 	"github.com/aportela/doneo/internal/database"
-	"github.com/aportela/doneo/internal/handlers"
 	"github.com/aportela/doneo/internal/handlers/authhandler"
+	"github.com/aportela/doneo/internal/handlers/projecthandler"
+	"github.com/aportela/doneo/internal/handlers/projecttypehandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 	"github.com/aportela/doneo/internal/handlers/workspacehandler"
-	"github.com/aportela/doneo/internal/repositories/projectrepository"
-	"github.com/aportela/doneo/internal/repositories/projecttyperepository"
 
-	//"github.com/aportela/doneo/internal/repositories"
-	"github.com/aportela/doneo/internal/services"
 	"github.com/aportela/doneo/internal/ui"
 )
 
@@ -60,9 +57,7 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 	})
 
 	apiRouter.Route("/projects", func(r chi.Router) {
-		projectRepository := projectrepository.NewProjectRepository(db)
-		projectService := services.NewProjectService(projectRepository)
-		projectHandler := handlers.NewProjectHandler(projectService)
+		projectHandler := projecthandler.NewProjectHandler(db)
 		r.Post("/", projectHandler.AddProject)
 		r.Get("/", projectHandler.SearchProjects)
 		r.Route("/{id}", func(r chi.Router) {
@@ -73,9 +68,7 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 	})
 
 	apiRouter.Route("/project_types", func(r chi.Router) {
-		projectTypeRepository := projecttyperepository.NewProjectTypeRepository(db)
-		projectTypeService := services.NewProjectTypeService(projectTypeRepository)
-		projectTypeHandler := handlers.NewProjectTypeHandler(projectTypeService)
+		projectTypeHandler := projecttypehandler.NewProjectTypeHandler(db)
 		r.Post("/", projectTypeHandler.AddProjectType)
 		r.Get("/", projectTypeHandler.SearchProjectTypes)
 		r.Route("/{id}", func(r chi.Router) {

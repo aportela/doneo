@@ -1,6 +1,6 @@
 package projecttyperepository
 
-type proyectTypeDTO struct {
+type projectTypeDTO struct {
 	ID   string `db:"id"`
 	Name string `db:"name"`
 }

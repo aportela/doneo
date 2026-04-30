@@ -66,7 +66,7 @@ func (userRepository *userRepository) Update(ctx context.Context, user userDTO) 
 				updated_at = ?,
 				is_super_user = ?
 			WHERE id = ?`
-		args = append(args, user.Email, user.Name, &user.PasswordHash, &user.UpdatedAt, adminFlag, user.ID)
+		args = append(args, user.Email, user.Name, &user.PasswordHash, utils.NullableInt64ToSQL(user.UpdatedAt), adminFlag, user.ID)
 	} else {
 		query = `
 			UPDATE users SET
@@ -75,7 +75,7 @@ func (userRepository *userRepository) Update(ctx context.Context, user userDTO) 
 				updated_at = ?,
 				is_super_user = ?
 			WHERE id = ?`
-		args = append(args, user.Email, user.Name, &user.UpdatedAt, adminFlag, user.ID)
+		args = append(args, user.Email, user.Name, utils.NullableInt64ToSQL(user.UpdatedAt), adminFlag, user.ID)
 	}
 	_, err := userRepository.database.ExecContext(ctx, query, args...)
 	return err

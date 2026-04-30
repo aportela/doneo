@@ -7,6 +7,7 @@ import (
 func CreateDemoData(database database.Database) {
 
 	userIds := createUsers(database, 32)
+	workspaceId := createDefaultWorkspace(database, userIds[0])
 	projectTypeIds := createProjectTypes(database)
-	createProjects(database, projectTypeIds, userIds, 32)
+	createProjects(database, workspaceId, projectTypeIds, userIds, 32)
 }

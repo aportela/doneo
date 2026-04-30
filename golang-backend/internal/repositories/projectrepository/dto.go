@@ -1,7 +1,8 @@
 package projectrepository
 
-type proyectDTO struct {
+type projectDTO struct {
 	ID          string  `db:"id"`
+	WorkspaceId string  `db:"workspace_id"`
 	Key         string  `db:"key"`
 	Summary     string  `db:"summary"`
 	Description *string `json:"description"`
@@ -12,4 +13,6 @@ type proyectDTO struct {
 	StartedAt   *int64  `db:"started_at"`
 	FinishedAt  *int64  `db:"finished_at"`
 	DueAt       *int64  `db:"due_at"`
+	TypeId      string  `db:"type_id"`
+	TypeName    string  `db:"type_name"`
 }

@@ -3,74 +3,53 @@ package projectrepository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/aportela/doneo/internal/database"
-	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/utils"
 )
 
-type ProjectRepository struct {
+type ProjectRepository interface {
+	Add(ctx context.Context, project projectDTO) error
+	Update(ctx context.Context, project projectDTO) error
+	Get(ctx context.Context, id string) (projectDTO, error)
+	Delete(ctx context.Context, id string) error
+	Search(ctx context.Context) ([]projectDTO, error)
+}
+
+type projectRepository struct {
 	database database.Database
 }
 
-func NewProjectRepository(database database.Database) *ProjectRepository {
-	return &ProjectRepository{
-		database: database,
-	}
+func NewProjectRepository(database database.Database) ProjectRepository {
+	return &projectRepository{database: database}
 }
 
-func (projectRepository *ProjectRepository) AddParticipant(ctx context.Context, projectId string, userId string) error {
+func (projectRepository *projectRepository) Add(ctx context.Context, project projectDTO) error {
+	fmt.Println(project.TypeId)
 	_, err := projectRepository.database.ExecContext(
 		ctx,
 		`
-            INSERT INTO project_user_roles (project_id, user_id, is_admin, is_member, is_guest)
-			VALUES (?, ?, 1, 1, 1)
-        `,
-		projectId,
-		userId,
-	)
-	return err
-}
-
-func (projectRepository *ProjectRepository) add(ctx context.Context, project domain.Project) error {
-	_, err := projectRepository.database.ExecContext(
-		ctx,
-		`
-            INSERT INTO projects (id, workspace_id, key, summary, description, creator_id, created_at, updated_at, started_at, finished_at, due_at, type)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO projects (id, workspace_id, key, summary, description, creator_id, created_at, updated_at, started_at, finished_at, due_at, type_id)
+			VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?)
         `,
 		project.ID,
-		"019dddbc-9df2-717c-be35-70f707e6098f",
+		project.WorkspaceId,
 		project.Key,
 		project.Summary,
 		utils.NullableStringToSQL(project.Description),
-		project.CreatedBy.ID,
+		project.CreatorId,
 		project.CreatedAt,
 		utils.NullableInt64ToSQL(project.UpdatedAt),
 		utils.NullableInt64ToSQL(project.StartedAt),
-		utils.NullableInt64ToSQL(project.UpdatedAt),
+		utils.NullableInt64ToSQL(project.FinishedAt),
 		utils.NullableInt64ToSQL(project.DueAt),
-		project.Type.ID,
+		project.TypeId,
 	)
 	return err
 }
 
-func (projectRepository *ProjectRepository) Add(ctx context.Context, project domain.Project) error {
-	// TODO: transaction
-	err := projectRepository.add(ctx, project)
-	if err != nil {
-		return err
-	}
-	for _, projectParticipant := range project.Participants {
-		err = projectRepository.AddParticipant(ctx, project.ID, projectParticipant.ID)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (projectRepository *ProjectRepository) Update(ctx context.Context, project domain.Project) error {
+func (projectRepository *projectRepository) Update(ctx context.Context, project projectDTO) error {
 	_, err := projectRepository.database.ExecContext(
 		ctx,
 		`
@@ -82,7 +61,7 @@ func (projectRepository *ProjectRepository) Update(ctx context.Context, project 
 				started_at = ?,
 				finished_at = ?,
 				due_at = ?,
-				type = ?
+				type_id = ?
 			WHERE id = ?
         `,
 		project.Key,
@@ -92,13 +71,13 @@ func (projectRepository *ProjectRepository) Update(ctx context.Context, project 
 		utils.NullableInt64ToSQL(project.StartedAt),
 		utils.NullableInt64ToSQL(project.UpdatedAt),
 		utils.NullableInt64ToSQL(project.DueAt),
-		project.Type.ID,
+		project.TypeId,
 		project.ID,
 	)
 	return err
 }
 
-func (projectRepository *ProjectRepository) Delete(ctx context.Context, id string) error {
+func (projectRepository *projectRepository) Delete(ctx context.Context, id string) error {
 	_, err := projectRepository.database.ExecContext(
 		ctx,
 		`
@@ -110,124 +89,63 @@ func (projectRepository *ProjectRepository) Delete(ctx context.Context, id strin
 	return err
 }
 
-func (projectRepository *ProjectRepository) getParticipants(ctx context.Context, projectId string) ([]domain.UserBase, error) {
-	rows, err := projectRepository.database.QueryContext(
-		ctx,
-		`
-        SELECT
-                U.id, U.name
-		FROM project_user_roles PP
-		INNER JOIN users U ON U.id = PP.user_id
-		WHERE PP.project_id = ?
-		ORDER BY U.name
-        `,
-		projectId,
-	)
-
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var participants []domain.UserBase
-
-	for rows.Next() {
-		var user domain.UserBase
-
-		if err := rows.Scan(
-			&user.ID, &user.Name,
-		); err != nil {
-			return nil, err
-		}
-
-		participants = append(participants, user)
-	}
-
-	return participants, nil
-}
-
-func (projectRepository *ProjectRepository) get(ctx context.Context, id string) (*domain.Project, error) {
-	var project domain.Project
-	var updated_at, started_at, finished_at, due_at sql.NullInt64
+func (projectRepository *projectRepository) Get(ctx context.Context, id string) (projectDTO, error) {
+	var project projectDTO
 	var description sql.NullString
-	var creatorID, creatorName string
+	var updated_at, started_at, finished_at, due_at sql.NullInt64
 	err := projectRepository.database.QueryRowContext(
 		ctx,
 		`
             SELECT
-                P.id, P.key, P.summary, P.description, P.created_at, P.updated_at, P.started_at, P.finished_at, P.due_at, P.type, PT.name, P.creator_id, U.name
+                P.id, P.key, P.summary, P.description, P.created_at, P.updated_at, P.started_at, P.finished_at, P.due_at, P.type_id, PT.name, P.creator_id, U.name
             FROM projects P
-			LEFT JOIN project_types PT ON PT.id = P.type
+			INNER JOIN project_types PT ON PT.id = P.type
 			INNER JOIN users U ON U.ID = P.creator_id
             WHERE P.id = ?
         `,
-		id).Scan(&project.ID, &project.Key, &project.Summary, &description, &project.CreatedAt, &updated_at, &started_at, &finished_at, &due_at, &project.Type.ID, &project.Type.Name, &creatorID, &creatorName)
-	project.CreatedBy = domain.UserBase{ID: creatorID, Name: creatorName}
+		id).Scan(&project.ID, &project.Key, &project.Summary, &description, &project.CreatedAt, &updated_at, &started_at, &finished_at, &due_at, &project.TypeId, &project.TypeName, &project.CreatorId, &project.CreatorName)
 	project.Description = utils.SQLStrPtr(description)
 	project.UpdatedAt = utils.SQLInt64Ptr(updated_at)
 	project.StartedAt = utils.SQLInt64Ptr(started_at)
 	project.UpdatedAt = utils.SQLInt64Ptr(finished_at)
 	project.DueAt = utils.SQLInt64Ptr(due_at)
-
-	return &project, err
+	return project, err
 }
 
-func (projectRepository *ProjectRepository) Get(ctx context.Context, id string) (*domain.Project, error) {
-	project, err := projectRepository.get(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	var participants []domain.UserBase
-	participants, err = projectRepository.getParticipants(ctx, project.ID)
-	if err != nil {
-		return nil, err
-	}
-	project.Participants = participants
-	return project, nil
-}
-
-func (projectRepository *ProjectRepository) Search(ctx context.Context) ([]domain.Project, error) {
+func (projectRepository *projectRepository) Search(ctx context.Context) ([]projectDTO, error) {
 	rows, err := projectRepository.database.QueryContext(
 		ctx,
 		`
-        SELECT
-                P.id, P.key, P.summary, P.description, P.created_at, P.updated_at, P.started_at, P.finished_at, P.due_at, P.type, PT.name, P.creator_id, U.name
-		FROM projects P
-		LEFT JOIN project_types PT ON PT.id = P.type
-		INNER JOIN users U ON U.ID = P.creator_id
+            SELECT
+                P.id, P.key, P.summary, P.description, P.created_at, P.updated_at, P.started_at, P.finished_at, P.due_at, P.type_id, PT.name, P.creator_id, U.name
+            FROM projects P
+			INNER JOIN project_types PT ON PT.id = P.type
+			INNER JOIN users U ON U.ID = P.creator_id
         `,
 	)
-
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-
-	var projects []domain.Project
+	var projects []projectDTO
 
 	for rows.Next() {
-		var project domain.Project
-		var updated_at, started_at, finished_at, due_at sql.NullInt64
+		var project projectDTO
 		var description sql.NullString
-		var creatorID, creatorName string
-
+		var updated_at, started_at, finished_at, due_at sql.NullInt64
 		if err := rows.Scan(
 			&project.ID, &project.Key, &project.Summary, &description,
 			&project.CreatedAt, &updated_at, &started_at, &finished_at, &due_at,
-			&project.Type.ID, &project.Type.Name, &creatorID, &creatorName,
+			&project.TypeId, &project.TypeName, &project.CreatorId, &project.CreatorName,
 		); err != nil {
 			return nil, err
 		}
-
-		project.CreatedBy = domain.UserBase{ID: creatorID, Name: creatorName}
 		project.Description = utils.SQLStrPtr(description)
 		project.UpdatedAt = utils.SQLInt64Ptr(updated_at)
 		project.StartedAt = utils.SQLInt64Ptr(started_at)
 		project.UpdatedAt = utils.SQLInt64Ptr(finished_at)
 		project.DueAt = utils.SQLInt64Ptr(due_at)
-
 		projects = append(projects, project)
 	}
-
 	return projects, nil
 }

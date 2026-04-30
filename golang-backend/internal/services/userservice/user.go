@@ -23,9 +23,7 @@ type userService struct {
 }
 
 func NewUserService(repository userrepository.UserRepository) UserService {
-	return &userService{
-		repository: repository,
-	}
+	return &userService{repository: repository}
 }
 
 func (s *userService) AddUser(ctx context.Context, user domain.User) error {
