@@ -15,6 +15,14 @@ var installSchemaQueries = []string{
 		) STRICT;
 	`,
 	`
+		CREATE TABLE IF NOT EXISTS roles (
+			id TEXT NOT NULL CHECK(length(id) == 36),
+			name TEXT NOT NULL CHECK(length(name) <= 32),
+			permission_bitmask INTEGER NOT NULL DEFAULT 0,
+			PRIMARY KEY (id)
+		) STRICT;
+	`,
+	`
 		CREATE TABLE IF NOT EXISTS workspaces (
 			id TEXT NOT NULL CHECK(length(id) == 36),
 			name TEXT NOT NULL CHECK(length(name) <= 16),
@@ -30,12 +38,11 @@ var installSchemaQueries = []string{
 		CREATE TABLE IF NOT EXISTS workspace_user_role (
 			workspace_id TEXT NOT NULL CHECK(length(workspace_id) == 36),
 			user_id TEXT NOT NULL CHECK(length(user_id) == 36),
-			is_admin INTEGER NOT NULL DEFAULT 0 CHECK(is_admin IN (0, 1)),
-			is_member INTEGER NOT NULL DEFAULT 0 CHECK(is_admin IN (0, 1)),
-			is_guest INTEGER NOT NULL DEFAULT 0 CHECK(is_guest IN (0, 1)),
+			role_id TEXT NOT NULL CHECK(length(role_id) == 36),
 			PRIMARY KEY (workspace_id, user_id),
 			FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,
-			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+			FOREIGN KEY(role_id) REFERENCES roles(id) ON DELETE CASCADE
 		) STRICT;
 	`,
 	`
@@ -66,15 +73,14 @@ var installSchemaQueries = []string{
 		) STRICT;
 	`,
 	`
-		CREATE TABLE IF NOT EXISTS project_user_roles (
+		CREATE TABLE IF NOT EXISTS project_user_role (
 			project_id TEXT NOT NULL CHECK(length(project_id) == 36),
 			user_id TEXT NOT NULL CHECK(length(user_id) == 36),
-			is_admin INTEGER NOT NULL DEFAULT 0 CHECK(is_admin IN (0, 1)),
-			is_member INTEGER NOT NULL DEFAULT 0 CHECK(is_member IN (0, 1)),
-			is_guest INTEGER NOT NULL DEFAULT 0 CHECK(is_guest IN (0, 1)),
+			role_id TEXT NOT NULL CHECK(length(role_id) == 36),
 			PRIMARY KEY (project_id, user_id),
-			FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE,
-			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+			FOREIGN KEY(project_id) REFERENCES project(id) ON DELETE CASCADE,
+			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+			FOREIGN KEY(role_id) REFERENCES roles(id) ON DELETE CASCADE
 		) STRICT;
 	`,
 	/*
