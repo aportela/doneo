@@ -31,5 +31,5 @@ type getProjectResponse struct {
 }
 
 type searchProjectsResponse struct {
-	Projects []projectResponse `json:"project"`
+	Projects []projectResponse `json:"projects"`
 }

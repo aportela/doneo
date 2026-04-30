@@ -28,5 +28,5 @@ type getProjectTypeResponse struct {
 }
 
 type searchProjectTypesResponse struct {
-	ProjectTypes []projectTypeResponse `json:"projectType"`
+	ProjectTypes []projectTypeResponse `json:"projectTypes"`
 }
