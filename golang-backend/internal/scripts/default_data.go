@@ -7,7 +7,9 @@ import (
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
+	"github.com/aportela/doneo/internal/repositories/workspacerepository"
 	"github.com/aportela/doneo/internal/services/userservice"
+	"github.com/aportela/doneo/internal/services/workspaceservice"
 	"github.com/aportela/doneo/internal/utils"
 	"github.com/gofrs/uuid"
 )
@@ -31,5 +33,24 @@ func CreateDefaultData(db database.Database) {
 	})
 	if err != nil {
 		fmt.Printf("Error creating user %s\n", err.Error())
+	}
+
+	workspaceRepository := workspacerepository.NewWorkspaceRepository(db)
+	workspaceService := workspaceservice.NewWorkspaceService(workspaceRepository)
+
+	workspaceID := func() string { u, _ := uuid.NewV7(); return u.String() }()
+
+	err = workspaceService.AddWorkspace(context.Background(), domain.Workspace{
+		ID:          workspaceID,
+		Name:        "default",
+		Description: nil,
+		CreatedBy: domain.UserBase{
+			ID: userID,
+		},
+		CreatedAt: utils.CurrentMSTimestamp(),
+		UpdatedAt: nil,
+	})
+	if err != nil {
+		fmt.Printf("Error creating workspace %s\n", err.Error())
 	}
 }

@@ -15,9 +15,6 @@ var installSchemaQueries = []string{
 		) STRICT;
 	`,
 	`
-		INSERT INTO users (id, email, name, password_hash, created_at, updated_at, is_super_user) VALUES('019dddbc-9df6-717d-842b-cfaa4333e936', 'foo@ba.r', 'John Doe', '$2a$10$TnG0KKz/tfoZMo9fF0bA2.AWjj7kcm4Odgpn6I.iBbv88j5C7lEvi', 1777541617024, NULL, 1);
-	`,
-	`
 		CREATE TABLE IF NOT EXISTS workspaces (
 			id TEXT NOT NULL CHECK(length(id) == 36),
 			name TEXT NOT NULL CHECK(length(name) <= 16),
@@ -28,9 +25,6 @@ var installSchemaQueries = []string{
 			PRIMARY KEY (id),
 			FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE
 		) STRICT;
-	`,
-	`
-		INSERT INTO workspaces (id, name, description,creator_id, created_at, updated_at) VALUES('019dddbc-9df2-717c-be35-70f707e6098f', 'default', 'Default workspace', '019dddbc-9df6-717d-842b-cfaa4333e936', 1777541617024, NULL)
 	`,
 	`
 		CREATE TABLE IF NOT EXISTS workspace_user_role (
