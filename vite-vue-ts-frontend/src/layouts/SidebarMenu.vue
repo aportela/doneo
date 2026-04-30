@@ -1,10 +1,11 @@
 <script setup lang="ts">
-    import type { MenuOption, } from 'naive-ui'
-    import { NMenu } from 'naive-ui';
+    import type { MenuOption } from 'naive-ui'
+    import { NMenu, NSelect } from 'naive-ui';
     import type { Component } from 'vue'
-    import { IconBug, IconSitemap, IconHome, IconFileAnalytics, IconSettings, IconSquarePlus, IconListDetails, IconMatrix } from '@tabler/icons-vue';
+    import { IconBug, IconSitemap, IconHome, IconFileAnalytics, IconSettings, IconMatrix, IconUsers } from '@tabler/icons-vue';
+    // IconListDetails
     import { NIcon } from 'naive-ui'
-    import { h } from 'vue'
+    import { h, ref } from 'vue'
     import { RouterLink } from 'vue-router'
 
     const commonIconSize = 20;
@@ -19,6 +20,29 @@
 
     const menuOptions: MenuOption[] = [
         {
+            key: 'divider-1',
+            type: 'divider',
+            props: {
+                style: {
+                    marginLeft: '32px'
+                }
+            }
+        },
+        {
+            key: 'workspace',
+            label: () =>
+                h(NSelect, {
+                    value: currentWorkspace.value,
+                    'onUpdate:value': (val) => {
+                        currentWorkspace.value = val
+                    },
+                    options: workspaceOptions,
+                    placeholder: 'Select workspace',
+                    style: 'width: 100%'
+                }),
+            icon: renderIcon(IconMatrix)(commonIconSize)
+        },
+        {
             label: () =>
                 h(
                     RouterLink,
@@ -29,11 +53,12 @@
                             }
                         }
                     },
-                    { default: () => 'Welcome' }
+                    { default: () => 'Home' }
                 ),
             key: 'home',
             icon: renderIcon(IconHome)(commonIconSize)
         },
+        /*
         {
             key: 'divider-1',
             type: 'divider',
@@ -44,7 +69,6 @@
             }
         },
         {
-
             label: () =>
                 h(
                     RouterLink,
@@ -59,43 +83,9 @@
                 ),
             key: 'workspaces',
             icon: renderIcon(IconMatrix)(commonIconSize),
-            children: [
-                {
-                    label: () =>
-                        h(
-                            RouterLink,
-                            {
-                                to: {
-                                    name: 'tasks',
-                                    params: {
-                                    }
-                                }
-                            },
-                            { default: () => 'Add' }
-                        ),
-                    key: 'add_project',
-                    icon: renderIcon(IconSquarePlus)(commonIconSize)
-                },
-                {
-                    label: () =>
-                        h(
-                            RouterLink,
-                            {
-                                to: {
-                                    name: 'tasks',
-                                    params: {
-                                    }
-                                }
-                            },
-                            { default: () => 'List' }
-                        ),
-                    key: 'list_project',
-                    icon: renderIcon(IconListDetails)(commonIconSize)
-                },
-            ]
         },
+        */
         {
-
             label: () =>
                 h(
                     RouterLink,
@@ -110,40 +100,6 @@
                 ),
             key: 'projects',
             icon: renderIcon(IconSitemap)(commonIconSize),
-            children: [
-                {
-                    label: () =>
-                        h(
-                            RouterLink,
-                            {
-                                to: {
-                                    name: 'tasks',
-                                    params: {
-                                    }
-                                }
-                            },
-                            { default: () => 'Add' }
-                        ),
-                    key: 'add_project',
-                    icon: renderIcon(IconSquarePlus)(commonIconSize)
-                },
-                {
-                    label: () =>
-                        h(
-                            RouterLink,
-                            {
-                                to: {
-                                    name: 'tasks',
-                                    params: {
-                                    }
-                                }
-                            },
-                            { default: () => 'List' }
-                        ),
-                    key: 'list_project',
-                    icon: renderIcon(IconListDetails)(commonIconSize)
-                },
-            ]
         },
         {
             label: () =>
@@ -188,7 +144,7 @@
                             }
                         }
                     },
-                    { default: () => 'Settings' }
+                    { default: () => 'Admin' }
                 ),
             key: 'settings',
             icon: renderIcon(IconSettings)(commonIconSize),
@@ -204,18 +160,103 @@
                                     }
                                 }
                             },
-                            { default: () => 'Manage users' }
+                            { default: () => 'Users' }
                         ),
                     key: 'users',
-                    icon: renderIcon(IconSettings)(commonIconSize)
+                    icon: renderIcon(IconUsers)(commonIconSize)
+                },
+                {
+                    label: () =>
+                        h(
+                            RouterLink,
+                            {
+                                to: {
+                                    name: 'users',
+                                    params: {
+                                    }
+                                }
+                            },
+                            { default: () => 'Workspaces' }
+                        ),
+                    key: 'users',
+                    icon: renderIcon(IconMatrix)(commonIconSize)
+                },
+                {
+                    label: () =>
+                        h(
+                            RouterLink,
+                            {
+                                to: {
+                                    name: 'projects',
+                                    params: {
+                                    }
+                                }
+                            },
+                            { default: () => 'Projects' }
+                        ),
+                    key: 'projects',
+                    icon: renderIcon(IconSitemap)(commonIconSize)
+                },
+                {
+                    label: () =>
+                        h(
+                            RouterLink,
+                            {
+                                to: {
+                                    name: 'tasks',
+                                    params: {
+                                    }
+                                }
+                            },
+                            { default: () => 'Tasks' }
+                        ),
+                    key: 'tasks',
+                    icon: renderIcon(IconBug)(commonIconSize)
+                },
+                {
+                    label: () =>
+                        h(
+                            RouterLink,
+                            {
+                                to: {
+                                    name: 'reports',
+                                    params: {
+                                    }
+                                }
+                            },
+                            { default: () => 'Reports' }
+                        ),
+                    key: 'reports',
+                    icon: renderIcon(IconBug)(commonIconSize)
                 },
             ]
         },
     ]
 
-
     function handleUpdateValue(_key: string, _item: MenuOption) {
     }
+
+    const currentWorkspace = ref<string>("w1");
+
+    const workspaceOptions = [
+        {
+            label: 'Workspace 1',
+            value: 'w1',
+        },
+        {
+            label: 'Workspace 2',
+            value: 'w2',
+        },
+        {
+            label: 'Workspace 3',
+            value: 'w3',
+        },
+        {
+            label: 'Workspace 4',
+            value: 'w4',
+        },
+
+    ]
 </script>
 
 <template>
