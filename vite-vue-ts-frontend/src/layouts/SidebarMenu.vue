@@ -2,7 +2,7 @@
     import type { MenuOption, } from 'naive-ui'
     import { NMenu } from 'naive-ui';
     import type { Component } from 'vue'
-    import { IconBug, IconSitemap, IconHome, IconFileAnalytics, IconSettings, IconSquarePlus, IconListDetails } from '@tabler/icons-vue';
+    import { IconBug, IconSitemap, IconHome, IconFileAnalytics, IconSettings, IconSquarePlus, IconListDetails, IconMatrix } from '@tabler/icons-vue';
     import { NIcon } from 'naive-ui'
     import { h } from 'vue'
     import { RouterLink } from 'vue-router'
@@ -44,6 +44,58 @@
             }
         },
         {
+
+            label: () =>
+                h(
+                    RouterLink,
+                    {
+                        to: {
+                            name: 'workspaces',
+                            params: {
+                            }
+                        }
+                    },
+                    { default: () => 'WorkSpaces' }
+                ),
+            key: 'workspaces',
+            icon: renderIcon(IconMatrix)(commonIconSize),
+            children: [
+                {
+                    label: () =>
+                        h(
+                            RouterLink,
+                            {
+                                to: {
+                                    name: 'tasks',
+                                    params: {
+                                    }
+                                }
+                            },
+                            { default: () => 'Add' }
+                        ),
+                    key: 'add_project',
+                    icon: renderIcon(IconSquarePlus)(commonIconSize)
+                },
+                {
+                    label: () =>
+                        h(
+                            RouterLink,
+                            {
+                                to: {
+                                    name: 'tasks',
+                                    params: {
+                                    }
+                                }
+                            },
+                            { default: () => 'List' }
+                        ),
+                    key: 'list_project',
+                    icon: renderIcon(IconListDetails)(commonIconSize)
+                },
+            ]
+        },
+        {
+
             label: () =>
                 h(
                     RouterLink,

@@ -90,8 +90,9 @@
 </script>
 
 <template>
+    <h1>Manage users</h1>
     <n-data-table size="small" :columns="columns" :data="users" :pagination="pagination" :bordered="false"
-        :loading="loading" :style="{ height: `95vh` }" flex-height />
+        :loading="loading" :style="{ height: `80vh` }" flex-height />
 </template>
 
 <style lang="css"></style>
