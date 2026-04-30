@@ -26,10 +26,11 @@ func mapProjectDomainToProjectResponse(project domain.Project) projectResponse {
 		Key:         project.Key,
 		Summary:     project.Summary,
 		Description: *project.Description,
-		Status:      project.Status,
 		CreatedBy:   creatorResponse{ID: project.CreatedBy.ID, Name: project.CreatedBy.Name},
 		CreatedAt:   project.CreatedAt,
 		Type:        projectTypeResponse{ID: project.Type.ID, Name: project.Type.Name},
+		Priority:    projectPriorityResponse{ID: project.Priority.ID, Name: project.Priority.Name},
+		Status:      projectStatusResponse{ID: project.Status.ID, Name: project.Status.Name},
 	}
 }
 

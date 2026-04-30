@@ -18,6 +18,34 @@
         }
     }
 
+    interface ProjectStatusInterface {
+        id: string;
+        name: string;
+    }
+
+    class ProjectStatus implements ProjectStatusInterface {
+        id: string;
+        name: string;
+        constructor(item: ProjectStatusInterface) {
+            this.id = item.id;
+            this.name = item.name;
+        }
+    }
+
+    interface ProjectPriorityInterface {
+        id: string;
+        name: string;
+    }
+
+    class ProjectPriority implements ProjectPriorityInterface {
+        id: string;
+        name: string;
+        constructor(item: ProjectPriority) {
+            this.id = item.id;
+            this.name = item.name;
+        }
+    }
+
     interface UserBaseInterface {
         id: string;
         name: string;
@@ -36,8 +64,9 @@
         id: string;
         key: string;
         type: ProjectType;
+        status: ProjectStatus;
+        priority: ProjectPriority;
         summary: string;
-        status: string;
         taskCount: number;
         createdBy: UserBase;
         createdAt: number;
@@ -47,8 +76,9 @@
         id: string;
         key: string;
         type: ProjectType;
+        status: ProjectStatus;
+        priority: ProjectPriority;
         summary: string;
-        status: string;
         taskCount: number;
         createdBy: UserBase;
         createdAt: number;
@@ -56,9 +86,10 @@
         constructor(item: ProjectInterface) {
             this.id = item.id;
             this.key = item.key;
-            this.type = item.type;
             this.summary = item.summary;
+            this.type = item.type;
             this.status = item.status;
+            this.priority = item.priority;
             this.taskCount = item.taskCount;
             this.createdBy = item.createdBy;
             this.createdAt = item.createdAt;
@@ -79,12 +110,22 @@
             }
         },
         {
-            title: 'Summary',
-            key: 'summary',
+            title: 'Priority',
+            key: 'priority',
+            render(row) {
+                return row.priority.name
+            }
         },
         {
             title: 'Status',
             key: 'status',
+            render(row) {
+                return row.status.name
+            }
+        },
+        {
+            title: 'Summary',
+            key: 'summary',
         },
         {
             title: 'Created At',

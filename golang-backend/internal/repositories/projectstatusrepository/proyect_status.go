@@ -34,6 +34,7 @@ func (projectStatusRepository *projectStatusRepository) Add(ctx context.Context,
         `,
 		projectStatus.ID,
 		projectStatus.Name,
+		projectStatus.Index,
 	)
 	return err
 }

@@ -29,9 +29,9 @@ func (projectRepository *projectRepository) Add(ctx context.Context, project pro
 		ctx,
 		`
             INSERT INTO projects
-				(id, workspace_id, key, summary, description, creator_id, created_at, updated_at, started_at, finished_at, due_at, type_id)
+				(id, workspace_id, key, summary, description, creator_id, created_at, updated_at, started_at, finished_at, due_at, priority_id, status_id, type_id)
 			VALUES
-				(?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?)
+				(?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?, ?, ?)
         `,
 		project.ID,
 		project.WorkspaceId,
@@ -43,6 +43,8 @@ func (projectRepository *projectRepository) Add(ctx context.Context, project pro
 		utils.NullableInt64ToSQL(project.StartedAt),
 		utils.NullableInt64ToSQL(project.FinishedAt),
 		utils.NullableInt64ToSQL(project.DueAt),
+		project.PriorityId,
+		project.StatusId,
 		project.TypeId,
 	)
 	return err
@@ -60,6 +62,8 @@ func (projectRepository *projectRepository) Update(ctx context.Context, project 
 				started_at = ?,
 				finished_at = ?,
 				due_at = ?,
+				priority_id = ?,
+				status_id = ?,
 				type_id = ?
 			WHERE id = ?
         `,
@@ -70,6 +74,8 @@ func (projectRepository *projectRepository) Update(ctx context.Context, project 
 		utils.NullableInt64ToSQL(project.StartedAt),
 		utils.NullableInt64ToSQL(project.UpdatedAt),
 		utils.NullableInt64ToSQL(project.DueAt),
+		project.PriorityId,
+		project.StatusId,
 		project.TypeId,
 		project.ID,
 	)
@@ -96,13 +102,20 @@ func (projectRepository *projectRepository) Get(ctx context.Context, id string) 
 		ctx,
 		`
             SELECT
-                P.id, P.key, P.summary, P.description, P.created_at, P.updated_at, P.started_at, P.finished_at, P.due_at, P.type_id, PT.name, P.creator_id, U.name
+                P.id, P.key, P.summary, P.description, P.created_at, P.updated_at, P.started_at, P.finished_at, P.due_at, P.status_id, PS.name AS status_name, P.priority_id, PP.name AS priority_name, P.type_id, PT.name AS type_name, P.creator_id, U.name AS creator_name
             FROM projects P
+			INNER JOIN project_priorities PP ON PP.id = P.priority_id
+			INNER JOIN project_statuses PS ON PS.id = P.status_id
 			INNER JOIN project_types PT ON PT.id = P.type_id
 			INNER JOIN users U ON U.ID = P.creator_id
             WHERE P.id = ?
         `,
-		id).Scan(&project.ID, &project.Key, &project.Summary, &description, &project.CreatedAt, &updated_at, &started_at, &finished_at, &due_at, &project.TypeId, &project.TypeName, &project.CreatorId, &project.CreatorName)
+		id).Scan(
+		&project.ID, &project.Key, &project.Summary, &description,
+		&project.CreatedAt, &updated_at, &started_at, &finished_at, &due_at,
+		&project.StatusId, &project.StatusName, &project.PriorityId, &project.PriorityName,
+		&project.TypeId, &project.TypeName, &project.CreatorId, &project.CreatorName,
+	)
 	project.Description = utils.SQLStrPtr(description)
 	project.UpdatedAt = utils.SQLInt64Ptr(updated_at)
 	project.StartedAt = utils.SQLInt64Ptr(started_at)
@@ -116,8 +129,10 @@ func (projectRepository *projectRepository) Search(ctx context.Context) ([]proje
 		ctx,
 		`
             SELECT
-                P.id, P.key, P.summary, P.description, P.created_at, P.updated_at, P.started_at, P.finished_at, P.due_at, P.type_id, PT.name, P.creator_id, U.name
+                P.id, P.key, P.summary, P.description, P.created_at, P.updated_at, P.started_at, P.finished_at, P.due_at, P.status_id, PS.name AS status_name, P.priority_id, PP.name AS priority_name, P.type_id, PT.name AS type_name, P.creator_id, U.name AS creator_name
             FROM projects P
+			INNER JOIN project_priorities PP ON PP.id = P.priority_id
+			INNER JOIN project_statuses PS ON PS.id = P.status_id
 			INNER JOIN project_types PT ON PT.id = P.type_id
 			INNER JOIN users U ON U.ID = P.creator_id
         `,
@@ -127,7 +142,6 @@ func (projectRepository *projectRepository) Search(ctx context.Context) ([]proje
 	}
 	defer rows.Close()
 	var projects []projectDTO
-
 	for rows.Next() {
 		var project projectDTO
 		var description sql.NullString
@@ -135,6 +149,7 @@ func (projectRepository *projectRepository) Search(ctx context.Context) ([]proje
 		if err := rows.Scan(
 			&project.ID, &project.Key, &project.Summary, &description,
 			&project.CreatedAt, &updated_at, &started_at, &finished_at, &due_at,
+			&project.StatusId, &project.StatusName, &project.PriorityId, &project.PriorityName,
 			&project.TypeId, &project.TypeName, &project.CreatorId, &project.CreatorName,
 		); err != nil {
 			return nil, err

@@ -10,6 +10,16 @@ type projectTypeResponse struct {
 	Name string `json:"name"`
 }
 
+type projectPriorityResponse struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type projectStatusResponse struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
 type addProjectRequest struct {
 	ID      string `json:"id"`
 	Key     string `json:"key"`
@@ -23,14 +33,15 @@ type updateProjectRequest struct {
 }
 
 type projectResponse struct {
-	ID          string              `json:"id"`
-	Key         string              `json:"key"`
-	Summary     string              `json:"summary"`
-	Description string              `json:"description"`
-	Status      uint8               `json:"status"`
-	CreatedBy   creatorResponse     `json:"createdBy"`
-	CreatedAt   int64               `json:"createdAt"`
-	Type        projectTypeResponse `json:"type"`
+	ID          string                  `json:"id"`
+	Key         string                  `json:"key"`
+	Summary     string                  `json:"summary"`
+	Description string                  `json:"description"`
+	CreatedBy   creatorResponse         `json:"createdBy"`
+	CreatedAt   int64                   `json:"createdAt"`
+	Type        projectTypeResponse     `json:"type"`
+	Priority    projectPriorityResponse `json:"priority"`
+	Status      projectStatusResponse   `json:"status"`
 }
 
 type addProjectResponse struct {

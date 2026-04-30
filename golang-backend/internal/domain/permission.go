@@ -1,6 +1,6 @@
 package domain
 
-type Permission uint64
+type Permission int
 
 const (
 	Create Permission = 1 << iota

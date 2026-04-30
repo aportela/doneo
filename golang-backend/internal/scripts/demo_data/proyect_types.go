@@ -12,14 +12,12 @@ import (
 )
 
 func createProjectTypes(database database.Database) []string {
-
 	projectTypeNames := []string{
 		"Personal", "Business", "Work", "Educational", "Technology",
 		"Creative", "Research", "Social", "Marketing", "Sports",
 		"Health", "Sustainability", "Government", "Financial", "Construction",
 		"Legal", "Logistics", "Administrative", "Strategy",
 	}
-
 	var newProjectTypeIds []string
 	projectTypeRepository := projecttyperepository.NewProjectTypeRepository(database)
 	projectTypeService := projecttypeservice.NewProjectTypeService(projectTypeRepository)

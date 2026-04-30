@@ -75,7 +75,6 @@ var installSchemaQueries = []string{
 			key TEXT NOT NULL CHECK(length(key) <= 8),
 			summary TEXT NOT NULL CHECK(length(summary) <= 128),
 			description TEXT,
-			status INT NOT NULL DEFAULT 0,
 			creator_id TEXT NOT NULL CHECK(length(creator_id) == 36),
 			created_at INTEGER NOT NULL,
 			updated_at INTEGER,

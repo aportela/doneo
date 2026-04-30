@@ -105,7 +105,7 @@ func getRandomProjectKey() string {
 	return string(result)
 }
 
-func getRandomProject(workspaceId string, userIds []string, projectTypeIds []string) domain.Project {
+func getRandomProject(workspaceId string, userIds []string, projectTypeIds []string, projectPriorityIds []string, projectStatusIds []string) domain.Project {
 	projectID := func() string { u, _ := uuid.NewV7(); return u.String() }()
 	projectDescription := getRandomProjectDescription()
 	startOffset := rand.Int63n(48)
@@ -117,6 +117,12 @@ func getRandomProject(workspaceId string, userIds []string, projectTypeIds []str
 	dtime := ftime + dueOffset*int64(time.Hour/time.Millisecond)
 	rand.Shuffle(len(userIds), func(i, j int) {
 		userIds[i], userIds[j] = userIds[j], userIds[i]
+	})
+	rand.Shuffle(len(projectTypeIds), func(i, j int) {
+		projectTypeIds[i], projectTypeIds[j] = projectTypeIds[j], projectTypeIds[i]
+	})
+	rand.Shuffle(len(projectStatusIds), func(i, j int) {
+		projectStatusIds[i], projectStatusIds[j] = projectStatusIds[j], projectStatusIds[i]
 	})
 	/*
 		numParticipants := rand.Intn(3) + 1
@@ -137,16 +143,18 @@ func getRandomProject(workspaceId string, userIds []string, projectTypeIds []str
 		StartedAt:   &stime,
 		DueAt:       &dtime,
 		Type:        domain.ProjectType{ID: projectTypeIds[rand.Intn(len(projectTypeIds))]},
+		Priority:    domain.ProjectPriority{ID: projectPriorityIds[rand.Intn(len(projectPriorityIds))]},
+		Status:      domain.ProjectStatus{ID: projectStatusIds[rand.Intn(len(projectStatusIds))]},
 	}
 }
 
-func createProjects(database database.Database, workspaceId string, projectTypeIds []string, userIds []string, count int) []string {
+func createProjects(database database.Database, workspaceId string, projectTypeIds []string, projectPriorityIds []string, projectStatusIds []string, userIds []string, count int) []string {
 	var newProjectIds []string
 	projectRepository := projectrepository.NewProjectRepository(database)
 
 	projectService := projectservice.NewProjectService(projectRepository)
 	for i := 1; i <= count; i++ {
-		newProject := getRandomProject(workspaceId, userIds, projectTypeIds)
+		newProject := getRandomProject(workspaceId, userIds, projectTypeIds, projectPriorityIds, projectStatusIds)
 		err := projectService.AddProject(context.Background(), newProject)
 		if err != nil {
 			fmt.Printf("Error creating project %s\n", err.Error())
