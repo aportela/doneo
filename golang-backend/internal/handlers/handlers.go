@@ -9,8 +9,9 @@ import (
 )
 
 type HandlerErrorResponse struct {
-	Message string `json:"message"`
-	Debug   string `json:"debug"`
+	Message  string `json:"message"`
+	Debug    string `json:"debug"`
+	APIError bool   `json:"APIError"`
 }
 
 func ToHandlerJSONResponse(w http.ResponseWriter, data any, err error, statusCode ...int) {
@@ -30,7 +31,7 @@ func ToHandlerJSONResponse(w http.ResponseWriter, data any, err error, statusCod
 			httpResponseCode = http.StatusInternalServerError
 		}
 		w.WriteHeader(httpResponseCode)
-		if err := json.NewEncoder(w).Encode(HandlerErrorResponse{Message: message, Debug: err.Error()}); err != nil {
+		if err := json.NewEncoder(w).Encode(HandlerErrorResponse{Message: message, Debug: err.Error(), APIError: true}); err != nil {
 			http.Error(w, "error encoding JSON: "+err.Error(), http.StatusInternalServerError)
 		}
 	} else {
