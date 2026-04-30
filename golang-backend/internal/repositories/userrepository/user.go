@@ -58,10 +58,23 @@ func (userRepository *userRepository) Update(ctx context.Context, user userDTO) 
 		adminFlag = 1
 	}
 	if user.PasswordHash != nil {
-		query = `UPDATE users SET email = ?, name = ?, password_hash = ?, updated_at = ?, is_super_user = ? WHERE id = ?`
+		query = `
+			UPDATE users SET
+				email = ?,
+				name = ?,
+				password_hash = ?,
+				updated_at = ?,
+				is_super_user = ?
+			WHERE id = ?`
 		args = append(args, user.Email, user.Name, &user.PasswordHash, &user.UpdatedAt, adminFlag, user.ID)
 	} else {
-		query = `UPDATE users SET email = ?, name = ?, updated_at = ?, is_super_user = ? WHERE id = ?`
+		query = `
+			UPDATE users SET
+				email = ?,
+				name = ?,
+				updated_at = ?,
+				is_super_user = ?
+			WHERE id = ?`
 		args = append(args, user.Email, user.Name, &user.UpdatedAt, adminFlag, user.ID)
 	}
 	_, err := userRepository.database.ExecContext(ctx, query, args...)
