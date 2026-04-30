@@ -53,12 +53,16 @@ func (userRepository *userRepository) Update(ctx context.Context, user userDTO) 
 
 	var query string
 	var args []interface{}
+	adminFlag := 0
+	if user.IsSuperUser {
+		adminFlag = 1
+	}
 	if user.PasswordHash != nil {
-		query = `UPDATE users SET email = ?, name = ?, password_hash = ?, updated_at = ? WHERE id = ?`
-		args = append(args, user.Email, user.Name, &user.PasswordHash, &user.UpdatedAt, user.ID)
+		query = `UPDATE users SET email = ?, name = ?, password_hash = ?, updated_at = ?, is_super_user = ? WHERE id = ?`
+		args = append(args, user.Email, user.Name, &user.PasswordHash, &user.UpdatedAt, adminFlag, user.ID)
 	} else {
-		query = `UPDATE users SET email = ?, name = ?, updated_at = ? WHERE id = ?`
-		args = append(args, user.Email, user.Name, &user.UpdatedAt, user.ID)
+		query = `UPDATE users SET email = ?, name = ?, updated_at = ?, is_super_user = ? WHERE id = ?`
+		args = append(args, user.Email, user.Name, &user.UpdatedAt, adminFlag, user.ID)
 	}
 	_, err := userRepository.database.ExecContext(ctx, query, args...)
 	return err
@@ -145,7 +149,6 @@ func (userRepository *userRepository) Search(ctx context.Context) ([]userDTO, er
 		if err := rows.Scan(&user.ID, &user.Email, &user.Name, &user.CreatedAt, &updatedAt, &isSuperUser); err != nil {
 			return nil, err
 		}
-
 		user.UpdatedAt = utils.SQLInt64Ptr(updatedAt)
 		user.IsSuperUser = isSuperUser.Valid && isSuperUser.Byte == 1
 		users = append(users, user)
