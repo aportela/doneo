@@ -9,7 +9,17 @@
     import { default as SwitchColorSchemeButton } from '../components/buttons/SwitchColorSchemeButton.vue';
     import { useUserSettingsStore } from '../stores/userSettings';
 
+    import { useRouter } from "vue-router";
+    import { api } from '../composables/api';
+    import { useSessionStore } from "../stores/session";
+    import { useLoadingStore } from '../stores/loading';
+
+
+    const router = useRouter();
+    const sessionStore = useSessionStore();
+
     const userSettingsStore = useUserSettingsStore();
+    const loadingStore = useLoadingStore();
 
     const commonIconSize = 18;
 
@@ -33,6 +43,38 @@
             icon: renderIcon(IconLogout)(commonIconSize)
         }
     ];
+
+    const onUserDropDownSelect = (key: string | number) => {
+        switch (key) {
+            case "profile":
+                break;
+            case "logout":
+                onSignOut();
+                break;
+        }
+    };
+
+    const onSignOut = () => {
+        loadingStore.set(true);
+        api.auth.signOut().then(() => {
+            sessionStore.removeAccessToken();
+            router.push(
+                { name: "login" }
+            ).catch((e) => {
+                console.error(e);
+            });
+        }).catch(() => {
+            sessionStore.removeAccessToken();
+            router.push(
+                { name: "login" }
+            ).catch((e) => {
+                console.error(e);
+            });
+        }).finally(() => {
+            loadingStore.set(false);
+        });
+    };
+
 </script>
 
 <template>
@@ -47,7 +89,8 @@
                 <GithubButton :size="commonIconSize" />
                 <SwitchColorSchemeButton :size="commonIconSize" />
                 <SwitchFluidLayoutButton :size="commonIconSize" />
-                <n-dropdown :options="userDropdownOptions" placement="bottom-end" trigger="hover">
+                <n-dropdown :options="userDropdownOptions" placement="bottom-end" trigger="hover"
+                    @select="onUserDropDownSelect">
                     <n-button quaternary>
                         <IconUserCircle :size="commonIconSize" />
                         <span class="username">Administrator</span>
