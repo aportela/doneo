@@ -23,8 +23,8 @@ func (projectRepository *ProjectRepository) AddParticipant(ctx context.Context, 
 	_, err := projectRepository.database.ExecContext(
 		ctx,
 		`
-            INSERT INTO PROJECT_PARTICIPANT (project_id, user_id)
-			VALUES (?, ?)
+            INSERT INTO project_user_roles (project_id, user_id, is_admin, is_member, is_guest)
+			VALUES (?, ?, 1, 1, 1)
         `,
 		projectId,
 		userId,
@@ -36,10 +36,11 @@ func (projectRepository *ProjectRepository) add(ctx context.Context, project dom
 	_, err := projectRepository.database.ExecContext(
 		ctx,
 		`
-            INSERT INTO PROJECT (id, key, summary, description, cuser, ctime, mtime, stime, ftime, dtime, type)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO projects (id, workspace_id, key, summary, description, creator_id, created_at, updated_at, started_at, finished_at, due_at, type)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `,
 		project.ID,
+		"019dddbc-9df2-717c-be35-70f707e6098f",
 		project.Key,
 		project.Summary,
 		utils.NullableStringToSQL(project.Description),
@@ -73,14 +74,14 @@ func (projectRepository *ProjectRepository) Update(ctx context.Context, project 
 	_, err := projectRepository.database.ExecContext(
 		ctx,
 		`
-            UPDATE PROJECT SET
+            UPDATE projects SET
 				key = ?,
 				summary = ?,
 				description = ?,
-				mtime = ?,
-				stime = ?,
-				ftime = ?,
-				dtime = ?,
+				updated_at = ?,
+				started_at = ?,
+				finished_at = ?,
+				due_at = ?,
 				type = ?
 			WHERE id = ?
         `,
@@ -101,7 +102,7 @@ func (projectRepository *ProjectRepository) Delete(ctx context.Context, id strin
 	_, err := projectRepository.database.ExecContext(
 		ctx,
 		`
-            DELETE FROM PROJECT
+            DELETE FROM projects
 			WHERE id = ?
         `,
 		id,
@@ -115,8 +116,8 @@ func (projectRepository *ProjectRepository) getParticipants(ctx context.Context,
 		`
         SELECT
                 U.id, U.name
-		FROM PROJECT_PARTICIPANT PP
-		INNER JOIN USER U ON U.id = PP.user_id
+		FROM project_user_roles PP
+		INNER JOIN users U ON U.id = PP.user_id
 		WHERE PP.project_id = ?
 		ORDER BY U.name
         `,
@@ -147,26 +148,26 @@ func (projectRepository *ProjectRepository) getParticipants(ctx context.Context,
 
 func (projectRepository *ProjectRepository) get(ctx context.Context, id string) (*domain.Project, error) {
 	var project domain.Project
-	var mtime, stime, ftime, dtime sql.NullInt64
+	var updated_at, started_at, finished_at, due_at sql.NullInt64
 	var description sql.NullString
 	var creatorID, creatorName string
 	err := projectRepository.database.QueryRowContext(
 		ctx,
 		`
             SELECT
-                P.id, P.key, P.summary, P.description, P.ctime, P.mtime, P.stime, P.ftime, P.dtime, P.type, PT.name, P.cuser, U.name
-            FROM PROJECT P
-			LEFT JOIN PROJECT_TYPE PT ON PT.id = P.type
-			INNER JOIN USER U ON U.ID = P.cuser
+                P.id, P.key, P.summary, P.description, P.created_at, P.updated_at, P.started_at, P.finished_at, P.due_at, P.type, PT.name, P.creator_id, U.name
+            FROM projects P
+			LEFT JOIN project_types PT ON PT.id = P.type
+			INNER JOIN users U ON U.ID = P.creator_id
             WHERE P.id = ?
         `,
-		id).Scan(&project.ID, &project.Key, &project.Summary, &description, &project.CreatedAt, &mtime, &stime, &ftime, &dtime, &project.Type.ID, &project.Type.Name, &creatorID, &creatorName)
+		id).Scan(&project.ID, &project.Key, &project.Summary, &description, &project.CreatedAt, &updated_at, &started_at, &finished_at, &due_at, &project.Type.ID, &project.Type.Name, &creatorID, &creatorName)
 	project.CreatedBy = domain.UserBase{ID: creatorID, Name: creatorName}
 	project.Description = utils.SQLStrPtr(description)
-	project.LastModifiedAt = utils.SQLInt64Ptr(mtime)
-	project.StartedAt = utils.SQLInt64Ptr(stime)
-	project.FinishedAt = utils.SQLInt64Ptr(ftime)
-	project.DueAt = utils.SQLInt64Ptr(dtime)
+	project.LastModifiedAt = utils.SQLInt64Ptr(updated_at)
+	project.StartedAt = utils.SQLInt64Ptr(started_at)
+	project.FinishedAt = utils.SQLInt64Ptr(finished_at)
+	project.DueAt = utils.SQLInt64Ptr(due_at)
 
 	return &project, err
 }
@@ -190,10 +191,10 @@ func (projectRepository *ProjectRepository) Search(ctx context.Context) ([]domai
 		ctx,
 		`
         SELECT
-                P.id, P.key, P.summary, P.description, P.ctime, P.mtime, P.stime, P.ftime, P.dtime, P.type, PT.name, P.cuser, U.name
-		FROM PROJECT P
-		LEFT JOIN PROJECT_TYPE PT ON PT.id = P.type
-		INNER JOIN USER U ON U.ID = P.cuser
+                P.id, P.key, P.summary, P.description, P.created_at, P.updated_at, P.started_at, P.finished_at, P.due_at, P.type, PT.name, P.creator_id, U.name
+		FROM projects P
+		LEFT JOIN project_types PT ON PT.id = P.type
+		INNER JOIN users U ON U.ID = P.creator_id
         `,
 	)
 
@@ -206,13 +207,13 @@ func (projectRepository *ProjectRepository) Search(ctx context.Context) ([]domai
 
 	for rows.Next() {
 		var project domain.Project
-		var mtime, stime, ftime, dtime sql.NullInt64
+		var updated_at, started_at, finished_at, due_at sql.NullInt64
 		var description sql.NullString
 		var creatorID, creatorName string
 
 		if err := rows.Scan(
 			&project.ID, &project.Key, &project.Summary, &description,
-			&project.CreatedAt, &mtime, &stime, &ftime, &dtime,
+			&project.CreatedAt, &updated_at, &started_at, &finished_at, &due_at,
 			&project.Type.ID, &project.Type.Name, &creatorID, &creatorName,
 		); err != nil {
 			return nil, err
@@ -220,10 +221,10 @@ func (projectRepository *ProjectRepository) Search(ctx context.Context) ([]domai
 
 		project.CreatedBy = domain.UserBase{ID: creatorID, Name: creatorName}
 		project.Description = utils.SQLStrPtr(description)
-		project.LastModifiedAt = utils.SQLInt64Ptr(mtime)
-		project.StartedAt = utils.SQLInt64Ptr(stime)
-		project.FinishedAt = utils.SQLInt64Ptr(ftime)
-		project.DueAt = utils.SQLInt64Ptr(dtime)
+		project.LastModifiedAt = utils.SQLInt64Ptr(updated_at)
+		project.StartedAt = utils.SQLInt64Ptr(started_at)
+		project.FinishedAt = utils.SQLInt64Ptr(finished_at)
+		project.DueAt = utils.SQLInt64Ptr(due_at)
 
 		projects = append(projects, project)
 	}

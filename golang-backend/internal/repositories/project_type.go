@@ -21,7 +21,7 @@ func (projectTypeRepository *ProjectTypeRepository) Add(ctx context.Context, pro
 	_, err := projectTypeRepository.database.ExecContext(
 		ctx,
 		`
-            INSERT INTO PROJECT_TYPE (id, name) VALUES (?, ?)
+            INSERT INTO project_types (id, name) VALUES (?, ?)
         `,
 		projectType.ID,
 		projectType.Name,
@@ -33,7 +33,7 @@ func (projectTypeRepository *ProjectTypeRepository) Update(ctx context.Context, 
 	_, err := projectTypeRepository.database.ExecContext(
 		ctx,
 		`
-            UPDATE PROJECT_TYPE SET name = ? WHERE id = ?
+            UPDATE project_types SET name = ? WHERE id = ?
         `,
 		projectType.ID,
 		projectType.Name,
@@ -45,7 +45,7 @@ func (projectTypeRepository *ProjectTypeRepository) Delete(ctx context.Context, 
 	_, err := projectTypeRepository.database.ExecContext(
 		ctx,
 		`
-            DELETE FROM PROJECT_TYPE
+            DELETE FROM project_types
 			WHERE id = ?
         `,
 		id,
@@ -59,7 +59,7 @@ func (ProjectTypeRepository *ProjectTypeRepository) Search(ctx context.Context) 
 		`
 			SELECT
 					PT.id, PT.name
-			FROM PROJECT_TYPE PT
+			FROM project_types PT
 			ORDER BY PT.name
         `,
 	)
