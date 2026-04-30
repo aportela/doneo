@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { onMounted, h, ref, shallowRef } from 'vue';
     import { api } from '../composables/api';
-    import { NDataTable, NTag } from 'naive-ui';
+    import { NDataTable, NTag, NTable } from 'naive-ui';
     import type { DataTableColumns } from 'naive-ui'
 
     interface ProjectTypeInterface {
@@ -190,10 +190,37 @@
     });
 
     const pagination = false as const
+
+    const simpleTable = true;
 </script>
 
 <template>
     <h1>Manage projects</h1>
+
+    <n-table :bordered="true" size="small" :striped="false" v-if="simpleTable">
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Type</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Summary</th>
+                <th>Created at</th>
+                <th>Creator</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="project in projects" :key="project.id">
+                <td>{{ project.key }}</td>
+                <td>{{ project.type.name }}</td>
+                <td><n-tag type="info">{{ project.priority.name }}</n-tag></td>
+                <td><n-tag type="error">{{ project.status.name }}</n-tag></td>
+                <td>{{ project.summary }}</td>
+                <td>{{ project.createdAt }}</td>
+                <td>{{ project.createdBy.name }}</td>
+            </tr>
+        </tbody>
+    </n-table>
     <n-data-table size="small" :columns="columns" :data="projects" :pagination="pagination" :bordered="false"
-        :loading="loading" :style="{ height: `80vh` }" flex-height />
+        :loading="loading" :style="{ height: `80vh` }" flex-height v-else />
 </template>
