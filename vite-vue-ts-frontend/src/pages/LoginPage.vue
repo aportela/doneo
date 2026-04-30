@@ -1,10 +1,11 @@
 <script setup lang="ts">
     //import { useRouter } from "vue-router";
     import { default as LoginForm } from "../components/forms/LoginForm.vue"
-    import { NCard, NSpace, NButton } from 'naive-ui'
-    import { IconDatabaseStar, IconMoon } from '@tabler/icons-vue';
+    import { NCard, NSpace } from 'naive-ui'
+    import { IconDatabaseStar } from '@tabler/icons-vue';
 
     import { default as GithubButton } from "../components/buttons/GithubButton.vue";
+    import { default as SwitchColorSchemeButton } from '../components/buttons/SwitchColorSchemeButton.vue';
     import { default as SwitchLocaleButton } from "../components/buttons/SwitchLocaleButton.vue";
 
     /*
@@ -30,9 +31,7 @@
                 <template #action>
                     <n-space justify="space-around">
                         <GithubButton :size="20" />
-                        <n-button quaternary>
-                            <IconMoon :size="20" />
-                        </n-button>
+                        <SwitchColorSchemeButton :size="20" />
                         <SwitchLocaleButton />
                     </n-space>
                 </template>
