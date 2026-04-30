@@ -1,7 +1,7 @@
 <script setup lang="ts">
-    import { onMounted, ref, shallowRef } from 'vue';
+    import { onMounted, h, ref, shallowRef } from 'vue';
     import { api } from '../composables/api';
-    import { NDataTable } from 'naive-ui';
+    import { NDataTable, NTag } from 'naive-ui';
     import type { DataTableColumns } from 'naive-ui'
 
     interface ProjectTypeInterface {
@@ -100,7 +100,9 @@
     const columns: DataTableColumns<ProjectInterface> = [
         {
             title: 'Key',
-            key: 'key'
+            key: 'key',
+            width: 100,
+            minWidth: 100,
         },
         {
             title: 'Type',
@@ -112,20 +114,51 @@
         {
             title: 'Priority',
             key: 'priority',
+            align: 'center',
             render(row) {
-                return row.priority.name
+                return h(
+                    NTag,
+                    {
+                        style: {
+                            marginRight: '6px'
+                        },
+                        type: 'info',
+                        bordered: false
+                    },
+                    {
+                        default: () => row.priority.name
+                    }
+                )
             }
         },
         {
             title: 'Status',
             key: 'status',
             render(row) {
-                return row.status.name
+                return h(
+                    NTag,
+                    {
+                        style: {
+                            marginRight: '6px'
+                        },
+                        type: 'success',
+                        bordered: false
+                    },
+                    {
+                        default: () => row.status.name
+                    }
+                )
             }
         },
         {
             title: 'Summary',
             key: 'summary',
+            /*
+            width: 1200,
+            ellipsis: {
+                tooltip: true
+            }
+            */
         },
         {
             title: 'Created At',
