@@ -13,5 +13,7 @@ type Project struct {
 	FinishedAt  *int64
 	DueAt       *int64
 	Type        ProjectType
-	//lead, asignee, priority, status
+	Priority    ProjectPriority
+	Status      ProjectStatus
+	//lead, asignee
 }

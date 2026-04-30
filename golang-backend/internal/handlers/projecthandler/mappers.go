@@ -22,12 +22,14 @@ func mapUpdateProjectRequestToProjectDomain(request updateProjectRequest) domain
 
 func mapProjectDomainToProjectResponse(project domain.Project) projectResponse {
 	return projectResponse{
-		ID:        project.ID,
-		Key:       project.Key,
-		Summary:   project.Summary,
-		CreatedBy: creatorResponse{ID: project.CreatedBy.ID, Name: project.CreatedBy.Name},
-		CreatedAt: project.CreatedAt,
-		Type:      projectTypeResponse{ID: project.Type.ID, Name: project.Type.Name},
+		ID:          project.ID,
+		Key:         project.Key,
+		Summary:     project.Summary,
+		Description: *project.Description,
+		Status:      project.Status,
+		CreatedBy:   creatorResponse{ID: project.CreatedBy.ID, Name: project.CreatedBy.Name},
+		CreatedAt:   project.CreatedAt,
+		Type:        projectTypeResponse{ID: project.Type.ID, Name: project.Type.Name},
 	}
 }
 

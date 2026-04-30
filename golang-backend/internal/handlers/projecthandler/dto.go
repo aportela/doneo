@@ -23,12 +23,14 @@ type updateProjectRequest struct {
 }
 
 type projectResponse struct {
-	ID        string              `json:"id"`
-	Key       string              `json:"key"`
-	Summary   string              `json:"summary"`
-	CreatedBy creatorResponse     `json:"createdBy"`
-	CreatedAt int64               `json:"createdAt"`
-	Type      projectTypeResponse `json:"type"`
+	ID          string              `json:"id"`
+	Key         string              `json:"key"`
+	Summary     string              `json:"summary"`
+	Description string              `json:"description"`
+	Status      uint8               `json:"status"`
+	CreatedBy   creatorResponse     `json:"createdBy"`
+	CreatedAt   int64               `json:"createdAt"`
+	Type        projectTypeResponse `json:"type"`
 }
 
 type addProjectResponse struct {

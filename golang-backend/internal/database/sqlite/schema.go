@@ -46,6 +46,22 @@ var installSchemaQueries = []string{
 		) STRICT;
 	`,
 	`
+		CREATE TABLE IF NOT EXISTS project_priorities(
+			id TEXT NOT NULL CHECK(length(id) == 36),
+			name TEXT NOT NULL CHECK(length(name) <= 32),
+			item_index INTEGER NOT NULL DEFAULT 0,
+			PRIMARY KEY (id)
+		) STRICT;
+	`,
+	`
+		CREATE TABLE IF NOT EXISTS project_statuses (
+			id TEXT NOT NULL CHECK(length(id) == 36),
+			name TEXT NOT NULL CHECK(length(name) <= 32),
+			item_index INTEGER NOT NULL DEFAULT 0,
+			PRIMARY KEY (id)
+		) STRICT;
+	`,
+	`
 		CREATE TABLE IF NOT EXISTS project_types (
 			id TEXT NOT NULL CHECK(length(id) == 36),
 			name TEXT NOT NULL CHECK(length(name) <= 32),
@@ -59,16 +75,21 @@ var installSchemaQueries = []string{
 			key TEXT NOT NULL CHECK(length(key) <= 8),
 			summary TEXT NOT NULL CHECK(length(summary) <= 128),
 			description TEXT,
+			status INT NOT NULL DEFAULT 0,
 			creator_id TEXT NOT NULL CHECK(length(creator_id) == 36),
 			created_at INTEGER NOT NULL,
 			updated_at INTEGER,
 			started_at INTEGER,
 			finished_at INTEGER,
 			due_at INTEGER,
+			priority_id TEXT NOT NULL CHECK(length(priority_id) == 36),
+			status_id TEXT NOT NULL CHECK(length(status_id) == 36),
 			type_id TEXT NOT NULL CHECK(length(type_id) == 36),
 			PRIMARY KEY (id),
 			FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,
 			FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE,
+			FOREIGN KEY(priority_id) REFERENCES project_priorities(id) ON DELETE CASCADE,
+			FOREIGN KEY(status_id) REFERENCES project_statuses(id) ON DELETE CASCADE,
 			FOREIGN KEY(type_id) REFERENCES project_types(id) ON DELETE CASCADE
 		) STRICT;
 	`,

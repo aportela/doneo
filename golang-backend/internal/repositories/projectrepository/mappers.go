@@ -6,20 +6,24 @@ import (
 
 func MapProyectDomainToProyectDTO(project domain.Project) projectDTO {
 	return projectDTO{
-		ID:          project.ID,
-		WorkspaceId: project.WorkspaceId,
-		Key:         project.Key,
-		Summary:     project.Summary,
-		Description: project.Description,
-		CreatorId:   project.CreatedBy.ID,
-		CreatorName: project.CreatedBy.Name,
-		CreatedAt:   project.CreatedAt,
-		UpdatedAt:   project.UpdatedAt,
-		StartedAt:   project.StartedAt,
-		FinishedAt:  project.FinishedAt,
-		DueAt:       project.DueAt,
-		TypeId:      project.Type.ID,
-		TypeName:    project.Type.Name,
+		ID:           project.ID,
+		WorkspaceId:  project.WorkspaceId,
+		Key:          project.Key,
+		Summary:      project.Summary,
+		Description:  project.Description,
+		CreatorId:    project.CreatedBy.ID,
+		CreatorName:  project.CreatedBy.Name,
+		CreatedAt:    project.CreatedAt,
+		UpdatedAt:    project.UpdatedAt,
+		StartedAt:    project.StartedAt,
+		FinishedAt:   project.FinishedAt,
+		DueAt:        project.DueAt,
+		TypeId:       project.Type.ID,
+		TypeName:     project.Type.Name,
+		PriorityId:   project.Priority.ID,
+		PriorityName: project.Priority.Name,
+		StatusId:     project.Status.ID,
+		StatusName:   project.Status.Name,
 	}
 }
 
@@ -37,6 +41,8 @@ func MapProjectDTOToProjectDomain(project projectDTO) domain.Project {
 		FinishedAt:  project.FinishedAt,
 		DueAt:       project.DueAt,
 		Type:        domain.ProjectType{ID: project.TypeId, Name: project.TypeName},
+		Priority:    domain.ProjectPriority{ID: project.PriorityId, Name: project.PriorityName},
+		Status:      domain.ProjectStatus{ID: project.StatusId, Name: project.StatusName},
 	}
 }
 
