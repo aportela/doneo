@@ -82,7 +82,7 @@ func (h *ProjectPriorityHandler) GetProjectPriority(w http.ResponseWriter, r *ht
 	handlers.ToHandlerJSONResponse(w, mapProjectPriorityDomainToGetProjectPriorityResponse(projectPriority), nil)
 }
 
-func (h *ProjectPriorityHandler) SearchProjectPrioritys(w http.ResponseWriter, r *http.Request) {
+func (h *ProjectPriorityHandler) SearchProjectPriorities(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectPriorities, err := h.service.SearchProjectPriorities(r.Context())
 	handlers.ToHandlerJSONResponse(w, mapProjectPriorityArrayDomainToSearchProjectPrioritysResponse(projectPriorities), err)
