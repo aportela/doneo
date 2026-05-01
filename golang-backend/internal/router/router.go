@@ -12,6 +12,8 @@ import (
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/handlers/authhandler"
 	"github.com/aportela/doneo/internal/handlers/projecthandler"
+	"github.com/aportela/doneo/internal/handlers/projectpriorityhandler"
+	"github.com/aportela/doneo/internal/handlers/projectstatushandler"
 	"github.com/aportela/doneo/internal/handlers/projecttypehandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 	"github.com/aportela/doneo/internal/handlers/workspacehandler"
@@ -78,22 +80,22 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 	})
 
 	apiRouter.Route("/project_statuses", func(r chi.Router) {
-		projectTypeHandler := projecttypehandler.NewProjectTypeHandler(db)
-		r.Post("/", projectTypeHandler.AddProjectType)
-		r.Get("/", projectTypeHandler.SearchProjectTypes)
+		projectStatusHandler := projectstatushandler.NewProjectStatusHandler(db)
+		r.Post("/", projectStatusHandler.AddProjectStatus)
+		r.Get("/", projectStatusHandler.SearchProjectStatus)
 		r.Route("/{id}", func(r chi.Router) {
-			r.Put("/", projectTypeHandler.UpdateProjectType)
-			r.Delete("/", projectTypeHandler.DeleteProjectType)
+			r.Put("/", projectStatusHandler.UpdateProjectStatus)
+			r.Delete("/", projectStatusHandler.DeleteProjectStatus)
 		})
 	})
 
 	apiRouter.Route("/project_priorities", func(r chi.Router) {
-		projectTypeHandler := projecttypehandler.NewProjectTypeHandler(db)
-		r.Post("/", projectTypeHandler.AddProjectType)
-		r.Get("/", projectTypeHandler.SearchProjectTypes)
+		projectTypeHandler := projectpriorityhandler.NewProjectPriorityHandler(db)
+		r.Post("/", projectTypeHandler.AddProjectPriority)
+		r.Get("/", projectTypeHandler.SearchProjectPriorities)
 		r.Route("/{id}", func(r chi.Router) {
-			r.Put("/", projectTypeHandler.UpdateProjectType)
-			r.Delete("/", projectTypeHandler.DeleteProjectType)
+			r.Put("/", projectTypeHandler.UpdateProjectPriority)
+			r.Delete("/", projectTypeHandler.DeleteProjectPriority)
 		})
 	})
 
