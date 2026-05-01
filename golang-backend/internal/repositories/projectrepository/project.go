@@ -102,7 +102,27 @@ func (projectRepository *projectRepository) Get(ctx context.Context, id string) 
 		ctx,
 		`
             SELECT
-                P.id, P.key, P.summary, P.description, P.created_at, P.updated_at, P.started_at, P.finished_at, P.due_at, P.status_id, PS.name AS status_name, P.priority_id, PP.name AS priority_name, P.type_id, PT.name AS type_name, P.creator_id, U.name AS creator_name
+                P.id,
+				P.key,
+				P.summary,
+				P.description,
+				P.created_at,
+				P.updated_at,
+				P.started_at,
+				P.finished_at,
+				P.due_at,
+				P.status_id,
+				PS.name AS status_name,
+				PS.item_index AS status_index,
+				PS.item_hex_color AS status_hex_color,
+				P.priority_id,
+				PP.name AS priority_name,
+				PP.item_index AS priority_index,
+				PP.item_hex_color AS priority_hex_color,
+				P.type_id,
+				PT.name AS type_name,
+				P.creator_id,
+				U.name AS creator_name
             FROM projects P
 			INNER JOIN project_priorities PP ON PP.id = P.priority_id
 			INNER JOIN project_statuses PS ON PS.id = P.status_id
@@ -111,15 +131,32 @@ func (projectRepository *projectRepository) Get(ctx context.Context, id string) 
             WHERE P.id = ?
         `,
 		id).Scan(
-		&project.ID, &project.Key, &project.Summary, &description,
-		&project.CreatedAt, &updated_at, &started_at, &finished_at, &due_at,
-		&project.StatusId, &project.StatusName, &project.PriorityId, &project.PriorityName,
-		&project.TypeId, &project.TypeName, &project.CreatorId, &project.CreatorName,
+		&project.ID,
+		&project.Key,
+		&project.Summary,
+		&description,
+		&project.CreatedAt,
+		&updated_at,
+		&started_at,
+		&finished_at,
+		&due_at,
+		&project.StatusId,
+		&project.StatusName,
+		&project.StatusIndex,
+		&project.StatusHexColor,
+		&project.PriorityId,
+		&project.PriorityName,
+		&project.PriorityIndex,
+		&project.PriorityHexColor,
+		&project.TypeId,
+		&project.TypeName,
+		&project.CreatorId,
+		&project.CreatorName,
 	)
 	project.Description = utils.SQLStrPtr(description)
 	project.UpdatedAt = utils.SQLInt64Ptr(updated_at)
 	project.StartedAt = utils.SQLInt64Ptr(started_at)
-	project.UpdatedAt = utils.SQLInt64Ptr(finished_at)
+	project.FinishedAt = utils.SQLInt64Ptr(finished_at)
 	project.DueAt = utils.SQLInt64Ptr(due_at)
 	return project, err
 }
@@ -129,7 +166,27 @@ func (projectRepository *projectRepository) Search(ctx context.Context) ([]proje
 		ctx,
 		`
             SELECT
-                P.id, P.key, P.summary, P.description, P.created_at, P.updated_at, P.started_at, P.finished_at, P.due_at, P.status_id, PS.name AS status_name, P.priority_id, PP.name AS priority_name, P.type_id, PT.name AS type_name, P.creator_id, U.name AS creator_name
+                P.id,
+				P.key,
+				P.summary,
+				P.description,
+				P.created_at,
+				P.updated_at,
+				P.started_at,
+				P.finished_at,
+				P.due_at,
+				P.status_id,
+				PS.name AS status_name,
+				PS.item_index AS status_index,
+				PS.item_hex_color AS status_hex_color,
+				P.priority_id,
+				PP.name AS priority_name,
+				PP.item_index AS priority_index,
+				PP.item_hex_color AS priority_hex_color,
+				P.type_id,
+				PT.name AS type_name,
+				P.creator_id,
+				U.name AS creator_name
             FROM projects P
 			INNER JOIN project_priorities PP ON PP.id = P.priority_id
 			INNER JOIN project_statuses PS ON PS.id = P.status_id
@@ -147,17 +204,34 @@ func (projectRepository *projectRepository) Search(ctx context.Context) ([]proje
 		var description sql.NullString
 		var updated_at, started_at, finished_at, due_at sql.NullInt64
 		if err := rows.Scan(
-			&project.ID, &project.Key, &project.Summary, &description,
-			&project.CreatedAt, &updated_at, &started_at, &finished_at, &due_at,
-			&project.StatusId, &project.StatusName, &project.PriorityId, &project.PriorityName,
-			&project.TypeId, &project.TypeName, &project.CreatorId, &project.CreatorName,
+			&project.ID,
+			&project.Key,
+			&project.Summary,
+			&description,
+			&project.CreatedAt,
+			&updated_at,
+			&started_at,
+			&finished_at,
+			&due_at,
+			&project.StatusId,
+			&project.StatusName,
+			&project.StatusIndex,
+			&project.StatusHexColor,
+			&project.PriorityId,
+			&project.PriorityName,
+			&project.PriorityIndex,
+			&project.PriorityHexColor,
+			&project.TypeId,
+			&project.TypeName,
+			&project.CreatorId,
+			&project.CreatorName,
 		); err != nil {
 			return nil, err
 		}
 		project.Description = utils.SQLStrPtr(description)
 		project.UpdatedAt = utils.SQLInt64Ptr(updated_at)
 		project.StartedAt = utils.SQLInt64Ptr(started_at)
-		project.UpdatedAt = utils.SQLInt64Ptr(finished_at)
+		project.FinishedAt = utils.SQLInt64Ptr(finished_at)
 		project.DueAt = utils.SQLInt64Ptr(due_at)
 		projects = append(projects, project)
 	}

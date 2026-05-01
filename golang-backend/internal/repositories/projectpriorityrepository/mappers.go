@@ -6,17 +6,19 @@ import (
 
 func MapProyectPriorityDomainToProyectPriorityDTO(projectPriority domain.ProjectPriority) projectPriorityDTO {
 	return projectPriorityDTO{
-		ID:    projectPriority.ID,
-		Name:  projectPriority.Name,
-		Index: projectPriority.Index,
+		ID:       projectPriority.ID,
+		Name:     projectPriority.Name,
+		Index:    projectPriority.Index,
+		HexColor: projectPriority.HexColor,
 	}
 }
 
 func MapProyectPriorityDTOToProyectPriorityDomain(projectPriority projectPriorityDTO) domain.ProjectPriority {
 	return domain.ProjectPriority{
-		ID:    projectPriority.ID,
-		Name:  projectPriority.Name,
-		Index: projectPriority.Index,
+		ID:       projectPriority.ID,
+		Name:     projectPriority.Name,
+		Index:    projectPriority.Index,
+		HexColor: projectPriority.HexColor,
 	}
 }
 

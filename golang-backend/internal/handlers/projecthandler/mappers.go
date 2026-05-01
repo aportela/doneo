@@ -29,8 +29,8 @@ func mapProjectDomainToProjectResponse(project domain.Project) projectResponse {
 		CreatedBy:   creatorResponse{ID: project.CreatedBy.ID, Name: project.CreatedBy.Name},
 		CreatedAt:   project.CreatedAt,
 		Type:        projectTypeResponse{ID: project.Type.ID, Name: project.Type.Name},
-		Priority:    projectPriorityResponse{ID: project.Priority.ID, Name: project.Priority.Name},
-		Status:      projectStatusResponse{ID: project.Status.ID, Name: project.Status.Name},
+		Priority:    projectPriorityResponse{ID: project.Priority.ID, Name: project.Priority.Name, Index: project.Priority.Index, HexColor: project.Priority.HexColor},
+		Status:      projectStatusResponse{ID: project.Status.ID, Name: project.Status.Name, Index: project.Status.Index, HexColor: project.Status.HexColor},
 	}
 }
 

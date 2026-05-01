@@ -29,12 +29,13 @@ func (projectStatusRepository *projectStatusRepository) Add(ctx context.Context,
 	_, err := projectStatusRepository.database.ExecContext(
 		ctx,
 		`
-            INSERT INTO project_statuses (id, name, item_index)
-			VALUES (?, ?, ?)
+            INSERT INTO project_statuses (id, name, item_index, item_hex_color)
+			VALUES (?, ?, ?, ?)
         `,
 		projectStatus.ID,
 		projectStatus.Name,
 		projectStatus.Index,
+		projectStatus.HexColor,
 	)
 	return err
 }
@@ -45,12 +46,14 @@ func (projectStatusRepository *projectStatusRepository) Update(ctx context.Conte
 		`
             UPDATE project_statuses SET
 				name = ?,
-				item_index = ?
+				item_index = ?,
+				item_hex_color = ?,
 			WHERE id = ?
         `,
 		projectStatus.ID,
 		projectStatus.Name,
 		projectStatus.Index,
+		projectStatus.HexColor,
 	)
 	return err
 }
@@ -73,11 +76,11 @@ func (projectStatusRepository *projectStatusRepository) Get(ctx context.Context,
 		ctx,
 		`
             SELECT
-                PS.id, PS.name, PS.item_index
+                PS.id, PS.name, PS.item_index, PS.item_hex_color
             FROM project_statuses PS
             WHERE PS.id = ?
         `,
-		id).Scan(&projectStatus.ID, &projectStatus.Name, &projectStatus.Index)
+		id).Scan(&projectStatus.ID, &projectStatus.Name, &projectStatus.Index, &projectStatus.HexColor)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return projectStatus, domain.ErrNotFound
@@ -92,7 +95,7 @@ func (projectStatusRepository *projectStatusRepository) Search(ctx context.Conte
 		ctx,
 		`
 			SELECT
-				PS.id, PS.name, PS.item_index
+				PS.id, PS.name, PS.item_index, PS.item_hex_color
 			FROM project_statuses PS
 			ORDER BY PS.item_index, PS.name
         `,
@@ -105,7 +108,7 @@ func (projectStatusRepository *projectStatusRepository) Search(ctx context.Conte
 	for rows.Next() {
 		var projectStatus projectStatusDTO
 		if err := rows.Scan(
-			&projectStatus.ID, &projectStatus.Name, &projectStatus.Index,
+			&projectStatus.ID, &projectStatus.Name, &projectStatus.Index, &projectStatus.HexColor,
 		); err != nil {
 			return nil, err
 		}

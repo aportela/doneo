@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { onMounted, h, ref, shallowRef } from 'vue';
     import { api } from '../composables/api';
-    import { NDataTable, NTag, NTable } from 'naive-ui';
+    import { NDataTable, NTag, NTable, NColorPicker, NGrid, NGridItem } from 'naive-ui';
     import type { DataTableColumns } from 'naive-ui'
 
     interface ProjectTypeInterface {
@@ -21,28 +21,40 @@
     interface ProjectStatusInterface {
         id: string;
         name: string;
+        index: number;
+        hexColor: string;
     }
 
     class ProjectStatus implements ProjectStatusInterface {
         id: string;
         name: string;
+        index: number;
+        hexColor: string;
         constructor(item: ProjectStatusInterface) {
             this.id = item.id;
             this.name = item.name;
+            this.index = item.index;
+            this.hexColor = item.hexColor;
         }
     }
 
     interface ProjectPriorityInterface {
         id: string;
         name: string;
+        index: number;
+        hexColor: string;
     }
 
     class ProjectPriority implements ProjectPriorityInterface {
         id: string;
         name: string;
+        index: number;
+        hexColor: string;
         constructor(item: ProjectPriority) {
             this.id = item.id;
             this.name = item.name;
+            this.index = item.index;
+            this.hexColor = item.hexColor;
         }
     }
 
@@ -94,7 +106,6 @@
             this.createdBy = item.createdBy;
             this.createdAt = item.createdAt;
         }
-
     }
 
     const columns: DataTableColumns<ProjectInterface> = [
@@ -192,35 +203,99 @@
     const pagination = false as const
 
     const simpleTable = true;
+
+    const hexToRgba = (hex: string, alphaOverride?: number) => {
+        if (!hex) return `rgba(0,0,0,1)`
+
+        let h = hex.replace('#', '')
+
+        let r, g, b, a = 1
+
+        if (h.length === 8) {
+            // RRGGBBAA
+            r = parseInt(h.slice(0, 2), 16)
+            g = parseInt(h.slice(2, 4), 16)
+            b = parseInt(h.slice(4, 6), 16)
+            a = parseInt(h.slice(6, 8), 16) / 255
+        } else {
+            // RRGGBB
+            r = parseInt(h.slice(0, 2), 16)
+            g = parseInt(h.slice(2, 4), 16)
+            b = parseInt(h.slice(4, 6), 16)
+        }
+
+        const alpha = alphaOverride ?? a
+
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`
+    }
+
+    const tagColor = (base: string) => {
+        console.log(base);
+        console.log(hexToRgba(base, 1));
+        console.log({
+            color: hexToRgba(base, 0.2),
+            textColor: hexToRgba(base, 1),
+            borderColor: hexToRgba(base, 0.5)
+        });
+        return {
+            color: hexToRgba(base, 0.2),
+            textColor: hexToRgba(base, 1),
+            borderColor: hexToRgba(base, 0.5)
+        }
+    }
+
+    const color = ref<string>("");
 </script>
 
 <template>
     <h1>Manage projects</h1>
 
+    <n-grid>
+        <n-grid-item>
+            <n-color-picker v-model:value="color" :modes="['hex']" :show-alpha="false" />
+        </n-grid-item>
+        <n-grid-item>
+            <n-tag :color="tagColor(color)">Colored test tag</n-tag>
+        </n-grid-item>
+    </n-grid>
     <n-table :bordered="true" size="small" :striped="false" v-if="simpleTable">
         <thead>
             <tr>
                 <th>Key</th>
+                <th>Summary</th>
                 <th>Type</th>
+                <th>Creator</th>
+                <th>Created at</th>
                 <th>Priority</th>
                 <th>Status</th>
-                <th>Summary</th>
-                <th>Created at</th>
-                <th>Creator</th>
             </tr>
         </thead>
         <tbody>
             <tr v-for="project in projects" :key="project.id">
                 <td>{{ project.key }}</td>
+                <td><router-link :to="{ name: 'project', params: { id: project.id } }">{{ project.summary
+                }}</router-link></td>
                 <td>{{ project.type.name }}</td>
-                <td><n-tag type="info">{{ project.priority.name }}</n-tag></td>
-                <td><n-tag type="error">{{ project.status.name }}</n-tag></td>
-                <td>{{ project.summary }}</td>
-                <td>{{ project.createdAt }}</td>
                 <td>{{ project.createdBy.name }}</td>
+                <td>{{ new Date(project.createdAt).toLocaleString() }}</td>
+                <td><n-tag :color="tagColor(project.priority.hexColor)" class="clickable_tag"
+                        title="Filter by this value">{{
+                            project.priority.name
+                        }}</n-tag>
+                </td>
+                <td><n-tag :color="tagColor(project.priority.hexColor)" class="clickable_tag"
+                        title="Filter by this value">{{ project.status.name
+                        }}</n-tag></td>
             </tr>
         </tbody>
     </n-table>
     <n-data-table size="small" :columns="columns" :data="projects" :pagination="pagination" :bordered="false"
         :loading="loading" :style="{ height: `80vh` }" flex-height v-else />
 </template>
+
+<style lang="css" scoped>
+
+    .clickable_tag {
+        cursor: pointer;
+    }
+</style>

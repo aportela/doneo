@@ -6,17 +6,19 @@ import (
 
 func MapProyectStatusDomainToProyectStatusDTO(projectStatus domain.ProjectStatus) projectStatusDTO {
 	return projectStatusDTO{
-		ID:    projectStatus.ID,
-		Name:  projectStatus.Name,
-		Index: projectStatus.Index,
+		ID:       projectStatus.ID,
+		Name:     projectStatus.Name,
+		Index:    projectStatus.Index,
+		HexColor: projectStatus.HexColor,
 	}
 }
 
 func MapProjectStatusDTOToProjectStatusDomain(projectStatus projectStatusDTO) domain.ProjectStatus {
 	return domain.ProjectStatus{
-		ID:    projectStatus.ID,
-		Name:  projectStatus.Name,
-		Index: projectStatus.Index,
+		ID:       projectStatus.ID,
+		Name:     projectStatus.Name,
+		Index:    projectStatus.Index,
+		HexColor: projectStatus.HexColor,
 	}
 }
 

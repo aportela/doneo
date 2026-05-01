@@ -50,6 +50,7 @@ var installSchemaQueries = []string{
 			id TEXT NOT NULL CHECK(length(id) == 36),
 			name TEXT NOT NULL CHECK(length(name) <= 32),
 			item_index INTEGER NOT NULL DEFAULT 0,
+			item_hex_color TEXT NOT NULL CHECK(length(item_hex_color) == 7),
 			PRIMARY KEY (id)
 		) STRICT;
 	`,
@@ -58,6 +59,7 @@ var installSchemaQueries = []string{
 			id TEXT NOT NULL CHECK(length(id) == 36),
 			name TEXT NOT NULL CHECK(length(name) <= 32),
 			item_index INTEGER NOT NULL DEFAULT 0,
+			item_hex_color TEXT NOT NULL CHECK(length(item_hex_color) == 7),
 			PRIMARY KEY (id)
 		) STRICT;
 	`,
