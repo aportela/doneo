@@ -25,11 +25,11 @@ func NewProjectService(repository projectrepository.ProjectRepository) ProjectSe
 }
 
 func (s *projectService) AddProject(ctx context.Context, project domain.Project) error {
-	return s.repository.Add(ctx, projectrepository.MapProyectDomainToProyectDTO(project))
+	return s.repository.Add(ctx, projectrepository.MapProjectDomainToProjectDTO(project))
 }
 
 func (s *projectService) UpdateProject(ctx context.Context, project domain.Project) error {
-	return s.repository.Update(ctx, projectrepository.MapProyectDomainToProyectDTO(project))
+	return s.repository.Update(ctx, projectrepository.MapProjectDomainToProjectDTO(project))
 }
 
 func (s *projectService) DeleteProject(ctx context.Context, id string) error {

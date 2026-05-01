@@ -4,7 +4,7 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 )
 
-func MapProyectTypeDomainToProyectTypeDTO(projectType domain.ProjectType) projectTypeDTO {
+func MapProjectTypeDomainToProjectTypeDTO(projectType domain.ProjectType) projectTypeDTO {
 	return projectTypeDTO{
 		ID:   projectType.ID,
 		Name: projectType.Name,

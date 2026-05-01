@@ -25,11 +25,11 @@ func NewProjectStatusService(repository projectstatusrepository.ProjectStatusRep
 }
 
 func (s *projectStatusService) AddProjectStatus(ctx context.Context, projectStatus domain.ProjectStatus) error {
-	return s.repository.Add(ctx, projectstatusrepository.MapProyectStatusDomainToProyectStatusDTO(projectStatus))
+	return s.repository.Add(ctx, projectstatusrepository.MapProjectStatusDomainToProjectStatusDTO(projectStatus))
 }
 
 func (s *projectStatusService) UpdateProjectStatus(ctx context.Context, projectStatus domain.ProjectStatus) error {
-	return s.repository.Update(ctx, projectstatusrepository.MapProyectStatusDomainToProyectStatusDTO(projectStatus))
+	return s.repository.Update(ctx, projectstatusrepository.MapProjectStatusDomainToProjectStatusDTO(projectStatus))
 }
 
 func (s *projectStatusService) DeleteProjectStatus(ctx context.Context, id string) error {

@@ -17,19 +17,19 @@ type ProjectPriorityService interface {
 }
 
 type projectPriorityService struct {
-	repository projectpriorityrepository.ProyectPriorityRepository
+	repository projectpriorityrepository.ProjectPriorityRepository
 }
 
-func NewProjectPriorityService(repository projectpriorityrepository.ProyectPriorityRepository) ProjectPriorityService {
+func NewProjectPriorityService(repository projectpriorityrepository.ProjectPriorityRepository) ProjectPriorityService {
 	return &projectPriorityService{repository: repository}
 }
 
 func (s *projectPriorityService) AddProjectPriority(ctx context.Context, projectPriority domain.ProjectPriority) error {
-	return s.repository.Add(ctx, projectpriorityrepository.MapProyectPriorityDomainToProyectPriorityDTO(projectPriority))
+	return s.repository.Add(ctx, projectpriorityrepository.MapProjectPriorityDomainToProjectPriorityDTO(projectPriority))
 }
 
 func (s *projectPriorityService) UpdateProjectPriority(ctx context.Context, projectPriority domain.ProjectPriority) error {
-	return s.repository.Update(ctx, projectpriorityrepository.MapProyectPriorityDomainToProyectPriorityDTO(projectPriority))
+	return s.repository.Update(ctx, projectpriorityrepository.MapProjectPriorityDomainToProjectPriorityDTO(projectPriority))
 }
 
 func (s *projectPriorityService) DeleteProjectPriority(ctx context.Context, id string) error {
@@ -39,9 +39,9 @@ func (s *projectPriorityService) DeleteProjectPriority(ctx context.Context, id s
 func (s *projectPriorityService) GetProjectPriority(ctx context.Context, id string) (domain.ProjectPriority, error) {
 	projectPriority, err := s.repository.Get(ctx, id)
 	if err != nil {
-		return projectpriorityrepository.MapProyectPriorityDTOToProyectPriorityDomain(projectPriority), fmt.Errorf("[ProjectPriorityService] failed to get project priority with ID %s: %w", id, err)
+		return projectpriorityrepository.MapProjectPriorityDTOToProjectPriorityDomain(projectPriority), fmt.Errorf("[ProjectPriorityService] failed to get project priority with ID %s: %w", id, err)
 	}
-	return projectpriorityrepository.MapProyectPriorityDTOToProyectPriorityDomain(projectPriority), nil
+	return projectpriorityrepository.MapProjectPriorityDTOToProjectPriorityDomain(projectPriority), nil
 }
 
 func (s *projectPriorityService) SearchProjectPriorities(ctx context.Context) ([]domain.ProjectPriority, error) {
@@ -49,5 +49,5 @@ func (s *projectPriorityService) SearchProjectPriorities(ctx context.Context) ([
 	if err != nil {
 		return nil, fmt.Errorf("[ProjectPriorityService] failed to search project priorities: %w", err)
 	}
-	return projectpriorityrepository.MapProyectPriorityArrayDTOToProyectPriorityArrayDomain(projectPriorities), nil
+	return projectpriorityrepository.MapProjectPriorityArrayDTOToProjectPriorityArrayDomain(projectPriorities), nil
 }

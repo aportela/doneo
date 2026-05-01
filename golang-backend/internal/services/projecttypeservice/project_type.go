@@ -25,11 +25,11 @@ func NewProjectTypeService(repository projecttyperepository.ProjectTypeRepositor
 }
 
 func (s *projectTypeService) AddProjectType(ctx context.Context, projectType domain.ProjectType) error {
-	return s.repository.Add(ctx, projecttyperepository.MapProyectTypeDomainToProyectTypeDTO(projectType))
+	return s.repository.Add(ctx, projecttyperepository.MapProjectTypeDomainToProjectTypeDTO(projectType))
 }
 
 func (s *projectTypeService) UpdateProjectType(ctx context.Context, projectType domain.ProjectType) error {
-	return s.repository.Update(ctx, projecttyperepository.MapProyectTypeDomainToProyectTypeDTO(projectType))
+	return s.repository.Update(ctx, projecttyperepository.MapProjectTypeDomainToProjectTypeDTO(projectType))
 }
 
 func (s *projectTypeService) DeleteProjectType(ctx context.Context, id string) error {

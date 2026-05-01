@@ -9,7 +9,7 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 )
 
-type ProyectPriorityRepository interface {
+type ProjectPriorityRepository interface {
 	Add(ctx context.Context, projectPriority projectPriorityDTO) error
 	Update(ctx context.Context, projectPriority projectPriorityDTO) error
 	Get(ctx context.Context, id string) (projectPriorityDTO, error)
@@ -17,16 +17,16 @@ type ProyectPriorityRepository interface {
 	Search(ctx context.Context) ([]projectPriorityDTO, error)
 }
 
-type proyectPriorityRepository struct {
+type projectPriorityRepository struct {
 	database database.Database
 }
 
-func NewProyectPriorityRepository(database database.Database) ProyectPriorityRepository {
-	return &proyectPriorityRepository{database: database}
+func NewProjectPriorityRepository(database database.Database) ProjectPriorityRepository {
+	return &projectPriorityRepository{database: database}
 }
 
-func (proyectPriorityRepository *proyectPriorityRepository) Add(ctx context.Context, projectPriority projectPriorityDTO) error {
-	_, err := proyectPriorityRepository.database.ExecContext(
+func (projectPriorityRepository *projectPriorityRepository) Add(ctx context.Context, projectPriority projectPriorityDTO) error {
+	_, err := projectPriorityRepository.database.ExecContext(
 		ctx,
 		`
             INSERT INTO project_priorities (id, name, item_index, item_hex_color)
@@ -40,8 +40,8 @@ func (proyectPriorityRepository *proyectPriorityRepository) Add(ctx context.Cont
 	return err
 }
 
-func (proyectPriorityRepository *proyectPriorityRepository) Update(ctx context.Context, projectPriority projectPriorityDTO) error {
-	_, err := proyectPriorityRepository.database.ExecContext(
+func (projectPriorityRepository *projectPriorityRepository) Update(ctx context.Context, projectPriority projectPriorityDTO) error {
+	_, err := projectPriorityRepository.database.ExecContext(
 		ctx,
 		`
             UPDATE project_priorities SET
@@ -58,8 +58,8 @@ func (proyectPriorityRepository *proyectPriorityRepository) Update(ctx context.C
 	return err
 }
 
-func (proyectPriorityRepository *proyectPriorityRepository) Delete(ctx context.Context, id string) error {
-	_, err := proyectPriorityRepository.database.ExecContext(
+func (projectPriorityRepository *projectPriorityRepository) Delete(ctx context.Context, id string) error {
+	_, err := projectPriorityRepository.database.ExecContext(
 		ctx,
 		`
             DELETE FROM project_priorities
@@ -70,9 +70,9 @@ func (proyectPriorityRepository *proyectPriorityRepository) Delete(ctx context.C
 	return err
 }
 
-func (proyectPriorityRepository *proyectPriorityRepository) Get(ctx context.Context, id string) (projectPriorityDTO, error) {
-	var proyectPriority projectPriorityDTO
-	err := proyectPriorityRepository.database.QueryRowContext(
+func (projectPriorityRepository *projectPriorityRepository) Get(ctx context.Context, id string) (projectPriorityDTO, error) {
+	var projectPriority projectPriorityDTO
+	err := projectPriorityRepository.database.QueryRowContext(
 		ctx,
 		`
             SELECT
@@ -80,18 +80,18 @@ func (proyectPriorityRepository *proyectPriorityRepository) Get(ctx context.Cont
             FROM project_priorities PP
             WHERE PP.id = ?
         `,
-		id).Scan(&proyectPriority.ID, &proyectPriority.Name, &proyectPriority.Index, &proyectPriority.HexColor)
+		id).Scan(&projectPriority.ID, &projectPriority.Name, &projectPriority.Index, &projectPriority.HexColor)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return proyectPriority, domain.ErrNotFound
+			return projectPriority, domain.ErrNotFound
 		}
-		return proyectPriority, err
+		return projectPriority, err
 	}
-	return proyectPriority, err
+	return projectPriority, err
 }
 
-func (proyectPriorityRepository *proyectPriorityRepository) Search(ctx context.Context) ([]projectPriorityDTO, error) {
-	rows, err := proyectPriorityRepository.database.QueryContext(
+func (projectPriorityRepository *projectPriorityRepository) Search(ctx context.Context) ([]projectPriorityDTO, error) {
+	rows, err := projectPriorityRepository.database.QueryContext(
 		ctx,
 		`
 			SELECT
@@ -106,13 +106,13 @@ func (proyectPriorityRepository *proyectPriorityRepository) Search(ctx context.C
 	defer rows.Close()
 	var proyecPriorities []projectPriorityDTO
 	for rows.Next() {
-		var proyectPriority projectPriorityDTO
+		var projectPriority projectPriorityDTO
 		if err := rows.Scan(
-			&proyectPriority.ID, &proyectPriority.Name, &proyectPriority.Index, &proyectPriority.HexColor,
+			&projectPriority.ID, &projectPriority.Name, &projectPriority.Index, &projectPriority.HexColor,
 		); err != nil {
 			return nil, err
 		}
-		proyecPriorities = append(proyecPriorities, proyectPriority)
+		proyecPriorities = append(proyecPriorities, projectPriority)
 	}
 	return proyecPriorities, nil
 }
