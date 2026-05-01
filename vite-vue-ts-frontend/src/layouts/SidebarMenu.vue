@@ -229,6 +229,22 @@
                     key: 'reports',
                     icon: renderIcon(IconBug)(commonIconSize)
                 },
+                {
+                    label: () =>
+                        h(
+                            RouterLink,
+                            {
+                                to: {
+                                    name: 'projectSettings',
+                                    params: {
+                                    }
+                                }
+                            },
+                            { default: () => 'Project settings' }
+                        ),
+                    key: 'projectSettings',
+                    icon: renderIcon(IconSettings)(commonIconSize)
+                },
             ]
         },
     ]

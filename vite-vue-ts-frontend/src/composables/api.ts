@@ -28,6 +28,15 @@ const api = {
   project: {
     search: () => axiosInstance.get("/projects"),
   },
+  projectTypes: {
+    search: () => axiosInstance.get("/project_types"),
+  },
+  projectStatuses: {
+    search: () => axiosInstance.get("/project_statuses"),
+  },
+  projectPriorities: {
+    search: () => axiosInstance.get("/project_priorities"),
+  },
 };
 
 export { api };

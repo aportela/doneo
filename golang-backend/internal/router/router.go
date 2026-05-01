@@ -77,6 +77,26 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		})
 	})
 
+	apiRouter.Route("/project_statuses", func(r chi.Router) {
+		projectTypeHandler := projecttypehandler.NewProjectTypeHandler(db)
+		r.Post("/", projectTypeHandler.AddProjectType)
+		r.Get("/", projectTypeHandler.SearchProjectTypes)
+		r.Route("/{id}", func(r chi.Router) {
+			r.Put("/", projectTypeHandler.UpdateProjectType)
+			r.Delete("/", projectTypeHandler.DeleteProjectType)
+		})
+	})
+
+	apiRouter.Route("/project_priorities", func(r chi.Router) {
+		projectTypeHandler := projecttypehandler.NewProjectTypeHandler(db)
+		r.Post("/", projectTypeHandler.AddProjectType)
+		r.Get("/", projectTypeHandler.SearchProjectTypes)
+		r.Route("/{id}", func(r chi.Router) {
+			r.Put("/", projectTypeHandler.UpdateProjectType)
+			r.Delete("/", projectTypeHandler.DeleteProjectType)
+		})
+	})
+
 	baseRouter.Mount("/api", apiRouter)
 
 	subFS, err := fs.Sub(ui.Dist, "dist")
