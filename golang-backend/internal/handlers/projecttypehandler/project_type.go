@@ -33,7 +33,7 @@ func (h *ProjectTypeHandler) AddProjectType(w http.ResponseWriter, r *http.Reque
 	user := mapAddProjectTypeRequestToProjectTypeDomain(request)
 	err := h.service.AddProjectType(r.Context(), user)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeHandler] failed to add user with ID %s: %w", request.ID, err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeHandler] failed to add project type with ID %s: %w", request.ID, err))
 		return
 	}
 	handlers.ToHandlerJSONResponse(w, mapProjectTypeDomainToAddProjectTypeResponse(user), nil, http.StatusCreated)
@@ -49,7 +49,7 @@ func (h *ProjectTypeHandler) UpdateProjectType(w http.ResponseWriter, r *http.Re
 	user := mapUpdateProjectTypeRequestToProjectTypeDomain(request)
 	err := h.service.UpdateProjectType(r.Context(), user)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeHandler] failed to update user with ID %s: %w", user.ID, err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeHandler] failed to update project type with ID %s: %w", user.ID, err))
 		return
 	}
 	handlers.ToHandlerJSONResponse(w, mapProjectTypeDomainToUpdateProjectTypeResponse(user), nil)
@@ -60,7 +60,7 @@ func (h *ProjectTypeHandler) DeleteProjectType(w http.ResponseWriter, r *http.Re
 	userId := chi.URLParam(r, "id")
 	err := h.service.DeleteProjectType(r.Context(), userId)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeService] failed to delete user with ID %s: %w", userId, err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeService] failed to delete project type with ID %s: %w", userId, err))
 		return
 	}
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
@@ -72,10 +72,10 @@ func (h *ProjectTypeHandler) GetProjectType(w http.ResponseWriter, r *http.Reque
 	user, err := h.service.GetProjectType(r.Context(), userId)
 	if err != nil {
 		if err == domain.ErrNotFound {
-			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeService] not found user with ID %s: %w", userId, err))
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeService] not found project type with ID %s: %w", userId, err))
 			return
 		} else {
-			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeService] failed to get user with ID %s: %w", userId, err))
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeService] failed to get project type with ID %s: %w", userId, err))
 			return
 		}
 	}
