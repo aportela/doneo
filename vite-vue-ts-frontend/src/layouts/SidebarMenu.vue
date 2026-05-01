@@ -2,7 +2,7 @@
     import type { MenuOption } from 'naive-ui'
     import { NMenu, NSelect } from 'naive-ui';
     import type { Component } from 'vue'
-    import { IconBug, IconSitemap, IconHome, IconFileAnalytics, IconSettings, IconMatrix, IconUsers } from '@tabler/icons-vue';
+    import { IconPresentation, IconUserCircle, IconBug, IconSitemap, IconFileAnalytics, IconSettings, IconMatrix, IconUsers, IconChartHistogram } from '@tabler/icons-vue';
     // IconListDetails
     import { NIcon } from 'naive-ui'
     import { h, ref } from 'vue'
@@ -20,15 +20,6 @@
 
     const menuOptions: MenuOption[] = [
         {
-            key: 'divider-1',
-            type: 'divider',
-            props: {
-                style: {
-                    marginLeft: '32px'
-                }
-            }
-        },
-        {
             key: 'workspace',
             label: () =>
                 h(NSelect, {
@@ -43,6 +34,15 @@
             icon: renderIcon(IconMatrix)(commonIconSize)
         },
         {
+            key: 'divider-1',
+            type: 'divider',
+            props: {
+                style: {
+                    marginLeft: '32px'
+                }
+            }
+        },
+        {
             label: () =>
                 h(
                     RouterLink,
@@ -53,10 +53,10 @@
                             }
                         }
                     },
-                    { default: () => 'Home' }
+                    { default: () => 'Overview' }
                 ),
             key: 'home',
-            icon: renderIcon(IconHome)(commonIconSize)
+            icon: renderIcon(IconPresentation)(commonIconSize)
         },
         /*
         {
@@ -132,6 +132,31 @@
                 ),
             key: 'reports',
             icon: renderIcon(IconFileAnalytics)(commonIconSize)
+        },
+        {
+            label: () =>
+                h(
+                    RouterLink,
+                    {
+                        to: {
+                            name: 'reports',
+                            params: {
+                            }
+                        }
+                    },
+                    { default: () => 'Charts' }
+                ),
+            key: 'reports',
+            icon: renderIcon(IconChartHistogram)(commonIconSize)
+        },
+        {
+            key: 'divider-1',
+            type: 'divider',
+            props: {
+                style: {
+                    marginLeft: '32px'
+                }
+            }
         },
         {
             label: () =>
@@ -247,6 +272,32 @@
                 },
             ]
         },
+        {
+            key: 'divider-1',
+            type: 'divider',
+            props: {
+                style: {
+                    marginLeft: '32px'
+                }
+            }
+        },
+        {
+            label: () =>
+                h(
+                    RouterLink,
+                    {
+                        to: {
+                            name: 'reports',
+                            params: {
+                            }
+                        }
+                    },
+                    { default: () => 'My profile' }
+                ),
+            key: 'reports',
+            icon: renderIcon(IconUserCircle)(commonIconSize)
+        },
+
     ]
 
     function handleUpdateValue(_key: string, _item: MenuOption) {
