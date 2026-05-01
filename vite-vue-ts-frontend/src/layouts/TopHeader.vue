@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { NButton, NDropdown } from 'naive-ui'
-    import { NIcon, NFlex } from 'naive-ui'
-    import { IconUserCircle, IconDatabaseStar, IconId, IconLogout } from '@tabler/icons-vue';
+    import { NIcon, NFlex, NInput } from 'naive-ui'
+    import { IconUserCircle, IconDatabaseStar, IconId, IconLogout, IconSearch } from '@tabler/icons-vue';
     import type { Component } from 'vue'
     import { h } from 'vue'
     import { default as SwitchFluidLayoutButton } from '../components/buttons/SwitchFluidLayoutButton.vue';
@@ -85,7 +85,15 @@
                 <IconDatabaseStar :size="commonIconSize" />
                 <span class="brand-name">Doneo</span>
             </div>
+            <div class="search-container">
+                <n-input placeholder="Search..." style="min-width: 50%;" round>
+                    <template #prefix>
+                        <IconSearch :size="16" />
+                    </template>
+                </n-input>
+            </div>
             <n-flex>
+
                 <GithubButton :size="commonIconSize" />
                 <SwitchColorSchemeButton :size="commonIconSize" />
                 <SwitchFluidLayoutButton :size="commonIconSize" />
@@ -135,10 +143,16 @@
         align-items: center;
     }
 
+
     .brand-name {
         margin-left: 8px;
         font-size: 18px;
         font-weight: 600;
+    }
+
+    .search-container {
+        display: flex;
+        align-items: center;
     }
 
     .username {
