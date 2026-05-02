@@ -1,9 +1,10 @@
 <script setup lang="ts">
     import { ref, onMounted, nextTick } from 'vue'
-    import { NSpin, NTable, NButton, NGrid, NGridItem, NFlex, NInput, useDialog, NDialog } from 'naive-ui'
-    import { v7 as uuidv7 } from 'uuid';
+    import { NSpin, NTable, NButton, NGrid, NGridItem, NFlex, useDialog, NModal } from 'naive-ui'
+    //import { v7 as uuidv7 } from 'uuid';
     import { api } from '../../../composables/api';
     import { IconDeviceFloppy, IconEdit, IconPlus, IconTrash } from '@tabler/icons-vue';
+    import ProjectTypeForm from '../../forms/ProjectTypeForm.vue';
 
     interface ProjectTypeInterface {
         id: string;
@@ -20,6 +21,8 @@
     }
 
     const tableFooter = ref<HTMLElement | null>(null);
+    console.log(tableFooter);
+    nextTick(() => { });
 
     const projectTypes = ref<ProjectType[]>([]);
     const loading = ref<boolean>(false);
@@ -35,6 +38,7 @@
 
     const dialog = useDialog()
 
+    /*
     const onAddProjectType = () => {
         projectTypes.value.push(
             new ProjectType({ id: uuidv7(), name: "" })
@@ -48,6 +52,7 @@
             }
         });
     };
+    */
 
     const onRemoveProjectType = (projectType: ProjectType, index: number) => {
         dialog.warning({
@@ -63,22 +68,14 @@
             }
         })
     }
-    const showAddDialog = ref<boolean>(true);
+    const showAddDialog = ref<boolean>(false);
 </script>
 
 <template>
     <n-spin :show="loading">
-        <n-dialog v-model.value="showAddDialog" title="Add new project type">
-            <n-flex>
-                <n-input placeholder="Project type name"></n-input>
-                <n-button @click="onAddProjectType">
-                    <template #icon>
-                        <IconPlus />
-                    </template>
-                    Add new
-                </n-button>
-            </n-flex>
-        </n-dialog>
+        <n-modal v-model:show="showAddDialog" @cancel="showAddDialog = false">
+            <ProjectTypeForm />
+        </n-modal>
         <n-table size="small">
             <caption class="table-caption">
                 <n-grid :cols="2" align="center">
