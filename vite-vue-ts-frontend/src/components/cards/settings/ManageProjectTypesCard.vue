@@ -1,9 +1,9 @@
 <script setup lang="ts">
-    import { ref, onMounted, shallowRef } from 'vue'
-    import { NTable, NColorPicker, NTag, NButton, NFlex } from 'naive-ui'
+    import { ref, onMounted, nextTick } from 'vue'
+    import { NSpin, NTable, NButton, NGrid, NGridItem, NFlex, NInput, useDialog, NDialog } from 'naive-ui'
+    import { v7 as uuidv7 } from 'uuid';
     import { api } from '../../../composables/api';
-    import { IconArrowDown, IconArrowUp } from '@tabler/icons-vue';
-
+    import { IconDeviceFloppy, IconPlus, IconTrash } from '@tabler/icons-vue';
 
     interface ProjectTypeInterface {
         id: string;
@@ -19,38 +19,9 @@
         }
     }
 
-    interface ProjectStatusInterface {
-        id: string;
-        name: string;
-        index: number;
-        hexColor: string;
-    }
+    const tableFooter = ref<HTMLElement | null>(null);
 
-    class ProjectStatus implements ProjectStatusInterface {
-        id: string;
-        name: string;
-        index: number;
-        hexColor: string;
-        constructor(item: ProjectStatusInterface) {
-            this.id = item.id;
-            this.name = item.name;
-            this.index = item.index;
-            this.hexColor = item.hexColor;
-        }
-    }
-
-    interface ProjectPriorityInterface {
-        id: string;
-        name: string;
-        index: number;
-        hexColor: string;
-    }
-
-
-    const projectTypes = shallowRef<ProjectType[]>([]);
-    const projectStatuses = shallowRef<ProjectStatus[]>([]);
-    const projectPriorities = shallowRef<ProjectPriorityInterface[]>([]);
-
+    const projectTypes = ref<ProjectType[]>([]);
     const loading = ref<boolean>(false);
 
     onMounted(() => {
@@ -60,86 +31,120 @@
         }).catch((errorResponse: any) => {
             console.log(errorResponse);
         }).finally(() => { loading.value = false; })
-        api.projectStatuses.search().then((successResponse: any) => {
-            projectStatuses.value = successResponse.data.projectTypes;
-        }).catch((errorResponse: any) => {
-            console.log(errorResponse);
-        }).finally(() => { loading.value = false; })
-        api.projectPriorities.search().then((successResponse: any) => {
-            projectPriorities.value = successResponse.data.projectTypes;
-        }).catch((errorResponse: any) => {
-            console.log(errorResponse);
-        }).finally(() => { loading.value = false; })
     });
 
-    const hexToRgba = (hex: string, alphaOverride?: number) => {
-        if (!hex) return `rgba(0,0,0,1)`
+    const dialog = useDialog()
 
-        let h = hex.replace('#', '')
-
-        let r, g, b, a = 1
-
-        if (h.length === 8) {
-            // RRGGBBAA
-            r = parseInt(h.slice(0, 2), 16)
-            g = parseInt(h.slice(2, 4), 16)
-            b = parseInt(h.slice(4, 6), 16)
-            a = parseInt(h.slice(6, 8), 16) / 255
-        } else {
-            // RRGGBB
-            r = parseInt(h.slice(0, 2), 16)
-            g = parseInt(h.slice(2, 4), 16)
-            b = parseInt(h.slice(4, 6), 16)
-        }
-
-        const alpha = alphaOverride ?? a
-
-        return `rgba(${r}, ${g}, ${b}, ${alpha})`
-    }
-
-    const tagColor = (base: string) => {
-        console.log(base);
-        console.log(hexToRgba(base, 1));
-        console.log({
-            color: hexToRgba(base, 0.2),
-            textColor: hexToRgba(base, 1),
-            borderColor: hexToRgba(base, 0.5)
+    const onAddProjectType = () => {
+        projectTypes.value.push(
+            new ProjectType({ id: uuidv7(), name: "" })
+        );
+        nextTick(() => {
+            if (tableFooter.value) {
+                tableFooter.value?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'end'
+                });
+            }
         });
-        return {
-            color: hexToRgba(base, 0.2),
-            textColor: hexToRgba(base, 1),
-            borderColor: hexToRgba(base, 0.5)
-        }
+    };
+
+    const onRemoveProjectType = (projectType: ProjectType, index: number) => {
+        dialog.warning({
+            title: 'Please confirm: ',
+            content: `Are you sure you want to remove project type: ${projectType.name}?`,
+            positiveText: 'Sure',
+            negativeText: 'Cancel',
+            draggable: true,
+            onPositiveClick: () => {
+                projectTypes.value.splice(index, 1);
+            },
+            onNegativeClick: () => {
+            }
+        })
+    }
+    const showAddDialog = ref<boolean>(true);
+</script>
+
+<template>
+    <n-spin :show="loading">
+        <n-dialog v-model.value="showAddDialog" title="Add new project type">
+            <n-flex>
+                <n-input placeholder="Project type name"></n-input>
+                <n-button @click="onAddProjectType">
+                    <template #icon>
+                        <IconPlus />
+                    </template>
+                    Add new
+                </n-button>
+            </n-flex>
+        </n-dialog>
+        <n-table size="small">
+            <caption class="table-caption">
+                <n-grid :cols="2" align="center">
+                    <n-grid-item style="text-align: left;">
+                        <span class="table-caption-title">Project types</span>
+                    </n-grid-item>
+                    <n-grid-item style="display: flex; justify-content: flex-end;">
+                        <n-flex>
+                            <n-button @click="showAddDialog = true">
+                                <template #icon>
+                                    <IconPlus />
+                                </template>
+                                Add new
+                            </n-button>
+                            <n-button disabled>
+                                <template #icon>
+                                    <IconDeviceFloppy />
+                                </template>
+                                Save
+                            </n-button>
+                        </n-flex>
+                    </n-grid-item>
+                </n-grid>
+            </caption>
+            <thead>
+                <tr>
+                    <th class="text-center column-action">#</th>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="projectType, index in projectTypes" :key="projectType.id">
+                    <td class="text-center">
+                        <n-button @click="onRemoveProjectType(projectType, index)">
+                            Delete
+                            <template #icon>
+                                <IconTrash :size="22" />
+                            </template>
+                        </n-button>
+                    </td>
+                    <td><n-input v-model:value="projectType.name" required
+                            placeholder="Please input project type name" /></td>
+                </tr>
+            </tbody>
+            <tfoot ref="tableFooter"></tfoot>
+        </n-table>
+    </n-spin>
+</template>
+
+<style lang="css" scoped>
+    .table-caption {
+        padding-bottom: 4px;
     }
 
-    const color = ref<string>("#000000");
-</script>
-<template>
-    <n-table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Color</th>
-                <th>Preview</th>
-                <th>Move Index/Position</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="projectType in projectTypes" :key="projectType.id">
-                <td>{{ projectType.name }}</td>
-                <td><n-color-picker v-model:value="color" :modes="['hex']" :show-alpha="false"></n-color-picker></td>
-                <td><n-tag :color="tagColor(color)">{{ projectType.name }}</n-tag></td>
-                <td>
-                    <n-flex>
-                        <n-button>
-                            <IconArrowUp />
-                        </n-button>
-                        <n-button>
-                            <IconArrowDown />
-                        </n-button>
-                    </n-flex>
-                </td>
-            </tr>
-        </tbody>
-    </n-table>
-</template>
+    .table-caption-title {
+        font-weight: 700;
+        font-size: large;
+
+    }
+
+    .column-action {
+        width: 1%;
+        white-space: nowrap;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+</style>
