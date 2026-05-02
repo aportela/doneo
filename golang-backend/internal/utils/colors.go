@@ -6,6 +6,16 @@ import (
 	"math/rand"
 )
 
+func clamp(v float64) int {
+	if v < 0 {
+		return 0
+	}
+	if v > 255 {
+		return 255
+	}
+	return int(math.Round(v))
+}
+
 // HSL -> RGB helper
 func hslToRgb(h, s, l float64) (int, int, int) {
 	var r, g, b float64
@@ -29,7 +39,7 @@ func hslToRgb(h, s, l float64) (int, int, int) {
 		r, g, b = c, 0, x
 	}
 
-	return int((r + m) * 255), int((g + m) * 255), int((b + m) * 255)
+	return clamp((r + m) * 255), clamp((g + m) * 255), clamp((b + m) * 255)
 }
 
 func abs(x float64) float64 {
