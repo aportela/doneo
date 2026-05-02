@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { onMounted, h, ref, shallowRef } from 'vue';
     import { api } from '../composables/api';
-    import { NDataTable, NTag, NTable } from 'naive-ui';
+    import { NDataTable, NTag, NTable, NAvatar } from 'naive-ui';
     import type { DataTableColumns } from 'naive-ui'
 
     interface ProjectTypeInterface {
@@ -268,7 +268,9 @@
                 <td><router-link :to="{ name: 'project', params: { id: project.id } }">{{ project.summary
                 }}</router-link></td>
                 <td>{{ project.type.name }}</td>
-                <td>{{ project.createdBy.name }}</td>
+                <td><n-avatar :src="'https://i.pravatar.cc/32?u=' + project.createdBy.id"></n-avatar><span
+                        class="creator-name">{{
+                            project.createdBy.name }}</span></td>
                 <td>{{ new Date(project.createdAt).toLocaleString() }}</td>
                 <td><n-tag :color="tagColor(project.priority.hexColor)" class="clickable_tag"
                         title="Filter by this value">{{
@@ -286,6 +288,11 @@
 </template>
 
 <style lang="css" scoped>
+
+    .creator-name {
+        margin-left: 8px;
+        vertical-align: bottom;
+    }
 
     .clickable_tag {
         cursor: pointer;
