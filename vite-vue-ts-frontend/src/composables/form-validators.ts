@@ -8,6 +8,7 @@ export const runValidators = (value: string, validators: Validator[]) => {
   return true;
 };
 
+// TODO: i18n
 export const required = (label: string): Validator => {
   return (value: string) => {
     if (!value) return new Error(`${label} is required`);
@@ -15,6 +16,7 @@ export const required = (label: string): Validator => {
   };
 };
 
+// TODO: i18n
 export const minLength = (min: number): Validator => {
   return (value: string) => {
     if (!value) return true; // required se encarga de esto
@@ -25,14 +27,12 @@ export const minLength = (min: number): Validator => {
   };
 };
 
+// TODO: i18n
 export const validEmail: Validator = (value: string) => {
   if (!value) return true;
-
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
   if (!emailRegex.test(value)) {
     return new Error("Invalid email format");
   }
-
   return true;
 };
