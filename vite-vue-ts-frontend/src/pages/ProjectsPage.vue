@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { onMounted, h, ref, shallowRef } from 'vue';
     import { api } from '../composables/api';
-    import { NDataTable, NTag, NTable, NColorPicker, NGrid, NGridItem } from 'naive-ui';
+    import { NDataTable, NTag, NTable } from 'naive-ui';
     import type { DataTableColumns } from 'naive-ui'
 
     interface ProjectTypeInterface {
@@ -243,21 +243,11 @@
             borderColor: hexToRgba(base, 0.5)
         }
     }
-
-    const color = ref<string>("#000000");
 </script>
 
 <template>
     <h1>Manage projects</h1>
 
-    <n-grid>
-        <n-grid-item>
-            <n-color-picker v-model:value="color" :modes="['hex']" :show-alpha="false" />
-        </n-grid-item>
-        <n-grid-item>
-            <n-tag :color="tagColor(color)">Colored test tag</n-tag>
-        </n-grid-item>
-    </n-grid>
     <n-table :bordered="true" size="small" :striped="false" v-if="simpleTable">
         <thead>
             <tr>
@@ -285,7 +275,7 @@
                             project.priority.name
                         }}</n-tag>
                 </td>
-                <td><n-tag :color="tagColor(project.priority.hexColor)" class="clickable_tag"
+                <td><n-tag :color="tagColor(project.status.hexColor)" class="clickable_tag"
                         title="Filter by this value">{{ project.status.name
                         }}</n-tag></td>
             </tr>
