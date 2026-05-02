@@ -1,8 +1,8 @@
 import axios from "axios";
-//import { useSessionStore } from "../stores/session";
+import { useSessionStore } from "../stores/session";
 import { SERVER_API_BASE_PATH } from "../constants";
 
-//const sessionStore = useSessionStore();
+const sessionStore = useSessionStore();
 
 const axiosInstance = axios.create({
   baseURL: SERVER_API_BASE_PATH,
@@ -23,11 +23,9 @@ axiosInstance.interceptors.response.use(
         };
       }
       if (error.response?.status === 401) {
-        /*
         if (sessionStore.hasAccessToken) {
           sessionStore.removeAccessToken();
         }
-          */
       }
       error.isAPIError =
         error.response.headers["content-type"] == "application/json" &&
