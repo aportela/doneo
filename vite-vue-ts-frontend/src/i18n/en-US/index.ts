@@ -43,4 +43,6 @@ export default {
   "Open project page": "Open project page",
   "Switch to dark mode": "Switch to dark mode",
   "Switch to light mode": "Switch to light mode",
+  "Switch to top navigation": "Switch to top navigation",
+  "Switch to side navigation": "Switch to side navigation",
 };
