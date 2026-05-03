@@ -20,13 +20,13 @@
 <template>
     <n-tooltip trigger="hover">
         <template #trigger>
-            <n-button quaternary @click="userSettingsStore.toggleFluidLayout" @mousedown.prevent>
-                <IconLayoutNavbarExpand :size="size" v-if="userSettingsStore.hasFluidLayout" />
+            <n-button quaternary @click="userSettingsStore.toggleNavigationMode" @mousedown.prevent>
+                <IconLayoutNavbarExpand :size="size" v-if="userSettingsStore.sideNavigationMode" />
                 <IconLayoutSidebarLeftExpand :size="size" v-else />
             </n-button>
         </template>
         {{
-            t(userSettingsStore.hasFluidLayout ?
+            t(userSettingsStore.sideNavigationMode ?
                 "Switch to top navigation" :
                 "Switch to side navigation")
         }}

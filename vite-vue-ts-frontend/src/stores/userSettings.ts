@@ -1,36 +1,38 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
 import { createStorageEntry } from "../composables/localStorage";
 
-const localStorageUserSettingsFluidLayout = createStorageEntry<boolean>(
-  "userSettings.fluidLayout",
-  true,
-);
+type navigationMode = "top" | "side";
+
+const localStorageUserSettingsNavigationMode =
+  createStorageEntry<navigationMode>("userSettings.navigationMode", "side");
 
 const localStorageUserSettingsDisableNotifications =
   createStorageEntry<boolean>("userSettings.disableNotifications", false);
 
 interface State {
-  fluidLayout: boolean;
+  navigationMode: navigationMode;
   disableNotifications: boolean;
 }
 
 export const useUserSettingsStore = defineStore("userSettings", {
   state: (): State => ({
-    fluidLayout: localStorageUserSettingsFluidLayout.get(),
+    navigationMode: localStorageUserSettingsNavigationMode.get(),
     disableNotifications: localStorageUserSettingsDisableNotifications.get(),
   }),
   getters: {
-    hasFluidLayout: (state): boolean => state.fluidLayout === true,
+    currentNavigationMode: (state): navigationMode => state.navigationMode,
+    topNavigationMode: (state): boolean => state.navigationMode === "top",
+    sideNavigationMode: (state): boolean => state.navigationMode === "side",
     hasNotificationsEnabled: (state): boolean =>
       state.disableNotifications !== true,
   },
   actions: {
-    setFluidLayout(fluid: boolean): void {
-      this.fluidLayout = fluid;
-      localStorageUserSettingsFluidLayout.set(this.fluidLayout);
+    setNavigationMode(mode: navigationMode): void {
+      this.navigationMode = mode;
+      localStorageUserSettingsNavigationMode.set(this.navigationMode);
     },
-    toggleFluidLayout(): void {
-      this.setFluidLayout(!this.fluidLayout);
+    toggleNavigationMode(): void {
+      this.setNavigationMode(this.navigationMode === "top" ? "side" : "top");
     },
     setNotifications(enabled: boolean): void {
       this.disableNotifications = !enabled;

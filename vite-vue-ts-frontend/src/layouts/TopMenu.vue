@@ -3,10 +3,8 @@
     import { IconBug, IconSitemap, IconHome, IconFileAnalytics, IconSettings } from '@tabler/icons-vue';
     import { ref, watch } from 'vue'
     import { useRouter } from "vue-router";
-    import { useUserSettingsStore } from '../stores/userSettings';
 
     const router = useRouter();
-    const userSettingsStore = useUserSettingsStore();
     const currentTab = ref<string | number>("home");
 
     watch(() => currentTab.value, (newValue) => {
@@ -20,8 +18,7 @@
 
 <template>
     <div class="header">
-        <div class="header__container"
-            :class="`header__container--${userSettingsStore.hasFluidLayout ? 'fluid' : 'contained'}`">
+        <div class="header__container header__container--fluid">
             <n-tabs type="bar" v-model:value="currentTab" animated>
                 <n-tab name="home" tab="Home">
                     <IconHome :size="18" />
