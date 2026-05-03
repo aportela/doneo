@@ -3,7 +3,7 @@ import { createStorageEntry } from "../composables/localStorage";
 
 const localStorageUserSettingsFluidLayout = createStorageEntry<boolean>(
   "userSettings.fluidLayout",
-  false,
+  true,
 );
 
 const localStorageUserSettingsDisableNotifications =
