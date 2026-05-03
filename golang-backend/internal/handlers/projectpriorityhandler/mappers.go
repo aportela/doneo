@@ -53,7 +53,7 @@ func mapProjectPriorityDomainToGetProjectPriorityResponse(projectPriority domain
 }
 
 func mapProjectPriorityArrayDomainToProjectPriorityArrayResponse(projectPriorities []domain.ProjectPriority) []projectPriorityResponse {
-	var projectPriorityResponses []projectPriorityResponse
+	projectPriorityResponses := []projectPriorityResponse{}
 	for _, projectPriority := range projectPriorities {
 		projectPriorityResponses = append(projectPriorityResponses, mapProjectPriorityDomainToProjectPriorityResponse(projectPriority))
 	}

@@ -51,7 +51,7 @@ func mapUserDomainToGetUserResponse(user domain.User) getUserResponse {
 }
 
 func mapUserArrayDomainToUserArrayResponse(users []domain.User) []userResponse {
-	var userResponses []userResponse
+	userResponses := []userResponse{}
 	for _, user := range users {
 		userResponses = append(userResponses, mapUserDomainToUserResponse(user))
 	}

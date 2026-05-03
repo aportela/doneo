@@ -25,7 +25,7 @@ func MapProjectPriorityDTOToProjectPriorityDomain(projectPriority projectPriorit
 }
 
 func MapProjectPriorityArrayDTOToProjectPriorityArrayDomain(projectPriority []projectPriorityDTO) []domain.ProjectPriority {
-	var results []domain.ProjectPriority
+	results := []domain.ProjectPriority{}
 	for _, projectPriority := range projectPriority {
 		results = append(results, MapProjectPriorityDTOToProjectPriorityDomain(projectPriority))
 	}

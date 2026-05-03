@@ -53,7 +53,7 @@ func mapProjectDomainToGetProjectResponse(project domain.Project) getProjectResp
 }
 
 func mapProjectArrayDomainToProjectArrayResponse(projects []domain.Project) []projectResponse {
-	var projectResponses []projectResponse
+	projectResponses := []projectResponse{}
 	for _, project := range projects {
 		projectResponses = append(projectResponses, mapProjectDomainToProjectResponse(project))
 	}

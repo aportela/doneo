@@ -32,7 +32,7 @@ func MapUserDTOToUserDomain(user userDTO) domain.User {
 }
 
 func MapUserArrayDTOToUserArrayDomain(users []userDTO) []domain.User {
-	var results []domain.User
+	results := []domain.User{}
 	for _, user := range users {
 		results = append(results, MapUserDTOToUserDomain(user))
 	}

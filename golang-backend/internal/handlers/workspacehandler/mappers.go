@@ -25,7 +25,7 @@ func mapWorkspaceDomainToAddWorkspaceResponse(workspace domain.Workspace) addWor
 }
 
 func mapWorkspaceArrayDomainToWorkspaceArrayResponse(workspaces []domain.Workspace) []workspaceResponse {
-	var workspaceResponses []workspaceResponse
+	workspaceResponses := []workspaceResponse{}
 	for _, workspace := range workspaces {
 		workspaceResponses = append(workspaceResponses, mapWorkspaceDomainToWorkspaceResponse(workspace))
 	}

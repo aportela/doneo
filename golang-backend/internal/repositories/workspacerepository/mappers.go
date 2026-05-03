@@ -31,7 +31,7 @@ func MapWorkspaceDTOToWorkspaceDomain(workspace workspaceDTO) domain.Workspace {
 }
 
 func MapWorkspaceArrayDTOToWorkspaceArrayDomain(workspaces []workspaceDTO) []domain.Workspace {
-	var results []domain.Workspace
+	results := []domain.Workspace{}
 	for _, workspace := range workspaces {
 		results = append(results, MapWorkspaceDTOToWorkspaceDomain(workspace))
 	}

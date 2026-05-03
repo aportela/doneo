@@ -25,7 +25,7 @@ func MapProjectStatusDTOToProjectStatusDomain(projectStatus projectStatusDTO) do
 }
 
 func MapProjectStatusArrayDTOToProjectStatusArrayDomain(projectStatuses []projectStatusDTO) []domain.ProjectStatus {
-	var results []domain.ProjectStatus
+	results := []domain.ProjectStatus{}
 	for _, projectStatus := range projectStatuses {
 		results = append(results, MapProjectStatusDTOToProjectStatusDomain(projectStatus))
 	}

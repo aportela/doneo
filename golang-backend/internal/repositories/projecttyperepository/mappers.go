@@ -23,7 +23,7 @@ func MapProjectTypeDTOToProjectTypeDomain(projectType projectTypeDTO) domain.Pro
 }
 
 func MapProjectTypeArrayDTOToProjectTypeArrayDomain(projectTypes []projectTypeDTO) []domain.ProjectType {
-	var results []domain.ProjectType
+	results := []domain.ProjectType{}
 	for _, projectType := range projectTypes {
 		results = append(results, MapProjectTypeDTOToProjectTypeDomain(projectType))
 	}

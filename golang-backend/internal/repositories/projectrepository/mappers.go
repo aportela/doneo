@@ -48,7 +48,7 @@ func MapProjectDTOToProjectDomain(project projectDTO) domain.Project {
 }
 
 func MapProjectArrayDTOToProjectArrayDomain(projects []projectDTO) []domain.Project {
-	var results []domain.Project
+	results := []domain.Project{}
 	for _, project := range projects {
 		results = append(results, MapProjectDTOToProjectDomain(project))
 	}

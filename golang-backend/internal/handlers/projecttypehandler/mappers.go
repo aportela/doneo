@@ -47,7 +47,7 @@ func mapProjectTypeDomainToGetProjectTypeResponse(projectType domain.ProjectType
 }
 
 func mapProjectTypeArrayDomainToProjectTypeArrayResponse(projectTypes []domain.ProjectType) []projectTypeResponse {
-	var projectTypeResponses []projectTypeResponse
+	projectTypeResponses := []projectTypeResponse{}
 	for _, projectType := range projectTypes {
 		projectTypeResponses = append(projectTypeResponses, mapProjectTypeDomainToProjectTypeResponse(projectType))
 	}
