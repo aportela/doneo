@@ -38,4 +38,7 @@ export default {
   // notifications
   "Enable notifications": "Activar notificacións",
   "Disable notifications": "Desactivar notificacións",
+
+  // hints
+  "Open project page": "Abrir páxina do proxecto",
 };
