@@ -14,7 +14,7 @@ type updateProjectStatusRequest struct {
 	HexColor string `json:"hexColor"`
 }
 
-type projectStatusResponse struct {
+type ProjectStatusResponse struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	Index    int    `json:"index"`
@@ -22,15 +22,15 @@ type projectStatusResponse struct {
 }
 
 type addProjectStatusResponse struct {
-	ProjectStatus projectStatusResponse `json:"projectStatus"`
+	ProjectStatus ProjectStatusResponse `json:"projectStatus"`
 }
 
 type updateProjectStatusResponse struct {
-	ProjectStatus projectStatusResponse `json:"projectStatus"`
+	ProjectStatus ProjectStatusResponse `json:"projectStatus"`
 }
 
 type getProjectStatusResponse struct {
-	ProjectStatus projectStatusResponse `json:"projectStatus"`
+	ProjectStatus ProjectStatusResponse `json:"projectStatus"`
 }
 
 type searchProjectStatusesRequest struct {
@@ -38,5 +38,5 @@ type searchProjectStatusesRequest struct {
 }
 
 type searchProjectStatusesResponse struct {
-	ProjectStatuses []projectStatusResponse `json:"projectStatuses"`
+	ProjectStatuses []ProjectStatusResponse `json:"projectStatuses"`
 }

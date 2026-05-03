@@ -12,24 +12,24 @@ type updateProjectTypeRequest struct {
 	HexColor string `json:"hexColor"`
 }
 
-type projectTypeResponse struct {
+type ProjectTypeResponse struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	HexColor string `json:"hexColor"`
 }
 
 type addProjectTypeResponse struct {
-	ProjectType projectTypeResponse `json:"projectType"`
+	ProjectType ProjectTypeResponse `json:"projectType"`
 }
 
 type updateProjectTypeResponse struct {
-	ProjectType projectTypeResponse `json:"projectType"`
+	ProjectType ProjectTypeResponse `json:"projectType"`
 }
 
 type getProjectTypeResponse struct {
-	ProjectType projectTypeResponse `json:"projectType"`
+	ProjectType ProjectTypeResponse `json:"projectType"`
 }
 
 type searchProjectTypesResponse struct {
-	ProjectTypes []projectTypeResponse `json:"projectTypes"`
+	ProjectTypes []ProjectTypeResponse `json:"projectTypes"`
 }

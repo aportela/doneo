@@ -24,8 +24,8 @@ func mapUpdateProjectPriorityRequestToProjectPriorityDomain(request updateProjec
 	}
 }
 
-func mapProjectPriorityDomainToProjectPriorityResponse(projectPriority domain.ProjectPriority) projectPriorityResponse {
-	return projectPriorityResponse{
+func mapProjectPriorityDomainToProjectPriorityResponse(projectPriority domain.ProjectPriority) ProjectPriorityResponse {
+	return ProjectPriorityResponse{
 		ID:          projectPriority.ID,
 		WorkspaceId: projectPriority.WorkspaceId,
 		Name:        projectPriority.Name,
@@ -52,8 +52,8 @@ func mapProjectPriorityDomainToGetProjectPriorityResponse(projectPriority domain
 	}
 }
 
-func mapProjectPriorityArrayDomainToProjectPriorityArrayResponse(projectPriorities []domain.ProjectPriority) []projectPriorityResponse {
-	projectPriorityResponses := []projectPriorityResponse{}
+func mapProjectPriorityArrayDomainToProjectPriorityArrayResponse(projectPriorities []domain.ProjectPriority) []ProjectPriorityResponse {
+	projectPriorityResponses := []ProjectPriorityResponse{}
 	for _, projectPriority := range projectPriorities {
 		projectPriorityResponses = append(projectPriorityResponses, mapProjectPriorityDomainToProjectPriorityResponse(projectPriority))
 	}

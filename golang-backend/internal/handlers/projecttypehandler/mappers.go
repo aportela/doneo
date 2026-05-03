@@ -20,8 +20,8 @@ func mapUpdateProjectTypeRequestToProjectTypeDomain(request updateProjectTypeReq
 	}
 }
 
-func mapProjectTypeDomainToProjectTypeResponse(projectType domain.ProjectType) projectTypeResponse {
-	return projectTypeResponse{
+func mapProjectTypeDomainToProjectTypeResponse(projectType domain.ProjectType) ProjectTypeResponse {
+	return ProjectTypeResponse{
 		ID:       projectType.ID,
 		Name:     projectType.Name,
 		HexColor: projectType.HexColor,
@@ -46,8 +46,8 @@ func mapProjectTypeDomainToGetProjectTypeResponse(projectType domain.ProjectType
 	}
 }
 
-func mapProjectTypeArrayDomainToProjectTypeArrayResponse(projectTypes []domain.ProjectType) []projectTypeResponse {
-	projectTypeResponses := []projectTypeResponse{}
+func mapProjectTypeArrayDomainToProjectTypeArrayResponse(projectTypes []domain.ProjectType) []ProjectTypeResponse {
+	projectTypeResponses := []ProjectTypeResponse{}
 	for _, projectType := range projectTypes {
 		projectTypeResponses = append(projectTypeResponses, mapProjectTypeDomainToProjectTypeResponse(projectType))
 	}

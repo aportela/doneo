@@ -22,8 +22,8 @@ func mapUpdateProjectStatusRequestToProjectStatusDomain(request updateProjectSta
 	}
 }
 
-func mapProjectStatusDomainToProjectStatusResponse(projectStatus domain.ProjectStatus) projectStatusResponse {
-	return projectStatusResponse{
+func mapProjectStatusDomainToProjectStatusResponse(projectStatus domain.ProjectStatus) ProjectStatusResponse {
+	return ProjectStatusResponse{
 		ID:       projectStatus.ID,
 		Name:     projectStatus.Name,
 		Index:    projectStatus.Index,
@@ -49,8 +49,8 @@ func mapProjectStatusDomainToGetProjectStatusResponse(projectStatus domain.Proje
 	}
 }
 
-func mapProjectStatusArrayDomainToProjectStatusArrayResponse(projectPriorities []domain.ProjectStatus) []projectStatusResponse {
-	projectStatusResponses := []projectStatusResponse{}
+func mapProjectStatusArrayDomainToProjectStatusArrayResponse(projectPriorities []domain.ProjectStatus) []ProjectStatusResponse {
+	projectStatusResponses := []ProjectStatusResponse{}
 	for _, projectStatus := range projectPriorities {
 		projectStatusResponses = append(projectStatusResponses, mapProjectStatusDomainToProjectStatusResponse(projectStatus))
 	}

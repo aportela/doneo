@@ -16,7 +16,7 @@ type updateProjectPriorityRequest struct {
 	HexColor    string `json:"hexColor"`
 }
 
-type projectPriorityResponse struct {
+type ProjectPriorityResponse struct {
 	ID          string `json:"id"`
 	WorkspaceId string `json:"workspaceId"`
 	Name        string `json:"name"`
@@ -25,15 +25,15 @@ type projectPriorityResponse struct {
 }
 
 type addProjectPriorityResponse struct {
-	ProjectPriority projectPriorityResponse `json:"projectPriority"`
+	ProjectPriority ProjectPriorityResponse `json:"projectPriority"`
 }
 
 type updateProjectPriorityResponse struct {
-	ProjectPriority projectPriorityResponse `json:"projectPriority"`
+	ProjectPriority ProjectPriorityResponse `json:"projectPriority"`
 }
 
 type getProjectPriorityResponse struct {
-	ProjectPriority projectPriorityResponse `json:"projectPriority"`
+	ProjectPriority ProjectPriorityResponse `json:"projectPriority"`
 }
 
 type searchProjectPrioritysRequest struct {
@@ -41,5 +41,5 @@ type searchProjectPrioritysRequest struct {
 }
 
 type searchProjectPrioritysResponse struct {
-	ProjectPriorities []projectPriorityResponse `json:"projectPriorities"`
+	ProjectPriorities []ProjectPriorityResponse `json:"projectPriorities"`
 }
