@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { ref, reactive, computed, onMounted, watch, type CSSProperties } from 'vue';
     import { useI18n } from "vue-i18n";
-    import { NCard, NInput, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules } from 'naive-ui';
+    import { NSpin, NCard, NInput, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules } from 'naive-ui';
     import { v7 as uuidv7 } from 'uuid';
     import { IconCancel, IconDeviceFloppy, IconTrash } from '@tabler/icons-vue';
     import { type AxiosAPIError } from '../../composables/axios';
@@ -11,7 +11,6 @@
     import { api } from '../../composables/api';
     import { required, minLength, runValidators } from '../../composables/form-validators';
     import { generateRandomSoftHexColor, getNaiveUITagColorProperty } from '../../composables/color';
-
 
     const emit = defineEmits(['add', 'update', 'delete', 'cancel'])
 
@@ -71,7 +70,7 @@
                 if (serverErrors.value.name) return new Error(serverErrors.value.name)
                 return true
             },
-            trigger: ['blur'],
+            trigger: ['blur', 'input'],
         }
     };
 
@@ -156,24 +155,28 @@
             }
         }
     });
-    projectTypeFormRef.value?.validate();
-
 </script>
 
 <template>
-    <n-card :title="title" :style="style">
+    <n-card :style="style" bordered>
+        <template #header>
+            {{ title }}
+        </template>
+        <template #header-extra>
+            <n-spin v-if="state.ajaxRunning" size="small" />
+        </template>
         <n-form ref="projectTypeFormRef" :model="projectType" :rules="projectTypeFormRules">
-            <n-form-item label="Name" path="name" show-feedback>
-                <n-input placeholder="Project type name" v-model:value="projectType.name"
+            <n-form-item :label="t('Name')" path="name" show-feedback>
+                <n-input :placeholder="t('Project type name')" v-model:value="projectType.name"
                     :disabled="state.ajaxRunning || deleteMode" :maxlength="projectTypeMaxNameLength"
                     :show-count="!deleteMode" clearable required autofocus></n-input>
             </n-form-item>
-            <n-form-item label="Preview" v-if="!deleteMode">
+            <n-form-item :label="t('Preview')" v-if="!deleteMode">
                 <n-tag :color="getNaiveUITagColorProperty(projectType.hexColor)">
                     {{ projectType.name }}
                 </n-tag>
             </n-form-item>
-            <n-form-item label="Color" v-if="!deleteMode">
+            <n-form-item :label="t('Color')" v-if="!deleteMode">
                 <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="projectType.hexColor" />
             </n-form-item>
         </n-form>
@@ -200,6 +203,7 @@
             </n-flex>
         </template>
     </n-card>
+
 </template>
 
 <style lang="css" scoped></style>
