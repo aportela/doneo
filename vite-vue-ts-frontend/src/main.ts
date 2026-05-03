@@ -10,6 +10,8 @@ import { useSessionStore } from "./stores/session";
 
 import { useUserSettingsStore } from "./stores/userSettings";
 
+import "./assets/styles/main.css";
+
 const pinia = createPinia();
 
 const app = createApp(App);
