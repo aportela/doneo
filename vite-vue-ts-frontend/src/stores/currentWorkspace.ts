@@ -1,13 +1,13 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
 import { createStorageEntry } from "../composables/localStorage";
 
-const localStorageCurrentWorkspace = createStorageEntry<string | null>(
+const localStorageCurrentWorkspace = createStorageEntry<string>(
   "currentWorkspace.workspaceId",
-  null,
+  "",
 );
 
 interface State {
-  currentWorkspaceId: string | null;
+  currentWorkspaceId: string;
 }
 
 export const useCurrentWorkspaceStore = defineStore("workspaceStore", {
@@ -15,7 +15,7 @@ export const useCurrentWorkspaceStore = defineStore("workspaceStore", {
     currentWorkspaceId: localStorageCurrentWorkspace.get(),
   }),
   getters: {
-    workspaceId: (state): string | null => state.currentWorkspaceId,
+    workspaceId: (state): string => state.currentWorkspaceId,
   },
   actions: {
     set(workspaceId: string): void {
