@@ -1,45 +1,49 @@
 <script setup lang="ts">
-    const title = "Title";
+    import { type CSSProperties } from 'vue';
+    import { NTable, type TableSize } from 'naive-ui';
 
+
+    interface ManageTableProps {
+        size: TableSize;
+        title: string;
+        style?: string | CSSProperties;
+    };
+
+    const props = defineProps<ManageTableProps>();
 </script>
 
 <template>
-    <n-table size="small">
-        <caption class="table-caption">
-            <n-grid :cols="2" align="center">
-                <n-grid-item style="text-align: left;">
-                    <span class="table-caption-title">{{ title }}</span>
-                </n-grid-item>
-                <!--
-                <n-grid-item style="display: flex; justify-content: flex-end;">
-                    <n-button @click="onAddProjectType" :disabled="state.ajaxRunning">
-                        <template #icon>
-                            <IconPlus />
-                        </template>
-{{ t("Add") }}
-</n-button>
-</n-grid-item>
--->
-            </n-grid>
-        </caption>
-
+    <div class="table-header">
+        <div>
+            <span class="table-caption-title">{{ title }}</span>
+        </div>
+        <div>
+            <slot name="caption-extra" />
+        </div>
+    </div>
+    <n-table :size="size" :style="style">
         <slot name="thead">
             <thead></thead>
         </slot>
         <slot name="tbody">
             <tbody></tbody>
         </slot>
+        <slot name="tfoot">
+            <tfoot></tfoot>
+        </slot>
     </n-table>
 </template>
 
 <style lang="css" scoped>
-    .table-caption {
-        padding-bottom: 4px;
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
     }
 
     .table-caption-title {
         font-weight: 700;
         font-size: large;
-
     }
 </style>
