@@ -39,13 +39,16 @@ const api = {
       axiosInstance.put("/project_types/" + projectType.id, projectType),
     delete: (id: string) => axiosInstance.delete("/project_types/" + id),
     get: (id: string) => axiosInstance.get("/project_types/" + id),
-    search: () => axiosInstance.get("/project_types"),
+    search: (workspaceId: string) =>
+      axiosInstance.get("/project_types?workspaceid=" + workspaceId),
   },
   projectStatuses: {
-    search: () => axiosInstance.get("/project_statuses"),
+    search: (workspaceId: string) =>
+      axiosInstance.get("/project_statuses?workspaceid=" + workspaceId),
   },
   projectPriorities: {
-    search: () => axiosInstance.get("/project_priorities"),
+    search: (workspaceId: string) =>
+      axiosInstance.get("/project_priorities?workspaceid=" + workspaceId),
   },
 };
 
