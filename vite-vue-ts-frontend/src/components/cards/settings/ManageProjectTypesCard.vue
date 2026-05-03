@@ -54,7 +54,6 @@
 
     const actionDialogMode = ref<EntityAction>("none");
 
-
     const isVisibleActionDialog = computed<boolean>({
         get: () => actionDialogMode.value !== "none",
         set: (value: boolean) => {
@@ -66,19 +65,19 @@
 
     const onAdd = () => {
         isVisibleActionDialog.value = false;
-        notify('success', "Project type added")
+        notify('success', t("Project type added"))
         onRefresh();
     };
 
     const onUpdate = () => {
         isVisibleActionDialog.value = false;
-        notify('success', "Project type updated")
+        notify('success', t("Project type updated"))
         onRefresh();
     };
 
     const onDelete = () => {
         isVisibleActionDialog.value = false;
-        notify('success', "Project type deleted")
+        notify('success', t("Project type deleted"))
         onRefresh();
     };
 
@@ -98,6 +97,14 @@
             @add="onAdd" @update="onUpdate" @delete="onDelete" @cancel="onCancel" />
     </n-modal>
     <ManageTable size="small" :title="t('Project types')">
+        <template #caption-extra>
+            <n-button @click="onAddProjectType" :disabled="state.ajaxRunning">
+                <template #icon>
+                    <IconPlus />
+                </template>
+                {{ t("Add") }}
+            </n-button>
+        </template>
         <template #thead>
             <tr>
                 <th>{{ t("Name") }}</th>
@@ -107,7 +114,7 @@
         <template #tbody>
             <tr v-for="projectType, index in projectTypes" :key="projectType.id">
                 <td><n-tag :color="getNaiveUITagColorProperty(projectType.hexColor)">{{ projectType.name
-                }}</n-tag></td>
+                        }}</n-tag><span style="display: inline-block; width: 100%;">&nbsp;</span></td>
                 <td class="text-center">
                     <n-button-group>
                         <n-button @click="onUpdateProjectType(projectType, index)">
@@ -152,7 +159,7 @@
         <tbody>
             <tr v-for="projectType, index in projectTypes" :key="projectType.id">
                 <td><n-tag :color="getNaiveUITagColorProperty(projectType.hexColor)">{{ projectType.name
-                }}</n-tag></td>
+                        }}</n-tag></td>
                 <td class="text-center">
                     <n-button-group>
                         <n-button @click="onUpdateProjectType(projectType, index)">

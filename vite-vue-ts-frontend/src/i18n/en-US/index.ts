@@ -22,6 +22,9 @@ export default {
   "Delete project type": "Delete project type",
   "Project type name": "Project type name",
   "Project types": "Project types",
+  "Project type added": "Project type added",
+  "Project type updated": "Project type updated",
+  "Project type deleted": "Project type deleted",
 
   // signin form fields
   Email: "Email",

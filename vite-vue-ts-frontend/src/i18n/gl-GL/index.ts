@@ -22,6 +22,9 @@ export default {
   "Delete project type": "Eliminar tipo de proxecto",
   "Project type name": "Nome do tipo de proxecto",
   "Project types": "Tipos de proxectos",
+  "Project type added": "Engadiuse o tipo do proxecto",
+  "Project type updated": "Modificouse o tipo do proxecto",
+  "Project type deleted": "Eliminouse o tipo do proxecto",
 
   // signin form fields
   Email: "Email",
