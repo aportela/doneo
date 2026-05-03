@@ -8,6 +8,7 @@ import (
 var (
 	ErrInvalidCredentials = fmt.Errorf("invalid credentials")
 	ErrNotFound           = fmt.Errorf("entity not found")
+	ErrDeleted            = fmt.Errorf("entity deleted")
 	ErrSQLDatabaseError   = errors.New("SQL database error: ")
 )
 
