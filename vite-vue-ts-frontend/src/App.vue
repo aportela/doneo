@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { NConfigProvider } from 'naive-ui';
+  import { NConfigProvider, NNotificationProvider } from 'naive-ui';
   import { darkTheme } from 'naive-ui'
 
   import { useColorSchemeStore } from './stores/colorScheme';
@@ -10,7 +10,9 @@
 
 <template>
   <n-config-provider :theme="colorSchemeStore.dark ? darkTheme : null">
-    <router-view />
+    <n-notification-provider>
+      <router-view />
+    </n-notification-provider>
   </n-config-provider>
 </template>
 
