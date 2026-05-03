@@ -1,17 +1,21 @@
 <script setup lang="ts">
-    import { NCard, NInput, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem } from 'naive-ui';
-    import { IconCancel, IconDeviceFloppy, IconTrash } from '@tabler/icons-vue';
-    import { computed, onMounted } from 'vue';
+    import { ref, reactive, computed, onMounted, watch, type CSSProperties } from 'vue';
+    import { useI18n } from "vue-i18n";
+    import { NCard, NInput, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules } from 'naive-ui';
     import { v7 as uuidv7 } from 'uuid';
+    import { IconCancel, IconDeviceFloppy, IconTrash } from '@tabler/icons-vue';
+    import { type AxiosAPIError } from '../../composables/axios';
     import type { EntityAction } from '../../types/common';
-
-    import { ref } from 'vue';
-    import type { CSSProperties } from 'vue';
+    import { type ProjectTypeInterface, ProjectTypeClass, maxNameLength as projectTypeMaxNameLength } from '../../types/models/projectType';
+    import { type AjaxStateInterface, defaultAjaxState } from '../../types/ajaxState';
     import { api } from '../../composables/api';
-    import { type ProjectTypeInterface, ProjectTypeClass, maxNameLength } from '../../types/models/projectType';
+    import { required, minLength, runValidators } from '../../composables/form-validators';
     import { generateRandomSoftHexColor, getNaiveUITagColorProperty } from '../../composables/color';
 
+
     const emit = defineEmits(['add', 'update', 'delete', 'cancel'])
+
+    const { t } = useI18n();
 
     interface ProjectTypeFormProps {
         mode: EntityAction;
@@ -21,12 +25,11 @@
 
     const props = defineProps<ProjectTypeFormProps>();
 
-    const saveButtonDisabled = computed<boolean>(() => {
-        const inactiveMode = !(addMode.value || updateMode.value);
-        const noName = !projectType.value.name;
-
-        return inactiveMode || noName;
-    });
+    const projectType = ref<ProjectTypeInterface>(
+        new ProjectTypeClass(
+            { id: uuidv7(), name: "", hexColor: generateRandomSoftHexColor() }
+        )
+    );
 
     const addMode = computed<boolean>(() => props.mode === "add");
     const updateMode = computed<boolean>(() => props.mode === "update");
@@ -35,96 +38,143 @@
     const title = computed<string>(() => {
         switch (props.mode) {
             case "add":
-                return "Add new project type";
+                return t("Add project type");
             case "update":
-                return "Update project type";
+                return t("Update project type");
             case "delete":
-                return "Delete project type";
+                return t("Delete project type");
             default:
                 return "";
         }
     });
 
-    const onSave = () => {
-        if (addMode) {
-            onAdd();
-        } else if (updateMode) {
-            onUpdate()
-        } else {
-            console.error("TODO");
+    const saveButtonDisabled = computed<boolean>(() => {
+        const inactiveMode = !(addMode.value || updateMode.value);
+        const noName = !projectType.value.name;
+        return inactiveMode || noName;
+    });
+
+    const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
+
+    const projectTypeFormRef = ref<FormInst | null>(null)
+
+    const projectTypeFormValues = ref({ name: null });
+
+    const serverErrors = ref<Record<string, string>>({});
+
+    const projectTypeFormRules: FormRules = {
+        name: {
+            validator: (_rule: FormItemRule, value) => {
+                if (state.ajaxRunning) return true;
+                const localResult = runValidators(value, [required('name'), minLength(3)])
+                if (localResult !== true) return localResult
+                if (serverErrors.value.name) return new Error(serverErrors.value.name)
+                return true
+            },
+            trigger: ['blur'],
+        }
+    };
+
+    watch(() => projectTypeFormValues.value.name, () => {
+        delete serverErrors.value.name
+    });
+
+    const onSave = async () => {
+        serverErrors.value = {};
+        try {
+            await projectTypeFormRef.value?.validate();
+            if (addMode.value) {
+                onAdd();
+            } else if (updateMode.value) {
+                onUpdate()
+            } else {
+                console.error("TODO");
+            }
+        } catch (e) {
+            //console.debug("ProjectType form validation error", e)
         }
     }
 
+    const onGet = (id: string) => {
+        state.ajaxRunning = true;
+        api.projectTypes.get(id).then((_response: any) => {
+            projectType.value = _response.data.projectType;
+        }).catch((_error: AxiosAPIError) => {
+            // TODO:
+            console.error(_error);
+        }).finally(() => {
+            state.ajaxRunning = false;
+        });
+    };
+
     const onAdd = () => {
-        emit('add')
+        state.ajaxRunning = true;
+        api.projectTypes.add(projectType.value).then((_response: any) => {
+            emit('add')
+        }).catch((_error: AxiosAPIError) => {
+            // TODO:
+            console.error(_error);
+        }).finally(() => {
+            state.ajaxRunning = false;
+        });
     };
 
     const onUpdate = () => {
-        emit('update')
+        state.ajaxRunning = true;
+        api.projectTypes.update(projectType.value).then((_response: any) => {
+            emit('update')
+        }).catch((_error: AxiosAPIError) => {
+            // TODO:
+            console.error(_error);
+        }).finally(() => {
+            state.ajaxRunning = false;
+        });
     };
 
     const onDelete = () => {
-        emit('delete')
+        state.ajaxRunning = true;
+        api.projectTypes.delete(projectType.value.id).then((_response: any) => {
+            emit('delete')
+        }).catch((_error: AxiosAPIError) => {
+            // TODO:
+            console.error(_error);
+        }).finally(() => {
+            state.ajaxRunning = false;
+        });
     };
 
     const onCancel = () => {
         emit('cancel')
     }
 
-    /*
-const onAddProjectType = () => {
-projectTypes.value.push(
-    new ProjectType({ id: uuidv7(), name: "" })
-);
-nextTick(() => {
-    if (tableFooter.value) {
-        tableFooter.value?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'end'
-        });
-    }
-});
-};
-*/
-
-    const projectType = ref<ProjectTypeInterface>(
-        new ProjectTypeClass(
-            { id: uuidv7(), name: "", hexColor: generateRandomSoftHexColor() }
-        )
-    );
-
-    const getProjectType = (id: string) => {
-        api.projectTypes.get(id).then((_response: any) => {
-            projectType.value = _response.data.projectType;
-        }).catch((_error: any) => { console.error(_error); }).finally(() => { });
-    };
-
     onMounted(() => {
         if (props.mode == "update" || props.mode == "delete") {
             if (props.projectTypeId) {
-                getProjectType(props.projectTypeId);
+                onGet(props.projectTypeId);
             } else {
-                console.error("TODO")
+                console.error(`TODO: missing projectTypeId prop for ${props.mode} action`);
             }
         }
     });
+    projectTypeFormRef.value?.validate();
 
 </script>
 
 <template>
     <n-card :title="title" :style="style">
-        <n-form>
-            <n-form-item label="Name">
-                <n-input placeholder="Project type name" v-model:value="projectType.name" :disabled="deleteMode"
-                    :maxlength="maxNameLength" show-count clearable required autofocus></n-input>
+        <n-form ref="projectTypeFormRef" :model="projectType" :rules="projectTypeFormRules">
+            <n-form-item label="Name" path="name" show-feedback>
+                <n-input placeholder="Project type name" v-model:value="projectType.name"
+                    :disabled="state.ajaxRunning || deleteMode" :maxlength="projectTypeMaxNameLength"
+                    :show-count="!deleteMode" clearable required autofocus></n-input>
             </n-form-item>
-            <n-form-item label="Preview">
+            <n-form-item label="Preview" v-if="!deleteMode">
                 <n-tag :color="getNaiveUITagColorProperty(projectType.hexColor)">
                     {{ projectType.name }}
                 </n-tag>
             </n-form-item>
-            <n-form-item label="Color">
-                <n-color-picker :modes="['hex']" v-model:value="projectType.hexColor" />
+            <n-form-item label="Color" v-if="!deleteMode">
+                <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="projectType.hexColor" />
             </n-form-item>
         </n-form>
         <template #action>
@@ -133,28 +183,23 @@ nextTick(() => {
                     <template #icon>
                         <IconDeviceFloppy />
                     </template>
-                    Save
+                    {{ t("Save") }}
                 </n-button>
-                <n-button @click="onDelete" v-else-if="deleteMode">
+                <n-button @click="onDelete" v-else-if="deleteMode" :disabled="state.ajaxRunning">
                     <template #icon>
                         <IconTrash />
                     </template>
-                    Delete
+                    {{ t("Delete") }}
                 </n-button>
-                <n-button @click="onCancel">
+                <n-button @click="onCancel" :disabled="state.ajaxRunning">
                     <template #icon>
                         <IconCancel />
                     </template>
-                    Cancel
+                    {{ t("Cancel") }}
                 </n-button>
             </n-flex>
         </template>
     </n-card>
 </template>
 
-<style lang="css" scoped>
-    .full-width-tag {
-        display: block;
-        width: 100%;
-    }
-</style>
+<style lang="css" scoped></style>

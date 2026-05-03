@@ -2,7 +2,7 @@
     import { ref, reactive, onMounted, nextTick, computed } from 'vue'
     import { NSpin, NTable, NButton, NGrid, NGridItem, NFlex, useDialog, NModal, NTag } from 'naive-ui'
     import { api } from '../../../composables/api';
-    import { IconDeviceFloppy, IconEdit, IconPlus, IconTrash } from '@tabler/icons-vue';
+    import { IconEdit, IconPlus, IconTrash } from '@tabler/icons-vue';
     import ProjectTypeForm from '../../forms/ProjectTypeForm.vue';
     import { getNaiveUITagColorProperty } from '../../../composables/color';
     import type { ProjectTypeInterface } from '../../../types/models/projectType';
@@ -19,10 +19,6 @@
 
     const tableFooter = ref<HTMLElement | null>(null);
 
-    console.log(tableFooter);
-
-    nextTick(() => { });
-
     const projectTypes = ref<ProjectTypeInterface[]>([]);
 
     const onRefresh = () => {
@@ -31,10 +27,10 @@
             projectTypes.value = successResponse.data.projectTypes;
         }).catch((errorResponse: any) => {
             console.log(errorResponse);
-        }).finally(() => { state.ajaxRunning = false; })
+        }).finally(() => {
+            state.ajaxRunning = false;
+        })
     };
-
-
 
     onMounted(() => {
         onRefresh();
@@ -44,7 +40,17 @@
 
     const onAddProjectType = () => {
         actionDialogMode.value = "add";
+        nextTick(() => {
+            if (tableFooter.value) {
+                tableFooter.value?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'end'
+                });
+            }
+        });
+
     };
+
     const onUpdateProjectType = (_projectType: ProjectTypeInterface, _index: number) => {
         actionDialogMode.value = "update";
         selectedProjectTypeId.value = _projectType.id;
@@ -65,12 +71,32 @@
         }
     });
 
+    const onAdd = () => {
+        isVisibleActionDialog.value = false;
+        onRefresh();
+    };
+
+    const onUpdate = () => {
+        isVisibleActionDialog.value = false;
+        onRefresh();
+    };
+
+    const onDelete = () => {
+        isVisibleActionDialog.value = false;
+        onRefresh();
+    };
+
+    const onCancel = () => {
+        isVisibleActionDialog.value = false;
+    };
+
 </script>
 
 <template>
     <n-spin :show="state.ajaxRunning">
-        <n-modal v-model:show="isVisibleActionDialog" @cancel="isVisibleActionDialog = false">
-            <ProjectTypeForm :mode="actionDialogMode" :project-type-id="selectedProjectTypeId" style="width: 40%;" />
+        <n-modal v-model:show="isVisibleActionDialog">
+            <ProjectTypeForm :mode="actionDialogMode" :project-type-id="selectedProjectTypeId" style="width: 40%;"
+                @add="onAdd" @update="onUpdate" @delete="onDelete" @cancel="onCancel" />
         </n-modal>
         <n-table size="small">
             <caption class="table-caption">
@@ -80,17 +106,11 @@
                     </n-grid-item>
                     <n-grid-item style="display: flex; justify-content: flex-end;">
                         <n-flex>
-                            <n-button @click="onAddProjectType">
+                            <n-button @click="onAddProjectType" :disabled="state.ajaxRunning">
                                 <template #icon>
                                     <IconPlus />
                                 </template>
                                 Add new
-                            </n-button>
-                            <n-button disabled>
-                                <template #icon>
-                                    <IconDeviceFloppy />
-                                </template>
-                                Save
                             </n-button>
                         </n-flex>
                     </n-grid-item>
