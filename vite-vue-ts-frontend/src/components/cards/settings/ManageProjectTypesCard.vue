@@ -98,7 +98,7 @@
     </n-modal>
     <ManageTable size="small" :title="t('Project types')">
         <template #caption-extra>
-            <n-button @click="onAddProjectType" :disabled="state.ajaxRunning">
+            <n-button @click="onAddProjectType" :disabled="state.ajaxRunning" size="small">
                 <template #icon>
                     <IconPlus />
                 </template>
@@ -108,22 +108,23 @@
         <template #thead>
             <tr>
                 <th>{{ t("Name") }}</th>
-                <th class="text-center">{{ t("Actions") }}</th>
+                <th class="text-right">{{ t("Actions") }}</th>
             </tr>
         </template>
         <template #tbody>
             <tr v-for="projectType, index in projectTypes" :key="projectType.id">
-                <td><n-tag :color="getNaiveUITagColorProperty(projectType.hexColor)">{{ projectType.name
+                <td class="cell-flex-vertical-align"><n-tag :color="getNaiveUITagColorProperty(projectType.hexColor)">{{
+                    projectType.name
                         }}</n-tag><span style="display: inline-block; width: 100%;">&nbsp;</span></td>
-                <td class="text-center">
+                <td class="text-right">
                     <n-button-group>
-                        <n-button @click="onUpdateProjectType(projectType, index)">
+                        <n-button size="small" @click="onUpdateProjectType(projectType, index)">
                             {{ t("Update") }}
                             <template #icon>
                                 <IconEdit :size="22" />
                             </template>
                         </n-button>
-                        <n-button @click="onDeleteProjectType(projectType, index)">
+                        <n-button size="small" @click="onDeleteProjectType(projectType, index)">
                             {{ t("Delete") }}
                             <template #icon>
                                 <IconTrash :size="22" />
