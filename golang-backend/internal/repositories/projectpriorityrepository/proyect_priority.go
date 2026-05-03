@@ -50,10 +50,10 @@ func (projectPriorityRepository *projectPriorityRepository) Update(ctx context.C
 				item_hex_color = ?
 			WHERE id = ?
         `,
-		projectPriority.ID,
 		projectPriority.Name,
 		projectPriority.Index,
 		projectPriority.HexColor,
+		projectPriority.ID,
 	)
 	return err
 }

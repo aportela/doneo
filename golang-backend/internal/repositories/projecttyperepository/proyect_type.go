@@ -48,9 +48,9 @@ func (projectTypeRepository *projectTypeRepository) Update(ctx context.Context, 
 				item_hex_color = ?
 			WHERE id = ?
         `,
-		projectType.ID,
 		projectType.Name,
 		projectType.HexColor,
+		projectType.ID,
 	)
 	return err
 }
