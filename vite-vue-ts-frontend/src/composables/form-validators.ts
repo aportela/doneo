@@ -21,7 +21,7 @@ export const minLength = (min: number): Validator => {
   return (value: string) => {
     if (!value) return true; // required se encarga de esto
     if (value.length < min) {
-      return new Error(`Min length is ${min}`);
+      return new Error(`min length is ${min}`);
     }
     return true;
   };
@@ -32,7 +32,7 @@ export const validEmail: Validator = (value: string) => {
   if (!value) return true;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(value)) {
-    return new Error("Invalid email format");
+    return new Error("invalid email format");
   }
   return true;
 };
