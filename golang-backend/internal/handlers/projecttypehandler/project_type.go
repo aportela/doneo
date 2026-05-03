@@ -57,7 +57,7 @@ func (h *ProjectTypeHandler) UpdateProjectType(w http.ResponseWriter, r *http.Re
 
 func (h *ProjectTypeHandler) DeleteProjectType(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	userId := chi.URLParam(r, "id")
+	userId := chi.URLParam(r, "project_type_id")
 	err := h.service.DeleteProjectType(r.Context(), userId)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeService] failed to delete project type with ID %s: %w", userId, err))
@@ -68,7 +68,7 @@ func (h *ProjectTypeHandler) DeleteProjectType(w http.ResponseWriter, r *http.Re
 
 func (h *ProjectTypeHandler) GetProjectType(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	userId := chi.URLParam(r, "id")
+	userId := chi.URLParam(r, "project_type_id")
 	user, err := h.service.GetProjectType(r.Context(), userId)
 	if err != nil {
 		if err == domain.ErrNotFound {
@@ -84,11 +84,6 @@ func (h *ProjectTypeHandler) GetProjectType(w http.ResponseWriter, r *http.Reque
 
 func (h *ProjectTypeHandler) SearchProjectTypes(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	var request searchProjectTypesRequest
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityHandler] invalid request payload: %w", err))
-		return
-	}
-	users, err := h.service.SearchProjectTypes(r.Context(), mapSearchProjectTypesRequestToProjectTypeFilterDomain(request))
-	handlers.ToHandlerJSONResponse(w, mapProjectTypeArrayDomainToSearchProjectTypesResponse(users), err)
+	projectTypes, err := h.service.SearchProjectTypes(r.Context(), domain.ProjectTypeFilter{WorkspaceId: chi.URLParam(r, "workspace_id")})
+	handlers.ToHandlerJSONResponse(w, mapProjectTypeArrayDomainToSearchProjectTypesResponse(projectTypes), err)
 }

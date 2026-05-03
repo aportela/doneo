@@ -59,9 +59,3 @@ func mapProjectTypeArrayDomainToSearchProjectTypesResponse(users []domain.Projec
 		ProjectTypes: mapProjectTypeArrayDomainToProjectTypeArrayResponse(users),
 	}
 }
-
-func mapSearchProjectTypesRequestToProjectTypeFilterDomain(request searchProjectTypesRequest) domain.ProjectTypeFilter {
-	return domain.ProjectTypeFilter{
-		WorkspaceId: request.WorkspaceId,
-	}
-}

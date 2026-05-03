@@ -33,22 +33,32 @@ const api = {
     search: () => axiosInstance.get("/projects"),
   },
   projectTypes: {
-    add: (projectType: ProjectTypeInterface) =>
-      axiosInstance.post("/project_types", projectType),
-    update: (projectType: ProjectTypeInterface) =>
-      axiosInstance.put("/project_types/" + projectType.id, projectType),
-    delete: (id: string) => axiosInstance.delete("/project_types/" + id),
-    get: (id: string) => axiosInstance.get("/project_types/" + id),
+    add: (workspaceId: string, projectType: ProjectTypeInterface) =>
+      axiosInstance.post(
+        "/workspaces/" + workspaceId + "/project-types",
+        projectType,
+      ),
+    update: (workspaceId: string, projectType: ProjectTypeInterface) =>
+      axiosInstance.put(
+        "/workspaces/" + workspaceId + "/project-types/" + projectType.id,
+        projectType,
+      ),
+    delete: (workspaceId: string, id: string) =>
+      axiosInstance.delete(
+        "/workspaces/" + workspaceId + "/project-types/" + id,
+      ),
+    get: (workspaceId: string, id: string) =>
+      axiosInstance.get("/workspaces/" + workspaceId + "/project-types/" + id),
     search: (workspaceId: string) =>
-      axiosInstance.get("/project_types?workspaceid=" + workspaceId),
+      axiosInstance.get("/workspaces/" + workspaceId + "/project-types"),
   },
   projectStatuses: {
     search: (workspaceId: string) =>
-      axiosInstance.get("/project_statuses?workspaceid=" + workspaceId),
+      axiosInstance.get("/project_statuses?workspace_id=" + workspaceId),
   },
   projectPriorities: {
     search: (workspaceId: string) =>
-      axiosInstance.get("/project_priorities?workspaceid=" + workspaceId),
+      axiosInstance.get("/project_priorities?workspace_id=" + workspaceId),
   },
 };
 

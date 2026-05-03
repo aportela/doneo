@@ -31,7 +31,7 @@
 
     onMounted(() => {
         loading.value = true;
-        api.projectStatuses.search().then((successResponse: any) => {
+        api.projectStatuses.search("2").then((successResponse: any) => {
             projectStatuses.value = successResponse.data.projectStatuses;
         }).catch((errorResponse: any) => {
             console.log(errorResponse);
@@ -56,7 +56,7 @@
                     <td><n-color-picker v-model:value="projectStatus.hexColor" :modes="['hex']"
                             :show-alpha="false"></n-color-picker></td>
                     <td><n-tag :color="getNaiveUITagColorProperty(projectStatus.hexColor)">{{ projectStatus.name
-                            }}</n-tag>
+                    }}</n-tag>
                     </td>
                     <td>
                         <n-flex>

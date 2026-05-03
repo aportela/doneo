@@ -18,7 +18,7 @@
 
     onMounted(() => {
         loading.value = true;
-        api.projectPriorities.search().then((successResponse: any) => {
+        api.projectPriorities.search("1").then((successResponse: any) => {
             projectPriorities.value = successResponse.data.projectPriorities;
         }).catch((errorResponse: any) => {
             console.log(errorResponse);
@@ -43,7 +43,7 @@
                     <td><n-color-picker v-model:value="projectPriority.hexColor" :modes="['hex']"
                             :show-alpha="false"></n-color-picker></td>
                     <td><n-tag :color="getNaiveUITagColorProperty(projectPriority.hexColor)">{{ projectPriority.name
-                            }}</n-tag></td>
+                    }}</n-tag></td>
                     <td>
                         <n-flex>
                             <n-button>

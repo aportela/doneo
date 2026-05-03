@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, reactive, shallowRef, onMounted, computed } from 'vue'
+    import { ref, watch, reactive, shallowRef, onMounted, computed } from 'vue'
     import { useI18n } from "vue-i18n";
     import { NTable, NButton, NButtonGroup, NGrid, NGridItem, NModal, NTag } from 'naive-ui'
     import { api } from '../../../composables/api';
@@ -13,7 +13,10 @@
     import { default as ProjectTypeForm } from '../../forms/ProjectTypeForm.vue';
     import { default as ManageTable } from '../../custom/ManageTable.vue';
 
+    import { useCurrentWorkspaceStore } from '../../../stores/currentWorkspace';
+
     const { notify } = useNotify();
+    const currentWorkSpaceStore = useCurrentWorkspaceStore();
 
     const { t } = useI18n();
 
@@ -23,10 +26,10 @@
 
     const projectTypes = shallowRef<ProjectTypeInterface[]>([]);
 
-    const onRefresh = () => {
+    const onRefresh = (workspaceId: string) => {
         state.ajaxRunning = true;
         loadingStore.set(true);
-        api.projectTypes.search().then((successResponse: any) => {
+        api.projectTypes.search(workspaceId).then((successResponse: any) => {
             projectTypes.value = [...successResponse.data.projectTypes];
         }).catch((errorResponse: any) => {
             // TODO
@@ -66,27 +69,44 @@
     const onAdd = () => {
         isVisibleActionDialog.value = false;
         notify('success', t("Project type added"))
-        onRefresh();
+        if (currentWorkSpaceStore.workspaceId) {
+            onRefresh(currentWorkSpaceStore.workspaceId);
+        }
     };
 
     const onUpdate = () => {
         isVisibleActionDialog.value = false;
         notify('success', t("Project type updated"))
-        onRefresh();
+        if (currentWorkSpaceStore.workspaceId) {
+            onRefresh(currentWorkSpaceStore.workspaceId);
+        }
     };
 
     const onDelete = () => {
         isVisibleActionDialog.value = false;
         notify('success', t("Project type deleted"))
-        onRefresh();
+        if (currentWorkSpaceStore.workspaceId) {
+            onRefresh(currentWorkSpaceStore.workspaceId);
+        }
     };
 
     const onCancel = () => {
         isVisibleActionDialog.value = false;
     };
 
+    watch(
+        () => currentWorkSpaceStore.currentWorkspaceId,
+        (newValue) => {
+            if (newValue) {
+                onRefresh(newValue);
+            }
+        }
+    );
+
     onMounted(() => {
-        onRefresh();
+        if (currentWorkSpaceStore.workspaceId) {
+            onRefresh(currentWorkSpaceStore.workspaceId);
+        }
     });
 
 </script>
@@ -160,7 +180,7 @@
         <tbody>
             <tr v-for="projectType, index in projectTypes" :key="projectType.id">
                 <td><n-tag :color="getNaiveUITagColorProperty(projectType.hexColor)">{{ projectType.name
-                        }}</n-tag></td>
+                }}</n-tag></td>
                 <td class="text-center">
                     <n-button-group>
                         <n-button @click="onUpdateProjectType(projectType, index)">

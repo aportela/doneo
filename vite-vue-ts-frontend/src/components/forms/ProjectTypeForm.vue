@@ -13,10 +13,12 @@
     import { required, minLength, runValidators } from '../../composables/form-validators';
     import { generateRandomSoftHexColor, getNaiveUITagColorProperty } from '../../composables/color';
     import { default as RemoteAPIAlert } from '../alerts/RemoteAPIAlert.vue';
+    import { useCurrentWorkspaceStore } from '../../stores/currentWorkspace';
 
     const emit = defineEmits(['add', 'update', 'delete', 'cancel'])
 
     const { t } = useI18n();
+    const currentWorkspaceStore = useCurrentWorkspaceStore();
 
     interface ProjectTypeFormProps {
         mode: EntityAction;
@@ -99,7 +101,7 @@
     const onGet = (id: string) => {
         Object.assign(state, defaultAjaxState);
         state.ajaxRunning = true;
-        api.projectTypes.get(id).then((response: GetProjectTypeResponse) => {
+        api.projectTypes.get(currentWorkspaceStore.workspaceId, id).then((response: GetProjectTypeResponse) => {
             if (response.data.projectType.id === id) {
                 projectType.value = response.data.projectType;
             } else {
@@ -133,7 +135,7 @@
     const onAdd = () => {
         Object.assign(state, defaultAjaxState);
         state.ajaxRunning = true;
-        api.projectTypes.add(projectType.value).then((_response: any) => {
+        api.projectTypes.add(currentWorkspaceStore.workspaceId, projectType.value).then((_response: any) => {
             emit('add')
         }).catch((_error: AxiosAPIError) => {
             // TODO:
@@ -146,7 +148,7 @@
     const onUpdate = () => {
         Object.assign(state, defaultAjaxState);
         state.ajaxRunning = true;
-        api.projectTypes.update(projectType.value).then((_response: any) => {
+        api.projectTypes.update(currentWorkspaceStore.workspaceId, projectType.value).then((_response: any) => {
             emit('update')
         }).catch((_error: AxiosAPIError) => {
             // TODO:
@@ -159,7 +161,7 @@
     const onDelete = () => {
         Object.assign(state, defaultAjaxState);
         state.ajaxRunning = true;
-        api.projectTypes.delete(projectType.value.id).then((_response: any) => {
+        api.projectTypes.delete(currentWorkspaceStore.workspaceId, projectType.value.id).then((_response: any) => {
             emit('delete')
         }).catch((_error: AxiosAPIError) => {
             // TODO:
