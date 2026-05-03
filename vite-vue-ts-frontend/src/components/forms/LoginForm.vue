@@ -1,40 +1,44 @@
 <script setup lang="ts">
     import { ref, reactive, watch } from 'vue';
-    import { useRouter } from "vue-router";
+    import { useI18n } from "vue-i18n";
     import { NIcon, NSpin, NForm, NFormItem, NInput, NButton, type FormItemRule, type FormInst, type FormRules } from 'naive-ui'
     import { IconEye, IconEyeCancel } from '@tabler/icons-vue';
+    import { type AjaxStateInterface, defaultAjaxState } from "../../types/ajaxState";
+    import { type SignInSucessResponse } from '../../types/apiResponses';
+    import { type AxiosAPIError } from '../../composables/axios';
     import { api } from '../../composables/api';
     import { required, minLength, validEmail, runValidators } from '../../composables/form-validators';
+    import { createStorageEntry } from '../../composables/localStorage';
     import { useSessionStore } from "../../stores/session";
-    import { type AjaxStateInterface, defaultAjaxState } from "../../types/ajaxState";
     import { default as RemoteAPIAlert } from '../alerts/RemoteAPIAlert.vue';
 
-    import { useI18n } from "vue-i18n";
-
-    import { createStorageEntry } from '../../composables/localStorage';
-
-    const localStorageLastUsedEmail = createStorageEntry<string | null>("lastUsedEmail", null);
-
-    const lastUsedEmail = localStorageLastUsedEmail.get();
-
-    const router = useRouter();
+    const emit = defineEmits(['success'])
 
     const { t } = useI18n();
 
     const sessionStore = useSessionStore();
 
+    const localStorageLastUsedEmail = createStorageEntry<string | null>("lastUsedEmail", null);
+
+    const lastUsedEmail = localStorageLastUsedEmail.get();
+
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
     const signInFormRef = ref<FormInst | null>(null)
 
-    const formValues = ref({
+    type signInFormValuesInterface = {
+        email: string | null,
+        password: string | null,
+    };
+
+    const signinFormValues = ref<signInFormValuesInterface>({
         email: lastUsedEmail || null,
         password: null,
     });
 
-    const serverErrors = ref<{ [key: string]: string }>({})
+    const serverErrors = ref<Record<string, string>>({});
 
-    const rules: FormRules = {
+    const signInFormRules: FormRules = {
         email: {
             validator: (_rule: FormItemRule, value) => {
                 const localResult = runValidators(value, [required('Email'), validEmail])
@@ -42,7 +46,7 @@
                 if (serverErrors.value.email) return new Error(serverErrors.value.email)
                 return true
             },
-            trigger: ['blur']
+            trigger: ['blur'],
         },
         password: {
             validator: (_rule: FormItemRule, value) => {
@@ -55,55 +59,54 @@
         }
     }
 
-    watch(() => formValues.value.email, () => {
+    watch(() => signinFormValues.value.email, () => {
         delete serverErrors.value.email
     });
 
-    watch(() => formValues.value.password, () => {
+    watch(() => signinFormValues.value.password, () => {
         delete serverErrors.value.password
     });
 
     const onSubmit = () => {
         serverErrors.value = {}
-        if (formValues.value.email && formValues.value.password) {
+        if (signinFormValues.value.email && signinFormValues.value.password) {
             Object.assign(state, defaultAjaxState);
             state.ajaxRunning = true;
-            api.auth.signIn(formValues.value.email, formValues.value.password)
-                .then((successResponse: any) => {
+            api.auth.signIn(signinFormValues.value.email, signinFormValues.value.password)
+                .then((successResponse: SignInSucessResponse) => {
                     if (successResponse.data.accessToken) {
                         sessionStore.setAccessToken(successResponse.data.accessToken.token, successResponse.data.accessToken.expiresAtTimestamp);
-                        localStorageLastUsedEmail.set(formValues.value.email);
-                        router.push(
-                            { name: "home" }
-                        ).catch((e) => {
-                            console.error(e);
-                        });
+                        localStorageLastUsedEmail.set(signinFormValues.value.email);
+                        emit('success');
                     } else {
-                        state.ajaxErrorMessage = "Invalid response";
+                        state.ajaxErrorMessage = t("Invalid API response");
                     }
                 })
-                .catch((errorResponse) => {
+                .catch((errorResponse: AxiosAPIError) => {
                     state.ajaxErrors = true;
                     if (errorResponse.isAPIError) {
                         state.ajaxAPIErrorDetails = errorResponse.customAPIErrorDetails;
                         switch (errorResponse.status) {
                             case 404:
-                                serverErrors.value.email = "Email not found";
+                                serverErrors.value.email = t("Email not found");
                                 break;
                             case 401:
-                                serverErrors.value.password = "Invalid password";
+                                serverErrors.value.password = t("Invalid password");
                                 break;
                             default:
-                                state.ajaxErrorMessage = "API Error: fatal error";
+                                state.ajaxErrorMessage = t("API Error: fatal error");
                                 break;
 
                         }
                         signInFormRef.value?.restoreValidation();
-                        signInFormRef.value?.validate().catch(() => { });
+                        signInFormRef.value?.validate().catch((e: any) => {
+                            console.error("TODO: SignIn form validation error", e);
+                        });
                     }
                     else {
+                        // TODO: i18n
                         state.ajaxErrorMessage = `Uncaught exception (${errorResponse.status})\n\n${errorResponse}`;
-                        console.error(errorResponse);
+                        console.error("Unhandled API error", errorResponse);
                     }
                 })
                 .finally(() => {
@@ -119,31 +122,22 @@
             await signInFormRef.value?.validate();
             onSubmit();
         }
-        catch (e) {
-            console.log(e);
+        catch (e: any) {
+            //console.debug("SignIn form validation error", e)
         }
     }
 </script>
 
 <template>
-    <!--
-    <h4 class="q-mt-sm q-mb-md text-h4 text-weight-bolder">{{
-        t(!!lastUsedEmail ? "Glad to see you again!" : "Welcome aboard!")
-        }}</h4>
-    <div class="text-color-secondary">{{
-        t(!!lastUsedEmail ? "Let's get back to organizing." : "Let's start organizing.")
-        }}
-    </div>
-    -->
-
+    <h2 class="title">{{ t("Login to your account") }}</h2>
     <n-spin :show="state.ajaxRunning" stroke="pink">
-        <n-form ref="signInFormRef" :model="formValues" label-width="100px" :rules="rules">
-            <n-form-item label="Email" path="email" show-feedback>
-                <n-input type="text" :autofocus="true" v-model:value="formValues.email"
+        <n-form ref="signInFormRef" :model="signinFormValues" label-width="100px" :rules="signInFormRules">
+            <n-form-item :label="t('Email')" path="email" show-feedback>
+                <n-input type="text" :autofocus="true" v-model:value="signinFormValues.email"
                     placeholder="Enter your email address" :disabled="state.ajaxRunning" />
             </n-form-item>
-            <n-form-item label="Password" path="password" show-feedback>
-                <n-input v-model:value="formValues.password" type="password" placeholder="Enter your password"
+            <n-form-item :label="t('Password')" path="password" show-feedback>
+                <n-input v-model:value="signinFormValues.password" type="password" placeholder="Enter your password"
                     show-password-on="click" :disabled="state.ajaxRunning" @keydown.enter="validateForm">
                     <template #password-visible-icon>
                         <n-icon :size="16" :component="IconEyeCancel" />
@@ -156,11 +150,12 @@
             <n-form-item>
                 <n-button secondary @click="validateForm" block :disabled="state.ajaxRunning">{{
                     t("Sign in")
-                    }}</n-button>
+                }}</n-button>
             </n-form-item>
         </n-form>
     </n-spin>
-    <RemoteAPIAlert v-if="state.ajaxErrorMessage" type="error" title="Login error" :message="state.ajaxErrorMessage" />
+    <RemoteAPIAlert v-if="state.ajaxErrorMessage" type="error" :title="t('Sign in error')"
+        :message="state.ajaxErrorMessage" />
 </template>
 
 <style lang="css" scoped></style>

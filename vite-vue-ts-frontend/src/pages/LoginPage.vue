@@ -1,14 +1,13 @@
 <script setup lang="ts">
-    //import { useRouter } from "vue-router";
-    import { default as LoginForm } from "../components/forms/LoginForm.vue"
-    import { NCard, NSpace } from 'naive-ui'
+    import { useRouter } from "vue-router";
+    import { NCard, NFlex } from 'naive-ui'
     import { IconDatabaseStar } from '@tabler/icons-vue';
+    import { default as LoginForm } from "../components/forms/LoginForm.vue"
 
     import { default as GithubButton } from "../components/buttons/GithubButton.vue";
     import { default as SwitchColorSchemeButton } from '../components/buttons/SwitchColorSchemeButton.vue';
     import { default as SwitchLocaleButton } from "../components/buttons/SwitchLocaleButton.vue";
 
-    /*
     const router = useRouter();
 
     const onSuccessLogin = () => {
@@ -18,22 +17,19 @@
             console.error(e);
         });
     };
-    */
-
 </script>
 
 <template>
     <div class="login-page">
         <div class="left">
-            <n-card class="login-card" bordered>
-                <h2 class="title">Login to your account</h2>
-                <LoginForm />
+            <n-card class="login-card">
+                <LoginForm @success="onSuccessLogin" />
                 <template #action>
-                    <n-space justify="space-around">
+                    <n-flex justify="space-around">
                         <GithubButton :size="20" />
                         <SwitchColorSchemeButton :size="20" />
                         <SwitchLocaleButton />
-                    </n-space>
+                    </n-flex>
                 </template>
             </n-card>
         </div>
@@ -45,7 +41,6 @@
                 <h2>Turn chaos into progress.</h2>
             </div>
         </div>
-
     </div>
 </template>
 
