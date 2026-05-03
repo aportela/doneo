@@ -14,5 +14,7 @@ class ProjectTypeClass implements ProjectTypeInterface {
     this.hexColor = item.hexColor;
   }
 }
+
 const maxNameLength = 32;
+
 export { type ProjectTypeInterface, ProjectTypeClass, maxNameLength };
