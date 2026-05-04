@@ -24,6 +24,7 @@ export default {
   "Update project type": "Update project type",
   "Delete project type": "Delete project type",
   "Project type name": "Project type name",
+  "Project type": "Project type",
   "Project types": "Project types",
   "Project type added": "Project type added",
   "Project type updated": "Project type updated",

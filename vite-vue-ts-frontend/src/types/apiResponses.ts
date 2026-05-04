@@ -39,6 +39,13 @@ interface SearchWorkspacesResponse extends Omit<DefaultAxiosResponse, "data"> {
   };
 }
 
+interface SearchProjectTypesResponse
+  extends Omit<DefaultAxiosResponse, "data"> {
+  data: {
+    projectTypes: ProjectTypeInterface[];
+  };
+}
+
 interface GetProjectTypeResponse extends Omit<DefaultAxiosResponse, "data"> {
   data: {
     projectType: ProjectTypeInterface;
@@ -50,5 +57,6 @@ export {
   type SignInSucessResponse,
   type GetNewAccessTokenResponse,
   type SearchWorkspacesResponse,
+  type SearchProjectTypesResponse,
   type GetProjectTypeResponse,
 };

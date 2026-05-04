@@ -24,6 +24,7 @@ export default {
   "Update project type": "Actualizar tipo de proyecto",
   "Delete project type": "Eliminar tipo de proyecto",
   "Project type name": "Nombre del tipo de proyecto",
+  "Project type": "Tipo de proyecto",
   "Project types": "Tipos de proyectos",
   "Project type added": "Se ha añadido el tipo de proyecto",
   "Project type updated": "Se ha actualizado el tipo de proyecto",

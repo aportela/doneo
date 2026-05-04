@@ -6,6 +6,7 @@
     import { IconEdit, IconPlus, IconTrash } from '@tabler/icons-vue';
     import { getNaiveUITagColorProperty } from '../../../composables/color';
     import type { ProjectTypeInterface } from '../../../types/models/projectType';
+    import type { SearchProjectTypesResponse } from '../../../types/apiResponses';
     import { type AjaxStateInterface, defaultAjaxState } from '../../../types/ajaxState';
     import { type EntityAction } from '../../../types/common';
     import { useLoadingStore } from '../../../stores/loading';
@@ -29,7 +30,7 @@
     const onRefresh = (workspaceId: string) => {
         state.ajaxRunning = true;
         loadingStore.set(true);
-        api.projectTypes.search(workspaceId).then((successResponse: any) => {
+        api.projectTypes.search(workspaceId).then((successResponse: SearchProjectTypesResponse) => {
             projectTypes.value = [...successResponse.data.projectTypes];
         }).catch((errorResponse: any) => {
             // TODO
@@ -180,7 +181,7 @@
         <tbody>
             <tr v-for="projectType, index in projectTypes" :key="projectType.id">
                 <td><n-tag :color="getNaiveUITagColorProperty(projectType.hexColor)">{{ projectType.name
-                        }}</n-tag></td>
+                }}</n-tag></td>
                 <td class="text-center">
                     <n-button-group>
                         <n-button @click="onUpdateProjectType(projectType, index)">
