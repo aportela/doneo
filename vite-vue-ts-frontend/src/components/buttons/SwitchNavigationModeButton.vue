@@ -7,11 +7,11 @@
     const { t } = useI18n();
 
     interface SwitchFluidLayoutButtonProps {
-        size?: number,
+        iconSize?: number,
     };
 
     withDefaults(defineProps<SwitchFluidLayoutButtonProps>(), {
-        size: 20
+        iconSize: 20
     });
 
     const userSettingsStore = useUserSettingsStore();
@@ -21,8 +21,8 @@
     <n-tooltip trigger="hover">
         <template #trigger>
             <n-button quaternary @click="userSettingsStore.toggleNavigationMode" @mousedown.prevent>
-                <IconLayoutNavbarExpand :size="size" v-if="userSettingsStore.sideNavigationMode" />
-                <IconLayoutSidebarLeftExpand :size="size" v-else />
+                <IconLayoutNavbarExpand :size="iconSize" v-if="userSettingsStore.sideNavigationMode" />
+                <IconLayoutSidebarLeftExpand :size="iconSize" v-else />
             </n-button>
         </template>
         {{

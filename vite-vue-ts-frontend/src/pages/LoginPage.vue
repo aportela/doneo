@@ -26,9 +26,9 @@
                 <LoginForm @success="onSuccessLogin" />
                 <template #action>
                     <n-flex justify="space-around">
-                        <GithubButton :size="20" />
-                        <SwitchColorSchemeButton :size="20" />
-                        <SwitchLocaleButton />
+                        <GithubButton :icon-size="20" />
+                        <SwitchColorSchemeButton :icon-size="20" />
+                        <SwitchLocaleButton :icon-size="20" />
                     </n-flex>
                 </template>
             </n-card>

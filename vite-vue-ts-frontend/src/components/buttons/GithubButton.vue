@@ -7,11 +7,11 @@
     const { t } = useI18n();
 
     interface GithubButtonProps {
-        size?: number,
+        iconSize?: number,
     };
 
     withDefaults(defineProps<GithubButtonProps>(), {
-        size: 20
+        iconSize: 20
     });
 </script>
 
@@ -20,7 +20,7 @@
         <template #trigger>
             <n-button quaternary>
                 <a :href="GITHUB_PROJECT_URL" class="link-color" target="_blank">
-                    <IconBrandGithub :size="size" />
+                    <IconBrandGithub :size="iconSize" />
                 </a>
             </n-button>
         </template>

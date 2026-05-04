@@ -93,11 +93,11 @@
             </div>
             <n-flex>
 
-                <SwitchLocaleButton :size="commonIconSize" />
-                <GithubButton :size="commonIconSize" />
-                <SwitchNotificationsButton :size="commonIconSize" />
-                <SwitchColorSchemeButton :size="commonIconSize" />
-                <SwitchNavigationModeButton :size="commonIconSize" />
+                <SwitchLocaleButton :icon-size="commonIconSize" />
+                <GithubButton :icon-size="commonIconSize" />
+                <SwitchNotificationsButton :icon-size="commonIconSize" />
+                <SwitchColorSchemeButton :icon-size="commonIconSize" />
+                <SwitchNavigationModeButton :icon-size="commonIconSize" />
                 <n-dropdown :options="userDropdownOptions" placement="bottom-end" trigger="hover"
                     @select="onUserDropDownSelect">
                     <n-button quaternary>

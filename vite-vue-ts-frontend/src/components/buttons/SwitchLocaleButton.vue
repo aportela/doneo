@@ -11,11 +11,11 @@
     const i18NStore = useI18nStore();
 
     interface SwitchLocaleButtonProps {
-        size?: number,
+        iconSize?: number,
     };
 
     withDefaults(defineProps<SwitchLocaleButtonProps>(), {
-        size: 20
+        iconSize: 20
     });
 
 
@@ -33,7 +33,7 @@
     <n-dropdown trigger="click" @select="onChangeLocale" :options="availableLocaleSelectorOptionItems"
         v-model="selected">
         <n-button quaternary>
-            <IconWorld :size="size" />
+            <IconWorld :size="iconSize" />
             <span class="selected_locale">{{ selectedLocale }}</span>
             <IconSelector />
         </n-button>

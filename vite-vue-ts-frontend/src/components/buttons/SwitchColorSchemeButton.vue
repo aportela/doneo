@@ -7,11 +7,11 @@
     const { t } = useI18n();
 
     interface SwitchColorSchemeButtonProps {
-        size?: number,
+        iconSize?: number,
     };
 
     withDefaults(defineProps<SwitchColorSchemeButtonProps>(), {
-        size: 20
+        iconSize: 20
     });
 
     const colorSchemeStore = useColorSchemeStore();
@@ -21,8 +21,8 @@
     <n-tooltip trigger="hover">
         <template #trigger>
             <n-button quaternary @click.prevent="colorSchemeStore.toggle" @mousedown.prevent>
-                <IconMoon :size="size" v-if="colorSchemeStore.light" />
-                <IconSun :size="size" v-else />
+                <IconMoon :size="iconSize" v-if="colorSchemeStore.light" />
+                <IconSun :size="iconSize" v-else />
             </n-button>
         </template>
         {{
