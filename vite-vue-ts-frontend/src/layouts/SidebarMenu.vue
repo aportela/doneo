@@ -7,7 +7,11 @@
     import { NIcon } from 'naive-ui'
     import { h } from 'vue'
     import { RouterLink } from 'vue-router'
-    import { default as WorkspaceSelector } from '../components/selectors/WorkspaceSelector.vue';
+    import { default as WorkspaceSelect } from '../components/selectors/WorkspaceSelect.vue';
+
+    import { useCurrentWorkspaceStore } from '../stores/currentWorkspace';
+
+    const currentWorkspace = useCurrentWorkspaceStore();
 
     const commonIconSize = 20;
 
@@ -44,7 +48,11 @@
                 }),
             */
             label: () =>
-                h(WorkspaceSelector, {
+                h(WorkspaceSelect, {
+                    value: currentWorkspace.workspaceId,
+                    'onUpdate:value': (val: any) => {
+                        currentWorkspace.set(val)
+                    },
                     style: 'width: 100%;'
                 }),
             icon: renderIcon(IconMatrix)(commonIconSize)
