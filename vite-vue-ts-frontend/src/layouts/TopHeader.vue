@@ -8,6 +8,7 @@
     import { default as SwitchNavigationModeButton } from '../components/buttons/SwitchNavigationModeButton.vue';
     import { default as GithubButton } from '../components/buttons/GithubButton.vue';
     import { default as SwitchColorSchemeButton } from '../components/buttons/SwitchColorSchemeButton.vue';
+    import { default as SwitchLocaleButton } from '../components/buttons/SwitchLocaleButton.vue';
 
     import { useRouter } from "vue-router";
     import { api } from '../composables/api';
@@ -92,6 +93,7 @@
             </div>
             <n-flex>
 
+                <SwitchLocaleButton :size="commonIconSize" />
                 <GithubButton :size="commonIconSize" />
                 <SwitchNotificationsButton :size="commonIconSize" />
                 <SwitchColorSchemeButton :size="commonIconSize" />
