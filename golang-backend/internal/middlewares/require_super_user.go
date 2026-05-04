@@ -11,7 +11,7 @@ func isSuperUser() bool {
 
 func RequireSuperUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !isAuthenticated() {
+		if !isSuperUser() {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusForbidden)
 			resp := errorResponse{

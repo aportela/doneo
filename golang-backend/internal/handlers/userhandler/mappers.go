@@ -2,64 +2,68 @@ package userhandler
 
 import (
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/utils"
 )
 
-func mapAddUserRequestToUserDomain(request addUserRequest) domain.User {
+func addRequestToUser(request addRequest) domain.User {
 	return domain.User{
-		UserBase:    domain.UserBase{ID: request.ID, Name: request.Name},
+		UserBase:    domain.UserBase{Name: request.Name},
 		Email:       request.Email,
+		Password:    request.Password,
 		IsSuperUser: request.IsSuperUser,
 	}
 }
 
-func mapUpdateUserRequestToUserDomain(request updateUserRequest) domain.User {
+func updateRequestToUser(request updateRequest) domain.User {
 	return domain.User{
-		UserBase:    domain.UserBase{ID: request.ID, Name: request.Name},
+		UserBase:    domain.UserBase{Name: request.Name},
 		Email:       request.Email,
+		Password:    *request.Password,
 		IsSuperUser: request.IsSuperUser,
 	}
 }
 
-func mapUserDomainToUserResponse(user domain.User) userResponse {
+func userToResponse(user domain.User) userResponse {
 	return userResponse{
 		ID:          user.ID,
 		Name:        user.Name,
 		Email:       user.Email,
-		CreatedAt:   user.CreatedAt,
-		UpdatedAt:   user.UpdatedAt,
+		CreatedAt:   user.CreatedAt.UnixMilli(),
+		UpdatedAt:   utils.TimePtrToInt64Ptr(user.UpdatedAt),
+		DeletedAt:   utils.TimePtrToInt64Ptr(user.DeletedAt),
 		IsSuperUser: user.IsSuperUser,
 		AvatarURL:   user.AvatarURL,
 	}
 }
 
-func mapUserDomainToAddUserResponse(user domain.User) addUserResponse {
-	return addUserResponse{
-		User: mapUserDomainToUserResponse(user),
+func userToAddResponse(user domain.User) addResponse {
+	return addResponse{
+		User: userToResponse(user),
 	}
 }
 
-func mapUserDomainToUpdateUserResponse(user domain.User) updateUserResponse {
-	return updateUserResponse{
-		User: mapUserDomainToUserResponse(user),
+func userToUpdateResponse(user domain.User) updateResponse {
+	return updateResponse{
+		User: userToResponse(user),
 	}
 }
 
-func mapUserDomainToGetUserResponse(user domain.User) getUserResponse {
-	return getUserResponse{
-		User: mapUserDomainToUserResponse(user),
+func userToGetResponse(user domain.User) getResponse {
+	return getResponse{
+		User: userToResponse(user),
 	}
 }
 
-func mapUserArrayDomainToUserArrayResponse(users []domain.User) []userResponse {
+func userArrayToResponse(users []domain.User) []userResponse {
 	userResponses := []userResponse{}
 	for _, user := range users {
-		userResponses = append(userResponses, mapUserDomainToUserResponse(user))
+		userResponses = append(userResponses, userToResponse(user))
 	}
 	return userResponses
 }
 
-func mapUserArrayDomainToSearchUsersResponse(users []domain.User) searchUsersResponse {
-	return searchUsersResponse{
-		Users: mapUserArrayDomainToUserArrayResponse(users),
+func userArrayToSearchResponse(users []domain.User) searchResponse {
+	return searchResponse{
+		Users: userArrayToResponse(users),
 	}
 }

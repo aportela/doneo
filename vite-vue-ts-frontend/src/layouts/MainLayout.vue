@@ -31,7 +31,7 @@
                         <router-view />
                     </n-layout-content>
                 </n-layout>
-                <n-layout-content v-else>
+                <n-layout-content v-else style="padding: 16px;">
                     <router-view />
                 </n-layout-content>
             </n-layout>

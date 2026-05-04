@@ -34,12 +34,11 @@ func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] invalid request payload: %w", err))
 		return
 	}
-	user, err := h.service.SignIn(r.Context(), mapSigninRequestToUserDomain(request))
+	user, err := h.service.SignIn(r.Context(), signinRequestToUserDomain(request))
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] failed to signin with email %s: %w", request.Email, err))
 		return
 	}
-
 	accessToken, err := jwt.GenerateToken(user, time.Now().Add(time.Duration(h.accessTokenExpirationHours)*time.Hour), h.secretKey)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] failed to generate access token: %w", err))

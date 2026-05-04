@@ -1,15 +1,13 @@
 package userhandler
 
-type addUserRequest struct {
-	ID          string `json:"id"`
+type addRequest struct {
 	Name        string `json:"name"`
 	Email       string `json:"email"`
 	Password    string `json:"password"`
 	IsSuperUser bool   `json:"isSuperUser"`
 }
 
-type updateUserRequest struct {
-	ID          string  `json:"id"`
+type updateRequest struct {
 	Name        string  `json:"name"`
 	Email       string  `json:"email"`
 	Password    *string `json:"password,omitempty"`
@@ -21,23 +19,24 @@ type userResponse struct {
 	Name        string `json:"name"`
 	Email       string `json:"email"`
 	CreatedAt   int64  `json:"createdAt"`
-	UpdatedAt   *int64 `json:"updatedAt,omitempty"`
+	UpdatedAt   *int64 `json:"updatedAt"`
+	DeletedAt   *int64 `json:"deletedAt"`
 	IsSuperUser bool   `json:"isSuperUser"`
 	AvatarURL   string `json:"avatar"`
 }
 
-type addUserResponse struct {
+type addResponse struct {
 	User userResponse `json:"user"`
 }
 
-type updateUserResponse struct {
+type updateResponse struct {
 	User userResponse `json:"user"`
 }
 
-type getUserResponse struct {
+type getResponse struct {
 	User userResponse `json:"user"`
 }
 
-type searchUsersResponse struct {
+type searchResponse struct {
 	Users []userResponse `json:"users"`
 }

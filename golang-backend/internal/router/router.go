@@ -17,6 +17,7 @@ import (
 	"github.com/aportela/doneo/internal/handlers/projecttypehandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 	"github.com/aportela/doneo/internal/handlers/workspacehandler"
+	"github.com/aportela/doneo/internal/middlewares"
 
 	"github.com/aportela/doneo/internal/ui"
 )
@@ -37,15 +38,15 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 
 	apiRouter.Route("/users", func(r chi.Router) {
 		//r.Use(middlewares.CheckJWT(cfg.Auth.SecretKey))
-		//r.Use(middlewares.RequireAuthentication)
-		//r.Use(middlewares.RequireSuperUser)
+		r.Use(middlewares.RequireAuthentication)
+		r.Use(middlewares.RequireSuperUser)
 		userHandler := userhandler.NewUserHandler(db)
-		r.Post("/", userHandler.AddUser)
-		r.Get("/", userHandler.SearchUsers)
-		r.Route("/{id}", func(r chi.Router) {
-			r.Get("/", userHandler.GetUser)
-			r.Put("/", userHandler.UpdateUser)
-			r.Delete("/", userHandler.DeleteUser)
+		r.Post("/", userHandler.Add)
+		r.Get("/", userHandler.Search)
+		r.Route("/{user_id}", func(r chi.Router) {
+			r.Get("/", userHandler.Get)
+			r.Put("/", userHandler.Update)
+			r.Delete("/", userHandler.Delete)
 		})
 	})
 
@@ -56,17 +57,10 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		workspaceHandler := workspacehandler.NewWorkspaceHandler(db)
 		r.Post("/", workspaceHandler.AddWorkspace)
 		r.Get("/", workspaceHandler.SearchWorkspaces)
-
 		r.Route("/{workspace_id}", func(r chi.Router) {
 			projectTypeHandler := projecttypehandler.NewProjectTypeHandler(db)
 			r.Route("/project-types", func(r chi.Router) {
-				r.Post("/", projectTypeHandler.AddProjectType)
 				r.Get("/", projectTypeHandler.SearchProjectTypes)
-				r.Route("/{project_type_id}", func(r chi.Router) {
-					r.Get("/", projectTypeHandler.GetProjectType)
-					r.Put("/", projectTypeHandler.UpdateProjectType)
-					r.Delete("/", projectTypeHandler.DeleteProjectType)
-				})
 			})
 		})
 	})
@@ -82,18 +76,16 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		})
 	})
 
-	/*
-		apiRouter.Route("/project_types", func(r chi.Router) {
-			projectTypeHandler := projecttypehandler.NewProjectTypeHandler(db)
-			r.Post("/", projectTypeHandler.AddProjectType)
-			r.Get("/", projectTypeHandler.SearchProjectTypes)
-			r.Route("/{id}", func(r chi.Router) {
-				r.Get("/", projectTypeHandler.GetProjectType)
-				r.Put("/", projectTypeHandler.UpdateProjectType)
-				r.Delete("/", projectTypeHandler.DeleteProjectType)
-			})
+	apiRouter.Route("/project_types", func(r chi.Router) {
+		projectTypeHandler := projecttypehandler.NewProjectTypeHandler(db)
+		r.Post("/", projectTypeHandler.AddProjectType)
+		r.Get("/", projectTypeHandler.SearchProjectTypes)
+		r.Route("/{id}", func(r chi.Router) {
+			r.Get("/", projectTypeHandler.GetProjectType)
+			r.Put("/", projectTypeHandler.UpdateProjectType)
+			r.Delete("/", projectTypeHandler.DeleteProjectType)
 		})
-	*/
+	})
 
 	apiRouter.Route("/project_statuses", func(r chi.Router) {
 		projectStatusHandler := projectstatushandler.NewProjectStatusHandler(db)
