@@ -24,6 +24,7 @@
     }
 
     const menuOptions: MenuOption[] = [
+        /*
         {
             key: 'divider-1',
             type: 'divider',
@@ -33,6 +34,7 @@
                 }
             }
         },
+        */
         {
             key: 'workspace',
             /*
