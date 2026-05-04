@@ -14,6 +14,7 @@ type ProjectTypeRepository interface {
 	Update(ctx context.Context, projectType projectTypeDTO) error
 	Get(ctx context.Context, id string) (projectTypeDTO, error)
 	Delete(ctx context.Context, id string) error
+	GetWorkspaceProjectTypes(ctx context.Context, workspaceId string) ([]projectTypeDTO, error)
 	Search(ctx context.Context, filter projectTypeFilterDTO) ([]projectTypeDTO, error)
 }
 
@@ -87,6 +88,43 @@ func (projectTypeRepository *projectTypeRepository) Get(ctx context.Context, id 
 		return projectType, err
 	}
 	return projectType, err
+}
+
+func (projectTypeRepository *projectTypeRepository) GetWorkspaceProjectTypes(ctx context.Context, workspaceId string) ([]projectTypeDTO, error) {
+	rows, err := projectTypeRepository.database.QueryContext(
+		ctx,
+		`
+			SELECT
+				PT.id, PT.name, PT.item_hex_color
+			FROM project_types PT
+			WHERE PT.workspace_id = ?
+			ORDER BY PT.name
+        `,
+		workspaceId,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var projectTypes []projectTypeDTO
+	for rows.Next() {
+		var projectType projectTypeDTO
+		if err := rows.Scan(
+			&projectType.ID, &projectType.Name, &projectType.HexColor,
+		); err != nil {
+			return nil, err
+		}
+		projectTypes = append(projectTypes, projectType)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	if len(projectTypes) == 0 {
+		return nil, domain.ErrNotFound
+	}
+	return projectTypes, nil
 }
 
 func (projectTypeRepository *projectTypeRepository) Search(ctx context.Context, filter projectTypeFilterDTO) ([]projectTypeDTO, error) {
