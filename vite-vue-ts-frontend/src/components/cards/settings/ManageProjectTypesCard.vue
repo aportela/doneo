@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, watch, reactive, shallowRef, onMounted, computed } from 'vue'
+    import { ref, reactive, shallowRef, onMounted, computed } from 'vue'
     import { useI18n } from "vue-i18n";
     import { NTable, NButton, NButtonGroup, NInput, NGrid, NGridItem, NModal, NTag } from 'naive-ui'
     import { api } from '../../../composables/api';
@@ -13,11 +13,8 @@
     import { useNotify } from '../../../composables/notification';
     import { default as ProjectTypeForm } from '../../forms/ProjectTypeForm.vue';
     import { default as ManageTable } from '../../custom/ManageTable.vue';
-    import { default as WorkspaceSelect } from '../../selectors/WorkspaceSelect.vue';
-    import { useCurrentWorkspaceStore } from '../../../stores/currentWorkspace';
 
     const { notify } = useNotify();
-    const currentWorkSpaceStore = useCurrentWorkspaceStore();
 
     const { t } = useI18n();
 
@@ -27,10 +24,10 @@
 
     const projectTypes = shallowRef<ProjectTypeInterface[]>([]);
 
-    const onRefresh = (workspaceId: string) => {
+    const onRefresh = () => {
         state.ajaxRunning = true;
         loadingStore.set(true);
-        api.projectTypes.search(workspaceId).then((successResponse: SearchProjectTypesResponse) => {
+        api.projectTypes.search().then((successResponse: SearchProjectTypesResponse) => {
             projectTypes.value = [...successResponse.data.projectTypes];
         }).catch((errorResponse: any) => {
             // TODO
@@ -70,44 +67,27 @@
     const onAdd = () => {
         isVisibleActionDialog.value = false;
         notify('success', t("Project type added"))
-        if (currentWorkSpaceStore.workspaceId) {
-            onRefresh(currentWorkSpaceStore.workspaceId);
-        }
+        onRefresh();
     };
 
     const onUpdate = () => {
         isVisibleActionDialog.value = false;
         notify('success', t("Project type updated"))
-        if (currentWorkSpaceStore.workspaceId) {
-            onRefresh(currentWorkSpaceStore.workspaceId);
-        }
+        onRefresh();
     };
 
     const onDelete = () => {
         isVisibleActionDialog.value = false;
         notify('success', t("Project type deleted"))
-        if (currentWorkSpaceStore.workspaceId) {
-            onRefresh(currentWorkSpaceStore.workspaceId);
-        }
+        onRefresh();
     };
 
     const onCancel = () => {
         isVisibleActionDialog.value = false;
     };
 
-    watch(
-        () => currentWorkSpaceStore.currentWorkspaceId,
-        (newValue) => {
-            if (newValue) {
-                onRefresh(newValue);
-            }
-        }
-    );
-
     onMounted(() => {
-        if (currentWorkSpaceStore.workspaceId) {
-            onRefresh(currentWorkSpaceStore.workspaceId);
-        }
+        onRefresh();
     });
 
 </script>
@@ -118,7 +98,7 @@
             @add="onAdd" @update="onUpdate" @delete="onDelete" @cancel="onCancel" />
     </n-modal>
     <ManageTable size="small" :title="t('Project types')">
-        <template #caption-extra v-if="currentWorkSpaceStore.workspaceId">
+        <template #caption-extra>
             <n-button @click="onAddProjectType" :disabled="state.ajaxRunning" size="small">
                 <template #icon>
                     <IconPlus />
@@ -128,21 +108,16 @@
         </template>
         <template #thead>
             <tr>
-                <th>{{ t("Workspace") }}</th>
                 <th>{{ t("Name") }}</th>
                 <th class="text-right" style="padding-right: 8px;">{{ t("Actions") }}</th>
             </tr>
             <tr>
-                <th>
-                    <WorkspaceSelect clearable :placeholder="t('Filter by workspace')" />
-                </th>
                 <th><n-input :placeholder="t('Filter by name')" clearable /></th>
                 <th></th>
             </tr>
         </template>
         <template #tbody>
             <tr v-for="projectType, index in projectTypes" :key="projectType.id">
-                <td></td>
                 <td class="cell-flex-vertical-align">
                     <n-tag :color="getNaiveUITagColorProperty(projectType.hexColor)">{{ projectType.name }}</n-tag>
                 </td>

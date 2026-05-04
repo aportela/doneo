@@ -30,13 +30,12 @@ func (projectTypeRepository *projectTypeRepository) Add(ctx context.Context, pro
 	_, err := projectTypeRepository.database.ExecContext(
 		ctx,
 		`
-            INSERT INTO project_types (id, name, item_hex_color, workspace_id)
+            INSERT INTO project_types (id, name, item_hex_color)
 			VALUES (?, ?, ?, ?)
         `,
 		projectType.ID,
 		projectType.Name,
 		projectType.HexColor,
-		projectType.WorkspaceId,
 	)
 	return err
 }
@@ -75,12 +74,11 @@ func (projectTypeRepository *projectTypeRepository) Get(ctx context.Context, id 
 		ctx,
 		`
             SELECT
-                PT.id, PT.name, PT.item_hex_color, PT.workspace_id, W.name AS workspace_name, W.item_hex_color AS workspace_hex_color
+                PT.id, PT.name, PT.item_hex_color
             FROM project_types PT
-			INNER JOIN workspaces W ON W.id = PT.workspace_id
             WHERE PT.id = ?
         `,
-		id).Scan(&projectType.ID, &projectType.Name, &projectType.HexColor, &projectType.WorkspaceId, &projectType.WorkspaceName, &projectType.WorkspaceHexColor)
+		id).Scan(&projectType.ID, &projectType.Name)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return projectType, domain.ErrNotFound
@@ -90,17 +88,15 @@ func (projectTypeRepository *projectTypeRepository) Get(ctx context.Context, id 
 	return projectType, err
 }
 
-func (projectTypeRepository *projectTypeRepository) GetWorkspaceProjectTypes(ctx context.Context, workspaceId string) ([]projectTypeDTO, error) {
+func (projectTypeRepository *projectTypeRepository) Search(ctx context.Context, filter projectTypeFilterDTO) ([]projectTypeDTO, error) {
 	rows, err := projectTypeRepository.database.QueryContext(
 		ctx,
 		`
 			SELECT
 				PT.id, PT.name, PT.item_hex_color
 			FROM project_types PT
-			WHERE PT.workspace_id = ?
 			ORDER BY PT.name
         `,
-		workspaceId,
 	)
 	if err != nil {
 		return nil, err
@@ -109,47 +105,9 @@ func (projectTypeRepository *projectTypeRepository) GetWorkspaceProjectTypes(ctx
 	var projectTypes []projectTypeDTO
 	for rows.Next() {
 		var projectType projectTypeDTO
+
 		if err := rows.Scan(
 			&projectType.ID, &projectType.Name, &projectType.HexColor,
-		); err != nil {
-			return nil, err
-		}
-		projectTypes = append(projectTypes, projectType)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	if len(projectTypes) == 0 {
-		return nil, domain.ErrNotFound
-	}
-	return projectTypes, nil
-}
-
-func (projectTypeRepository *projectTypeRepository) Search(ctx context.Context, filter projectTypeFilterDTO) ([]projectTypeDTO, error) {
-	rows, err := projectTypeRepository.database.QueryContext(
-		ctx,
-		`
-			SELECT
-				PT.id, PT.name, PT.item_hex_color, PT.workspace_id, W.name AS workspace_name, W.item_hex_color AS workspace_hex_color
-			FROM project_types PT
-			INNER JOIN workspaces W ON W.id = PT.workspace_id
-			WHERE PT.workspace_id = ?
-			ORDER BY PT.name
-        `,
-		filter.WorkspaceId,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var projectTypes []projectTypeDTO
-	for rows.Next() {
-		var projectType projectTypeDTO
-
-		if err := rows.Scan(
-			&projectType.ID, &projectType.Name, &projectType.HexColor, &projectType.WorkspaceId, &projectType.WorkspaceName, &projectType.WorkspaceHexColor,
 		); err != nil {
 			return nil, err
 		}

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-    import { h, type CSSProperties, type VNodeChild, type Component } from 'vue';
+    import { h, type CSSProperties, type VNodeChild, type Component, watch } from 'vue';
     import { NSelect, NIcon, type SelectSize } from 'naive-ui';
     import { type NaiveUISelectOptionWithColor } from '../../types/customNaiveUI';
     import { IconSquareFilled } from '@tabler/icons-vue';
 
 
-    interface WorkspaceSelectorProps {
+    interface ColoredIconSelectProps {
         size?: SelectSize;
         disabled?: boolean;
         loading?: boolean;
@@ -18,7 +18,7 @@
     };
 
 
-    const props = withDefaults(defineProps<WorkspaceSelectorProps>(), {
+    const props = withDefaults(defineProps<ColoredIconSelectProps>(), {
         size: "medium",
         disabled: false,
         loading: false,
@@ -27,6 +27,14 @@
     });
 
     const modelValue = defineModel<string | null>('value');
+
+    watch(modelValue, (val) => {
+        const exists = props.options.some(opt => opt.value === val)
+        if (!exists && val !== null) {
+            console.warn(`modelValue "${val}" does not exist in options`, props.options)
+            modelValue.value = null
+        }
+    }, { immediate: true })
 
     const renderLabel = (option: NaiveUISelectOptionWithColor): VNodeChild => {
         if (option.type === 'group')

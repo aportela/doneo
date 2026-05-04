@@ -8,10 +8,10 @@
     import { useLoadingStore } from '../stores/loading';
 
     const userSettingsStore = useUserSettingsStore();
+
     const loadingStore = useLoadingStore();
 
     const isCollapsed = ref<boolean>(false);
-
 </script>
 
 <template>

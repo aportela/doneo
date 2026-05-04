@@ -16,7 +16,6 @@ import (
 	"github.com/aportela/doneo/internal/handlers/projectstatushandler"
 	"github.com/aportela/doneo/internal/handlers/projecttypehandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
-	"github.com/aportela/doneo/internal/handlers/workspacehandler"
 	"github.com/aportela/doneo/internal/middlewares"
 
 	"github.com/aportela/doneo/internal/ui"
@@ -47,21 +46,6 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 			r.Get("/", userHandler.Get)
 			r.Put("/", userHandler.Update)
 			r.Delete("/", userHandler.Delete)
-		})
-	})
-
-	apiRouter.Route("/workspaces", func(r chi.Router) {
-		//r.Use(middlewares.CheckJWT(cfg.Auth.SecretKey))
-		//r.Use(middlewares.RequireAuthentication)
-		//r.Use(middlewares.RequireSuperUser)
-		workspaceHandler := workspacehandler.NewWorkspaceHandler(db)
-		r.Post("/", workspaceHandler.AddWorkspace)
-		r.Get("/", workspaceHandler.SearchWorkspaces)
-		r.Route("/{workspace_id}", func(r chi.Router) {
-			projectTypeHandler := projecttypehandler.NewProjectTypeHandler(db)
-			r.Route("/project-types", func(r chi.Router) {
-				r.Get("/", projectTypeHandler.SearchProjectTypes)
-			})
 		})
 	})
 

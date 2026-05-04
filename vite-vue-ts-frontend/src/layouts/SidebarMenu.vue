@@ -2,16 +2,13 @@
     import type { MenuOption } from 'naive-ui'
     import { NMenu } from 'naive-ui';
     import type { Component } from 'vue'
-    import { IconPresentation, IconUserCircle, IconBug, IconSitemap, IconFileAnalytics, IconSettings, IconMatrix, IconUsers, IconChartHistogram } from '@tabler/icons-vue';
+    import { IconPresentation, IconUserCircle, IconBug, IconSitemap, IconFileAnalytics, IconSettings, IconUsers, IconChartHistogram } from '@tabler/icons-vue';
     // IconListDetails
     import { NIcon } from 'naive-ui'
     import { h } from 'vue'
     import { RouterLink } from 'vue-router'
-    import { default as WorkspaceSelect } from '../components/selectors/WorkspaceSelect.vue';
 
-    import { useCurrentWorkspaceStore } from '../stores/currentWorkspace';
 
-    const currentWorkspace = useCurrentWorkspaceStore();
 
     const commonIconSize = 20;
 
@@ -36,30 +33,6 @@
         },
         */
         {
-            key: 'workspace',
-            /*
-            label: () =>
-                h(NSelect, {
-                    value: currentWorkspace.value,
-                    'onUpdate:value': (val) => {
-                        currentWorkspace.value = val
-                    },
-                    options: workspaceOptions,
-                    placeholder: 'Select workspace',
-
-                }),
-            */
-            label: () =>
-                h(WorkspaceSelect, {
-                    value: currentWorkspace.workspaceId,
-                    'onUpdate:value': (val: any) => {
-                        currentWorkspace.set(val)
-                    },
-                    style: 'width: 100%;'
-                }),
-            icon: renderIcon(IconMatrix)(commonIconSize)
-        },
-        {
             key: 'divider-1',
             type: 'divider',
             props: {
@@ -82,7 +55,7 @@
                     { default: () => 'Overview' }
                 ),
             key: 'home',
-            icon: renderIcon(IconPresentation)(commonIconSize)
+            icon: renderIcon(IconPresentation)(commonIconSize),
         },
         {
             label: () =>

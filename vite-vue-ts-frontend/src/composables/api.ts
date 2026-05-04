@@ -23,11 +23,6 @@ const api = {
       return axiosInstance.post("/auth/renew-access-token");
     },
   },
-  workspace: {
-    search: () => axiosInstance.get("/workspaces"),
-    getProjectTypes: (workspaceId: string) =>
-      axiosInstance.get("/workspaces/" + workspaceId + "/project-types"),
-  },
   user: {
     search: () => axiosInstance.get("/users"),
   },
@@ -35,24 +30,13 @@ const api = {
     search: () => axiosInstance.get("/projects"),
   },
   projectTypes: {
-    add: (workspaceId: string, projectType: ProjectTypeInterface) =>
-      axiosInstance.post(
-        "/workspaces/" + workspaceId + "/project-types",
-        projectType,
-      ),
-    update: (workspaceId: string, projectType: ProjectTypeInterface) =>
-      axiosInstance.put(
-        "/workspaces/" + workspaceId + "/project-types/" + projectType.id,
-        projectType,
-      ),
-    delete: (workspaceId: string, id: string) =>
-      axiosInstance.delete(
-        "/workspaces/" + workspaceId + "/project-types/" + id,
-      ),
-    get: (workspaceId: string, id: string) =>
-      axiosInstance.get("/workspaces/" + workspaceId + "/project-types/" + id),
-    search: (workspaceId: string) =>
-      axiosInstance.get("/workspaces/" + workspaceId + "/project-types"),
+    add: (projectType: ProjectTypeInterface) =>
+      axiosInstance.post("/project-types", projectType),
+    update: (projectType: ProjectTypeInterface) =>
+      axiosInstance.put("/project-types/" + projectType.id, projectType),
+    delete: (id: string) => axiosInstance.delete("/project-types/" + id),
+    get: (id: string) => axiosInstance.get("/project-types/" + id),
+    search: () => axiosInstance.get("/project-types"),
   },
   projectStatuses: {
     search: (workspaceId: string) =>

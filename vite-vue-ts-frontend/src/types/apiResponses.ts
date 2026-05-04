@@ -3,7 +3,6 @@ import { type AxiosResponse } from "axios";
 import { type ValidAuthTypes } from "./common";
 
 import type { ProjectTypeInterface } from "./models/projectType";
-import type { WorkspaceInterface } from "./models/workspace";
 
 interface DefaultAxiosResponse<T = unknown> {
   data: AxiosResponse<T>;
@@ -33,14 +32,10 @@ interface GetNewAccessTokenResponse extends Omit<DefaultAxiosResponse, "data"> {
   };
 }
 
-interface SearchWorkspacesResponse extends Omit<DefaultAxiosResponse, "data"> {
-  data: {
-    workspaces: WorkspaceInterface[];
-  };
-}
-
-interface SearchProjectTypesResponse
-  extends Omit<DefaultAxiosResponse, "data"> {
+interface SearchProjectTypesResponse extends Omit<
+  DefaultAxiosResponse,
+  "data"
+> {
   data: {
     projectTypes: ProjectTypeInterface[];
   };
@@ -56,7 +51,6 @@ export {
   type DefaultAxiosResponse,
   type SignInSucessResponse,
   type GetNewAccessTokenResponse,
-  type SearchWorkspacesResponse,
   type SearchProjectTypesResponse,
   type GetProjectTypeResponse,
 };

@@ -1,7 +1,6 @@
 package sqlite
 
 var installSchemaQueries = []string{
-	// TODO: role table ?
 	`
 		CREATE TABLE IF NOT EXISTS users (
 			id TEXT NOT NULL CHECK(length(id) == 36),
@@ -24,79 +23,35 @@ var installSchemaQueries = []string{
 		) STRICT;
 	`,
 	`
-		CREATE TABLE IF NOT EXISTS workspaces (
-			id TEXT NOT NULL CHECK(length(id) == 36),
-			name TEXT NOT NULL UNIQUE CHECK(length(name) BETWEEN 1 AND 16),
-			description TEXT,
-			item_hex_color TEXT NOT NULL CHECK(length(item_hex_color) = 7),
-			creator_id TEXT NOT NULL CHECK(length(creator_id) == 36),
-			created_at INTEGER NOT NULL,
-			updated_at INTEGER,
-			deleted_at INTEGER,
-			PRIMARY KEY (id),
-			FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE
-		) STRICT;
-	`,
-	`
-		CREATE TABLE IF NOT EXISTS workspace_members (
-			workspace_id TEXT NOT NULL CHECK(length(workspace_id) == 36),
-			user_id TEXT NOT NULL CHECK(length(user_id) == 36),
-			role_id TEXT NOT NULL CHECK(length(role_id) == 36),
-			PRIMARY KEY (workspace_id, user_id),
-			FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,
-			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
-			FOREIGN KEY(role_id) REFERENCES roles(id) ON DELETE CASCADE
-		) STRICT;
-	`,
-	`
 		CREATE TABLE IF NOT EXISTS project_priorities(
 			id TEXT NOT NULL CHECK(length(id) == 36),
-			workspace_id TEXT NOT NULL CHECK(length(workspace_id) == 36),
-			name TEXT NOT NULL CHECK(length(name) BETWEEN 1 AND 32),
+			name TEXT NOT NULL UNIQUE CHECK(length(name) BETWEEN 1 AND 32),
 			item_index INTEGER NOT NULL,
 			item_hex_color TEXT NOT NULL CHECK(length(item_hex_color) = 7),
-			PRIMARY KEY (id),
-			FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,
-			UNIQUE (name, workspace_id)
+			PRIMARY KEY (id)
 		) STRICT;
-	`,
-	`
-		CREATE INDEX idx_project_priorities_workspace_id ON project_priorities(workspace_id);
 	`,
 	`
 		CREATE TABLE IF NOT EXISTS project_statuses (
 			id TEXT NOT NULL CHECK(length(id) == 36),
-			workspace_id TEXT NOT NULL CHECK(length(workspace_id) == 36),
-			name TEXT NOT NULL CHECK(length(name) BETWEEN 1 AND 32),
+			name TEXT NOT NULL UNIQUE CHECK(length(name) BETWEEN 1 AND 32),
 			item_index INTEGER NOT NULL,
 			item_hex_color TEXT NOT NULL CHECK(length(item_hex_color) = 7),
-			PRIMARY KEY (id),
-			FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,
-			UNIQUE (name, workspace_id)
+			PRIMARY KEY (id)
 		) STRICT;
-	`,
-	`
-		CREATE INDEX idx_project_statuses_workspace_id ON project_statuses(workspace_id);
 	`,
 	`
 		CREATE TABLE IF NOT EXISTS project_types (
 			id TEXT NOT NULL CHECK(length(id) == 36),
-			workspace_id TEXT NOT NULL CHECK(length(workspace_id) == 36),
-			name TEXT NOT NULL CHECK(length(name) BETWEEN 1 AND 32),
+			name TEXT NOT NULL UNIQUE CHECK(length(name) BETWEEN 1 AND 32),
 			item_hex_color TEXT NOT NULL CHECK(length(item_hex_color) = 7),
-			PRIMARY KEY (id),
-			FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,
-			UNIQUE (name, workspace_id)
+			PRIMARY KEY (id)
 		) STRICT;
-	`,
-	`
-		CREATE INDEX idx_project_types_workspace_id ON project_types(workspace_id);
 	`,
 	`
 		CREATE TABLE IF NOT EXISTS projects (
 			id TEXT NOT NULL CHECK(length(id) == 36),
-			workspace_id TEXT NOT NULL CHECK(length(workspace_id) == 36),
-			key TEXT NOT NULL CHECK(length(key) BETWEEN 1 AND 8),
+			key TEXT NOT NULL UNIQUE CHECK(length(key) BETWEEN 1 AND 8),
 			summary TEXT NOT NULL CHECK(length(key) BETWEEN 1 AND 128),
 			description TEXT,
 			creator_id TEXT NOT NULL CHECK(length(creator_id) == 36),
@@ -111,7 +66,6 @@ var installSchemaQueries = []string{
 			status_id TEXT NOT NULL CHECK(length(status_id) == 36),
 			type_id TEXT NOT NULL CHECK(length(type_id) == 36),
 			PRIMARY KEY (id),
-			FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,
 			FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE,
 			FOREIGN KEY(priority_id) REFERENCES project_priorities(id) ON DELETE CASCADE,
 			FOREIGN KEY(status_id) REFERENCES project_statuses(id) ON DELETE CASCADE,
@@ -119,7 +73,6 @@ var installSchemaQueries = []string{
 		) STRICT;
 	`,
 	`
-		CREATE INDEX idx_projects_workspace_id ON projects(workspace_id);
 		CREATE INDEX idx_projects_status_id ON projects(status_id);
 		CREATE INDEX idx_projects_priority_id ON projects(priority_id);
 		CREATE INDEX idx_projects_type_id ON projects(type_id);

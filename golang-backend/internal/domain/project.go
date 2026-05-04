@@ -2,7 +2,6 @@ package domain
 
 type Project struct {
 	ID          string
-	WorkspaceId string
 	Key         string
 	Summary     string
 	Description *string

@@ -1,11 +1,10 @@
 <script setup lang="ts">
     import { NMenu, NIcon, type MenuOption } from 'naive-ui'
-    import { IconBug, IconSitemap, IconFileAnalytics, IconSettings, IconMatrix, IconPresentation, IconChartHistogram, IconUsers } from '@tabler/icons-vue';
+    import { IconBug, IconSitemap, IconFileAnalytics, IconSettings, IconPresentation, IconChartHistogram, IconUsers } from '@tabler/icons-vue';
     import { ref, watch, h } from 'vue'
     import type { Component } from 'vue'
     import { useRouter } from "vue-router";
     import { RouterLink } from 'vue-router'
-    import { default as WorkspaceSelect } from '../components/selectors/WorkspaceSelect.vue';
 
 
     const router = useRouter();
@@ -41,26 +40,6 @@
                     marginLeft: '32px'
                 }
             }
-        },
-        {
-            key: 'workspace',
-            /*
-            label: () =>
-                h(NSelect, {
-                    value: currentWorkspace.value,
-                    'onUpdate:value': (val) => {
-                        currentWorkspace.value = val
-                    },
-                    options: workspaceOptions,
-                    placeholder: 'Select workspace',
-
-                }),
-            */
-            label: () =>
-                h(WorkspaceSelect, {
-                    style: 'width: 100%;'
-                }),
-            icon: renderIcon(IconMatrix)(commonIconSize)
         },
         {
             key: 'divider-1',
