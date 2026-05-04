@@ -2,7 +2,7 @@
     import type { MenuOption } from 'naive-ui'
     import { NMenu } from 'naive-ui';
     import type { Component } from 'vue'
-    import { IconPresentation, IconUserCircle, IconBug, IconSitemap, IconFileAnalytics, IconSettings, IconMatrix, IconUsers, IconChartHistogram } from '@tabler/icons-vue';
+    import { IconPresentation, IconUserCircle, IconBug, IconSitemap, IconFileAnalytics, IconSettings, IconMatrix, IconUsers, IconChartHistogram, IconDatabaseStar } from '@tabler/icons-vue';
     // IconListDetails
     import { NIcon } from 'naive-ui'
     import { h } from 'vue'
@@ -20,6 +20,15 @@
     }
 
     const menuOptions: MenuOption[] = [
+        {
+            key: 'divider-1',
+            type: 'divider',
+            props: {
+                style: {
+                    marginLeft: '32px'
+                }
+            }
+        },
         {
             key: 'workspace',
             /*
@@ -65,33 +74,6 @@
             key: 'home',
             icon: renderIcon(IconPresentation)(commonIconSize)
         },
-        /*
-        {
-            key: 'divider-1',
-            type: 'divider',
-            props: {
-                style: {
-                    marginLeft: '32px'
-                }
-            }
-        },
-        {
-            label: () =>
-                h(
-                    RouterLink,
-                    {
-                        to: {
-                            name: 'workspaces',
-                            params: {
-                            }
-                        }
-                    },
-                    { default: () => 'WorkSpaces' }
-                ),
-            key: 'workspaces',
-            icon: renderIcon(IconMatrix)(commonIconSize),
-        },
-        */
         {
             label: () =>
                 h(
@@ -109,6 +91,8 @@
             icon: renderIcon(IconSitemap)(commonIconSize),
         },
         {
+            label: "Tasks",
+            /*
             label: () =>
                 h(
                     RouterLink,
@@ -121,10 +105,13 @@
                     },
                     { default: () => 'Tasks' }
                 ),
+            */
             key: 'tasks',
             icon: renderIcon(IconBug)(commonIconSize)
         },
         {
+            label: "Reports",
+            /*
             label: () =>
                 h(
                     RouterLink,
@@ -138,22 +125,26 @@
                     { default: () => 'Reports' }
                 ),
             key: 'reports',
+            */
             icon: renderIcon(IconFileAnalytics)(commonIconSize)
         },
         {
+            label: "Charts",
+            /*
             label: () =>
                 h(
                     RouterLink,
                     {
                         to: {
-                            name: 'reports',
+                            name: 'charts',
                             params: {
                             }
                         }
                     },
                     { default: () => 'Charts' }
                 ),
-            key: 'reports',
+            */
+            key: 'charts',
             icon: renderIcon(IconChartHistogram)(commonIconSize)
         },
         {
@@ -166,6 +157,8 @@
             }
         },
         {
+            label: "Admin",
+            /*
             label: () =>
                 h(
                     RouterLink,
@@ -178,6 +171,7 @@
                     },
                     { default: () => 'Admin' }
                 ),
+            */
             key: 'settings',
             icon: renderIcon(IconSettings)(commonIconSize),
             children: [
@@ -197,6 +191,7 @@
                     key: 'users',
                     icon: renderIcon(IconUsers)(commonIconSize)
                 },
+                /*
                 {
                     label: () =>
                         h(
@@ -261,6 +256,7 @@
                     key: 'reports',
                     icon: renderIcon(IconBug)(commonIconSize)
                 },
+                */
                 {
                     label: () =>
                         h(
@@ -289,19 +285,22 @@
             }
         },
         {
+            label: "My profile",
+            /*
             label: () =>
                 h(
                     RouterLink,
                     {
                         to: {
-                            name: 'reports',
+                            name: 'profile',
                             params: {
                             }
                         }
                     },
                     { default: () => 'My profile' }
                 ),
-            key: 'reports',
+            */
+            key: 'profile',
             icon: renderIcon(IconUserCircle)(commonIconSize)
         },
 
@@ -335,8 +334,24 @@
 </script>
 
 <template>
+    <div class="brand-container">
+        <IconDatabaseStar :size="commonIconSize" />
+        <span class="brand-name">Doneo</span>
+    </div>
     <n-menu :collapsed-width="64" :collapsed-icon-size="commonIconSize" :options="menuOptions"
         @update:value="handleUpdateValue" />
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+    .brand-container {
+        display: flex;
+        align-items: center;
+    }
+
+
+    .brand-name {
+        margin-left: 8px;
+        font-size: 18px;
+        font-weight: 600;
+    }
+</style>
