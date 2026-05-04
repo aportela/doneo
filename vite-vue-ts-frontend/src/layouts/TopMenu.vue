@@ -5,7 +5,7 @@
     import type { Component } from 'vue'
     import { useRouter } from "vue-router";
     import { RouterLink } from 'vue-router'
-    import { default as WorkspaceSelector } from '../components/selectors/WorkspaceSelector.vue';
+    import { default as WorkspaceSelect } from '../components/selectors/WorkspaceSelect.vue';
 
 
     const router = useRouter();
@@ -57,7 +57,7 @@
                 }),
             */
             label: () =>
-                h(WorkspaceSelector, {
+                h(WorkspaceSelect, {
                     style: 'width: 100%;'
                 }),
             icon: renderIcon(IconMatrix)(commonIconSize)
