@@ -56,17 +56,10 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		workspaceHandler := workspacehandler.NewWorkspaceHandler(db)
 		r.Post("/", workspaceHandler.AddWorkspace)
 		r.Get("/", workspaceHandler.SearchWorkspaces)
-
 		r.Route("/{workspace_id}", func(r chi.Router) {
 			projectTypeHandler := projecttypehandler.NewProjectTypeHandler(db)
 			r.Route("/project-types", func(r chi.Router) {
-				r.Post("/", projectTypeHandler.AddProjectType)
 				r.Get("/", projectTypeHandler.SearchProjectTypes)
-				r.Route("/{project_type_id}", func(r chi.Router) {
-					r.Get("/", projectTypeHandler.GetProjectType)
-					r.Put("/", projectTypeHandler.UpdateProjectType)
-					r.Delete("/", projectTypeHandler.DeleteProjectType)
-				})
 			})
 		})
 	})
@@ -82,18 +75,16 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		})
 	})
 
-	/*
-		apiRouter.Route("/project_types", func(r chi.Router) {
-			projectTypeHandler := projecttypehandler.NewProjectTypeHandler(db)
-			r.Post("/", projectTypeHandler.AddProjectType)
-			r.Get("/", projectTypeHandler.SearchProjectTypes)
-			r.Route("/{id}", func(r chi.Router) {
-				r.Get("/", projectTypeHandler.GetProjectType)
-				r.Put("/", projectTypeHandler.UpdateProjectType)
-				r.Delete("/", projectTypeHandler.DeleteProjectType)
-			})
+	apiRouter.Route("/project_types", func(r chi.Router) {
+		projectTypeHandler := projecttypehandler.NewProjectTypeHandler(db)
+		r.Post("/", projectTypeHandler.AddProjectType)
+		r.Get("/", projectTypeHandler.SearchProjectTypes)
+		r.Route("/{id}", func(r chi.Router) {
+			r.Get("/", projectTypeHandler.GetProjectType)
+			r.Put("/", projectTypeHandler.UpdateProjectType)
+			r.Delete("/", projectTypeHandler.DeleteProjectType)
 		})
-	*/
+	})
 
 	apiRouter.Route("/project_statuses", func(r chi.Router) {
 		projectStatusHandler := projectstatushandler.NewProjectStatusHandler(db)

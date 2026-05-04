@@ -3,6 +3,7 @@ package userservice
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
@@ -27,30 +28,29 @@ func NewUserService(repository userrepository.UserRepository) UserService {
 }
 
 func (s *userService) AddUser(ctx context.Context, user domain.User) error {
-	hashedPasswordBytes, hashErr := bcrypt.GenerateFromPassword([]byte(*user.Password), bcrypt.DefaultCost)
+	hashedPasswordBytes, hashErr := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if hashErr != nil {
 		return hashErr
 	}
-	hashedPassword := string(hashedPasswordBytes)
-	user.PasswordHash = &hashedPassword
-	user.CreatedAt = utils.CurrentMSTimestamp()
-	if err := s.repository.Add(ctx, userrepository.MapUserDomainToUserDTO(user)); err != nil {
+	user.PasswordHash = string(hashedPasswordBytes)
+	user.CreatedAt = time.Now()
+	if err := s.repository.Add(ctx, userrepository.UserToDTO(user)); err != nil {
 		return fmt.Errorf("[UserService] failed to add user with ID %s: %w", user.ID, err)
 	}
 	return nil
 }
 
 func (s *userService) UpdateUser(ctx context.Context, user domain.User) error {
-	if user.Password != nil {
-		hashedPasswordBytes, hashErr := bcrypt.GenerateFromPassword([]byte(*user.Password), bcrypt.DefaultCost)
+	if user.Password != "" {
+		hashedPasswordBytes, hashErr := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 		if hashErr != nil {
 			return hashErr
 		}
-		hashedPassword := string(hashedPasswordBytes)
-		user.PasswordHash = &hashedPassword
+		user.PasswordHash = string(hashedPasswordBytes)
 	}
-	user.UpdatedAt = utils.CurrentMSTimestampPtr()
-	if err := s.repository.Update(ctx, userrepository.MapUserDomainToUserDTO(user)); err != nil {
+
+	user.UpdatedAt = utils.NowToTimePtr()
+	if err := s.repository.Update(ctx, userrepository.UserToDTO(user)); err != nil {
 		return fmt.Errorf("[UserService] failed to update user with ID %s: %w", user.ID, err)
 	}
 	return nil
@@ -66,9 +66,9 @@ func (s *userService) DeleteUser(ctx context.Context, id string) error {
 func (s *userService) GetUser(ctx context.Context, id string) (domain.User, error) {
 	user, err := s.repository.Get(ctx, id)
 	if err != nil {
-		return userrepository.MapUserDTOToUserDomain(user), fmt.Errorf("[UserService] failed to get user with ID %s: %w", id, err)
+		return userrepository.DTOToUser(user), fmt.Errorf("[UserService] failed to get user with ID %s: %w", id, err)
 	}
-	return userrepository.MapUserDTOToUserDomain(user), nil
+	return userrepository.DTOToUser(user), nil
 }
 
 func (s *userService) SearchUsers(ctx context.Context) ([]domain.User, error) {
@@ -76,5 +76,5 @@ func (s *userService) SearchUsers(ctx context.Context) ([]domain.User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("[UserService] failed to search users: %w", err)
 	}
-	return userrepository.MapUserArrayDTOToUserArrayDomain(users), nil
+	return userrepository.ToUserArray(users), nil
 }
