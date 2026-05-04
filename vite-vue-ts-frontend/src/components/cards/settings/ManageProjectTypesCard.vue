@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { ref, watch, reactive, shallowRef, onMounted, computed } from 'vue'
     import { useI18n } from "vue-i18n";
-    import { NTable, NButton, NButtonGroup, NGrid, NGridItem, NModal, NTag } from 'naive-ui'
+    import { NTable, NButton, NButtonGroup, NInput, NGrid, NGridItem, NModal, NTag } from 'naive-ui'
     import { api } from '../../../composables/api';
     import { IconEdit, IconPlus, IconTrash } from '@tabler/icons-vue';
     import { getNaiveUITagColorProperty } from '../../../composables/color';
@@ -13,7 +13,7 @@
     import { useNotify } from '../../../composables/notification';
     import { default as ProjectTypeForm } from '../../forms/ProjectTypeForm.vue';
     import { default as ManageTable } from '../../custom/ManageTable.vue';
-
+    import { default as WorkspaceSelect } from '../../selectors/WorkspaceSelect.vue';
     import { useCurrentWorkspaceStore } from '../../../stores/currentWorkspace';
 
     const { notify } = useNotify();
@@ -128,12 +128,21 @@
         </template>
         <template #thead>
             <tr>
+                <th>{{ t("Workspace") }}</th>
                 <th>{{ t("Name") }}</th>
                 <th class="text-right" style="padding-right: 8px;">{{ t("Actions") }}</th>
+            </tr>
+            <tr>
+                <th>
+                    <WorkspaceSelect clearable :placeholder="t('Filter by workspace')" />
+                </th>
+                <th><n-input :placeholder="t('Filter by name')" clearable /></th>
+                <th></th>
             </tr>
         </template>
         <template #tbody>
             <tr v-for="projectType, index in projectTypes" :key="projectType.id">
+                <td></td>
                 <td class="cell-flex-vertical-align">
                     <n-tag :color="getNaiveUITagColorProperty(projectType.hexColor)">{{ projectType.name }}</n-tag>
                 </td>
