@@ -29,13 +29,13 @@ func (projectTypeRepository *projectTypeRepository) Add(ctx context.Context, pro
 	_, err := projectTypeRepository.database.ExecContext(
 		ctx,
 		`
-            INSERT INTO project_types (id, workspace_id, name, item_hex_color)
+            INSERT INTO project_types (id, name, item_hex_color, workspace_id)
 			VALUES (?, ?, ?, ?)
         `,
 		projectType.ID,
-		projectType.WorkspaceId,
 		projectType.Name,
 		projectType.HexColor,
+		projectType.WorkspaceId,
 	)
 	return err
 }
@@ -74,11 +74,12 @@ func (projectTypeRepository *projectTypeRepository) Get(ctx context.Context, id 
 		ctx,
 		`
             SELECT
-                PT.id, PT.workspace_id, PT.name, PT.item_hex_color
+                PT.id, PT.name, PT.item_hex_color, PT.workspace_id, W.name AS workspace_name, W.item_hex_color AS workspace_hex_color
             FROM project_types PT
+			INNER JOIN workspaces W ON W.id = PT.workspace_id
             WHERE PT.id = ?
         `,
-		id).Scan(&projectType.ID, &projectType.WorkspaceId, &projectType.Name, &projectType.HexColor)
+		id).Scan(&projectType.ID, &projectType.Name, &projectType.HexColor, &projectType.WorkspaceId, &projectType.WorkspaceName, &projectType.WorkspaceHexColor)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return projectType, domain.ErrNotFound
@@ -93,8 +94,9 @@ func (projectTypeRepository *projectTypeRepository) Search(ctx context.Context, 
 		ctx,
 		`
 			SELECT
-				PT.id, PT.workspace_id, PT.name, PT.item_hex_color
+				PT.id, PT.name, PT.item_hex_color, PT.workspace_id, W.name AS workspace_name, W.item_hex_color AS workspace_hex_color
 			FROM project_types PT
+			INNER JOIN workspaces W ON W.id = PT.workspace_id
 			WHERE PT.workspace_id = ?
 			ORDER BY PT.name
         `,
@@ -109,7 +111,7 @@ func (projectTypeRepository *projectTypeRepository) Search(ctx context.Context, 
 		var projectType projectTypeDTO
 
 		if err := rows.Scan(
-			&projectType.ID, &projectType.WorkspaceId, &projectType.Name, &projectType.HexColor,
+			&projectType.ID, &projectType.Name, &projectType.HexColor, &projectType.WorkspaceId, &projectType.WorkspaceName, &projectType.WorkspaceHexColor,
 		); err != nil {
 			return nil, err
 		}
