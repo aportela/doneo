@@ -15,7 +15,7 @@
     vertical-align: middle;
 }
 
-/* deny select table header (sometimes is selected by click event (sorting) */
-th {
+/* deny select text (clicking at element) on table header & menu items  */
+th, .n-menu .n-menu-item {
         user-select: none;
 }
