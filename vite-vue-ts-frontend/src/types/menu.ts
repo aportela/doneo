@@ -19,10 +19,10 @@ import {
   IconSearch,
 } from "@tabler/icons-vue";
 
-const commonIconSize = 20;
+const menuOptionIconSize = 20;
 
 const renderIcon = (icon: Component) => {
-  return (size = commonIconSize) =>
+  return (size = menuOptionIconSize) =>
     () =>
       h(
         NIcon,
@@ -55,7 +55,7 @@ const menuOptions: MenuOption[] = [
       ),
     key: "search",
     show: false,
-    icon: renderIcon(IconSearch)(commonIconSize),
+    icon: renderIcon(IconSearch)(menuOptionIconSize),
   },
   {
     label: () =>
@@ -70,7 +70,7 @@ const menuOptions: MenuOption[] = [
         { default: () => "Overview" },
       ),
     key: "home",
-    icon: renderIcon(IconPresentation)(commonIconSize),
+    icon: renderIcon(IconPresentation)(menuOptionIconSize),
   },
   {
     label: () =>
@@ -85,25 +85,25 @@ const menuOptions: MenuOption[] = [
         { default: () => "Projects" },
       ),
     key: "projects",
-    icon: renderIcon(IconSitemap)(commonIconSize),
+    icon: renderIcon(IconSitemap)(menuOptionIconSize),
   },
   {
     label: "Tasks",
     key: "tasks",
     disabled: true,
-    icon: renderIcon(IconBug)(commonIconSize),
+    icon: renderIcon(IconBug)(menuOptionIconSize),
   },
   {
     label: "Reports",
     key: "reports",
     disabled: true,
-    icon: renderIcon(IconFileAnalytics)(commonIconSize),
+    icon: renderIcon(IconFileAnalytics)(menuOptionIconSize),
   },
   {
     label: "Charts",
     key: "charts",
     disabled: true,
-    icon: renderIcon(IconChartHistogram)(commonIconSize),
+    icon: renderIcon(IconChartHistogram)(menuOptionIconSize),
   },
   {
     key: "divider-2",
@@ -119,7 +119,7 @@ const menuOptions: MenuOption[] = [
     label: "Settings",
     key: "settings",
     show: true,
-    icon: renderIcon(IconSettings)(commonIconSize),
+    icon: renderIcon(IconSettings)(menuOptionIconSize),
     children: [
       {
         label: () =>
@@ -134,18 +134,18 @@ const menuOptions: MenuOption[] = [
             { default: () => "Users" },
           ),
         key: "manageUsers",
-        icon: renderIcon(IconUsers)(commonIconSize),
+        icon: renderIcon(IconUsers)(menuOptionIconSize),
       },
       {
         label: "Roles",
         key: "roles",
         disabled: true,
-        icon: renderIcon(IconUserCheck)(commonIconSize),
+        icon: renderIcon(IconUserCheck)(menuOptionIconSize),
       },
       {
         label: "Project",
         key: "projectSettings",
-        icon: renderIcon(IconSettings)(commonIconSize),
+        icon: renderIcon(IconSettings)(menuOptionIconSize),
         children: [
           {
             label: () =>
@@ -160,7 +160,7 @@ const menuOptions: MenuOption[] = [
                 { default: () => "Type" },
               ),
             key: "manageProjectTypes",
-            icon: renderIcon(IconBookmark)(commonIconSize),
+            icon: renderIcon(IconBookmark)(menuOptionIconSize),
           },
           {
             label: () =>
@@ -175,7 +175,7 @@ const menuOptions: MenuOption[] = [
                 { default: () => "Priority" },
               ),
             key: "manageProjectPriorities",
-            icon: renderIcon(IconFlagBolt)(commonIconSize),
+            icon: renderIcon(IconFlagBolt)(menuOptionIconSize),
           },
           {
             label: () =>
@@ -190,7 +190,7 @@ const menuOptions: MenuOption[] = [
                 { default: () => "Status" },
               ),
             key: "manageProjectStatuses",
-            icon: renderIcon(IconAdjustmentsBolt)(commonIconSize),
+            icon: renderIcon(IconAdjustmentsBolt)(menuOptionIconSize),
           },
         ],
       },
@@ -208,21 +208,21 @@ const menuOptions: MenuOption[] = [
   {
     label: "John Doe",
     key: "myuser",
-    icon: renderIcon(IconUserCircle)(commonIconSize),
+    icon: renderIcon(IconUserCircle)(menuOptionIconSize),
     children: [
       {
         label: "Profile",
         key: "profile",
         disabled: true,
-        icon: renderIcon(IconId)(commonIconSize),
+        icon: renderIcon(IconId)(menuOptionIconSize),
       },
       {
         label: "Logout",
         key: "signout",
-        icon: renderIcon(IconLogout)(commonIconSize),
+        icon: renderIcon(IconLogout)(menuOptionIconSize),
       },
     ],
   },
 ];
 
-export { menuOptions };
+export { menuOptions, menuOptionIconSize };

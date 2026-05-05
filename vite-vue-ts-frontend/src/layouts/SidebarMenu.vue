@@ -2,10 +2,9 @@
     import { NMenu } from 'naive-ui';
     import { IconDatabaseStar } from '@tabler/icons-vue';
     import { useRoute } from 'vue-router'
-    import { menuOptions } from '../types/menu';
+    import { menuOptions, menuOptionIconSize } from '../types/menu';
 
     const route = useRoute()
-    const commonIconSize = 20;
 </script>
 
 <template>
@@ -13,7 +12,7 @@
         <IconDatabaseStar :size="32" class="brand-icon" />
         <span class="brand-name">Doneo</span>
     </div>
-    <n-menu :collapsed-width="64" :collapsed-icon-size="commonIconSize" :options="menuOptions"
+    <n-menu :collapsed-width="64" :collapsed-icon-size="menuOptionIconSize" :options="menuOptions"
         :value="route.name as string" accordion />
 </template>
 
