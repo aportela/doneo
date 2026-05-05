@@ -198,8 +198,8 @@
             :disabled="state.ajaxRunning">
             <n-form-item :label="t('Name')" path="name" show-feedback>
                 <n-input :placeholder="t('Project type name')" v-model:value="projectType.name"
-                    :maxlength="projectTypeMaxNameLength" :show-count="!deleteMode" clearable required
-                    autofocus></n-input>
+                    :maxlength="projectTypeMaxNameLength" :show-count="!deleteMode" clearable required autofocus
+                    :readonly="deleteMode"></n-input>
             </n-form-item>
             <n-form-item :label="t('Preview')" v-if="!deleteMode">
                 <n-flex style="width: 100%" align="center" :wrap="false">
