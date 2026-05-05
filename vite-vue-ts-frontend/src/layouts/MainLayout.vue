@@ -43,7 +43,7 @@
                     <TopMenu v-if="userSettingsStore.topNavigationMode" />
                 </n-layout-header>
                 <n-layout :has-sider="true" v-if="userSettingsStore.sideNavigationMode">
-                    <n-layout-sider collapse-mode="width" :collapsed-width="64" :width="240" :collapsed="isCollapsed"
+                    <n-layout-sider collapse-mode="width" :collapsed-width="62" :width="220" :collapsed="isCollapsed"
                         @collapse="isCollapsed = true" @expand="isCollapsed = false" show-trigger>
                         <SidebarMenu />
                     </n-layout-sider>
@@ -51,7 +51,7 @@
                         <router-view />
                     </n-layout-content>
                 </n-layout>
-                <n-layout-content v-else style="padding: 16px;">
+                <n-layout-content v-else>
                     <router-view />
                 </n-layout-content>
             </n-layout>
@@ -63,5 +63,6 @@
     .n-layout-content {
         height: calc(100vh - 64px);
         overflow: auto;
+        padding: 16px;
     }
 </style>
