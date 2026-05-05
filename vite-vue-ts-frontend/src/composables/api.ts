@@ -46,6 +46,12 @@ const api = {
       axiosInstance.post("/project-statuses", projectStatus),
     update: (projectStatus: ProjectStatusInterface) =>
       axiosInstance.put("/project-statuses/" + projectStatus.id, projectStatus),
+    patchIndex: (id: string, newIndex: number) => {
+      const params = {
+        index: newIndex,
+      };
+      return axiosInstance.patch("/project-statuses/" + id, params);
+    },
     delete: (id: string) => axiosInstance.delete("/project-statuses/" + id),
     get: (id: string) => axiosInstance.get("/project-statuses/" + id),
     search: () => axiosInstance.get("/project-statuses"),
@@ -58,6 +64,12 @@ const api = {
         "/project-priorities/" + projectPriority.id,
         projectPriority,
       ),
+    patchIndex: (id: string, newIndex: number) => {
+      const params = {
+        index: newIndex,
+      };
+      return axiosInstance.patch("/project-priorities/" + id, params);
+    },
     delete: (id: string) => axiosInstance.delete("/project-priorities/" + id),
     get: (id: string) => axiosInstance.get("/project-priorities/" + id),
     search: () => axiosInstance.get("/project-priorities"),
