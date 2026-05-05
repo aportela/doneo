@@ -2,7 +2,7 @@
     import type { MenuOption } from 'naive-ui'
     import { NMenu } from 'naive-ui';
     import type { Component } from 'vue'
-    import { IconPresentation, IconUserCircle, IconBug, IconSitemap, IconFileAnalytics, IconSettings, IconUsers, IconChartHistogram } from '@tabler/icons-vue';
+    import { IconPresentation, IconUserCircle, IconBug, IconSitemap, IconFileAnalytics, IconSettings, IconUsers, IconChartHistogram, IconBookmark, IconFlagBolt, IconAdjustmentsBolt } from '@tabler/icons-vue';
     // IconListDetails
     import { NIcon } from 'naive-ui'
     import { h } from 'vue'
@@ -241,20 +241,60 @@
                 },
                 */
                 {
-                    label: () =>
-                        h(
-                            RouterLink,
-                            {
-                                to: {
-                                    name: 'projectSettings',
-                                    params: {
-                                    }
-                                }
-                            },
-                            { default: () => 'Project settings' }
-                        ),
+                    label: "Project settings",
                     key: 'projectSettings',
-                    icon: renderIcon(IconSettings)(commonIconSize)
+                    icon: renderIcon(IconSettings)(commonIconSize),
+                    children: [
+                        {
+                            label: () =>
+                                h(
+                                    RouterLink,
+                                    {
+                                        to: {
+                                            name: 'manageProjectTypes',
+                                            params: {
+                                            }
+                                        }
+                                    },
+                                    { default: () => 'Project types' }
+                                ),
+                            key: "111",
+                            icon: renderIcon(IconBookmark)(commonIconSize)
+                        },
+                        {
+                            label: () =>
+                                h(
+                                    RouterLink,
+                                    {
+                                        to: {
+                                            name: 'manageProjectPriorities',
+                                            params: {
+                                            }
+                                        }
+                                    },
+                                    { default: () => 'Project priorities' }
+                                ),
+                            key: "222",
+                            icon: renderIcon(IconFlagBolt)(commonIconSize)
+                        },
+                        {
+                            label: () =>
+                                h(
+                                    RouterLink,
+                                    {
+                                        to: {
+                                            name: 'manageProjectStatuses',
+                                            params: {
+                                            }
+                                        }
+                                    },
+                                    { default: () => 'Project statuses' }
+                                ),
+                            key: "333",
+                            icon: renderIcon(IconAdjustmentsBolt)(commonIconSize)
+
+                        }
+                    ]
                 },
             ]
         },

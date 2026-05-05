@@ -54,9 +54,19 @@ const routes: RouteRecordRaw[] = [
         component: () => import("../pages/UsersPage.vue"),
       },
       {
-        name: "projectSettings",
-        path: "project_settings",
-        component: () => import("../pages/ProjectSettingsPage.vue"),
+        name: "manageProjectTypes",
+        path: "manage/project-types",
+        component: () => import("../pages/ManageProjectTypesPage.vue"),
+      },
+      {
+        name: "manageProjectStatuses",
+        path: "manage/project-statuses",
+        component: () => import("../pages/ManageProjectStatusesPage.vue"),
+      },
+      {
+        name: "manageProjectPriorities",
+        path: "manage/project-priorities",
+        component: () => import("../pages/ManageProjectPrioritiesPage.vue"),
       },
     ],
   },
