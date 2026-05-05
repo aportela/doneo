@@ -12,7 +12,7 @@
     const userSettingsStore = useUserSettingsStore();
 
     const route = useRoute();
-    const showBrand = true;
+    const showBrand = false;
 
     const isMenuCollapsed = ref<boolean>(false);
 
