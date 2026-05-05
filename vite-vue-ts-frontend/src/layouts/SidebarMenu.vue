@@ -8,6 +8,9 @@
     import { h } from 'vue'
     import { RouterLink } from 'vue-router'
 
+    import { useRoute } from 'vue-router'
+
+    const route = useRoute()
 
 
     const commonIconSize = 20;
@@ -235,14 +238,12 @@
         },
     ];
 
-    function handleUpdateValue(_key: string, _item: MenuOption) {
-    }
 
 </script>
 
 <template>
     <n-menu :collapsed-width="64" :collapsed-icon-size="commonIconSize" :options="menuOptions"
-        @update:value="handleUpdateValue" accordion />
+        :value="route.name as string" accordion />
 </template>
 
 <style lang="css" scoped></style>
