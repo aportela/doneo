@@ -91,9 +91,19 @@ export function useMenu() {
         icon: renderIcon(IconSitemap)(menuOptionIconSize),
       },
       {
-        label: "Tasks",
+        label: () =>
+          h(
+            RouterLink,
+            {
+              to: {
+                name: "tasks",
+                params: {},
+              },
+            },
+            { default: () => "Tasks" },
+          ),
         key: "tasks",
-        disabled: true,
+        disabled: false,
         icon: renderIcon(IconBug)(menuOptionIconSize),
       },
       {
