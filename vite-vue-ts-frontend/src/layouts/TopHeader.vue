@@ -85,11 +85,16 @@
                 <span class="brand-name">Doneo</span>
             </div>
             <div class="search-container">
-                <n-input placeholder="Search..." style="min-width: 50%;" round>
+                <n-input placeholder="Search..." style="min-width: 50%;" round v-if="false">
                     <template #prefix>
                         <IconSearch :size="16" />
                     </template>
                 </n-input>
+                <span class="shortcut"
+                    style="padding: 4px 8px; border: 1px solid rgb(239, 239, 245); border-radius: 17px; width: 300px; cursor: pointer;">
+                    <IconSearch :size="16" />
+                    <kbd>Crtl</kbd>+<kbd>K</kbd> to open search
+                </span>
             </div>
             <n-flex>
 
@@ -158,5 +163,22 @@
 
     .username {
         margin-left: 8px;
+    }
+
+
+    .shortcut {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+    }
+
+    kbd {
+        padding: 2px 8px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        background: #f5f5f5;
+        font-family: monospace;
+        font-size: 12px;
     }
 </style>
