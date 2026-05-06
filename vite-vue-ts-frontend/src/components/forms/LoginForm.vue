@@ -1,7 +1,7 @@
 <script setup lang="ts">
-    import { ref, reactive, watch } from 'vue';
+    import { ref, reactive, watch, nextTick, onMounted } from 'vue';
     import { useI18n } from "vue-i18n";
-    import { NIcon, NSpin, NForm, NFormItem, NInput, NButton, type FormItemRule, type FormInst, type FormRules } from 'naive-ui'
+    import { NIcon, NSpin, NForm, NFormItem, NInput, NButton, type FormItemRule, type FormInst, type FormRules, type InputInst } from 'naive-ui'
     import { IconEye, IconEyeCancel } from '@tabler/icons-vue';
     import { type AjaxStateInterface, defaultAjaxState } from "../../types/ajaxState";
     import { type SignInSucessResponse } from '../../types/apiResponses';
@@ -17,6 +17,9 @@
     const { t } = useI18n();
 
     const sessionStore = useSessionStore();
+
+    const inputEmailRef = ref<InputInst | null>(null);
+    const inputPasswordRef = ref<InputInst | null>(null);
 
     const localStorageLastUsedEmail = createStorageEntry<string | null>("lastUsedEmail", null);
 
@@ -126,6 +129,15 @@
             //console.debug("SignIn form validation error", e)
         }
     }
+
+    onMounted(async () => {
+        await nextTick();
+        if (signinFormValues.value.email === null) {
+            inputEmailRef.value?.focus();
+        } else {
+            inputPasswordRef.value?.focus();
+        }
+    });
 </script>
 
 <template>
@@ -133,12 +145,13 @@
     <n-spin :show="state.ajaxRunning" stroke="pink">
         <n-form ref="signInFormRef" :model="signinFormValues" label-width="100px" :rules="signInFormRules">
             <n-form-item :label="t('Email')" path="email" show-feedback>
-                <n-input type="text" :autofocus="true" v-model:value="signinFormValues.email"
-                    placeholder="Enter your email address" :disabled="state.ajaxRunning" />
+                <n-input type="text" v-model:value="signinFormValues.email" placeholder="Enter your email address"
+                    :disabled="state.ajaxRunning" ref="inputEmailRef" />
             </n-form-item>
             <n-form-item :label="t('Password')" path="password" show-feedback>
                 <n-input v-model:value="signinFormValues.password" type="password" placeholder="Enter your password"
-                    show-password-on="click" :disabled="state.ajaxRunning" @keydown.enter="validateForm">
+                    show-password-on="click" :disabled="state.ajaxRunning" @keydown.enter="validateForm"
+                    ref="inputPasswordRef">
                     <template #password-visible-icon>
                         <n-icon :size="16" :component="IconEyeCancel" />
                     </template>
@@ -150,7 +163,7 @@
             <n-form-item>
                 <n-button secondary @click="validateForm" block :disabled="state.ajaxRunning">{{
                     t("Sign in")
-                }}</n-button>
+                    }}</n-button>
             </n-form-item>
         </n-form>
     </n-spin>
