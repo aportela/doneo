@@ -248,9 +248,18 @@ export function useMenu() {
             icon: renderIcon(IconMoon)(menuOptionIconSize),
           },
           {
-            label: "Profile",
+            label: () =>
+              h(
+                RouterLink,
+                {
+                  to: {
+                    name: "profile",
+                    params: {},
+                  },
+                },
+                { default: () => "Profile" },
+              ),
             key: "profile",
-            disabled: true,
             icon: renderIcon(IconId)(menuOptionIconSize),
           },
           {

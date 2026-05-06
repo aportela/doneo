@@ -68,6 +68,11 @@ const routes: RouteRecordRaw[] = [
         path: "manage/project-priorities",
         component: () => import("../pages/ManageProjectPrioritiesPage.vue"),
       },
+      {
+        name: "profile",
+        path: "profile",
+        component: () => import("../pages/ProfilePage.vue"),
+      },
     ],
   },
   // Always leave this as last one,
