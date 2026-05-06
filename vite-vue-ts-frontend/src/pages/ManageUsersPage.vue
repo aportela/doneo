@@ -44,20 +44,22 @@
     const updatedAtFilter = ref<number | null>(0);
     const deletedAtFilter = ref<number | null>(0);
 
-    const usersc = computed(() => {
+    const searchMappedUsers = computed(() => {
         return users.value.map(u => ({
             ...u,
-            _search: (u.name + ' ' + u.email).toLowerCase()
-        }))
+            _searchName: (u.name).toLowerCase(),
+            _searchEmail: (u.email).toLowerCase()
+        }));
     })
 
     const filteredUsers = computed(() => {
-        const q = filterByUsername.value?.trim().toLowerCase()
-        if (!q) return users.value
-
-        return usersc.value
-            .filter(u => u._search.includes(q))
-            .map(({ _search, ...u }) => u)
+        const name = filterByUsername.value?.trim().toLowerCase();
+        const email = filterByEmail.value?.trim().toLowerCase();
+        return searchMappedUsers.value.filter(u => {
+            const matchName = !name || u._searchName.includes(name);
+            const matchEmail = !email || u._searchEmail.includes(email);
+            return matchName && matchEmail;
+        });
     })
 </script>
 
