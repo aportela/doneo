@@ -8,7 +8,6 @@
     const colorSchemeStore = useColorSchemeStore();
 
     const currentTab = ref<string>("mySettings");
-    const currentTheme = ref<string>("light");
 </script>
 
 <template>
