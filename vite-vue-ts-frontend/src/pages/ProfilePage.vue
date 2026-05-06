@@ -39,7 +39,7 @@
         </n-tab-pane>
         <n-tab-pane name="mySettings" tab="My settings">
             <n-card bordered>
-                <H1>My settings</H1>
+                <h1>My settings</h1>
 
                 <h2>Locale</h2>
 
