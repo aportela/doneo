@@ -2,7 +2,7 @@
     import { onMounted, ref, computed, shallowRef } from 'vue';
     import { useI18n } from "vue-i18n";
     import { api } from '../composables/api';
-    import { NAvatar, NInput, NSelect, NIcon, NButton, NButtonGroup } from 'naive-ui';
+    import { NAvatar, NInput, NSelect, NIcon, NButton, NButtonGroup, NDatePicker } from 'naive-ui';
     import { default as ManageTable } from '../components/custom/ManageTable.vue';
     import { IconUser, IconUserKey, IconSearch, IconPlus, IconEdit, IconTrash } from '@tabler/icons-vue';
 
@@ -24,16 +24,17 @@
 
 
     const filterUserOptions = [
-        { label: 'All users', value: 1 },
-        { label: 'Administrators only', value: 2 },
-        { label: 'Users only', value: 3 }
+        { label: 'All users', value: 0 },
+        { label: 'Administrators only', value: 1 },
+        { label: 'Users only', value: 2 }
     ];
 
     const filterDateOptions = [
         { label: 'Any date', value: 0 },
         { label: 'Today', value: 1 },
         { label: 'Yesterday', value: 2 },
-        { label: 'This week', value: 3 }
+        { label: 'This week', value: 3 },
+        { label: 'Custom date', value: 4 }
     ];
 
     const filterByUsername = ref<string | null>(null);
@@ -41,6 +42,7 @@
     const userFilterType = ref<number | null>(1);
 
     const createdAtFilter = ref<number | null>(0);
+    const createdAtDatepickerFilter = ref<number | null>(0);
     const updatedAtFilter = ref<number | null>(0);
     const deletedAtFilter = ref<number | null>(0);
 
@@ -58,7 +60,8 @@
         return searchMappedUsers.value.filter(u => {
             const matchName = !name || u._searchName.includes(name);
             const matchEmail = !email || u._searchEmail.includes(email);
-            return matchName && matchEmail;
+            const matchType = userFilterType.value === 0 || (u.isSuperUser && userFilterType.value == 1) || (!u.isSuperUser && userFilterType.value == 2);
+            return matchName && matchEmail && matchType;
         });
     })
 </script>
@@ -67,9 +70,9 @@
     <ManageTable size="small" title="Manage users">
         <template #thead>
             <tr>
+                <th class="text-center">Type</th>
                 <th>Name</th>
                 <th>Email</th>
-                <th class="text-center">Type</th>
                 <th>Created at</th>
                 <th>Updated at</th>
                 <th>Deleted at</th>
@@ -77,13 +80,9 @@
             </tr>
             <tr>
                 <th>
-                    <n-input size="small" placeholder="search by name..." v-model:value="filterByUsername" clearable>
-                        <template #prefix>
-                            <n-icon>
-                                <IconSearch />
-                            </n-icon>
-                        </template>
-                    </n-input>
+                    <n-select size="small" trigger="click" :options="filterUserOptions" v-model:value="userFilterType"
+                        placeholder="Search by user type">
+                    </n-select>
                 </th>
                 <th>
                     <n-input size="small" placeholder="search by email..." v-model:value="filterByEmail" clearable>
@@ -95,13 +94,19 @@
                     </n-input>
                 </th>
                 <th>
-                    <n-select size="small" trigger="click" :options="filterUserOptions" v-model:value="userFilterType"
-                        placeholder="Search by user type">
-                    </n-select>
+                    <n-input size="small" placeholder="search by name..." v-model:value="filterByUsername" clearable>
+                        <template #prefix>
+                            <n-icon>
+                                <IconSearch />
+                            </n-icon>
+                        </template>
+                    </n-input>
                 </th>
                 <th>
+                    <n-date-picker size="small" v-if="createdAtFilter === 4" clearable @clear="createdAtFilter = 0"
+                        v-model:value="createdAtDatepickerFilter" type="date" required :actions="[]"></n-date-picker>
                     <n-select size="small" trigger="click" :options="filterDateOptions" v-model:value="createdAtFilter"
-                        placeholder="Select date filter">
+                        placeholder="Select date filter" v-else>
                     </n-select>
                 </th>
                 <th>
@@ -129,16 +134,16 @@
         </template>
         <template #tbody>
             <tr v-for="user in filteredUsers" :key="user.id">
+                <td class="text-center">
+                    <IconUserKey v-if="user.isSuperUser" color="red" />
+                    <IconUser v-else />
+                </td>
                 <td>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <n-avatar :src="user.avatar" class="avatar" /> {{ user.name }}
                     </div>
                 </td>
                 <td><a :href="'mailto:' + user.email">{{ user.email }}</a></td>
-                <td class="text-center">
-                    <IconUserKey v-if="user.isSuperUser" color="red" />
-                    <IconUser v-else />
-                </td>
                 <td>{{ user.createdAt ? new Date(user.createdAt).toLocaleString() : null }}</td>
                 <td>{{ user.updatedAt ? new Date(user.updatedAt).toLocaleString() : null }}</td>
                 <td>{{ user.deletedAt ? new Date(user.deletedAt).toLocaleString() : null }}</td>
