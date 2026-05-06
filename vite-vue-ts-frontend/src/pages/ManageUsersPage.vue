@@ -1,9 +1,10 @@
 <script setup lang="ts">
-    import { h, onMounted, ref, shallowRef } from 'vue';
+    import { h, onMounted, ref, computed, shallowRef } from 'vue';
     import { api } from '../composables/api';
-    import { NDataTable, NAvatar } from 'naive-ui';
+    import { NDataTable, NAvatar, NInput, NSelect, NIcon } from 'naive-ui';
+    import { default as ManageTable } from '../components/custom/ManageTable.vue';
     import type { DataTableColumns } from 'naive-ui'
-    import { IconUser, IconUserKey } from '@tabler/icons-vue';
+    import { IconUser, IconUserKey, IconSearch } from '@tabler/icons-vue';
 
     interface UserInterface {
         id: string;
@@ -184,12 +185,122 @@
 
     const pagination = false as const
 
+    const filterUserOptions = [
+        { label: 'All users', value: 1 },
+        { label: 'Administrators only', value: 2 },
+        { label: 'Users only', value: 3 }
+    ];
+
+    const filterDateOptions = [
+        { label: 'Any date', value: 0 },
+        { label: 'Today', value: 1 },
+        { label: 'Yesterday', value: 2 },
+        { label: 'This week', value: 3 }
+    ];
+
+    const filterByUsername = ref<string | null>(null);
+    const filterByEmail = ref<string | null>(null);
+    const userFilterType = ref<number | null>(1);
+
+    const createdAtFilter = ref<number | null>(0);
+    const updatedAtFilter = ref<number | null>(0);
+    const deletedAtFilter = ref<number | null>(0);
+
+    const usersc = computed(() => {
+        return users.value.map(u => ({
+            ...u,
+            _search: (u.name + ' ' + u.email).toLowerCase()
+        }))
+    })
+
+    const filteredUsers = computed(() => {
+        const q = filterByUsername.value?.trim().toLowerCase()
+        if (!q) return users.value
+
+        return usersc.value
+            .filter(u => u._search.includes(q))
+            .map(({ _search, ...u }) => u)
+    })
 </script>
 
 <template>
+    <!--
     <h1>Manage users</h1>
+    -->
+    <ManageTable size="small" title="Manage users">
+        <template #thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Type</th>
+                <th>Created at</th>
+                <th>Updated at</th>
+                <th>Deleted at</th>
+            </tr>
+            <tr>
+                <th>
+                    <n-input placeholder="username condition" v-model:value="filterByUsername" clearable>
+                        <template #prefix>
+                            <n-icon>
+                                <IconSearch />
+                            </n-icon>
+                        </template>
+                    </n-input>
+                </th>
+                <th>
+                    <n-input placeholder="email condition" v-model:value="filterByEmail" clearable>
+                        <template #prefix>
+                            <n-icon>
+                                <IconSearch />
+                            </n-icon>
+                        </template>
+                    </n-input>
+                </th>
+                <th>
+                    <n-select trigger="click" :options="filterUserOptions" v-model:value="userFilterType"
+                        placeholder="Select user filter">
+                    </n-select>
+                </th>
+                <th>
+                    <n-select trigger="click" :options="filterDateOptions" v-model:value="createdAtFilter"
+                        placeholder="Select date filter">
+                    </n-select>
+                </th>
+                <th>
+                    <n-select trigger="click" :options="filterDateOptions" v-model:value="updatedAtFilter"
+                        placeholder="Select date filter">
+                    </n-select>
+                </th>
+                <th>
+                    <n-select trigger="click" :options="filterDateOptions" v-model:value="deletedAtFilter"
+                        placeholder="Select date filter">
+                    </n-select>
+                </th>
+            </tr>
+
+        </template>
+        <template #tbody>
+            <tr v-for="user in filteredUsers" :key="user.id">
+                <td>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <n-avatar :src="user.avatar" class="avatar" /> {{ user.name }}
+                    </div>
+                </td>
+                <td>{{ user.email }}</td>
+                <td></td>
+                <td>{{ user.createdAt ? new Date(user.createdAt).toLocaleString() : null }}</td>
+                <td>{{ user.updatedAt ? new Date(user.updatedAt).toLocaleString() : null }}</td>
+                <td>{{ user.deletedAt ? new Date(user.deletedAt).toLocaleString() : null }}</td>
+            </tr>
+        </template>
+    </ManageTable>
     <n-data-table size="small" :columns="columns" :data="users" :pagination="pagination" :bordered="false"
-        :loading="loading" :style="{ height: `80vh` }" />
+        :loading="loading" :style="{ height: `80vh` }" v-if="false" />
+
 </template>
 
-<style lang="css"></style>
+<style lang="css">
+    .avatar {
+        margin-right: 4px;
+    }
+</style>
