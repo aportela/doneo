@@ -131,12 +131,12 @@
                 <th class="text-center">Type</th>
                 <th>Name</th>
                 <th>Email</th>
-                <th>Created at</th>
-                <th>Updated at</th>
-                <th>Deleted at</th>
+                <th class="hide-mobile">Created at</th>
+                <th class="hide-mobile">Updated at</th>
+                <th class="hide-mobile">Deleted at</th>
                 <th class="text-center">Operations</th>
             </tr>
-            <tr>
+            <tr class="hide-mobile">
                 <th>
                     <n-select size="small" trigger="click" :options="filterUserOptions" v-model:value="userFilterType"
                         placeholder="Search by user type">
@@ -193,9 +193,9 @@
                     </div>
                 </td>
                 <td><a :href="'mailto:' + user.email">{{ user.email }}</a></td>
-                <td>{{ user.createdAt ? new Date(user.createdAt).toLocaleString() : null }}</td>
-                <td>{{ user.updatedAt ? new Date(user.updatedAt).toLocaleString() : null }}</td>
-                <td>{{ user.deletedAt ? new Date(user.deletedAt).toLocaleString() : null }}</td>
+                <td class="hide-mobile">{{ user.createdAt ? new Date(user.createdAt).toLocaleString() : null }}</td>
+                <td class="hide-mobile">{{ user.updatedAt ? new Date(user.updatedAt).toLocaleString() : null }}</td>
+                <td class="hide-mobile">{{ user.deletedAt ? new Date(user.deletedAt).toLocaleString() : null }}</td>
                 <td class="text-center">
                     <n-button-group>
                         <n-button size="small" @click="onUpdateUser(user, index)">
@@ -220,5 +220,11 @@
 <style lang="css">
     .avatar {
         margin-right: 4px;
+    }
+
+    @media (max-width: 768px) {
+        .hide-mobile {
+            display: none;
+        }
     }
 </style>
