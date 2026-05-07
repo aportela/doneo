@@ -2,6 +2,7 @@ import { type AxiosResponse } from "axios";
 
 import { type ValidAuthTypes } from "./common";
 
+import type { UserInterface } from "./models/user";
 import type { ProjectTypeInterface } from "./models/projectType";
 import type { ProjectPriorityInterface } from "./models/projectPriority";
 
@@ -30,6 +31,18 @@ interface GetNewAccessTokenResponse extends Omit<DefaultAxiosResponse, "data"> {
       expiresAtTimestamp: number;
     };
     tokenType: ValidAuthTypes;
+  };
+}
+
+interface SearchUsersResponse extends Omit<DefaultAxiosResponse, "data"> {
+  data: {
+    users: UserInterface[];
+  };
+}
+
+interface GetUserResponse extends Omit<DefaultAxiosResponse, "data"> {
+  data: {
+    user: UserInterface;
   };
 }
 
@@ -64,6 +77,8 @@ export {
   type DefaultAxiosResponse,
   type SignInSucessResponse,
   type GetNewAccessTokenResponse,
+  type SearchUsersResponse,
+  type GetUserResponse,
   type SearchProjectTypesResponse,
   type GetProjectTypeResponse,
   type SearchProjectPrioritiesResponse,
