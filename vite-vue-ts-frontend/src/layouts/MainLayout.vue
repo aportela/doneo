@@ -44,8 +44,8 @@
                 </n-layout-header>
                 <n-layout :has-sider="true" v-if="userSettingsStore.sideNavigationMode">
                     <n-layout-sider collapse-mode="width" :collapsed-width="62" :width="220" :collapsed="isCollapsed"
-                        @collapse="isCollapsed = true" @expand="isCollapsed = false">
-                        <SidebarMenu />
+                        @collapse="isCollapsed = true" @expand="isCollapsed = false" show-trigger="arrow-circle">
+                        <SidebarMenu :collapsed="isCollapsed" />
                     </n-layout-sider>
                     <n-layout-content>
                         <router-view />
