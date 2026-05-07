@@ -1,11 +1,11 @@
 <script setup lang="ts">
     import { ref, reactive, computed, onMounted, watch, type CSSProperties } from 'vue';
     import { useI18n } from "vue-i18n";
-    import { NSpin, NCard, NInput, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules } from 'naive-ui';
-    import { IconCancel, IconDeviceFloppy, IconPalette, IconTrash } from '@tabler/icons-vue';
+    import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules } from 'naive-ui';
+    import { IconCancel, IconDeviceFloppy, IconTrash } from '@tabler/icons-vue';
     import { type AxiosAPIError } from '../../composables/axios';
     import type { EntityAction } from '../../types/common';
-    import { type GetProjectTypeResponse } from '../../types/apiResponses';
+    import { type GetUserResponse } from '../../types/apiResponses';
     import { type UserInterface, UserClass } from '../../types/models/user';
     import { type AjaxStateInterface, defaultAjaxState } from '../../types/ajaxState';
     import { api } from '../../composables/api';
@@ -95,7 +95,7 @@
     const onGet = (id: string) => {
         Object.assign(state, defaultAjaxState);
         state.ajaxRunning = true;
-        api.user.get(id).then((response: GetProjectTypeResponse) => {
+        api.user.get(id).then((response: GetUserResponse) => {
             if (response.data.user.id === id) {
                 user.value = response.data.user;
             } else {
@@ -245,25 +245,8 @@
         </template>
         <n-form ref="projectTypeFormRef" :model="user" :rules="projectTypeFormRules" :disabled="state.ajaxRunning">
             <n-form-item :label="t('Name')" path="name" show-feedback>
-                <n-input :placeholder="t('Project type name')" v-model:value="user.name"
-                    :maxlength="projectTypeMaxNameLength" :show-count="!deleteMode" clearable required autofocus
-                    :readonly="deleteMode"></n-input>
-            </n-form-item>
-            <n-form-item :label="t('Preview')" v-if="!deleteMode">
-                <n-flex style="width: 100%" align="center" :wrap="false">
-                    <n-tag :color="getNaiveUITagColorProperty(user.hexColor)" style="width: 100%;">
-                        {{ user.name }}
-                    </n-tag>
-                    <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="user.hexColor">
-                        <template #trigger="{ onClick, ref: triggerRef }">
-                            <n-button :ref="triggerRef" quaternary @click="onClick">
-                                <template #icon>
-                                    <IconPalette />
-                                </template>
-                            </n-button>
-                        </template>
-                    </n-color-picker>
-                </n-flex>
+                <n-input :placeholder="t('Project type name')" v-model:value="user.name" :maxlength="10"
+                    :show-count="!deleteMode" clearable required autofocus :readonly="deleteMode"></n-input>
             </n-form-item>
         </n-form>
         <template #footer>

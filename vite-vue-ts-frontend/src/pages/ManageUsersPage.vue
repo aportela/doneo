@@ -1,18 +1,28 @@
 <script setup lang="ts">
-    import { onMounted, ref, computed, shallowRef } from 'vue';
+    import { onMounted, ref, reactive, computed, shallowRef } from 'vue';
     import { useI18n } from "vue-i18n";
     import { NAvatar, NInput, NSelect, NIcon, NButton, NButtonGroup } from 'naive-ui';
     import { IconUser, IconUserKey, IconSearch, IconPlus, IconEdit, IconTrash } from '@tabler/icons-vue';
     import { api } from '../composables/api';
     import { type UserInterface, UserClass } from '../types/models/user';
+    import type { SearchUsersResponse } from '../types/apiResponses';
+    import { type AjaxStateInterface, defaultAjaxState } from '../types/ajaxState';
+    import { type EntityAction } from '../types/common';
+    import { useLoadingStore } from '../stores/loading';
+    import { useNotify } from '../composables/notification';
+    import { default as UserForm } from '../components/forms/UserForm.vue';
     import { default as ManageTable } from '../components/custom/ManageTable.vue';
     import { default as DateFilter } from '../components/forms/DateFilter.vue';
 
+    const { notify } = useNotify();
+
     const { t } = useI18n();
 
-    const users = shallowRef<UserClass[]>([]);
+    const loadingStore = useLoadingStore();
 
-    const loading = ref<boolean>(false);
+    const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
+
+    const users = shallowRef<UserClass[]>([]);
 
     const filterUserOptions = [
         { label: 'All users', value: 0 },
@@ -30,7 +40,7 @@
             _searchName: (u.name).toLowerCase(),
             _searchEmail: (u.email).toLowerCase()
         }));
-    })
+    });
 
     const filteredUsers = computed(() => {
         const name = filterByUsername.value?.trim().toLowerCase();
@@ -43,17 +53,78 @@
         });
     });
 
-    onMounted(() => {
-        loading.value = true;
-        api.user.search().then((successResponse: any) => {
+    const onRefresh = () => {
+        state.ajaxRunning = true;
+        loadingStore.set(true);
+        api.user.search().then((successResponse: SearchUsersResponse) => {
             users.value = successResponse.data.users.map((u: UserInterface) => new UserClass(u));
         }).catch((errorResponse: any) => {
             console.log(errorResponse);
-        }).finally(() => { loading.value = false; })
+        }).finally(() => {
+            loadingStore.set(false);
+            state.ajaxRunning = false;
+        });
+    };
+
+    const selectedUserId = ref<string | undefined>(undefined);
+
+    const onAddUser = () => {
+        actionDialogMode.value = "add";
+    };
+
+    const onUpdateUser = (user: UserInterface, _index: number) => {
+        actionDialogMode.value = "update";
+        selectedUserId.value = user.id;
+    };
+    const onDeleteUser = (user: UserInterface, _index: number) => {
+        actionDialogMode.value = "delete";
+        selectedUserId.value = user.id;
+    };
+
+    const actionDialogMode = ref<EntityAction>("none");
+
+    const isVisibleActionDialog = computed<boolean>({
+        get: () => actionDialogMode.value !== "none",
+        set: (value: boolean) => {
+            if (!value) {
+                actionDialogMode.value = "none";
+            }
+        }
+    });
+
+    const onAdd = () => {
+        isVisibleActionDialog.value = false;
+        notify('success', t("User added"))
+        onRefresh();
+    };
+
+    const onUpdate = () => {
+        isVisibleActionDialog.value = false;
+        notify('success', t("User updated"))
+        onRefresh();
+    };
+
+    const onDelete = () => {
+        isVisibleActionDialog.value = false;
+        notify('success', t("User deleted"))
+        onRefresh();
+    };
+
+    const onCancel = () => {
+        isVisibleActionDialog.value = false;
+    };
+
+    onMounted(() => {
+        onRefresh();
     });
 </script>
 
 <template>
+    <n-modal v-model:show="isVisibleActionDialog">
+        <UserForm :mode="actionDialogMode" :user-id="selectedUserId" style="width: 40%;" @add="onAdd" @update="onUpdate"
+            @delete="onDelete" @cancel="onCancel" />
+    </n-modal>
+
     <ManageTable size="small" title="Manage users">
         <template #thead>
             <tr>
@@ -99,7 +170,7 @@
                     <DateFilter />
                 </th>
                 <th class="text-center">
-                    <n-button size="small" block>
+                    <n-button size="small" block @click="onAddUser">
                         <template #icon>
                             <NIcon>
                                 <IconPlus />
@@ -111,7 +182,7 @@
             </tr>
         </template>
         <template #tbody>
-            <tr v-for="user in filteredUsers" :key="user.id">
+            <tr v-for="user, index in filteredUsers" :key="user.id">
                 <td class="text-center">
                     <IconUserKey v-if="user.isSuperUser" color="red" />
                     <IconUser v-else />
@@ -127,13 +198,13 @@
                 <td>{{ user.deletedAt ? new Date(user.deletedAt).toLocaleString() : null }}</td>
                 <td class="text-center">
                     <n-button-group>
-                        <n-button size="small">
+                        <n-button size="small" @click="onUpdateUser(user, index)">
                             {{ t("Update") }}
                             <template #icon>
                                 <IconEdit :size="22" />
                             </template>
                         </n-button>
-                        <n-button size="small">
+                        <n-button size="small" @click="onDeleteUser(user, index)">
                             {{ t("Delete") }}
                             <template #icon>
                                 <IconTrash :size="22" />
