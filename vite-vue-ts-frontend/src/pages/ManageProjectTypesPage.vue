@@ -35,7 +35,7 @@
         }).finally(() => {
             loadingStore.set(false);
             state.ajaxRunning = false;
-        })
+        });
     };
 
     const selectedProjectTypeId = ref<string | undefined>(undefined);
@@ -44,13 +44,13 @@
         actionDialogMode.value = "add";
     };
 
-    const onUpdateProjectType = (_projectType: ProjectTypeInterface, _index: number) => {
+    const onUpdateProjectType = (projectType: ProjectTypeInterface, _index: number) => {
         actionDialogMode.value = "update";
-        selectedProjectTypeId.value = _projectType.id;
+        selectedProjectTypeId.value = projectType.id;
     };
-    const onDeleteProjectType = (_projectType: ProjectTypeInterface, _index: number) => {
+    const onDeleteProjectType = (projectType: ProjectTypeInterface, _index: number) => {
         actionDialogMode.value = "delete";
-        selectedProjectTypeId.value = _projectType.id;
+        selectedProjectTypeId.value = projectType.id;
     };
 
     const actionDialogMode = ref<EntityAction>("none");
@@ -87,6 +87,7 @@
     };
 
     const filterByName = ref<string | null>(null);
+
     onMounted(() => {
         onRefresh();
     });
