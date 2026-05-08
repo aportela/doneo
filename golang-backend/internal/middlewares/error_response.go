@@ -1,6 +1,7 @@
 package middlewares
 
 type errorResponse struct {
-	Error   string `json:"error"`
-	Message string `json:"message"`
+	ErrorDetails string `json:"error"`
+	UserMessage  string `json:"message"`
+	APIError     bool   `json:"APIError"`
 }
