@@ -43,13 +43,6 @@ func VerifyToken(tokenString string, secretKey string) (string, error) {
 		return "", err
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		if exp, ok := claims["exp"].(float64); ok {
-			if time.Now().Unix() > int64(exp) {
-				return "", errors.New("token has expired")
-			}
-		} else {
-			return "", errors.New("exp claim is missing or invalid")
-		}
 		sub, ok := claims["sub"].(string)
 		if !ok {
 			return "", errors.New("sub claim is missing or invalid")
