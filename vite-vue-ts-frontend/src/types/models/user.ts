@@ -1,6 +1,7 @@
 interface UserInterface {
   id: string;
   name: string;
+  password?: string;
   email: string;
   isSuperUser: boolean;
   createdAt: number;
@@ -12,6 +13,7 @@ interface UserInterface {
 class UserClass implements UserInterface {
   id: string;
   name: string;
+  password?: string;
   email: string;
   isSuperUser: boolean;
   createdAt: number;
@@ -22,6 +24,7 @@ class UserClass implements UserInterface {
   constructor(item: UserInterface) {
     this.id = item.id;
     this.name = item.name;
+    this.password = item.password;
     this.email = item.email;
     this.isSuperUser = item.isSuperUser;
     this.createdAt = item.createdAt;
