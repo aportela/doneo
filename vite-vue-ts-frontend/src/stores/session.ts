@@ -85,6 +85,8 @@ export const useSessionStore = defineStore("session", {
   },
 });
 
+export type SessionStoreType = ReturnType<typeof useSessionStore>;
+
 if (import.meta.hot) {
   import.meta.hot.accept(acceptHMRUpdate(useSessionStore, import.meta.hot));
 }
