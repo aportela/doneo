@@ -71,26 +71,42 @@ axiosInstance.interceptors.response.use(
 
 const bgDownload = async (url: string, fileName: string = "fileName") => {
   const startTime = Date.now();
-  const response = await axiosInstance.get(url, {
-    responseType: "blob",
-  });
-  const blob = response.data;
-  const tmpLink = document.createElement("a");
-  const urlBlob = URL.createObjectURL(blob);
-  tmpLink.href = urlBlob;
-  tmpLink.download = fileName;
-  document.body.appendChild(tmpLink);
-  tmpLink.click();
-  document.body.removeChild(tmpLink);
-  URL.revokeObjectURL(urlBlob);
-  const endTime = Date.now();
-  return {
-    fileName: fileName,
-    url: url,
-    mimeType: blob.type,
-    length: blob.size,
-    msTime: endTime - startTime,
-  };
+
+  let urlBlob: string | null = null;
+  let tmpLink: HTMLAnchorElement | null = null;
+
+  try {
+    const response = await axiosInstance.get(url, {
+      responseType: "blob",
+    });
+
+    const blob = response.data;
+
+    urlBlob = URL.createObjectURL(blob);
+
+    tmpLink = document.createElement("a");
+    tmpLink.href = urlBlob;
+    tmpLink.download = fileName;
+
+    document.body.appendChild(tmpLink);
+    tmpLink.click();
+
+    return {
+      fileName,
+      url,
+      mimeType: blob.type,
+      length: blob.size,
+      msTime: Date.now() - startTime,
+    };
+  } finally {
+    if (tmpLink) {
+      document.body.removeChild(tmpLink);
+    }
+
+    if (urlBlob) {
+      URL.revokeObjectURL(urlBlob);
+    }
+  }
 };
 
 export { axiosInstance, type AxiosAPIError, bgDownload };
