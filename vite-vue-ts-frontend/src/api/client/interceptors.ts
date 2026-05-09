@@ -2,62 +2,77 @@ import type {
   AxiosError,
   InternalAxiosRequestConfig,
   AxiosHeaders,
+  AxiosInstance,
 } from "axios";
-import { axiosInstance } from "./client";
-import { useSessionStore } from "../../stores/session";
-import type { AxiosAPIError } from "./errors";
-import { enrichAxiosError } from "./errors";
-
-axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const sessionStore = useSessionStore();
-
-  config.headers = config.headers ?? {};
-
-  if (sessionStore.hasAccessToken) {
-    config.headers.Authorization = `Bearer ${sessionStore.accessToken}`;
-  }
-
-  return config;
-});
+import type { SessionStoreType } from "../../stores/session";
+import type { APIError, APIErrorResponse } from "./errors";
 
 const getContentType = (
   headers: AxiosHeaders | Record<string, unknown> | undefined,
 ): string | undefined => {
-  if (!headers) return undefined;
+  if (!headers) {
+    return undefined;
+  }
+
   if ("get" in headers && typeof headers.get === "function") {
     const ct = headers.get("content-type");
     return typeof ct === "string" ? ct : undefined;
-  } else {
-    const raw = (headers as Record<string, unknown>)["content-type"];
-    if (Array.isArray(raw)) {
-      return raw.find((v) => typeof v === "string");
-    } else if (typeof raw === "string") {
-      return raw;
-    } else {
-      return undefined;
-    }
   }
+
+  const raw = (headers as Record<string, unknown>)["content-type"];
+
+  if (Array.isArray(raw)) {
+    return raw.find((v): v is string => typeof v === "string");
+  }
+
+  return typeof raw === "string" ? raw : undefined;
 };
 
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error: AxiosError) => {
-    const sessionStore = useSessionStore();
+const initializedInstances = new WeakSet<AxiosInstance>();
 
-    if (error.response?.status === 401) {
-      if (sessionStore.hasAccessToken) {
-        sessionStore.removeAccessToken();
-      }
+export const setupInterceptors = (
+  sessionStore: SessionStoreType,
+  instance: AxiosInstance,
+): void => {
+  if (initializedInstances.has(instance)) {
+    return;
+  }
+
+  initializedInstances.add(instance);
+
+  instance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+    if (sessionStore.hasAccessToken && sessionStore.accessToken) {
+      config.headers.set?.(
+        "Authorization",
+        `Bearer ${sessionStore.accessToken}`,
+      );
     }
+    return config;
+  });
 
-    const apiError = enrichAxiosError(error) as AxiosAPIError;
+  instance.interceptors.response.use(
+    (response) => response,
+    (error: AxiosError): Promise<APIError> => {
+      if (error.response?.status === 401) {
+        if (sessionStore.hasAccessToken) {
+          sessionStore.removeAccessToken();
+        }
+      }
 
-    const contentType = getContentType(error.response?.headers);
-    apiError.isAPIError = !!(
-      contentType?.toLowerCase().includes("application/json") &&
-      (error.response?.data as any)?.APIError === true
-    );
+      const contentType = getContentType(error.response?.headers);
+      const responseData = error.response?.data as APIErrorResponse | undefined;
 
-    return Promise.reject(apiError);
-  },
-);
+      const apiError: APIError = {
+        ...error,
+        isAPIError: Boolean(
+          contentType?.toLowerCase().includes("application/json") &&
+            responseData?.APIError === true,
+        ),
+        code: responseData?.code || error.code || "",
+        message: responseData?.message || error.message,
+      };
+
+      return Promise.reject(apiError);
+    },
+  );
+};

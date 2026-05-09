@@ -1,4 +1,4 @@
-import { axiosInstance } from "./client";
+import { axiosInstance } from "./index";
 
 export const bgDownload = async (
   url: string,

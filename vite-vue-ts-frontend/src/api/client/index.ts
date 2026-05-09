@@ -1,7 +1,7 @@
-/*
-import { axiosInstance } from "./client";
-import { authInterceptor,errorInterceptor } from "./interceptors";
+import { axiosInstance } from "./axios";
+import { setupAxiosWithStore } from "./setupAxiosWithStore";
+import { useSessionStore } from "../../stores/session";
 
-authInterceptor(axiosInstance);
-errorInterceptor(axiosInstance);
-*/
+setupAxiosWithStore(useSessionStore());
+
+export { axiosInstance };
