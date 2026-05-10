@@ -8,25 +8,24 @@
     const route = useRoute();
     const sessionStore = useSessionStore();
 
-    const tokenRefreshing = ref<boolean>(false);
+    const showRouterView = ref<boolean>(false);
     onMounted(async () => {
         if (!sessionStore.hasAccessToken) {
-            tokenRefreshing.value = true;
             try {
                 const success = await TokenManager.refreshAccessToken(sessionStore);
                 if (success) {
                     const redirectPath = (route.query.redirect as string) || '/home';
                     await router.push(redirectPath);
-                    tokenRefreshing.value = false;
                 }
             } catch (error: unknown) {
                 console.error("An unhandled exception occurred during access token refresh", error);
-                tokenRefreshing.value = false;
+            } finally {
+                showRouterView.value = true;
             }
         }
     });
 </script>
 
 <template>
-    <router-view v-if="!tokenRefreshing" />
+    <router-view v-if="showRouterView" />
 </template>
