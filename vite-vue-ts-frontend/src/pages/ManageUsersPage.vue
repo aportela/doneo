@@ -414,7 +414,7 @@
                     </td>
                     <td>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <n-avatar v-if="user.avatarURL" :src="user.avatarURL" class="avatar" /> {{ user.name }}
+                            <n-avatar v-if="user.avatarUrl" :src="user.avatarUrl" class="avatar" /> {{ user.name }}
                         </div>
                     </td>
                     <td><a :href="'mailto:' + user.email">{{ user.email }}</a></td>

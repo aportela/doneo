@@ -23,7 +23,7 @@ export class User {
   createdAt: IDate;
   updatedAt: IDate | null;
   deletedAt: IDate | null;
-  avatarURL: string | null;
+  avatarUrl: string | null;
 
   constructor(data: UserDTO) {
     this.id = data.id;
@@ -34,7 +34,7 @@ export class User {
     this.createdAt = new IDate(data.createdAt);
     this.updatedAt = data.updatedAt !== null ? new IDate(data.updatedAt) : null;
     this.deletedAt = data.deletedAt !== null ? new IDate(data.deletedAt) : null;
-    this.avatarURL = data.avatarURL;
+    this.avatarUrl = data.avatarUrl;
   }
 
   toDTO(): UserDTO {
@@ -46,7 +46,7 @@ export class User {
       createdAt: this.createdAt.msTimestamp,
       updatedAt: this.updatedAt?.msTimestamp ?? null,
       deletedAt: this.deletedAt?.msTimestamp ?? null,
-      avatarURL: this.avatarURL ?? "",
+      avatarUrl: this.avatarUrl ?? "",
     };
   }
 }

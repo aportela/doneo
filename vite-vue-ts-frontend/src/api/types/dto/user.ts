@@ -44,7 +44,7 @@ export type UserResponse = {
   createdAt: number;
   updatedAt: number | null;
   deletedAt: number | null;
-  avatarURL: string | null;
+  avatarUrl: string | null;
 };
 
 export type AddResponse = {

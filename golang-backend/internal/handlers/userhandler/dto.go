@@ -26,7 +26,7 @@ type userResponse struct {
 	UpdatedAt   *int64 `json:"updatedAt"`
 	DeletedAt   *int64 `json:"deletedAt"`
 	IsSuperUser bool   `json:"isSuperUser"`
-	AvatarURL   string `json:"avatar"`
+	AvatarURL   string `json:"avatarUrl"`
 }
 
 type addResponse struct {
