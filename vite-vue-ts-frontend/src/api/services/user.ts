@@ -9,7 +9,7 @@ import type {
   SearchResponse,
 } from "../types/dto/user";
 
-export const authService = {
+export const userService = {
   async add(payload: AddRequest): Promise<AddResponse> {
     const { data } = await axiosInstance.post<AddResponse>("/users", payload);
     return data;
