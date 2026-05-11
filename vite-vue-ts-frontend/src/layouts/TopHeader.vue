@@ -1,16 +1,17 @@
 <script setup lang="ts">
+    import { h } from 'vue'
+    import type { Component } from 'vue'
+    import { useRouter } from "vue-router";
+
     import { NButton, NDropdown } from 'naive-ui'
     import { NIcon, NFlex, NInput } from 'naive-ui'
     import { IconUserCircle, IconDatabaseStar, IconId, IconLogout, IconSearch } from '@tabler/icons-vue';
-    import type { Component } from 'vue'
-    import { h } from 'vue'
-    import { default as SwitchNotificationsButton } from '../components/buttons/SwitchNotificationsButton.vue';
-    import { default as SwitchNavigationModeButton } from '../components/buttons/SwitchNavigationModeButton.vue';
-    import { default as GithubButton } from '../components/buttons/GithubButton.vue';
-    import { default as SwitchColorSchemeButton } from '../components/buttons/SwitchColorSchemeButton.vue';
-    import { default as SwitchLocaleButton } from '../components/buttons/SwitchLocaleButton.vue';
 
-    import { useRouter } from "vue-router";
+    import SwitchNotificationsButton from '../shared/components/buttons/SwitchNotificationsButton.vue';
+    import SwitchNavigationModeButton from '../shared/components/buttons/SwitchNavigationModeButton.vue';
+    import GithubButton from '../shared/components/buttons/GithubButton.vue';
+    import SwitchColorSchemeButton from '../shared/components/buttons/SwitchColorSchemeButton.vue';
+    import SwitchLocaleButton from '../shared/components/buttons/SwitchLocaleButton.vue';
     import { api } from '../composables/api';
     import { useSessionStore } from "../stores/session";
     import { useLoadingStore } from '../stores/loading';

@@ -1,12 +1,13 @@
 <script setup lang="ts">
     import { useRouter } from "vue-router";
+
     import { NCard, NFlex } from 'naive-ui'
     import { IconDatabaseStar } from '@tabler/icons-vue';
-    import { default as LoginForm } from "../components/forms/LoginForm.vue"
 
-    import { default as GithubButton } from "../components/buttons/GithubButton.vue";
-    import { default as SwitchColorSchemeButton } from '../components/buttons/SwitchColorSchemeButton.vue';
-    import { default as SwitchLocaleButton } from "../components/buttons/SwitchLocaleButton.vue";
+    import LoginForm from "../components/forms/LoginForm.vue"
+    import GithubButton from "../shared/components/buttons/GithubButton.vue";
+    import SwitchColorSchemeButton from "../shared/components/buttons/SwitchColorSchemeButton.vue";
+    import SwitchLocaleButton from "../shared/components/buttons/SwitchLocaleButton.vue";
 
     const router = useRouter();
 
