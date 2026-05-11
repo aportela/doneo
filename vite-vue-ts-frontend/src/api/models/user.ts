@@ -50,3 +50,6 @@ export class User {
     };
   }
 }
+
+export const maxNameLength = 32;
+export const maxEmailLength = 255;
