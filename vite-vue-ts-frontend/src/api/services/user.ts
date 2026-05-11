@@ -34,10 +34,11 @@ export const userService = {
     const { data } = await axiosInstance.get<GetResponse>("/users/" + id);
     return data;
   },
-  async search(params?: SearchRequest): Promise<SearchResponse> {
-    const { data } = await axiosInstance.get<SearchResponse>("/users", {
-      params,
-    });
+  async search(payload: SearchRequest): Promise<SearchResponse> {
+    const { data } = await axiosInstance.post<SearchResponse>(
+      "/users/search",
+      payload,
+    );
     return data;
   },
 };

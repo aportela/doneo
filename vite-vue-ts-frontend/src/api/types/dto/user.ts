@@ -29,11 +29,14 @@ export type UpdateRequest = {
 };
 
 export type SearchRequest = {
-  name?: string;
-  email?: string;
-  isSuperUser?: boolean;
-  page?: number;
-  limit?: number;
+  pager: {
+    currentPage: number;
+    resultsPage: number;
+  };
+  order: {
+    field: string;
+    sort: string;
+  };
 };
 
 export type UserResponse = {
@@ -61,4 +64,11 @@ export type GetResponse = {
 
 export type SearchResponse = {
   users: UserResponse[];
+  pager: {
+    enabled: boolean;
+    currentPage: number;
+    resultsPage: number;
+    totalPages: number;
+    totalResults: number;
+  };
 };

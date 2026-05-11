@@ -40,7 +40,8 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		r.Use(middlewares.RequireSuperUser)
 		userHandler := userhandler.NewUserHandler(db)
 		r.Post("/", userHandler.Add)
-		r.Get("/", userHandler.Search)
+		//r.Get("/", userHandler.Search)
+		r.Post("/search", userHandler.Search)
 		r.Route("/{id}", func(r chi.Router) {
 			r.Get("/", userHandler.Get)
 			r.Put("/", userHandler.Update)

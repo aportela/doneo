@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"github.com/aportela/doneo/internal/utils"
@@ -19,7 +20,7 @@ type UserService interface {
 	UnDelete(ctx context.Context, id string) error
 	Purge(ctx context.Context, id string) error
 	Get(ctx context.Context, id string) (domain.User, error)
-	Search(ctx context.Context) ([]domain.User, error)
+	Search(ctx context.Context, pager browser.Params) ([]domain.User, browser.Result, error)
 }
 
 type userService struct {
@@ -94,10 +95,10 @@ func (s *userService) Get(ctx context.Context, id string) (domain.User, error) {
 	return userrepository.DTOToUser(user), nil
 }
 
-func (s *userService) Search(ctx context.Context) ([]domain.User, error) {
-	users, err := s.repository.Search(ctx)
+func (s *userService) Search(ctx context.Context, pager browser.Params) ([]domain.User, browser.Result, error) {
+	users, pagerResult, err := s.repository.Search(ctx, pager)
 	if err != nil {
-		return nil, fmt.Errorf("[UserService] failed to search users: %w", err)
+		return nil, browser.Result{}, fmt.Errorf("[UserService] failed to search users: %w", err)
 	}
-	return userrepository.ToUserArray(users), nil
+	return userrepository.ToUserArray(users), pagerResult, nil
 }

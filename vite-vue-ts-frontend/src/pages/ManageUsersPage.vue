@@ -2,7 +2,7 @@
     import { onMounted, onBeforeUnmount, ref, reactive, computed, shallowRef, h, type Component, watch } from 'vue';
     import { useI18n } from "vue-i18n";
     import { NAvatar, NInput, NSelect, NIcon, NButton, NModal, NButtonGroup, useDialog, NEmpty, NCard, NPagination, NFlex } from 'naive-ui';
-    import { IconUser, IconUserKey, IconPlus, IconEdit, IconSearch, IconTrash, IconTrashOff } from '@tabler/icons-vue';
+    import { IconUser, IconUserKey, IconPlus, IconEdit, IconSearch, IconTrash, IconTrashOff, IconRefresh } from '@tabler/icons-vue';
     import { api } from '../composables/api';
     import { type AjaxStateInterface, defaultAjaxState } from '../types/ajaxState';
     import type { AxiosAPIError } from '../composables/axios';
@@ -53,29 +53,11 @@
     const filterByEmail = ref<string | null>(null);
     const userFilterType = ref<number | null>(0);
 
-    const filteredUsers = computed<SearchableUser[]>(() => {
-        const name = filterByUsername.value?.trim().toLowerCase();
-        const email = filterByEmail.value?.trim().toLowerCase();
-        return users.value.filter(u => {
-            const matchName = !name || u._searchName.includes(name);
-            const matchEmail = !email || u._searchEmail.includes(email);
-            const matchType = userFilterType.value === 0 || (u.isSuperUser && userFilterType.value == 1) || (!u.isSuperUser && userFilterType.value == 2);
-            return matchName && matchEmail && matchType;
-        });
-    });
-
     const currentPage = ref(1);
     const pageSize = ref(10);
+    const totalResuls = ref(0);
+    const totalPages = ref(0);
 
-    const paginatedUsers = computed<SearchableUser[]>(() => {
-        const start = (currentPage.value - 1) * pageSize.value;
-        const end = start + pageSize.value;
-        return filteredUsers.value.slice(start, end);
-    });
-
-    const totalPages = computed(() => {
-        return Math.ceil(filteredUsers.value.length / pageSize.value);
-    });
 
     watch([filterByUsername, filterByEmail, userFilterType], () => {
         currentPage.value = 1;
@@ -85,11 +67,27 @@
         currentPage.value = 1;
     });
 
+    watch(currentPage, () => {
+        onRefresh();
+    });
+
     const onRefresh = async () => {
         state.ajaxRunning = true;
         loadingStore.set(true);
         try {
-            const response = await userService.search();
+            const payload = {
+                pager: {
+                    currentPage: currentPage.value,
+                    resultsPage: pageSize.value,
+                },
+                order: {
+                    field: "name",
+                    sort: "ASC",
+                }
+            };
+            const response = await userService.search(payload);
+            totalPages.value = response.pager.totalPages;
+            totalResuls.value = response.pager.totalResults;
             users.value = response.users.map((user: UserResponse) => new SearchableUser(user));
         }
         finally {
@@ -253,7 +251,7 @@
     };
 
 
-    const dialog = useDialog()
+    const dialog = useDialog();
 
     function confirmDelete(user: User, _index: number) {
         dialog.warning({
@@ -272,7 +270,7 @@
                 onDelete(user.id);
             },
         })
-    }
+    };
 
     function confirmUnDelete(user: User, _index: number) {
         dialog.warning({
@@ -291,8 +289,13 @@
                 onUnDelete(user.id);
             },
         })
-    }
+    };
+
     const pageSizes = [
+        {
+            label: 'All results',
+            value: 0
+        },
         {
             label: '5 results/page',
             value: 5
@@ -329,8 +332,7 @@
     <n-card :title="t('Manage users')">
         <n-flex justify="space-between" class="pagination-container">
             <div style="padding-top: 2px; padding-left: 2px;">
-                <span>Total users: {{ users.length }}</span>
-                <span v-if="users.length != filteredUsers.length"> | Filtered users: {{ filteredUsers.length }}</span>
+                <span>Total users: {{ totalResuls }}</span>
             </div>
             <n-pagination v-model:page="currentPage" :page-count="totalPages" v-model:page-size="pageSize"
                 show-size-picker :page-sizes="pageSizes" :page-slot="8">
@@ -385,19 +387,29 @@
                         <DateFilter />
                     </th>
                     <th class="text-center">
-                        <n-button size="small" block @click="onAddUser">
-                            <template #icon>
-                                <NIcon>
-                                    <IconPlus />
-                                </NIcon>
-                            </template>
-                            {{ t("Add") }}
-                        </n-button>
+                        <n-button-group>
+                            <n-button size="small" @click="onRefresh">
+                                <template #icon>
+                                    <n-icon :size="22">
+                                        <IconRefresh />
+                                    </n-icon>
+                                </template>
+                                {{ t("Refresh") }}
+                            </n-button>
+                            <n-button size="small" @click="onAddUser">
+                                <template #icon>
+                                    <n-icon :size="22">
+                                        <IconPlus />
+                                    </n-icon>
+                                </template>
+                                {{ t("Add") }}
+                            </n-button>
+                        </n-button-group>
                     </th>
                 </tr>
             </template>
             <template #tbody>
-                <tr v-for="user, index in paginatedUsers" :key="user.id">
+                <tr v-for="user, index in users" :key="user.id">
                     <td class="text-center">
                         <span style="display: flex; align-items: center;" v-if="user.isSuperUser">
                             <n-icon :size="16" style="margin-right: 6px;">
@@ -426,28 +438,33 @@
                             <n-button size="small" @click="onUpdateUser(user, index)">
                                 {{ t("Update") }}
                                 <template #icon>
-                                    <IconEdit :size="22" />
+                                    <n-icon :size="22">
+                                        <IconEdit />
+                                    </n-icon>
                                 </template>
                             </n-button>
                             <n-button size="small" @click="confirmDelete(user, index)"
                                 :disabled="user.id === sessionStore.sessionUserId">
                                 {{ t("Delete") }}
                                 <template #icon>
-                                    <IconTrash :size="22" />
+                                    <n-icon :size="22">
+                                        <IconTrash />
+                                    </n-icon>
                                 </template>
                             </n-button>
-
                         </n-button-group>
                         <n-button size="small" @click="confirmUnDelete(user, index)" v-else>
                             {{ t("Restore") }}
                             <template #icon>
-                                <IconTrashOff :size="22" />
+                                <n-icon :size="22">
+                                    <IconTrashOff />
+                                </n-icon>
                             </template>
                         </n-button>
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="7" v-if="filteredUsers.length < 1 && !state.ajaxRunning">
+                    <td colspan="7" v-if="totalResuls < 1 && !state.ajaxRunning">
                         <n-empty :description="t('No results')">
                         </n-empty>
                     </td>

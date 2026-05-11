@@ -6,6 +6,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 )
@@ -19,7 +20,7 @@ type UserRepository interface {
 	Purge(ctx context.Context, id string) error
 	Get(ctx context.Context, id string) (UserDTO, error)
 	GetByEmailForVerifyCredentials(ctx context.Context, email string, password string) (UserDTO, error)
-	Search(ctx context.Context) ([]UserDTO, error)
+	Search(ctx context.Context, pager browser.Params) ([]UserDTO, browser.Result, error)
 }
 
 type userRepository struct {
@@ -53,7 +54,7 @@ func (userRepository *userRepository) Add(ctx context.Context, user UserDTO) err
 
 func (userRepository *userRepository) Update(ctx context.Context, user UserDTO) error {
 	var query string
-	var args []interface{}
+	var args []any
 	adminFlag := 0
 	if user.IsSuperUser {
 		adminFlag = 1
@@ -180,17 +181,21 @@ func (userRepository *userRepository) GetByEmailForVerifyCredentials(ctx context
 	return user, err
 }
 
-func (userRepository *userRepository) Search(ctx context.Context) ([]UserDTO, error) {
-	rows, err := userRepository.database.QueryContext(
-		ctx,
-		`
-			SELECT
-				U.id, U.email, U.name, U.created_at, U.updated_at, U.deleted_at, U.is_super_user
-			FROM users U
-        `,
-	)
+func (userRepository *userRepository) Search(ctx context.Context, pager browser.Params) ([]UserDTO, browser.Result, error) {
+	var args []any
+	query := `
+		SELECT
+			U.id, U.email, U.name, U.created_at, U.updated_at, U.deleted_at, U.is_super_user
+		FROM users U
+	`
+	query += " ORDER BY U.name COLLATE NOCASE "
+	if pager.Enabled() {
+		query += " LIMIT ? OFFSET ? "
+		args = append(args, pager.Limit(), pager.Offset())
+	}
+	rows, err := userRepository.database.QueryContext(ctx, query, args...)
 	if err != nil {
-		return nil, err
+		return nil, browser.Result{}, err
 	}
 	defer rows.Close()
 	var users []UserDTO
@@ -198,13 +203,33 @@ func (userRepository *userRepository) Search(ctx context.Context) ([]UserDTO, er
 		var user UserDTO
 		var isSuperUser byte
 		if err := rows.Scan(&user.ID, &user.Email, &user.Name, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt, &isSuperUser); err != nil {
-			return nil, err
+			return nil, browser.Result{}, err
 		}
 		user.IsSuperUser = isSuperUser == 1
 		users = append(users, user)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, err
+		return nil, browser.Result{}, err
 	}
-	return users, nil
+
+	var totalResults int
+
+	if pager.Enabled() {
+		err = userRepository.database.QueryRowContext(
+			ctx,
+			`
+				SELECT
+					COUNT(*) AS total_users
+				FROM users
+			`,
+		).Scan(&totalResults)
+
+		if err != nil {
+			return nil, browser.Result{}, err
+		}
+	} else {
+		totalResults = len(users)
+	}
+
+	return users, browser.NewResult(pager, totalResults), nil
 }

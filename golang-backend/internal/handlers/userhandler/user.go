@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
@@ -129,6 +130,18 @@ func (h *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
 
 func (h *UserHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	users, err := h.service.Search(r.Context())
-	handlers.ToHandlerJSONResponse(w, userArrayToSearchResponse(users), err)
+	var request searchRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] invalid request payload: %w", err))
+		return
+	}
+	users, pagerResult, err := h.service.Search(r.Context(),
+		browser.Params{
+			CurrentPage: request.Pager.CurrentPage,
+			ResultsPage: request.Pager.ResultsPage,
+		},
+	)
+	if pagerResult.TotalResults > 0 {
+	}
+	handlers.ToHandlerJSONResponse(w, ToSearchResponse(users, pagerResult), err)
 }
