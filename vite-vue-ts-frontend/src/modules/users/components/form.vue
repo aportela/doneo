@@ -11,7 +11,7 @@
     import { handleAPIError } from '../../../api/client/errorHandler';
     import type { AddRequest, GetResponse, UpdateRequest } from '../types/dto';
     import { required, minLength, validEmail, runValidators, maxLength } from '../../../shared/composables/form-validators';
-    import RemoteAPIAlert from '../../shared/components/alerts/RemoteAPIAlert.vue';
+    import RemoteAPIAlert from '../../../shared/components/alerts/RemoteAPIAlert.vue';
 
     import type { FormMode } from '../types/user.form';
 

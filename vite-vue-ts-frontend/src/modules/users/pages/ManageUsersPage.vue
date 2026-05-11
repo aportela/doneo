@@ -13,7 +13,7 @@
     import { useLoadingStore } from '../../../stores/loading';
     import { useSessionStore } from '../../../stores/session';
     import { useNotify } from '../../../shared/composables/notification';
-    import UserForm from '../components/forms/UserForm.vue';
+    import { default as UserForm } from '../components/form.vue';
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import DateFilter from '../../../shared/components/forms/DateFilter.vue';
     import { useAppBus, type AppBusEvent } from '../../../shared/composables/bus';
@@ -21,7 +21,7 @@
     import { User } from '../models/user';
     import { handleAPIError } from '../../../api/client/errorHandler';
     import type { UserResponse } from '../types/dto';
-    import TableCellHeaderSortIcon from '../components/custom/TableCellHeaderSortIcon.vue';
+    import TableCellHeaderSortIcon from '../../../shared/components/tables/TableCellHeaderSortIcon.vue';
     import type { SortOrder } from '../../../shared/types/common';
 
     const appBus = useAppBus();

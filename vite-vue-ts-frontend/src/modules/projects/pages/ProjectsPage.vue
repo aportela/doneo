@@ -1,9 +1,9 @@
 <script setup lang="ts">
     import { onMounted, h, ref, shallowRef } from 'vue';
-    import { api } from '../shared/composables/api';
+    import { api } from '../../../shared/composables/api';
     import { NDataTable, NTag, NTable, NAvatar } from 'naive-ui';
     import type { DataTableColumns } from 'naive-ui'
-    import { getNaiveUITagColorProperty } from '../shared/composables/color';
+    import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
 
     interface ProjectTypeInterface {
         id: string;
@@ -246,7 +246,7 @@
                     project.key }}</router-link>
                 </td>
                 <td><router-link :to="{ name: 'project', params: { id: project.id } }">{{ project.summary
-                        }}</router-link></td>
+                }}</router-link></td>
                 <td><n-tag :color="getNaiveUITagColorProperty(project.type.hexColor)" class="clickable_tag"
                         title="Filter by this value">{{
                             project.type.name

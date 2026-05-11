@@ -8,7 +8,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: "login",
         path: "login",
-        component: () => import("../pages/LoginPage.vue"),
+        component: () => import("../modules/auth/pages/LoginPage.vue"),
       },
     ],
   },
@@ -26,12 +26,12 @@ const routes: RouteRecordRaw[] = [
       {
         name: "projects",
         path: "projects",
-        component: () => import("../pages/ProjectsPage.vue"),
+        component: () => import("../modules/projects/pages/ProjectsPage.vue"),
       },
       {
         name: "project",
         path: "project/:id",
-        component: () => import("../pages/ProjectPage.vue"),
+        component: () => import("../modules/projects/pages/ProjectPage.vue"),
       },
       {
         name: "tasks",
@@ -56,17 +56,20 @@ const routes: RouteRecordRaw[] = [
       {
         name: "manageProjectTypes",
         path: "manage/project-types",
-        component: () => import("../pages/ManageProjectTypesPage.vue"),
+        component: () =>
+          import("../modules/project-types/pages/ManageProjectTypesPage.vue"),
       },
       {
         name: "manageProjectStatuses",
         path: "manage/project-statuses",
-        component: () => import("../pages/ManageProjectStatusesPage.vue"),
+        component: () =>
+          import("../modules/project-statuses/pages/ManageProjectStatusesPage.vue"),
       },
       {
         name: "manageProjectPriorities",
         path: "manage/project-priorities",
-        component: () => import("../pages/ManageProjectPrioritiesPage.vue"),
+        component: () =>
+          import("../modules/project-priorities/pages/ManageProjectPrioritiesPage.vue"),
       },
       {
         name: "profile",

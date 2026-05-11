@@ -2,17 +2,17 @@
     import { ref, reactive, shallowRef, onMounted, computed } from 'vue'
     import { useI18n } from "vue-i18n";
     import { NButton, NButtonGroup, NModal, NTag, NInput, NIcon } from 'naive-ui'
-    import { api } from '../shared/composables/api';
+    import { api } from '../../../shared/composables/api';
     import { IconEdit, IconPlus, IconTrash, IconSearch } from '@tabler/icons-vue';
-    import { getNaiveUITagColorProperty } from '../shared/composables/color';
-    import type { ProjectTypeInterface } from '../shared/types/models/projectType';
-    import type { SearchProjectTypesResponse } from '../shared/types/apiResponses';
-    import { type AjaxStateInterface, defaultAjaxState } from '../shared/types/ajaxState';
-    import { type EntityAction } from '../shared/types/common';
-    import { useLoadingStore } from '../stores/loading';
-    import { useNotify } from '../shared/composables/notification';
+    import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
+    import type { ProjectTypeInterface } from '../../../shared/types/models/projectType';
+    import type { SearchProjectTypesResponse } from '../../../shared/types/apiResponses';
+    import { type AjaxStateInterface, defaultAjaxState } from '../../../shared/types/ajaxState';
+    import { type EntityAction } from '../../../shared/types/common';
+    import { useLoadingStore } from '../../../stores/loading';
+    import { useNotify } from '../../../shared/composables/notification';
     import { default as ProjectTypeForm } from '../components/forms/ProjectTypeForm.vue';
-    import ManageTable from '../shared/components/tables/ManageTable.vue';
+    import ManageTable from '../../../shared/components/tables/ManageTable.vue';
 
     const { notify } = useNotify();
 
