@@ -1,18 +1,20 @@
 <script setup lang="ts">
-    import { onMounted, onBeforeUnmount, ref, reactive, computed, shallowRef, h, type Component, watch } from 'vue';
+    import { onMounted, onBeforeUnmount, ref, reactive, shallowRef, h, type Component, watch } from 'vue';
     import { useI18n } from "vue-i18n";
+
     import { NAvatar, NInput, NSelect, NIcon, NButton, NModal, NButtonGroup, useDialog, NEmpty, NCard, NPagination, NFlex } from 'naive-ui';
     import { IconUser, IconUserKey, IconPlus, IconEdit, IconSearch, IconTrash, IconTrashOff, IconRefresh } from '@tabler/icons-vue';
+
     import { api } from '../composables/api';
     import { type AjaxStateInterface, defaultAjaxState } from '../types/ajaxState';
     import type { AxiosAPIError } from '../composables/axios';
-    import { type EntityAction } from '../types/common';
+    //import { type EntityAction } from '../types/common';
     import { useLoadingStore } from '../stores/loading';
     import { useSessionStore } from '../stores/session';
     import { useNotify } from '../composables/notification';
-    import { default as UserForm } from '../components/forms/UserForm.vue';
-    import { default as ManageTable } from '../components/custom/ManageTable.vue';
-    import { default as DateFilter } from '../components/forms/DateFilter.vue';
+    import UserForm from '../components/forms/UserForm.vue';
+    import ManageTable from '../components/custom/ManageTable.vue';
+    import DateFilter from '../components/forms/DateFilter.vue';
     import { useAppBus, type AppBusEvent } from '../composables/bus';
     import { userService } from '../api/services/user';
     import { User } from '../api/models/user';
@@ -64,6 +66,8 @@
     const totalResuls = ref(0);
     const totalPages = ref(0);
 
+    const showUserDialog = ref<boolean>(false);
+    const userDialogMode = ref<string>("add");
 
     watch([filterByUsername, filterByEmail, userFilterType], () => {
         currentPage.value = 1;
@@ -135,55 +139,32 @@
     const selectedUserId = ref<string | undefined>(undefined);
 
     const onAddUser = () => {
-        actionDialogMode.value = "add";
+        userDialogMode.value = "add";
+        showUserDialog.value = true;
     };
 
     const onUpdateUser = (user: User, _index: number) => {
-        actionDialogMode.value = "update";
         selectedUserId.value = user.id;
+        userDialogMode.value = "update";
+        showUserDialog.value = true;
     };
 
-    const actionDialogMode = ref<EntityAction>("none");
-
-    const isVisibleActionDialog = computed<boolean>({
-        get: () => actionDialogMode.value !== "none",
-        set: (value: boolean) => {
-            if (!value) {
-                actionDialogMode.value = "none";
-            }
-        }
-    });
 
     const onAdd = () => {
-        isVisibleActionDialog.value = false;
+        showUserDialog.value = false;
         notify('success', t("User added"))
         onRefresh();
     };
 
     const onUpdate = () => {
-        isVisibleActionDialog.value = false;
+        showUserDialog.value = false;
         notify('success', t("User updated"))
         onRefresh();
     };
 
     const onCancel = () => {
-        isVisibleActionDialog.value = false;
+        showUserDialog.value = false;
     };
-
-    onMounted(() => {
-        onRefresh();
-        appBus.on((event: AppBusEvent) => {
-            if (event.type == "reauthValidNotify" && event.to.includes("ManageUsersPage.onRefresh")) {
-                onRefresh();
-            }
-        });
-    });
-
-    onBeforeUnmount(() => {
-        // TODO: manage this
-        //bus.off("reAuthSucess");
-    });
-
 
     const onDelete = (userId: string) => {
         Object.assign(state, defaultAjaxState);
@@ -360,12 +341,27 @@
         },
 
     ];
+
+    onMounted(() => {
+        onRefresh();
+        appBus.on((event: AppBusEvent) => {
+            if (event.type == "reauthValidNotify" && event.to.includes("ManageUsersPage.onRefresh")) {
+                onRefresh();
+            }
+        });
+    });
+
+    onBeforeUnmount(() => {
+        // TODO: manage this
+        //bus.off("reAuthSucess");
+    });
+
 </script>
 
 <template>
-    <n-modal v-model:show="isVisibleActionDialog">
-        <UserForm :mode="actionDialogMode" :user-id="selectedUserId" style="width: 40%;" @add="onAdd" @update="onUpdate"
-            @delete="onDelete" @cancel="onCancel" @undelete="onUnDelete" />
+    <n-modal v-model:show="showUserDialog">
+        <UserForm :mode="userDialogMode == 'add' ? 'add' : 'update'" :user-id="selectedUserId" style="width: 40%;"
+            @add="onAdd" @update="onUpdate" @delete="onDelete" @cancel="onCancel" @undelete="onUnDelete" />
     </n-modal>
 
     <n-card :title="t('Manage users')">
