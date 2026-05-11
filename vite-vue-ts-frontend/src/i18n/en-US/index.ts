@@ -12,10 +12,10 @@ export default {
   Refresh: "Refresh",
 
   // errors
-  "Invalid API response": "Invalid API response",
+  "Uncaught exception": "Uncaught exception",
+  "Invalid API response code": "Invalid API response code",
   "Email not found": "Email not found",
   "Invalid password": "Invalid password",
-  "API Error: fatal error": "API Error: fatal error",
   "Sign in error": "Sign in error",
 
   // users

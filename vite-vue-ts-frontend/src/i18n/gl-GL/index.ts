@@ -12,10 +12,10 @@ export default {
   Refresh: "Recargar",
 
   // errors
-  "Invalid API response": "Resposta da API non válida",
+  "Uncaught exception": "Excepción non controlada",
+  "Invalid API response code": "Código de resposta da API incorrecto",
   "Email not found": "O Email non existe",
   "Invalid password": "A contrasinal é incorrecta",
-  "API Error: fatal error": "Error fatal de API",
   "Sign in error": "Error ó inicia-la sesión",
 
   // users
