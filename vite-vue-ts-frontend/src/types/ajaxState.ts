@@ -14,4 +14,11 @@ const defaultAjaxState: AjaxStateInterface = {
   ajaxAPIErrorDetails: null,
 };
 
-export { type AjaxStateInterface, defaultAjaxState };
+const defaultAjaxStateRunning: AjaxStateInterface = {
+  ajaxRunning: true,
+  ajaxErrors: false,
+  ajaxErrorMessage: null,
+  ajaxAPIErrorDetails: null,
+};
+
+export { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning };

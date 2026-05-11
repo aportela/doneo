@@ -3,11 +3,12 @@
     import { useI18n } from "vue-i18n";
     import { NIcon, NSpin, NForm, NFormItem, NInput, NButton, type FormItemRule, type FormInst, type FormRules, type InputInst } from 'naive-ui'
     import { IconEye, IconEyeCancel } from '@tabler/icons-vue';
-    import { type AjaxStateInterface, defaultAjaxState } from "../../types/ajaxState";
+
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from "../../types/ajaxState";
     import { required, minLength, validEmail, runValidators } from '../../composables/form-validators';
     import { createStorageEntry } from '../../composables/localStorage';
     import { useSessionStore } from "../../stores/session";
-    import { default as RemoteAPIAlert } from '../alerts/RemoteAPIAlert.vue';
+    import RemoteAPIAlert from '../alerts/RemoteAPIAlert.vue';
     import { authService } from '../../api/services/auth';
     import type { SignInResponse } from '../../api/types/dto/auth';
     import { handleAPIError } from '../../api/client/errorHandler';
@@ -75,8 +76,7 @@
     const submit = async () => {
         serverErrors.value = {}
         if (signinFormValues.value.email && signinFormValues.value.password) {
-            Object.assign(state, defaultAjaxState);
-            state.ajaxRunning = true;
+            Object.assign(state, defaultAjaxStateRunning);
             try {
                 const payload = { email: signinFormValues.value.email, password: signinFormValues.value.password };
                 const response: SignInResponse = await authService.signIn(payload);
