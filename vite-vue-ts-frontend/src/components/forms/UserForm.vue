@@ -1,8 +1,10 @@
 <script setup lang="ts">
     import { ref, reactive, computed, onMounted, watch, type CSSProperties } from 'vue';
     import { useI18n } from "vue-i18n";
+
     import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconEye, IconEyeCancel } from '@tabler/icons-vue';
+
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../types/ajaxState';
     import { User, maxNameLength, maxEmailLength } from '../../api/models/user';
     import { userService } from '../../api/services/user';
@@ -11,10 +13,10 @@
     import { required, minLength, validEmail, runValidators, maxLength } from '../../composables/form-validators';
     import RemoteAPIAlert from '../alerts/RemoteAPIAlert.vue';
 
-    type Mode = "add" | "update";
+    type FormMode = "add" | "update";
 
     interface UserFormProps {
-        mode: Mode;
+        mode: FormMode;
         userId?: string;
         style?: string | CSSProperties;
     }
@@ -240,6 +242,7 @@
             userFormRef.value?.validate();
         }
     });
+
 </script>
 
 <template>
