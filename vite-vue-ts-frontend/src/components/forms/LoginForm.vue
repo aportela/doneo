@@ -9,7 +9,7 @@
     import { required, minLength, validEmail, runValidators } from '../../composables/form-validators';
     import { createStorageEntry } from '../../composables/localStorage';
     import { useSessionStore } from "../../stores/session";
-    import RemoteAPIAlert from '../alerts/RemoteAPIAlert.vue';
+    import RemoteAPIAlert from '../../shared/components/alerts/RemoteAPIAlert.vue';
     import { authService } from '../../api/services/auth';
     import type { SignInRequest, SignInResponse } from '../../api/types/dto/auth';
     import { handleAPIError } from '../../api/client/errorHandler';
@@ -159,7 +159,7 @@
             <n-form-item>
                 <n-button secondary @click="onSignIn" block :disabled="state.ajaxRunning">{{
                     t("Sign in")
-                    }}</n-button>
+                }}</n-button>
             </n-form-item>
         </n-form>
     </n-spin>

@@ -11,7 +11,7 @@
     import { api } from '../../composables/api';
     import { required, minLength, runValidators } from '../../composables/form-validators';
     import { generateRandomSoftHexColor, getNaiveUITagColorProperty } from '../../composables/color';
-    import { default as RemoteAPIAlert } from '../alerts/RemoteAPIAlert.vue';
+    import RemoteAPIAlert from '../../shared/components/alerts/RemoteAPIAlert.vue';
 
     const emit = defineEmits(['add', 'update', 'delete', 'cancel'])
 
