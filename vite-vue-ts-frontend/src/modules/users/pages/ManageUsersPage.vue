@@ -13,16 +13,16 @@
     import { useLoadingStore } from '../../../stores/loading';
     import { useSessionStore } from '../../../stores/session';
     import { useNotify } from '../../../shared/composables/notification';
-    import { default as UserForm } from '../components/form.vue';
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import DateFilter from '../../../shared/components/forms/DateFilter.vue';
     import { useAppBus, type AppBusEvent } from '../../../shared/composables/bus';
     import { userService } from '../services/user';
-    import { User } from '../models/user';
+    import UserForm from '../components/UserForm.vue';
     import { handleAPIError } from '../../../api/client/errorHandler';
     import type { UserResponse } from '../types/dto';
     import TableCellHeaderSortIcon from '../../../shared/components/tables/TableCellHeaderSortIcon.vue';
     import type { SortOrder } from '../../../shared/types/common';
+    import { User } from '../models/user';
 
     const appBus = useAppBus();
 
@@ -36,18 +36,7 @@
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    class SearchableUser extends User {
-        _searchName: string;
-        _searchEmail: string;
-
-        constructor(data: UserResponse) {
-            super(data);
-            this._searchName = data.name.toLowerCase();
-            this._searchEmail = data.email.toLowerCase();
-        }
-    }
-
-    const users = shallowRef<SearchableUser[]>([]);
+    const users = shallowRef<User[]>([]);
 
     const filterUserOptions = [
         { label: 'All users', value: 0 },
@@ -115,7 +104,7 @@
             const response = await userService.search(payload);
             totalPages.value = response.pager.totalPages;
             totalResuls.value = response.pager.totalResults;
-            users.value = response.users.map((user: UserResponse) => new SearchableUser(user));
+            users.value = response.users.map((user: UserResponse) => new User(user));
         } catch (error: unknown) {
             users.value.length = 0;
             state.ajaxErrors = true;
