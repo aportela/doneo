@@ -21,7 +21,7 @@ export const TokenManager = {
 */
 
 import { authService } from "./auth";
-import { useSessionStore } from "../../stores/session";
+import { useSessionStore } from "../../../stores/session";
 
 export const TokenManager = {
   async refreshAccessToken(

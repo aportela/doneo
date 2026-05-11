@@ -5,15 +5,15 @@
     import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconEye, IconEyeCancel } from '@tabler/icons-vue';
 
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../types/ajaxState';
-    import { User, maxNameLength, maxEmailLength } from '../../api/models/user';
-    import { userService } from '../../api/services/user';
-    import { handleAPIError } from '../../api/client/errorHandler';
-    import type { AddRequest, GetResponse, UpdateRequest } from '../../api/types/dto/user';
-    import { required, minLength, validEmail, runValidators, maxLength } from '../../composables/form-validators';
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
+    import { User, maxNameLength, maxEmailLength } from '../models/user';
+    import { userService } from '../services/user'
+    import { handleAPIError } from '../../../api/client/errorHandler';
+    import type { AddRequest, GetResponse, UpdateRequest } from '../types/dto';
+    import { required, minLength, validEmail, runValidators, maxLength } from '../../../shared/composables/form-validators';
     import RemoteAPIAlert from '../../shared/components/alerts/RemoteAPIAlert.vue';
 
-    type FormMode = "add" | "update";
+    import type { FormMode } from '../types/user.form';
 
     interface UserFormProps {
         mode: FormMode;

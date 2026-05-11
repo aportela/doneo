@@ -1,4 +1,4 @@
-import type { UserResponse } from "./user";
+import type { UserResponse } from "../../users/types/dto";
 
 export type Token = {
   token: string;

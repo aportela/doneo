@@ -51,7 +51,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: "manageUsers",
         path: "manage/users",
-        component: () => import("../pages/ManageUsersPage.vue"),
+        component: () => import("../modules/users/pages/ManageUsersPage.vue"),
       },
       {
         name: "manageProjectTypes",

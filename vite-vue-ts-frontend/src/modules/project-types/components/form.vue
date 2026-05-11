@@ -3,14 +3,14 @@
     import { useI18n } from "vue-i18n";
     import { NSpin, NCard, NInput, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconPalette, IconTrash } from '@tabler/icons-vue';
-    import { type AxiosAPIError } from '../../composables/axios';
-    import type { EntityAction } from '../../types/common';
-    import { type GetProjectTypeResponse } from '../../types/apiResponses';
-    import { type ProjectTypeInterface, ProjectTypeClass, maxNameLength as projectTypeMaxNameLength } from '../../types/models/projectType';
-    import { type AjaxStateInterface, defaultAjaxState } from '../../types/ajaxState';
-    import { api } from '../../composables/api';
-    import { required, minLength, runValidators } from '../../composables/form-validators';
-    import { generateRandomSoftHexColor, getNaiveUITagColorProperty } from '../../composables/color';
+    import type { AxiosAPIError } from '../../../shared/composables/axios';
+    import type { EntityAction } from '../../../shared/types/common';
+    import type { GetProjectTypeResponse } from '../../../shared/types/apiResponses';
+    import { type ProjectTypeInterface, ProjectTypeClass, maxNameLength as projectTypeMaxNameLength } from '../../../shared/types/models/projectType';
+    import { type AjaxStateInterface, defaultAjaxState } from '../../../shared/types/ajaxState';
+    import { api } from '../../../shared/composables/api';
+    import { required, minLength, runValidators } from '../../../shared/composables/form-validators';
+    import { generateRandomSoftHexColor, getNaiveUITagColorProperty } from '../../../shared/composables/color';
     import RemoteAPIAlert from '../../shared/components/alerts/RemoteAPIAlert.vue';
 
     const emit = defineEmits(['add', 'update', 'delete', 'cancel'])

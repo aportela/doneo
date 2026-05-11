@@ -3,7 +3,7 @@
     import { NDivider, NMenu } from 'naive-ui';
     import { IconDatabaseStar } from '@tabler/icons-vue';
     import { useRoute } from 'vue-router'
-    import { menuOptionIconSize, useMenu } from '../types/menu';
+    import { menuOptionIconSize, useMenu } from '../shared/types/menu';
 
     import { useColorSchemeStore } from '../stores/colorScheme';
     import { useUserSettingsStore } from '../stores/userSettings';

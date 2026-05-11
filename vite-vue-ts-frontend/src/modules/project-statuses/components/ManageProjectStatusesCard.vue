@@ -1,9 +1,9 @@
 <script setup lang="ts">
     import { ref, onMounted } from 'vue'
     import { NSpin, NTable, NColorPicker, NTag, NButton, NFlex } from 'naive-ui'
-    import { api } from '../../../composables/api';
+    import { api } from '../../../shared/composables/api';
     import { IconArrowDown, IconArrowUp } from '@tabler/icons-vue';
-    import { getNaiveUITagColorProperty } from '../../../composables/color';
+    import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
 
     interface ProjectStatusInterface {
         id: string;

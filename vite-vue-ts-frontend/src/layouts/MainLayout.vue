@@ -2,15 +2,15 @@
     import { ref, reactive, onMounted, onBeforeUnmount } from 'vue';
     import { NLayout, NLayoutHeader, NLayoutSider, NLayoutContent, NSpin, NDialogProvider, NButton, NDrawer, NDrawerContent, NModal } from 'naive-ui'
     import { useBreakpoints } from '@vueuse/core';
-    import { useAppBus, type AppBusEvent } from '../composables/bus';
-    import { TokenManager } from '../api/services/tokenManager';
+    import { useAppBus, type AppBusEvent } from '../shared/composables/bus';
+    import { TokenManager } from '../modules/auth/services/tokenManager';
     import { useUserSettingsStore } from '../stores/userSettings';
     import { useLoadingStore } from '../stores/loading';
     import { useSessionStore } from '../stores/session';
     import TopHeader from './TopHeader.vue';
     import TopMenu from './TopMenu.vue';
-    import SearchModal from '../components/modals/SearchModal.vue';
-    import LoginForm from '../components/forms/LoginForm.vue';
+    import SearchModal from '../shared/components/modals/SearchModal.vue';
+    import LoginForm from '../modules/auth/components/LoginForm.vue';
     import SidebarMenu from './SidebarMenu.vue';
 
     const appBus = useAppBus();

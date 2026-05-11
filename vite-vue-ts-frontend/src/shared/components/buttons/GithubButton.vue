@@ -4,7 +4,7 @@
     import { NButton, NIcon, NTooltip } from 'naive-ui'
     import { IconBrandGithub } from '@tabler/icons-vue';
 
-    import { GITHUB_PROJECT_URL } from '../../constants';
+    import { GITHUB_PROJECT_URL } from '../../../constants';
 
     interface GithubButtonProps {
         iconSize?: number,

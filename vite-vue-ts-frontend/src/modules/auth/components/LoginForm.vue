@@ -5,15 +5,15 @@
     import { NIcon, NSpin, NForm, NFormItem, NInput, NButton, type FormItemRule, type FormInst, type FormRules, type InputInst } from 'naive-ui'
     import { IconEye, IconEyeCancel } from '@tabler/icons-vue';
 
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from "../../types/ajaxState";
-    import { required, minLength, validEmail, runValidators } from '../../composables/form-validators';
-    import { createStorageEntry } from '../../composables/localStorage';
-    import { useSessionStore } from "../../stores/session";
-    import RemoteAPIAlert from '../../shared/components/alerts/RemoteAPIAlert.vue';
-    import { authService } from '../../api/services/auth';
-    import type { SignInRequest, SignInResponse } from '../../api/types/dto/auth';
-    import { handleAPIError } from '../../api/client/errorHandler';
-    import { User } from "../../api/models/user";
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from "../../../shared/types/ajaxState";
+    import { required, minLength, validEmail, runValidators } from '../../../shared/composables/form-validators';
+    import { createStorageEntry } from '../../../shared/composables/localStorage';
+    import { useSessionStore } from "../../../stores/session";
+    import RemoteAPIAlert from '../../../shared/components/alerts/RemoteAPIAlert.vue';
+    import { authService } from '../../../modules/auth/services/auth';
+    import type { SignInRequest, SignInResponse } from '../../../modules/auth/types/dto';
+    import { handleAPIError } from '../../../api/client/errorHandler';
+    import { User } from "../../../modules/users/models/user";
 
     type signInFormValuesInterface = {
         email: string;
@@ -159,7 +159,7 @@
             <n-form-item>
                 <n-button secondary @click="onSignIn" block :disabled="state.ajaxRunning">{{
                     t("Sign in")
-                }}</n-button>
+                    }}</n-button>
             </n-form-item>
         </n-form>
     </n-spin>

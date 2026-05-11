@@ -2,17 +2,17 @@
     import { ref, reactive, shallowRef, onMounted, computed } from 'vue'
     import { useI18n } from "vue-i18n";
     import { NButton, NButtonGroup, NModal, NTag, NInput, NIcon } from 'naive-ui'
-    import { api } from '../composables/api';
+    import { api } from '../shared/composables/api';
     import { IconEdit, IconPlus, IconTrash, IconSearch } from '@tabler/icons-vue';
-    import { getNaiveUITagColorProperty } from '../composables/color';
-    import type { ProjectTypeInterface } from '../types/models/projectType';
-    import type { SearchProjectTypesResponse } from '../types/apiResponses';
-    import { type AjaxStateInterface, defaultAjaxState } from '../types/ajaxState';
-    import { type EntityAction } from '../types/common';
+    import { getNaiveUITagColorProperty } from '../shared/composables/color';
+    import type { ProjectTypeInterface } from '../shared/types/models/projectType';
+    import type { SearchProjectTypesResponse } from '../shared/types/apiResponses';
+    import { type AjaxStateInterface, defaultAjaxState } from '../shared/types/ajaxState';
+    import { type EntityAction } from '../shared/types/common';
     import { useLoadingStore } from '../stores/loading';
-    import { useNotify } from '../composables/notification';
+    import { useNotify } from '../shared/composables/notification';
     import { default as ProjectTypeForm } from '../components/forms/ProjectTypeForm.vue';
-    import { default as ManageTable } from '../components/custom/ManageTable.vue';
+    import ManageTable from '../shared/components/tables/ManageTable.vue';
 
     const { notify } = useNotify();
 

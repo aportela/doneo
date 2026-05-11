@@ -2,9 +2,9 @@
     import { ref, onMounted } from 'vue'
     import { useI18n } from "vue-i18n";
     import { NSpin, NTable, NColorPicker, NTag, NButton, NButtonGroup } from 'naive-ui'
-    import { api } from '../../../composables/api';
+    import { api } from '../../../shared/composables/api';
     import { IconArrowDown, IconArrowUp } from '@tabler/icons-vue';
-    import { getNaiveUITagColorProperty } from '../../../composables/color';
+    import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
 
     const { t } = useI18n();
 
@@ -50,7 +50,7 @@
                     <td><n-color-picker v-model:value="projectPriority.hexColor" :modes="['hex']"
                             :show-alpha="false"></n-color-picker></td>
                     <td><n-tag :color="getNaiveUITagColorProperty(projectPriority.hexColor)">{{ projectPriority.name
-                    }}</n-tag></td>
+                            }}</n-tag></td>
                     <td>
                         <n-button-group>
                             <n-button size="small" @click="onChangeIndex(projectPriority.id, index - 1)"

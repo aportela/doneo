@@ -1,5 +1,5 @@
 import { useLocalStorage } from "@vueuse/core";
-import { LOCAL_STORAGE_NAMESPACE } from "../constants";
+import { LOCAL_STORAGE_NAMESPACE } from "../../constants";
 
 export type StorageValue = string | number | boolean | null | object;
 

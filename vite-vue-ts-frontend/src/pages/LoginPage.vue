@@ -4,7 +4,7 @@
     import { NCard, NFlex } from 'naive-ui'
     import { IconDatabaseStar } from '@tabler/icons-vue';
 
-    import LoginForm from "../components/forms/LoginForm.vue"
+    import LoginForm from "../modules/auth/components/LoginForm.vue";
     import GithubButton from "../shared/components/buttons/GithubButton.vue";
     import SwitchColorSchemeButton from "../shared/components/buttons/SwitchColorSchemeButton.vue";
     import SwitchLocaleButton from "../shared/components/buttons/SwitchLocaleButton.vue";

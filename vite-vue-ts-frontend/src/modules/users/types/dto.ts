@@ -1,5 +1,8 @@
-import type { PagerRequest, PagerResponse } from "./pager";
-import type { Order } from "./order";
+import type {
+  PagerRequest,
+  PagerResponse,
+} from "../../../shared/types/dto/pager";
+import type { Order } from "../../../shared/types/dto/order";
 
 /*
 export type UserRequest = {

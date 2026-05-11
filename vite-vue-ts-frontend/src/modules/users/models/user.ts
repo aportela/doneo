@@ -1,4 +1,4 @@
-import type { UserResponse as UserDTO } from "../types/dto/user";
+import type { UserResponse as UserDTO } from "../types/dto";
 
 class IDate {
   msTimestamp: number;

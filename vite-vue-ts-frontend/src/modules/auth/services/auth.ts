@@ -1,9 +1,9 @@
-import { axiosInstance } from "../client";
+import { axiosInstance } from "../../../api/client";
 import type {
   SignInRequest,
   SignInResponse,
   RenewAccessTokenResponse,
-} from "../types/dto/auth";
+} from "../types/dto";
 
 export const authService = {
   async signIn(payload: SignInRequest): Promise<SignInResponse> {

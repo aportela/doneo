@@ -4,7 +4,7 @@
     import { NButton, NIcon, NTooltip } from 'naive-ui';
     import { IconBell, IconBellOff } from '@tabler/icons-vue';
 
-    import { useUserSettingsStore } from '../../stores/userSettings';
+    import { useUserSettingsStore } from "../../../stores/userSettings";
 
     interface SwitchNotificationsButtonProps {
         iconSize?: number,

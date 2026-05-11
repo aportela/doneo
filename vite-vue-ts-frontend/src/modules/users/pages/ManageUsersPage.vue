@@ -5,23 +5,24 @@
     import { NAvatar, NInput, NSelect, NIcon, NButton, NModal, NButtonGroup, useDialog, NEmpty, NCard, NPagination, NFlex } from 'naive-ui';
     import { IconUser, IconUserKey, IconPlus, IconEdit, IconSearch, IconTrash, IconTrashOff, IconRefresh } from '@tabler/icons-vue';
 
-    import { api } from '../composables/api';
-    import { type AjaxStateInterface, defaultAjaxState } from '../types/ajaxState';
-    import type { AxiosAPIError } from '../composables/axios';
+    import { api } from '../../../shared/composables/api';
+
+    import { type AjaxStateInterface, defaultAjaxState } from '../../../shared/types/ajaxState';
+    import type { AxiosAPIError } from '../../../shared/composables/axios';
     //import { type EntityAction } from '../types/common';
-    import { useLoadingStore } from '../stores/loading';
-    import { useSessionStore } from '../stores/session';
-    import { useNotify } from '../composables/notification';
+    import { useLoadingStore } from '../../../stores/loading';
+    import { useSessionStore } from '../../../stores/session';
+    import { useNotify } from '../../../shared/composables/notification';
     import UserForm from '../components/forms/UserForm.vue';
-    import ManageTable from '../components/custom/ManageTable.vue';
-    import DateFilter from '../components/forms/DateFilter.vue';
-    import { useAppBus, type AppBusEvent } from '../composables/bus';
-    import { userService } from '../api/services/user';
-    import { User } from '../api/models/user';
-    import { handleAPIError } from '../api/client/errorHandler';
-    import type { UserResponse } from '../api/types/dto/user';
+    import ManageTable from '../../../shared/components/tables/ManageTable.vue';
+    import DateFilter from '../../../shared/components/forms/DateFilter.vue';
+    import { useAppBus, type AppBusEvent } from '../../../shared/composables/bus';
+    import { userService } from '../services/user';
+    import { User } from '../models/user';
+    import { handleAPIError } from '../../../api/client/errorHandler';
+    import type { UserResponse } from '../types/dto';
     import TableCellHeaderSortIcon from '../components/custom/TableCellHeaderSortIcon.vue';
-    import type { SortOrder } from '../types/common';
+    import type { SortOrder } from '../../../shared/types/common';
 
     const appBus = useAppBus();
 

@@ -5,8 +5,8 @@
     import { NDropdown, NButton, NIcon } from 'naive-ui';
     import { IconWorld, IconSelector } from '@tabler/icons-vue';
 
-    import { availableLocaleSelectorOptionItems, getlocaleSelectorOptionItem } from '../../i18n';
-    import { useI18nStore } from "../../stores/i18n";
+    import { availableLocaleSelectorOptionItems, getlocaleSelectorOptionItem } from '../../../i18n';
+    import { useI18nStore } from '../../../stores/i18n';
 
     interface SwitchLocaleButtonProps {
         iconSize?: number,

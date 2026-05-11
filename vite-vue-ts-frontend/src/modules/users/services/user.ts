@@ -1,4 +1,5 @@
-import { axiosInstance } from "../client";
+import { axiosInstance } from "../../../api/client";
+
 import type {
   AddRequest,
   AddResponse,
@@ -7,7 +8,7 @@ import type {
   UpdateResponse,
   GetResponse,
   SearchResponse,
-} from "../types/dto/user";
+} from "../types/dto";
 
 export const userService = {
   async add(payload: AddRequest): Promise<AddResponse> {

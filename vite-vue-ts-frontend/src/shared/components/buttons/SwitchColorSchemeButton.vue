@@ -4,7 +4,7 @@
     import { NButton, NIcon, NTooltip } from 'naive-ui';
     import { IconMoon, IconSun } from '@tabler/icons-vue';
 
-    import { useColorSchemeStore } from '../../stores/colorScheme';
+    import { useColorSchemeStore } from "../../../stores/colorScheme";
 
     interface SwitchColorSchemeButtonProps {
         iconSize?: number,

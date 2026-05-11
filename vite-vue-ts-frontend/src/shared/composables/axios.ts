@@ -1,8 +1,8 @@
 import axios from "axios";
 import { AxiosError } from "axios";
-import { SERVER_API_BASE_PATH } from "../constants";
+import { SERVER_API_BASE_PATH } from "../../constants";
 import { type APIErrorDetails } from "../types/apiErrorDetails";
-import { useSessionStore } from "../stores/session";
+import { useSessionStore } from "../../stores/session";
 
 interface AxiosAPIError extends AxiosError {
   isAPIError: boolean;

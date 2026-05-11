@@ -12,7 +12,7 @@
     import GithubButton from '../shared/components/buttons/GithubButton.vue';
     import SwitchColorSchemeButton from '../shared/components/buttons/SwitchColorSchemeButton.vue';
     import SwitchLocaleButton from '../shared/components/buttons/SwitchLocaleButton.vue';
-    import { api } from '../composables/api';
+    import { api } from '../shared/composables/api';
     import { useSessionStore } from "../stores/session";
     import { useLoadingStore } from '../stores/loading';
 

@@ -2,17 +2,17 @@
     import { ref, reactive, shallowRef, onMounted, computed } from 'vue'
     import { useI18n } from "vue-i18n";
     import { NButton, NButtonGroup, NModal, NTag, NInput, NIcon } from 'naive-ui'
-    import { api } from '../composables/api';
+    import { api } from '../shared/composables/api';
     import { IconEdit, IconPlus, IconTrash, IconSearch, IconArrowUp, IconArrowDown } from '@tabler/icons-vue';
-    import { getNaiveUITagColorProperty } from '../composables/color';
-    import type { ProjectPriorityInterface } from '../types/models/projectPriority';
-    import type { SearchProjectPrioritiesResponse } from '../types/apiResponses';
-    import { type AjaxStateInterface, defaultAjaxState } from '../types/ajaxState';
-    import { type EntityAction } from '../types/common';
+    import { getNaiveUITagColorProperty } from '../shared/composables/color';
+    import type { ProjectPriorityInterface } from '../shared/types/models/projectPriority';
+    import type { SearchProjectPrioritiesResponse } from '../shared/types/apiResponses';
+    import { type AjaxStateInterface, defaultAjaxState } from '../shared/types/ajaxState';
+    import { type EntityAction } from '../shared/types/common';
     import { useLoadingStore } from '../stores/loading';
-    import { useNotify } from '../composables/notification';
+    import { useNotify } from '../shared/composables/notification';
     import { default as ProjectPriorityForm } from '../components/forms/ProjectTypeForm.vue';
-    import { default as ManageTable } from '../components/custom/ManageTable.vue';
+    import ManageTable from '../shared/components/tables/ManageTable.vue';
 
     const { notify } = useNotify();
 
@@ -131,7 +131,7 @@
             <tr v-for="projectPriority, index in projectPriorities" :key="projectPriority.id">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(projectPriority.hexColor)">{{ projectPriority.name
-                    }}</n-tag>
+                        }}</n-tag>
                 </td>
                 <td class="text-center">
                     <n-button-group>

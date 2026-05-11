@@ -1,6 +1,6 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
 import { useNavigatorLanguage } from "@vueuse/core";
-import { createStorageEntry } from "../composables/localStorage";
+import { createStorageEntry } from "../shared/composables/localStorage";
 import { availableSystemLocales } from "../i18n";
 import { DEFAULT_LOCALE } from "../constants";
 

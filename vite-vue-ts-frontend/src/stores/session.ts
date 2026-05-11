@@ -1,5 +1,5 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
-import { User } from "../api/models/user";
+import { User } from "../modules/users/models/user";
 
 interface State {
   session: {

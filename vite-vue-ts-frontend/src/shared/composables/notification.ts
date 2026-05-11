@@ -1,6 +1,6 @@
 import { type NotificationType, useNotification } from "naive-ui";
 
-import { useUserSettingsStore } from "../stores/userSettings";
+import { useUserSettingsStore } from "../../stores/userSettings";
 
 export const useNotify = () => {
   const userSettingsStore = useUserSettingsStore();

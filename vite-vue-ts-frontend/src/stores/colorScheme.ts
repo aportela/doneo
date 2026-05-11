@@ -1,5 +1,5 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
-import { createStorageEntry } from "../composables/localStorage";
+import { createStorageEntry } from "../shared/composables/localStorage";
 
 type Schemes = "dark" | "light";
 

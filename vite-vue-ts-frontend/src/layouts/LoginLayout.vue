@@ -2,7 +2,7 @@
     import { ref, onMounted } from "vue";
     import { useRoute, useRouter } from 'vue-router';
     import { useSessionStore } from "../stores/session";
-    import { TokenManager } from '../api/services/tokenManager';
+    import { TokenManager } from "../modules/auth/services/tokenManager";
 
     const router = useRouter();
     const route = useRoute();
