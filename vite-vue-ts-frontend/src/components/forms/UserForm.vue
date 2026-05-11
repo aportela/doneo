@@ -3,73 +3,55 @@
     import { useI18n } from "vue-i18n";
     import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconEye, IconEyeCancel } from '@tabler/icons-vue';
-    import { type AxiosAPIError } from '../../composables/axios';
-    import type { EntityAction } from '../../types/common';
-    import { type GetUserResponse } from '../../types/apiResponses';
-    import { type UserInterface, UserClass, maxNameLength, maxEmailLength } from '../../types/models/user';
-    import { type AjaxStateInterface, defaultAjaxState } from '../../types/ajaxState';
-    import { api } from '../../composables/api';
-    import { required, minLength, validEmail, runValidators } from '../../composables/form-validators';
-    import { default as RemoteAPIAlert } from '../alerts/RemoteAPIAlert.vue';
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../types/ajaxState';
+    import { User, maxNameLength, maxEmailLength } from '../../api/models/user';
+    import { userService } from '../../api/services/user';
+    import { handleAPIError } from '../../api/client/errorHandler';
+    import type { AddRequest, GetResponse, UpdateRequest } from '../../api/types/dto/user';
+    import { required, minLength, validEmail, runValidators, maxLength } from '../../composables/form-validators';
+    import RemoteAPIAlert from '../alerts/RemoteAPIAlert.vue';
 
-    const emit = defineEmits(['add', 'update', 'cancel'])
-
-    const { t } = useI18n();
+    type Mode = "add" | "update";
 
     interface UserFormProps {
-        mode: EntityAction;
+        mode: Mode;
         userId?: string;
         style?: string | CSSProperties;
     }
 
+    const emit = defineEmits(['add', 'update', 'cancel'])
+
     const props = defineProps<UserFormProps>();
 
-    const user = ref<UserInterface>(
-        new UserClass({ "id": "", name: "", email: "", isSuperUser: false, createdAt: 0, updatedAt: 0, deletedAt: 0, avatarURL: "" })
+    const { t } = useI18n();
+
+    const user = ref<User>(
+        new User({ "id": "", name: "", email: "", isSuperUser: false, createdAt: 0, updatedAt: 0, deletedAt: 0, avatarUrl: "" })
     );
 
-    const addMode = computed<boolean>(() => props.mode === "add");
-    const updateMode = computed<boolean>(() => props.mode === "update");
-
-    const title = computed<string>(() => {
-        switch (props.mode) {
-            case "add":
-                return t("Add user");
-            case "update":
-                return t("Update user");
-            default:
-                return "";
-        }
-    });
-
-    const saveButtonDisabled = computed<boolean>(() => {
-        const inactiveMode = !(addMode.value || updateMode.value);
-        const noName = !user.value.name;
-        return inactiveMode || noName;
-    });
-
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
+
+    const serverErrors = ref<Record<string, string>>({});
 
     const userFormRef = ref<FormInst | null>(null)
 
     const userFormValues = ref({ name: null });
 
-    const serverErrors = ref<Record<string, string>>({});
-
-    const projectTypeFormRules: FormRules = {
+    const userFormRules: FormRules =
+    {
         name: {
             validator: (_rule: FormItemRule, value) => {
                 if (state.ajaxRunning) return true;
-                const localResult = runValidators(value, [required('name'), minLength(3)])
+                const localResult = runValidators(value, [required('name'), minLength(3), maxLength(maxNameLength)])
                 if (localResult !== true) return localResult
                 if (serverErrors.value.name) return new Error(serverErrors.value.name)
                 return true
             },
-            trigger: ['blur', 'input'],
+            trigger: ['blur'],
         },
         email: {
             validator: (_rule: FormItemRule, value) => {
-                const localResult = runValidators(value, [required('Email'), validEmail])
+                const localResult = runValidators(value, [required('Email'), validEmail, maxLength(maxEmailLength)])
                 if (localResult !== true) return localResult
                 if (serverErrors.value.email) return new Error(serverErrors.value.email)
                 return true
@@ -87,6 +69,21 @@
         }
     };
 
+    const title = computed<string>(() => {
+        switch (props.mode) {
+            case "add":
+                return t("Add user");
+            case "update":
+                return t("Update user");
+            default:
+                return "";
+        }
+    });
+
+    const isSaveDisabled = computed<boolean>(() => {
+        return !user.value.name;
+    });
+
     watch(() => userFormValues.value.name, () => {
         delete serverErrors.value.name
     });
@@ -95,117 +92,142 @@
         serverErrors.value = {};
         try {
             await userFormRef.value?.validate();
-            if (addMode.value) {
-                onAdd();
-            } else if (updateMode.value) {
-                onUpdate()
+            if (props.mode === "add") {
+                await onAdd();
             } else {
-                console.error("onSave invalid mode");
+                await onUpdate()
             }
-        } catch (e) {
-            //console.debug("User form validation error", e)
+        } catch (error) {
+            console.debug("User form validation error", error)
         }
-    }
-
-    const onGet = (id: string) => {
-        Object.assign(state, defaultAjaxState);
-        state.ajaxRunning = true;
-        api.user.get(id).then((response: GetUserResponse) => {
-            if (response.data.user.id === id) {
-                user.value = response.data.user;
-            } else {
-                state.ajaxErrorMessage = t("There was a problem loading the user data");
-            }
-        }).catch((errorResponse: AxiosAPIError) => {
-            state.ajaxErrors = true;
-            if (errorResponse.isAPIError) {
-                state.ajaxAPIErrorDetails = errorResponse.customAPIErrorDetails;
-                switch (errorResponse.status) {
-                    case 401:
-                        state.ajaxErrors = false;
-                        //bus.emit("reAuthRequired", { emitter: "DocumentPage.onRefresh" });
-                        break;
-                    case 404:
-                        state.ajaxErrorMessage = t("We couldn’t find the specified user");
-                        break;
-                    default:
-                        state.ajaxErrorMessage = t("There was a problem loading the user data");
-                        break;
-                }
-            } else {
-                state.ajaxErrorMessage = t("There was a problem loading the user data");
-                console.error(errorResponse);
-            }
-        }).finally(() => {
-            state.ajaxRunning = false;
-        });
-    };
-
-    const onAdd = () => {
-        Object.assign(state, defaultAjaxState);
-        state.ajaxRunning = true;
-        api.user.add(user.value).then((_response: any) => {
-            emit('add')
-        }).catch((errorResponse: AxiosAPIError) => {
-            state.ajaxErrors = true;
-            if (errorResponse.isAPIError) {
-                state.ajaxAPIErrorDetails = errorResponse.customAPIErrorDetails;
-                switch (errorResponse.status) {
-                    case 401:
-                        state.ajaxErrors = false;
-                        //bus.emit("reAuthRequired", { emitter: "DocumentPage.onRefresh" });
-                        break;
-                    case 409:
-                        // TODO: conflict (invalid id || name ?)
-                        state.ajaxErrorMessage = t("There was a problem adding the user data");
-                        break;
-                    default:
-                        state.ajaxErrorMessage = t("There was a problem adding the user data");
-                        break;
-                }
-            } else {
-                state.ajaxErrorMessage = t("There was a problem adding the user data");
-                console.error(errorResponse);
-            }
-        }).finally(() => {
-            state.ajaxRunning = false;
-        });
-    };
-
-    const onUpdate = () => {
-        Object.assign(state, defaultAjaxState);
-        state.ajaxRunning = true;
-        api.user.update(user.value).then((_response: any) => {
-            emit('update')
-        }).catch((errorResponse: AxiosAPIError) => {
-            state.ajaxErrors = true;
-            if (errorResponse.isAPIError) {
-                state.ajaxAPIErrorDetails = errorResponse.customAPIErrorDetails;
-                switch (errorResponse.status) {
-                    case 401:
-                        state.ajaxErrors = false;
-                        //bus.emit("reAuthRequired", { emitter: "DocumentPage.onRefresh" });
-                        break;
-                    case 409:
-                        // TODO: conflict (invalid id || name ?)
-                        state.ajaxErrorMessage = t("There was a problem updating the user data");
-                        break;
-                    default:
-                        state.ajaxErrorMessage = t("There was a problem updating the user data");
-                        break;
-                }
-            } else {
-                state.ajaxErrorMessage = t("There was a problem updating the user data");
-                console.error(errorResponse);
-            }
-        }).finally(() => {
-            state.ajaxRunning = false;
-        });
     };
 
     const onCancel = () => {
         emit('cancel')
     }
+
+
+    const onGet = async (id: string) => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const response: GetResponse = await userService.get(id);
+            if (response.user.id === id) {
+                user.value = new User(response.user);
+            } else {
+                state.ajaxErrorMessage = t("There was a problem loading the user data");
+            }
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 404:
+                            serverErrors.value.email = t("Email not found");
+                            break;
+                        case 401:
+                            state.ajaxErrors = false;
+                            //bus.emit("reAuthRequired", { emitter: "DocumentPage.onRefresh" });
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("API Error: fatal error");
+                            break;
+                    }
+                    userFormRef.value?.restoreValidation();
+                    userFormRef.value?.validate().then(() => { }).catch(() => { });
+                },
+                (fatalError) => {
+                    console.error("Unhandled API error", { file: "UserForm.vue", method: "onGet" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+        }
+    };
+
+    const onAdd = async () => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const payload: AddRequest = {
+                user: {
+                    name: user.value.name,
+                    email: user.value.email,
+                    isSuperUser: user.value.isSuperUser,
+                }
+            };
+            await userService.add(payload);
+            emit('add')
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        /*
+                        case 401:
+                        state.ajaxErrors = false;
+                        //bus.emit("reAuthRequired", { emitter: "DocumentPage.onRefresh" });
+                        break;
+                    case 409:
+                        // TODO: conflict (invalid id || name ?)
+                        state.ajaxErrorMessage = t("There was a problem adding the user data");
+                        break;
+                    default:
+                        state.ajaxErrorMessage = t("There was a problem adding the user data");
+                        break;
+                            */
+                    }
+                    //signInFormRef.value?.restoreValidation();
+                    //signInFormRef.value?.validate().then(() => { }).catch(() => { });
+                },
+                (fatalError) => {
+                    console.error("Unhandled API error", { file: "UserForm.vue", method: "onGet" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+        }
+    };
+
+    const onUpdate = async () => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const payload: UpdateRequest = {
+                user: {
+                    id: user.value.id,
+                    name: user.value.name,
+                    email: user.value.email,
+                    isSuperUser: user.value.isSuperUser,
+                }
+            };
+            await userService.update(payload);
+            emit('update')
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        /*
+                        case 401:
+                        state.ajaxErrors = false;
+                        //bus.emit("reAuthRequired", { emitter: "DocumentPage.onRefresh" });
+                        break;
+                    case 409:
+                        // TODO: conflict (invalid id || name ?)
+                        state.ajaxErrorMessage = t("There was a problem adding the user data");
+                        break;
+                    default:
+                        state.ajaxErrorMessage = t("There was a problem adding the user data");
+                        break;
+                            */
+                    }
+                    //signInFormRef.value?.restoreValidation();
+                    //signInFormRef.value?.validate().then(() => { }).catch(() => { });
+                },
+                (fatalError) => {
+                    console.error("Unhandled API error", { file: "UserForm.vue", method: "onGet" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+        }
+    };
+
 
     onMounted(() => {
         if (props.mode === "update") {
@@ -228,7 +250,7 @@
         <template #header-extra>
             <n-spin v-if="state.ajaxRunning" size="small" />
         </template>
-        <n-form ref="projectTypeFormRef" :model="user" :rules="projectTypeFormRules" :disabled="state.ajaxRunning">
+        <n-form ref="projectTypeFormRef" :model="user" :rules="userFormRules" :disabled="state.ajaxRunning">
             <n-form-item :label="t('Name')" path="name" show-feedback>
                 <n-input :placeholder="t('Name')" v-model:value="user.name" :maxlength="maxNameLength"
                     :show-count="true" clearable required autofocus></n-input>
@@ -249,21 +271,20 @@
                 </n-input>
             </n-form-item>
         </n-form>
-        <template #footer>
-            <RemoteAPIAlert v-if="state.ajaxErrorMessage" type="error" :title="t('Error')"
-                :message="state.ajaxErrorMessage" />
+        <template #footer v-if="state.ajaxErrorMessage">
+            <RemoteAPIAlert type="error" :title="t('Error')" :message="state.ajaxErrorMessage" />
         </template>
         <template #action>
             <n-flex>
-                <n-button @click="onSave" v-if="addMode || updateMode" :disabled="saveButtonDisabled">
+                <n-button @click="onSave" :disabled="isSaveDisabled">
                     <template #icon>
-                        <IconDeviceFloppy />
+                        <n-icon :component="IconDeviceFloppy" />
                     </template>
                     {{ t("Save") }}
                 </n-button>
                 <n-button @click="onCancel" :disabled="state.ajaxRunning">
                     <template #icon>
-                        <IconCancel />
+                        <n-icon :component="IconCancel" />
                     </template>
                     {{ t("Cancel") }}
                 </n-button>
