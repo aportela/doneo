@@ -338,6 +338,33 @@
         },
     ];
 
+    const columns = [
+        {
+            label: "Type",
+            field: "isSuperUser",
+        },
+        {
+            label: "Name",
+            field: "name",
+        },
+        {
+            label: "Email",
+            field: "email",
+        },
+        {
+            label: "Created at",
+            field: "createdAt"
+        },
+        {
+            label: "Updated at",
+            field: "updatedAt"
+        },
+        {
+            label: "Deleted at",
+            field: "deletedAt"
+        },
+
+    ];
 </script>
 
 <template>
@@ -360,30 +387,13 @@
         </n-flex>
         <ManageTable size="small">
             <template #thead>
-                <tr>
-                    <th class="cursor-pointer th-content" @click="onToggleSort('isSuperUser')">
-                        <span>Type</span>
-                        <TableCellHeaderSortIcon :order="sortOrder" v-if="sortField === 'isSuperUser'" />
-                    </th>
-                    <th class="cursor-pointer" @click="onToggleSort('name')">
-                        <span>Name</span>
-                        <TableCellHeaderSortIcon :order="sortOrder" v-if="sortField === 'name'" />
-                    </th>
-                    <th class="cursor-pointer" @click="onToggleSort('email')">
-                        <span>Email</span>
-                        <TableCellHeaderSortIcon :order="sortOrder" v-if="sortField === 'email'" />
-                    </th>
-                    <th class="cursor-pointer" @click="onToggleSort('createdAt')">
-                        <span>Created at</span>
-                        <TableCellHeaderSortIcon :order="sortOrder" v-if="sortField === 'createdAt'" />
-                    </th>
-                    <th class="cursor-pointer" @click="onToggleSort('updatedAt')">
-                        <span>Updated at</span>
-                        <TableCellHeaderSortIcon :order="sortOrder" v-if="sortField === 'updatedAt'" />
-                    </th>
-                    <th class="cursor-pointer" @click="onToggleSort('deletedAt')">
-                        <span>Deleted at</span>
-                        <TableCellHeaderSortIcon :order="sortOrder" v-if="sortField === 'deletedAt'" />
+                <tr class="table-header-click-action">
+                    <th v-for="column in columns" :key="column.field" @click="onToggleSort(column.field)">
+                        <n-flex justify="space-between">
+                            <span>{{ column.label }}</span>
+
+                            <TableCellHeaderSortIcon v-if="sortField === column.field" :order="sortOrder" />
+                        </n-flex>
                     </th>
                     <th class="text-center">Operations</th>
                 </tr>
@@ -523,11 +533,12 @@
         border-radius: 3px;
     }
 
-    .th-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
+    .table-header-click-action th:not(:last-of-type) {
+        cursor: pointer;
+    }
+
+    .table-header-click-action th:not(:last-of-type) .n-icon {
+        margin-top: 4px;
     }
 
     @media (max-width: 768px) {
