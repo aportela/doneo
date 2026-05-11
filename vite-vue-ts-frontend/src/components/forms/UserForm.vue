@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, onMounted, watch, type CSSProperties } from 'vue';
+    import { ref, reactive, computed, onMounted, type CSSProperties } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
@@ -36,8 +36,6 @@
     const serverErrors = ref<Record<string, string>>({});
 
     const userFormRef = ref<FormInst | null>(null)
-
-    const userFormValues = ref({ name: null });
 
     const userFormRules: FormRules =
     {
@@ -84,10 +82,6 @@
 
     const isSaveDisabled = computed<boolean>(() => {
         return !user.value.name;
-    });
-
-    watch(() => userFormValues.value.name, () => {
-        delete serverErrors.value.name
     });
 
     const onSave = async () => {
@@ -253,7 +247,7 @@
         <template #header-extra>
             <n-spin v-if="state.ajaxRunning" size="small" />
         </template>
-        <n-form ref="projectTypeFormRef" :model="user" :rules="userFormRules" :disabled="state.ajaxRunning">
+        <n-form ref="userFormRef" :model="user" :rules="userFormRules" :disabled="state.ajaxRunning">
             <n-form-item :label="t('Name')" path="name" show-feedback>
                 <n-input :placeholder="t('Name')" v-model:value="user.name" :maxlength="maxNameLength"
                     :show-count="true" clearable required autofocus></n-input>
