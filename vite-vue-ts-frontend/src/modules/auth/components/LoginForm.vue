@@ -29,7 +29,6 @@
     const localStorageLastUsedEmail = createStorageEntry<string | null>("lastUsedEmail", null);
 
     const lastUsedEmail = localStorageLastUsedEmail.get();
-    console.log(lastUsedEmail)
 
     const inputEmailRef = ref<InputInst | null>(null);
     const inputPasswordRef = ref<InputInst | null>(null);
@@ -159,7 +158,7 @@
             <n-form-item>
                 <n-button secondary @click="onSignIn" block :disabled="state.ajaxRunning">{{
                     t("Sign in")
-                    }}</n-button>
+                }}</n-button>
             </n-form-item>
         </n-form>
     </n-spin>
