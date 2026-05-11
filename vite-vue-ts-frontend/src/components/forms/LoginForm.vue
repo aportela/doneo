@@ -29,6 +29,7 @@
     const localStorageLastUsedEmail = createStorageEntry<string | null>("lastUsedEmail", null);
 
     const lastUsedEmail = localStorageLastUsedEmail.get();
+    console.log(lastUsedEmail)
 
     const inputEmailRef = ref<InputInst | null>(null);
     const inputPasswordRef = ref<InputInst | null>(null);
@@ -127,7 +128,7 @@
 
     onMounted(async () => {
         await nextTick();
-        if (signinFormValues.value.email === null) {
+        if (signinFormValues.value.email == "") {
             inputEmailRef.value?.focus();
         } else {
             inputPasswordRef.value?.focus();
