@@ -16,6 +16,7 @@
     import { useAppBus, type AppBusEvent } from '../composables/bus';
     import { userService } from '../api/services/user';
     import { User } from '../api/models/user';
+    import { handleAPIError } from '../api/client/errorHandler';
     import type { UserResponse } from '../api/types/dto/user';
     import TableCellHeaderSortIcon from '../components/custom/TableCellHeaderSortIcon.vue';
     import type { SortOrder } from '../types/common';
@@ -105,36 +106,30 @@
             totalPages.value = response.pager.totalPages;
             totalResuls.value = response.pager.totalResults;
             users.value = response.users.map((user: UserResponse) => new SearchableUser(user));
+        } catch (error: unknown) {
+            users.value.length = 0;
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emitReauthRequired("ManageUsersPage.onRefresh");
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("There was a problem while refreshing the user list");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("There was a problem while refreshing the user list");
+                    console.error("Unhandled API error", { file: "ManageUsersPage.vue", method: "onRefresh" }, { err: fatalError });
+                });
         }
         finally {
             state.ajaxRunning = false;
             loadingStore.set(false);
         }
-        /*
-        api.user.search().then((successResponse: SearchUsersResponse) => {
-            users.value = successResponse.data.users.map((u: UserInterface) => new UserClass(u));
-        }).catch((errorResponse: AxiosAPIError) => {
-            state.ajaxErrors = true;
-            if (errorResponse.isAPIError) {
-                state.ajaxAPIErrorDetails = errorResponse.customAPIErrorDetails;
-                switch (errorResponse.status) {
-                    case 401:
-                        state.ajaxErrors = false;
-                        appBus.emitReauthRequired("ManageUsersPage.onRefresh");
-                        break;
-                    default:
-                        state.ajaxErrorMessage = t("There was a problem while refreshing the user list");
-                        break;
-                }
-            } else {
-                state.ajaxErrorMessage = t("There was a problem while refreshing the user list");
-                console.error(errorResponse);
-            }
-        }).finally(() => {
-            loadingStore.set(false);
-            state.ajaxRunning = false;
-        });
-        */
     };
 
     const selectedUserId = ref<string | undefined>(undefined);
