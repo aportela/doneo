@@ -37,7 +37,7 @@ func generateRandomEmail(fullName string) string {
 	firstInitial := strings.ToLower(string(parts[0][0]))
 	secondAndThirdName := strings.ToLower(parts[1]) + "." + strings.ToLower(parts[2])
 	randomNumber := rand.Intn(100)
-	email := fmt.Sprintf("%s%s%d@localhost", firstInitial, secondAndThirdName, randomNumber)
+	email := fmt.Sprintf("%s%s%d@localhost.local", firstInitial, secondAndThirdName, randomNumber)
 	return email
 }
 
