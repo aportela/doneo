@@ -15,7 +15,7 @@ export default {
   // errors
   "Uncaught exception": "Excepción non controlada",
   "Invalid API response code": "Código de resposta da API incorrecto",
-  "Email not found": "O Email non existe",
+  "Email not found": "O email non existe",
   "Invalid password": "A contrasinal é incorrecta",
   "Sign in error": "Error ó inicia-la sesión",
 
