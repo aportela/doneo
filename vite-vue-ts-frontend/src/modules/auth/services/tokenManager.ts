@@ -2,6 +2,7 @@ import { authService } from "./auth";
 import { useSessionStore } from "../../../stores/session";
 import type { RenewAccessTokenResponse } from "../types/dto";
 import { User } from "../../users/models/user";
+import axios from "axios";
 
 export const TokenManager = {
   async refreshAccessToken(
@@ -16,8 +17,16 @@ export const TokenManager = {
       );
       sessionStore.setUser(new User(response.user));
       return true;
-    } catch (err) {
-      console.error("Failed to refresh token", err);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        if (error.status === 401) {
+          // normal error (no cookie || invalid refresh token)
+        } else {
+          console.error("Invalid API response code", error);
+        }
+      } else {
+        console.error("Uncaught error while refreshing token", error);
+      }
       return false;
     }
   },
