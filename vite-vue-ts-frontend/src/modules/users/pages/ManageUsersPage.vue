@@ -130,7 +130,6 @@
     };
 
     const onUpdateUser = (user: User, _index: number) => {
-        console.log(1);
         selectedUserId.value = user.id;
         userDialogMode.value = "update";
         showUserDialog.value = true;
@@ -138,7 +137,6 @@
 
 
     const onAdd = () => {
-        console.log(2);
         showUserDialog.value = false;
         notify('success', t("User added"))
         onRefresh();
@@ -158,7 +156,7 @@
         Object.assign(state, defaultAjaxState);
         state.ajaxRunning = true;
         api.user.delete(user.id).then((_response: any) => {
-            notify('success', t("User deleted"))
+            notify('success', t(`User ${user.name} has been deleted`))
             onRefresh();
         }).catch((errorResponse: AxiosAPIError) => {
             state.ajaxErrors = true;
@@ -189,7 +187,7 @@
         Object.assign(state, defaultAjaxState);
         state.ajaxRunning = true;
         api.user.unDelete(user.id).then((_response: any) => {
-            notify('success', t("User undeleted"))
+            notify('success', t(`User ${user.name} has been restored`))
             onRefresh();
         }).catch((errorResponse: AxiosAPIError) => {
             state.ajaxErrors = true;
