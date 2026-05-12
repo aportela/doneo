@@ -99,14 +99,12 @@ export default {
   "We couldn’t find the specified project type":
     "El tipo de proyecto especificado no existe",
 
-  // signin form fields
-  Email: "Email",
-  Password: "Contraseña",
-
-  // signin
+  // auth
   "Login to your account": "Inicie sesión con su cuenta",
-  "Enter your email address": "Introduzca su correo electrónico",
-  "Enter your password": "Introduzca su contraseña",
+  loginFormEmailLabel: "Email",
+  loginFormPasswordLabel: "Contraseña",
+  loginFormEmailFieldPlaceholder: "Introduzca su correo electrónico",
+  loginFormPasswordFieldPlaceholder: "Introduzca su contraseña",
 
   // other
   Error: "Error",

@@ -139,18 +139,19 @@
     <h2 class="title">{{ t("Login to your account") }}</h2>
     <n-spin :show="state.ajaxRunning" stroke="pink">
         <n-form ref="signInFormRef" :model="signinFormValues" label-width="100px" :rules="signInFormRules">
-            <n-form-item :label="t('Email')" path="email" show-feedback>
-                <n-input type="text" v-model:value="signinFormValues.email" :placeholder="t('Enter your email address')"
-                    :disabled="state.ajaxRunning" ref="inputEmailRef">
+            <n-form-item :label="t('loginFormEmailLabel')" path="email" show-feedback>
+                <n-input type="text" v-model:value="signinFormValues.email"
+                    :placeholder="t('loginFormEmailFieldPlaceholder')" :disabled="state.ajaxRunning"
+                    ref="inputEmailRef">
                     <template #prefix>
                         <n-icon :component="IconMail" />
                     </template>
                 </n-input>
             </n-form-item>
-            <n-form-item :label="t('Password')" path="password" show-feedback>
+            <n-form-item :label="t('loginFormPasswordLabel')" path="password" show-feedback>
                 <n-input v-model:value="signinFormValues.password" type="password"
-                    :placeholder="t('Enter your password')" show-password-on="click" :disabled="state.ajaxRunning"
-                    @keydown.enter="onSignIn" ref="inputPasswordRef">
+                    :placeholder="t('loginFormPasswordFieldPlaceholder')" show-password-on="click"
+                    :disabled="state.ajaxRunning" @keydown.enter="onSignIn" ref="inputPasswordRef">
                     <template #prefix>
                         <n-icon :component="IconKey" />
                     </template>
