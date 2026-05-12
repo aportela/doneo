@@ -15,9 +15,6 @@ export default {
   // errors
   "Uncaught exception": "Uncaught exception",
   "Invalid API response code": "Invalid API response code",
-  "Email not found": "Email not found",
-  "Invalid password": "Invalid password",
-  "Sign in error": "Sign in error",
 
   // text filter
   searchByNameDefaultPlaceholder: "search by name",
@@ -105,6 +102,14 @@ export default {
   loginFormPasswordLabel: "Password",
   loginFormEmailFieldPlaceholder: "Enter your email address",
   loginFormPasswordFieldPlaceholder: "Enter your password",
+  loginFormEmailFieldEmptyError: "Email is empty",
+  loginFormEmailFieldInvalidError: "Email is invalid",
+  loginFormEmailFieldTooLargeError: "Email is too large",
+  loginFormPasswordFieldEmptyError: "Password is empty",
+  loginFormPasswordFieldTooShortError: "Password is too short",
+  loginFormEmailFieldAPINotFound: "Email not found",
+  loginFormPasswordFieldIncorrect: "Invalid password",
+  "Sign in error": "Sign in error",
 
   // other
   Error: "Error",

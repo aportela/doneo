@@ -15,9 +15,6 @@ export default {
   // errors
   "Uncaught exception": "Excepción non controlada",
   "Invalid API response code": "Código de resposta da API incorrecto",
-  "Email not found": "O email non existe",
-  "Invalid password": "A contrasinal é incorrecta",
-  "Sign in error": "Error ó inicia-la sesión",
 
   // text filter
   searchByNameDefaultPlaceholder: "procurar por nome",
@@ -105,6 +102,14 @@ export default {
   loginFormPasswordLabel: "Contrasinal",
   loginFormEmailFieldPlaceholder: "Introduzca o séu correo electrónico",
   loginFormPasswordFieldPlaceholder: "Introduzca o seu contrasinal",
+  loginFormEmailFieldEmptyError: "O email está vacío",
+  loginFormEmailFieldInvalidError: "O email non ten un formato válido",
+  loginFormEmailFieldTooLargeError: "O email é moi longo",
+  loginFormPasswordFieldEmptyError: "O contrasinal está vacía",
+  loginFormPasswordFieldTooShortError: "O contrasinal é moi corto",
+  loginFormEmailFieldAPINotFound: "O email non existe",
+  loginFormPasswordFieldIncorrect: "O contrasinal é incorrecto",
+  "Sign in error": "Error ó inicia-la sesión",
 
   // other
   Error: "Error",

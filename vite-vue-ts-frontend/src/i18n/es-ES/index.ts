@@ -15,9 +15,6 @@ export default {
   // errors
   "Uncaught exception": "Excepción no controlada",
   "Invalid API response code": "Código de respuesta de la API incorrecto",
-  "Email not found": "El email no existe",
-  "Invalid password": "La contraseña es incorrecta",
-  "Sign in error": "Error al iniciar la sesión",
 
   // text filter
   searchByNameDefaultPlaceholder: "buscar por nombre",
@@ -105,6 +102,14 @@ export default {
   loginFormPasswordLabel: "Contraseña",
   loginFormEmailFieldPlaceholder: "Introduzca su correo electrónico",
   loginFormPasswordFieldPlaceholder: "Introduzca su contraseña",
+  loginFormEmailFieldEmptyError: "El email está vacío",
+  loginFormEmailFieldInvalidError: "El email no tiene un formato válido",
+  loginFormEmailFieldTooLargeError: "El email es muy largo",
+  loginFormPasswordFieldEmptyError: "La contraseña está vacía",
+  loginFormPasswordFieldTooShortError: "La contraseña es muy corta",
+  loginFormEmailFieldAPINotFound: "El email no existe",
+  loginFormPasswordFieldIncorrect: "La contraseña es incorrecta",
+  "Sign in error": "Error al iniciar la sesión",
 
   // other
   Error: "Error",

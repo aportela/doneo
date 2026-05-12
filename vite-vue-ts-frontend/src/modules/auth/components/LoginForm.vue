@@ -6,14 +6,14 @@
     import { IconEye, IconEyeCancel, IconMail, IconKey } from '@tabler/icons-vue';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from "../../../shared/types/ajaxState";
-    import { required, minLength, validEmail, runValidators } from '../../../shared/composables/form-validators';
+    import { isValidEmail } from '../../../shared/composables/form-validators';
     import { createStorageEntry } from '../../../shared/composables/localStorage';
     import { useSessionStore } from "../../../stores/session";
     import RemoteAPIAlert from '../../../shared/components/alerts/RemoteAPIAlert.vue';
     import { authService } from '../../../modules/auth/services/auth';
     import type { SignInRequest, SignInResponse } from '../../../modules/auth/types/dto';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import { User } from "../../../modules/users/models/user";
+    import { maxEmailLength, minPasswordLength, User } from "../../../modules/users/models/user";
 
     type signInFormValuesInterface = {
         email: string;
@@ -46,27 +46,43 @@
 
     const signInFormRules: FormRules = {
         email: {
-            validator: (_rule: FormItemRule, value) => {
-                const localResult = runValidators(value, [required('Email'), validEmail])
-                if (localResult !== true) return localResult
-                if (serverErrors.value.email) return new Error(serverErrors.value.email)
-                return true
+            required: true,
+            validator: (_rule: FormItemRule, value: string) => {
+                if (!value) {
+                    return new Error(t("loginFormEmailFieldEmptyError"));
+                }
+                else if (!isValidEmail(value)) {
+                    return new Error(t("loginFormEmailFieldInvalidError"));
+                }
+                else if (value.length > maxEmailLength) {
+                    return new Error(t("loginFormEmailFieldTooLargeError"));
+                } else if (serverErrors.value.email) {
+                    return new Error(t(serverErrors.value.email));
+                } else {
+                    return true
+                }
             },
             trigger: ['blur'],
         },
         password: {
-            validator: (_rule: FormItemRule, value) => {
-                const localResult = runValidators(value, [required('Password'), minLength(4)])
-                if (localResult !== true) return localResult
-                if (serverErrors.value.password) return new Error(serverErrors.value.password)
-                return true
+            required: true,
+            validator: (_rule: FormItemRule, value: string) => {
+                if (!value) {
+                    return new Error(t("loginFormPasswordFieldEmptyError"));
+                }
+                else if (value.length < minPasswordLength) {
+                    return new Error(t("loginFormPasswordFieldTooShortError"));
+                } else if (serverErrors.value.password) {
+                    return new Error(t(serverErrors.value.password));
+                } else {
+                    return true
+                }
             },
             trigger: ['blur'],
         },
     };
 
     watch(() => signinFormValues.value.email, () => { delete serverErrors.value.email });
-
     watch(() => signinFormValues.value.password, () => { delete serverErrors.value.password });
 
     const onSubmit = async () => {
@@ -89,10 +105,10 @@
                     (apiError) => {
                         switch (apiError.response?.status) {
                             case 404:
-                                serverErrors.value.email = t("Email not found");
+                                serverErrors.value.email = "loginFormEmailFieldAPINotFound";
                                 break;
                             case 401:
-                                serverErrors.value.password = t("Invalid password");
+                                serverErrors.value.password = "loginFormPasswordFieldIncorrect";
                                 break;
                             default:
                                 state.ajaxErrorMessage = t("Invalid API response code");
@@ -176,7 +192,7 @@
             <n-form-item>
                 <n-button secondary @click="onSignIn" block :disabled="state.ajaxRunning">{{
                     t("Sign in")
-                }}</n-button>
+                    }}</n-button>
             </n-form-item>
         </n-form>
     </n-spin>
