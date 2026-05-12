@@ -272,22 +272,4 @@
     </n-card>
 </template>
 
-<style lang="css">
-    .avatar {
-        margin-right: 4px;
-    }
-
-    .table-header-click-action th:not(:last-of-type) {
-        cursor: pointer;
-    }
-
-    .table-header-click-action th:not(:last-of-type) .n-icon {
-        margin-top: 4px;
-    }
-
-    @media (max-width: 768px) {
-        .hide-mobile {
-            display: none;
-        }
-    }
-</style>
+<style lang="css"></style>
