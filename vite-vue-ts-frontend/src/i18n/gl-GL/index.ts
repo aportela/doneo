@@ -114,6 +114,10 @@ export default {
   Preview: "Vista previa",
   Color: "Cor",
 
+  // tooltips
+  "show password": "mostrar contrasinal",
+  "hide password": "ocultar contrasinal",
+
   // notifications
   "Enable notifications": "Activar notificacións",
   "Disable notifications": "Desactivar notificacións",
