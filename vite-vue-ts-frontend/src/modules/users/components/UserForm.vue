@@ -101,7 +101,6 @@
         emit('cancel')
     }
 
-
     const onGet = async (id: string) => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
@@ -195,7 +194,6 @@
             state.ajaxErrors = true;
             handleAPIError(error,
                 (apiError) => {
-                    console.log(apiError.response?.status);
                     switch (apiError.response?.status) {
                         /*
                         case 401:
@@ -233,7 +231,7 @@
                 console.error(`TODO: missing userId property for ${props.mode} action`);
             }
         } else if (props.mode === "add") {
-            userFormRef.value?.validate();
+            //userFormRef.value?.validate();
         }
     });
 
@@ -267,7 +265,7 @@
                     </template>
                 </n-input>
                 <n-button v-else @click="onShowPasswordFormItem" block>{{ t("userFormChangePasswordButtonLabel")
-                }}</n-button>
+                    }}</n-button>
             </n-form-item>
         </n-form>
         <template #footer v-if="state.ajaxErrorMessage">
