@@ -1,6 +1,8 @@
 package browser
 
-import "math"
+import (
+	"math"
+)
 
 const (
 	DefaultResultsPage = 20
@@ -20,7 +22,7 @@ func (p Params) getCurrentPage() int {
 }
 
 func (p Params) getResultsPage() int {
-	if p.ResultsPage <= 0 {
+	if p.ResultsPage < 0 {
 		return DefaultResultsPage
 	}
 
