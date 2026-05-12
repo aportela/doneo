@@ -93,6 +93,7 @@ func (h *UserHandler) Patch(w http.ResponseWriter, r *http.Request) {
 func (h *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	userId := chi.URLParam(r, "id")
+	// TODO: deny delete current session user ?
 	err := h.service.Delete(r.Context(), userId)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserService] failed to delete user: %w", err))
