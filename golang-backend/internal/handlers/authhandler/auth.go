@@ -91,6 +91,7 @@ func (h *AuthHandler) RenewAccessToken(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("refresh_token")
 	// TODO: refresh token in request ?
 	if err != nil {
+		// TODO: return APIError JSON HERE !
 		http.Error(w, "No refresh token cookie found", http.StatusUnauthorized)
 		return
 	}
@@ -98,16 +99,19 @@ func (h *AuthHandler) RenewAccessToken(w http.ResponseWriter, r *http.Request) {
 	refreshToken.Token = cookie.Value
 	userId, err := jwt.VerifyToken(refreshToken.Token, h.secretKey)
 	if err != nil {
+		// TODO: return APIError JSON HERE !
 		http.Error(w, "Invalid token", http.StatusUnauthorized)
 		return
 	}
 	user, err := h.service.GetUserInfo(r.Context(), userId)
 	if err != nil {
+		// TODO: return APIError JSON HERE !
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] failed to get user info: %w", err))
 		return
 	}
 	accessToken, err := jwt.GenerateToken(user, time.Now().Add(time.Duration(h.accessTokenExpirationHours)*time.Hour), h.secretKey)
 	if err != nil {
+		// TODO: return APIError JSON HERE !
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] failed to generate access token: %w", err))
 		return
 	}
