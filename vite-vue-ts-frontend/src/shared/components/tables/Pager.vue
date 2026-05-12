@@ -1,4 +1,6 @@
 <script setup lang="ts">
+    import { useI18n } from "vue-i18n";
+
     import { NFlex, NPagination } from 'naive-ui';
 
     interface PagerProps {
@@ -8,6 +10,7 @@
 
     const props = defineProps<PagerProps>();
 
+    const { t } = useI18n();
     const pageSizes = [
         {
             label: 'All results',
@@ -46,26 +49,31 @@
 </script>
 
 <template>
-    <n-flex justify="space-between" class="pagination-container">
-        <div style="padding-top: 2px; padding-left: 2px;">
+    <n-flex justify="space-between" class="doneo-pagination-container">
+        <div class="doneo-pagination-total-results-container">
             <span>Total results: {{ props.totalResults }}</span>
         </div>
-        <n-pagination v-model:page="currentPage" :page-count="totalPages" v-model:page-size="pageSize" show-size-picker
-            :page-sizes="pageSizes" :page-slot="8">
+        <n-pagination v-model:page="currentPage" v-model:page-size="pageSize" :page-count="totalPages"
+            :page-sizes="pageSizes" show-size-picker :page-slot="8">
             <template #prefix="{ page, pageCount }">
-                Page {{ page }} of {{ pageCount }}
+                {{ t("labelPageOfTotalPages", { currentPage: page, totalPages: pageCount }) }}
             </template>
         </n-pagination>
     </n-flex>
 </template>
 
 <style lang="css" scoped>
-    .pagination-container {
+    .doneo-pagination-container {
         padding: 4px;
         background-color: rgba(250, 250, 252, 1);
         margin-bottom: 8px;
         border: 1px solid;
         border-color: rgb(239, 239, 245);
         border-radius: 3px;
+    }
+
+    .doneo-doneo-pagination-total-results-container {
+        padding-top: 2px;
+        padding-left: 2px;
     }
 </style>

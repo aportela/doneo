@@ -114,4 +114,7 @@ export default {
   "Switch to light mode": "Cambiar a modo claro",
   "Switch to top navigation": "Cambiar a navegación superior",
   "Switch to side navigation": "Cambiar a navegación lateral",
+
+  // pager
+  labelPageOfTotalPages: "Página {currentPage} de {totalPages}",
 };
