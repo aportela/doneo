@@ -211,7 +211,7 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="7" v-if="users.length < 1 && !props.loading">
+                <td :colspan="columns.length + 1" v-if="users.length < 1 && !props.loading">
                     <n-empty :description="t('No results')">
                     </n-empty>
                 </td>
