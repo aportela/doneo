@@ -158,8 +158,8 @@
                     <!-- TODO: hide icon /label on small screens ? -->
                     <span class="doneo-flex-center-align">
                         <n-icon :size="16" style="margin-right: 6px;"
-                            :component="user.isSuperUser ? IconUserKey : IconUser">
-                            <IconUserKey color="red" />
+                            :component="user.isSuperUser ? IconUserKey : IconUser"
+                            :color="user.isSuperUser ? 'red' : undefined">
                         </n-icon>
                         {{ t(user.isSuperUser ? "AdminTypeValue" : "UserTypeValue") }}
                     </span>
