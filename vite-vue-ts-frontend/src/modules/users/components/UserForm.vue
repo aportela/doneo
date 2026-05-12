@@ -3,7 +3,7 @@
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, type InputInst } from 'naive-ui';
-    import { IconCancel, IconDeviceFloppy, IconEye, IconEyeCancel } from '@tabler/icons-vue';
+    import { IconCancel, IconDeviceFloppy, IconEye, IconEyeCancel, IconMail, IconUser, IconUserEdit, IconUserPlus, IconKey } from '@tabler/icons-vue';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { User, maxNameLength, maxEmailLength } from '../models/user';
@@ -240,7 +240,10 @@
 <template>
     <n-card :style="style" bordered>
         <template #header>
-            {{ t(props.mode == "add" ? "Add user" : "Update user") }}
+            <div class="doneo-flex-center-align">
+                <n-icon :component="props.mode == 'add' ? IconUserPlus : IconUserEdit" />
+                {{ t(props.mode == "add" ? "Add user" : "Update user") }}
+            </div>
         </template>
         <template #header-extra>
             <n-spin v-if="state.ajaxRunning" size="small" />
@@ -248,15 +251,26 @@
         <n-form ref="userFormRef" :model="user" :rules="userFormRules" :disabled="state.ajaxRunning">
             <n-form-item :label="t('userFormNameLabel')" path="name" show-feedback>
                 <n-input type="text" :placeholder="t('userFormNameFieldPlaceholder')" v-model:value="user.name"
-                    :maxlength="maxNameLength" :show-count="true" clearable required autofocus></n-input>
+                    :maxlength="maxNameLength" :show-count="true" clearable required autofocus>
+                    <template #prefix>
+                        <n-icon :size="16" :component="IconUser" />
+                    </template>
+                </n-input>
             </n-form-item>
             <n-form-item :label="t('userFormEmailLabel')" path="email" show-feedback>
                 <n-input type="text" :placeholder="t('userFormEmailFieldPlaceholder')" v-model:value="user.email"
-                    :maxlength="maxEmailLength" :show-count="true" clearable required autofocus></n-input>
+                    :maxlength="maxEmailLength" :show-count="true" clearable required autofocus>
+                    <template #prefix>
+                        <n-icon :size="16" :component="IconMail" />
+                    </template>
+                </n-input>
             </n-form-item>
             <n-form-item :label="t('userFormPasswordLabel')" path="password" show-feedback>
                 <n-input v-if="showPasswordField" type="password" :placeholder="t('userFormPasswordFieldPlaceholder')"
                     show-password-on="click" ref="inputPasswordRef">
+                    <template #prefix>
+                        <n-icon :size="16" :component="IconKey" />
+                    </template>
                     <template #password-visible-icon>
                         <n-icon :size="16" :component="IconEyeCancel" />
                     </template>
@@ -265,7 +279,7 @@
                     </template>
                 </n-input>
                 <n-button v-else @click="onShowPasswordFormItem" block>{{ t("userFormChangePasswordButtonLabel")
-                    }}</n-button>
+                }}</n-button>
             </n-form-item>
         </n-form>
         <template #footer v-if="state.ajaxErrorMessage">
@@ -291,4 +305,8 @@
 
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+    .doneo-flex-center-align .n-icon {
+        margin-right: 4px;
+    }
+</style>
