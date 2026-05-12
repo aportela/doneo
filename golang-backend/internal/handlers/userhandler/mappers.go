@@ -41,24 +41,6 @@ func userToResponse(user domain.User) userResponse {
 	}
 }
 
-func userToAddResponse(user domain.User) addResponse {
-	return addResponse{
-		User: userToResponse(user),
-	}
-}
-
-func userToUpdateResponse(user domain.User) updateResponse {
-	return updateResponse{
-		User: userToResponse(user),
-	}
-}
-
-func userToGetResponse(user domain.User) getResponse {
-	return getResponse{
-		User: userToResponse(user),
-	}
-}
-
 func userArrayToResponse(users []domain.User) []userResponse {
 	userResponses := []userResponse{}
 	for _, user := range users {

@@ -1,18 +1,17 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, onMounted, type CSSProperties } from 'vue';
+    import { ref, reactive, computed, onMounted, type CSSProperties, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
+    import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, type InputInst } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconEye, IconEyeCancel } from '@tabler/icons-vue';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { User, maxNameLength, maxEmailLength } from '../models/user';
     import { userService } from '../services/user'
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import type { AddRequest, GetResponse, UpdateRequest } from '../types/dto';
+    import type { UserResponse, AddRequest, UpdateRequest } from '../types/dto';
     import { required, minLength, validEmail, runValidators, maxLength } from '../../../shared/composables/form-validators';
     import RemoteAPIAlert from '../../../shared/components/alerts/RemoteAPIAlert.vue';
-
     import type { FormMode } from '../types/form-mode';
 
     interface UserFormProps {
@@ -33,37 +32,42 @@
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
+    const showPasswordField = ref<boolean>(true);
+
     const serverErrors = ref<Record<string, string>>({});
 
     const userFormRef = ref<FormInst | null>(null)
+
+    const inputPasswordRef = ref<InputInst | null>(null);
 
     const userFormRules: FormRules =
     {
         name: {
             validator: (_rule: FormItemRule, value) => {
                 if (state.ajaxRunning) return true;
-                const localResult = runValidators(value, [required('name'), minLength(3), maxLength(maxNameLength)])
-                if (localResult !== true) return localResult
+                const localResult = true;//runValidators(value, [required('name'), minLength(3), maxLength(maxNameLength)])
+                if (localResult !== true) return localResult;
                 if (serverErrors.value.name) return new Error(serverErrors.value.name)
-                return true
+                return true;
             },
             trigger: ['blur'],
         },
         email: {
             validator: (_rule: FormItemRule, value) => {
-                const localResult = runValidators(value, [required('Email'), validEmail, maxLength(maxEmailLength)])
-                if (localResult !== true) return localResult
+                const localResult = true;//runValidators(value, [required('Email'), validEmail, maxLength(maxEmailLength)])
+                if (localResult !== true) return localResult;
                 if (serverErrors.value.email) return new Error(serverErrors.value.email)
-                return true
+                return true;
             },
             trigger: ['blur'],
         },
         password: {
             validator: (_rule: FormItemRule, value) => {
-                const localResult = runValidators(value, [required('Password'), minLength(4)])
-                if (localResult !== true) return localResult
+                if (!showPasswordField.value) return true;
+                const localResult = true;//runValidators(value, [required('Password'), minLength(4)])
+                if (localResult !== true) return localResult;
                 if (serverErrors.value.password) return new Error(serverErrors.value.password)
-                return true
+                return true;
             },
             trigger: ['blur']
         }
@@ -72,6 +76,12 @@
     const isSaveDisabled = computed<boolean>(() => {
         return !user.value.name;
     });
+
+    const onShowPasswordFormItem = async () => {
+        showPasswordField.value = true;
+        await nextTick();
+        inputPasswordRef.value?.focus();
+    };
 
     const onSave = async () => {
         serverErrors.value = {};
@@ -95,11 +105,11 @@
     const onGet = async (id: string) => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const response: GetResponse = await userService.get(id);
-            if (response.user.id === id) {
-                user.value = new User(response.user);
+            const response: UserResponse = await userService.get(id);
+            if (response.id === id) {
+                user.value = new User(response);
             } else {
-                state.ajaxErrorMessage = t("There was a problem loading the user data");
+                state.ajaxErrorMessage = t("There was a problem while loading the user data");
             }
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -121,6 +131,7 @@
                     userFormRef.value?.validate().then(() => { }).catch(() => { });
                 },
                 (fatalError) => {
+                    state.ajaxErrorMessage = t("There was a problem while loading the user data");
                     console.error("Unhandled API error", { file: "UserForm.vue", method: "onGet" }, { err: fatalError });
                 });
         } finally {
@@ -132,11 +143,9 @@
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const payload: AddRequest = {
-                user: {
-                    name: user.value.name,
-                    email: user.value.email,
-                    isSuperUser: user.value.isSuperUser,
-                }
+                name: user.value.name,
+                email: user.value.email,
+                isSuperUser: user.value.isSuperUser,
             };
             await userService.add(payload);
             emit('add')
@@ -154,16 +163,17 @@
                         // TODO: conflict (invalid id || name ?)
                         state.ajaxErrorMessage = t("There was a problem adding the user data");
                         break;
-                    default:
-                        state.ajaxErrorMessage = t("There was a problem adding the user data");
-                        break;
-                            */
+                        */
+                        default:
+                            state.ajaxErrorMessage = t("There was a problem while adding the user data");
+                            break;
                     }
                     //signInFormRef.value?.restoreValidation();
                     //signInFormRef.value?.validate().then(() => { }).catch(() => { });
                 },
                 (fatalError) => {
-                    console.error("Unhandled API error", { file: "UserForm.vue", method: "onGet" }, { err: fatalError });
+                    state.ajaxErrorMessage = t("There was a problem while adding the user data");
+                    console.error("Unhandled API error", { file: "UserForm.vue", method: "onAdd" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
@@ -174,12 +184,10 @@
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const payload: UpdateRequest = {
-                user: {
-                    id: user.value.id,
-                    name: user.value.name,
-                    email: user.value.email,
-                    isSuperUser: user.value.isSuperUser,
-                }
+                id: user.value.id,
+                name: user.value.name,
+                email: user.value.email,
+                isSuperUser: user.value.isSuperUser,
             };
             await userService.update(payload);
             emit('update')
@@ -187,6 +195,7 @@
             state.ajaxErrors = true;
             handleAPIError(error,
                 (apiError) => {
+                    console.log(apiError.response?.status);
                     switch (apiError.response?.status) {
                         /*
                         case 401:
@@ -197,16 +206,17 @@
                         // TODO: conflict (invalid id || name ?)
                         state.ajaxErrorMessage = t("There was a problem adding the user data");
                         break;
-                    default:
-                        state.ajaxErrorMessage = t("There was a problem adding the user data");
-                        break;
-                            */
+                    */
+                        default:
+                            state.ajaxErrorMessage = t("There was a problem while updating the user data");
+                            break;
                     }
                     //signInFormRef.value?.restoreValidation();
                     //signInFormRef.value?.validate().then(() => { }).catch(() => { });
                 },
                 (fatalError) => {
-                    console.error("Unhandled API error", { file: "UserForm.vue", method: "onGet" }, { err: fatalError });
+                    state.ajaxErrorMessage = t("There was a problem while updating the user data");
+                    console.error("Unhandled API error", { file: "UserForm.vue", method: "onUpdate" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
@@ -216,6 +226,7 @@
 
     onMounted(() => {
         if (props.mode === "update") {
+            showPasswordField.value = false;
             if (props.userId) {
                 onGet(props.userId);
             } else {
@@ -237,17 +248,17 @@
             <n-spin v-if="state.ajaxRunning" size="small" />
         </template>
         <n-form ref="userFormRef" :model="user" :rules="userFormRules" :disabled="state.ajaxRunning">
-            <n-form-item :label="t('Name')" path="name" show-feedback>
-                <n-input :placeholder="t('Name')" v-model:value="user.name" :maxlength="maxNameLength"
-                    :show-count="true" clearable required autofocus></n-input>
+            <n-form-item :label="t('userFormNameLabel')" path="name" show-feedback>
+                <n-input type="text" :placeholder="t('userFormNameFieldPlaceholder')" v-model:value="user.name"
+                    :maxlength="maxNameLength" :show-count="true" clearable required autofocus></n-input>
             </n-form-item>
-            <n-form-item :label="t('Email')" path="email" show-feedback>
-                <n-input :placeholder="t('Password')" v-model:value="user.email" :maxlength="maxEmailLength"
-                    :show-count="true" clearable required autofocus></n-input>
+            <n-form-item :label="t('userFormEmailLabel')" path="email" show-feedback>
+                <n-input type="text" :placeholder="t('userFormEmailFieldPlaceholder')" v-model:value="user.email"
+                    :maxlength="maxEmailLength" :show-count="true" clearable required autofocus></n-input>
             </n-form-item>
-            <n-form-item :label="t('Password')" path="password" show-feedback>
-                <n-input type="password" placeholder="Enter your password" show-password-on="click"
-                    :disabled="state.ajaxRunning" ref="inputPasswordRef">
+            <n-form-item :label="t('userFormPasswordLabel')" path="password" show-feedback>
+                <n-input v-if="showPasswordField" type="password" :placeholder="t('userFormPasswordFieldPlaceholder')"
+                    show-password-on="click" ref="inputPasswordRef">
                     <template #password-visible-icon>
                         <n-icon :size="16" :component="IconEyeCancel" />
                     </template>
@@ -255,6 +266,8 @@
                         <n-icon :size="16" :component="IconEye" />
                     </template>
                 </n-input>
+                <n-button v-else @click="onShowPasswordFormItem" block>{{ t("userFormChangePasswordButtonLabel")
+                    }}</n-button>
             </n-form-item>
         </n-form>
         <template #footer v-if="state.ajaxErrorMessage">

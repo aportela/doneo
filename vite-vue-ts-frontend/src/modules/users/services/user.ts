@@ -2,22 +2,20 @@ import { axiosInstance } from "../../../api/client";
 
 import type {
   AddRequest,
-  AddResponse,
   UpdateRequest,
   SearchRequest,
-  UpdateResponse,
-  GetResponse,
+  UserResponse,
   SearchResponse,
 } from "../types/dto";
 
 export const userService = {
-  async add(payload: AddRequest): Promise<AddResponse> {
-    const { data } = await axiosInstance.post<AddResponse>("/users", payload);
+  async add(payload: AddRequest): Promise<UserResponse> {
+    const { data } = await axiosInstance.post<UserResponse>("/users", payload);
     return data;
   },
-  async update(payload: UpdateRequest): Promise<UpdateResponse> {
-    const { data } = await axiosInstance.put<UpdateResponse>(
-      "/users/" + payload.user.id,
+  async update(payload: UpdateRequest): Promise<UserResponse> {
+    const { data } = await axiosInstance.put<UserResponse>(
+      "/users/" + payload.id,
       payload,
     );
     return data;
@@ -31,8 +29,8 @@ export const userService = {
     };
     await axiosInstance.patch<void>("/users/" + id, params);
   },
-  async get(id: string): Promise<GetResponse> {
-    const { data } = await axiosInstance.get<GetResponse>("/users/" + id);
+  async get(id: string): Promise<UserResponse> {
+    const { data } = await axiosInstance.get<UserResponse>("/users/" + id);
     return data;
   },
   async search(payload: SearchRequest): Promise<SearchResponse> {

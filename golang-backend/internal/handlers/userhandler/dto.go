@@ -41,18 +41,6 @@ type userResponse struct {
 	AvatarURL   string `json:"avatarUrl"`
 }
 
-type addResponse struct {
-	User userResponse `json:"user"`
-}
-
-type updateResponse struct {
-	User userResponse `json:"user"`
-}
-
-type getResponse struct {
-	User userResponse `json:"user"`
-}
-
 type searchResponse struct {
 	Users []userResponse         `json:"users"`
 	Pager handlers.PagerResponse `json:"pager"`

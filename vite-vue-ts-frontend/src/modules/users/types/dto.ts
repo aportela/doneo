@@ -18,20 +18,16 @@ export type UserRequest = {
 */
 
 export type AddRequest = {
-  user: {
-    name: string;
-    email: string;
-    isSuperUser: boolean;
-  };
+  name: string;
+  email: string;
+  isSuperUser: boolean;
 };
 
 export type UpdateRequest = {
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    isSuperUser: boolean;
-  };
+  id: string;
+  name: string;
+  email: string;
+  isSuperUser: boolean;
 };
 
 export type SearchRequest = {
@@ -48,18 +44,6 @@ export type UserResponse = {
   updatedAt: number | null;
   deletedAt: number | null;
   avatarUrl: string | null;
-};
-
-export type AddResponse = {
-  user: UserResponse;
-};
-
-export type UpdateResponse = {
-  user: UserResponse;
-};
-
-export type GetResponse = {
-  user: UserResponse;
 };
 
 export type SearchResponse = {

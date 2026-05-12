@@ -39,7 +39,7 @@ func (h *UserHandler) Add(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] failed to add user: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, userToAddResponse(user), nil, http.StatusCreated)
+	handlers.ToHandlerJSONResponse(w, userToResponse(user), nil, http.StatusCreated)
 }
 
 func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +56,7 @@ func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] failed to update user: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, userToUpdateResponse(user), nil)
+	handlers.ToHandlerJSONResponse(w, userToResponse(user), nil)
 }
 
 func (h *UserHandler) Patch(w http.ResponseWriter, r *http.Request) {
@@ -86,7 +86,7 @@ func (h *UserHandler) Patch(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] failed to patch user: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, userToGetResponse(user), nil)
+	handlers.ToHandlerJSONResponse(w, userToResponse(user), nil)
 
 }
 
@@ -126,7 +126,7 @@ func (h *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	handlers.ToHandlerJSONResponse(w, userToGetResponse(user), nil)
+	handlers.ToHandlerJSONResponse(w, userToResponse(user), nil)
 }
 
 func (h *UserHandler) Search(w http.ResponseWriter, r *http.Request) {
