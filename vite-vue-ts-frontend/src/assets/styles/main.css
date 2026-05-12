@@ -18,3 +18,9 @@
 th, td, .n-menu, .n-menu-item, .n-tabs-nav {
         user-select: none;
 }
+
+
+.doneo-flex-center-align {
+    display: flex;
+    align-items: center;
+}
