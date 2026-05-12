@@ -43,7 +43,7 @@
     const showUserDialog = ref<boolean>(false);
     const userDialogMode = ref<string>("add");
 
-    const selectedUserId = ref<string | undefined>(undefined);
+    const selectedUserId = ref<string>("");
 
     watch(state, (newValue: AjaxStateInterface) => {
         loadingStore.set(newValue.ajaxRunning);
@@ -59,7 +59,6 @@
         } else {
             onRefresh();
         }
-
     });
 
     watch(currentPage, () => {
