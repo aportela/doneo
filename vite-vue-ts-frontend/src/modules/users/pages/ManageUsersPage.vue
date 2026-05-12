@@ -45,7 +45,7 @@
 
     const currentPage = ref(1);
     const pageSize = ref(10);
-    const totalResuls = ref(0);
+    const totalResults = ref(0);
     const totalPages = ref(0);
 
     const showUserDialog = ref<boolean>(false);
@@ -126,7 +126,7 @@
             };
             const response = await userService.search(payload);
             totalPages.value = response.pager.totalPages;
-            totalResuls.value = response.pager.totalResults;
+            totalResults.value = response.pager.totalResults;
             users.value = response.users.map((user: UserResponse) => new User(user));
         } catch (error: unknown) {
             users.value.length = 0;
@@ -254,6 +254,7 @@
         appBus.reset();
     });
 
+
 </script>
 
 <template>
@@ -264,7 +265,7 @@
 
     <n-card :title="t('Manage users')">
         <Pager v-model:current-page="currentPage" v-model:page-size="pageSize" :total-pages="totalPages"
-            :total-results="users.length">
+            :total-results="totalResults">
             <template #total-results-label="{ totalResults }">
                 {{ t("TotalUsersPagerLabel", { total: totalResults }) }}
             </template>
