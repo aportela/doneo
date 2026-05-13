@@ -1,5 +1,6 @@
 <script setup lang="ts">
     import { useRouter } from "vue-router";
+    import { useI18n } from "vue-i18n";
 
     import { NCard, NFlex } from 'naive-ui'
     import { IconDatabaseStar } from '@tabler/icons-vue';
@@ -10,6 +11,8 @@
     import SwitchLocaleButton from "../../../shared/components/buttons/SwitchLocaleButton.vue";
 
     const router = useRouter();
+
+    const { t } = useI18n();
 
     const onSuccessLogin = () => {
         router.push(
@@ -24,6 +27,7 @@
     <div class="login-page">
         <div class="left">
             <n-card class="login-card">
+                <h2 class="title">{{ t("Login to your account") }}</h2>
                 <LoginForm @success="onSuccessLogin" />
                 <template #action>
                     <n-flex justify="space-around">
