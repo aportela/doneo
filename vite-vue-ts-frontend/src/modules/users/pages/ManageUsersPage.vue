@@ -243,9 +243,10 @@
             </template>
         </Pager>
         <UsersTable :users="users" :loading="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
-            @update="onShowUpdateForm" @delete="onDelete" @undelete="onUnDelete" :sort-field="sort.field"
-            :sort-order="sort.order" @toggle-sort="onToggleSort" v-model:user-type-filter="typeFilter"
-            v-model:user-name-filter="nameFilter" v-model:email-filter="emailFilter" />
+            @update="onShowUpdateForm" @delete="onDelete" @undelete="onUnDelete" @textfilter-keydown-enter="onRefresh"
+            :sort-field="sort.field" :sort-order="sort.order" @toggle-sort="onToggleSort"
+            v-model:user-type-filter="typeFilter" v-model:user-name-filter="nameFilter"
+            v-model:email-filter="emailFilter" />
     </n-card>
 </template>
 

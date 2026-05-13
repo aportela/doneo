@@ -28,7 +28,7 @@
 
     const sessionStore = useSessionStore();
 
-    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'undelete', 'toggleSort']);
+    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'undelete', 'toggleSort', 'textfilterKeydownEnter']);
 
     const props = defineProps<Props>();
 
@@ -126,6 +126,10 @@
             },
         })
     };
+
+    const onTextFilterKeyDownEnter = () => {
+        emit("textfilterKeydownEnter");
+    };
 </script>
 
 <template>
@@ -146,11 +150,11 @@
                 </th>
                 <th>
                     <TextFilterInput clearable size="small" :placeholder="t('searchByNameDefaultPlaceholder')"
-                        v-model:value="userNameFilter" />
+                        v-model:value="userNameFilter" @keydown-enter="onTextFilterKeyDownEnter" />
                 </th>
                 <th>
                     <TextFilterInput clearable size="small" :placeholder="t('searchByEmailDefaultPlaceholder')"
-                        v-model:value="emailFilter" />
+                        v-model:value="emailFilter" @keydown-enter="onTextFilterKeyDownEnter" />
                 </th>
                 <th>
                     <DateFilter />
