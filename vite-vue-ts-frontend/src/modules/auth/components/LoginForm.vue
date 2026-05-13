@@ -152,7 +152,6 @@
 </script>
 
 <template>
-    <h2 class="title">{{ t("Login to your account") }}</h2>
     <n-spin :show="state.ajaxRunning" stroke="pink">
         <n-form ref="signInFormRef" :model="signinFormValues" label-width="100px" :rules="signInFormRules">
             <n-form-item :label="t('loginFormEmailLabel')" path="email" show-feedback>
