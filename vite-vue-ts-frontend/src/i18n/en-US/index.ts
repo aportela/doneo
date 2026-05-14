@@ -27,9 +27,15 @@ export default {
   Yesterday: "Yesterday",
   Today: "Today",
   Tomorrow: "Tomorrow",
+  "Last week": "Last week",
   "This week": "This week",
+  "Next week": "Next week",
+  "Last month": "Last month",
   "This month": "This month",
+  "Next month": "Next month",
+  "Last year": "Last year",
   "This year": "This year",
+  "Next year": "Next year",
 
   // user type filter
   "All users": "All users",

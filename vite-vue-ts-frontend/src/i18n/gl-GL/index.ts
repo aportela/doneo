@@ -27,9 +27,15 @@ export default {
   Yesterday: "Onte",
   Today: "Hoxe",
   Tomorrow: "Mañá",
+  "Last week": "Semana pasada",
   "This week": "Esta semana",
+  "Next week": "Próxima semana",
+  "Last month": "Mes pasado",
   "This month": "Este mes",
+  "Next month": "Próximo mes",
+  "Last year": "Ano pasado",
   "This year": "Este ano",
+  "Next year": "Próximo ano",
 
   // user type filter
   "All users": "Todo-los usuarios",
