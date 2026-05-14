@@ -151,6 +151,33 @@ func (h *UserHandler) Search(w http.ResponseWriter, r *http.Request) {
 		if request.Filter.AdministratorFlag != nil {
 			filter.AdministratorFlag = request.Filter.AdministratorFlag
 		}
+		if request.Filter.CreatedAt != nil {
+			filter.CreatedAt = &domain.TimestampFilter{From: nil, To: nil}
+			if request.Filter.CreatedAt.From != nil {
+				filter.CreatedAt.From = request.Filter.CreatedAt.From
+			}
+			if request.Filter.CreatedAt.To != nil {
+				filter.CreatedAt.To = request.Filter.CreatedAt.To
+			}
+		}
+		if request.Filter.UpdatedAt != nil {
+			filter.UpdatedAt = &domain.TimestampFilter{From: nil, To: nil}
+			if request.Filter.UpdatedAt.From != nil {
+				filter.UpdatedAt.From = request.Filter.UpdatedAt.From
+			}
+			if request.Filter.CreatedAt.To != nil {
+				filter.UpdatedAt.To = request.Filter.UpdatedAt.To
+			}
+		}
+		if request.Filter.DeletedAt != nil {
+			filter.DeletedAt = &domain.TimestampFilter{From: nil, To: nil}
+			if request.Filter.DeletedAt.From != nil {
+				filter.DeletedAt.From = request.Filter.DeletedAt.From
+			}
+			if request.Filter.DeletedAt.To != nil {
+				filter.DeletedAt.To = request.Filter.DeletedAt.To
+			}
+		}
 	}
 	users, pagerResult, err := h.service.Search(r.Context(),
 		browser.Params{

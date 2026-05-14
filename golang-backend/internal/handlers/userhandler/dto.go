@@ -21,10 +21,18 @@ type patchRequest struct {
 	DeletedAt *int64 `json:"deletedAt"`
 }
 
+type TimestampFilter struct {
+	From *int `json:"from"`
+	To   *int `json:"to"`
+}
+
 type FilterRequest struct {
-	Name              *string `json:"name"`
-	Email             *string `json:"email"`
-	AdministratorFlag *bool   `json:"administratorFlag"`
+	Name              *string          `json:"name"`
+	Email             *string          `json:"email"`
+	AdministratorFlag *bool            `json:"administratorFlag"`
+	CreatedAt         *TimestampFilter `json:"createdAt"`
+	UpdatedAt         *TimestampFilter `json:"updatedAt"`
+	DeletedAt         *TimestampFilter `json:"deletedAt"`
 }
 
 type searchRequest struct {

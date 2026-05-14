@@ -3,6 +3,7 @@ import type {
   PagerResponse,
 } from "../../../shared/types/dto/pager";
 import type { Order } from "../../../shared/types/dto/order";
+import type { TimestampRange } from "../../../shared/composables/timestamps";
 
 /*
 export type UserRequest = {
@@ -35,6 +36,9 @@ type SearchRequestFilter = {
   type?: number;
   name?: string;
   email?: string;
+  createdAt?: TimestampRange;
+  updatedAt?: TimestampRange;
+  deletedAt?: TimestampRange;
 };
 
 export type SearchRequest = {
