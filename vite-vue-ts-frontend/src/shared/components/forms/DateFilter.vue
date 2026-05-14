@@ -45,7 +45,15 @@
                 break;
             case 1: // custom  date
                 if (datepickerValue.value) {
-                    // TODO
+                    const from = new Date(datepickerValue.value);
+                    from.setHours(0, 0, 0, 0);
+                    const to = new Date(datepickerValue.value);
+                    to.setHours(23, 59, 59, 999);
+                    range.value.from = from.getTime();
+                    range.value.to = to.getTime();
+                } else {
+                    range.value.from = null;
+                    range.value.to = null;
                 }
                 break;
             case 2: { // yesterday
