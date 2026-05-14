@@ -1,6 +1,10 @@
 package userrepository
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"github.com/aportela/doneo/internal/repositories"
+)
 
 type UserBaseDTO struct {
 	ID   string `db:"id"`
@@ -17,16 +21,11 @@ type UserDTO struct {
 	IsSuperUser  bool          `db:"is_super_user"`
 }
 
-type TimestampFilter struct {
-	From *int
-	To   *int
-}
-
 type SearchUsersFilterDTO struct {
 	Name              *string
 	Email             *string
 	AdministratorFlag *bool
-	CreatedAt         *TimestampFilter
-	UpdatedAt         *TimestampFilter
-	DeletedAt         *TimestampFilter
+	CreatedAt         *repositories.TimestampFilter
+	UpdatedAt         *repositories.TimestampFilter
+	DeletedAt         *repositories.TimestampFilter
 }
