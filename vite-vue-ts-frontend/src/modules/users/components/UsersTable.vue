@@ -16,6 +16,7 @@
     import DateFilter from '../../../shared/components/forms/DateFilter.vue';
     import TableCellHeaderSortIcon from '../../../shared/components/tables/TableCellHeaderSortIcon.vue';
     import { useSessionStore } from '../../../stores/session';
+    import type { TimestampRange } from '../../../shared/composables/timestamps';
 
     interface Props {
         loading: boolean;
@@ -28,7 +29,7 @@
 
     const sessionStore = useSessionStore();
 
-    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'undelete', 'toggleSort', 'textfilterKeydownEnter']);
+    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'undelete', 'toggleSort', 'textfilterKeydownEnter', 'createdAtFilterChange', 'updatedAtFilterChange', 'deletedAtFilterChange']);
 
     const props = defineProps<Props>();
 
@@ -69,6 +70,27 @@
 
     const emailFilter = defineModel<string>("emailFilter", {
         default: "",
+    });
+
+    const createdAtFilter = defineModel<TimestampRange>("createdAtFilter", {
+        default: {
+            from: null,
+            to: null
+        }
+    });
+
+    const updatedAtFilter = defineModel<TimestampRange>("updatedAtFilter", {
+        default: {
+            from: null,
+            to: null
+        }
+    });
+
+    const deletedAtFilter = defineModel<TimestampRange>("deletedAtFilter", {
+        default: {
+            from: null,
+            to: null
+        }
     });
 
     const dialog = useDialog();
@@ -130,18 +152,6 @@
     const onTextFilterKeyDownEnter = () => {
         emit("textfilterKeydownEnter");
     };
-
-    const onCreatedAtFilterChanged = (e: any) => {
-        console.log(e);
-    }
-
-    const onUpdatedAtFilterChanged = (e: any) => {
-        console.log(e);
-    }
-
-    const onDeletedAtFilterChanged = (e: any) => {
-        console.log(e);
-    }
 </script>
 
 <template>
@@ -169,13 +179,13 @@
                         v-model:value="emailFilter" @keydown-enter="onTextFilterKeyDownEnter" />
                 </th>
                 <th>
-                    <DateFilter @timestamp-range-change="onCreatedAtFilterChanged" />
+                    <DateFilter v-model:range="createdAtFilter" />
                 </th>
                 <th>
-                    <DateFilter @timestamp-range-change="onUpdatedAtFilterChanged" />
+                    <DateFilter v-model:range="updatedAtFilter" />
                 </th>
                 <th>
-                    <DateFilter @timestamp-range-change="onDeletedAtFilterChanged" />
+                    <DateFilter v-model:range="deletedAtFilter" />
                 </th>
                 <th class="text-center">
                     <n-button-group size="small">

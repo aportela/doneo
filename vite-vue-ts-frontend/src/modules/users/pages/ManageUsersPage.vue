@@ -17,6 +17,7 @@
     import UserForm from '../components/UserForm.vue';
     import Pager from '../../../shared/components/tables/Pager.vue';
     import { Sort } from '../../../shared/types/models/sort';
+    import type { TimestampRange } from '../../../shared/composables/timestamps';
 
     const { notify } = useNotify();
 
@@ -33,6 +34,10 @@
     const nameFilter = ref<string>("");
     const emailFilter = ref<string>("");
     const typeFilter = ref<UserTypeFilter>(UserTypeFilterValue.None);
+
+    const createdAtFilter = ref<TimestampRange>({ from: null, to: null });
+    const updatedAtFilter = ref<TimestampRange>({ from: null, to: null });
+    const deletedAtFilter = ref<TimestampRange>({ from: null, to: null });
 
     const currentPage = ref(1);
     const pageSize = ref(10);
@@ -112,6 +117,9 @@
                     name: nameFilter.value,
                     email: emailFilter.value,
                     administratorFlag: typeFilter.value == UserTypeFilterValue.None ? undefined : (typeFilter.value === UserTypeFilterValue.OnlyAdministrators ? true : false),
+                    createdAt: createdAtFilter.value,
+                    updatedAt: updatedAtFilter.value,
+                    deletedAt: deletedAtFilter.value
                 }
             };
             const response = await userService.search(payload);
@@ -246,7 +254,8 @@
             @update="onShowUpdateForm" @delete="onDelete" @undelete="onUnDelete" @textfilter-keydown-enter="onRefresh"
             :sort-field="sort.field" :sort-order="sort.order" @toggle-sort="onToggleSort"
             v-model:user-type-filter="typeFilter" v-model:user-name-filter="nameFilter"
-            v-model:email-filter="emailFilter" />
+            v-model:email-filter="emailFilter" v-model:created-at-filter="createdAtFilter"
+            v-model:updated-at-filter="updatedAtFilter" v-model:deleted-at-filter="deletedAtFilter" />
     </n-card>
 </template>
 

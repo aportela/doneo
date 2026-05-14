@@ -1,5 +1,10 @@
 type WeekStart = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
+export type TimestampRange = {
+  from: number | null;
+  to: number | null;
+};
+
 type RangeType =
   | "today"
   | "yesterday"

@@ -4,9 +4,8 @@
 
     import { NSelect, NDatePicker } from 'naive-ui';
     import type { SelectMixedOption } from 'naive-ui/es/select/src/interface';
-    import { getRange } from '../../composables/timestamps';
+    import { type TimestampRange, getRange } from '../../composables/timestamps';
 
-    const emit = defineEmits(['timestampRangeChange']);
 
     const { t } = useI18n();
 
@@ -27,6 +26,13 @@
         { label: t("Next year"), value: 13 },
     ]);
 
+    const range = defineModel<TimestampRange>("range", {
+        default: {
+            from: null,
+            to: null
+        }
+    });
+
     const selectorValue = ref<number>(0)
     const datepickerValue = ref<number | null>(null)
     const isDatePickerVisible = ref<boolean>(false);
@@ -34,8 +40,8 @@
     const recalcTimestamps = () => {
         switch (selectorValue.value) {
             case 0: // any date
-                fromTimestamp.value = null;
-                toTimestamp.value = null;
+                range.value.from = null;
+                range.value.to = null;
                 break;
             case 1: // custom  date
                 if (datepickerValue.value) {
@@ -44,89 +50,88 @@
                 break;
             case 2: { // yesterday
                 const { from, to } = getRange('yesterday');
-                fromTimestamp.value = from;
-                toTimestamp.value = to;
+                range.value.from = from;
+                range.value.to = to;
                 break;
             }
 
             case 3: { // today
                 const { from, to } = getRange('today');
-                fromTimestamp.value = from;
-                toTimestamp.value = to;
+                range.value.from = from;
+                range.value.to = to;
                 break;
             }
 
             case 4: { // tomorrow
                 const { from, to } = getRange('tomorrow');
-                fromTimestamp.value = from;
-                toTimestamp.value = to;
+                range.value.from = from;
+                range.value.to = to;
                 break;
             }
 
             case 5: { // last week
                 const { from, to } = getRange('last_week', { weekStartsOn: 1 });
-                fromTimestamp.value = from;
-                toTimestamp.value = to;
+                range.value.from = from;
+                range.value.to = to;
                 break;
             }
 
             case 6: { // this week
                 const { from, to } = getRange('this_week', { weekStartsOn: 1 });
-                fromTimestamp.value = from;
-                toTimestamp.value = to;
+                range.value.from = from;
+                range.value.to = to;
                 break;
             }
 
             case 7: { // next week
                 const { from, to } = getRange('next_week', { weekStartsOn: 1 });
-                fromTimestamp.value = from;
-                toTimestamp.value = to;
+                range.value.from = from;
+                range.value.to = to;
                 break;
             }
 
             case 8: { // last month
                 const { from, to } = getRange('last_month');
-                fromTimestamp.value = from;
-                toTimestamp.value = to;
+                range.value.from = from;
+                range.value.to = to;
                 break;
             }
 
             case 9: { // this month
                 const { from, to } = getRange('this_month');
-                fromTimestamp.value = from;
-                toTimestamp.value = to;
+                range.value.from = from;
+                range.value.to = to;
                 break;
             }
 
             case 10: { // next month
                 const { from, to } = getRange('next_month');
-                fromTimestamp.value = from;
-                toTimestamp.value = to;
+                range.value.from = from;
+                range.value.to = to;
                 break;
             }
 
             case 11: { // last year
                 const { from, to } = getRange('last_year');
-                fromTimestamp.value = from;
-                toTimestamp.value = to;
+                range.value.from = from;
+                range.value.to = to;
                 break;
             }
 
             case 12: { // this year
                 const { from, to } = getRange('this_year');
-                fromTimestamp.value = from;
-                toTimestamp.value = to;
+                range.value.from = from;
+                range.value.to = to;
                 break;
             }
 
             case 13: { // next year
                 const { from, to } = getRange('next_year');
-                fromTimestamp.value = from;
-                toTimestamp.value = to;
+                range.value.from = from;
+                range.value.to = to;
                 break;
             }
         }
-        emit("timestampRangeChange", { from: fromTimestamp.value, to: toTimestamp.value });
     };
 
     watch(selectorValue, async (val) => {
@@ -160,9 +165,6 @@
         isDatePickerVisible.value = false;
         recalcTimestamps();
     };
-
-    const fromTimestamp = ref<number | null>(null);
-    const toTimestamp = ref<number | null>(null);
 
     const isSelectorVisible = computed(() => selectorValue.value !== 1);
 </script>
