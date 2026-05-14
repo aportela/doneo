@@ -130,6 +130,18 @@
     const onTextFilterKeyDownEnter = () => {
         emit("textfilterKeydownEnter");
     };
+
+    const onCreatedAtFilterChanged = (e: any) => {
+        console.log(e);
+    }
+
+    const onUpdatedAtFilterChanged = (e: any) => {
+        console.log(e);
+    }
+
+    const onDeletedAtFilterChanged = (e: any) => {
+        console.log(e);
+    }
 </script>
 
 <template>
@@ -157,13 +169,13 @@
                         v-model:value="emailFilter" @keydown-enter="onTextFilterKeyDownEnter" />
                 </th>
                 <th>
-                    <DateFilter />
+                    <DateFilter @timestamp-range-change="onCreatedAtFilterChanged" />
                 </th>
                 <th>
-                    <DateFilter />
+                    <DateFilter @timestamp-range-change="onUpdatedAtFilterChanged" />
                 </th>
                 <th>
-                    <DateFilter />
+                    <DateFilter @timestamp-range-change="onDeletedAtFilterChanged" />
                 </th>
                 <th class="text-center">
                     <n-button-group size="small">
