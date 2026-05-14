@@ -27,11 +27,6 @@ func (u *User) IsAdmin() bool {
 	return u.IsSuperUser
 }
 
-type TimestampFilter struct {
-	From *int
-	To   *int
-}
-
 type SearchUsersFilter struct {
 	Name              *string
 	Email             *string
