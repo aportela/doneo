@@ -76,7 +76,7 @@ export default {
   userFormNameLabel: "Name",
   userFormEmailLabel: "Email",
   userFormPasswordLabel: "Password",
-  userFormNameFieldPlaceholder: "Enter name address",
+  userFormNameFieldPlaceholder: "Enter name",
   userFormEmailFieldPlaceholder: "Enter email address",
   userFormPasswordFieldPlaceholder: "Enter password",
   userFormNameFieldEmptyError: "Name is empty",
@@ -91,6 +91,32 @@ export default {
 
   // user roles
   "Manage roles": "Manage roles",
+  TotalRolesPagerLabel: "Total roles: {total}",
+  RolenameTableHeader: "Name",
+  RolePermissionAllowCreateTableHeader: "Allow create",
+  RolePermissionAllowUpdateTableHeader: "Allow update",
+  RolePermissionAllowDeleteTableHeader: "Allow delete",
+  RolePermissionAllowViewTableHeader: "Allow view",
+  RolePermissionAllowListTableHeader: "Allow list",
+  RolePermissionAllowExecuteTableHeader: "Allow execute",
+  "Add role": "Add role",
+  "Update role": "Update role",
+  "Delete role": "Delete role",
+  "No roles found": "No roles found",
+  deleteRoleConfirmation:
+    'You are about to delete the role "{name}" from the system.',
+  "There was a problem while refreshing the role list":
+    "There was a problem while refreshing the role list",
+  "We couldn’t find the specified role": "We couldn’t find the specified role",
+  "There was a problem while deleting the role":
+    "There was a problem while deleting the role",
+  roleAddedNotification: 'Role "{name}" has been added',
+  roleUpdatedNotification: 'Role "{name}" has been updated',
+  roleDeletedNotification: 'Role "{name}" has been deleted',
+  roleFormNameLabel: "Name",
+  roleFormNameFieldPlaceholder: "Enter role name",
+  roleFormNameFieldEmptyError: "Name is empty",
+  roleFormNameFieldTooLargeError: "Name is too large",
 
   // project types
   "Add project type": "Add project type",

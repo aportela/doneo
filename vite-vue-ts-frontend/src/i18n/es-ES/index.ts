@@ -91,6 +91,32 @@ export default {
 
   // user roles
   "Manage roles": "Gestión de roles",
+  TotalRolesPagerLabel: "Total roles: {total}",
+  RolenameTableHeader: "Nombre",
+  RolePermissionAllowCreateTableHeader: "Permitir crear",
+  RolePermissionAllowUpdateTableHeader: "Permitir actualizar",
+  RolePermissionAllowDeleteTableHeader: "Permitir eliminar",
+  RolePermissionAllowViewTableHeader: "Permitir ver",
+  RolePermissionAllowListTableHeader: "Permitir listar",
+  RolePermissionAllowExecuteTableHeader: "Permitir ejecutar",
+  "Add role": "Añadir rol",
+  "Update role": "Modificar rol",
+  "Delete role": "Eliminar rol",
+  "No roles found": "No se han encontrado roles",
+  deleteRoleConfirmation:
+    'Está a punto de eliminar el rol "{name}" del sistema.',
+  "There was a problem while refreshing the role list":
+    "Se ha producido un error durante la búsqueda de roles",
+  "We couldn’t find the specified role": "El rol especificado no existe",
+  "There was a problem while deleting the role":
+    "Se ha producido un error al eliminar el rol",
+  roleAddedNotification: 'El rol "{name}" se ha añadido',
+  roleUpdatedNotification: 'El rol "{name}" se ha modificado',
+  roleDeletedNotification: 'El rol "{name}" se ha eliminado',
+  roleFormNameLabel: "Nombre",
+  roleFormNameFieldPlaceholder: "Introduzca el nombre",
+  roleFormNameFieldEmptyError: "El nombre está vacío",
+  roleFormNameFieldTooLargeError: "El nombre es muy largo",
 
   // project types
   "Add project type": "Añadir tipo de proyecto",

@@ -90,7 +90,32 @@ export default {
   userFormEmailNotFoundError: "O email non existe",
 
   // user roles
-  "Manage roles": "Xestión de roles",
+  "Manage roles": "Gestión de roles",
+  TotalRolesPagerLabel: "Total roles: {total}",
+  RolenameTableHeader: "Nome",
+  RolePermissionAllowCreateTableHeader: "Permitir crear",
+  RolePermissionAllowUpdateTableHeader: "Permitir actualizar",
+  RolePermissionAllowDeleteTableHeader: "Permitir eliminar",
+  RolePermissionAllowViewTableHeader: "Permitir ver",
+  RolePermissionAllowListTableHeader: "Permitir listar",
+  RolePermissionAllowExecuteTableHeader: "Permitir executar",
+  "Add role": "Engadir rol",
+  "Update role": "Modificar rol",
+  "Delete role": "Eliminar rol",
+  "No roles found": "Non se atoparon roles",
+  deleteRoleConfirmation: 'Está a punto de elimina-lo rol "{name}" do sistema.',
+  "There was a problem while refreshing the role list":
+    "Producíuse un erro durante a procura de roles",
+  "We couldn’t find the specified role": "O rol especificado non existe",
+  "There was a problem while deleting the role":
+    "Producíuse un erro ó elimina-lo rol",
+  roleAddedNotification: 'O rol "{name}" engadiuse',
+  roleUpdatedNotification: 'O rol "{name}" modificouse',
+  roleDeletedNotification: 'O rol "{name}" eliminouse',
+  roleFormNameLabel: "Nome",
+  roleFormNameFieldPlaceholder: "Introduzca o nome",
+  roleFormNameFieldEmptyError: "O nome está vacío",
+  roleFormNameFieldTooLargeError: "O nome é moi longo",
 
   // project types
   "Add project type": "Engadir tipo de proxecto",
