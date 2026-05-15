@@ -6,23 +6,61 @@ import (
 	"github.com/aportela/doneo/internal/handlers"
 )
 
+func requestPermissionsToDomain(permissions PermissionFlags) domain.PermissionBitmask {
+	var bitmaskPermission domain.PermissionBitmask
+	bitmaskPermission = 0
+	if permissions.AllowCreate {
+		bitmaskPermission.AddPermission(domain.PermissionCreate)
+	}
+	if permissions.AllowUpdate {
+		bitmaskPermission.AddPermission(domain.PermissionUpdate)
+	}
+	if permissions.AllowDelete {
+		bitmaskPermission.AddPermission(domain.PermissionDelete)
+	}
+	if permissions.AllowView {
+		bitmaskPermission.AddPermission(domain.PermissionView)
+	}
+	if permissions.AllowList {
+		bitmaskPermission.AddPermission(domain.PermissionList)
+	}
+	if permissions.AllowExecute {
+		bitmaskPermission.AddPermission(domain.PermissionExecute)
+	}
+	return bitmaskPermission
+}
+
 func addRequestToRole(request addRequest) domain.Role {
 	return domain.Role{
-		Name: request.Name,
+		Name:       request.Name,
+		Permission: requestPermissionsToDomain(request.Permissions),
 	}
 }
 
 func updateRequestToRole(request updateRequest) domain.Role {
 	return domain.Role{
-		ID:   request.Id,
-		Name: request.Name,
+		ID:         request.Id,
+		Name:       request.Name,
+		Permission: requestPermissionsToDomain(request.Permissions),
+	}
+}
+
+func domainPermissionToResponsePermissions(bitmaskPermission domain.PermissionBitmask) PermissionFlags {
+	return PermissionFlags{
+		AllowCreate:  bitmaskPermission.HasPermission(domain.PermissionCreate),
+		AllowUpdate:  bitmaskPermission.HasPermission(domain.PermissionUpdate),
+		AllowDelete:  bitmaskPermission.HasPermission(domain.PermissionDelete),
+		AllowView:    bitmaskPermission.HasPermission(domain.PermissionView),
+		AllowList:    bitmaskPermission.HasPermission(domain.PermissionList),
+		AllowExecute: bitmaskPermission.HasPermission(domain.PermissionExecute),
 	}
 }
 
 func roleToResponse(role domain.Role) roleResponse {
 	return roleResponse{
-		ID:   role.ID,
-		Name: role.Name,
+		ID:          role.ID,
+		Name:        role.Name,
+		Permissions: domainPermissionToResponsePermissions(role.Permission),
 	}
 }
 
