@@ -30,35 +30,42 @@
         {
             label: t("RolenameTableHeader"),
             field: "name",
+            sortable: true,
         },
         {
             label: t("RolePermissionAllowCreateTableHeader"),
             field: "allowCreatePermission",
+            sortable: false,
             align: "center",
         },
         {
             label: t("RolePermissionAllowUpdateTableHeader"),
             field: "allowUpdatePermission",
+            sortable: false,
             align: "center",
         },
         {
             label: t("RolePermissionAllowDeleteTableHeader"),
             field: "allowDeletePermission",
+            sortable: false,
             align: "center",
         },
         {
             label: t("RolePermissionAllowViewTableHeader"),
             field: "allowViewPermission",
+            sortable: false,
             align: "center",
         },
         {
             label: t("RolePermissionAllowListTableHeader"),
             field: "allowListPermission",
+            sortable: false,
             align: "center",
         },
         {
             label: t("RolePermissionAllowExecuteTableHeader"),
             field: "allowExecutePermission",
+            sortable: false,
             align: "center",
         },
     ]);
@@ -114,13 +121,15 @@
     <ManageTable size="small">
         <template #thead>
             <tr class="table-header-click-action">
-                <th v-for="column in columns" :key="column.field" @click="onToggleSort(column.field)">
-                    <n-flex justify="space-between">
+                <th v-for="column in columns" :key="column.field" @click="column.sortable && onToggleSort(column.field)"
+                    :class="{ 'doneo-cursor-pointer': column.sortable, 'doneo-text-center': column.align === 'center' }">
+                    <n-flex justify="space-between" v-if="column.sortable">
                         <span>{{ column.label }}</span>
                         <TableCellHeaderSortIcon v-if="props.sortField === column.field" :order="props.sortOrder" />
                     </n-flex>
+                    <span v-else>{{ column.label }}</span>
                 </th>
-                <th class="text-center">{{ t("Actions") }}</th>
+                <th class="doneo-text-center">{{ t("Actions") }}</th>
             </tr>
             <tr class="hide-mobile">
                 <th>
@@ -133,7 +142,7 @@
                 <th></th>
                 <th></th>
                 <th></th>
-                <th class="text-center">
+                <th class="doneo-text-center">
                     <n-button-group size="small">
                         <n-button @click="onRefresh">
                             <template #icon>
@@ -162,25 +171,25 @@
                         {{ role.name }}
                     </div>
                 </td>
-                <td>
+                <td class="doneo-text-center">
                     <n-icon :size="16" v-if="role.permissions.allowCreate" :component="IconSquareCheck" />
                 </td>
-                <td>
+                <td class="doneo-text-center">
                     <n-icon :size="16" v-if="role.permissions.allowUpdate" :component="IconSquareCheck" />
                 </td>
-                <td>
+                <td class="doneo-text-center">
                     <n-icon :size="16" v-if="role.permissions.allowDelete" :component="IconSquareCheck" />
                 </td>
-                <td>
+                <td class="doneo-text-center">
                     <n-icon :size="16" v-if="role.permissions.allowView" :component="IconSquareCheck" />
                 </td>
-                <td>
+                <td class="doneo-text-center">
                     <n-icon :size="16" v-if="role.permissions.allowList" :component="IconSquareCheck" />
                 </td>
-                <td>
+                <td class="doneo-text-center">
                     <n-icon :size="16" v-if="role.permissions.allowExecute" :component="IconSquareCheck" />
                 </td>
-                <td class="text-center">
+                <td class="doneo-text-center">
                     <n-button-group size="small">
                         <n-button @click="onUpdate(role, index)" :disabled="props.loading">
                             {{ t("Update") }}
@@ -212,10 +221,6 @@
 </template>
 
 <style lang="css" scoped>
-
-    .table-header-click-action th:not(:last-of-type) {
-        cursor: pointer;
-    }
 
     .table-header-click-action th:not(:last-of-type) .n-icon {
         margin-top: 4px;

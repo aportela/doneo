@@ -103,7 +103,7 @@
         <template #thead>
             <tr>
                 <th style="width: auto;">Name</th>
-                <th class="text-center" style="width: 1%;white-space: nowrap;">Actions</th>
+                <th class="doneo-text-center" style="width: 1%;white-space: nowrap;">Actions</th>
             </tr>
             <tr>
                 <th>
@@ -115,7 +115,7 @@
                         </template>
                     </n-input>
                 </th>
-                <th class="text-center">
+                <th class="doneo-text-center">
                     <n-button size="small" block @click="onAddProjectPriority">
                         <template #icon>
                             <NIcon>
@@ -131,9 +131,9 @@
             <tr v-for="projectPriority, index in projectPriorities" :key="projectPriority.id">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(projectPriority.hexColor)">{{ projectPriority.name
-                        }}</n-tag>
+                    }}</n-tag>
                 </td>
-                <td class="text-center">
+                <td class="doneo-text-center">
                     <n-button-group>
                         <n-button size="small">
                             Up
