@@ -37,26 +37,32 @@
         {
             label: t("UserTypeTableHeader"),
             field: "isSuperUser",
+            sortable: true,
         },
         {
             label: t("UsernameTableHeader"),
             field: "name",
+            sortable: true,
         },
         {
             label: t("EmailTableHeader"),
             field: "email",
+            sortable: true,
         },
         {
             label: t("CreatedAtTableHeader"),
-            field: "createdAt"
+            field: "createdAt",
+            sortable: true,
         },
         {
             label: t("UpdatedAtTableHeader"),
-            field: "updatedAt"
+            field: "updatedAt",
+            sortable: true,
         },
         {
             label: t("DeletedAtTableHeader"),
-            field: "deletedAt"
+            field: "deletedAt",
+            sortable: true,
         },
     ]);
 
@@ -157,14 +163,15 @@
 <template>
     <ManageTable size="small">
         <template #thead>
-            <tr class="table-header-click-action">
-                <th v-for="column in columns" :key="column.field" @click="onToggleSort(column.field)">
+            <tr>
+                <th v-for="column in columns" :key="column.field" @click="onToggleSort(column.field)"
+                    class="doneo-cursor-pointer">
                     <n-flex justify="space-between">
                         <span>{{ column.label }}</span>
                         <TableCellHeaderSortIcon v-if="props.sortField === column.field" :order="props.sortOrder" />
                     </n-flex>
                 </th>
-                <th class="text-center">{{ t("Actions") }}</th>
+                <th class="doneo-text-center">{{ t("Actions") }}</th>
             </tr>
             <tr class="hide-mobile">
                 <th>
@@ -187,7 +194,7 @@
                 <th>
                     <DateFilter v-model:range="deletedAtFilter" />
                 </th>
-                <th class="text-center">
+                <th class="doneo-text-center">
                     <n-button-group size="small">
                         <n-button @click="onRefresh">
                             <template #icon>
@@ -211,7 +218,7 @@
         </template>
         <template #tbody>
             <tr v-for="user, index in users" :key="user.id">
-                <td class="text-center">
+                <td class="doneo-text-center">
                     <!-- TODO: hide icon /label on small screens ? -->
                     <span class="doneo-flex-center-align">
                         <n-icon :size="16" style="margin-right: 6px;"
@@ -231,7 +238,7 @@
                 <td class="hide-mobile">{{ user.createdAt.toLocaleString() }}</td>
                 <td class="hide-mobile">{{ user.updatedAt?.toLocaleString() }}</td>
                 <td class="hide-mobile">{{ user.deletedAt?.toLocaleString() }}</td>
-                <td class="text-center">
+                <td class="doneo-text-center">
                     <n-button-group v-if="!user.deletedAt" size="small">
                         <n-button @click="onUpdate(user, index)" :disabled="props.loading">
                             {{ t("Update") }}
@@ -274,14 +281,6 @@
 <style lang="css" scoped>
     .avatar {
         margin-right: 4px;
-    }
-
-    .table-header-click-action th:not(:last-of-type) {
-        cursor: pointer;
-    }
-
-    .table-header-click-action th:not(:last-of-type) .n-icon {
-        margin-top: 4px;
     }
 
     @media (max-width: 768px) {
