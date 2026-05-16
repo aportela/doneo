@@ -10,7 +10,7 @@
     import { appBus } from '../../../shared/composables/bus';
     import { roleService as roleService } from '../services/role';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import type { RoleResponse } from '../types/dto';
+    import type { RoleResponse, SearchRequest } from '../types/dto';
     import { Role } from '../models/role';
     import RolesTable from '../components/RolesTable.vue';
     import RoleForm from '../components/RoleForm.vue';
@@ -91,7 +91,7 @@
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload = {
+            const payload: SearchRequest = {
                 pager: {
                     currentPage: currentPage.value,
                     resultsPage: pageSize.value,
@@ -102,6 +102,14 @@
                 },
                 filter: {
                     name: nameFilter.value,
+                    permissions: {
+                        allowCreate: true,
+                        allowUpdate: undefined,
+                        allowDelete: undefined,
+                        allowView: undefined,
+                        allowList: undefined,
+                        allowExecute: undefined,
+                    }
                 }
             };
             const response = await roleService.search(payload);

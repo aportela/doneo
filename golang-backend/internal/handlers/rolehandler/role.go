@@ -93,6 +93,39 @@ func (h *RoleHandler) Search(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[RoleHandler] invalid request payload: %w", err))
 		return
 	}
+	filter := domain.SearchRolesFilter{
+		Name:               nil,
+		PermissionsBitmask: nil,
+	}
+	if request.Filter != nil {
+		if request.Filter.Name != nil {
+			filter.Name = request.Filter.Name
+		}
+		if request.Filter.Permissions != nil {
+			permissionsBitmask := domain.PermissionsBitmask(0)
+			filter.PermissionsBitmask = &permissionsBitmask
+			if request.Filter.Permissions.AllowCreate != nil {
+				filter.PermissionsBitmask.AddPermission(domain.PermissionCreate)
+			}
+			if request.Filter.Permissions.AllowUpdate != nil {
+				filter.PermissionsBitmask.AddPermission(domain.PermissionUpdate)
+			}
+			if request.Filter.Permissions.AllowDelete != nil {
+				filter.PermissionsBitmask.AddPermission(domain.PermissionDelete)
+			}
+			if request.Filter.Permissions.AllowView != nil {
+				filter.PermissionsBitmask.AddPermission(domain.PermissionView)
+			}
+			if request.Filter.Permissions.AllowList != nil {
+				filter.PermissionsBitmask.AddPermission(domain.PermissionList)
+			}
+			if request.Filter.Permissions.AllowExecute != nil {
+				filter.PermissionsBitmask.AddPermission(domain.PermissionExecute)
+			}
+		}
+		fmt.Printf("es %d", filter.PermissionsBitmask)
+	}
+
 	roles, pagerResult, err := h.role.Search(r.Context(),
 		browser.Params{
 			CurrentPage: request.Pager.CurrentPage,
@@ -102,6 +135,7 @@ func (h *RoleHandler) Search(w http.ResponseWriter, r *http.Request) {
 			Field: request.Order.Field,
 			Sort:  string(request.Order.Sort),
 		},
+		filter,
 	)
 	if pagerResult.TotalResults > 0 {
 	}

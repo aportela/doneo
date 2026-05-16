@@ -6,8 +6,8 @@ import (
 	"github.com/aportela/doneo/internal/handlers"
 )
 
-func requestPermissionsToDomain(permissions PermissionFlags) domain.PermissionBitmask {
-	var bitmaskPermission domain.PermissionBitmask
+func requestPermissionsToDomain(permissions PermissionsFlags) domain.PermissionsBitmask {
+	var bitmaskPermission domain.PermissionsBitmask
 	bitmaskPermission = 0
 	if permissions.AllowCreate {
 		bitmaskPermission.AddPermission(domain.PermissionCreate)
@@ -32,21 +32,21 @@ func requestPermissionsToDomain(permissions PermissionFlags) domain.PermissionBi
 
 func addRequestToRole(request addRequest) domain.Role {
 	return domain.Role{
-		Name:       request.Name,
-		Permission: requestPermissionsToDomain(request.Permissions),
+		Name:               request.Name,
+		PermissionsBitmask: requestPermissionsToDomain(request.Permissions),
 	}
 }
 
 func updateRequestToRole(request updateRequest) domain.Role {
 	return domain.Role{
-		ID:         request.Id,
-		Name:       request.Name,
-		Permission: requestPermissionsToDomain(request.Permissions),
+		ID:                 request.Id,
+		Name:               request.Name,
+		PermissionsBitmask: requestPermissionsToDomain(request.Permissions),
 	}
 }
 
-func domainPermissionToResponsePermissions(bitmaskPermission domain.PermissionBitmask) PermissionFlags {
-	return PermissionFlags{
+func domainPermissionToResponsePermissions(bitmaskPermission domain.PermissionsBitmask) PermissionsFlags {
+	return PermissionsFlags{
 		AllowCreate:  bitmaskPermission.HasPermission(domain.PermissionCreate),
 		AllowUpdate:  bitmaskPermission.HasPermission(domain.PermissionUpdate),
 		AllowDelete:  bitmaskPermission.HasPermission(domain.PermissionDelete),
@@ -60,7 +60,7 @@ func roleToResponse(role domain.Role) roleResponse {
 	return roleResponse{
 		ID:          role.ID,
 		Name:        role.Name,
-		Permissions: domainPermissionToResponsePermissions(role.Permission),
+		Permissions: domainPermissionToResponsePermissions(role.PermissionsBitmask),
 	}
 }
 

@@ -17,7 +17,7 @@ type RoleRepository interface {
 	Update(ctx context.Context, role RoleDTO) error
 	Delete(ctx context.Context, id string) error
 	Get(ctx context.Context, id string) (RoleDTO, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order) ([]RoleDTO, browser.Result, error)
+	Search(ctx context.Context, pager browser.Params, order browser.Order, filter SearchRolesFilterDTO) ([]RoleDTO, browser.Result, error)
 }
 
 type roleRepository struct {
@@ -90,7 +90,7 @@ func (roleRepository *roleRepository) Get(ctx context.Context, id string) (RoleD
 	return role, err
 }
 
-func (roleRepository *roleRepository) Search(ctx context.Context, pager browser.Params, order browser.Order) ([]RoleDTO, browser.Result, error) {
+func (roleRepository *roleRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter SearchRolesFilterDTO) ([]RoleDTO, browser.Result, error) {
 	var filterArgs []any
 	var queryArgs []any
 	sqlQuery := `
@@ -117,6 +117,16 @@ func (roleRepository *roleRepository) Search(ctx context.Context, pager browser.
 	sqlOrder := fmt.Sprintf(" ORDER BY %s %s ", field, sort)
 	sqlWhere := ""
 	var sqlWhereConditions []string
+	if filter.Name != nil {
+		sqlWhereConditions = append(sqlWhereConditions, "R.name LIKE ?")
+		filterArgs = append(filterArgs, "%"+*filter.Name+"%")
+	}
+	/*
+		if filter.PermissionBitmask != nil {
+			sqlWhereConditions = append(sqlWhereConditions, "R.permission_bitmask & ? = ?")
+			filterArgs = append(filterArgs, filter.PermissionBitmask, filter.PermissionBitmask)
+		}
+	*/
 	if len(sqlWhereConditions) > 0 {
 		sqlWhere = " WHERE " + strings.Join(sqlWhereConditions, " AND ")
 	}

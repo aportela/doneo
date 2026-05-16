@@ -14,7 +14,7 @@ type RoleService interface {
 	Update(ctx context.Context, role domain.Role) error
 	Delete(ctx context.Context, id string) error
 	Get(ctx context.Context, id string) (domain.Role, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order) ([]domain.Role, browser.Result, error)
+	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error)
 }
 
 type roleService struct {
@@ -54,8 +54,8 @@ func (r *roleService) Get(ctx context.Context, id string) (domain.Role, error) {
 	return rolerepository.DTOToRole(role), nil
 }
 
-func (r *roleService) Search(ctx context.Context, pager browser.Params, order browser.Order) ([]domain.Role, browser.Result, error) {
-	roles, pagerResult, err := r.repository.Search(ctx, pager, order)
+func (r *roleService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error) {
+	roles, pagerResult, err := r.repository.Search(ctx, pager, order, rolerepository.SearchRolesFilterToDTO(filter))
 	if err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[RoleService] failed to search roles: %w", err)
 	}

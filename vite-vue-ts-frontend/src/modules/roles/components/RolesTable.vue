@@ -136,7 +136,8 @@
                     <TextFilterInput clearable size="small" :placeholder="t('searchByNameDefaultPlaceholder')"
                         v-model:value="roleNameFilter" @keydown-enter="onTextFilterKeyDownEnter" />
                 </th>
-                <th></th>
+                <th>
+                </th>
                 <th></th>
                 <th></th>
                 <th></th>

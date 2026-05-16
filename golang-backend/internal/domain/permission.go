@@ -1,9 +1,9 @@
 package domain
 
-type PermissionBitmask uint8
+type PermissionsBitmask uint8
 
 const (
-	PermissionCreate PermissionBitmask = 1 << iota
+	PermissionCreate PermissionsBitmask = 1 << iota
 	PermissionUpdate
 	PermissionDelete
 	PermissionView
@@ -11,14 +11,14 @@ const (
 	PermissionExecute
 )
 
-func (p PermissionBitmask) HasPermission(v PermissionBitmask) bool {
+func (p PermissionsBitmask) HasPermission(v PermissionsBitmask) bool {
 	return p&v == v
 }
 
-func (p *PermissionBitmask) AddPermission(v PermissionBitmask) {
+func (p *PermissionsBitmask) AddPermission(v PermissionsBitmask) {
 	*p |= v
 }
 
-func (p *PermissionBitmask) RemovePermission(v PermissionBitmask) {
+func (p *PermissionsBitmask) RemovePermission(v PermissionsBitmask) {
 	*p &^= v
 }

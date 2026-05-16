@@ -26,6 +26,14 @@ export type UpdateRequest = {
 
 type SearchRequestFilter = {
   name?: string;
+  permissions?: {
+    allowCreate?: boolean;
+    allowUpdate?: boolean;
+    allowDelete?: boolean;
+    allowView?: boolean;
+    allowList?: boolean;
+    allowExecute?: boolean;
+  };
 };
 
 export type SearchRequest = {

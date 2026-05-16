@@ -16,13 +16,13 @@ func createRoles(database database.Database) []string {
 	roleRepository := rolerepository.NewRoleRepository(database)
 	roleService := roleservice.NewRoleService(roleRepository)
 	roleID := utils.UUID()
-	var permissionBitMask domain.PermissionBitmask
+	var permissionBitMask domain.PermissionsBitmask
 	permissionBitMask = 0
 	permissionBitMask.AddPermission(domain.PermissionCreate | domain.PermissionUpdate | domain.PermissionDelete | domain.PermissionView | domain.PermissionList | domain.PermissionExecute)
 	err := roleService.Add(context.Background(), domain.Role{
-		ID:         roleID,
-		Name:       "Administrator",
-		Permission: permissionBitMask,
+		ID:                 roleID,
+		Name:               "Administrator",
+		PermissionsBitmask: permissionBitMask,
 	})
 	if err != nil {
 		fmt.Printf("Error creating role %s\n", err.Error())
@@ -33,9 +33,9 @@ func createRoles(database database.Database) []string {
 	permissionBitMask = 0
 	permissionBitMask.AddPermission(domain.PermissionView | domain.PermissionList)
 	err = roleService.Add(context.Background(), domain.Role{
-		ID:         roleID,
-		Name:       "Guest",
-		Permission: permissionBitMask,
+		ID:                 roleID,
+		Name:               "Guest",
+		PermissionsBitmask: permissionBitMask,
 	})
 	if err != nil {
 		fmt.Printf("Error creating role %s\n", err.Error())
