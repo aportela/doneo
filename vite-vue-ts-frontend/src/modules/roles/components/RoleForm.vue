@@ -3,7 +3,7 @@
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NGrid, NGi, NSwitch } from 'naive-ui';
-    import { IconCancel, IconDeviceFloppy, IconUser, IconUserEdit, IconUserPlus } from '@tabler/icons-vue';
+    import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus } from '@tabler/icons-vue';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { Role, maxNameLength } from '../models/role';
@@ -245,7 +245,7 @@
     <n-card :style="style" bordered>
         <template #header>
             <div class="doneo-flex-center-align">
-                <n-icon :component="props.mode == 'add' ? IconUserPlus : IconUserEdit" />
+                <n-icon :component="props.mode == 'add' ? IconPlus : IconEdit" />
                 {{ t(props.mode == "add" ? "Add role" : "Update role") }}
             </div>
         </template>
