@@ -2,6 +2,7 @@ package domain
 
 type PermissionsBitmask uint8
 
+// ProjectView|ProjectUpdate|ProjectDelete|TaskCreate|TaskUpdate|TaskDelete|TaskView
 const (
 	PermissionCreate PermissionsBitmask = 1 << iota
 	PermissionUpdate
