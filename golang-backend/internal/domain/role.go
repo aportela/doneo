@@ -7,6 +7,7 @@ type Role struct {
 }
 
 type SearchRolesFilter struct {
-	Name               *string
-	PermissionsBitmask *PermissionsBitmask
+	Name                        *string
+	RequiredPermissionsBitmask  *PermissionsBitmask
+	ForbiddenPermissionsBitmask *PermissionsBitmask
 }

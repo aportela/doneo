@@ -94,36 +94,61 @@ func (h *RoleHandler) Search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	filter := domain.SearchRolesFilter{
-		Name:               nil,
-		PermissionsBitmask: nil,
+		Name:                       nil,
+		RequiredPermissionsBitmask: nil,
 	}
 	if request.Filter != nil {
 		if request.Filter.Name != nil {
 			filter.Name = request.Filter.Name
 		}
 		if request.Filter.Permissions != nil {
-			permissionsBitmask := domain.PermissionsBitmask(0)
-			filter.PermissionsBitmask = &permissionsBitmask
+			requiredPermissionsBitmask := domain.PermissionsBitmask(0)
+			forbiddenPermissionsBitmask := domain.PermissionsBitmask(0)
 			if request.Filter.Permissions.AllowCreate != nil {
-				filter.PermissionsBitmask.AddPermission(domain.PermissionCreate)
+				if *request.Filter.Permissions.AllowCreate {
+					requiredPermissionsBitmask.AddPermission(domain.PermissionCreate)
+				} else {
+					forbiddenPermissionsBitmask.AddPermission(domain.PermissionCreate)
+				}
 			}
 			if request.Filter.Permissions.AllowUpdate != nil {
-				filter.PermissionsBitmask.AddPermission(domain.PermissionUpdate)
+				if *request.Filter.Permissions.AllowUpdate {
+					requiredPermissionsBitmask.AddPermission(domain.PermissionUpdate)
+				} else {
+					forbiddenPermissionsBitmask.AddPermission(domain.PermissionUpdate)
+				}
 			}
 			if request.Filter.Permissions.AllowDelete != nil {
-				filter.PermissionsBitmask.AddPermission(domain.PermissionDelete)
+				if *request.Filter.Permissions.AllowDelete {
+					requiredPermissionsBitmask.AddPermission(domain.PermissionDelete)
+				} else {
+					forbiddenPermissionsBitmask.AddPermission(domain.PermissionDelete)
+				}
 			}
 			if request.Filter.Permissions.AllowView != nil {
-				filter.PermissionsBitmask.AddPermission(domain.PermissionView)
+				if *request.Filter.Permissions.AllowView {
+					requiredPermissionsBitmask.AddPermission(domain.PermissionView)
+				} else {
+					forbiddenPermissionsBitmask.AddPermission(domain.PermissionView)
+				}
 			}
 			if request.Filter.Permissions.AllowList != nil {
-				filter.PermissionsBitmask.AddPermission(domain.PermissionList)
+				if *request.Filter.Permissions.AllowList {
+					requiredPermissionsBitmask.AddPermission(domain.PermissionList)
+				} else {
+					forbiddenPermissionsBitmask.AddPermission(domain.PermissionList)
+				}
 			}
 			if request.Filter.Permissions.AllowExecute != nil {
-				filter.PermissionsBitmask.AddPermission(domain.PermissionExecute)
+				if *request.Filter.Permissions.AllowExecute {
+					requiredPermissionsBitmask.AddPermission(domain.PermissionExecute)
+				} else {
+					forbiddenPermissionsBitmask.AddPermission(domain.PermissionExecute)
+				}
 			}
+			filter.RequiredPermissionsBitmask = &requiredPermissionsBitmask
+			filter.ForbiddenPermissionsBitmask = &forbiddenPermissionsBitmask
 		}
-		fmt.Printf("es %d", filter.PermissionsBitmask)
 	}
 
 	roles, pagerResult, err := h.role.Search(r.Context(),

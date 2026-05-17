@@ -37,7 +37,7 @@ func (roleRepository *roleRepository) Add(ctx context.Context, role RoleDTO) err
         `,
 		role.ID,
 		role.Name,
-		role.PermissionBitmask,
+		role.PermissionsBitmask,
 	)
 	return err
 }
@@ -52,7 +52,7 @@ func (roleRepository *roleRepository) Update(ctx context.Context, role RoleDTO) 
 			WHERE id = ?
         `,
 		role.Name,
-		role.PermissionBitmask,
+		role.PermissionsBitmask,
 		role.ID,
 	)
 	return err
@@ -80,7 +80,7 @@ func (roleRepository *roleRepository) Get(ctx context.Context, id string) (RoleD
             FROM roles R
             WHERE R.id = ?
         `,
-		id).Scan(&role.ID, &role.Name, &role.PermissionBitmask)
+		id).Scan(&role.ID, &role.Name, &role.PermissionsBitmask)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return RoleDTO{}, domain.ErrNotFound
@@ -121,12 +121,14 @@ func (roleRepository *roleRepository) Search(ctx context.Context, pager browser.
 		sqlWhereConditions = append(sqlWhereConditions, "R.name LIKE ?")
 		filterArgs = append(filterArgs, "%"+*filter.Name+"%")
 	}
-	/*
-		if filter.PermissionBitmask != nil {
-			sqlWhereConditions = append(sqlWhereConditions, "R.permission_bitmask & ? = ?")
-			filterArgs = append(filterArgs, filter.PermissionBitmask, filter.PermissionBitmask)
-		}
-	*/
+	if filter.RequiredPermissionsBitmask != nil {
+		sqlWhereConditions = append(sqlWhereConditions, "(R.permission_bitmask & ?) = ?")
+		filterArgs = append(filterArgs, filter.RequiredPermissionsBitmask, filter.RequiredPermissionsBitmask)
+	}
+	if filter.ForbiddenPermissionsBitmask != nil {
+		sqlWhereConditions = append(sqlWhereConditions, "(R.permission_bitmask & ?) = 0")
+		filterArgs = append(filterArgs, filter.ForbiddenPermissionsBitmask)
+	}
 	if len(sqlWhereConditions) > 0 {
 		sqlWhere = " WHERE " + strings.Join(sqlWhereConditions, " AND ")
 	}
@@ -147,7 +149,7 @@ func (roleRepository *roleRepository) Search(ctx context.Context, pager browser.
 	roles := make([]RoleDTO, 0)
 	for rows.Next() {
 		var role RoleDTO
-		if err := rows.Scan(&role.ID, &role.Name, &role.PermissionBitmask); err != nil {
+		if err := rows.Scan(&role.ID, &role.Name, &role.PermissionsBitmask); err != nil {
 			return nil, browser.Result{}, err
 		}
 		roles = append(roles, role)
