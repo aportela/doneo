@@ -92,6 +92,11 @@ export default {
   superUserPermission: "Super usuario",
   normalUserPermission: "Usuario normal",
 
+  // role permission typefilter
+  rolePermissionTypeSelectorValueAll: "Todos",
+  rolePermissionTypeSelectorValueAllowed: "Sólo permitidos",
+  rolePermissionTypeSelectorValueNotAllowed: "Sólo no permitidos",
+
   // user roles
   "Manage roles": "Gestión de roles",
   TotalRolesPagerLabel: "Total roles: {total}",

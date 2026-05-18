@@ -22,9 +22,9 @@
     });
 
     const options = computed<SelectMixedOption[]>(() => [
-        { label: t("Allowed & not allowed"), value: PermissionTypeFilterValue.All },
-        { label: t("Allowed"), value: PermissionTypeFilterValue.Allowed },
-        { label: t("Not allowed"), value: PermissionTypeFilterValue.NotAllowed }
+        { label: t("rolePermissionTypeSelectorValueAll"), value: PermissionTypeFilterValue.All },
+        { label: t("rolePermissionTypeSelectorValueAllowed"), value: PermissionTypeFilterValue.Allowed },
+        { label: t("rolePermissionTypeSelectorValueNotAllowed"), value: PermissionTypeFilterValue.NotAllowed }
     ]);
 
 
