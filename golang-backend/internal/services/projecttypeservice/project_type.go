@@ -25,11 +25,11 @@ func NewProjectTypeService(repository projecttyperepository.ProjectTypeRepositor
 }
 
 func (s *projectTypeService) Add(ctx context.Context, projectType domain.ProjectType) error {
-	return s.repository.Add(ctx, projecttyperepository.ProjectTypeToDTO(projectType))
+	return s.repository.Add(ctx, projecttyperepository.DomainToDTO(projectType))
 }
 
 func (s *projectTypeService) Update(ctx context.Context, projectType domain.ProjectType) error {
-	return s.repository.Update(ctx, projecttyperepository.ProjectTypeToDTO(projectType))
+	return s.repository.Update(ctx, projecttyperepository.DomainToDTO(projectType))
 }
 
 func (s *projectTypeService) Delete(ctx context.Context, id string) error {
@@ -39,9 +39,9 @@ func (s *projectTypeService) Delete(ctx context.Context, id string) error {
 func (s *projectTypeService) Get(ctx context.Context, id string) (domain.ProjectType, error) {
 	projectType, err := s.repository.Get(ctx, id)
 	if err != nil {
-		return projecttyperepository.DTOToProjectType(projectType), fmt.Errorf("[ProjectTypeService] failed to get project type with ID %s: %w", id, err)
+		return projecttyperepository.DTOToDomain(projectType), fmt.Errorf("[ProjectTypeService] failed to get project type with ID %s: %w", id, err)
 	}
-	return projecttyperepository.DTOToProjectType(projectType), nil
+	return projecttyperepository.DTOToDomain(projectType), nil
 }
 
 func (s *projectTypeService) Search(ctx context.Context) ([]domain.ProjectType, error) {
@@ -49,5 +49,5 @@ func (s *projectTypeService) Search(ctx context.Context) ([]domain.ProjectType, 
 	if err != nil {
 		return nil, fmt.Errorf("[ProjectTypeService] failed to search project types: %w", err)
 	}
-	return projecttyperepository.ToProjectTypeArray(projectTypes), nil
+	return projecttyperepository.DTOArrayToDomainArray(projectTypes), nil
 }

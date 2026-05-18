@@ -31,14 +31,14 @@ func (h *ProjectStatusHandler) Add(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectStatusHandler] invalid request payload: %w", err))
 		return
 	}
-	projectStatus := addRequestToProjectStatus(request)
+	projectStatus := addRequestToDomain(request)
 	projectStatus.ID = utils.UUID()
 	err := h.service.Add(r.Context(), projectStatus)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectStatusHandler] failed to add project status: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, projectStatusToAddResponse(projectStatus), nil, http.StatusCreated)
+	handlers.ToHandlerJSONResponse(w, domainToResponse(projectStatus), nil, http.StatusCreated)
 }
 
 func (h *ProjectStatusHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -48,14 +48,14 @@ func (h *ProjectStatusHandler) Update(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectStatusHandler] invalid request payload: %w", err))
 		return
 	}
-	projectStatus := updateRequestToProjectStatus(request)
+	projectStatus := updateRequestToDomain(request)
 	projectStatus.ID = chi.URLParam(r, "id")
 	err := h.service.Update(r.Context(), projectStatus)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectStatusHandler] failed to update project status: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, projectStatusToUpdateResponse(projectStatus), nil)
+	handlers.ToHandlerJSONResponse(w, domainToResponse(projectStatus), nil)
 }
 
 func (h *ProjectStatusHandler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -82,11 +82,11 @@ func (h *ProjectStatusHandler) Get(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	handlers.ToHandlerJSONResponse(w, projectStatusToGetResponse(projectStatus), nil)
+	handlers.ToHandlerJSONResponse(w, domainToResponse(projectStatus), nil)
 }
 
 func (h *ProjectStatusHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectStatuses, err := h.service.Search(r.Context())
-	handlers.ToHandlerJSONResponse(w, projectStatusArrayToSearchResponse(projectStatuses), err)
+	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectStatuses), err)
 }

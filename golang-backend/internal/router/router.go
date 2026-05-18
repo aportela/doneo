@@ -59,6 +59,39 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		r.Delete("/{id}", roleHandler.Delete)
 	})
 
+	apiRouter.Route("/project-types", func(r chi.Router) {
+		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
+		r.Use(middlewares.RequireSuperUser)
+		projectTypeHandler := projecttypehandler.NewProjectTypeHandler(db)
+		r.Post("/", projectTypeHandler.Add)
+		r.Post("/search", projectTypeHandler.Search)
+		r.Get("/{id}", projectTypeHandler.Get)
+		r.Put("/{id}", projectTypeHandler.Update)
+		r.Delete("/{id}", projectTypeHandler.Delete)
+	})
+
+	apiRouter.Route("/project-statuses", func(r chi.Router) {
+		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
+		r.Use(middlewares.RequireSuperUser)
+		projectStatusHandler := projectstatushandler.NewProjectStatusHandler(db)
+		r.Post("/", projectStatusHandler.Add)
+		r.Post("/search", projectStatusHandler.Search)
+		r.Get("/{id}", projectStatusHandler.Get)
+		r.Put("/{id}", projectStatusHandler.Update)
+		r.Delete("/{id}", projectStatusHandler.Delete)
+	})
+
+	apiRouter.Route("/project-priorities", func(r chi.Router) {
+		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
+		r.Use(middlewares.RequireSuperUser)
+		projectTypeHandler := projectpriorityhandler.NewProjectPriorityHandler(db)
+		r.Post("/", projectTypeHandler.Add)
+		r.Post("/search", projectTypeHandler.Search)
+		r.Get("/{id}", projectTypeHandler.Get)
+		r.Put("/{id}", projectTypeHandler.Update)
+		r.Delete("/{id}", projectTypeHandler.Delete)
+	})
+
 	apiRouter.Route("/projects", func(r chi.Router) {
 		projectHandler := projecthandler.NewProjectHandler(db)
 		r.Post("/", projectHandler.AddProject)
@@ -67,39 +100,6 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 			r.Get("/", projectHandler.GetProject)
 			r.Put("/", projectHandler.UpdateProject)
 			r.Delete("/", projectHandler.DeleteProject)
-		})
-	})
-
-	apiRouter.Route("/project-types", func(r chi.Router) {
-		projectTypeHandler := projecttypehandler.NewProjectTypeHandler(db)
-		r.Post("/", projectTypeHandler.Add)
-		r.Get("/", projectTypeHandler.Search)
-		r.Route("/{id}", func(r chi.Router) {
-			r.Get("/", projectTypeHandler.Get)
-			r.Put("/", projectTypeHandler.Update)
-			r.Delete("/", projectTypeHandler.Delete)
-		})
-	})
-
-	apiRouter.Route("/project-statuses", func(r chi.Router) {
-		projectStatusHandler := projectstatushandler.NewProjectStatusHandler(db)
-		r.Post("/", projectStatusHandler.Add)
-		r.Get("/", projectStatusHandler.Search)
-		r.Route("/{id}", func(r chi.Router) {
-			r.Get("/", projectStatusHandler.Get)
-			r.Put("/", projectStatusHandler.Update)
-			r.Delete("/", projectStatusHandler.Delete)
-		})
-	})
-
-	apiRouter.Route("/project-priorities", func(r chi.Router) {
-		projectTypeHandler := projectpriorityhandler.NewProjectPriorityHandler(db)
-		r.Post("/", projectTypeHandler.Add)
-		r.Get("/", projectTypeHandler.Search)
-		r.Route("/{id}", func(r chi.Router) {
-			r.Get("/", projectTypeHandler.Get)
-			r.Put("/", projectTypeHandler.Update)
-			r.Delete("/", projectTypeHandler.Delete)
 		})
 	})
 

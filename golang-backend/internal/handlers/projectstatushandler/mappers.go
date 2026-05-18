@@ -4,7 +4,7 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 )
 
-func addRequestToProjectStatus(request addRequest) domain.ProjectStatus {
+func addRequestToDomain(request addRequest) domain.ProjectStatus {
 	return domain.ProjectStatus{
 		ID:       request.ID,
 		Name:     request.Name,
@@ -13,7 +13,7 @@ func addRequestToProjectStatus(request addRequest) domain.ProjectStatus {
 	}
 }
 
-func updateRequestToProjectStatus(request updateRequest) domain.ProjectStatus {
+func updateRequestToDomain(request updateRequest) domain.ProjectStatus {
 	return domain.ProjectStatus{
 		ID:       request.ID,
 		Name:     request.Name,
@@ -22,7 +22,7 @@ func updateRequestToProjectStatus(request updateRequest) domain.ProjectStatus {
 	}
 }
 
-func mapProjectStatusDomainToResponse(projectStatus domain.ProjectStatus) projectStatusResponse {
+func domainToResponse(projectStatus domain.ProjectStatus) projectStatusResponse {
 	return projectStatusResponse{
 		ID:       projectStatus.ID,
 		Name:     projectStatus.Name,
@@ -31,34 +31,16 @@ func mapProjectStatusDomainToResponse(projectStatus domain.ProjectStatus) projec
 	}
 }
 
-func projectStatusToAddResponse(projectStatus domain.ProjectStatus) addResponse {
-	return addResponse{
-		ProjectStatus: mapProjectStatusDomainToResponse(projectStatus),
-	}
-}
-
-func projectStatusToUpdateResponse(projectStatus domain.ProjectStatus) updateResponse {
-	return updateResponse{
-		ProjectStatus: mapProjectStatusDomainToResponse(projectStatus),
-	}
-}
-
-func projectStatusToGetResponse(projectStatus domain.ProjectStatus) getResponse {
-	return getResponse{
-		ProjectStatus: mapProjectStatusDomainToResponse(projectStatus),
-	}
-}
-
-func projectStatusArrayToResponse(projectStatuses []domain.ProjectStatus) []projectStatusResponse {
+func domainArrayToResponseArray(projectStatuses []domain.ProjectStatus) []projectStatusResponse {
 	projectStatusResponses := []projectStatusResponse{}
 	for _, projectStatus := range projectStatuses {
-		projectStatusResponses = append(projectStatusResponses, mapProjectStatusDomainToResponse(projectStatus))
+		projectStatusResponses = append(projectStatusResponses, domainToResponse(projectStatus))
 	}
 	return projectStatusResponses
 }
 
-func projectStatusArrayToSearchResponse(users []domain.ProjectStatus) searchResponse {
+func toSearchResponse(users []domain.ProjectStatus) searchResponse {
 	return searchResponse{
-		ProjectStatuses: projectStatusArrayToResponse(users),
+		ProjectStatuses: domainArrayToResponseArray(users),
 	}
 }

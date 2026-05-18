@@ -31,14 +31,14 @@ func (h *ProjectTypeHandler) Add(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeHandler] invalid request payload: %w", err))
 		return
 	}
-	projectType := addRequestToProjectType(request)
+	projectType := addRequestToDomain(request)
 	projectType.ID = utils.UUID()
 	err := h.service.Add(r.Context(), projectType)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeHandler] failed to add project type: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, projectTypeToAddResponse(projectType), nil, http.StatusCreated)
+	handlers.ToHandlerJSONResponse(w, domainToResponse(projectType), nil, http.StatusCreated)
 }
 
 func (h *ProjectTypeHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -48,14 +48,14 @@ func (h *ProjectTypeHandler) Update(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeHandler] invalid request payload: %w", err))
 		return
 	}
-	projectType := updateRequestToProjectType(request)
+	projectType := updateRequestToDomain(request)
 	projectType.ID = chi.URLParam(r, "id")
 	err := h.service.Update(r.Context(), projectType)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeHandler] failed to update project type: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, projectTypeToUpdateResponse(projectType), nil)
+	handlers.ToHandlerJSONResponse(w, domainToResponse(projectType), nil)
 }
 
 func (h *ProjectTypeHandler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -82,11 +82,11 @@ func (h *ProjectTypeHandler) Get(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	handlers.ToHandlerJSONResponse(w, projectTypeToGetResponse(projectType), nil)
+	handlers.ToHandlerJSONResponse(w, domainToResponse(projectType), nil)
 }
 
 func (h *ProjectTypeHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectTypes, err := h.service.Search(r.Context())
-	handlers.ToHandlerJSONResponse(w, projectTypeArrayToSearchResponse(projectTypes), err)
+	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectTypes), err)
 }

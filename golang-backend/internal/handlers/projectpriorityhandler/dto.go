@@ -1,5 +1,7 @@
 package projectpriorityhandler
 
+import "github.com/aportela/doneo/internal/handlers"
+
 type addRequest struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
@@ -21,18 +23,7 @@ type projectPriorityResponse struct {
 	Index    int    `json:"index"`
 }
 
-type addResponse struct {
-	ProjectPriority projectPriorityResponse `json:"projectPriority"`
-}
-
-type updateResponse struct {
-	ProjectPriority projectPriorityResponse `json:"projectPriority"`
-}
-
-type getResponse struct {
-	ProjectPriority projectPriorityResponse `json:"projectPriority"`
-}
-
 type searchResponse struct {
 	ProjectPriorities []projectPriorityResponse `json:"projectPriorities"`
+	Pager             handlers.PagerResponse    `json:"pager"`
 }

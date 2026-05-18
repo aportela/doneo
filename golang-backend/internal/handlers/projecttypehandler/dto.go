@@ -1,5 +1,7 @@
 package projecttypehandler
 
+import "github.com/aportela/doneo/internal/handlers"
+
 type addRequest struct {
 	Name     string `json:"name"`
 	HexColor string `json:"hexColor"`
@@ -16,18 +18,7 @@ type projectTypeResponse struct {
 	HexColor string `json:"hexColor"`
 }
 
-type addResponse struct {
-	ProjectType projectTypeResponse `json:"projectType"`
-}
-
-type updateResponse struct {
-	ProjectType projectTypeResponse `json:"projectType"`
-}
-
-type getResponse struct {
-	ProjectType projectTypeResponse `json:"projectType"`
-}
-
 type searchResponse struct {
-	ProjectTypes []projectTypeResponse `json:"projectTypes"`
+	ProjectTypes []projectTypeResponse  `json:"projectTypes"`
+	Pager        handlers.PagerResponse `json:"pager"`
 }

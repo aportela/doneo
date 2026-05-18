@@ -31,14 +31,14 @@ func (h *ProjectPriorityHandler) Add(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityHandler] invalid request payload: %w", err))
 		return
 	}
-	projectPriority := addRequestToProjectPriority(request)
+	projectPriority := addRequestToDomain(request)
 	projectPriority.ID = utils.UUID()
 	err := h.service.Add(r.Context(), projectPriority)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityHandler] failed to add project priority: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, projectPriorityToAddResponse(projectPriority), nil, http.StatusCreated)
+	handlers.ToHandlerJSONResponse(w, domainToResponse(projectPriority), nil, http.StatusCreated)
 }
 
 func (h *ProjectPriorityHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -48,14 +48,14 @@ func (h *ProjectPriorityHandler) Update(w http.ResponseWriter, r *http.Request) 
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityHandler] invalid request payload: %w", err))
 		return
 	}
-	projectPriority := updateRequestToProjectPriority(request)
+	projectPriority := updateRequestToDomain(request)
 	projectPriority.ID = chi.URLParam(r, "id")
 	err := h.service.Update(r.Context(), projectPriority)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityHandler] failed to update project priority: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, projectPriorityToUpdateResponse(projectPriority), nil)
+	handlers.ToHandlerJSONResponse(w, domainToResponse(projectPriority), nil)
 }
 
 func (h *ProjectPriorityHandler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -82,11 +82,11 @@ func (h *ProjectPriorityHandler) Get(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	handlers.ToHandlerJSONResponse(w, projectPriorityToGetResponse(projectPriority), nil)
+	handlers.ToHandlerJSONResponse(w, domainToResponse(projectPriority), nil)
 }
 
 func (h *ProjectPriorityHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectPriorities, err := h.service.Search(r.Context())
-	handlers.ToHandlerJSONResponse(w, projectPriorityArrayToSearchResponse(projectPriorities), err)
+	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectPriorities), err)
 }

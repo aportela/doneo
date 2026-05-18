@@ -4,7 +4,7 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 )
 
-func addRequestToProjectPriority(request addRequest) domain.ProjectPriority {
+func addRequestToDomain(request addRequest) domain.ProjectPriority {
 	return domain.ProjectPriority{
 		ID:       request.ID,
 		Name:     request.Name,
@@ -13,7 +13,7 @@ func addRequestToProjectPriority(request addRequest) domain.ProjectPriority {
 	}
 }
 
-func updateRequestToProjectPriority(request updateRequest) domain.ProjectPriority {
+func updateRequestToDomain(request updateRequest) domain.ProjectPriority {
 	return domain.ProjectPriority{
 		ID:       request.ID,
 		Name:     request.Name,
@@ -22,7 +22,7 @@ func updateRequestToProjectPriority(request updateRequest) domain.ProjectPriorit
 	}
 }
 
-func projectPriorityToResponse(projectPriority domain.ProjectPriority) projectPriorityResponse {
+func domainToResponse(projectPriority domain.ProjectPriority) projectPriorityResponse {
 	return projectPriorityResponse{
 		ID:       projectPriority.ID,
 		Name:     projectPriority.Name,
@@ -31,34 +31,16 @@ func projectPriorityToResponse(projectPriority domain.ProjectPriority) projectPr
 	}
 }
 
-func projectPriorityToAddResponse(projectPriority domain.ProjectPriority) addResponse {
-	return addResponse{
-		ProjectPriority: projectPriorityToResponse(projectPriority),
-	}
-}
-
-func projectPriorityToUpdateResponse(projectPriority domain.ProjectPriority) updateResponse {
-	return updateResponse{
-		ProjectPriority: projectPriorityToResponse(projectPriority),
-	}
-}
-
-func projectPriorityToGetResponse(projectPriority domain.ProjectPriority) getResponse {
-	return getResponse{
-		ProjectPriority: projectPriorityToResponse(projectPriority),
-	}
-}
-
-func projectPriorityArrayToResponse(projectPriorities []domain.ProjectPriority) []projectPriorityResponse {
+func domainArrayToResponseArray(projectPriorities []domain.ProjectPriority) []projectPriorityResponse {
 	projectPriorityResponses := []projectPriorityResponse{}
 	for _, projectPriority := range projectPriorities {
-		projectPriorityResponses = append(projectPriorityResponses, projectPriorityToResponse(projectPriority))
+		projectPriorityResponses = append(projectPriorityResponses, domainToResponse(projectPriority))
 	}
 	return projectPriorityResponses
 }
 
-func projectPriorityArrayToSearchResponse(projectPriorities []domain.ProjectPriority) searchResponse {
+func toSearchResponse(projectPriorities []domain.ProjectPriority) searchResponse {
 	return searchResponse{
-		ProjectPriorities: projectPriorityArrayToResponse(projectPriorities),
+		ProjectPriorities: domainArrayToResponseArray(projectPriorities),
 	}
 }

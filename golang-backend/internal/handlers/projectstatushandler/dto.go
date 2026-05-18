@@ -1,5 +1,7 @@
 package projectstatushandler
 
+import "github.com/aportela/doneo/internal/handlers"
+
 type addRequest struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
@@ -21,18 +23,7 @@ type projectStatusResponse struct {
 	Index    int    `json:"index"`
 }
 
-type addResponse struct {
-	ProjectStatus projectStatusResponse `json:"projectStatus"`
-}
-
-type updateResponse struct {
-	ProjectStatus projectStatusResponse `json:"projectStatus"`
-}
-
-type getResponse struct {
-	ProjectStatus projectStatusResponse `json:"projectStatus"`
-}
-
 type searchResponse struct {
 	ProjectStatuses []projectStatusResponse `json:"projectStatuses"`
+	Pager           handlers.PagerResponse  `json:"pager"`
 }
