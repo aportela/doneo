@@ -3,7 +3,7 @@
     import { useI18n } from "vue-i18n";
 
     import { useDialog, NButtonGroup, NButton, NFlex, NEmpty, NIcon } from 'naive-ui';
-    import { IconEdit, IconPlus, IconRefresh, IconSquareCheck, IconTrash } from '@tabler/icons-vue';
+    import { IconEdit, IconPlus, IconRefresh, IconEyeCheck, IconSquarePlus, IconTrash } from '@tabler/icons-vue';
 
     import { Role } from '../models/role';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
@@ -11,8 +11,6 @@
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
-    import { type PermissionTypeFilter, PermissionTypeFilterValue } from '../types/filter-permission-type';
-    import FilterPermissionTypeSelector from '../components/FilterPermissionTypeSelector.vue';
     import TableCellHeaderSortIcon from '../../../shared/components/tables/TableCellHeaderSortIcon.vue';
 
     interface Props {
@@ -35,38 +33,8 @@
             sortable: true,
         },
         {
-            label: t("RolePermissionAllowCreateTableHeader"),
-            field: "allowCreatePermission",
-            sortable: false,
-            align: "center",
-        },
-        {
-            label: t("RolePermissionAllowUpdateTableHeader"),
-            field: "allowUpdatePermission",
-            sortable: false,
-            align: "center",
-        },
-        {
-            label: t("RolePermissionAllowDeleteTableHeader"),
-            field: "allowDeletePermission",
-            sortable: false,
-            align: "center",
-        },
-        {
-            label: t("RolePermissionAllowViewTableHeader"),
-            field: "allowViewPermission",
-            sortable: false,
-            align: "center",
-        },
-        {
-            label: t("RolePermissionAllowListTableHeader"),
-            field: "allowListPermission",
-            sortable: false,
-            align: "center",
-        },
-        {
-            label: t("RolePermissionAllowExecuteTableHeader"),
-            field: "allowExecutePermission",
+            label: t("RolePermissionsTableHeader"),
+            field: "permissions",
             sortable: false,
             align: "center",
         },
@@ -74,30 +42,6 @@
 
     const roleNameFilter = defineModel<string>("roleNameFilter", {
         default: "",
-    });
-
-    const createPermissionFilter = defineModel<PermissionTypeFilter>("createPermissionFilter", {
-        default: PermissionTypeFilterValue.All,
-    });
-
-    const updatePermissionFilter = defineModel<PermissionTypeFilter>("updatePermissionFilter", {
-        default: PermissionTypeFilterValue.All,
-    });
-
-    const deletePermissionFilter = defineModel<PermissionTypeFilter>("deletePermissionFilter", {
-        default: PermissionTypeFilterValue.All,
-    });
-
-    const viewPermissionFilter = defineModel<PermissionTypeFilter>("viewPermissionFilter", {
-        default: PermissionTypeFilterValue.All,
-    });
-
-    const listPermissionFilter = defineModel<PermissionTypeFilter>("listPermissionFilter", {
-        default: PermissionTypeFilterValue.All,
-    });
-
-    const executePermissionFilter = defineModel<PermissionTypeFilter>("executePermissionFilter", {
-        default: PermissionTypeFilterValue.All,
     });
 
     const dialog = useDialog();
@@ -162,24 +106,7 @@
                     <TextFilterInput clearable size="small" :placeholder="t('searchByNameDefaultPlaceholder')"
                         v-model:value="roleNameFilter" @keydown-enter="onTextFilterKeyDownEnter" />
                 </th>
-                <th>
-                    <FilterPermissionTypeSelector v-model="createPermissionFilter" />
-                </th>
-                <th>
-                    <FilterPermissionTypeSelector v-model="updatePermissionFilter" />
-                </th>
-                <th>
-                    <FilterPermissionTypeSelector v-model="deletePermissionFilter" />
-                </th>
-                <th>
-                    <FilterPermissionTypeSelector v-model="viewPermissionFilter" />
-                </th>
-                <th>
-                    <FilterPermissionTypeSelector v-model="listPermissionFilter" />
-                </th>
-                <th>
-                    <FilterPermissionTypeSelector v-model="executePermissionFilter" />
-                </th>
+                <th></th>
                 <th class="doneo-text-center">
                     <n-button-group size="small">
                         <n-button @click="onRefresh">
@@ -210,22 +137,13 @@
                     </div>
                 </td>
                 <td class="doneo-text-center">
-                    <n-icon :size="16" v-if="role.permissions.allowCreate" :component="IconSquareCheck" />
-                </td>
-                <td class="doneo-text-center">
-                    <n-icon :size="16" v-if="role.permissions.allowUpdate" :component="IconSquareCheck" />
-                </td>
-                <td class="doneo-text-center">
-                    <n-icon :size="16" v-if="role.permissions.allowDelete" :component="IconSquareCheck" />
-                </td>
-                <td class="doneo-text-center">
-                    <n-icon :size="16" v-if="role.permissions.allowView" :component="IconSquareCheck" />
-                </td>
-                <td class="doneo-text-center">
-                    <n-icon :size="16" v-if="role.permissions.allowList" :component="IconSquareCheck" />
-                </td>
-                <td class="doneo-text-center">
-                    <n-icon :size="16" v-if="role.permissions.allowExecute" :component="IconSquareCheck" />
+                    <IconEdit v-if="role.permissions.allowUpdateProject" />
+                    <IconTrash v-if="role.permissions.allowDeleteProject" />
+                    <IconEyeCheck v-if="role.permissions.allowViewProject" />
+                    <IconSquarePlus v-if="role.permissions.allowAddTask" />
+                    <IconEdit v-if="role.permissions.allowUpdateTask" />
+                    <IconTrash v-if="role.permissions.allowDeleteTask" />
+                    <IconEyeCheck v-if="role.permissions.allowViewTask" />
                 </td>
                 <td class="doneo-text-center">
                     <n-button-group size="small">

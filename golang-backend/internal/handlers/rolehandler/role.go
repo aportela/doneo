@@ -32,14 +32,14 @@ func (h *RoleHandler) Add(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[RoleHandler] invalid request payload: %w", err))
 		return
 	}
-	role := addRequestToRole(request)
+	role := addRequestToDomain(request)
 	role.ID = utils.UUID()
 	err := h.role.Add(r.Context(), role)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[RoleHandler] failed to add role: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, roleToResponse(role), nil, http.StatusCreated)
+	handlers.ToHandlerJSONResponse(w, domainToResponse(role), nil, http.StatusCreated)
 }
 
 func (h *RoleHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -49,14 +49,14 @@ func (h *RoleHandler) Update(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[RoleHandler] invalid request payload: %w", err))
 		return
 	}
-	role := updateRequestToRole(request)
+	role := updateRequestToDomain(request)
 	role.ID = chi.URLParam(r, "id")
 	err := h.role.Update(r.Context(), role)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[RoleHandler] failed to update role: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, roleToResponse(role), nil)
+	handlers.ToHandlerJSONResponse(w, domainToResponse(role), nil)
 }
 
 func (h *RoleHandler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -83,7 +83,7 @@ func (h *RoleHandler) Get(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	handlers.ToHandlerJSONResponse(w, roleToResponse(user), nil)
+	handlers.ToHandlerJSONResponse(w, domainToResponse(user), nil)
 }
 
 func (h *RoleHandler) Search(w http.ResponseWriter, r *http.Request) {
@@ -100,54 +100,6 @@ func (h *RoleHandler) Search(w http.ResponseWriter, r *http.Request) {
 	if request.Filter != nil {
 		if request.Filter.Name != nil {
 			filter.Name = request.Filter.Name
-		}
-		if request.Filter.Permissions != nil {
-			requiredPermissionsBitmask := domain.PermissionsBitmask(0)
-			forbiddenPermissionsBitmask := domain.PermissionsBitmask(0)
-			if request.Filter.Permissions.AllowCreate != nil {
-				if *request.Filter.Permissions.AllowCreate {
-					requiredPermissionsBitmask.AddPermission(domain.PermissionCreate)
-				} else {
-					forbiddenPermissionsBitmask.AddPermission(domain.PermissionCreate)
-				}
-			}
-			if request.Filter.Permissions.AllowUpdate != nil {
-				if *request.Filter.Permissions.AllowUpdate {
-					requiredPermissionsBitmask.AddPermission(domain.PermissionUpdate)
-				} else {
-					forbiddenPermissionsBitmask.AddPermission(domain.PermissionUpdate)
-				}
-			}
-			if request.Filter.Permissions.AllowDelete != nil {
-				if *request.Filter.Permissions.AllowDelete {
-					requiredPermissionsBitmask.AddPermission(domain.PermissionDelete)
-				} else {
-					forbiddenPermissionsBitmask.AddPermission(domain.PermissionDelete)
-				}
-			}
-			if request.Filter.Permissions.AllowView != nil {
-				if *request.Filter.Permissions.AllowView {
-					requiredPermissionsBitmask.AddPermission(domain.PermissionView)
-				} else {
-					forbiddenPermissionsBitmask.AddPermission(domain.PermissionView)
-				}
-			}
-			if request.Filter.Permissions.AllowList != nil {
-				if *request.Filter.Permissions.AllowList {
-					requiredPermissionsBitmask.AddPermission(domain.PermissionList)
-				} else {
-					forbiddenPermissionsBitmask.AddPermission(domain.PermissionList)
-				}
-			}
-			if request.Filter.Permissions.AllowExecute != nil {
-				if *request.Filter.Permissions.AllowExecute {
-					requiredPermissionsBitmask.AddPermission(domain.PermissionExecute)
-				} else {
-					forbiddenPermissionsBitmask.AddPermission(domain.PermissionExecute)
-				}
-			}
-			filter.RequiredPermissionsBitmask = &requiredPermissionsBitmask
-			filter.ForbiddenPermissionsBitmask = &forbiddenPermissionsBitmask
 		}
 	}
 

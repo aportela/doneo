@@ -31,15 +31,16 @@ const (
 	UserPermissionAdmin = 1 << iota
 )
 
-// TODO: new
-// PermissionUpdateProject
-// PermissionDeleteProject
-// PermissionViewProject
-// PermissionAddTask
-// PermissionUpdateTask
-// PermissionDeleteTask
-// PermissionViewTask
-// PermissionExecuteReport
+// app permissions
+const (
+	PermissionUpdateProject PermissionsBitmask = 1 << iota
+	PermissionDeleteProject
+	PermissionViewProject
+	PermissionAddTask
+	PermissionUpdateTask
+	PermissionDeleteTask
+	PermissionViewTask
+)
 
 // app permissions
 const (

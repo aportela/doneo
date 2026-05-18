@@ -5,12 +5,13 @@ import type {
 import type { Order } from "../../../shared/types/dto/order";
 
 export type Permissions = {
-  allowCreate: boolean;
-  allowUpdate: boolean;
-  allowDelete: boolean;
-  allowView: boolean;
-  allowList: boolean;
-  allowExecute: boolean;
+  allowUpdateProject: boolean;
+  allowDeleteProject: boolean;
+  allowViewProject: boolean;
+  allowAddTask: boolean;
+  allowUpdateTask: boolean;
+  allowDeleteTask: boolean;
+  allowViewTask: boolean;
 };
 
 export type AddRequest = {
@@ -26,14 +27,6 @@ export type UpdateRequest = {
 
 type SearchRequestFilter = {
   name?: string;
-  permissions?: {
-    allowCreate?: boolean;
-    allowUpdate?: boolean;
-    allowDelete?: boolean;
-    allowView?: boolean;
-    allowList?: boolean;
-    allowExecute?: boolean;
-  };
 };
 
 export type SearchRequest = {

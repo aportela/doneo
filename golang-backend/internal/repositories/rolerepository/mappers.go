@@ -12,7 +12,7 @@ func RoleToDTO(role domain.Role) RoleDTO {
 	}
 }
 
-func DTOToRole(role RoleDTO) domain.Role {
+func DTOToDomain(role RoleDTO) domain.Role {
 	return domain.Role{
 		ID:                 role.ID,
 		Name:               role.Name,
@@ -20,18 +20,16 @@ func DTOToRole(role RoleDTO) domain.Role {
 	}
 }
 
-func ToRoleArray(roles []RoleDTO) []domain.Role {
+func DTOArrayToDomainArray(roles []RoleDTO) []domain.Role {
 	results := make([]domain.Role, 0, len(roles))
 	for _, role := range roles {
-		results = append(results, DTOToRole(role))
+		results = append(results, DTOToDomain(role))
 	}
 	return results
 }
 
 func SearchRolesFilterToDTO(filter domain.SearchRolesFilter) SearchRolesFilterDTO {
 	return SearchRolesFilterDTO{
-		Name:                        filter.Name,
-		RequiredPermissionsBitmask:  (*uint64)(filter.RequiredPermissionsBitmask),
-		ForbiddenPermissionsBitmask: (*uint64)(filter.ForbiddenPermissionsBitmask),
+		Name: filter.Name,
 	}
 }

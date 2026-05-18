@@ -6,38 +6,40 @@ import (
 	"github.com/aportela/doneo/internal/handlers"
 )
 
-func requestPermissionsToDomain(permissions PermissionsFlags) domain.PermissionsBitmask {
-	var bitmaskPermission domain.PermissionsBitmask
-	bitmaskPermission = 0
-	if permissions.AllowCreate {
-		bitmaskPermission.AddPermission(domain.PermissionCreate)
+func requestPermissionsToDomain(permissions permissionsFlags) domain.PermissionsBitmask {
+	bitmaskPermission := domain.PermissionsBitmask(0)
+	if permissions.AllowUpdateProject {
+		bitmaskPermission.AddPermission(domain.PermissionUpdateProject)
 	}
-	if permissions.AllowUpdate {
-		bitmaskPermission.AddPermission(domain.PermissionUpdate)
+	if permissions.AllowDeleteProject {
+		bitmaskPermission.AddPermission(domain.PermissionDeleteProject)
 	}
-	if permissions.AllowDelete {
-		bitmaskPermission.AddPermission(domain.PermissionDelete)
+	if permissions.AllowViewProject {
+		bitmaskPermission.AddPermission(domain.PermissionViewProject)
 	}
-	if permissions.AllowView {
-		bitmaskPermission.AddPermission(domain.PermissionView)
+	if permissions.AllowAddTask {
+		bitmaskPermission.AddPermission(domain.PermissionAddTask)
 	}
-	if permissions.AllowList {
-		bitmaskPermission.AddPermission(domain.PermissionList)
+	if permissions.AllowUpdateTask {
+		bitmaskPermission.AddPermission(domain.PermissionUpdateTask)
 	}
-	if permissions.AllowExecute {
-		bitmaskPermission.AddPermission(domain.PermissionExecute)
+	if permissions.AllowDeleteTask {
+		bitmaskPermission.AddPermission(domain.PermissionDeleteTask)
+	}
+	if permissions.AllowViewTask {
+		bitmaskPermission.AddPermission(domain.PermissionViewTask)
 	}
 	return bitmaskPermission
 }
 
-func addRequestToRole(request addRequest) domain.Role {
+func addRequestToDomain(request addRequest) domain.Role {
 	return domain.Role{
 		Name:               request.Name,
 		PermissionsBitmask: requestPermissionsToDomain(request.Permissions),
 	}
 }
 
-func updateRequestToRole(request updateRequest) domain.Role {
+func updateRequestToDomain(request updateRequest) domain.Role {
 	return domain.Role{
 		ID:                 request.Id,
 		Name:               request.Name,
@@ -45,36 +47,37 @@ func updateRequestToRole(request updateRequest) domain.Role {
 	}
 }
 
-func domainPermissionToResponsePermissions(bitmaskPermission domain.PermissionsBitmask) PermissionsFlags {
-	return PermissionsFlags{
-		AllowCreate:  bitmaskPermission.HasPermission(domain.PermissionCreate),
-		AllowUpdate:  bitmaskPermission.HasPermission(domain.PermissionUpdate),
-		AllowDelete:  bitmaskPermission.HasPermission(domain.PermissionDelete),
-		AllowView:    bitmaskPermission.HasPermission(domain.PermissionView),
-		AllowList:    bitmaskPermission.HasPermission(domain.PermissionList),
-		AllowExecute: bitmaskPermission.HasPermission(domain.PermissionExecute),
+func permissionDomainToResponsePermissionsFlags(bitmaskPermission domain.PermissionsBitmask) permissionsFlags {
+	return permissionsFlags{
+		AllowUpdateProject: bitmaskPermission.HasPermission(domain.PermissionUpdateProject),
+		AllowDeleteProject: bitmaskPermission.HasPermission(domain.PermissionDeleteProject),
+		AllowViewProject:   bitmaskPermission.HasPermission(domain.PermissionViewProject),
+		AllowAddTask:       bitmaskPermission.HasPermission(domain.PermissionAddTask),
+		AllowUpdateTask:    bitmaskPermission.HasPermission(domain.PermissionUpdateTask),
+		AllowDeleteTask:    bitmaskPermission.HasPermission(domain.PermissionDeleteTask),
+		AllowViewTask:      bitmaskPermission.HasPermission(domain.PermissionViewTask),
 	}
 }
 
-func roleToResponse(role domain.Role) roleResponse {
+func domainToResponse(role domain.Role) roleResponse {
 	return roleResponse{
 		ID:          role.ID,
 		Name:        role.Name,
-		Permissions: domainPermissionToResponsePermissions(role.PermissionsBitmask),
+		Permissions: permissionDomainToResponsePermissionsFlags(role.PermissionsBitmask),
 	}
 }
 
-func roleArrayToResponse(roles []domain.Role) []roleResponse {
+func domainArrayToResponse(roles []domain.Role) []roleResponse {
 	roleResponses := []roleResponse{}
 	for _, role := range roles {
-		roleResponses = append(roleResponses, roleToResponse(role))
+		roleResponses = append(roleResponses, domainToResponse(role))
 	}
 	return roleResponses
 }
 
 func ToSearchResponse(roles []domain.Role, pager browser.Result) searchResponse {
 	return searchResponse{
-		Roles: roleArrayToResponse(roles),
+		Roles: domainArrayToResponse(roles),
 		Pager: handlers.PagerResponse{
 			Enabled:      pager.ResultsPage > 0,
 			CurrentPage:  pager.CurrentPage,

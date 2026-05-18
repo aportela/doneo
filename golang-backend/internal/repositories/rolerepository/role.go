@@ -121,14 +121,6 @@ func (roleRepository *roleRepository) Search(ctx context.Context, pager browser.
 		sqlWhereConditions = append(sqlWhereConditions, "R.name LIKE ?")
 		filterArgs = append(filterArgs, "%"+*filter.Name+"%")
 	}
-	if filter.RequiredPermissionsBitmask != nil {
-		sqlWhereConditions = append(sqlWhereConditions, "(R.permissions_bitmask & ?) = ?")
-		filterArgs = append(filterArgs, filter.RequiredPermissionsBitmask, filter.RequiredPermissionsBitmask)
-	}
-	if filter.ForbiddenPermissionsBitmask != nil {
-		sqlWhereConditions = append(sqlWhereConditions, "(R.permissions_bitmask & ?) = 0")
-		filterArgs = append(filterArgs, filter.ForbiddenPermissionsBitmask)
-	}
 	if len(sqlWhereConditions) > 0 {
 		sqlWhere = " WHERE " + strings.Join(sqlWhereConditions, " AND ")
 	}

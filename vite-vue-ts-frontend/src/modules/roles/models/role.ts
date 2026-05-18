@@ -1,12 +1,13 @@
 import type { RoleResponse as RoleDTO } from "../types/dto";
 
 type Permissions = {
-  allowCreate: boolean;
-  allowUpdate: boolean;
-  allowDelete: boolean;
-  allowView: boolean;
-  allowList: boolean;
-  allowExecute: boolean;
+  allowUpdateProject: boolean;
+  allowDeleteProject: boolean;
+  allowViewProject: boolean;
+  allowAddTask: boolean;
+  allowUpdateTask: boolean;
+  allowDeleteTask: boolean;
+  allowViewTask: boolean;
 };
 
 export class Role {
@@ -25,12 +26,13 @@ export class Role {
       id: this.id,
       name: this.name,
       permissions: {
-        allowCreate: this.permissions.allowCreate,
-        allowUpdate: this.permissions.allowUpdate,
-        allowDelete: this.permissions.allowDelete,
-        allowView: this.permissions.allowView,
-        allowList: this.permissions.allowList,
-        allowExecute: this.permissions.allowExecute,
+        allowUpdateProject: this.permissions.allowUpdateProject,
+        allowDeleteProject: this.permissions.allowDeleteProject,
+        allowViewProject: this.permissions.allowViewProject,
+        allowAddTask: this.permissions.allowAddTask,
+        allowUpdateTask: this.permissions.allowUpdateTask,
+        allowDeleteTask: this.permissions.allowDeleteTask,
+        allowViewTask: this.permissions.allowViewTask,
       },
     };
   }

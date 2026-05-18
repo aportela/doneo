@@ -7,7 +7,5 @@ type RoleDTO struct {
 }
 
 type SearchRolesFilterDTO struct {
-	Name                        *string
-	RequiredPermissionsBitmask  *uint64
-	ForbiddenPermissionsBitmask *uint64
+	Name *string
 }

@@ -51,7 +51,7 @@ func (r *roleService) Get(ctx context.Context, id string) (domain.Role, error) {
 	if err != nil {
 		return domain.Role{}, fmt.Errorf("[RoleService] failed to get role with ID %s: %w", id, err)
 	}
-	return rolerepository.DTOToRole(role), nil
+	return rolerepository.DTOToDomain(role), nil
 }
 
 func (r *roleService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error) {
@@ -59,5 +59,5 @@ func (r *roleService) Search(ctx context.Context, pager browser.Params, order br
 	if err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[RoleService] failed to search roles: %w", err)
 	}
-	return rolerepository.ToRoleArray(roles), pagerResult, nil
+	return rolerepository.DTOArrayToDomainArray(roles), pagerResult, nil
 }

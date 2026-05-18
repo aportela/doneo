@@ -32,12 +32,13 @@
                 "id": "",
                 name: "",
                 permissions: {
-                    allowCreate: false,
-                    allowUpdate: false,
-                    allowDelete: false,
-                    allowView: false,
-                    allowList: false,
-                    allowExecute: false,
+                    allowUpdateProject: false,
+                    allowDeleteProject: false,
+                    allowViewProject: false,
+                    allowAddTask: false,
+                    allowUpdateTask: false,
+                    allowDeleteTask: false,
+                    allowViewTask: false,
                 }
             }
         )
@@ -266,62 +267,72 @@
 
             <n-grid :y-gap="8" :cols="2">
                 <n-gi>
-                    <n-switch v-model:value="role.permissions.allowCreate">
+                    <n-switch v-model:value="role.permissions.allowUpdateProject">
                         <template #checked>
-                            Create allowed
+                            Update project allowed
                         </template>
                         <template #unchecked>
-                            Create not allowed
+                            Update project not allowed
                         </template>
                     </n-switch>
                 </n-gi>
                 <n-gi>
-                    <n-switch v-model:value="role.permissions.allowUpdate">
+                    <n-switch v-model:value="role.permissions.allowDeleteProject">
                         <template #checked>
-                            Update allowed
+                            Delete project allowed
                         </template>
                         <template #unchecked>
-                            Update not allowed
+                            Delete project not allowed
                         </template>
                     </n-switch>
                 </n-gi>
                 <n-gi>
-                    <n-switch v-model:value="role.permissions.allowDelete">
+                    <n-switch v-model:value="role.permissions.allowViewProject">
                         <template #checked>
-                            Delete allowed
+                            View project allowed
                         </template>
                         <template #unchecked>
-                            Delete not allowed
+                            View project not allowed
                         </template>
                     </n-switch>
                 </n-gi>
                 <n-gi>
-                    <n-switch v-model:value="role.permissions.allowView">
+                    <n-switch v-model:value="role.permissions.allowAddTask">
                         <template #checked>
-                            View allowed
+                            Add task allowed
                         </template>
                         <template #unchecked>
-                            View not allowed
+                            Add task not allowed
                         </template>
                     </n-switch>
                 </n-gi>
                 <n-gi>
-                    <n-switch v-model:value="role.permissions.allowList">
+                    <n-switch v-model:value="role.permissions.allowUpdateTask">
                         <template #checked>
-                            List allowed
+                            Update task allowed
                         </template>
                         <template #unchecked>
-                            List not allowed
+                            Update task not allowed
                         </template>
                     </n-switch>
                 </n-gi>
                 <n-gi>
-                    <n-switch v-model:value="role.permissions.allowExecute">
+                    <n-switch v-model:value="role.permissions.allowDeleteTask">
                         <template #checked>
-                            Execute allowed
+                            Delete task allowed
                         </template>
                         <template #unchecked>
-                            Execute not allowed
+                            Delete task not allowed
+                        </template>
+                    </n-switch>
+                </n-gi>
+                <n-gi>
+                    <n-switch v-model:value="role.permissions.allowViewTask">
+                        <template #checked>
+                            View task allowed
+                        </template>
+                        <template #unchecked>
+                            View task not allowed
                         </template>
                     </n-switch>
                 </n-gi>
