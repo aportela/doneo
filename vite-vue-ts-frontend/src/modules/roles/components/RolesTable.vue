@@ -2,8 +2,8 @@
     import { h, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { useDialog, NButtonGroup, NButton, NFlex, NEmpty, NIcon } from 'naive-ui';
-    import { IconEdit, IconPlus, IconRefresh, IconEyeCheck, IconSquarePlus, IconTrash } from '@tabler/icons-vue';
+    import { useDialog, NButtonGroup, NButton, NFlex, NEmpty, NIcon, NTooltip } from 'naive-ui';
+    import { IconEdit, IconPlus, IconRefresh, IconEyeCheck, IconSquarePlus, IconTrash, IconCopyX } from '@tabler/icons-vue';
 
     import { Role } from '../models/role';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
@@ -33,8 +33,14 @@
             sortable: true,
         },
         {
-            label: t("RolePermissionsTableHeader"),
-            field: "permissions",
+            label: t("RoleProjectPermissionsTableHeader"),
+            field: "projectPermissions",
+            sortable: false,
+            align: "center",
+        },
+        {
+            label: t("RoleTasksPermissionsTableHeader"),
+            field: "taskPermissions",
             sortable: false,
             align: "center",
         },
@@ -107,6 +113,7 @@
                         v-model:value="roleNameFilter" @keydown-enter="onTextFilterKeyDownEnter" />
                 </th>
                 <th></th>
+                <th></th>
                 <th class="doneo-text-center">
                     <n-button-group size="small">
                         <n-button @click="onRefresh">
@@ -137,13 +144,50 @@
                     </div>
                 </td>
                 <td class="doneo-text-center">
-                    <IconEdit v-if="role.permissions.allowUpdateProject" />
-                    <IconTrash v-if="role.permissions.allowDeleteProject" />
-                    <IconEyeCheck v-if="role.permissions.allowViewProject" />
-                    <IconSquarePlus v-if="role.permissions.allowAddTask" />
-                    <IconEdit v-if="role.permissions.allowUpdateTask" />
-                    <IconTrash v-if="role.permissions.allowDeleteTask" />
-                    <IconEyeCheck v-if="role.permissions.allowViewTask" />
+                    <n-tooltip trigger="hover" v-if="role.permissions.allowUpdateProject">
+                        <template #trigger>
+                            <IconEdit class="doneo-cursor-help" />
+                        </template>
+                        {{ t("Update project allowed") }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover" v-if="role.permissions.allowDeleteProject">
+                        <template #trigger>
+                            <IconCopyX class="doneo-cursor-help" />
+                        </template>
+                        {{ t("Delete project allowed") }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover" v-if="role.permissions.allowViewProject">
+                        <template #trigger>
+                            <IconEyeCheck class="doneo-cursor-help" />
+                        </template>
+                        {{ t("View project allowed") }}
+                    </n-tooltip>
+                </td>
+                <td class="doneo-text-center">
+                    <n-tooltip trigger="hover" v-if="role.permissions.allowAddTask">
+                        <template #trigger>
+                            <IconSquarePlus class="doneo-cursor-help" />
+                        </template>
+                        {{ t("Add task allowed") }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover" v-if="role.permissions.allowUpdateTask">
+                        <template #trigger>
+                            <IconEdit class="doneo-cursor-help" />
+                        </template>
+                        {{ t("Update task allowed") }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover" v-if="role.permissions.allowDeleteTask">
+                        <template #trigger>
+                            <IconTrash class="doneo-cursor-help" />
+                        </template>
+                        {{ t("Delete task allowed") }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover" v-if="role.permissions.allowViewTask">
+                        <template #trigger>
+                            <IconEyeCheck class="doneo-cursor-help" />
+                        </template>
+                        {{ t("View task allowed") }}
+                    </n-tooltip>
                 </td>
                 <td class="doneo-text-center">
                     <n-button-group size="small">
@@ -187,4 +231,6 @@
             display: none;
         }
     }
+
+
 </style>
