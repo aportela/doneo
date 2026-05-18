@@ -189,7 +189,7 @@
     <n-modal v-model:show="showProjectTypeDialogForm">
         <ProjectTypeForm :mode="projectTypeDialogFormMode == 'add' ? 'add' : 'update'"
             :project-type-id="selectedProjectTypeId" style="width: 40%;" @add="onAdd" @update="onUpdate"
-            @delete="onDelete" @cancel="onCancel" />
+            @cancel="onCancel" />
     </n-modal>
 
     <n-card :title="t('Manage project types')">
@@ -202,7 +202,7 @@
         <ProjectTypesTable :project-types="projectTypes" :loading="state.ajaxRunning" @refresh="onRefresh"
             @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" @textfilter-keydown-enter="onRefresh"
             :sort-field="sort.field" :sort-order="sort.order" @toggle-sort="onToggleSort"
-            v-model:role-name-filter="nameFilter" />
+            v-model:project-type-name-filter="nameFilter" />
     </n-card>
 </template>
 
