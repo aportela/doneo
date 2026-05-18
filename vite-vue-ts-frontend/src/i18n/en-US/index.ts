@@ -133,15 +133,14 @@ export default {
   roleFormNameFieldTooLargeError: "Name is too large",
 
   // project types
+  "Manage project types": "Manage project types",
+  TotalProjectTypesPagerLabel: "Total project types: {total}",
+  ProjectTypeNameTableHeader: "Name",
   "Add project type": "Add project type",
   "Update project type": "Update project type",
   "Delete project type": "Delete project type",
-  "Project type name": "Project type name",
-  "Project type": "Project type",
-  "Project types": "Project types",
-  "Project type added": "Project type added",
-  "Project type updated": "Project type updated",
-  "Project type deleted": "Project type deleted",
+  deleteProjectTypeConfirmation:
+    'You are about to delete the project type "{name}" from the system.',
   "There was a problem loading the project type data":
     "There was a problem loading the project type data",
   "There was a problem adding the project type data":
@@ -152,6 +151,10 @@ export default {
     "There was a problem deleting the project type data",
   "We couldn’t find the specified project type":
     "We couldn’t find the specified project type",
+  projectTypeFormNameFieldPlaceholder: "Enter project type name",
+  projectTypeAddedNotification: 'Project type "{name}" has been added',
+  projectTypeUpdatedNotification: 'Project type "{name}" has been updated',
+  projectTypeDeletedNotification: 'Project type "{name}" has been deleted',
 
   // auth
   "Login to your account": "Login to your account",

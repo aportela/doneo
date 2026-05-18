@@ -196,7 +196,7 @@
         <Pager v-model:current-page="currentPage" v-model:page-size="pageSize" :total-pages="totalPages"
             :total-results="totalResults" class="doneo-pager-container">
             <template #total-results-label="{ totalResults }">
-                {{ t("TotalRolesPagerLabel", { total: totalResults }) }}
+                {{ t("TotalProjectTypesPagerLabel", { total: totalResults }) }}
             </template>
         </Pager>
         <ProjectTypesTable :project-types="projectTypes" :loading="state.ajaxRunning" @refresh="onRefresh"

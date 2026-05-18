@@ -133,15 +133,14 @@ export default {
   roleFormNameFieldTooLargeError: "El nombre es muy largo",
 
   // project types
+  "Manage project types": "Gestión de tipos de proyectos",
+  TotalProjectTypesPagerLabel: "Total tipos de proyecto: {total}",
+  ProjectTypeNameTableHeader: "Nombre",
   "Add project type": "Añadir tipo de proyecto",
   "Update project type": "Actualizar tipo de proyecto",
   "Delete project type": "Eliminar tipo de proyecto",
-  "Project type name": "Nombre del tipo de proyecto",
-  "Project type": "Tipo de proyecto",
-  "Project types": "Tipos de proyectos",
-  "Project type added": "Se ha añadido el tipo de proyecto",
-  "Project type updated": "Se ha modificado el tipo de proyecto",
-  "Project type deleted": "Se ha eliminado el tipo de proyecto",
+  deleteProjectTypeConfirmation:
+    'Está a punto de eliminar el tipo de proyecto "{name}" del sistema.',
   "There was a problem loading the project type data":
     "Se produjo un problema al cargar los datos del tipo de proyecto",
   "There was a problem adding the project type data":
@@ -152,6 +151,15 @@ export default {
     "Se produjo un problema al eliminar los datos del tipo de proyecto",
   "We couldn’t find the specified project type":
     "El tipo de proyecto especificado no existe",
+  projectTypeFormNameFieldPlaceholder:
+    "Introduzca el nombre del tipo de proyecto",
+  projectTypeFormNameFieldEmptyError: "El nombre está vacío",
+  projectTypeFormNameFieldTooLargeError: "El nombre es muy largo",
+  projectTypeAddedNotification: 'El tipo de proyecto "{name}" se ha añadido',
+  projectTypeUpdatedNotification:
+    'El tipo de proyecto "{name}" se ha modificado',
+  projectTypeDeletedNotification:
+    'El tipo de proyecto "{name}" se ha eliminado',
 
   // auth
   "Login to your account": "Inicie sesión con su cuenta",
