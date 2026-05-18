@@ -13,11 +13,11 @@ import (
 )
 
 type RoleRepository interface {
-	Add(ctx context.Context, role RoleDTO) error
-	Update(ctx context.Context, role RoleDTO) error
+	Add(ctx context.Context, role roleDTO) error
+	Update(ctx context.Context, role roleDTO) error
 	Delete(ctx context.Context, id string) error
-	Get(ctx context.Context, id string) (RoleDTO, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter SearchRolesFilterDTO) ([]RoleDTO, browser.Result, error)
+	Get(ctx context.Context, id string) (roleDTO, error)
+	Search(ctx context.Context, pager browser.Params, order browser.Order, filter searchFilterDTO) ([]roleDTO, browser.Result, error)
 }
 
 type roleRepository struct {
@@ -28,7 +28,7 @@ func NewRoleRepository(database database.Database) RoleRepository {
 	return &roleRepository{database: database}
 }
 
-func (roleRepository *roleRepository) Add(ctx context.Context, role RoleDTO) error {
+func (roleRepository *roleRepository) Add(ctx context.Context, role roleDTO) error {
 	_, err := roleRepository.database.ExecContext(
 		ctx,
 		`
@@ -42,7 +42,7 @@ func (roleRepository *roleRepository) Add(ctx context.Context, role RoleDTO) err
 	return err
 }
 
-func (roleRepository *roleRepository) Update(ctx context.Context, role RoleDTO) error {
+func (roleRepository *roleRepository) Update(ctx context.Context, role roleDTO) error {
 	_, err := roleRepository.database.ExecContext(
 		ctx,
 		`
@@ -70,8 +70,8 @@ func (roleRepository *roleRepository) Delete(ctx context.Context, id string) err
 	return err
 }
 
-func (roleRepository *roleRepository) Get(ctx context.Context, id string) (RoleDTO, error) {
-	var role RoleDTO
+func (roleRepository *roleRepository) Get(ctx context.Context, id string) (roleDTO, error) {
+	var role roleDTO
 	err := roleRepository.database.QueryRowContext(
 		ctx,
 		`
@@ -83,14 +83,14 @@ func (roleRepository *roleRepository) Get(ctx context.Context, id string) (RoleD
 		id).Scan(&role.ID, &role.Name, &role.PermissionsBitmask)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return RoleDTO{}, domain.ErrNotFound
+			return roleDTO{}, domain.ErrNotFound
 		}
-		return RoleDTO{}, err
+		return roleDTO{}, err
 	}
 	return role, err
 }
 
-func (roleRepository *roleRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter SearchRolesFilterDTO) ([]RoleDTO, browser.Result, error) {
+func (roleRepository *roleRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter searchFilterDTO) ([]roleDTO, browser.Result, error) {
 	var filterArgs []any
 	var queryArgs []any
 	sqlQuery := `
@@ -138,9 +138,9 @@ func (roleRepository *roleRepository) Search(ctx context.Context, pager browser.
 		return nil, browser.Result{}, err
 	}
 	defer rows.Close()
-	roles := make([]RoleDTO, 0)
+	roles := make([]roleDTO, 0)
 	for rows.Next() {
-		var role RoleDTO
+		var role roleDTO
 		if err := rows.Scan(&role.ID, &role.Name, &role.PermissionsBitmask); err != nil {
 			return nil, browser.Result{}, err
 		}

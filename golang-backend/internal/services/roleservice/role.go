@@ -26,14 +26,14 @@ func NewRoleService(role rolerepository.RoleRepository) RoleService {
 }
 
 func (r *roleService) Add(ctx context.Context, role domain.Role) error {
-	if err := r.repository.Add(ctx, rolerepository.RoleToDTO(role)); err != nil {
+	if err := r.repository.Add(ctx, rolerepository.DomainToDTO(role)); err != nil {
 		return fmt.Errorf("[RoleService] failed to add role with ID %s: %w", role.ID, err)
 	}
 	return nil
 }
 
 func (r *roleService) Update(ctx context.Context, role domain.Role) error {
-	if err := r.repository.Update(ctx, rolerepository.RoleToDTO(role)); err != nil {
+	if err := r.repository.Update(ctx, rolerepository.DomainToDTO(role)); err != nil {
 		return fmt.Errorf("[RoleService] failed to update role with ID %s: %w", role.ID, err)
 	}
 	return nil
@@ -55,7 +55,7 @@ func (r *roleService) Get(ctx context.Context, id string) (domain.Role, error) {
 }
 
 func (r *roleService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error) {
-	roles, pagerResult, err := r.repository.Search(ctx, pager, order, rolerepository.SearchRolesFilterToDTO(filter))
+	roles, pagerResult, err := r.repository.Search(ctx, pager, order, rolerepository.DomainFilterToDTO(filter))
 	if err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[RoleService] failed to search roles: %w", err)
 	}
