@@ -48,11 +48,9 @@
     const showUserDialogForm = ref<boolean>(false);
     const userDialogFormMode = ref<FormMode>("add");
 
-    const selectedUserId = ref<string>("");
-    const currentUser = ref<User>(
+    const selectedUser = ref<User>(
         new User({ "id": "", name: "", email: "", permissions: { isSuperUser: false }, createdAt: 0, updatedAt: 0, deletedAt: 0, avatarUrl: "" })
     );
-    const currentIndex = ref<number>(0);
 
     watch(state, (newValue: AjaxStateInterface) => {
         loadingStore.set(newValue.ajaxRunning);
@@ -85,7 +83,7 @@
     };
 
     const onShowUpdateForm = (user: User, _index: number) => {
-        selectedUserId.value = user.id;
+        selectedUser.value = user;
         userDialogFormMode.value = "update";
         showUserDialogForm.value = true;
     };
@@ -158,9 +156,7 @@
         }
     };
 
-    const onDelete = async (user: User, _index: number) => {
-        currentUser.value = user;
-        currentIndex.value = _index;
+    const onDelete = async (user: User, _index?: number) => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
             await userService.delete(user.id);
@@ -173,6 +169,7 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
+                            selectedUser.value = user;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onDelete" } });
                             break;
                         case 404:
@@ -192,9 +189,7 @@
         }
     };
 
-    const onUnDelete = async (user: User, _index: number) => {
-        currentUser.value = user;
-        currentIndex.value = _index;
+    const onUnDelete = async (user: User, _index?: number) => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
             await userService.unDelete(user.id);
@@ -207,6 +202,7 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
+                            selectedUser.value = user;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onUnDelete" } });
                             break;
                         case 404:
@@ -234,9 +230,9 @@
             if (payload.to.includes("ManageUsersPage.onRefresh")) {
                 onRefresh();
             } else if (payload.to.includes("ManageUsersPage.onDelete")) {
-                onDelete(currentUser.value, currentIndex.value)
+                onDelete(selectedUser.value)
             } else if (payload.to.includes("ManageUsersPage.onUnDelete")) {
-                onUnDelete(currentUser.value, currentIndex.value);
+                onUnDelete(selectedUser.value);
             }
         });
     });
@@ -248,7 +244,7 @@
 
 <template>
     <n-modal v-model:show="showUserDialogForm">
-        <UserForm :mode="userDialogFormMode == 'add' ? 'add' : 'update'" :user-id="selectedUserId" style="width: 40%;"
+        <UserForm :mode="userDialogFormMode == 'add' ? 'add' : 'update'" :user-id="selectedUser.id" style="width: 40%;"
             @add="onAdd" @update="onUpdate" @cancel="onCancel" />
     </n-modal>
 
