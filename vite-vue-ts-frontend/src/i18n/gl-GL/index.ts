@@ -73,6 +73,8 @@ export default {
     "Producíuse un erro o engadi-lo usuario",
   "There was a problem while updating the user data":
     "Producíuse un erro o modifica-lo usuario",
+  "There was a problem while loading the user data":
+    "Producíuse un erro o carga-lo usuario",
   userAddedNotification: 'O usuario "{name}" engadiuse',
   userUpdatedNotification: 'O usuario "{name}" modificouse',
   userDeletedNotification: 'O usuario "{name}" eliminouse',
@@ -94,7 +96,6 @@ export default {
   userFormPasswordFieldEmptyError: "O contrasinal está vacío",
   userFormPasswordFieldTooShortError: "O contrasinal é moi curto",
   userFormChangePasswordButtonLabel: "Modificar contrasinal",
-  userFormEmailNotFoundError: "O email non existe",
   superUserPermission: "Super usuario",
   normalUserPermission: "Usuario normal",
 
@@ -160,6 +161,10 @@ export default {
     "Produciuse un problema ó modifica-los datos do tipo de proxecto",
   "There was a problem deleting the project type data":
     "Produciuse un problema ó elimina-los datos do tipo de proxecto",
+  "There was a problem while adding the project type data":
+    "Produciuse un problema ó engadi-los datos do tipo de proxecto",
+  "There was a problem while updating the project type data":
+    "Produciuse un problema ó modifica-los datos do tipo de proxecto",
   "We couldn’t find the specified project type":
     "O tipo de proxecto especificado non existe",
   projectTypeFormNameFieldPlaceholder: "Introduzca o nome do tipo de proxecto",

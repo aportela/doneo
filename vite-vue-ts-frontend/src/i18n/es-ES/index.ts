@@ -73,6 +73,9 @@ export default {
     "Se ha producido un error al añadir el usuario",
   "There was a problem while updating the user data":
     "Se ha producido un error al modificar el usuario",
+  "There was a problem while loading the user data":
+    "Se ha producido un error al cargar el usuario",
+
   userAddedNotification: 'El usuario "{name}" se ha añadido',
   userUpdatedNotification: 'El usuario "{name}" se ha modificado',
   userDeletedNotification: 'El usuario "{name}" se ha eliminado',
@@ -94,7 +97,6 @@ export default {
   userFormPasswordFieldEmptyError: "La contraseña está vacía",
   userFormPasswordFieldTooShortError: "La contraseña es muy corta",
   userFormChangePasswordButtonLabel: "Modificar contraseña",
-  userFormEmailNotFoundError: "El email no existe",
   superUserPermission: "Super usuario",
   normalUserPermission: "Usuario normal",
 
@@ -160,6 +162,10 @@ export default {
     "Se produjo un problema al modificar los datos del tipo de proyecto",
   "There was a problem deleting the project type data":
     "Se produjo un problema al eliminar los datos del tipo de proyecto",
+  "There was a problem while adding the project type data":
+    "Se produjo un problema al añadir los datos del tipo de proyecto",
+  "There was a problem while updating the project type data":
+    "Se produjo un problema al modificar los datos del tipo de proyecto",
   "We couldn’t find the specified project type":
     "El tipo de proyecto especificado no existe",
   projectTypeFormNameFieldPlaceholder:

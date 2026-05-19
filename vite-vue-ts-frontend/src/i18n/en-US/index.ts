@@ -73,6 +73,8 @@ export default {
     "There was a problem while adding the user data",
   "There was a problem while updating the user data":
     "There was a problem while updating the user data",
+  "There was a problem while loading the user data":
+    "There was a problem while loading the user data",
   userAddedNotification: 'User "{name}" has been added',
   userUpdatedNotification: 'User "{name}" has been updated',
   userDeletedNotification: 'User "{name}" has been deleted',
@@ -94,7 +96,6 @@ export default {
   userFormPasswordFieldEmptyError: "Password is empty",
   userFormPasswordFieldTooShortError: "Password is too short",
   userFormChangePasswordButtonLabel: "Change password",
-  userFormEmailNotFoundError: "Email not found",
 
   superUserPermission: "Super user",
   normalUserPermission: "Normal user",
@@ -161,8 +162,17 @@ export default {
     "There was a problem updating the project type data",
   "There was a problem deleting the project type data":
     "There was a problem deleting the project type data",
+  "There was a problem while adding the project type data":
+    "There was a problem while adding the project type data",
+  "There was a problem while updating the project type data":
+    "There was a problem while updating the project type data",
   "We couldn’t find the specified project type":
     "We couldn’t find the specified project type",
+  projectTypeFormNameFieldEmptyError: "",
+  projectTypeFormNameFieldTooLargeError: "",
+  projectTypeFormIdNotFoundError: "",
+  projectTypeFormNameFieldAlreadyExists: "",
+
   projectTypeFormNameFieldPlaceholder: "Enter project type name",
   projectTypeAddedNotification: 'Project type "{name}" has been added',
   projectTypeUpdatedNotification: 'Project type "{name}" has been updated',

@@ -152,7 +152,7 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "UserForm.onGet" } });
                             break;
                         case 404:
-                            state.ajaxErrorMessage = t("userFormEmailNotFoundError"); // TODO: check this label, ! email but id ????
+                            state.ajaxErrorMessage = t("There was a problem while loading the user data");
                             break;
                         default:
                             state.ajaxErrorMessage = t("There was a problem while loading the user data");
@@ -358,7 +358,7 @@
                     </template>
                 </n-input>
                 <n-button v-else @click="onShowPasswordFormItem" block>{{ t("userFormChangePasswordButtonLabel")
-                    }}</n-button>
+                }}</n-button>
             </n-form-item>
             <n-form-item :label="t('userFormPermissionsLabel')">
                 <n-radio-group v-model:value="user.permissions.isSuperUser" name="radiogroup">
