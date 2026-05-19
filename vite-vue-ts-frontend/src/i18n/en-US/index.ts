@@ -86,13 +86,16 @@ export default {
   userFormPasswordFieldPlaceholder: "Enter password",
   userFormNameFieldEmptyError: "Name is empty",
   userFormNameFieldTooLargeError: "Name is too large",
+  userFormNameFieldAlreadyExists: "Name already exists",
   userFormEmailFieldEmptyError: "Email is empty",
   userFormEmailFieldInvalidError: "Email is invalid",
   userFormEmailFieldTooLargeError: "Email is too large",
+  userFormEmailFieldAlreadyExists: "Email already exists",
   userFormPasswordFieldEmptyError: "Password is empty",
   userFormPasswordFieldTooShortError: "Password is too short",
   userFormChangePasswordButtonLabel: "Change password",
   userFormEmailNotFoundError: "Email not found",
+
   superUserPermission: "Super user",
   normalUserPermission: "Normal user",
 

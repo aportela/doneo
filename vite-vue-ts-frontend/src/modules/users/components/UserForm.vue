@@ -197,6 +197,8 @@
                         case 409:
                             if (apiError.details?.field === "name") {
                                 serverErrors.value.name = "userFormNameFieldAlreadyExists";
+                            } else if (apiError.details?.field === "email") {
+                                serverErrors.value.email = "userFormEmailFieldAlreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("There was a problem while adding the user data");
                             }
@@ -247,6 +249,8 @@
                         case 409:
                             if (apiError.details?.field === "name") {
                                 serverErrors.value.name = "userFormNameFieldAlreadyExists";
+                            } else if (apiError.details?.field === "email") {
+                                serverErrors.value.email = "userFormEmailFieldAlreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("There was a problem while updating the user data");
                             }
