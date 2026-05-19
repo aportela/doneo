@@ -124,8 +124,6 @@
                             state.ajaxErrorMessage = t("There was a problem while loading the role data");
                             break;
                     }
-                    roleFormRef.value?.restoreValidation();
-                    roleFormRef.value?.validate().then(() => { }).catch(() => { });
                 },
                 (fatalError) => {
                     state.ajaxErrorMessage = t("There was a problem while loading the role data");
@@ -133,6 +131,11 @@
                 });
         } finally {
             state.ajaxRunning = false;
+            if (state.ajaxErrors) {
+                await nextTick();
+                roleFormRef.value?.restoreValidation();
+                roleFormRef.value?.validate().then(() => { }).catch(() => { });
+            }
         }
     };
 
