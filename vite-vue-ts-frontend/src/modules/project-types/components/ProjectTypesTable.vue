@@ -94,7 +94,7 @@
                     </n-flex>
                     <span v-else>{{ column.label }}</span>
                 </th>
-                <th class="doneo-text-center">{{ t("Actions") }}</th>
+                <th class="doneo-table-actions-column">{{ t("Actions") }}</th>
             </tr>
             <tr class="hide-mobile">
                 <th>
@@ -170,6 +170,4 @@
             display: none;
         }
     }
-
-
 </style>

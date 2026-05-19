@@ -171,7 +171,7 @@
                         <TableCellHeaderSortIcon v-if="props.sortField === column.field" :order="props.sortOrder" />
                     </n-flex>
                 </th>
-                <th class="doneo-text-center">{{ t("Actions") }}</th>
+                <th class="doneo-table-actions-column">{{ t("Actions") }}</th>
             </tr>
             <tr class="hide-mobile">
                 <th>

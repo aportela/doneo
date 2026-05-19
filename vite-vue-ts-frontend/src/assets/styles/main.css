@@ -27,3 +27,9 @@ th, td, .n-menu, .n-menu-item, .n-tabs-nav {
     display: flex;
     align-items: center;
 }
+
+.doneo-table-actions-column {
+    width: 1%;
+    white-space: nowrap;
+    text-align: center !important;
+}
