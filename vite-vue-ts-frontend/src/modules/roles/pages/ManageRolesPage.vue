@@ -40,7 +40,23 @@
     const showRoleDialogForm = ref<boolean>(false);
     const roleDialogFormMode = ref<FormMode>("add");
 
-    const selectedRoleId = ref<string>("");
+    const selectedRole = ref<Role>(
+        new Role(
+            {
+                id: "",
+                name: "",
+                permissions: {
+                    allowUpdateProject: false,
+                    allowDeleteProject: false,
+                    allowViewProject: false,
+                    allowAddTask: false,
+                    allowUpdateTask: false,
+                    allowDeleteTask: false,
+                    allowViewTask: false,
+                },
+            }
+        )
+    );
 
     watch(state, (newValue: AjaxStateInterface) => {
         loadingStore.set(newValue.ajaxRunning);
@@ -68,8 +84,8 @@
         showRoleDialogForm.value = true;
     };
 
-    const onShowUpdateForm = (role: Role, _index: number) => {
-        selectedRoleId.value = role.id;
+    const onShowUpdateForm = (role: Role, _index?: number) => {
+        selectedRole.value = role;
         roleDialogFormMode.value = "update";
         showRoleDialogForm.value = true;
     };
@@ -135,7 +151,7 @@
         }
     };
 
-    const onDelete = async (role: Role, _index: number) => {
+    const onDelete = async (role: Role, _index?: number) => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
             await roleService.delete(role.id);
@@ -148,6 +164,7 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
+                            selectedRole.value = role;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageRolesPage.onDelete" } });
                             break;
                         case 404:
@@ -175,8 +192,7 @@
             if (payload.to.includes("ManageRolesPage.onRefresh")) {
                 onRefresh();
             } else if (payload.to.includes("ManageRolesPage.onDelete")) {
-                // TODO: missing role/index param at this point
-                //onDelete();
+                onDelete(selectedRole.value);
             }
         });
     });
@@ -188,7 +204,7 @@
 
 <template>
     <n-modal v-model:show="showRoleDialogForm">
-        <RoleForm :mode="roleDialogFormMode == 'add' ? 'add' : 'update'" :roleId="selectedRoleId" style="width: 40%;"
+        <RoleForm :mode="roleDialogFormMode == 'add' ? 'add' : 'update'" :role-id="selectedRole.id" style="width: 40%;"
             @add="onAdd" @update="onUpdate" @cancel="onCancel" />
     </n-modal>
 
