@@ -161,6 +161,37 @@ export default {
   projectTypeDeletedNotification:
     'El tipo de proyecto "{name}" se ha eliminado',
 
+  // project statuses
+  "Manage project statuses": "Gestión de estados de proyectos",
+  TotalProjectStatusesPagerLabel: "Total estados de proyecto: {total}",
+  ProjectStatusNameTableHeader: "Nombre",
+  ProjectStatusIndexTableHeader: "Índice",
+  "Add project status": "Añadir estado de proyecto",
+  "Update project status": "Actualizar estado de proyecto",
+  "Delete project status": "Eliminar estado de proyecto",
+  deleteProjectStatusConfirmation:
+    'Está a punto de eliminar el estado de proyecto "{name}" del sistema.',
+  "There was a problem loading the project status data":
+    "Se produjo un problema al cargar los datos del estado de proyecto",
+  "There was a problem adding the project status data":
+    "Se produjo un problema al añadir los datos del estado de proyecto",
+  "There was a problem updating the project status data":
+    "Se produjo un problema al modificar los datos del estado de proyecto",
+  "There was a problem deleting the project status data":
+    "Se produjo un problema al eliminar los datos del estado de proyecto",
+  "We couldn’t find the specified project status":
+    "El estado de proyecto especificado no existe",
+  projectStatusFormNameFieldPlaceholder:
+    "Introduzca el nombre del estado de proyecto",
+  projectStatusFormNameFieldEmptyError: "El nombre está vacío",
+  projectStatusFormNameFieldTooLargeError: "El nombre es muy largo",
+  projectStatusAddedNotification:
+    'El estado de proyecto "{name}" se ha añadido',
+  projectStatusUpdatedNotification:
+    'El estado de proyecto "{name}" se ha modificado',
+  projectStatusDeletedNotification:
+    'El estado de proyecto "{name}" se ha eliminado',
+
   // auth
   "Login to your account": "Inicie sesión con su cuenta",
   "Session lost... re-auth required":

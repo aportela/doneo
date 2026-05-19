@@ -158,6 +158,35 @@ export default {
   projectTypeUpdatedNotification: 'O tipo de proxecto "{name}" modificouse',
   projectTypeDeletedNotification: 'O tipo de proxecto "{name}" eliminouse',
 
+  // project statuses
+  "Manage project statuses": "Xestión de estados de proxectos",
+  TotalProjectStatusesPagerLabel: "Total estados de proxecto: {total}",
+  ProjectStatusNameTableHeader: "Nome",
+  ProjectStatusIndexTableHeader: "Índice",
+  "Add project status": "Engadir estado de proxecto",
+  "Update project status": "Actualizar estado de proxecto",
+  "Delete project status": "Eliminar estado de proxecto",
+  "Project status name": "Nome do estado de proxecto",
+  deleteProjectStatusConfirmation:
+    'Está a punto de elimina-lo estado de proxecto "{name}" do sistema.',
+  "There was a problem loading the project status data":
+    "Produciuse un problema ó carga-los datos do estado de proxecto",
+  "There was a problem adding the project status data":
+    "Produciuse un problema ó engadi-los datos do estado de proxecto",
+  "There was a problem updating the project status data":
+    "Produciuse un problema ó modifica-los datos do estado de proxecto",
+  "There was a problem deleting the project status data":
+    "Produciuse un problema ó elimina-los datos do estado de proxecto",
+  "We couldn’t find the specified project status":
+    "O tipo de proxecto especificado non existe",
+  projectStatusFormNameFieldPlaceholder:
+    "Introduzca o nome do estado de proxecto",
+  projectStatusFormNameFieldEmptyError: "O nome está vacío",
+  projectStatusFormNameFieldTooLargeError: "O nome é moi longo",
+  projectStatusAddedNotification: 'O estado de proxecto "{name}" engadiuse',
+  projectStatusUpdatedNotification: 'O estado de proxecto "{name}" modificouse',
+  projectStatusDeletedNotification: 'O estado de proxecto "{name}" eliminouse',
+
   // auth
   "Login to your account": "Inicie sesión coa sua conta",
   "Session lost... re-auth required":

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
@@ -63,7 +64,7 @@ func (h *ProjectStatusHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	projectStatusId := chi.URLParam(r, "id")
 	err := h.service.Delete(r.Context(), projectStatusId)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectStatusService] failed to delete project status: %w", err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectStatusHandler] failed to delete project status: %w", err))
 		return
 	}
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
@@ -75,10 +76,10 @@ func (h *ProjectStatusHandler) Get(w http.ResponseWriter, r *http.Request) {
 	projectStatus, err := h.service.Get(r.Context(), projectStatusId)
 	if err != nil {
 		if err == domain.ErrNotFound {
-			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectStatusService] failed to get non existent project status: %w", err))
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectStatusHandler] failed to get non existent project status: %w", err))
 			return
 		} else {
-			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectStatusService] failed to get projectStatus: %w", err))
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectStatusHandler] failed to get projectStatus: %w", err))
 			return
 		}
 	}
@@ -87,6 +88,29 @@ func (h *ProjectStatusHandler) Get(w http.ResponseWriter, r *http.Request) {
 
 func (h *ProjectStatusHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectStatuses, err := h.service.Search(r.Context())
-	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectStatuses), err)
+	var request searchRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectStatusHandler] invalid request payload: %w", err))
+		return
+	}
+	filter := domain.SearchProjectStatusesFilter{
+		Name: nil,
+	}
+	if request.Filter != nil {
+		if request.Filter.Name != nil {
+			filter.Name = request.Filter.Name
+		}
+	}
+	projectStatuses, pagerResult, err := h.service.Search(r.Context(),
+		browser.Params{
+			CurrentPage: request.Pager.CurrentPage,
+			ResultsPage: request.Pager.ResultsPage,
+		},
+		browser.Order{
+			Field: request.Order.Field,
+			Sort:  string(request.Order.Sort),
+		},
+		filter,
+	)
+	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectStatuses, pagerResult), err)
 }

@@ -4,7 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"strings"
 
+	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 )
@@ -14,7 +17,7 @@ type ProjectStatusRepository interface {
 	Update(ctx context.Context, projectStatus projectStatusDTO) error
 	Get(ctx context.Context, id string) (projectStatusDTO, error)
 	Delete(ctx context.Context, id string) error
-	Search(ctx context.Context) ([]projectStatusDTO, error)
+	Search(ctx context.Context, pager browser.Params, order browser.Order, filter searchFilterDTO) ([]projectStatusDTO, browser.Result, error)
 }
 
 type projectStatusRepository struct {
@@ -108,32 +111,92 @@ func (projectStatusRepository *projectStatusRepository) Get(ctx context.Context,
 	return projectStatus, err
 }
 
-func (projectStatusRepository *projectStatusRepository) Search(ctx context.Context) ([]projectStatusDTO, error) {
-	rows, err := projectStatusRepository.database.QueryContext(
-		ctx,
-		`
+func (projectStatusRepository *projectStatusRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter searchFilterDTO) ([]projectStatusDTO, browser.Result, error) {
+	var filterArgs []any
+	var queryArgs []any
+	sqlQuery := `
 			SELECT
 				PS.id, PS.name, PS.item_hex_color, PS.item_index
 			FROM project_statuses PS
-			ORDER BY PS.item_index, PS.name
-        `,
-	)
+    `
+	var field string
+	switch order.Field {
+	case "name":
+		field = "PS.name COLLATE NOCASE"
+	case "index":
+		field = "PS.item_index"
+	default:
+		field = "PS.item_index"
+	}
+	var sort string
+	switch order.Sort {
+	case "DESC":
+		sort = "DESC"
+	case "ASC":
+		sort = "ASC"
+	default:
+		sort = "ASC"
+	}
+	sqlOrder := fmt.Sprintf(" ORDER BY %s %s ", field, sort)
+	sqlWhere := ""
+	var sqlWhereConditions []string
+	if filter.Name != nil {
+		sqlWhereConditions = append(sqlWhereConditions, "PS.name LIKE ?")
+		filterArgs = append(filterArgs, "%"+*filter.Name+"%")
+	}
+
+	if len(sqlWhereConditions) > 0 {
+		sqlWhere = " WHERE " + strings.Join(sqlWhereConditions, " AND ")
+	}
+	queryArgs = append(queryArgs, filterArgs...)
+	var sqlLimit string
+	if pager.Enabled() {
+		sqlLimit = " LIMIT ? OFFSET ? "
+		queryArgs = append(queryArgs, pager.Limit(), pager.Offset())
+	} else {
+		sqlLimit = ""
+	}
+	sqlQuery = fmt.Sprintf("%s %s %s %s ", sqlQuery, sqlWhere, sqlOrder, sqlLimit)
+	rows, err := projectStatusRepository.database.QueryContext(ctx, sqlQuery, queryArgs...)
 	if err != nil {
-		return nil, err
+		return nil, browser.Result{}, err
 	}
 	defer rows.Close()
-	var projectStatuses []projectStatusDTO
+	projectStatuses := make([]projectStatusDTO, 0)
 	for rows.Next() {
 		var projectStatus projectStatusDTO
 		if err := rows.Scan(
 			&projectStatus.ID, &projectStatus.Name, &projectStatus.HexColor, &projectStatus.Index,
 		); err != nil {
-			return nil, err
+			return nil, browser.Result{}, err
 		}
 		projectStatuses = append(projectStatuses, projectStatus)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, err
+		return nil, browser.Result{}, err
 	}
-	return projectStatuses, nil
+
+	var totalResults int
+
+	if pager.Enabled() {
+		sqlCountQuery := `
+			SELECT
+				COUNT(*) AS total_project_statuses
+			FROM project_statuses PT
+		`
+		sqlCountQuery = fmt.Sprintf("%s %s", sqlCountQuery, sqlWhere)
+		err = projectStatusRepository.database.QueryRowContext(
+			ctx,
+			sqlCountQuery,
+			filterArgs...,
+		).Scan(&totalResults)
+
+		if err != nil {
+			return nil, browser.Result{}, err
+		}
+	} else {
+		totalResults = len(projectStatuses)
+	}
+
+	return projectStatuses, browser.NewResult(pager, totalResults), nil
 }

@@ -1,7 +1,9 @@
 package projectstatushandler
 
 import (
+	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/handlers"
 )
 
 func addRequestToDomain(request addRequest) domain.ProjectStatus {
@@ -39,8 +41,15 @@ func domainArrayToResponseArray(projectStatuses []domain.ProjectStatus) []projec
 	return projectStatusResponses
 }
 
-func toSearchResponse(users []domain.ProjectStatus) searchResponse {
+func toSearchResponse(users []domain.ProjectStatus, pager browser.Result) searchResponse {
 	return searchResponse{
 		ProjectStatuses: domainArrayToResponseArray(users),
+		Pager: handlers.PagerResponse{
+			Enabled:      pager.ResultsPage > 0,
+			CurrentPage:  pager.CurrentPage,
+			ResultsPage:  pager.ResultsPage,
+			TotalPages:   pager.TotalPages,
+			TotalResults: pager.TotalResults,
+		},
 	}
 }

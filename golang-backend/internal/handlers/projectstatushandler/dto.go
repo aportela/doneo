@@ -16,6 +16,16 @@ type updateRequest struct {
 	Index    int    `json:"index"`
 }
 
+type filterRequest struct {
+	Name *string `json:"name"`
+}
+
+type searchRequest struct {
+	Pager  handlers.PagerRequest `json:"pager"`
+	Order  handlers.OrderRequest `json:"order"`
+	Filter *filterRequest        `json:"filter"`
+}
+
 type projectStatusResponse struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`

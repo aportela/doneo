@@ -156,6 +156,31 @@ export default {
   projectTypeUpdatedNotification: 'Project type "{name}" has been updated',
   projectTypeDeletedNotification: 'Project type "{name}" has been deleted',
 
+  // project statuses
+  "Manage project statuses": "Manage project statuses",
+  TotalProjectStatusesPagerLabel: "Total project statuses: {total}",
+  ProjectStatusNameTableHeader: "Name",
+  ProjectStatusIndexTableHeader: "Index",
+  "Add project status": "Add project status",
+  "Update project status": "Update project status",
+  "Delete project status": "Delete project status",
+  deleteProjectStatusConfirmation:
+    'You are about to delete the project status "{name}" from the system.',
+  "There was a problem loading the project status data":
+    "There was a problem loading the project status data",
+  "There was a problem adding the project status data":
+    "There was a problem adding the project status data",
+  "There was a problem updating the project status data":
+    "There was a problem updating the project status data",
+  "There was a problem deleting the project status data":
+    "There was a problem deleting the project status data",
+  "We couldn’t find the specified project status":
+    "We couldn’t find the specified project status",
+  projectStatusFormNameFieldPlaceholder: "Enter project status name",
+  projectStatusAddedNotification: 'Project status "{name}" has been added',
+  projectStatusUpdatedNotification: 'Project status "{name}" has been updated',
+  projectStatusDeletedNotification: 'Project status "{name}" has been deleted',
+
   // auth
   "Login to your account": "Login to your account",
   "Session lost... re-auth required": "Session lost... re-auth required",

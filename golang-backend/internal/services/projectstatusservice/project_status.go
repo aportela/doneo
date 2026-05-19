@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/projectstatusrepository"
 )
@@ -13,7 +14,7 @@ type ProjectStatusService interface {
 	Update(ctx context.Context, projectStatus domain.ProjectStatus) error
 	Delete(ctx context.Context, id string) error
 	Get(ctx context.Context, id string) (domain.ProjectStatus, error)
-	Search(ctx context.Context) ([]domain.ProjectStatus, error)
+	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.Result, error)
 }
 
 type projectStatusService struct {
@@ -44,10 +45,10 @@ func (s *projectStatusService) Get(ctx context.Context, id string) (domain.Proje
 	return projectstatusrepository.DTOToDomain(projectStatus), nil
 }
 
-func (s *projectStatusService) Search(ctx context.Context) ([]domain.ProjectStatus, error) {
-	projectStatuses, err := s.repository.Search(ctx)
+func (s *projectStatusService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.Result, error) {
+	projectStatuses, pagerResult, err := s.repository.Search(ctx, pager, order, projectstatusrepository.DomainFilterToDTO(filter))
 	if err != nil {
-		return nil, fmt.Errorf("[ProjectStatusService] failed to search project statuses: %w", err)
+		return nil, browser.Result{}, fmt.Errorf("[ProjectStatusService] failed to search project statuses: %w", err)
 	}
-	return projectstatusrepository.DTOArrayToDomainArray(projectStatuses), nil
+	return projectstatusrepository.DTOArrayToDomainArray(projectStatuses), pagerResult, nil
 }
