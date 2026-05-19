@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, onMounted, type CSSProperties, watch, onBeforeUnmount } from 'vue';
+    import { ref, reactive, computed, onMounted, type CSSProperties, watch, onBeforeUnmount, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NGrid, NGi, NSwitch } from 'naive-ui';
@@ -57,7 +57,6 @@
         name: {
             required: true,
             validator: (_rule: FormItemRule, value: string) => {
-                console.log("validator", serverErrors.value.name);
                 if (!value) {
                     return new Error(t("roleFormNameFieldEmptyError"));
                 }
@@ -158,8 +157,6 @@
                         case 409:
                             if (apiError.details?.field === "name") {
                                 serverErrors.value.name = "roleFormNameFieldAlreadyExists";
-                                console.log(409);
-                                roleFormRef.value?.validate().catch(() => { });
                             } else {
                                 state.ajaxErrorMessage = t("There was a problem while adding the role data");
                             }
@@ -176,6 +173,7 @@
         } finally {
             state.ajaxRunning = false;
             if (state.ajaxErrors) {
+                await nextTick();
                 roleFormRef.value?.restoreValidation();
                 roleFormRef.value?.validate().then(() => { }).catch(() => { });
             }
@@ -202,13 +200,16 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "RoleForm.onUpdate" } });
                             break;
                         case 409:
-                        // conflict (invalid id || name ?)
+                            if (apiError.details?.field === "name") {
+                                serverErrors.value.name = "roleFormNameFieldAlreadyExists";
+                            } else {
+                                state.ajaxErrorMessage = t("There was a problem while updating the role data");
+                            }
+                            break;
                         default:
                             state.ajaxErrorMessage = t("There was a problem while updating the role data");
                             break;
                     }
-                    roleFormRef.value?.restoreValidation();
-                    roleFormRef.value?.validate().then(() => { }).catch(() => { });
                 },
                 (fatalError) => {
                     state.ajaxErrorMessage = t("There was a problem while updating the role data");
@@ -216,6 +217,11 @@
                 });
         } finally {
             state.ajaxRunning = false;
+            if (state.ajaxErrors) {
+                await nextTick();
+                roleFormRef.value?.restoreValidation();
+                roleFormRef.value?.validate().then(() => { }).catch(() => { });
+            }
         }
     };
 
