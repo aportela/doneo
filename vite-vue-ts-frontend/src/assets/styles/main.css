@@ -19,7 +19,7 @@
 }
 
 /* deny select text (clicking at element) */
-th, td, .n-menu, .n-menu-item, .n-tabs-nav {
+th, td, .n-menu, .n-menu-item, .n-tabs-nav, .n-notification-container {
         user-select: none;
 }
 
