@@ -28,7 +28,7 @@ func (p *PermissionsBitmask) Clear() {
 
 // user permissions
 const (
-	UserPermissionAdmin = 1 << iota
+	UserPermissionAdmin PermissionsBitmask = 1 << iota
 )
 
 // app permissions
