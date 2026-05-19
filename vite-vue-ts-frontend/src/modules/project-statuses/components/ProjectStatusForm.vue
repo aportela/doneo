@@ -42,7 +42,10 @@
         name: {
             required: true,
             validator: (_rule: FormItemRule, value: string) => {
-                if (!value) {
+                if (state.ajaxRunning) {
+                    return true;
+                }
+                if (!value?.trim()) {
                     return new Error(t("projectStatusFormNameFieldEmptyError"));
                 }
                 else if (value.length > maxNameLength) {
@@ -106,7 +109,7 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectStatusForm.onGet" } });
                             break;
                         case 404:
-                            state.ajaxErrorMessage = t("projectStatusFormIdNotFoundError");
+                            state.ajaxErrorMessage = t("We couldn’t find the specified project status");
                             break;
                         default:
                             state.ajaxErrorMessage = t("There was a problem while loading the project status data");
@@ -146,13 +149,16 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectStatusForm.onAdd" } });
                             break;
                         case 409:
-                        // conflict (invalid id || name ?)
+                            if (apiError.details?.field === "name") {
+                                serverErrors.value.name = "projectStatusormNameFieldAlreadyExists";
+                            } else {
+                                state.ajaxErrorMessage = t("There was a problem while adding the project status data");
+                            }
+                            break;
                         default:
                             state.ajaxErrorMessage = t("There was a problem while adding the project status data");
                             break;
                     }
-                    projectStatusFormRef.value?.restoreValidation();
-                    projectStatusFormRef.value?.validate().then(() => { }).catch(() => { });
                 },
                 (fatalError) => {
                     state.ajaxErrorMessage = t("There was a problem while adding the project status data");
@@ -160,6 +166,11 @@
                 });
         } finally {
             state.ajaxRunning = false;
+            if (state.ajaxErrors) {
+                await nextTick();
+                projectStatusFormRef.value?.restoreValidation();
+                projectStatusFormRef.value?.validate().then(() => { }).catch(() => { });
+            }
         }
     };
 
@@ -184,13 +195,16 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectStatusForm.onUpdate" } });
                             break;
                         case 409:
-                        // conflict (invalid id || name ?)
+                            if (apiError.details?.field === "name") {
+                                serverErrors.value.name = "projectStatusormNameFieldAlreadyExists";
+                            } else {
+                                state.ajaxErrorMessage = t("There was a problem while updating the project status data");
+                            }
+                            break;
                         default:
                             state.ajaxErrorMessage = t("There was a problem while updating the project status data");
                             break;
                     }
-                    projectStatusFormRef.value?.restoreValidation();
-                    projectStatusFormRef.value?.validate().then(() => { }).catch(() => { });
                 },
                 (fatalError) => {
                     state.ajaxErrorMessage = t("There was a problem while updating the project status data");
@@ -198,6 +212,11 @@
                 });
         } finally {
             state.ajaxRunning = false;
+            if (state.ajaxErrors) {
+                await nextTick();
+                projectStatusFormRef.value?.restoreValidation();
+                projectStatusFormRef.value?.validate().then(() => { }).catch(() => { });
+            }
         }
     };
 
