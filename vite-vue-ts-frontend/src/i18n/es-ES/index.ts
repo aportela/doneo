@@ -172,10 +172,11 @@ export default {
     "Se produjo un problema al cargar los datos del tipo de proyecto",
   "We couldn’t find the specified project type":
     "El tipo de proyecto especificado no existe",
-  projectTypeFormNameFieldPlaceholder:
-    "Introduzca el nombre del tipo de proyecto",
   projectTypeFormNameFieldEmptyError: "El nombre está vacío",
   projectTypeFormNameFieldTooLargeError: "El nombre es muy largo",
+  projectTypeFormNameFieldAlreadyExists: "El nombre ya existe",
+  projectTypeFormNameFieldPlaceholder:
+    "Introduzca el nombre del tipo de proyecto",
   projectTypeAddedNotification: 'El tipo de proyecto "{name}" se ha añadido',
   projectTypeUpdatedNotification:
     'El tipo de proyecto "{name}" se ha modificado',
@@ -202,10 +203,11 @@ export default {
     "Se produjo un problema al eliminar los datos del estado de proyecto",
   "We couldn’t find the specified project status":
     "El estado de proyecto especificado no existe",
-  projectStatusFormNameFieldPlaceholder:
-    "Introduzca el nombre del estado de proyecto",
   projectStatusFormNameFieldEmptyError: "El nombre está vacío",
   projectStatusFormNameFieldTooLargeError: "El nombre es muy largo",
+  projectStatusFormNameFieldAlreadyExists: "El nombre ya existe",
+  projectStatusFormNameFieldPlaceholder:
+    "Introduzca el nombre del estado de proyecto",
   projectStatusAddedNotification:
     'El estado de proyecto "{name}" se ha añadido',
   projectStatusUpdatedNotification:

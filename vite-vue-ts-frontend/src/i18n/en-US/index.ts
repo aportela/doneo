@@ -172,11 +172,9 @@ export default {
     "There was a problem while loading the project type data",
   "We couldn’t find the specified project type":
     "We couldn’t find the specified project type",
-  projectTypeFormNameFieldEmptyError: "",
-  projectTypeFormNameFieldTooLargeError: "",
-  projectTypeFormIdNotFoundError: "",
-  projectTypeFormNameFieldAlreadyExists: "",
-
+  projectTypeFormNameFieldEmptyError: "Name is empty",
+  projectTypeFormNameFieldTooLargeError: "Name is too large",
+  projectTypeFormNameFieldAlreadyExists: "Name already exists",
   projectTypeFormNameFieldPlaceholder: "Enter project type name",
   projectTypeAddedNotification: 'Project type "{name}" has been added',
   projectTypeUpdatedNotification: 'Project type "{name}" has been updated',
@@ -202,6 +200,9 @@ export default {
     "There was a problem deleting the project status data",
   "We couldn’t find the specified project status":
     "We couldn’t find the specified project status",
+  projectStatusFormNameFieldEmptyError: "Name is empty",
+  projectStatusFormNameFieldTooLargeError: "Name is too large",
+  projectStatusFormNameFieldAlreadyExists: "Name already exists",
   projectStatusFormNameFieldPlaceholder: "Enter project status name",
   projectStatusAddedNotification: 'Project status "{name}" has been added',
   projectStatusUpdatedNotification: 'Project status "{name}" has been updated',

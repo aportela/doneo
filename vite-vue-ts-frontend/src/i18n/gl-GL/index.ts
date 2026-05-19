@@ -174,6 +174,7 @@ export default {
   projectTypeFormNameFieldPlaceholder: "Introduzca o nome do tipo de proxecto",
   projectTypeFormNameFieldEmptyError: "O nome está vacío",
   projectTypeFormNameFieldTooLargeError: "O nome é moi longo",
+  projectTypeFormNameFieldAlreadyExists: "O nombre xa existe",
   projectTypeAddedNotification: 'O tipo de proxecto "{name}" engadiuse',
   projectTypeUpdatedNotification: 'O tipo de proxecto "{name}" modificouse',
   projectTypeDeletedNotification: 'O tipo de proxecto "{name}" eliminouse',
@@ -199,10 +200,11 @@ export default {
     "Produciuse un problema ó elimina-los datos do estado de proxecto",
   "We couldn’t find the specified project status":
     "O tipo de proxecto especificado non existe",
-  projectStatusFormNameFieldPlaceholder:
-    "Introduzca o nome do estado de proxecto",
   projectStatusFormNameFieldEmptyError: "O nome está vacío",
   projectStatusFormNameFieldTooLargeError: "O nome é moi longo",
+  projectStatusFormNameFieldAlreadyExists: "El nombre ya existe",
+  projectStatusFormNameFieldPlaceholder:
+    "Introduzca o nome do estado de proxecto",
   projectStatusAddedNotification: 'O estado de proxecto "{name}" engadiuse',
   projectStatusUpdatedNotification: 'O estado de proxecto "{name}" modificouse',
   projectStatusDeletedNotification: 'O estado de proxecto "{name}" eliminouse',
