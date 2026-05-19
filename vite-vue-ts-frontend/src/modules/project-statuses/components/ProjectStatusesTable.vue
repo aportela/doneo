@@ -3,7 +3,7 @@
     import { useI18n } from "vue-i18n";
 
     import { useDialog, NButtonGroup, NButton, NFlex, NEmpty, NIcon, NTag } from 'naive-ui';
-    import { IconEdit, IconPlus, IconRefresh, IconTrash } from '@tabler/icons-vue';
+    import { IconArrowBigDown, IconArrowBigUp, IconEdit, IconPlus, IconRefresh, IconTrash } from '@tabler/icons-vue';
 
     import { ProjectStatus } from '../models/project-status';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
@@ -23,7 +23,7 @@
 
     const { t } = useI18n();
 
-    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'toggleSort', 'textfilterKeydownEnter']);
+    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'toggleSort', 'textfilterKeydownEnter', 'moveIndexUp', 'moveIndexDown']);
 
     const props = defineProps<Props>();
 
@@ -56,6 +56,14 @@
 
     const onAdd = () => {
         emit("add");
+    };
+
+    const onMoveIndexUp = (projectType: ProjectStatus, index: number) => {
+        emit("moveIndexUp", projectType, index);
+    };
+
+    const onMoveIndexDown = (projectType: ProjectStatus, index: number) => {
+        emit("moveIndexDown", projectType, index);
     };
 
     const onUpdate = (projectType: ProjectStatus, index: number) => {
@@ -137,6 +145,22 @@
                 <td>{{ projectStatus.index }}</td>
                 <td class="doneo-text-center">
                     <n-button-group size="small">
+                        <n-button @click="onMoveIndexUp(projectStatus, index)" :disabled="props.loading">
+                            {{ t("Up") }}
+                            <template #icon>
+                                <n-icon :size="22">
+                                    <IconArrowBigUp />
+                                </n-icon>
+                            </template>
+                        </n-button>
+                        <n-button @click="onMoveIndexDown(projectStatus, index)" :disabled="props.loading">
+                            {{ t("Down") }}
+                            <template #icon>
+                                <n-icon :size="22">
+                                    <IconArrowBigDown />
+                                </n-icon>
+                            </template>
+                        </n-button>
                         <n-button @click="onUpdate(projectStatus, index)" :disabled="props.loading">
                             {{ t("Update") }}
                             <template #icon>

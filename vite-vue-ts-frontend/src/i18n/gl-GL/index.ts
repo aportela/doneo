@@ -212,6 +212,8 @@ export default {
   projectStatusAddedNotification: 'O estado de proxecto "{name}" engadiuse',
   projectStatusUpdatedNotification: 'O estado de proxecto "{name}" modificouse',
   projectStatusDeletedNotification: 'O estado de proxecto "{name}" eliminouse',
+  projectStatusIndexMovedNotification:
+    'O índice do estado do pxoyecto "{name}" moveuse',
 
   // auth
   "Login to your account": "Inicie sesión coa sua conta",

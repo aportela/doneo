@@ -211,6 +211,8 @@ export default {
   projectStatusAddedNotification: 'Project status "{name}" has been added',
   projectStatusUpdatedNotification: 'Project status "{name}" has been updated',
   projectStatusDeletedNotification: 'Project status "{name}" has been deleted',
+  projectStatusIndexMovedNotification:
+    'Project status "{name}" index has been moved',
 
   // auth
   "Login to your account": "Login to your account",

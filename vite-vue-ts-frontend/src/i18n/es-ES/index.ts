@@ -218,6 +218,8 @@ export default {
     'El estado de proyecto "{name}" se ha modificado',
   projectStatusDeletedNotification:
     'El estado de proyecto "{name}" se ha eliminado',
+  projectStatusIndexMovedNotification:
+    'El índice del estado de proyecto "{name}" se ha movido',
 
   // auth
   "Login to your account": "Inicie sesión con su cuenta",
