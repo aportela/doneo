@@ -154,6 +154,7 @@ export default {
   "Add project type": "Add project type",
   "Update project type": "Update project type",
   "Delete project type": "Delete project type",
+  "No project types found": "No project types found",
   deleteProjectTypeConfirmation:
     'You are about to delete the project type "{name}" from the system.',
   "There was a problem loading the project type data":
@@ -188,6 +189,7 @@ export default {
   "Add project status": "Add project status",
   "Update project status": "Update project status",
   "Delete project status": "Delete project status",
+  "No project statuses found": "No project statuses found",
   deleteProjectStatusConfirmation:
     'You are about to delete the project status "{name}" from the system.',
   "There was a problem loading the project status data":
@@ -198,6 +200,8 @@ export default {
     "There was a problem updating the project status data",
   "There was a problem deleting the project status data":
     "There was a problem deleting the project status data",
+  "There was a problem while loading the project status data":
+    "There was a problem while loading the project status data",
   "We couldn’t find the specified project status":
     "We couldn’t find the specified project status",
   projectStatusFormNameFieldEmptyError: "Name is empty",

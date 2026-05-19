@@ -153,6 +153,7 @@ export default {
   "Update project type": "Actualizar tipo de proxecto",
   "Delete project type": "Eliminar tipo de proxecto",
   "Project type name": "Nome do tipo de proxecto",
+  "No project types found": "Non se atoparon tipos de proxectos",
   deleteProjectTypeConfirmation:
     'Está a punto de elimina-lo tipo de proxecto "{name}" do sistema.',
   "There was a problem loading the project type data":
@@ -188,6 +189,7 @@ export default {
   "Update project status": "Actualizar estado de proxecto",
   "Delete project status": "Eliminar estado de proxecto",
   "Project status name": "Nome do estado de proxecto",
+  "No project statuses found": "No se han atoparon estados de proxectos",
   deleteProjectStatusConfirmation:
     'Está a punto de elimina-lo estado de proxecto "{name}" do sistema.',
   "There was a problem loading the project status data":
@@ -198,6 +200,8 @@ export default {
     "Produciuse un problema ó modifica-los datos do estado de proxecto",
   "There was a problem deleting the project status data":
     "Produciuse un problema ó elimina-los datos do estado de proxecto",
+  "There was a problem while loading the project status data":
+    "Produciuse un problema ó carga-los datos do estado de proxecto",
   "We couldn’t find the specified project status":
     "O tipo de proxecto especificado non existe",
   projectStatusFormNameFieldEmptyError: "O nome está vacío",

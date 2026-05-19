@@ -154,6 +154,7 @@ export default {
   "Add project type": "Añadir tipo de proyecto",
   "Update project type": "Actualizar tipo de proyecto",
   "Delete project type": "Eliminar tipo de proyecto",
+  "No project types found": "No se han encontrado tipos de proyectos",
   deleteProjectTypeConfirmation:
     'Está a punto de eliminar el tipo de proyecto "{name}" del sistema.',
   "There was a problem loading the project type data":
@@ -188,6 +189,7 @@ export default {
   TotalProjectStatusesPagerLabel: "Total estados de proyecto: {total}",
   ProjectStatusNameTableHeader: "Nombre",
   ProjectStatusIndexTableHeader: "Índice",
+  "No project statuses found": "No se han encontrado estados de proyectos",
   "Add project status": "Añadir estado de proyecto",
   "Update project status": "Actualizar estado de proyecto",
   "Delete project status": "Eliminar estado de proyecto",
@@ -201,6 +203,8 @@ export default {
     "Se produjo un problema al modificar los datos del estado de proyecto",
   "There was a problem deleting the project status data":
     "Se produjo un problema al eliminar los datos del estado de proyecto",
+  "There was a problem while loading the project status data":
+    "Se produjo un problema al cargar los datos del estado de proyecto",
   "We couldn’t find the specified project status":
     "El estado de proyecto especificado no existe",
   projectStatusFormNameFieldEmptyError: "El nombre está vacío",
