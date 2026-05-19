@@ -136,6 +136,8 @@ export default {
     "There was a problem while adding the role data",
   "There was a problem while updating the role data":
     "There was a problem while updating the role data",
+  "There was a problem while loading the role data":
+    "There was a problem while loading the role data",
   roleAddedNotification: 'Role "{name}" has been added',
   roleUpdatedNotification: 'Role "{name}" has been updated',
   roleDeletedNotification: 'Role "{name}" has been deleted',

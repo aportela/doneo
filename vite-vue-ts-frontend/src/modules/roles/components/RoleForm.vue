@@ -118,7 +118,7 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "RoleForm.onGet" } });
                             break;
                         case 404:
-                            state.ajaxErrorMessage = t("roleFormIdNotFoundError");
+                            state.ajaxErrorMessage = t("There was a problem while loading the role data");
                             break;
                         default:
                             state.ajaxErrorMessage = t("There was a problem while loading the role data");

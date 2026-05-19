@@ -136,6 +136,8 @@ export default {
     "Se ha producido un error al añadir el rol",
   "There was a problem while updating the role data":
     "Se ha producido un error al modificar el rol",
+  "There was a problem while loading the role data":
+    "Se ha producido un error al cargar el rol",
   roleAddedNotification: 'El rol "{name}" se ha añadido',
   roleUpdatedNotification: 'El rol "{name}" se ha modificado',
   roleDeletedNotification: 'El rol "{name}" se ha eliminado',

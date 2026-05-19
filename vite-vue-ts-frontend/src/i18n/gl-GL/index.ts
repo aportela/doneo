@@ -134,6 +134,8 @@ export default {
     "Producíuse un erro ó engadi-lo rol",
   "There was a problem while updating the role data":
     "Producíuse un erro ó modifica-lo rol",
+  "There was a problem while loading the role data":
+    "Producíuse un erro ó carga-lo rol",
   roleAddedNotification: 'O rol "{name}" engadiuse',
   roleUpdatedNotification: 'O rol "{name}" modificouse',
   roleDeletedNotification: 'O rol "{name}" eliminouse',
