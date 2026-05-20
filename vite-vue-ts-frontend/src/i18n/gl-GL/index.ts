@@ -186,7 +186,6 @@ export default {
   "Manage project statuses": "Xestión de estados de proxectos",
   TotalProjectStatusesPagerLabel: "Total estados de proxecto: {total}",
   ProjectStatusNameTableHeader: "Nome",
-  ProjectStatusIndexTableHeader: "Índice",
   "Add project status": "Engadir estado de proxecto",
   "Update project status": "Actualizar estado de proxecto",
   "Delete project status": "Eliminar estado de proxecto",
@@ -214,8 +213,38 @@ export default {
   projectStatusAddedNotification: 'O estado de proxecto "{name}" engadiuse',
   projectStatusUpdatedNotification: 'O estado de proxecto "{name}" modificouse',
   projectStatusDeletedNotification: 'O estado de proxecto "{name}" eliminouse',
-  projectStatusIndexMovedNotification:
-    'O índice do estado do pxoyecto "{name}" moveuse',
+
+  // project priorities
+  "Manage project priorities": "Gestión de prioridades de proyectos",
+  TotalProjectPrioritiesPagerLabel: "Total prioridades de proyectos: {total}",
+  ProjectPriorityNameTableHeader: "Nombre",
+  "Add project priority": "Añadir prioridad de proyecto",
+  "Update project priority": "Actualizar prioridad de proyecto",
+  "Delete project priority": "Eliminar prioridad de proyecto",
+  "No project priorities found": "No se han encontrado prioridades de proyecto",
+  deleteProjectPriorityConfirmation:
+    'Está a punto de eliminar la prioridad de proyecto "{name}" del sistema.',
+  "There was a problem loading the project priority data":
+    "There was a problem loading the project priority data",
+  "There was a problem adding the project priority data":
+    "There was a problem adding the project priority data",
+  "There was a problem updating the project priority data":
+    "There was a problem updating the project priority data",
+  "There was a problem deleting the project priority data":
+    "There was a problem deleting the project priority data",
+  "There was a problem while loading the project priority data":
+    "There was a problem while loading the project priority data",
+  "We couldn’t find the specified project priority":
+    "We couldn’t find the specified project priority",
+  projectPriorityFormNameFieldEmptyError: "Name is empty",
+  projectPriorityFormNameFieldTooLargeError: "Name is too large",
+  projectPriorityFormNameFieldAlreadyExists: "Name already exists",
+  projectPriorityFormNameFieldPlaceholder: "Enter project priority name",
+  projectPriorityAddedNotification: 'Project priority "{name}" has been added',
+  projectPriorityUpdatedNotification:
+    'Project priority "{name}" has been updated',
+  projectPriorityDeletedNotification:
+    'Project priority "{name}" has been deleted',
 
   // auth
   "Login to your account": "Inicie sesión coa sua conta",

@@ -1,19 +1,19 @@
 import enUS from "./en-US";
-import esES from "./es-ES";
-import glGL from "./gl-GL";
+//import esES from "./es-ES";
+//import glGL from "./gl-GL";
 
 const messages = {
   "en-US": enUS,
-  "es-ES": esES,
-  "gl-GL": glGL,
+  //"es-ES": esES,
+  //"gl-GL": glGL,
 };
 
 const availableSystemLocales: string[] = Object.keys(messages);
 
 const localeSelectorOptionItems = [
   { shortLabel: "EN", label: "English", key: "en-US" },
-  { shortLabel: "ES", label: "Español", key: "es-ES" },
-  { shortLabel: "GL", label: "Galego", key: "gl-GL" },
+  //{ shortLabel: "ES", label: "Español", key: "es-ES" },
+  //{ shortLabel: "GL", label: "Galego", key: "gl-GL" },
 ];
 
 const availableLocaleSelectorOptionItems = localeSelectorOptionItems.filter(

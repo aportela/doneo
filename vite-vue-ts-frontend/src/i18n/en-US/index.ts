@@ -1,4 +1,41 @@
 export default {
+  shared: {
+    errorMessages: {
+      uncaugthException: "Uncaught exception",
+      invalidAPIResponseCode: "Invalid API response code",
+    },
+    warningMessages: {
+      fieldIsRequired: "Field is required",
+      fieldHasInvalidFormat: "Field has invalid format",
+      fieldExceedsMaxLength: "Field exceeds max length",
+      fieldIsBelowMinimumLength: "Field is below minimum length",
+    },
+  },
+  modules: {
+    // auth module
+    auth: {
+      components: {
+        LoginForm: {
+          inputs: {
+            email: {
+              label: "Email",
+              placeholder: "Enter your email address",
+            },
+            password: {
+              label: "Password",
+              placeholder: "Enter your password",
+            },
+          },
+          warnings: {
+            noAccountFoundForThisEmail: "No account found for this email",
+            incorrectPassword: "Incorrect password",
+          },
+          errors: {},
+        },
+      },
+    },
+  },
+
   "Sign in": "Sign in",
 
   // common actions/operations
@@ -187,7 +224,6 @@ export default {
   "Manage project statuses": "Manage project statuses",
   TotalProjectStatusesPagerLabel: "Total project statuses: {total}",
   ProjectStatusNameTableHeader: "Name",
-  ProjectStatusIndexTableHeader: "Index",
   "Add project status": "Add project status",
   "Update project status": "Update project status",
   "Delete project status": "Delete project status",
@@ -213,8 +249,38 @@ export default {
   projectStatusAddedNotification: 'Project status "{name}" has been added',
   projectStatusUpdatedNotification: 'Project status "{name}" has been updated',
   projectStatusDeletedNotification: 'Project status "{name}" has been deleted',
-  projectStatusIndexMovedNotification:
-    'Project status "{name}" index has been moved',
+
+  // project priorities
+  "Manage project priorities": "Manage project priorities",
+  TotalProjectPrioritiesPagerLabel: "Total project priorities: {total}",
+  ProjectPriorityNameTableHeader: "Name",
+  "Add project priority": "Add project priority",
+  "Update project priority": "Update project priority",
+  "Delete project priority": "Delete project priority",
+  "No project priorities found": "No project priorities found",
+  deleteProjectPriorityConfirmation:
+    'You are about to delete the project priority "{name}" from the system.',
+  "There was a problem loading the project priority data":
+    "There was a problem loading the project priority data",
+  "There was a problem adding the project priority data":
+    "There was a problem adding the project priority data",
+  "There was a problem updating the project priority data":
+    "There was a problem updating the project priority data",
+  "There was a problem deleting the project priority data":
+    "There was a problem deleting the project priority data",
+  "There was a problem while loading the project priority data":
+    "There was a problem while loading the project priority data",
+  "We couldn’t find the specified project priority":
+    "We couldn’t find the specified project priority",
+  projectPriorityFormNameFieldEmptyError: "Name is empty",
+  projectPriorityFormNameFieldTooLargeError: "Name is too large",
+  projectPriorityFormNameFieldAlreadyExists: "Name already exists",
+  projectPriorityFormNameFieldPlaceholder: "Enter project priority name",
+  projectPriorityAddedNotification: 'Project priority "{name}" has been added',
+  projectPriorityUpdatedNotification:
+    'Project priority "{name}" has been updated',
+  projectPriorityDeletedNotification:
+    'Project priority "{name}" has been deleted',
 
   // auth
   "Login to your account": "Login to your account",

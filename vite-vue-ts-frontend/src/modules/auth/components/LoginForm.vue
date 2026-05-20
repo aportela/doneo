@@ -52,13 +52,13 @@
                     return true;
                 }
                 if (!value?.trim()) {
-                    return new Error(t("loginFormEmailFieldEmptyError"));
+                    return new Error(t("shared.warningMessages.fieldIsRequired"));
                 }
                 else if (!isValidEmail(value)) {
-                    return new Error(t("loginFormEmailFieldInvalidError"));
+                    return new Error(t("shared.warningMessages.fieldHasInvalidFormat"));
                 }
                 else if (value.length > maxEmailLength) {
-                    return new Error(t("loginFormEmailFieldTooLargeError"));
+                    return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
                 } else if (serverErrors.value.email) {
                     return new Error(t(serverErrors.value.email));
                 } else {
@@ -71,10 +71,10 @@
             required: true,
             validator: (_rule: FormItemRule, value: string) => {
                 if (!value?.trim()) {
-                    return new Error(t("loginFormPasswordFieldEmptyError"));
+                    return new Error(t("shared.warningMessages.fieldIsRequired"));
                 }
                 else if (value.length < minPasswordLength) {
-                    return new Error(t("loginFormPasswordFieldTooShortError"));
+                    return new Error(t("shared.warningMessages.fieldIsBelowMinimumLength"));
                 } else if (serverErrors.value.password) {
                     return new Error(t(serverErrors.value.password));
                 } else {
@@ -109,18 +109,18 @@
                     (apiError) => {
                         switch (apiError.response?.status) {
                             case 404:
-                                serverErrors.value.email = "loginFormEmailFieldAPINotFound";
+                                serverErrors.value.email = "modules.auth.components.LoginForm.warnings.noAccountFoundForThisEmail";
                                 break;
                             case 401:
-                                serverErrors.value.password = "loginFormPasswordFieldIncorrect";
+                                serverErrors.value.password = "modules.auth.components.LoginForm.warnings.incorrectPassword";
                                 break;
                             default:
-                                state.ajaxErrorMessage = t("Invalid API response code");
+                                state.ajaxErrorMessage = t("shared.errorMessages.invalidAPIResponseCode");
                                 break;
                         }
                     },
                     (fatalError) => {
-                        state.ajaxErrorMessage = t("Uncaught exception");
+                        state.ajaxErrorMessage = t("shared.errorMessages.uncaugthException");
                         console.error("Fatal error", { file: "LoginForm.vue", method: "onSubmit", details: "uncaught exception", error: fatalError });
                     });
             } finally {
@@ -161,19 +161,21 @@
 <template>
     <n-spin :show="state.ajaxRunning" stroke="pink">
         <n-form ref="signInFormRef" :model="signinFormValues" label-width="100px" :rules="signInFormRules">
-            <n-form-item :label="t('loginFormEmailLabel')" path="email" show-feedback>
+            <n-form-item :label="t('modules.auth.components.LoginForm.inputs.email.label')" path="email" show-feedback>
                 <n-input type="text" v-model:value="signinFormValues.email"
-                    :placeholder="t('loginFormEmailFieldPlaceholder')" :disabled="state.ajaxRunning"
-                    ref="inputEmailRef">
+                    :placeholder="t('modules.auth.components.LoginForm.inputs.email.placeholder')"
+                    :disabled="state.ajaxRunning" ref="inputEmailRef">
                     <template #prefix>
                         <n-icon :component="IconMail" />
                     </template>
                 </n-input>
             </n-form-item>
-            <n-form-item :label="t('loginFormPasswordLabel')" path="password" show-feedback>
+            <n-form-item :label="t('modules.auth.components.LoginForm.inputs.password.label')" path="password"
+                show-feedback>
                 <n-input v-model:value="signinFormValues.password" type="password"
-                    :placeholder="t('loginFormPasswordFieldPlaceholder')" show-password-on="click"
-                    :disabled="state.ajaxRunning" @keydown.enter="onSignIn" ref="inputPasswordRef">
+                    :placeholder="t('modules.auth.components.LoginForm.inputs.password.placeholder')"
+                    show-password-on="click" :disabled="state.ajaxRunning" @keydown.enter="onSignIn"
+                    ref="inputPasswordRef">
                     <template #prefix>
                         <n-icon :component="IconKey" />
                     </template>
@@ -198,7 +200,7 @@
             <n-form-item>
                 <n-button secondary @click="onSignIn" block :disabled="state.ajaxRunning">{{
                     t("Sign in")
-                    }}</n-button>
+                }}</n-button>
             </n-form-item>
         </n-form>
     </n-spin>
