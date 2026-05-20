@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/projectpriorityrepository"
 )
@@ -13,7 +14,7 @@ type ProjectPriorityService interface {
 	Update(ctx context.Context, projectPriority domain.ProjectPriority) error
 	Delete(ctx context.Context, id string) error
 	Get(ctx context.Context, id string) (domain.ProjectPriority, error)
-	Search(ctx context.Context) ([]domain.ProjectPriority, error)
+	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectPrioritiesFilter) ([]domain.ProjectPriority, browser.Result, error)
 }
 
 type projectPriorityService struct {
@@ -44,10 +45,10 @@ func (s *projectPriorityService) Get(ctx context.Context, id string) (domain.Pro
 	return projectpriorityrepository.DTOToDomain(projectPriority), nil
 }
 
-func (s *projectPriorityService) Search(ctx context.Context) ([]domain.ProjectPriority, error) {
-	projectPriorities, err := s.repository.Search(ctx)
+func (s *projectPriorityService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectPrioritiesFilter) ([]domain.ProjectPriority, browser.Result, error) {
+	projectPriorities, pagerResult, err := s.repository.Search(ctx, pager, order, projectpriorityrepository.DomainFilterToDTO(filter))
 	if err != nil {
-		return nil, fmt.Errorf("[ProjectPriorityService] failed to search project priorities: %w", err)
+		return nil, browser.Result{}, fmt.Errorf("[ProjectPriorityService] failed to search project priorities: %w", err)
 	}
-	return projectpriorityrepository.DTOArrayToDomainArray(projectPriorities), nil
+	return projectpriorityrepository.DTOArrayToDomainArray(projectPriorities), pagerResult, nil
 }

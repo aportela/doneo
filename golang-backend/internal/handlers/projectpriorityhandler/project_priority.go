@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
@@ -63,7 +64,7 @@ func (h *ProjectPriorityHandler) Delete(w http.ResponseWriter, r *http.Request) 
 	projectPriorityId := chi.URLParam(r, "id")
 	err := h.service.Delete(r.Context(), projectPriorityId)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityService] failed to delete project priority: %w", err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityHandler] failed to delete project priority: %w", err))
 		return
 	}
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
@@ -75,10 +76,10 @@ func (h *ProjectPriorityHandler) Get(w http.ResponseWriter, r *http.Request) {
 	projectPriority, err := h.service.Get(r.Context(), projectPriorityId)
 	if err != nil {
 		if err == domain.NotFoundError {
-			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityService] failed to get non existent project priority: %w", err))
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityHandler] failed to get non existent project priority: %w", err))
 			return
 		} else {
-			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityService] failed to get projectPriority: %w", err))
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityHandler] failed to get projectPriority: %w", err))
 			return
 		}
 	}
@@ -87,6 +88,29 @@ func (h *ProjectPriorityHandler) Get(w http.ResponseWriter, r *http.Request) {
 
 func (h *ProjectPriorityHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectPriorities, err := h.service.Search(r.Context())
-	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectPriorities), err)
+	var request searchRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityHandler] invalid request payload: %w", err))
+		return
+	}
+	filter := domain.SearchProjectPrioritiesFilter{
+		Name: nil,
+	}
+	if request.Filter != nil {
+		if request.Filter.Name != nil {
+			filter.Name = request.Filter.Name
+		}
+	}
+	projectTypes, pagerResult, err := h.service.Search(r.Context(),
+		browser.Params{
+			CurrentPage: request.Pager.CurrentPage,
+			ResultsPage: request.Pager.ResultsPage,
+		},
+		browser.Order{
+			Field: request.Order.Field,
+			Sort:  string(request.Order.Sort),
+		},
+		filter,
+	)
+	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectTypes, pagerResult), err)
 }

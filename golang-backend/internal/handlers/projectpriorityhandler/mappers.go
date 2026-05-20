@@ -1,24 +1,22 @@
 package projectpriorityhandler
 
 import (
+	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/handlers"
 )
 
 func addRequestToDomain(request addRequest) domain.ProjectPriority {
 	return domain.ProjectPriority{
-		ID:       request.ID,
 		Name:     request.Name,
 		HexColor: request.HexColor,
-		Index:    request.Index,
 	}
 }
 
 func updateRequestToDomain(request updateRequest) domain.ProjectPriority {
 	return domain.ProjectPriority{
-		ID:       request.ID,
 		Name:     request.Name,
 		HexColor: request.HexColor,
-		Index:    request.Index,
 	}
 }
 
@@ -39,8 +37,15 @@ func domainArrayToResponseArray(projectPriorities []domain.ProjectPriority) []pr
 	return projectPriorityResponses
 }
 
-func toSearchResponse(projectPriorities []domain.ProjectPriority) searchResponse {
+func toSearchResponse(projectPriorities []domain.ProjectPriority, pager browser.Result) searchResponse {
 	return searchResponse{
 		ProjectPriorities: domainArrayToResponseArray(projectPriorities),
+		Pager: handlers.PagerResponse{
+			Enabled:      pager.ResultsPage > 0,
+			CurrentPage:  pager.CurrentPage,
+			ResultsPage:  pager.ResultsPage,
+			TotalPages:   pager.TotalPages,
+			TotalResults: pager.TotalResults,
+		},
 	}
 }

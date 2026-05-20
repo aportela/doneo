@@ -7,5 +7,6 @@ type ProjectPriority struct {
 	HexColor string
 }
 
-type ProjectPriorityFilter struct {
+type SearchProjectPrioritiesFilter struct {
+	Name *string
 }

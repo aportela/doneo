@@ -6,3 +6,7 @@ type projectPriorityDTO struct {
 	HexColor string `db:"item_hex_color"`
 	Index    int    `db:"item_index"`
 }
+
+type searchFilterDTO struct {
+	Name *string
+}
