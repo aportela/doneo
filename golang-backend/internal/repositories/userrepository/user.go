@@ -18,7 +18,6 @@ import (
 type UserRepository interface {
 	Add(ctx context.Context, user UserDTO) error
 	Update(ctx context.Context, user UserDTO) error
-	Patch(ctx context.Context, user UserDTO) error
 	Delete(ctx context.Context, id string) error
 	UnDelete(ctx context.Context, id string) error
 	Purge(ctx context.Context, id string) error
@@ -124,21 +123,6 @@ func (userRepository *userRepository) Update(ctx context.Context, user UserDTO) 
 			}
 		}
 	}
-	return err
-}
-
-func (userRepository *userRepository) Patch(ctx context.Context, user UserDTO) error {
-	_, err := userRepository.database.ExecContext(
-		ctx,
-		`
-            UPDATE users
-				SET
-					deleted_at = ?
-			WHERE id = ?
-        `,
-		user.DeletedAt,
-		user.ID,
-	)
 	return err
 }
 

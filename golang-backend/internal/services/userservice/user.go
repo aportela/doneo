@@ -60,8 +60,14 @@ func (s *userService) Update(ctx context.Context, user domain.User) error {
 }
 
 func (s *userService) Patch(ctx context.Context, user domain.User) error {
-	if err := s.repository.Patch(ctx, userrepository.DomainToDTO(user)); err != nil {
-		return fmt.Errorf("[UserService] failed to patch user with ID %s: %w", user.ID, err)
+	if user.DeletedAt == nil {
+		if err := s.repository.UnDelete(ctx, user.ID); err != nil {
+			return fmt.Errorf("[UserService] failed to patch user with ID %s: %w", user.ID, err)
+		}
+	} else {
+		if err := s.repository.Delete(ctx, user.ID); err != nil {
+			return fmt.Errorf("[UserService] failed to patch user with ID %s: %w", user.ID, err)
+		}
 	}
 	return nil
 }

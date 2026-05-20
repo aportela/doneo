@@ -71,10 +71,10 @@ func (h *UserHandler) Patch(w http.ResponseWriter, r *http.Request) {
 	user, err := h.service.Get(r.Context(), userId)
 	if err != nil {
 		if err == domain.NotFoundError {
-			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserService] failed to get non existent user: %w", err))
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] failed to get non existent user: %w", err))
 			return
 		} else {
-			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserService] failed to get user: %w", err))
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] failed to get user: %w", err))
 			return
 		}
 	}
