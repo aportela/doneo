@@ -12,7 +12,7 @@
     import { generateRandomSoftHexColor, getNaiveUITagColorProperty } from '../../../shared/composables/color';
     import type { ProjectStatusResponse, AddRequest, UpdateRequest } from '../types/dto';
     import RemoteAPIAlert from '../../../shared/components/alerts/RemoteAPIAlert.vue';
-    import type { FormMode } from '../types/form-mode';
+    import type { FormMode } from '../../../shared/types/form-mode';
     import { appBus } from '../../../shared/composables/bus';
 
     interface ProjectStatusFormProps {
@@ -122,10 +122,6 @@
                 });
         } finally {
             state.ajaxRunning = false;
-            if (state.ajaxErrors) {
-                await nextTick();
-                projectStatusFormRef.value?.validate().then(() => { }).catch(() => { });
-            }
         }
     };
 

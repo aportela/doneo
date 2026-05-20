@@ -14,34 +14,26 @@
     import { ProjectPriority } from '../models/project-priority';
     import ProjectPrioritiesTable from '../components/ProjectPrioritiesTable.vue';
     import ProjectPriorityForm from '../components/ProjectPriorityForm.vue';
-    import Pager from '../../../shared/components/tables/Pager.vue';
     import { Sort } from '../../../shared/types/models/sort';
-    import type { FormMode } from '../types/form-mode';
-
-    const { notify } = useNotify();
+    import type { FormMode } from '../../../shared/types/form-mode';
 
     const { t } = useI18n();
+    const { notify } = useNotify();
 
     const loadingStore = useLoadingStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    const projectPriorities = shallowRef<ProjectPriority[]>([]);
+    const items = shallowRef<ProjectPriority[]>([]);
 
-    const sort = ref<Sort>(new Sort("index", "ASC"));
+    const sort = ref<Sort>(new Sort("name", "ASC"));
 
     const nameFilter = ref<string>("");
 
-    const currentPage = ref(1);
-    const pageSize = ref(0);
-    const totalResults = ref(0);
-    const totalPages = ref(0);
+    const showForm = ref<boolean>(false);
+    const formMode = ref<FormMode>("add");
 
-
-    const showProjectPriorityDialogForm = ref<boolean>(false);
-    const projectPriorityDialogFormMode = ref<FormMode>("add");
-
-    const selectedProjectPriority = ref<ProjectPriority>(new ProjectPriority({
+    const selectedItem = ref<ProjectPriority>(new ProjectPriority({
         id: "",
         name: "",
         hexColor: "",
@@ -51,48 +43,36 @@
         loadingStore.set(newValue.ajaxRunning);
     });
 
-    watch(pageSize, () => {
-        if (currentPage.value != 1) {
-            currentPage.value = 1;
-        } else {
-            onRefresh();
-        }
-    });
-
-    watch(currentPage, () => {
-        onRefresh();
-    });
-
     const onToggleSort = (field: string) => {
         sort.value.toggleSort(field);
         onRefresh();
     };
 
     const onShowAddForm = () => {
-        projectPriorityDialogFormMode.value = "add";
-        showProjectPriorityDialogForm.value = true;
+        formMode.value = "add";
+        showForm.value = true;
     };
 
     const onShowUpdateForm = (projectPriority: ProjectPriority, _index: number) => {
-        selectedProjectPriority.value = projectPriority;
-        projectPriorityDialogFormMode.value = "update";
-        showProjectPriorityDialogForm.value = true;
+        selectedItem.value = projectPriority;
+        formMode.value = "update";
+        showForm.value = true;
     };
 
     const onAdd = (projectPriority: ProjectPriority) => {
-        showProjectPriorityDialogForm.value = false;
+        showForm.value = false;
         notify('success', t("projectStatusAddedNotification", { name: projectPriority.name }));
         onRefresh();
     };
 
     const onUpdate = (projectPriority: ProjectPriority) => {
-        showProjectPriorityDialogForm.value = false;
+        showForm.value = false;
         notify('success', t("projectStatusUpdatedNotification", { name: projectPriority.name }));
         onRefresh();
     };
 
     const onCancel = () => {
-        showProjectPriorityDialogForm.value = false;
+        showForm.value = false;
     };
 
     const onRefresh = async () => {
@@ -100,8 +80,8 @@
         try {
             const payload: SearchRequest = {
                 pager: {
-                    currentPage: currentPage.value,
-                    resultsPage: pageSize.value,
+                    currentPage: 1,
+                    resultsPage: 0,
                 },
                 order: {
                     field: sort.value.field,
@@ -112,11 +92,9 @@
                 }
             };
             const response = await projectPriorityService.search(payload);
-            totalPages.value = response.pager.totalPages;
-            totalResults.value = response.pager.totalResults;
-            projectPriorities.value = response.projectPriorities.map((projectPriority: ProjectPriorityResponse) => new ProjectPriority(projectPriority))
+            items.value = response.projectPriorities.map((projectPriority: ProjectPriorityResponse) => new ProjectPriority(projectPriority))
         } catch (error: unknown) {
-            projectPriorities.value.length = 0;
+            items.value.length = 0;
             state.ajaxErrors = true;
             handleAPIError(error,
                 (apiError) => {
@@ -153,7 +131,7 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            selectedProjectPriority.value = projectPriority;
+                            selectedItem.value = projectPriority;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageProjectPrioritiesPage.onDelete" } });
                             break;
                         case 404:
@@ -181,7 +159,7 @@
             if (payload.to.includes("ManageProjectPrioritiesPage.onRefresh")) {
                 onRefresh();
             } else if (payload.to.includes("ManageProjectPrioritiesPage.onDelete")) {
-                onDelete(selectedProjectPriority.value);
+                onDelete(selectedItem.value);
             }
         });
     });
@@ -192,28 +170,17 @@
 </script>
 
 <template>
-    <n-modal v-model:show="showProjectPriorityDialogForm">
-        <ProjectPriorityForm :mode="projectPriorityDialogFormMode == 'add' ? 'add' : 'update'"
-            :project-priority-id="selectedProjectPriority.id" style="width: 40%;" @add="onAdd" @update="onUpdate"
-            @cancel="onCancel" />
+    <n-modal v-model:show="showForm">
+        <ProjectPriorityForm :mode="formMode == 'add' ? 'add' : 'update'" :project-priority-id="selectedItem.id"
+            style="width: 40%;" @add="onAdd" @update="onUpdate" @cancel="onCancel" />
     </n-modal>
 
     <n-card :title="t('Manage project priorities')">
-        <Pager v-model:current-page="currentPage" v-model:page-size="pageSize" :total-pages="totalPages"
-            :total-results="totalResults" class="doneo-pager-container">
-            <template #total-results-label="{ totalResults }">
-                {{ t("TotalProjectPrioritiesPagerLabel", { total: totalResults }) }}
-            </template>
-        </Pager>
-        <ProjectPrioritiesTable :projectPriorities="projectPriorities" :loading="state.ajaxRunning" @refresh="onRefresh"
+        <ProjectPrioritiesTable :projectPriorities="items" :loading="state.ajaxRunning" @refresh="onRefresh"
             @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" @textfilter-keydown-enter="onRefresh"
             :sort-field="sort.field" :sort-order="sort.order" @toggle-sort="onToggleSort"
             v-model:project-priority-name-filter="nameFilter" />
     </n-card>
 </template>
 
-<style lang="css" scoped>
-    .doneo-pager-container {
-        margin-bottom: 4px;
-    }
-</style>
+<style lang="css" scoped></style>

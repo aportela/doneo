@@ -15,26 +15,25 @@
     import ProjectTypesTable from '../components/ProjectTypesTable.vue';
     import ProjectTypeForm from '../components/ProjectTypeForm.vue';
     import { Sort } from '../../../shared/types/models/sort';
-    import type { FormMode } from '../types/form-mode';
-
-    const { notify } = useNotify();
+    import type { FormMode } from '../../../shared/types/form-mode';
 
     const { t } = useI18n();
+    const { notify } = useNotify();
 
     const loadingStore = useLoadingStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    const projectTypes = shallowRef<ProjectType[]>([]);
+    const items = shallowRef<ProjectType[]>([]);
 
     const sort = ref<Sort>(new Sort("name", "ASC"));
 
     const nameFilter = ref<string>("");
 
-    const showProjectTypeDialogForm = ref<boolean>(false);
-    const projectTypeDialogFormMode = ref<FormMode>("add");
+    const showForm = ref<boolean>(false);
+    const formMode = ref<FormMode>("add");
 
-    const selectedProjectType = ref<ProjectType>(new ProjectType({
+    const selectedItem = ref<ProjectType>(new ProjectType({
         id: "",
         name: "",
         hexColor: "",
@@ -44,37 +43,36 @@
         loadingStore.set(newValue.ajaxRunning);
     });
 
-
     const onToggleSort = (field: string) => {
         sort.value.toggleSort(field);
         onRefresh();
     };
 
     const onShowAddForm = () => {
-        projectTypeDialogFormMode.value = "add";
-        showProjectTypeDialogForm.value = true;
+        formMode.value = "add";
+        showForm.value = true;
     };
 
     const onShowUpdateForm = (projectType: ProjectType, _index: number) => {
-        selectedProjectType.value = projectType;
-        projectTypeDialogFormMode.value = "update";
-        showProjectTypeDialogForm.value = true;
+        selectedItem.value = projectType;
+        formMode.value = "update";
+        showForm.value = true;
     };
 
     const onAdd = (projectType: ProjectType) => {
-        showProjectTypeDialogForm.value = false;
+        showForm.value = false;
         notify('success', t("projectTypeAddedNotification", { name: projectType.name }));
         onRefresh();
     };
 
     const onUpdate = (projectType: ProjectType) => {
-        showProjectTypeDialogForm.value = false;
+        showForm.value = false;
         notify('success', t("projectTypeUpdatedNotification", { name: projectType.name }));
         onRefresh();
     };
 
     const onCancel = () => {
-        showProjectTypeDialogForm.value = false;
+        showForm.value = false;
     };
 
     const onRefresh = async () => {
@@ -94,9 +92,9 @@
                 }
             };
             const response = await projectTypeService.search(payload);
-            projectTypes.value = response.projectTypes.map((projectType: ProjectTypeResponse) => new ProjectType(projectType))
+            items.value = response.projectTypes.map((projectType: ProjectTypeResponse) => new ProjectType(projectType))
         } catch (error: unknown) {
-            projectTypes.value.length = 0;
+            items.value.length = 0;
             state.ajaxErrors = true;
             handleAPIError(error,
                 (apiError) => {
@@ -133,7 +131,7 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            selectedProjectType.value = projectType;
+                            selectedItem.value = projectType;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageProjectTypesPage.onDelete" } });
                             break;
                         case 404:
@@ -161,7 +159,7 @@
             if (payload.to.includes("ManageProjectTypesPage.onRefresh")) {
                 onRefresh();
             } else if (payload.to.includes("ManageProjectTypesPage.onDelete")) {
-                onDelete(selectedProjectType.value);
+                onDelete(selectedItem.value);
             }
         });
     });
@@ -172,22 +170,16 @@
 </script>
 
 <template>
-    <n-modal v-model:show="showProjectTypeDialogForm">
-        <ProjectTypeForm :mode="projectTypeDialogFormMode == 'add' ? 'add' : 'update'"
-            :project-type-id="selectedProjectType.id" style="width: 40%;" @add="onAdd" @update="onUpdate"
-            @cancel="onCancel" />
+    <n-modal v-model:show="showForm">
+        <ProjectTypeForm :mode="formMode == 'add' ? 'add' : 'update'" :project-type-id="selectedItem.id"
+            style="width: 40%;" @add="onAdd" @update="onUpdate" @cancel="onCancel" />
     </n-modal>
 
     <n-card :title="t('Manage project types')">
-        <ProjectTypesTable :project-types="projectTypes" :loading="state.ajaxRunning" @refresh="onRefresh"
-            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" @textfilter-keydown-enter="onRefresh"
-            :sort-field="sort.field" :sort-order="sort.order" @toggle-sort="onToggleSort"
-            v-model:project-type-name-filter="nameFilter" />
+        <ProjectTypesTable :project-types="items" :loading="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
+            @update="onShowUpdateForm" @delete="onDelete" @textfilter-keydown-enter="onRefresh" :sort-field="sort.field"
+            :sort-order="sort.order" @toggle-sort="onToggleSort" v-model:project-type-name-filter="nameFilter" />
     </n-card>
 </template>
 
-<style lang="css" scoped>
-    .doneo-pager-container {
-        margin-bottom: 4px;
-    }
-</style>
+<style lang="css" scoped></style>
