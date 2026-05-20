@@ -1,18 +1,22 @@
 <script setup lang="ts">
-    import { ref, reactive, shallowRef, onMounted, computed } from 'vue'
+    import { onMounted, onBeforeUnmount, ref, reactive, shallowRef, watch } from 'vue';
     import { useI18n } from "vue-i18n";
-    import { NButton, NButtonGroup, NModal, NTag, NInput, NIcon } from 'naive-ui'
-    import { api } from '../../../shared/composables/api';
-    import { IconEdit, IconPlus, IconTrash, IconSearch, IconArrowUp, IconArrowDown } from '@tabler/icons-vue';
-    import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
-    import type { ProjectPriorityInterface } from '../../../shared/types/models/projectPriority';
-    import type { SearchProjectPrioritiesResponse } from '../../../shared/types/apiResponses';
-    import { type AjaxStateInterface, defaultAjaxState } from '../../../shared/types/ajaxState';
-    import { type EntityAction } from '../../../shared/types/common';
+
+    import { NModal, NCard } from 'naive-ui';
+
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { useLoadingStore } from '../../../stores/loading';
     import { useNotify } from '../../../shared/composables/notification';
-    import { default as ProjectPriorityForm } from '../components/forms/ProjectTypeForm.vue';
-    import ManageTable from '../../../shared/components/tables/ManageTable.vue';
+    import { appBus } from '../../../shared/composables/bus';
+    import { projectPriorityService } from '../services/project-priority';
+    import { handleAPIError } from '../../../api/client/errorHandler';
+    import type { ProjectPriorityResponse, SearchRequest } from '../types/dto';
+    import { ProjectPriority } from '../models/project-priority';
+    import ProjectPrioritiesTable from '../components/ProjectPrioritiesTable.vue';
+    import ProjectPriorityForm from '../components/ProjectPriorityForm.vue';
+    import Pager from '../../../shared/components/tables/Pager.vue';
+    import { Sort } from '../../../shared/types/models/sort';
+    import type { FormMode } from '../types/form-mode';
 
     const { notify } = useNotify();
 
@@ -22,149 +26,259 @@
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    const projectPriorities = shallowRef<ProjectPriorityInterface[]>([]);
+    const projectPriorities = shallowRef<ProjectPriority[]>([]);
 
-    const onRefresh = () => {
-        state.ajaxRunning = true;
-        loadingStore.set(true);
-        api.projectPriority.search().then((successResponse: SearchProjectPrioritiesResponse) => {
-            projectPriorities.value = [...successResponse.data.projectPriorities];
-        }).catch((errorResponse: any) => {
-            // TODO
-            console.log(errorResponse);
-        }).finally(() => {
-            loadingStore.set(false);
-            state.ajaxRunning = false;
-        })
-    };
+    const sort = ref<Sort>(new Sort("index", "ASC"));
 
-    const selectedProjectPriorityId = ref<string | undefined>(undefined);
+    const nameFilter = ref<string>("");
 
-    const onAddProjectPriority = () => {
-        actionDialogMode.value = "add";
-    };
+    const currentPage = ref(1);
+    const pageSize = ref(0);
+    const totalResults = ref(0);
+    const totalPages = ref(0);
 
-    const onUpdateProjectPriority = (_projectType: ProjectPriorityInterface, _index: number) => {
-        actionDialogMode.value = "update";
-        selectedProjectPriorityId.value = _projectType.id;
-    };
-    const onDeleteProjectPriority = (_projectType: ProjectPriorityInterface, _index: number) => {
-        actionDialogMode.value = "delete";
-        selectedProjectPriorityId.value = _projectType.id;
-    };
 
-    const actionDialogMode = ref<EntityAction>("none");
+    const showProjectPriorityDialogForm = ref<boolean>(false);
+    const projectPriorityDialogFormMode = ref<FormMode>("add");
 
-    const isVisibleActionDialog = computed<boolean>({
-        get: () => actionDialogMode.value !== "none",
-        set: (value: boolean) => {
-            if (!value) {
-                actionDialogMode.value = "none";
-            }
+    const selectedProjectPriority = ref<ProjectPriority>(new ProjectPriority({
+        id: "",
+        name: "",
+        hexColor: "",
+        index: 0,
+    }));
+
+    watch(state, (newValue: AjaxStateInterface) => {
+        loadingStore.set(newValue.ajaxRunning);
+    });
+
+    watch(pageSize, () => {
+        if (currentPage.value != 1) {
+            currentPage.value = 1;
+        } else {
+            onRefresh();
         }
     });
 
-    const onAdd = () => {
-        isVisibleActionDialog.value = false;
-        notify('success', t("Project priority added"))
+    watch(currentPage, () => {
+        onRefresh();
+    });
+
+    const onToggleSort = (field: string) => {
+        sort.value.toggleSort(field);
         onRefresh();
     };
 
-    const onUpdate = () => {
-        isVisibleActionDialog.value = false;
-        notify('success', t("Project priority updated"))
+    const onShowAddForm = () => {
+        projectPriorityDialogFormMode.value = "add";
+        showProjectPriorityDialogForm.value = true;
+    };
+
+    const onShowUpdateForm = (projectPriority: ProjectPriority, _index: number) => {
+        selectedProjectPriority.value = projectPriority;
+        projectPriorityDialogFormMode.value = "update";
+        showProjectPriorityDialogForm.value = true;
+    };
+
+    const onAdd = (projectPriority: ProjectPriority) => {
+        showProjectPriorityDialogForm.value = false;
+        notify('success', t("projectStatusAddedNotification", { name: projectPriority.name }));
         onRefresh();
     };
 
-    const onDelete = () => {
-        isVisibleActionDialog.value = false;
-        notify('success', t("Project priority deleted"))
+    const onUpdate = (projectPriority: ProjectPriority) => {
+        showProjectPriorityDialogForm.value = false;
+        notify('success', t("projectStatusUpdatedNotification", { name: projectPriority.name }));
         onRefresh();
     };
 
     const onCancel = () => {
-        isVisibleActionDialog.value = false;
+        showProjectPriorityDialogForm.value = false;
     };
 
-    const filterByName = ref<string | null>(null);
+    const onRefresh = async () => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const payload: SearchRequest = {
+                pager: {
+                    currentPage: currentPage.value,
+                    resultsPage: pageSize.value,
+                },
+                order: {
+                    field: sort.value.field,
+                    sort: sort.value.order,
+                },
+                filter: {
+                    name: nameFilter.value,
+                }
+            };
+            const response = await projectPriorityService.search(payload);
+            totalPages.value = response.pager.totalPages;
+            totalResults.value = response.pager.totalResults;
+            projectPriorities.value = response.projectStatuses.map((projectPriority: ProjectPriorityResponse) => new ProjectPriority(projectPriority))
+        } catch (error: unknown) {
+            projectPriorities.value.length = 0;
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageProjectPrioritiesPage.onRefresh" } });
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("There was a problem while refreshing the project priority list");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("There was a problem while refreshing the project priority list");
+                    console.error("Unhandled API error", { file: "ManageProjectPrioritiesPage.vue", method: "onRefresh" }, { err: fatalError });
+                });
+        }
+        finally {
+            state.ajaxRunning = false;
+        }
+    };
+
+    const onDelete = async (projectPriority: ProjectPriority, _index?: number) => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            await projectPriorityService.delete(projectPriority.id);
+            notify('success', t("projectPriorityIndexMovedNotification", { name: projectPriority.name }));
+            onRefresh();
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            selectedProjectPriority.value = projectPriority;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageProjectPrioritiesPage.onDelete" } });
+                            break;
+                        case 404:
+                            state.ajaxErrorMessage = t("We couldn’t find the specified project priority");
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("There was a problem while deleting the project priority");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("There was a problem while deleting the project priority");
+                    console.error("Unhandled API error", { file: "ManageProjectPrioritiesPage.vue", method: "onRefresh" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+        }
+    };
+
+    const onMoveIndexUp = async (projectPriority: ProjectPriority, _index?: number) => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            notify('success', t("projectPriorityIndexMovedNotification", { name: projectPriority.name }));
+            onRefresh();
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            selectedProjectPriority.value = projectPriority;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageProjectPrioritiesPage.onMoveIndexUp" } });
+                            break;
+                        case 404:
+                            state.ajaxErrorMessage = t("We couldn’t find the specified project priority");
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("There was a problem while updating the project priority");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("There was a problem while updating the project priority");
+                    console.error("Unhandled API error", { file: "ManageProjectPrioritiesPage.vue", method: "onMoveIndexUp" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+        }
+    }
+
+    const onMoveIndexDown = async (projectPriority: ProjectPriority, _index?: number) => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            notify('success', t("projectPriorityIndexMovedNotification", { name: projectPriority.name }));
+            onRefresh();
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            selectedProjectPriority.value = projectPriority;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageProjectPrioritiesPage.onMoveIndexDown" } });
+                            break;
+                        case 404:
+                            state.ajaxErrorMessage = t("We couldn’t find the specified project priority");
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("There was a problem while updating the project priority");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("There was a problem while updating the project priority");
+                    console.error("Unhandled API error", { file: "ManageProjectPrioritiesPage.vue", method: "onMoveIndexDown" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+        }
+    }
+
+    let stopBusReauthListener: () => void;
+
     onMounted(() => {
         onRefresh();
+        stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
+            if (payload.to.includes("ManageProjectPrioritiesPage.onRefresh")) {
+                onRefresh();
+            } else if (payload.to.includes("ManageProjectPrioritiesPage.onDelete")) {
+                onDelete(selectedProjectPriority.value);
+            }
+        });
     });
 
+    onBeforeUnmount(() => {
+        stopBusReauthListener();
+    });
 </script>
 
 <template>
-    <n-modal v-model:show="isVisibleActionDialog">
-        <ProjectPriorityForm :mode="actionDialogMode" :project-type-id="selectedProjectPriorityId" style="width: 40%;"
-            @add="onAdd" @update="onUpdate" @delete="onDelete" @cancel="onCancel" />
+    <n-modal v-model:show="showProjectPriorityDialogForm">
+        <ProjectPriorityForm :mode="projectPriorityDialogFormMode == 'add' ? 'add' : 'update'"
+            :project-priority-id="selectedProjectPriority.id" style="width: 40%;" @add="onAdd" @update="onUpdate"
+            @cancel="onCancel" />
     </n-modal>
 
-    <ManageTable size="small" title="Manage project priorities">
-        <template #thead>
-            <tr>
-                <th style="width: auto;">Name</th>
-                <th class="doneo-text-center" style="width: 1%;white-space: nowrap;">Actions</th>
-            </tr>
-            <tr>
-                <th>
-                    <n-input size="small" placeholder="search by name..." v-model:value="filterByName" clearable>
-                        <template #prefix>
-                            <n-icon>
-                                <IconSearch />
-                            </n-icon>
-                        </template>
-                    </n-input>
-                </th>
-                <th class="doneo-text-center">
-                    <n-button size="small" block @click="onAddProjectPriority">
-                        <template #icon>
-                            <NIcon>
-                                <IconPlus />
-                            </NIcon>
-                        </template>
-                        Add
-                    </n-button>
-                </th>
-            </tr>
-        </template>
-        <template #tbody>
-            <tr v-for="projectPriority, index in projectPriorities" :key="projectPriority.id">
-                <td>
-                    <n-tag :color="getNaiveUITagColorProperty(projectPriority.hexColor)">{{ projectPriority.name
-                    }}</n-tag>
-                </td>
-                <td class="doneo-text-center">
-                    <n-button-group>
-                        <n-button size="small">
-                            Up
-                            <template #icon>
-                                <IconArrowUp />
-                            </template>
-                        </n-button>
-                        <n-button size="small">
-                            Down
-                            <template #icon>
-                                <IconArrowDown />
-                            </template>
-                        </n-button>
-                        <n-button size="small" @click="onUpdateProjectPriority(projectPriority, index)">
-                            {{ t("Update") }}
-                            <template #icon>
-                                <IconEdit :size="22" />
-                            </template>
-                        </n-button>
-                        <n-button size="small" @click="onDeleteProjectPriority(projectPriority, index)">
-                            {{ t("Delete") }}
-                            <template #icon>
-                                <IconTrash :size="22" />
-                            </template>
-                        </n-button>
-                    </n-button-group>
-                </td>
-            </tr>
-        </template>
-
-    </ManageTable>
+    <n-card :title="t('Manage project priorities')">
+        <Pager v-model:current-page="currentPage" v-model:page-size="pageSize" :total-pages="totalPages"
+            :total-results="totalResults" class="doneo-pager-container">
+            <template #total-results-label="{ totalResults }">
+                {{ t("TotalProjectPrioritiesPagerLabel", { total: totalResults }) }}
+            </template>
+        </Pager>
+        <ProjectPrioritiesTable :projectPriorities="projectPriorities" :loading="state.ajaxRunning" @refresh="onRefresh"
+            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" @textfilter-keydown-enter="onRefresh"
+            @move-index-up="onMoveIndexUp" @move-index-down="onMoveIndexDown" :sort-field="sort.field"
+            :sort-order="sort.order" @toggle-sort="onToggleSort" v-model:project-priority-name-filter="nameFilter" />
+    </n-card>
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+    .doneo-pager-container {
+        margin-bottom: 4px;
+    }
+</style>
