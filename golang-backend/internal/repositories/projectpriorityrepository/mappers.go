@@ -9,7 +9,6 @@ func DomainToDTO(projectPriority domain.ProjectPriority) projectPriorityDTO {
 		ID:       projectPriority.ID,
 		Name:     projectPriority.Name,
 		HexColor: projectPriority.HexColor,
-		Index:    projectPriority.Index,
 	}
 }
 
@@ -18,7 +17,6 @@ func DTOToDomain(projectPriority projectPriorityDTO) domain.ProjectPriority {
 		ID:       projectPriority.ID,
 		Name:     projectPriority.Name,
 		HexColor: projectPriority.HexColor,
-		Index:    projectPriority.Index,
 	}
 }
 

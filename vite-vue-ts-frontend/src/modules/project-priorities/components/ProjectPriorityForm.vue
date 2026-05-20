@@ -29,7 +29,7 @@
 
     const projectPriority = ref<ProjectPriority>(
         new ProjectPriority(
-            { id: "", name: "", hexColor: generateRandomSoftHexColor(), index: 0 }
+            { id: "", name: "", hexColor: generateRandomSoftHexColor() }
         )
     );
 
@@ -255,7 +255,7 @@
         <template #header>
             <div class="doneo-flex-center-align">
                 <n-icon :component="props.mode == 'add' ? IconPlus : IconEdit" />
-                {{ t(props.mode == "add" ? "Add project status" : "Update project status") }}
+                {{ t(props.mode == "add" ? "Add project priority" : "Update project priority") }}
             </div>
         </template>
         <template #header-extra>

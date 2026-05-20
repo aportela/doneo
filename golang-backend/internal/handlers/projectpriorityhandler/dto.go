@@ -26,7 +26,6 @@ type projectPriorityResponse struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	HexColor string `json:"hexColor"`
-	Index    int    `json:"index"`
 }
 
 type searchResponse struct {

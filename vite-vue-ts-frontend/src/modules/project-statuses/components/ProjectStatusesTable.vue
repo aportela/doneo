@@ -3,7 +3,7 @@
     import { useI18n } from "vue-i18n";
 
     import { useDialog, NButtonGroup, NButton, NFlex, NEmpty, NIcon, NTag } from 'naive-ui';
-    import { IconArrowBigDown, IconArrowBigUp, IconEdit, IconPlus, IconRefresh, IconTrash } from '@tabler/icons-vue';
+    import { IconEdit, IconPlus, IconRefresh, IconTrash } from '@tabler/icons-vue';
 
     import { ProjectStatus } from '../models/project-status';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
@@ -23,7 +23,7 @@
 
     const { t } = useI18n();
 
-    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'toggleSort', 'textfilterKeydownEnter', 'moveIndexUp', 'moveIndexDown']);
+    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'toggleSort', 'textfilterKeydownEnter']);
 
     const props = defineProps<Props>();
 
@@ -32,26 +32,8 @@
             label: t("ProjectStatusNameTableHeader"),
             field: "name",
             sortable: true,
-        },
-        {
-            label: t("ProjectStatusIndexTableHeader"),
-            field: "index",
-            sortable: true,
-        },
+        }
     ]);
-
-    const minMax = computed(() => {
-        if (!props.projectStatuses.length) {
-            return { min: null, max: null }
-        }
-        let min = props.projectStatuses[0].index
-        let max = props.projectStatuses[0].index
-        for (const item of props.projectStatuses) {
-            if (item.index < min) min = item.index
-            if (item.index > max) max = item.index
-        }
-        return { min, max }
-    });
 
     const projectStatusNameFilter = defineModel<string>("projectStatusNameFilter", {
         default: "",
@@ -69,14 +51,6 @@
 
     const onAdd = () => {
         emit("add");
-    };
-
-    const onMoveIndexUp = (projectType: ProjectStatus, index: number) => {
-        emit("moveIndexUp", projectType, index);
-    };
-
-    const onMoveIndexDown = (projectType: ProjectStatus, index: number) => {
-        emit("moveIndexDown", projectType, index);
     };
 
     const onUpdate = (projectType: ProjectStatus, index: number) => {
@@ -127,7 +101,6 @@
                     <TextFilterInput clearable size="small" :placeholder="t('searchByNameDefaultPlaceholder')"
                         v-model:value="projectStatusNameFilter" @keydown-enter="onTextFilterKeyDownEnter" />
                 </th>
-                <th></th>
                 <th class="doneo-text-center">
                     <n-button-group size="small">
                         <n-button @click="onRefresh">
@@ -155,27 +128,8 @@
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(projectStatus.hexColor)">{{ projectStatus.name }}</n-tag>
                 </td>
-                <td>{{ projectStatus.index }}</td>
                 <td class="doneo-text-center">
                     <n-button-group size="small">
-                        <n-button @click="onMoveIndexUp(projectStatus, index)"
-                            :disabled="props.loading || projectStatus.index == minMax.min">
-                            {{ t("Move up") }}
-                            <template #icon>
-                                <n-icon :size="22">
-                                    <IconArrowBigUp />
-                                </n-icon>
-                            </template>
-                        </n-button>
-                        <n-button @click="onMoveIndexDown(projectStatus, index)"
-                            :disabled="props.loading || projectStatus.index == minMax.max">
-                            {{ t("Move down") }}
-                            <template #icon>
-                                <n-icon :size="22">
-                                    <IconArrowBigDown />
-                                </n-icon>
-                            </template>
-                        </n-button>
                         <n-button @click="onUpdate(projectStatus, index)" :disabled="props.loading">
                             {{ t("Update") }}
                             <template #icon>

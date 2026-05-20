@@ -17,12 +17,11 @@ func createProjectPriorities(database database.Database) []string {
 	var newProjectPriorityIds []string
 	projectPriorityRepository := projectpriorityrepository.NewProjectPriorityRepository(database)
 	projectPriorityService := projectpriorityservice.NewProjectPriorityService(projectPriorityRepository)
-	for index, projectPriorityName := range projectPriorityNames {
+	for _, projectPriorityName := range projectPriorityNames {
 		projectPriorityID := func() string { u, _ := uuid.NewV7(); return u.String() }()
 		err := projectPriorityService.Add(context.Background(), domain.ProjectPriority{
 			ID:       projectPriorityID,
 			Name:     projectPriorityName,
-			Index:    index,
 			HexColor: utils.RandomSoftHexColor(),
 		})
 		if err != nil {

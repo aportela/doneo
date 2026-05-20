@@ -29,7 +29,7 @@
 
     const projectStatus = ref<ProjectStatus>(
         new ProjectStatus(
-            { id: "", name: "", hexColor: generateRandomSoftHexColor(), index: 0 }
+            { id: "", name: "", hexColor: generateRandomSoftHexColor() }
         )
     );
 

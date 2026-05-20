@@ -34,8 +34,8 @@ func (projectPriorityRepository *projectPriorityRepository) Add(ctx context.Cont
 	_, err := projectPriorityRepository.database.ExecContext(
 		ctx,
 		`
-            INSERT INTO project_priorities (id, name, item_hex_color, item_index)
-			VALUES (?, ?, ?, COALESCE((SELECT MAX(item_index) FROM project_priorities), 0) + 1)
+            INSERT INTO project_priorities (id, name, item_hex_color)
+			VALUES (?, ?, ?)
         `,
 		projectPriority.ID,
 		projectPriority.Name,
@@ -73,13 +73,11 @@ func (projectPriorityRepository *projectPriorityRepository) Update(ctx context.C
 		`
             UPDATE project_priorities SET
 				name = ?,
-				item_hex_color = ?,
-				item_index = ?
+				item_hex_color = ?
 			WHERE id = ?
         `,
 		projectPriority.Name,
 		projectPriority.HexColor,
-		projectPriority.Index,
 		projectPriority.ID,
 	)
 	if err != nil {
@@ -126,11 +124,11 @@ func (projectPriorityRepository *projectPriorityRepository) Get(ctx context.Cont
 		ctx,
 		`
             SELECT
-                PP.id, PP.name, PP.item_hex_color,  PP.item_index
+                PP.id, PP.name, PP.item_hex_color
             FROM project_priorities PP
             WHERE PP.id = ?
         `,
-		id).Scan(&projectPriority.ID, &projectPriority.Name, &projectPriority.HexColor, &projectPriority.Index)
+		id).Scan(&projectPriority.ID, &projectPriority.Name, &projectPriority.HexColor)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return projectPriorityDTO{}, domain.NotFoundError
@@ -145,17 +143,15 @@ func (projectPriorityRepository *projectPriorityRepository) Search(ctx context.C
 	var queryArgs []any
 	sqlQuery := `
 			SELECT
-				PP.id, PP.name, PP.item_hex_color,  PP.item_index
+				PP.id, PP.name, PP.item_hex_color
 			FROM project_priorities PP
     `
 	var field string
 	switch order.Field {
 	case "name":
 		field = "PP.name COLLATE NOCASE"
-	case "index":
-		field = "PP.item_index"
 	default:
-		field = "PP.item_index"
+		field = "PP.name COLLATE NOCASE"
 	}
 	var sort string
 	switch order.Sort {
@@ -195,7 +191,7 @@ func (projectPriorityRepository *projectPriorityRepository) Search(ctx context.C
 	for rows.Next() {
 		var projectPriority projectPriorityDTO
 		if err := rows.Scan(
-			&projectPriority.ID, &projectPriority.Name, &projectPriority.HexColor, &projectPriority.Index,
+			&projectPriority.ID, &projectPriority.Name, &projectPriority.HexColor,
 		); err != nil {
 			return nil, browser.Result{}, err
 		}

@@ -29,7 +29,6 @@ export type ProjectStatusResponse = {
   id: string;
   name: string;
   hexColor: string;
-  index: number;
 };
 
 export type SearchResponse = {

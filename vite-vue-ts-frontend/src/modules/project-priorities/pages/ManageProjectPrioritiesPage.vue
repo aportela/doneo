@@ -45,7 +45,6 @@
         id: "",
         name: "",
         hexColor: "",
-        index: 0,
     }));
 
     watch(state, (newValue: AjaxStateInterface) => {
@@ -174,70 +173,6 @@
         }
     };
 
-    const onMoveIndexUp = async (projectPriority: ProjectPriority, _index?: number) => {
-        Object.assign(state, defaultAjaxStateRunning);
-        try {
-            notify('success', t("projectPriorityIndexMovedNotification", { name: projectPriority.name }));
-            onRefresh();
-        } catch (error: unknown) {
-            state.ajaxErrors = true;
-            handleAPIError(error,
-                (apiError) => {
-                    switch (apiError.response?.status) {
-                        case 401:
-                            state.ajaxErrors = false;
-                            selectedProjectPriority.value = projectPriority;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageProjectPrioritiesPage.onMoveIndexUp" } });
-                            break;
-                        case 404:
-                            state.ajaxErrorMessage = t("We couldn’t find the specified project priority");
-                            break;
-                        default:
-                            state.ajaxErrorMessage = t("There was a problem while updating the project priority");
-                            break;
-                    }
-                },
-                (fatalError) => {
-                    state.ajaxErrorMessage = t("There was a problem while updating the project priority");
-                    console.error("Unhandled API error", { file: "ManageProjectPrioritiesPage.vue", method: "onMoveIndexUp" }, { err: fatalError });
-                });
-        } finally {
-            state.ajaxRunning = false;
-        }
-    }
-
-    const onMoveIndexDown = async (projectPriority: ProjectPriority, _index?: number) => {
-        Object.assign(state, defaultAjaxStateRunning);
-        try {
-            notify('success', t("projectPriorityIndexMovedNotification", { name: projectPriority.name }));
-            onRefresh();
-        } catch (error: unknown) {
-            state.ajaxErrors = true;
-            handleAPIError(error,
-                (apiError) => {
-                    switch (apiError.response?.status) {
-                        case 401:
-                            state.ajaxErrors = false;
-                            selectedProjectPriority.value = projectPriority;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageProjectPrioritiesPage.onMoveIndexDown" } });
-                            break;
-                        case 404:
-                            state.ajaxErrorMessage = t("We couldn’t find the specified project priority");
-                            break;
-                        default:
-                            state.ajaxErrorMessage = t("There was a problem while updating the project priority");
-                            break;
-                    }
-                },
-                (fatalError) => {
-                    state.ajaxErrorMessage = t("There was a problem while updating the project priority");
-                    console.error("Unhandled API error", { file: "ManageProjectPrioritiesPage.vue", method: "onMoveIndexDown" }, { err: fatalError });
-                });
-        } finally {
-            state.ajaxRunning = false;
-        }
-    }
-
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -272,8 +207,8 @@
         </Pager>
         <ProjectPrioritiesTable :projectPriorities="projectPriorities" :loading="state.ajaxRunning" @refresh="onRefresh"
             @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" @textfilter-keydown-enter="onRefresh"
-            @move-index-up="onMoveIndexUp" @move-index-down="onMoveIndexDown" :sort-field="sort.field"
-            :sort-order="sort.order" @toggle-sort="onToggleSort" v-model:project-priority-name-filter="nameFilter" />
+            :sort-field="sort.field" :sort-order="sort.order" @toggle-sort="onToggleSort"
+            v-model:project-priority-name-filter="nameFilter" />
     </n-card>
 </template>
 

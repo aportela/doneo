@@ -25,7 +25,6 @@ func domainToResponse(projectPriority domain.ProjectPriority) projectPriorityRes
 		ID:       projectPriority.ID,
 		Name:     projectPriority.Name,
 		HexColor: projectPriority.HexColor,
-		Index:    projectPriority.Index,
 	}
 }
 

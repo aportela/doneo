@@ -45,7 +45,6 @@
         id: "",
         name: "",
         hexColor: "",
-        index: 0,
     }));
 
     watch(state, (newValue: AjaxStateInterface) => {
@@ -174,70 +173,6 @@
         }
     };
 
-    const onMoveIndexUp = async (projectStatus: ProjectStatus, _index?: number) => {
-        Object.assign(state, defaultAjaxStateRunning);
-        try {
-            notify('success', t("projectStatusIndexMovedNotification", { name: projectStatus.name }));
-            onRefresh();
-        } catch (error: unknown) {
-            state.ajaxErrors = true;
-            handleAPIError(error,
-                (apiError) => {
-                    switch (apiError.response?.status) {
-                        case 401:
-                            state.ajaxErrors = false;
-                            selectedProjectStatus.value = projectStatus;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageProjectStatusesPage.onMoveIndexUp" } });
-                            break;
-                        case 404:
-                            state.ajaxErrorMessage = t("We couldn’t find the specified project type");
-                            break;
-                        default:
-                            state.ajaxErrorMessage = t("There was a problem while updating the project type");
-                            break;
-                    }
-                },
-                (fatalError) => {
-                    state.ajaxErrorMessage = t("There was a problem while updating the project type");
-                    console.error("Unhandled API error", { file: "ManageProjectStatusesPage.vue", method: "onMoveIndexUp" }, { err: fatalError });
-                });
-        } finally {
-            state.ajaxRunning = false;
-        }
-    }
-
-    const onMoveIndexDown = async (projectStatus: ProjectStatus, _index?: number) => {
-        Object.assign(state, defaultAjaxStateRunning);
-        try {
-            notify('success', t("projectStatusIndexMovedNotification", { name: projectStatus.name }));
-            onRefresh();
-        } catch (error: unknown) {
-            state.ajaxErrors = true;
-            handleAPIError(error,
-                (apiError) => {
-                    switch (apiError.response?.status) {
-                        case 401:
-                            state.ajaxErrors = false;
-                            selectedProjectStatus.value = projectStatus;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageProjectStatusesPage.onMoveIndexDown" } });
-                            break;
-                        case 404:
-                            state.ajaxErrorMessage = t("We couldn’t find the specified project type");
-                            break;
-                        default:
-                            state.ajaxErrorMessage = t("There was a problem while updating the project type");
-                            break;
-                    }
-                },
-                (fatalError) => {
-                    state.ajaxErrorMessage = t("There was a problem while updating the project type");
-                    console.error("Unhandled API error", { file: "ManageProjectStatusesPage.vue", method: "onMoveIndexDown" }, { err: fatalError });
-                });
-        } finally {
-            state.ajaxRunning = false;
-        }
-    }
-
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -259,7 +194,7 @@
 <template>
     <n-modal v-model:show="showProjectStatusDialogForm">
         <ProjectStatusForm :mode="projectStatusDialogFormMode == 'add' ? 'add' : 'update'"
-            :project-type-id="selectedProjectStatus.id" style="width: 40%;" @add="onAdd" @update="onUpdate"
+            :project-status-id="selectedProjectStatus.id" style="width: 40%;" @add="onAdd" @update="onUpdate"
             @cancel="onCancel" />
     </n-modal>
 
@@ -272,8 +207,8 @@
         </Pager>
         <ProjectStatusesTable :projectStatuses="projectStatuses" :loading="state.ajaxRunning" @refresh="onRefresh"
             @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" @textfilter-keydown-enter="onRefresh"
-            @move-index-up="onMoveIndexUp" @move-index-down="onMoveIndexDown" :sort-field="sort.field"
-            :sort-order="sort.order" @toggle-sort="onToggleSort" v-model:project-status-name-filter="nameFilter" />
+            :sort-field="sort.field" :sort-order="sort.order" @toggle-sort="onToggleSort"
+            v-model:project-status-name-filter="nameFilter" />
     </n-card>
 </template>
 
