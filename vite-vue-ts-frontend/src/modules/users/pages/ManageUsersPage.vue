@@ -18,7 +18,7 @@
     import Pager from '../../../shared/components/tables/Pager.vue';
     import { Sort } from '../../../shared/types/models/sort';
     import type { TimestampRange } from '../../../shared/composables/timestamps';
-    import type { FormMode } from '../types/form-mode';
+    import type { FormMode } from '../../../shared/types/form-mode';
 
     const { notify } = useNotify();
 

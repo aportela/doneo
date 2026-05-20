@@ -16,7 +16,7 @@
     import RoleForm from '../components/RoleForm.vue';
     import Pager from '../../../shared/components/tables/Pager.vue';
     import { Sort } from '../../../shared/types/models/sort';
-    import type { FormMode } from '../types/form-mode';
+    import type { FormMode } from '../../../shared/types/form-mode';
 
     const { notify } = useNotify();
 

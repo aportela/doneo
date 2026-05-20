@@ -12,7 +12,7 @@
     import type { UserResponse, AddRequest, UpdateRequest } from '../types/dto';
     import { isValidEmail } from '../../../shared/composables/form-validators';
     import RemoteAPIAlert from '../../../shared/components/alerts/RemoteAPIAlert.vue';
-    import type { FormMode } from '../types/form-mode';
+    import type { FormMode } from '../../../shared/types/form-mode';
     import { appBus } from '../../../shared/composables/bus';
 
     interface UserFormProps {
@@ -369,7 +369,7 @@
                 </n-input>
                 <n-button v-else @click="onShowPasswordFormItem" block :disabled="state.ajaxRunning">{{
                     t("userFormChangePasswordButtonLabel")
-                    }}</n-button>
+                }}</n-button>
             </n-form-item>
             <n-form-item :label="t('userFormPermissionsLabel')">
                 <n-radio-group v-model:value="user.permissions.isSuperUser" name="radiogroup">
