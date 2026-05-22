@@ -50,10 +50,10 @@
                     return true;
                 }
                 if (!value?.trim()) {
-                    return new Error(t("userFormNameFieldEmptyError"));
+                    return new Error(t("shared.warningMessages.fieldIsRequired"));
                 }
                 else if (value.length > maxNameLength) {
-                    return new Error(t("userFormNameFieldTooLargeError"));
+                    return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
                 } else if (serverErrors.value.name) {
                     return new Error(t(serverErrors.value.name));
                 } else {
@@ -69,13 +69,13 @@
                     return true;
                 }
                 if (!value?.trim()) {
-                    return new Error(t("userFormEmailFieldEmptyError"));
+                    return new Error(t("shared.warningMessages.fieldIsRequired"));
                 }
                 else if (!isValidEmail(value)) {
-                    return new Error(t("userFormEmailFieldInvalidError"));
+                    return new Error(t("shared.warningMessages.fieldHasInvalidFormat"));
                 }
                 else if (value.length > maxEmailLength) {
-                    return new Error(t("userFormEmailFieldTooLargeError"));
+                    return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
                 } else if (serverErrors.value.email) {
                     return new Error(t(serverErrors.value.email));
                 } else {
@@ -93,10 +93,10 @@
                     return true;
                 }
                 if (!value?.trim()) {
-                    return new Error(t("userFormPasswordFieldEmptyError"));
+                    return new Error(t("shared.warningMessages.fieldIsRequired"));
                 }
                 else if (value.length < minPasswordLength) {
-                    return new Error(t("userFormPasswordFieldTooShortError"));
+                    return new Error(t("shared.warningMessages.fieldIsBelowMinimumLength"));
                 } else if (serverErrors.value.password) {
                     return new Error(t(serverErrors.value.password));
                 } else {
@@ -150,7 +150,7 @@
             if (response.id === id) {
                 user.value = new User(response);
             } else {
-                state.ajaxErrorMessage = t("There was a problem while loading the user data");
+                state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.loadError");
             }
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -162,15 +162,15 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "UserForm.onGet" } });
                             break;
                         case 404:
-                            state.ajaxErrorMessage = t("We couldn’t find the specified user");
+                            state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.notFoundError");
                             break;
                         default:
-                            state.ajaxErrorMessage = t("There was a problem while loading the user data");
+                            state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.loadError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("There was a problem while loading the user data");
+                    state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.loadError");
                     console.error("Unhandled API error", { file: "UserForm.vue", method: "onGet" }, { err: fatalError });
                 });
         } finally {
@@ -207,20 +207,20 @@
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
-                                serverErrors.value.name = "userFormNameFieldAlreadyExists";
+                                serverErrors.value.name = "modules.user.components.UserForm.inputs.name.errors.alreadyExists";
                             } else if (apiError.details?.field === "email") {
-                                serverErrors.value.email = "userFormEmailFieldAlreadyExists";
+                                serverErrors.value.email = "modules.user.components.UserForm.inputs.email.errors.alreadyExists";
                             } else {
-                                state.ajaxErrorMessage = t("There was a problem while adding the user data");
+                                state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.addError");
                             }
                             break;
                         default:
-                            state.ajaxErrorMessage = t("There was a problem while adding the user data");
+                            state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.addError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("There was a problem while adding the user data");
+                    state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.addError");
                     console.error("Unhandled API error", { file: "UserForm.vue", method: "onAdd" }, { err: fatalError });
                 });
         } finally {
@@ -259,20 +259,20 @@
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
-                                serverErrors.value.name = "userFormNameFieldAlreadyExists";
+                                serverErrors.value.name = "modules.user.components.UserForm.inputs.name.errors.alreadyExists";
                             } else if (apiError.details?.field === "email") {
-                                serverErrors.value.email = "userFormEmailFieldAlreadyExists";
+                                serverErrors.value.email = "modules.user.components.UserForm.inputs.email.errors.alreadyExists";
                             } else {
-                                state.ajaxErrorMessage = t("There was a problem while updating the user data");
+                                state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.updateError");
                             }
                             break;
                         default:
-                            state.ajaxErrorMessage = t("There was a problem while updating the user data");
+                            state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.updateError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("There was a problem while updating the user data");
+                    state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.updateError");
                     console.error("Unhandled API error", { file: "UserForm.vue", method: "onUpdate" }, { err: fatalError });
                 });
         } finally {
@@ -320,7 +320,8 @@
         <template #header>
             <div class="doneo-flex-center-align">
                 <n-icon :component="props.mode == 'add' ? IconUserPlus : IconUserEdit" />
-                {{ t(props.mode == "add" ? "Add user" : "Update user") }}
+                {{ t(props.mode == "add" ? "modules.user.components.UserForm.headers.addUser" :
+                "modules.user.components.UserForm.headers.updateUser") }}
             </div>
         </template>
         <template #header-extra>
@@ -328,24 +329,28 @@
         </template>
         <n-form ref="userFormRef" :model="user" :rules="state.ajaxRunning ? {} : userFormRules"
             :disabled="state.ajaxRunning">
-            <n-form-item :label="t('userFormNameLabel')" path="name" show-feedback>
-                <n-input type="text" :placeholder="t('userFormNameFieldPlaceholder')" v-model:value="user.name"
-                    :maxlength="maxNameLength" :show-count="true" clearable required autofocus>
+            <n-form-item :label="t('modules.user.components.UserForm.inputs.name.label')" path="name" show-feedback>
+                <n-input type="text" :placeholder="t('modules.user.components.UserForm.inputs.name.placeholder')"
+                    v-model:value="user.name" :maxlength="maxNameLength" :show-count="true" clearable required
+                    autofocus>
                     <template #prefix>
                         <n-icon :component="IconUser" />
                     </template>
                 </n-input>
             </n-form-item>
-            <n-form-item :label="t('userFormEmailLabel')" path="email" show-feedback>
-                <n-input type="text" :placeholder="t('userFormEmailFieldPlaceholder')" v-model:value="user.email"
-                    :maxlength="maxEmailLength" :show-count="true" clearable required autofocus>
+            <n-form-item :label="t('modules.user.components.UserForm.inputs.email.label')" path="email" show-feedback>
+                <n-input type="text" :placeholder="t('modules.user.components.UserForm.inputs.email.placeholder')"
+                    v-model:value="user.email" :maxlength="maxEmailLength" :show-count="true" clearable required
+                    autofocus>
                     <template #prefix>
                         <n-icon :component="IconMail" />
                     </template>
                 </n-input>
             </n-form-item>
-            <n-form-item :label="t('userFormPasswordLabel')" path="password" show-feedback>
-                <n-input v-if="showPasswordField" type="password" :placeholder="t('userFormPasswordFieldPlaceholder')"
+            <n-form-item :label="t('modules.user.components.UserForm.inputs.password.label')" path="password"
+                show-feedback>
+                <n-input v-if="showPasswordField" type="password"
+                    :placeholder="t('modules.user.components.UserForm.inputs.password.placeholder')"
                     v-model:value="user.password" show-password-on="click" ref="inputPasswordRef">
                     <template #prefix>
                         <n-icon :component="IconKey" />
@@ -355,7 +360,7 @@
                             <template #trigger>
                                 <n-icon :size="16" :component="IconEyeCancel" />
                             </template>
-                            {{ t("hide password") }}
+                            {{ t("modules.user.components.UserForm.inputs.password.hidePasswordTooltipIcon") }}
                         </n-tooltip>
                     </template>
                     <template #password-invisible-icon>
@@ -363,25 +368,27 @@
                             <template #trigger>
                                 <n-icon :size="16" :component="IconEye" />
                             </template>
-                            {{ t("show password") }}
+                            {{ t("modules.user.components.UserForm.inputs.password.showPasswordTooltipIcon") }}
                         </n-tooltip>
                     </template>
                 </n-input>
                 <n-button v-else @click="onShowPasswordFormItem" block :disabled="state.ajaxRunning">{{
-                    t("userFormChangePasswordButtonLabel")
-                }}</n-button>
+                    t("modules.user.components.UserForm.buttons.changePassword.label")
+                    }}</n-button>
             </n-form-item>
             <n-form-item :label="t('userFormPermissionsLabel')">
                 <n-radio-group v-model:value="user.permissions.isSuperUser" name="radiogroup">
-                    <n-radio :value="true" name="aaa" :label="t('superUserPermission')">
+                    <n-radio :value="true" name="isSuperUser"
+                        :label="t('modules.user.components.UserForm.radios.Permissions.SuperUser.label')">
                     </n-radio>
-                    <n-radio :value="false" name="aaa" :label="t('normalUserPermission')">
+                    <n-radio :value="false" name="isSuperUser"
+                        :label="t('modules.user.components.UserForm.radios.Permissions.NormalUser.label')">
                     </n-radio>
                 </n-radio-group>
             </n-form-item>
         </n-form>
         <template #footer v-if="state.ajaxErrorMessage">
-            <RemoteAPIAlert type="error" :title="t('Error')" :message="state.ajaxErrorMessage" />
+            <RemoteAPIAlert type="error" :title="t('shared.errorMessages.Error')" :message="state.ajaxErrorMessage" />
         </template>
         <template #action>
             <n-flex>
@@ -389,13 +396,13 @@
                     <template #icon>
                         <n-icon :component="IconDeviceFloppy" />
                     </template>
-                    {{ t("Save") }}
+                    {{ t("shared.buttons.Save.label") }}
                 </n-button>
                 <n-button @click="onCancel" :disabled="state.ajaxRunning">
                     <template #icon>
                         <n-icon :component="IconCancel" />
                     </template>
-                    {{ t("Cancel") }}
+                    {{ t("shared.buttons.Cancel.label") }}
                 </n-button>
             </n-flex>
         </template>

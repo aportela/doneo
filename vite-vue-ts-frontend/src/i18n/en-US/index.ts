@@ -10,7 +10,16 @@ export default {
     },
   },
   shared: {
+    buttons: {
+      Save: {
+        label: "Save",
+      },
+      Cancel: {
+        label: "Cancel",
+      },
+    },
     errorMessages: {
+      Error: "Error",
       uncaugthException: "Uncaught exception",
       invalidAPIResponseCode: "Invalid API response code",
     },
@@ -60,6 +69,63 @@ export default {
         },
       },
     },
+    user: {
+      components: {
+        UserForm: {
+          headers: {
+            addUser: "Add user",
+            updateUser: "Update user",
+          },
+          inputs: {
+            name: {
+              label: "Name",
+              placeholder: "Enter user name",
+              errors: {
+                alreadyExists: "Name already exists",
+              },
+            },
+            email: {
+              label: "Email",
+              placeholder: "Enter user email address",
+              errors: {
+                alreadyExists: "Email already exists",
+              },
+            },
+            password: {
+              label: "Password",
+              placeholder: "Enter user password",
+              hidePasswordTooltipIcon: "hide password",
+              showPasswordTooltipIcon: "show passwword",
+            },
+          },
+          buttons: {
+            changePassword: {
+              label: "Change password",
+            },
+            signIn: {
+              label: "Sign in",
+            },
+          },
+          radios: {
+            Permissions: {
+              SuperUser: {
+                label: "Administrator",
+              },
+              NormalUser: {
+                label: "Normal user",
+              },
+            },
+          },
+          errors: {
+            loadError: "There was a problem while loading the user data",
+            notFoundError: "We couldn’t find the specified user",
+            addError: "There was a problem while adding the user data",
+            updateError: "There was a problem while updating the user data",
+          },
+        },
+      },
+    },
+    role: {},
   },
 
   // common actions/operations
