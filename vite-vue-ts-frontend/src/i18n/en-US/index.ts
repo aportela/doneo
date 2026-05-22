@@ -147,9 +147,31 @@ export default {
           },
           errors: {
             loadError: "There was a problem while loading the user data",
+            // TODO: deduplicate
             notFoundError: "We couldn’t find the specified user",
             addError: "There was a problem while adding the user data",
             updateError: "There was a problem while updating the user data",
+          },
+        },
+        ManageUsersPage: {
+          header: {
+            title: "Manage users",
+          },
+          pager: {
+            totalItemsLabel: "Total users: {total}",
+          },
+          notifications: {
+            userAdded: 'User "{name}" has been added',
+            userUpdated: 'User "{name}" has been updated',
+            userDeleted: 'User "{name}" has been deleted',
+            userRestored: 'User "{name}" has been restored',
+          },
+          errors: {
+            refreshError: "There was a problem while refreshing the user list",
+            deleteError: "There was a problem while deleting the user",
+            restoreError: "There was a problem while restoring the user",
+            // TODO: deduplicate
+            notFoundError: "We couldn’t find the specified user",
           },
         },
         UsersTable: {
@@ -168,6 +190,14 @@ export default {
               },
               email: {
                 placeholder: "search by email",
+              },
+            },
+          },
+          body: {
+            columns: {
+              permissions: {
+                administrator: "Administrator",
+                user: "User",
               },
             },
           },
@@ -241,64 +271,6 @@ export default {
   userAdminPermissionSelectorValueAll: "All",
   userAdminPermissionSelectorValueOnlyAdministrators: "Only administrators",
   userAdminPermissionSelectorValueOnlyUsers: "Only users",
-
-  // users
-  "Manage users": "Manage users",
-  TotalUsersPagerLabel: "Total users: {total}",
-  UserAdminPermissionTableHeader: "Permissions",
-  UsernameTableHeader: "Name",
-  EmailTableHeader: "Email",
-  CreatedAtTableHeader: "Created at",
-  UpdatedAtTableHeader: "Updated at",
-  DeletedAtTableHeader: "Deleted at",
-  AdminTypeValue: "Administrator",
-  UserTypeValue: "User",
-  "Add user": "Add user",
-  "Update user": "Update user",
-  "Delete user": "Delete user",
-  "Restore user": "Restore user",
-  "No users found": "No users found",
-  deleteUserConfirmation:
-    'You are about to delete the user "{name}" from the system.',
-  restoreUserConfirmation:
-    'You are about to restore the user "{name}" from the system.',
-  "There was a problem while refreshing the user list":
-    "There was a problem while refreshing the user list",
-  "We couldn’t find the specified user": "We couldn’t find the specified user",
-  "There was a problem while deleting the user":
-    "There was a problem while deleting the user",
-  "There was a problem while restoring the user":
-    "There was a problem while restoring the user",
-  "There was a problem while adding the user data":
-    "There was a problem while adding the user data",
-  "There was a problem while updating the user data":
-    "There was a problem while updating the user data",
-  "There was a problem while loading the user data":
-    "There was a problem while loading the user data",
-  userAddedNotification: 'User "{name}" has been added',
-  userUpdatedNotification: 'User "{name}" has been updated',
-  userDeletedNotification: 'User "{name}" has been deleted',
-  userRestoredNotification: 'User "{name}" has been restored',
-  userFormNameLabel: "Name",
-  userFormEmailLabel: "Email",
-  userFormPasswordLabel: "Password",
-  userFormPermissionsLabel: "Permissions",
-  userFormNameFieldPlaceholder: "Enter name",
-  userFormEmailFieldPlaceholder: "Enter email address",
-  userFormPasswordFieldPlaceholder: "Enter password",
-  userFormNameFieldEmptyError: "Name is empty",
-  userFormNameFieldTooLargeError: "Name is too large",
-  userFormNameFieldAlreadyExists: "Name already exists",
-  userFormEmailFieldEmptyError: "Email is empty",
-  userFormEmailFieldInvalidError: "Email is invalid",
-  userFormEmailFieldTooLargeError: "Email is too large",
-  userFormEmailFieldAlreadyExists: "Email already exists",
-  userFormPasswordFieldEmptyError: "Password is empty",
-  userFormPasswordFieldTooShortError: "Password is too short",
-  userFormChangePasswordButtonLabel: "Change password",
-
-  superUserPermission: "Super user",
-  normalUserPermission: "Normal user",
 
   // role permission typefilter
   rolePermissionTypeSelectorValueAll: "All",

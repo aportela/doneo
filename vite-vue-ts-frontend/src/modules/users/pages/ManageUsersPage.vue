@@ -90,13 +90,13 @@
 
     const onAdd = (user: User) => {
         showUserDialogForm.value = false;
-        notify('success', t("userAddedNotification", { name: user.name }));
+        notify('success', t("modules.user.components.ManageUsersPage.notifications.userAdded", { name: user.name }));
         onRefresh();
     };
 
     const onUpdate = (user: User) => {
         showUserDialogForm.value = false;
-        notify('success', t("userUpdatedNotification", { name: user.name }));
+        notify('success', t("modules.user.components.ManageUsersPage.notifications.userUpdated", { name: user.name }));
         onRefresh();
     };
 
@@ -142,12 +142,12 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onRefresh" } });
                             break;
                         default:
-                            state.ajaxErrorMessage = t("There was a problem while refreshing the user list");
+                            state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.refreshError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("There was a problem while refreshing the user list");
+                    state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.refreshError");
                     console.error("Unhandled API error", { file: "ManageUsersPage.vue", method: "onRefresh" }, { err: fatalError });
                 });
         }
@@ -160,7 +160,7 @@
         Object.assign(state, defaultAjaxStateRunning);
         try {
             await userService.delete(user.id);
-            notify('success', t("userDeletedNotification", { name: user.name }));
+            notify('success', t("modules.user.components.ManageUsersPage.notifications.userDeleted", { name: user.name }));
             onRefresh();
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -173,15 +173,17 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onDelete" } });
                             break;
                         case 404:
-                            state.ajaxErrorMessage = t("We couldn’t find the specified user");
+                            // TODO: notification vs error ?
+                            state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.notFoundError");
                             break;
                         default:
-                            state.ajaxErrorMessage = t("There was a problem while deleting the user");
+                            // TODO: notification vs error ?
+                            state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.deleteError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("There was a problem while deleting the user");
+                    state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.deleteError");
                     console.error("Unhandled API error", { file: "ManageUsersPage.vue", method: "onRefresh" }, { err: fatalError });
                 });
         } finally {
@@ -193,7 +195,7 @@
         Object.assign(state, defaultAjaxStateRunning);
         try {
             await userService.unDelete(user.id);
-            notify('success', t("userRestoredNotification", { name: user.name }));
+            notify('success', t("modules.user.components.ManageUsersPage.notifications.userRestored", { name: user.name }));
             onRefresh();
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -206,15 +208,17 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onUnDelete" } });
                             break;
                         case 404:
-                            state.ajaxErrorMessage = t("We couldn’t find the specified user");
+                            // TODO: notification vs error ?
+                            state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.notFoundError");
                             break;
                         default:
-                            state.ajaxErrorMessage = t("There was a problem while restoring the user");
+                            // TODO: notification vs error ?
+                            state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.restoreError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("There was a problem while restoring the user");
+                    state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.restoreError");
                     console.error("Unhandled API error", { file: "ManageUsersPage.vue", method: "onRefresh" }, { err: fatalError });
                 });
         } finally {
@@ -248,11 +252,11 @@
             @add="onAdd" @update="onUpdate" @cancel="onCancel" />
     </n-modal>
 
-    <n-card :title="t('Manage users')">
+    <n-card :title="t('modules.user.components.ManageUsersPage.header.title')">
         <Pager v-model:current-page="currentPage" v-model:page-size="pageSize" :total-pages="totalPages"
             :total-results="totalResults" class="doneo-pager-container">
             <template #total-results-label="{ totalResults }">
-                {{ t("TotalUsersPagerLabel", { total: totalResults }) }}
+                {{ t("modules.user.components.ManageUsersPage.pager.totalItemsLabel", { total: totalResults }) }}
             </template>
         </Pager>
         <UsersTable :users="users" :loading="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"

@@ -227,7 +227,9 @@
                             :component="user.permissions.isSuperUser ? IconUserKey : IconUser"
                             :color="user.permissions.isSuperUser ? 'red' : undefined">
                         </n-icon>
-                        {{ t(user.permissions.isSuperUser ? "AdminTypeValue" : "UserTypeValue") }}
+                        {{ t(user.permissions.isSuperUser ?
+                            "modules.user.components.UsersTable.body.columns.permissions.administrator" :
+                        "modules.user.components.UsersTable.body.columns.permissions.user") }}
                     </span>
                 </td>
                 <td>
