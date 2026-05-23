@@ -2,8 +2,8 @@
     import { h, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { useDialog, NButtonGroup, NButton, NFlex, NEmpty, NIcon, NTooltip } from 'naive-ui';
-    import { IconEdit, IconPlus, IconRefresh, IconEyeCheck, IconSquarePlus, IconTrash } from '@tabler/icons-vue';
+    import { useDialog, NFlex, NEmpty, NIcon, NTooltip } from 'naive-ui';
+    import { IconEdit, IconEyeCheck, IconSquarePlus, IconTrash } from '@tabler/icons-vue';
 
     import { Role } from '../models/role';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
@@ -13,6 +13,7 @@
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
     import TableCellHeaderSortIcon from '../../../shared/components/tables/TableCellHeaderSortIcon.vue';
     import UpdateDeleteActionsColumn from '../../../shared/components/tables/UpdateDeleteActionsColumn.vue';
+    import RefreshAddActionsColumn from '../../../shared/components/tables/RefreshAddActionsColumn.vue';
 
     interface Props {
         loading: boolean;
@@ -117,24 +118,7 @@
                 <th></th>
                 <th></th>
                 <th class="doneo-text-center">
-                    <n-button-group size="small">
-                        <n-button @click="onRefresh">
-                            <template #icon>
-                                <n-icon :size="22">
-                                    <IconRefresh />
-                                </n-icon>
-                            </template>
-                            {{ t("shared.buttons.Refresh.label") }}
-                        </n-button>
-                        <n-button @click="onAdd">
-                            <template #icon>
-                                <n-icon :size="22">
-                                    <IconPlus />
-                                </n-icon>
-                            </template>
-                            {{ t("shared.buttons.Add.label") }}
-                        </n-button>
-                    </n-button-group>
+                    <RefreshAddActionsColumn @refresh="onRefresh" @add="onAdd" />
                 </th>
             </tr>
         </template>
