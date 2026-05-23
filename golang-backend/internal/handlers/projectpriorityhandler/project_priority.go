@@ -101,7 +101,7 @@ func (h *ProjectPriorityHandler) Search(w http.ResponseWriter, r *http.Request) 
 			filter.Name = request.Filter.Name
 		}
 	}
-	projectTypes, pagerResult, err := h.service.Search(r.Context(),
+	projectPriorities, pagerResult, err := h.service.Search(r.Context(),
 		browser.Params{
 			CurrentPage: request.Pager.CurrentPage,
 			ResultsPage: request.Pager.ResultsPage,
@@ -112,5 +112,5 @@ func (h *ProjectPriorityHandler) Search(w http.ResponseWriter, r *http.Request) 
 		},
 		filter,
 	)
-	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectTypes, pagerResult), err)
+	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectPriorities, pagerResult), err)
 }
