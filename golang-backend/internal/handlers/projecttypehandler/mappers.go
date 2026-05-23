@@ -36,9 +36,9 @@ func domainArrayToResponseArray(projectTypes []domain.ProjectType) []projectType
 	return projectTypeResponses
 }
 
-func toSearchResponse(users []domain.ProjectType, pager browser.Result) searchResponse {
+func toSearchResponse(projectTypes []domain.ProjectType, pager browser.Result) searchResponse {
 	return searchResponse{
-		ProjectTypes: domainArrayToResponseArray(users),
+		ProjectTypes: domainArrayToResponseArray(projectTypes),
 		Pager: handlers.PagerResponse{
 			Enabled:      pager.ResultsPage > 0,
 			CurrentPage:  pager.CurrentPage,
