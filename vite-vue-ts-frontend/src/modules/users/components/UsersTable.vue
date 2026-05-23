@@ -13,7 +13,7 @@
     import { type UserPermissionFilter, UserPermissionFilterValue } from '../types/user-admin-permission-filter';
     import UserPermissionsFilterSelector from '../components/UserPermissionsFilterSelector.vue';
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
-    import DateFilter from '../../../shared/components/forms/DateFilter.vue';
+    import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import TableCellHeaderSortIcon from '../../../shared/components/tables/TableCellHeaderSortIcon.vue';
     import { useSessionStore } from '../../../stores/session';
     import type { TimestampRange } from '../../../shared/composables/timestamps';
@@ -188,13 +188,13 @@
                         v-model:value="emailFilter" @keydown-enter="onTextFilterKeyDownEnter" />
                 </th>
                 <th>
-                    <DateFilter v-model:range="createdAtFilter" />
+                    <DateFilterSelect v-model:range="createdAtFilter" />
                 </th>
                 <th>
-                    <DateFilter v-model:range="updatedAtFilter" />
+                    <DateFilterSelect v-model:range="updatedAtFilter" />
                 </th>
                 <th>
-                    <DateFilter v-model:range="deletedAtFilter" />
+                    <DateFilterSelect v-model:range="deletedAtFilter" />
                 </th>
                 <th class="doneo-text-center">
                     <n-button-group size="small">
@@ -229,7 +229,7 @@
                         </n-icon>
                         {{ t(user.permissions.isSuperUser ?
                             "modules.user.components.UsersTable.body.columns.permissions.administrator" :
-                        "modules.user.components.UsersTable.body.columns.permissions.user") }}
+                            "modules.user.components.UsersTable.body.columns.permissions.user") }}
                     </span>
                 </td>
                 <td>
