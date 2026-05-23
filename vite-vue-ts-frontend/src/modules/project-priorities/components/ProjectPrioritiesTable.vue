@@ -29,7 +29,7 @@
 
     const columns = computed<TableHeaderColumn[]>(() => [
         {
-            label: t("ProjectPriorityNameTableHeader"),
+            label: t("modules.projectPriority.components.ProjectPrioritiesTable.header.columns.name"),
             field: "name",
             sortable: true,
         },
@@ -60,17 +60,17 @@
 
     const onConfirmDelete = (projectPriority: ProjectPriority, index: number) => {
         dialog.warning({
-            title: t("Delete project priority"),
+            title: t("modules.projectPriority.components.ProjectPrioritiesTable.dialogs.deleteConfirmation.title"),
             icon: renderIcon(IconTrash)(24),
             content: () =>
                 h('div', [
-                    t("deleteProjectPriorityConfirmation", { name: projectPriority.name }),
+                    t("modules.projectPriority.components.ProjectPrioritiesTable.dialogs.deleteConfirmation.message", { name: projectPriority.name }),
                     h('br'),
                     h('br'),
-                    t("Do you want to continue ?"),
+                    t("shared.components.dialogs.confirmation.continueMessage"),
                 ]),
-            positiveText: t("Delete"),
-            negativeText: t("Cancel"),
+            positiveText: t("shared.buttons.Delete.label"),
+            negativeText: t("shared.buttons.Cancel.label"),
             onPositiveClick: () => {
                 emit("delete", projectPriority, index)
             },
@@ -95,11 +95,12 @@
                     </n-flex>
                     <span v-else>{{ column.label }}</span>
                 </th>
-                <th class="doneo-table-actions-column">{{ t("Actions") }}</th>
+                <th class="doneo-table-actions-column">{{ t("shared.components.table.header.columns.actions") }}</th>
             </tr>
             <tr class="hide-mobile">
                 <th>
-                    <TextFilterInput clearable size="small" :placeholder="t('searchByNameDefaultPlaceholder')"
+                    <TextFilterInput clearable size="small"
+                        :placeholder="t('modules.projectPriority.components.ProjectPrioritiesTable.filters.name.placeholder')"
                         v-model:value="projectPriorityNameFilter" @keydown-enter="onTextFilterKeyDownEnter" />
                 </th>
                 <th class="doneo-text-center">
@@ -110,7 +111,7 @@
                                     <IconRefresh />
                                 </n-icon>
                             </template>
-                            {{ t("Refresh") }}
+                            {{ t("shared.buttons.Refresh.label") }}
                         </n-button>
                         <n-button @click="onAdd">
                             <template #icon>
@@ -118,7 +119,7 @@
                                     <IconPlus />
                                 </n-icon>
                             </template>
-                            {{ t("Add") }}
+                            {{ t("shared.buttons.Add.label") }}
                         </n-button>
                     </n-button-group>
                 </th>
@@ -128,12 +129,12 @@
             <tr v-for="projectPriority, index in projectPriorities" :key="projectPriority.id">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(projectPriority.hexColor)">{{ projectPriority.name
-                    }}</n-tag>
+                        }}</n-tag>
                 </td>
                 <td class="doneo-text-center">
                     <n-button-group size="small">
                         <n-button @click="onUpdate(projectPriority, index)" :disabled="props.loading">
-                            {{ t("Update") }}
+                            {{ t("shared.buttons.Update.label") }}
                             <template #icon>
                                 <n-icon :size="22">
                                     <IconEdit />
@@ -141,7 +142,7 @@
                             </template>
                         </n-button>
                         <n-button @click="onConfirmDelete(projectPriority, index)" :disabled="props.loading">
-                            {{ t("Delete") }}
+                            {{ t("shared.buttons.Delete.label") }}
                             <template #icon>
                                 <n-icon :size="22">
                                     <IconTrash />
@@ -153,7 +154,8 @@
             </tr>
             <tr>
                 <td :colspan="columns.length + 1" v-if="projectPriorities.length < 1 && !props.loading">
-                    <n-empty :description="t('No project priorities found')">
+                    <n-empty
+                        :description="t('modules.projectPriority.components.ProjectPrioritiesTable.warnings.noItemsFound')">
                     </n-empty>
                 </td>
             </tr>

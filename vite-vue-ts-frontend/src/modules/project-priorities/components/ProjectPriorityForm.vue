@@ -46,10 +46,10 @@
                     return true;
                 }
                 if (!value?.trim()) {
-                    return new Error(t("projectPriorityFormNameFieldEmptyError"));
+                    return new Error(t("shared.warningMessages.fieldIsRequired"));
                 }
                 else if (value.length > maxNameLength) {
-                    return new Error(t("projectPriorityFormNameFieldTooLargeError"));
+                    return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
                 } else if (serverErrors.value.name) {
                     return new Error(t(serverErrors.value.name));
                 } else {
@@ -97,7 +97,7 @@
             if (response.id === id) {
                 projectPriority.value = new ProjectPriority(response);
             } else {
-                state.ajaxErrorMessage = t("There was a problem while loading the project priority data");
+                state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.loadError");
             }
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -109,15 +109,15 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPriorityForm.onGet" } });
                             break;
                         case 404:
-                            state.ajaxErrorMessage = t("We couldn’t find the specified project priority");
+                            state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.notFoundError");
                             break;
                         default:
-                            state.ajaxErrorMessage = t("There was a problem while loading the project priority data");
+                            state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.loadError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("There was a problem while loading the project priority data");
+                    state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.loadError");
                     console.error("Unhandled API error", { file: "ProjectPriorityForm.vue", method: "onGet" }, { err: fatalError });
                 });
         } finally {
@@ -151,18 +151,18 @@
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
-                                serverErrors.value.name = "projectPriorityormNameFieldAlreadyExists";
+                                serverErrors.value.name = "modules.projectPriority.components.ProjectPriorityForm.warnings.nameAlreadyExists";
                             } else {
-                                state.ajaxErrorMessage = t("There was a problem while adding the project priority data");
+                                state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.addError");
                             }
                             break;
                         default:
-                            state.ajaxErrorMessage = t("There was a problem while adding the project priority data");
+                            state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.addError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("There was a problem while adding the project priority data");
+                    state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.addError");
                     console.error("Unhandled API error", { file: "ProjectPriorityForm.vue", method: "onAdd" }, { err: fatalError });
                 });
         } finally {
@@ -197,18 +197,18 @@
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
-                                serverErrors.value.name = "projectPriorityormNameFieldAlreadyExists";
+                                serverErrors.value.name = "modules.projectPriority.components.ProjectPriorityForm.warnings.nameAlreadyExists";
                             } else {
-                                state.ajaxErrorMessage = t("There was a problem while updating the project priority data");
+                                state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.updateError");
                             }
                             break;
                         default:
-                            state.ajaxErrorMessage = t("There was a problem while updating the project priority data");
+                            state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.updateError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("There was a problem while updating the project priority data");
+                    state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.updateError");
                     console.error("Unhandled API error", { file: "ProjectPriorityForm.vue", method: "onUpdate" }, { err: fatalError });
                 });
         } finally {
@@ -255,7 +255,9 @@
         <template #header>
             <div class="doneo-flex-center-align">
                 <n-icon :component="props.mode == 'add' ? IconPlus : IconEdit" />
-                {{ t(props.mode == "add" ? "Add project priority" : "Update project priority") }}
+                {{ t(props.mode == "add" ?
+                    "modules.projectPriority.components.ProjectPriorityForm.headers.addProjectPriority" :
+                    "modules.projectPriority.components.ProjectPriorityForm.headers.updateProjectPriority") }}
             </div>
         </template>
         <template #header-extra>
@@ -263,8 +265,10 @@
         </template>
         <n-form ref="projectStatusFormRef" :model="projectPriority" :rules="projectPriorityFormRules"
             :disabled="state.ajaxRunning">
-            <n-form-item :label="t('Name')" path="name" show-feedback>
-                <n-input type="text" :placeholder="t('projectStatusFormNameFieldPlaceholder')"
+            <n-form-item :label="t('modules.projectPriority.components.ProjectPriorityForm.inputs.name.label')"
+                path="name" show-feedback>
+                <n-input type="text"
+                    :placeholder="t('modules.projectPriority.components.ProjectPriorityForm.inputs.name.placeholder')"
                     v-model:value="projectPriority.name" :maxlength="maxNameLength" :show-count="true" clearable
                     required autofocus>
                     <template #prefix>
@@ -272,7 +276,7 @@
                     </template>
                 </n-input>
             </n-form-item>
-            <n-form-item :label="t('Preview')">
+            <n-form-item :label="t('modules.projectPriority.components.ProjectPriorityForm.inputs.preview.label')">
                 <n-flex style="width: 100%" align="center" :wrap="false">
                     <n-tag :color="getNaiveUITagColorProperty(projectPriority.hexColor)" style="width: 100%;">
                         {{ projectPriority.name }}
@@ -290,7 +294,7 @@
             </n-form-item>
         </n-form>
         <template #footer v-if="state.ajaxErrorMessage">
-            <RemoteAPIAlert type="error" :title="t('Error')" :message="state.ajaxErrorMessage" />
+            <RemoteAPIAlert type="error" :title="t('shared.errorMessages.Error')" :message="state.ajaxErrorMessage" />
         </template>
         <template #action>
             <n-flex>
@@ -298,13 +302,13 @@
                     <template #icon>
                         <n-icon :component="IconDeviceFloppy" />
                     </template>
-                    {{ t("Save") }}
+                    {{ t("shared.buttons.Save.label") }}
                 </n-button>
                 <n-button @click="onCancel" :disabled="state.ajaxRunning">
                     <template #icon>
                         <n-icon :component="IconCancel" />
                     </template>
-                    {{ t("Cancel") }}
+                    {{ t("shared.buttons.Cancel.label") }}
                 </n-button>
             </n-flex>
         </template>

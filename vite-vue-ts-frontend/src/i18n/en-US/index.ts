@@ -331,9 +331,6 @@ export default {
           header: {
             title: "Manage roles",
           },
-          pager: {
-            totalItemsLabel: "Total roles: {total}",
-          },
           notifications: {
             roleAdded: 'Role "{name}" has been added',
             roleUpdated: 'Role "{name}" has been updated',
@@ -385,6 +382,98 @@ export default {
         },
       },
     },
+    projectPriority: {
+      components: {
+        ProjectPriorityForm: {
+          headers: {
+            addProjectPriority: "Add project priority",
+            updateProjectPriority: "Update project priority",
+          },
+          inputs: {
+            name: {
+              label: "Name",
+              placeholder: "Enter project priority name",
+              errors: {
+                alreadyExists: "Name already exists",
+              },
+            },
+            preview: {
+              label: "Preview",
+            },
+          },
+          errors: {
+            loadError:
+              "There was a problem while loading the project priority data",
+            // TODO: deduplicate
+            notFoundError: "We couldn’t find the specified project priority",
+            addError:
+              "There was a problem while adding the project priority data",
+            updateError:
+              "There was a problem while updating the project priority data",
+          },
+          warnings: {
+            nameAlreadyExists: "Name already exists",
+          },
+        },
+        ManageProjectPrioritiesPage: {
+          header: {
+            title: "Manage project priorities",
+          },
+          pager: {
+            totalItemsLabel: "Total project priorities: {total}",
+          },
+          notifications: {
+            projectPriorityAdded: 'Project priority "{name}" has been added',
+            projectPriorityUpdated:
+              'Project priority "{name}" has been updated',
+            projectPriorityDeleted:
+              'Project priority "{name}" has been deleted',
+          },
+          errors: {
+            refreshError:
+              "There was a problem while refreshing the project priority list",
+            deleteError:
+              "There was a problem while deleting the project priority",
+            // TODO: deduplicate
+            notFoundError: "We couldn’t find the specified project priority",
+          },
+        },
+        ProjectPrioritiesTable: {
+          header: {
+            columns: {
+              name: "Name",
+            },
+          },
+          filters: {
+            name: {
+              placeholder: "search by name",
+            },
+          },
+          dialogs: {
+            deleteConfirmation: {
+              title: "Delete project priority",
+              message:
+                'You are about to delete the project priority "{name}" from the system.',
+            },
+          },
+          warnings: {
+            noItemsFound: "No project priorities found",
+          },
+        },
+      },
+    },
+    /*
+    projectStatus: {
+      components: {
+
+      }
+    },
+    projectType: {
+      components: {
+
+      }
+    },
+    */
   },
 
   // common actions/operations
@@ -467,38 +556,6 @@ export default {
   projectStatusAddedNotification: 'Project status "{name}" has been added',
   projectStatusUpdatedNotification: 'Project status "{name}" has been updated',
   projectStatusDeletedNotification: 'Project status "{name}" has been deleted',
-
-  // project priorities
-  "Manage project priorities": "Manage project priorities",
-  TotalProjectPrioritiesPagerLabel: "Total project priorities: {total}",
-  ProjectPriorityNameTableHeader: "Name",
-  "Add project priority": "Add project priority",
-  "Update project priority": "Update project priority",
-  "Delete project priority": "Delete project priority",
-  "No project priorities found": "No project priorities found",
-  deleteProjectPriorityConfirmation:
-    'You are about to delete the project priority "{name}" from the system.',
-  "There was a problem loading the project priority data":
-    "There was a problem loading the project priority data",
-  "There was a problem adding the project priority data":
-    "There was a problem adding the project priority data",
-  "There was a problem updating the project priority data":
-    "There was a problem updating the project priority data",
-  "There was a problem deleting the project priority data":
-    "There was a problem deleting the project priority data",
-  "There was a problem while loading the project priority data":
-    "There was a problem while loading the project priority data",
-  "We couldn’t find the specified project priority":
-    "We couldn’t find the specified project priority",
-  projectPriorityFormNameFieldEmptyError: "Name is empty",
-  projectPriorityFormNameFieldTooLargeError: "Name is too large",
-  projectPriorityFormNameFieldAlreadyExists: "Name already exists",
-  projectPriorityFormNameFieldPlaceholder: "Enter project priority name",
-  projectPriorityAddedNotification: 'Project priority "{name}" has been added',
-  projectPriorityUpdatedNotification:
-    'Project priority "{name}" has been updated',
-  projectPriorityDeletedNotification:
-    'Project priority "{name}" has been deleted',
 
   // other
   Error: "Error",

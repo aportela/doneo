@@ -61,13 +61,13 @@
 
     const onAdd = (projectPriority: ProjectPriority) => {
         showForm.value = false;
-        notify('success', t("projectStatusAddedNotification", { name: projectPriority.name }));
+        notify('success', t("modules.projectPriority.components.ManageProjectPrioritiesPage.notifications.projectPriorityAdded", { name: projectPriority.name }));
         onRefresh();
     };
 
     const onUpdate = (projectPriority: ProjectPriority) => {
         showForm.value = false;
-        notify('success', t("projectStatusUpdatedNotification", { name: projectPriority.name }));
+        notify('success', t("modules.projectPriority.components.ManageProjectPrioritiesPage.notifications.projectPriorityUpdated", { name: projectPriority.name }));
         onRefresh();
     };
 
@@ -104,12 +104,12 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageProjectPrioritiesPage.onRefresh" } });
                             break;
                         default:
-                            state.ajaxErrorMessage = t("There was a problem while refreshing the project priority list");
+                            state.ajaxErrorMessage = t("modules.projectPriority.components.ManageProjectPrioritiesPage.errors.refreshError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("There was a problem while refreshing the project priority list");
+                    state.ajaxErrorMessage = t("modules.projectPriority.components.ManageProjectPrioritiesPage.errors.refreshError");
                     console.error("Unhandled API error", { file: "ManageProjectPrioritiesPage.vue", method: "onRefresh" }, { err: fatalError });
                 });
         }
@@ -122,7 +122,7 @@
         Object.assign(state, defaultAjaxStateRunning);
         try {
             await projectPriorityService.delete(projectPriority.id);
-            notify('success', t("projectPriorityIndexMovedNotification", { name: projectPriority.name }));
+            notify('success', t("modules.projectPriority.components.ManageProjectPrioritiesPage.notifications.projectPriorityDeleted", { name: projectPriority.name }));
             onRefresh();
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -135,15 +135,15 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageProjectPrioritiesPage.onDelete" } });
                             break;
                         case 404:
-                            state.ajaxErrorMessage = t("We couldn’t find the specified project priority");
+                            state.ajaxErrorMessage = t("modules.projectPriority.components.ManageProjectPrioritiesPage.errors.notFoundError");
                             break;
                         default:
-                            state.ajaxErrorMessage = t("There was a problem while deleting the project priority");
+                            state.ajaxErrorMessage = t("modules.projectPriority.components.ManageProjectPrioritiesPage.errors.deleteError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("There was a problem while deleting the project priority");
+                    state.ajaxErrorMessage = t("modules.projectPriority.components.ManageProjectPrioritiesPage.errors.deleteError");
                     console.error("Unhandled API error", { file: "ManageProjectPrioritiesPage.vue", method: "onRefresh" }, { err: fatalError });
                 });
         } finally {
@@ -175,7 +175,7 @@
             style="width: 40%;" @add="onAdd" @update="onUpdate" @cancel="onCancel" />
     </n-modal>
 
-    <n-card :title="t('Manage project priorities')">
+    <n-card :title="t('modules.projectPriority.components.ManageProjectPrioritiesPage.header.title')">
         <ProjectPrioritiesTable :projectPriorities="items" :loading="state.ajaxRunning" @refresh="onRefresh"
             @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" @textfilter-keydown-enter="onRefresh"
             :sort-field="sort.field" :sort-order="sort.order" @toggle-sort="onToggleSort"
