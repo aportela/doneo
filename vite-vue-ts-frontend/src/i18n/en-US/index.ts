@@ -226,7 +226,45 @@ export default {
         },
       },
     },
-    role: {},
+    role: {
+      RoleForm: {
+        headers: {
+          addRole: "Add role",
+          updateRole: "Update role",
+          rolePermissions: "Role permissions",
+          projectPermissions: "Project permissions",
+          taskPermissions: "Task permissions",
+        },
+        inputs: {
+          name: {
+            label: "Name",
+            placeholder: "Enter role name",
+            errors: {
+              alreadyExists: "Name already exists",
+            },
+          },
+        },
+        permissionSwitches: {
+          updateProjectAllowed: "Update project allowed",
+          deleteProjectAllowed: "Delete project allowed",
+          viewProjectAllowed: "View project allowed",
+          addTaskAllowed: "Add task allowed",
+          updateTaskAllowed: "UpdateTaskAllowed",
+          deleteTaskAllowed: "Delete task allowed",
+          viewTaskAllowed: "View task allowed",
+        },
+        errors: {
+          loadError: "There was a problem while loading the role data",
+          // TODO: deduplicate
+          notFoundError: "We couldn’t find the specified role",
+          addError: "There was a problem while adding the role data",
+          updateError: "There was a problem while updating the role data",
+        },
+        warnings: {
+          nameAlreadyExists: "Name already exists",
+        },
+      },
+    },
   },
 
   // common actions/operations

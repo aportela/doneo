@@ -110,7 +110,7 @@
             if (response.id === id) {
                 role.value = new Role(response);
             } else {
-                state.ajaxErrorMessage = t("There was a problem while loading the role data");
+                state.ajaxErrorMessage = t("modules.role.RoleForm.errors.loadError");
             }
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -122,15 +122,15 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "RoleForm.onGet" } });
                             break;
                         case 404:
-                            state.ajaxErrorMessage = t("We couldn’t find the specified role");
+                            state.ajaxErrorMessage = t("modules.role.RoleForm.errors.notFoundError");
                             break;
                         default:
-                            state.ajaxErrorMessage = t("There was a problem while loading the role data");
+                            state.ajaxErrorMessage = t("modules.role.RoleForm.errors.loadError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("There was a problem while loading the role data");
+                    state.ajaxErrorMessage = t("modules.role.RoleForm.errors.loadError");
                     console.error("Unhandled API error", { file: "RoleForm.vue", method: "onGet" }, { err: fatalError });
                 });
         } finally {
@@ -164,18 +164,18 @@
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
-                                serverErrors.value.name = "roleFormNameFieldAlreadyExists";
+                                serverErrors.value.name = "modules.role.RoleForm.warnings.nameAlreadyExists";
                             } else {
-                                state.ajaxErrorMessage = t("There was a problem while adding the role data");
+                                state.ajaxErrorMessage = t("modules.role.RoleForm.errors.addError");
                             }
                             break;
                         default:
-                            state.ajaxErrorMessage = t("There was a problem while adding the role data");
+                            state.ajaxErrorMessage = t("modules.role.RoleForm.errors.addError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("There was a problem while adding the role data");
+                    state.ajaxErrorMessage = t("modules.role.RoleForm.errors.addError");
                     console.error("Unhandled API error", { file: "RoleForm.vue", method: "onAdd" }, { err: fatalError });
                 });
         } finally {
@@ -210,18 +210,18 @@
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
-                                serverErrors.value.name = "roleFormNameFieldAlreadyExists";
+                                serverErrors.value.name = "modules.role.RoleForm.warnings.nameAlreadyExists";
                             } else {
-                                state.ajaxErrorMessage = t("There was a problem while updating the role data");
+                                state.ajaxErrorMessage = t("modules.role.RoleForm.errors.updateError");
                             }
                             break;
                         default:
-                            state.ajaxErrorMessage = t("There was a problem while updating the role data");
+                            state.ajaxErrorMessage = t("modules.role.RoleForm.errors.updateError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("There was a problem while updating the role data");
+                    state.ajaxErrorMessage = t("modules.role.RoleForm.errors.updateError");
                     console.error("Unhandled API error", { file: "RoleForm.vue", method: "onUpdate" }, { err: fatalError });
                 });
         } finally {
@@ -269,7 +269,8 @@
         <template #header>
             <div class="doneo-flex-center-align">
                 <n-icon :component="props.mode == 'add' ? IconPlus : IconEdit" />
-                {{ t(props.mode == "add" ? "Add role" : "Update role") }}
+                {{ t(props.mode == "add" ? "modules.role.RoleForm.headers.addRole" :
+                    "modules.role.RoleForm.headers.updateRole") }}
             </div>
         </template>
         <template #header-extra>
@@ -277,83 +278,86 @@
         </template>
         <n-form ref="roleFormRef" :model="role" :rules="state.ajaxRunning ? {} : roleFormRules"
             :disabled="state.ajaxRunning">
-            <n-form-item :label="t('roleFormNameLabel')" path="name" show-feedback>
-                <n-input type="text" :placeholder="t('roleFormNameFieldPlaceholder')" v-model:value="role.name"
-                    :maxlength="maxNameLength" :show-count="true" clearable required autofocus>
+            <n-form-item :label="t('modules.role.RoleForm.inputs.name.label')" path="name" show-feedback>
+                <n-input type="text" :placeholder="t('modules.role.RoleForm.inputs.name.placeholder')"
+                    v-model:value="role.name" :maxlength="maxNameLength" :show-count="true" clearable required
+                    autofocus>
                     <template #prefix>
                         <n-icon :component="IconUser" />
                     </template>
                 </n-input>
             </n-form-item>
-            <h4>{{ t("Role permissions") }}</h4>
+            <h4>{{ t("modules.role.RoleForm.headers.rolePermissions") }}</h4>
 
             <n-grid :x-gap="8" :y-gap="8" :cols="2">
                 <n-gi>
-                    <h4 class="doneo-permission-group-header">{{ t("Project permissions") }}</h4>
+                    <h4 class="doneo-permission-group-header">{{ t("modules.role.RoleForm.headers.projectPermissions")
+                        }}</h4>
                     <n-switch v-model:value="role.permissions.allowUpdateProject" class="doneo-permission-switch">
                         <template #checked>
-                            {{ t("Update project allowed") }}
+                            {{ t("modules.role.RoleForm.permissionSwitches.updateProjectAllowed") }}
                         </template>
                         <template #unchecked>
-                            {{ t("Update project allowed") }}
+                            {{ t("modules.role.RoleForm.permissionSwitches.updateProjectAllowed") }}
                         </template>
                     </n-switch>
                     <n-switch v-model:value="role.permissions.allowDeleteProject" class="doneo-permission-switch">
                         <template #checked>
-                            {{ t("Delete project allowed") }}
+                            {{ t("modules.role.RoleForm.permissionSwitches.deleteProjectAllowed") }}
                         </template>
                         <template #unchecked>
-                            {{ t("Delete project allowed") }}
+                            {{ t("modules.role.RoleForm.permissionSwitches.deleteProjectAllowed") }}
                         </template>
                     </n-switch>
                     <n-switch v-model:value="role.permissions.allowViewProject" class="doneo-permission-switch">
                         <template #checked>
-                            {{ t("View project allowed") }}
+                            {{ t("modules.role.RoleForm.permissionSwitches.viewProjectAllowed") }}
                         </template>
                         <template #unchecked>
-                            {{ t("View project allowed") }}
+                            {{ t("modules.role.RoleForm.permissionSwitches.viewProjectAllowed") }}
                         </template>
                     </n-switch>
                 </n-gi>
                 <n-gi>
-                    <h4 class="doneo-permission-group-header">{{ t("Task permissions") }}</h4>
+                    <h4 class="doneo-permission-group-header">{{ t("modules.role.RoleForm.headers.taskPermissions") }}
+                    </h4>
                     <n-switch v-model:value="role.permissions.allowAddTask" class="doneo-permission-switch">
                         <template #checked>
-                            {{ t("Add task allowed") }}
+                            {{ t("modules.role.RoleForm.permissionSwitches.addTaskAllowed") }}
                         </template>
                         <template #unchecked>
-                            {{ t("Add task allowed") }}
+                            {{ t("modules.role.RoleForm.permissionSwitches.addTaskAllowed") }}
                         </template>
                     </n-switch>
                     <n-switch v-model:value="role.permissions.allowUpdateTask" class="doneo-permission-switch">
                         <template #checked>
-                            {{ t("Update task allowed") }}
+                            {{ t("modules.role.RoleForm.permissionSwitches.updateTaskAllowed") }}
                         </template>
                         <template #unchecked>
-                            {{ t("Update task allowed") }}
+                            {{ t("modules.role.RoleForm.permissionSwitches.updateTaskAllowed") }}
                         </template>
                     </n-switch>
                     <n-switch v-model:value="role.permissions.allowDeleteTask" class="doneo-permission-switch">
                         <template #checked>
-                            {{ t("Delete task allowed") }}
+                            {{ t("modules.role.RoleForm.permissionSwitches.deleteTaskAllowed") }}
                         </template>
                         <template #unchecked>
-                            {{ t("Delete task allowed") }}
+                            {{ t("modules.role.RoleForm.permissionSwitches.deleteTaskAllowed") }}
                         </template>
                     </n-switch>
                     <n-switch v-model:value="role.permissions.allowViewTask" class="doneo-permission-switch">
                         <template #checked>
-                            {{ t("View task allowed") }}
+                            {{ t("modules.role.RoleForm.permissionSwitches.viewTaskAllowed") }}
                         </template>
                         <template #unchecked>
-                            {{ t("View task allowed") }}
+                            {{ t("modules.role.RoleForm.permissionSwitches.viewTaskAllowed") }}
                         </template>
                     </n-switch>
                 </n-gi>
             </n-grid>
         </n-form>
         <template #footer v-if="state.ajaxErrorMessage">
-            <RemoteAPIAlert type="error" :title="t('Error')" :message="state.ajaxErrorMessage" />
+            <RemoteAPIAlert type="error" :title="t('shared.errorMessages.Error')" :message="state.ajaxErrorMessage" />
         </template>
         <template #action>
             <n-flex>
@@ -361,13 +365,13 @@
                     <template #icon>
                         <n-icon :component="IconDeviceFloppy" />
                     </template>
-                    {{ t("Save") }}
+                    {{ t("shared.buttons.Save.label") }}
                 </n-button>
                 <n-button @click="onCancel" :disabled="state.ajaxRunning">
                     <template #icon>
                         <n-icon :component="IconCancel" />
                     </template>
-                    {{ t("Cancel") }}
+                    {{ t("shared.buttons.Cancel.label") }}
                 </n-button>
             </n-flex>
         </template>
