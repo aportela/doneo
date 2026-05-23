@@ -56,6 +56,35 @@ export default {
           currentPageOfTotal: "Page {currentPage} of {totalPages}",
         },
       },
+      buttons: {
+        github: {
+          toolTip: "Open project page",
+        },
+        notifications: {
+          enable: {
+            toolTip: "Enable notifications",
+          },
+          disable: {
+            toolTip: "Disable notifications",
+          },
+        },
+        colorScheme: {
+          darkMode: {
+            toolTip: "Switch to dark mode",
+          },
+          lightMode: {
+            toolTip: "Switch to light mode",
+          },
+        },
+        navigationMode: {
+          topNavigation: {
+            toolTip: "Switch to top navigation",
+          },
+          sideNavigation: {
+            toolTip: "Switch to side navigation",
+          },
+        },
+      },
     },
     buttons: {
       Save: {
@@ -476,19 +505,4 @@ export default {
   Name: "Name",
   Preview: "Preview",
   Color: "Color",
-
-  // tooltips
-  "show password": "show password",
-  "hide password": "hide password",
-
-  // notifications
-  "Enable notifications": "Enable notifications",
-  "Disable notifications": "Disable notifications",
-
-  // hints
-  "Open project page": "Open project page",
-  "Switch to dark mode": "Switch to dark mode",
-  "Switch to light mode": "Switch to light mode",
-  "Switch to top navigation": "Switch to top navigation",
-  "Switch to side navigation": "Switch to side navigation",
 };

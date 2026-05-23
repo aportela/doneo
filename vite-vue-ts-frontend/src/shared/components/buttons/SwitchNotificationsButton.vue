@@ -28,8 +28,8 @@
         </template>
         {{
             t(userSettingsStore.disableNotifications ?
-                "Enable notifications" :
-                "Disable notifications")
+                "shared.components.buttons.notifications.enable.toolTip" :
+                "shared.components.buttons.notifications.disable.toolTip")
         }}
     </n-tooltip>
 </template>

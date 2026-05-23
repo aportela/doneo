@@ -27,7 +27,7 @@
                 </a>
             </n-button>
         </template>
-        {{ t("Open project page") }}
+        {{ t("shared.components.buttons.github.toolTip") }}
     </n-tooltip>
 </template>
 

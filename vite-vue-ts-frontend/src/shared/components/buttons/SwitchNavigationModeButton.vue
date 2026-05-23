@@ -30,8 +30,8 @@
         </template>
         {{
             t(userSettingsStore.sideNavigationMode ?
-                "Switch to top navigation" :
-                "Switch to side navigation")
+                "shared.components.buttons.navigationMode.topNavigation.toolTip" :
+                "shared.components.buttons.navigationMode.sideNavigation.toolTip")
         }}
     </n-tooltip>
 </template>

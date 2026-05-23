@@ -29,8 +29,8 @@
         </template>
         {{
             t(colorSchemeStore.light ?
-                "Switch to dark mode" :
-                "Switch to light mode")
+                "shared.components.buttons.colorScheme.darkMode.toolTip" :
+                "shared.components.buttons.colorScheme.lightMode.toolTip")
         }}
     </n-tooltip>
 </template>
