@@ -229,6 +229,24 @@ export function useMenu() {
                     RouterLink,
                     {
                       to: {
+                        name: "manageTaskPriorities",
+                        params: {},
+                      },
+                    },
+                    {
+                      default: () =>
+                        t("layouts.sidebarMenu.options.manageTaskPriorities"),
+                    },
+                  ),
+                key: "manageTaskPriorities",
+                icon: renderIcon(IconFlagBolt)(menuOptionIconSize),
+              },
+              {
+                label: () =>
+                  h(
+                    RouterLink,
+                    {
+                      to: {
                         name: "manageTaskStatuses",
                         params: {},
                       },

@@ -16,6 +16,7 @@ export default {
         manageProjectPriorities: "Priority",
         manageProjectStatuses: "Status",
         taskSettings: "Task",
+        manageTaskPriorities: "Priority",
         manageTaskStatuses: "Status",
         disableNotifications: "Disable notifications",
         enableNotifications: "Enable notifications",
@@ -712,6 +713,82 @@ export default {
           },
           warnings: {
             noItemsFound: "No task statuses found",
+          },
+        },
+      },
+    },
+    taskPriority: {
+      components: {
+        TaskPriorityForm: {
+          headers: {
+            addTaskPriority: "Add task priority",
+            updateTaskPriority: "Update task priority",
+          },
+          inputs: {
+            name: {
+              label: "Name",
+              placeholder: "Enter task priority name",
+              errors: {
+                alreadyExists: "Name already exists",
+              },
+            },
+            preview: {
+              label: "Preview",
+            },
+          },
+          errors: {
+            loadError:
+              "There was a problem while loading the task priority data",
+            // TODO: deduplicate
+            notFoundError: "We couldn’t find the specified task priority",
+            addError: "There was a problem while adding the task priority data",
+            updateError:
+              "There was a problem while updating the task priority data",
+          },
+          warnings: {
+            nameAlreadyExists: "Name already exists",
+          },
+        },
+        ManageTaskPrioritiesPage: {
+          header: {
+            title: "Manage task priorities",
+          },
+          pager: {
+            totalItemsLabel: "Total task priorities: {total}",
+          },
+          notifications: {
+            taskPriorityAdded: 'Task priority "{name}" has been added',
+            taskPriorityUpdated: 'Task priority "{name}" has been updated',
+            taskPriorityDeleted: 'Task priority "{name}" has been deleted',
+          },
+          errors: {
+            refreshError:
+              "There was a problem while refreshing the task priority list",
+            deleteError: "There was a problem while deleting the task priority",
+            // TODO: deduplicate
+            notFoundError: "We couldn’t find the specified task priority",
+          },
+        },
+        TaskPrioritiesTable: {
+          header: {
+            columns: {
+              name: "Name",
+            },
+          },
+          filters: {
+            name: {
+              placeholder: "search by name",
+            },
+          },
+          dialogs: {
+            deleteConfirmation: {
+              title: "Delete task priority",
+              message:
+                'You are about to delete the task priority "{name}" from the system.',
+            },
+          },
+          warnings: {
+            noItemsFound: "No task priorities found",
           },
         },
       },

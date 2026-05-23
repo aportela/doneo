@@ -16,6 +16,7 @@ import (
 	"github.com/aportela/doneo/internal/handlers/projectstatushandler"
 	"github.com/aportela/doneo/internal/handlers/projecttypehandler"
 	"github.com/aportela/doneo/internal/handlers/rolehandler"
+	"github.com/aportela/doneo/internal/handlers/taskpriorityhandler"
 	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 	"github.com/aportela/doneo/internal/middlewares"
@@ -102,6 +103,17 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		r.Get("/{id}", taskStatusHandler.Get)
 		r.Put("/{id}", taskStatusHandler.Update)
 		r.Delete("/{id}", taskStatusHandler.Delete)
+	})
+
+	apiRouter.Route("/task-priorities", func(r chi.Router) {
+		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
+		r.Use(middlewares.RequireSuperUser)
+		taskPriorityHandler := taskpriorityhandler.NewTaskPriorityHandler(db)
+		r.Post("/", taskPriorityHandler.Add)
+		r.Post("/search", taskPriorityHandler.Search)
+		r.Get("/{id}", taskPriorityHandler.Get)
+		r.Put("/{id}", taskPriorityHandler.Update)
+		r.Delete("/{id}", taskPriorityHandler.Delete)
 	})
 
 	apiRouter.Route("/projects", func(r chi.Router) {

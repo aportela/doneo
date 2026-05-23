@@ -11,5 +11,6 @@ func CreateDemoData(database database.Database) {
 	projectPriorityIds := createProjectPriorities(database)
 	projectStatusIds := createProjectStatuses(database)
 	createTaskStatuses(database)
+	createTaskPriorities(database)
 	createProjects(database, projectTypeIds, projectPriorityIds, projectStatusIds, userIds, 32)
 }
