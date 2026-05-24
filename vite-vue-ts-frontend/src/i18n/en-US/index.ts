@@ -644,7 +644,7 @@ export default {
     },
     project: {
       components: {
-        ProjectsPage: {
+        ManageProjectsPage: {
           header: {
             title: "Manage projects",
           },
