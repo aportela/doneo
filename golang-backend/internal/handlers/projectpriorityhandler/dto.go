@@ -22,13 +22,13 @@ type searchRequest struct {
 	Filter *filterRequest        `json:"filter"`
 }
 
-type projectPriorityResponse struct {
+type ProjectPriorityResponse struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	HexColor string `json:"hexColor"`
 }
 
 type searchResponse struct {
-	ProjectPriorities []projectPriorityResponse `json:"projectPriorities"`
+	ProjectPriorities []ProjectPriorityResponse `json:"projectPriorities"`
 	Pager             handlers.PagerResponse    `json:"pager"`
 }

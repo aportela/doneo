@@ -39,7 +39,7 @@ func (h *ProjectStatusHandler) Add(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectStatusHandler] failed to add project status: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(projectStatus), nil, http.StatusCreated)
+	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectStatus), nil, http.StatusCreated)
 }
 
 func (h *ProjectStatusHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +56,7 @@ func (h *ProjectStatusHandler) Update(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectStatusHandler] failed to update project status: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(projectStatus), nil)
+	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectStatus), nil)
 }
 
 func (h *ProjectStatusHandler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -83,7 +83,7 @@ func (h *ProjectStatusHandler) Get(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(projectStatus), nil)
+	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectStatus), nil)
 }
 
 func (h *ProjectStatusHandler) Search(w http.ResponseWriter, r *http.Request) {

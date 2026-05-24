@@ -20,18 +20,18 @@ func updateRequestToDomain(request updateRequest) domain.ProjectPriority {
 	}
 }
 
-func domainToResponse(projectPriority domain.ProjectPriority) projectPriorityResponse {
-	return projectPriorityResponse{
+func DomainToResponse(projectPriority domain.ProjectPriority) ProjectPriorityResponse {
+	return ProjectPriorityResponse{
 		ID:       projectPriority.ID,
 		Name:     projectPriority.Name,
 		HexColor: projectPriority.HexColor,
 	}
 }
 
-func domainArrayToResponseArray(projectPriorities []domain.ProjectPriority) []projectPriorityResponse {
-	projectPriorityResponses := []projectPriorityResponse{}
+func domainArrayToResponseArray(projectPriorities []domain.ProjectPriority) []ProjectPriorityResponse {
+	projectPriorityResponses := []ProjectPriorityResponse{}
 	for _, projectPriority := range projectPriorities {
-		projectPriorityResponses = append(projectPriorityResponses, domainToResponse(projectPriority))
+		projectPriorityResponses = append(projectPriorityResponses, DomainToResponse(projectPriority))
 	}
 	return projectPriorityResponses
 }

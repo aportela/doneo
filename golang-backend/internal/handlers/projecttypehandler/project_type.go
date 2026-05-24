@@ -39,7 +39,7 @@ func (h *ProjectTypeHandler) Add(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeHandler] failed to add project type: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(projectType), nil, http.StatusCreated)
+	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectType), nil, http.StatusCreated)
 }
 
 func (h *ProjectTypeHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +56,7 @@ func (h *ProjectTypeHandler) Update(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeHandler] failed to update project type: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(projectType), nil)
+	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectType), nil)
 }
 
 func (h *ProjectTypeHandler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -83,7 +83,7 @@ func (h *ProjectTypeHandler) Get(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(projectType), nil)
+	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectType), nil)
 }
 
 func (h *ProjectTypeHandler) Search(w http.ResponseWriter, r *http.Request) {

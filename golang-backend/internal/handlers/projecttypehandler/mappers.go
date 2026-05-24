@@ -20,18 +20,18 @@ func updateRequestToDomain(request updateRequest) domain.ProjectType {
 	}
 }
 
-func domainToResponse(projectType domain.ProjectType) projectTypeResponse {
-	return projectTypeResponse{
+func DomainToResponse(projectType domain.ProjectType) ProjectTypeResponse {
+	return ProjectTypeResponse{
 		ID:       projectType.ID,
 		Name:     projectType.Name,
 		HexColor: projectType.HexColor,
 	}
 }
 
-func domainArrayToResponseArray(projectTypes []domain.ProjectType) []projectTypeResponse {
-	projectTypeResponses := []projectTypeResponse{}
+func domainArrayToResponseArray(projectTypes []domain.ProjectType) []ProjectTypeResponse {
+	projectTypeResponses := []ProjectTypeResponse{}
 	for _, projectType := range projectTypes {
-		projectTypeResponses = append(projectTypeResponses, domainToResponse(projectType))
+		projectTypeResponses = append(projectTypeResponses, DomainToResponse(projectType))
 	}
 	return projectTypeResponses
 }

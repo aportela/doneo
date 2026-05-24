@@ -39,7 +39,7 @@ func (h *ProjectPriorityHandler) Add(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityHandler] failed to add project priority: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(projectPriority), nil, http.StatusCreated)
+	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectPriority), nil, http.StatusCreated)
 }
 
 func (h *ProjectPriorityHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +56,7 @@ func (h *ProjectPriorityHandler) Update(w http.ResponseWriter, r *http.Request) 
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityHandler] failed to update project priority: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(projectPriority), nil)
+	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectPriority), nil)
 }
 
 func (h *ProjectPriorityHandler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -83,7 +83,7 @@ func (h *ProjectPriorityHandler) Get(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(projectPriority), nil)
+	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectPriority), nil)
 }
 
 func (h *ProjectPriorityHandler) Search(w http.ResponseWriter, r *http.Request) {
