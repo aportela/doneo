@@ -134,6 +134,9 @@ export default {
       Update: {
         label: "Update",
       },
+      Open: {
+        label: "Open",
+      },
     },
     errorMessages: {
       Error: "Error",

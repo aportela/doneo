@@ -1,18 +1,16 @@
 <script setup lang="ts">
-    import { h, computed } from 'vue';
+    import { computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { useDialog, NFlex, NEmpty, NTag, NAvatar } from 'naive-ui';
-    import { IconTrash } from '@tabler/icons-vue';
+    import { NFlex, NEmpty, NTag, NAvatar, NButtonGroup, NButton, NIcon } from 'naive-ui';
+    import { IconFilePencil } from '@tabler/icons-vue';
 
     import { Project } from '../models/project';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import { type SortOrder } from '../../../shared/types/common';
-    import { renderIcon } from '../../../shared/composables/naive-ui-icon';
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
     import TableCellHeaderSortIcon from '../../../shared/components/tables/TableCellHeaderSortIcon.vue';
-    import UpdateDeleteActionsColumn from '../../../shared/components/tables/UpdateDeleteActionsColumn.vue';
     import RefreshAddActionsColumn from '../../../shared/components/tables/RefreshAddActionsColumn.vue';
     import ProjectPrioritySelector from '../../project-priorities/components/ProjectPrioritySelector.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
@@ -27,7 +25,7 @@
 
     const { t } = useI18n();
 
-    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'toggleSort', 'textfilterKeydownEnter']);
+    const emit = defineEmits(['refresh', 'add', 'toggleSort', 'textfilterKeydownEnter']);
 
     const props = defineProps<Props>();
 
@@ -69,7 +67,6 @@
         },
     ]);
 
-
     const projectKeyFilter = defineModel<string>("projectKeyFilter", {
         default: "",
     });
@@ -77,8 +74,6 @@
     const projectSummaryFilter = defineModel<string>("projectSummaryFilter", {
         default: "",
     });
-
-    const dialog = useDialog();
 
     const onToggleSort = (field: string) => {
         emit("toggleSort", field);
@@ -92,28 +87,6 @@
         emit("add");
     };
 
-    const onUpdate = (project: Project, index: number) => {
-        emit("update", project, index);
-    };
-
-    const onConfirmDelete = (project: Project, index: number) => {
-        dialog.warning({
-            title: t("modules.project.components.ProjectsTable.dialogs.deleteConfirmation.title"),
-            icon: renderIcon(IconTrash)(24),
-            content: () =>
-                h('div', [
-                    t("modules.project.components.ProjectsTable.dialogs.deleteConfirmation.message", { summary: project.summary }),
-                    h('br'),
-                    h('br'),
-                    t("shared.components.dialogs.confirmation.continueMessage"),
-                ]),
-            positiveText: t("shared.buttons.Delete.label"),
-            negativeText: t("shared.buttons.Cancel.label"),
-            onPositiveClick: () => {
-                emit("delete", project, index)
-            },
-        });
-    };
 
     const onTextFilterKeyDownEnter = () => {
         emit("textfilterKeydownEnter");
@@ -165,14 +138,17 @@
             </tr>
         </template>
         <template #tbody>
-            <tr v-for="project, index in projects" :key="project.id">
-                <td>{{ project.key }}</td>
-                <td><n-tag type="info" :bordered="false" :color="getNaiveUITagColorProperty(project.type.hexColor)">{{
-                    project.type.name }}</n-tag></td>
-                <td><n-tag type="info" :bordered="false"
-                        :color="getNaiveUITagColorProperty(project.priority.hexColor)">{{ project.priority.name
+            <tr v-for="project, _index in projects" :key="project.id">
+                <td>
+                    {{ project.key }}
+                </td>
+                <td><n-tag :bordered="false" :color="getNaiveUITagColorProperty(project.type.hexColor)">{{
+                    project.type.name }}</n-tag>
+                </td>
+                <td><n-tag :bordered="false" :color="getNaiveUITagColorProperty(project.priority.hexColor)">{{
+                    project.priority.name
                         }}</n-tag></td>
-                <td><n-tag type="info" :bordered="false" :color="getNaiveUITagColorProperty(project.status.hexColor)">{{
+                <td><n-tag :bordered="false" :color="getNaiveUITagColorProperty(project.status.hexColor)">{{
                     project.status.name }}</n-tag></td>
                 <td>{{ project.summary }}</td>
                 <td>{{ project.createdAt.toLocaleString() }}</td>
@@ -185,8 +161,18 @@
 
                 </td>
                 <td class="doneo-text-center">
-                    <UpdateDeleteActionsColumn @update="onUpdate(project, index)"
-                        @delete="onConfirmDelete(project, index)" />
+                    <n-button-group size="small">
+                        <router-link :to="{ name: 'project', params: { id: project.id } }">
+                            <n-button>
+                                {{ t("shared.buttons.Open.label") }}
+                                <template #icon>
+                                    <n-icon :size="22">
+                                        <IconFilePencil />
+                                    </n-icon>
+                                </template>
+                            </n-button>
+                        </router-link>
+                    </n-button-group>
                 </td>
             </tr>
             <tr>
