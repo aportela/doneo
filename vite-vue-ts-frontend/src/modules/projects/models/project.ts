@@ -9,6 +9,7 @@ export class Project {
   id: string;
   key: string;
   summary: string;
+  description: string;
   type: ProjectType;
   priority: ProjectPriority;
   status: ProjectStatus;
@@ -24,6 +25,7 @@ export class Project {
     this.id = data.id;
     this.key = data.key;
     this.summary = data.summary;
+    this.description = data.description;
     this.type = new ProjectType(data.type);
     this.priority = new ProjectPriority(data.priority);
     this.status = new ProjectStatus(data.status);
@@ -41,6 +43,7 @@ export class Project {
       id: this.id,
       key: this.key,
       summary: this.summary,
+      description: this.description,
       type: this.type.toDTO(),
       priority: this.priority.toDTO(),
       status: this.status.toDTO(),

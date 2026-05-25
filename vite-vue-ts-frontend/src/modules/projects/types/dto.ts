@@ -34,6 +34,7 @@ export type ProjectResponse = {
   id: string;
   key: string;
   summary: string;
+  description: string;
   type: ProjectTypeResponse;
   priority: ProjectPriorityResponse;
   status: ProjectStatusResponse;

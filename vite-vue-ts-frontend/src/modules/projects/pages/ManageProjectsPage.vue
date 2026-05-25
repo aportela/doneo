@@ -41,6 +41,7 @@
         id: "",
         key: "",
         summary: "",
+        description: "",
         type: new ProjectType({ id: "", name: "", hexColor: "" }),
         priority: new ProjectPriority({ id: "", name: "", hexColor: "" }),
         status: new ProjectStatus({ id: "", name: "", hexColor: "" }),
