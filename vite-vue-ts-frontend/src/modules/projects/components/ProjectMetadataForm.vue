@@ -1,13 +1,14 @@
 <script setup lang="ts">
     import type { CSSProperties } from 'vue';
 
-    import { NCard, NForm, NFormItem, NInput, NAvatar } from 'naive-ui';
+    import { NCard, NForm, NFormItem, NInput } from 'naive-ui';
 
     import type { FormMode } from '../../../shared/types/form-mode';
     import { Project, maxKeyLength, maxSummaryLength } from "../models/project";
     import ProjectPrioritySelector from "../../project-priorities/components/ProjectPrioritySelector.vue";
     import ProjectStatusSelector from "../../project-statuses/components/ProjectStatusSelector.vue";
     import ProjectTypeSelector from "../../project-types/components/ProjectTypeSelector.vue";
+    import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
 
     interface ProjectFormProps {
         mode: FormMode;
@@ -24,8 +25,7 @@
     <n-card bordered :style="props.style">
         <n-form-item label="Created by">
             <div class="note-user">
-                <n-avatar size="small" :src="'https://i.pravatar.cc/32?u=' + project.createdBy.id" />
-                <span>{{ project.createdBy.name }}</span>
+                <AvatarUserName :user="project.createdBy" />
             </div>
         </n-form-item>
         <n-form-item label="Created at">

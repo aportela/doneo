@@ -2,7 +2,7 @@
     import { h, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { useDialog, NButtonGroup, NButton, NFlex, NEmpty, NAvatar, NIcon } from 'naive-ui';
+    import { useDialog, NButtonGroup, NButton, NFlex, NEmpty, NIcon } from 'naive-ui';
     import { IconUserKey, IconUser, IconEdit, IconTrash, IconTrashOff } from '@tabler/icons-vue';
 
     import { User } from '../models/user';
@@ -16,6 +16,7 @@
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import TableCellHeaderSortIcon from '../../../shared/components/tables/TableCellHeaderSortIcon.vue';
     import RefreshAddActionsColumn from '../../../shared/components/tables/RefreshAddActionsColumn.vue';
+    import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import { useSessionStore } from '../../../stores/session';
     import type { TimestampRange } from '../../../shared/composables/timestamps';
 
@@ -217,10 +218,7 @@
                     </span>
                 </td>
                 <td>
-                    <div class="doneo-flex-center-align" style="gap: 8px;">
-                        <n-avatar v-if="user.avatarUrl" :src="user.avatarUrl" class="avatar" />
-                        {{ user.name }}
-                    </div>
+                    <AvatarUserName :user="user" />
                 </td>
                 <td><a :href="'mailto:' + user.email">{{ user.email }}</a></td>
                 <td class="hide-mobile">{{ user.createdAt.toLocaleString() }}</td>
@@ -267,10 +265,6 @@
 </template>
 
 <style lang="css" scoped>
-    .avatar {
-        margin-right: 4px;
-    }
-
     @media (max-width: 768px) {
         .hide-mobile {
             display: none;

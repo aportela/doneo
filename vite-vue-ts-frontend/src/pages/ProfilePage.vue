@@ -17,6 +17,7 @@
                 <h1>My account</h1>
                 <h2>Profile details</h2>
                 <n-flex style="align-items:center;">
+
                     <n-avatar :size="128" src="https://i.pravatar.cc/128?u=019dfcaa-aa06-755b-aca0-bb05e4ea44a7" />
                     <n-button>
                         <template #icon>

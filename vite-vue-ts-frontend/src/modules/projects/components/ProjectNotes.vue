@@ -1,7 +1,11 @@
 <script setup lang="ts">
     import type { CSSProperties } from "vue";
 
-    import { NSpace, NCard, NAvatar } from "naive-ui";
+    import { NSpace, NCard } from "naive-ui";
+
+    import { UserBase } from "../../users/models/user.ts";
+
+    import AvatarUserName from "../../../shared/components/AvatarUserName.vue";
 
     interface ProjectNotesProps {
         style?: string | CSSProperties;
@@ -10,6 +14,7 @@
 
     const props = defineProps<ProjectNotesProps>();
 
+    const user = new UserBase({ id: '019e5b68-f701-7af7-a694-c8146e3366a1', name: 'John Doe', avatarUrl: 'https://i.pravatar.cc/32?u=019e5b68-f701-7af7-a694-c8146e3366a1' });
 
 </script>
 
@@ -19,8 +24,7 @@
             <n-card v-for="index in [1, 2, 3, 4, 5]" :key="index" size="small" bordered>
                 <div class="note-header">
                     <div class="note-user">
-                        <n-avatar size="small" src="https://i.pravatar.cc/32?u=019e5b68-f701-7af7-a694-c8146e3366a1" />
-                        <span>John Doe</span>
+                        <AvatarUserName :user="user" />
                     </div>
 
                     <span class="note-date">

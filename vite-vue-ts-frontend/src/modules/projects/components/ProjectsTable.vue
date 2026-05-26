@@ -2,7 +2,7 @@
     import { computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NFlex, NEmpty, NTag, NAvatar, NButtonGroup, NButton, NIcon } from 'naive-ui';
+    import { NFlex, NEmpty, NTag, NButtonGroup, NButton, NIcon } from 'naive-ui';
     import { IconFilePencil } from '@tabler/icons-vue';
 
     import { Project } from '../models/project';
@@ -16,6 +16,7 @@
     import ProjectTypeSelector from '../../project-types/components/ProjectTypeSelector.vue';
     import ProjectStatusSelector from '../../project-statuses/components/ProjectStatusSelector.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
+    import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
 
     interface Props {
@@ -155,12 +156,7 @@
                 <td>{{ project.summary }}</td>
                 <td>{{ project.createdAt.toLocaleString() }}</td>
                 <td>
-                    <div class="doneo-flex-center-align" style="gap: 8px;">
-                        <n-avatar v-if="project.createdBy.avatarUrl" :src="project.createdBy.avatarUrl"
-                            class="avatar" />
-                        {{ project.createdBy.name }}
-                    </div>
-
+                    <AvatarUserName :user="project.createdBy" />
                 </td>
                 <td class="doneo-text-center">
                     <n-button-group size="small">
