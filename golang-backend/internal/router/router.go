@@ -149,7 +149,7 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		r.Put("/{id:"+uuidPattern+"}", projectHandler.Update)
 		r.Delete("/{id:"+uuidPattern+"}", projectHandler.Delete)
 		r.Get("/{id:"+uuidPattern+"}/permissions", projectPermissionHandler.Search)
-		r.Delete("/{id:"+uuidPattern+"}/permissions/{permission_id:"+uuidPattern+"}", projectPermissionHandler.Search)
+		r.Delete("/{id:"+uuidPattern+"}/permissions/{permission_id:"+uuidPattern+"}", projectPermissionHandler.Delete)
 	})
 
 	// TODO: 404 route ?
