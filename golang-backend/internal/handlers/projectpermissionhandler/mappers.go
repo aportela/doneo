@@ -19,15 +19,9 @@ func addRequestToDomain(request addRequest) domain.ProjectPermission {
 
 func domainToResponse(projectPermission domain.ProjectPermission) ProjectPermissionResponse {
 	return ProjectPermissionResponse{
-		ID: projectPermission.ID,
-		User: userhandler.UserBaseResponse{
-			ID:   projectPermission.User.ID,
-			Name: projectPermission.User.Name,
-		},
-		Role: rolehandler.RoleResponse{
-			ID:   projectPermission.Role.ID,
-			Name: projectPermission.Role.Name,
-		},
+		ID:   projectPermission.ID,
+		User: userhandler.BaseDomainToBaseResponse(projectPermission.User),
+		Role: rolehandler.DomainToResponse(projectPermission.Role),
 	}
 }
 

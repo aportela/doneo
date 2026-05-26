@@ -39,7 +39,7 @@ func (h *RoleHandler) Add(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[RoleHandler] failed to add role: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(role), nil, http.StatusCreated)
+	handlers.ToHandlerJSONResponse(w, DomainToResponse(role), nil, http.StatusCreated)
 }
 
 func (h *RoleHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +56,7 @@ func (h *RoleHandler) Update(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[RoleHandler] failed to update role: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(role), nil)
+	handlers.ToHandlerJSONResponse(w, DomainToResponse(role), nil)
 }
 
 func (h *RoleHandler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -83,7 +83,7 @@ func (h *RoleHandler) Get(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(user), nil)
+	handlers.ToHandlerJSONResponse(w, DomainToResponse(user), nil)
 }
 
 func (h *RoleHandler) Search(w http.ResponseWriter, r *http.Request) {

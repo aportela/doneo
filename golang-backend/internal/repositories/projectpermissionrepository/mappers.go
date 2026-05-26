@@ -1,6 +1,8 @@
 package projectpermissionrepository
 
-import "github.com/aportela/doneo/internal/domain"
+import (
+	"github.com/aportela/doneo/internal/domain"
+)
 
 func DTOToDomain(projectPermission projectPermissionDTO) domain.ProjectPermission {
 	return domain.ProjectPermission{
@@ -10,8 +12,9 @@ func DTOToDomain(projectPermission projectPermissionDTO) domain.ProjectPermissio
 			Name: projectPermission.UserName,
 		},
 		Role: domain.Role{
-			ID:   projectPermission.RoleId,
-			Name: projectPermission.RoleName,
+			ID:                 projectPermission.RoleId,
+			Name:               projectPermission.RoleName,
+			PermissionsBitmask: domain.PermissionsBitmask(projectPermission.PermissionsBitmask),
 		},
 	}
 }
