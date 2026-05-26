@@ -132,62 +132,83 @@
                 <td class="doneo-text-center">
                     <n-tooltip trigger="hover" v-if="role.permissions.allowUpdateProject">
                         <template #trigger>
-                            <n-icon :size="22">
-                                <IconEdit class="doneo-cursor-help" />
+                            <n-icon :size="22" class="doneo-cursor-help">
+                                <IconEdit />
                             </n-icon>
                         </template>
                         {{ t("modules.role.components.RolesTable.body.columns.permissionsHints.updateProjectAllowed") }}
                     </n-tooltip>
+                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
+                        <IconEdit class="doneo-cursor-help" />
+                    </n-icon>
                     <n-tooltip trigger="hover" v-if="role.permissions.allowDeleteProject">
                         <template #trigger>
-                            <n-icon :size="22">
-                                <IconTrash class="doneo-cursor-help" />
+                            <n-icon :size="22" class="doneo-cursor-help">
+                                <IconTrash />
                             </n-icon>
                         </template>
                         {{ t("modules.role.components.RolesTable.body.columns.permissionsHints.deleteProjectAllowed") }}
                     </n-tooltip>
+                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
+                        <IconTrash class="doneo-cursor-help" />
+                    </n-icon>
                     <n-tooltip trigger="hover" v-if="role.permissions.allowViewProject">
                         <template #trigger>
-                            <n-icon :size="22">
-                                <IconEyeCheck class="doneo-cursor-help" />
+                            <n-icon :size="22" class="doneo-cursor-help">
+                                <IconEyeCheck />
                             </n-icon>
                         </template>
                         {{ t("modules.role.components.RolesTable.body.columns.permissionsHints.viewProjectAllowed") }}
                     </n-tooltip>
+                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
+                        <IconEyeCheck />
+                    </n-icon>
                 </td>
                 <td class="doneo-text-center">
                     <n-tooltip trigger="hover" v-if="role.permissions.allowAddTask">
                         <template #trigger>
-                            <n-icon :size="22">
-                                <IconSquarePlus class="doneo-cursor-help" />
+                            <n-icon :size="22" class="doneo-cursor-help">
+                                <IconSquarePlus />
                             </n-icon>
                         </template>
                         {{ t("modules.role.components.RolesTable.body.columns.permissionsHints.addTaskAllowed") }}
                     </n-tooltip>
+                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
+                        <IconSquarePlus />
+                    </n-icon>
                     <n-tooltip trigger="hover" v-if="role.permissions.allowUpdateTask">
                         <template #trigger>
-                            <n-icon :size="22">
-                                <IconEdit class="doneo-cursor-help" />
+                            <n-icon :size="22" class="doneo-cursor-help">
+                                <IconEdit />
                             </n-icon>
                         </template>
                         {{ t("modules.role.components.RolesTable.body.columns.permissionsHints.updateTaskAllowed") }}
                     </n-tooltip>
+                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
+                        <IconEdit />
+                    </n-icon>
                     <n-tooltip trigger="hover" v-if="role.permissions.allowDeleteTask">
                         <template #trigger>
-                            <n-icon :size="22">
-                                <IconTrash class="doneo-cursor-help" />
+                            <n-icon :size="22" class="doneo-cursor-help">
+                                <IconTrash />
                             </n-icon>
                         </template>
                         {{ t("modules.role.components.RolesTable.body.columns.permissionsHints.deleteTaskAllowed") }}
                     </n-tooltip>
+                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
+                        <IconTrash />
+                    </n-icon>
                     <n-tooltip trigger="hover" v-if="role.permissions.allowViewTask">
                         <template #trigger>
-                            <n-icon :size="22">
-                                <IconEyeCheck class="doneo-cursor-help" />
+                            <n-icon :size="22" class="doneo-cursor-help">
+                                <IconEyeCheck />
                             </n-icon>
                         </template>
                         {{ t("modules.role.components.RolesTable.body.columns.permissionsHints.viewTaskAllowed") }}
                     </n-tooltip>
+                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
+                        <IconEyeCheck />
+                    </n-icon>
                 </td>
                 <td class="doneo-text-center">
                     <UpdateDeleteActionsColumn @update="onUpdate(role, index)" @delete="onConfirmDelete(role, index)" />
@@ -215,5 +236,7 @@
         }
     }
 
-
+    .doneo-disabled-permission-icon {
+        opacity: 0.1;
+    }
 </style>
