@@ -648,6 +648,51 @@ export default {
         },
       },
     },
+    projectPermission: {
+      components: {
+        projectPermissionsTable: {
+          header: {
+            columns: {
+              user: "User",
+              role: "Role",
+              permissions: "Permissions",
+            },
+          },
+          filters: {
+            user: {
+              placeholder: "search by user",
+            },
+            role: {
+              placeholder: "search by role",
+            },
+          },
+          dialogs: {
+            deleteConfirmation: {
+              title: "Delete project permission",
+              message:
+                'You are about to delete the project permission with user "{user}" and role "{role}" from the system.',
+            },
+          },
+          warnings: {
+            noItemsFound: "No project permissions found",
+          },
+        },
+        projectPermissions: {
+          notifications: {
+            projectPermissionAdded:
+              'Project permission of user "{user}" with role "{role}" has been added',
+            projectPermissionDeleted:
+              'Project permission of user "{user}" with role "{role}" has been deleted',
+          },
+          errors: {
+            refreshError:
+              "There was a problem while refreshing the project permission list",
+            deleteError:
+              "There was a problem while deleting the project permission",
+          },
+        },
+      },
+    },
     project: {
       components: {
         ManageProjectsPage: {
