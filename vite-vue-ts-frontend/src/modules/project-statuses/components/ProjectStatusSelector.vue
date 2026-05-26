@@ -50,6 +50,9 @@
             };
             const response = await projectStatusService.search(payload);
             projectStatuses.value = response.projectStatuses;
+            if (projectStatusId.value) {
+                selectedColor.value = projectStatuses.value.find((projectStatus) => projectStatus.id === projectStatusId.value)?.hexColor
+            }
             options.value = response.projectStatuses.map((projectStatus: ProjectStatusResponse) => ({ label: projectStatus.name, value: projectStatus.id }));
         } catch (error: unknown) {
             options.value.length = 0;

@@ -51,6 +51,9 @@
             };
             const response = await projectPriorityService.search(payload);
             projectPriorities.value = response.projectPriorities;
+            if (projectPriorityId.value) {
+                selectedColor.value = projectPriorities.value.find((projectPriority) => projectPriority.id === projectPriorityId.value)?.hexColor
+            }
             options.value = response.projectPriorities.map((projectPriority: ProjectPriorityResponse) => ({ label: projectPriority.name, value: projectPriority.id }));
         } catch (error: unknown) {
             options.value.length = 0;

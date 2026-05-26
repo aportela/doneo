@@ -50,6 +50,9 @@
             };
             const response = await projectTypeService.search(payload);
             projectTypes.value = response.projectTypes;
+            if (projectTypeId.value) {
+                selectedColor.value = projectTypes.value.find((projectType) => projectType.id === projectTypeId.value)?.hexColor
+            }
             options.value = response.projectTypes.map((projectType: ProjectTypeResponse) => ({ label: projectType.name, value: projectType.id }));
         } catch (error: unknown) {
             options.value.length = 0;
