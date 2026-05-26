@@ -59,9 +59,14 @@
         }),
     }));
 
-
     watch(state, (newValue: AjaxStateInterface) => {
         loadingStore.set(newValue.ajaxRunning);
+    });
+
+    watch(() => props.projectId, (newValue, oldValue) => {
+        if (!oldValue && newValue) {
+            onRefresh();
+        }
     });
 
     const onShowAddForm = () => {
@@ -134,7 +139,9 @@
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
-        onRefresh();
+        if (props.projectId) {
+            onRefresh();
+        }
         stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
             if (payload.to.includes("ProjectPermissions.onRefresh")) {
                 onRefresh();
