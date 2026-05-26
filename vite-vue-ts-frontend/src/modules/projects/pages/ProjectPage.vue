@@ -137,22 +137,22 @@
 
 <template>
     <n-tabs placement="top" type="line" animated v-model:value="tab">
-        <n-tab-pane name="metadata" tab="Metadata">
+        <n-tab-pane name="metadata" tab="Metadata" display-directive="show:lazy">
             <ProjectMetadataForm mode="add" :project-id="projectId" v-model:project="project" />
         </n-tab-pane>
-        <n-tab-pane name="permissions" :tab="permissionsTabLabel">
+        <n-tab-pane name="permissions" :tab="permissionsTabLabel" display-directive="show:lazy">
             <ProjectPermissions :project-id="project.id" />
         </n-tab-pane>
-        <n-tab-pane name="notes" :tab="notesTabLabel">
+        <n-tab-pane name="notes" :tab="notesTabLabel" display-directive="show:lazy">
             <ProjectNotes :project-id="project.id" />
         </n-tab-pane>
-        <n-tab-pane name="attachments" :tab="attachmentsTabLabel">
+        <n-tab-pane name="attachments" :tab="attachmentsTabLabel" display-directive="show:lazy">
             <ProjectAttachments :project-id="project.id" />
         </n-tab-pane>
-        <n-tab-pane name="history" :tab="historyTabLabel">
+        <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy">
             <ProjectHistoryOperations :project-id="project.id" />
         </n-tab-pane>
-        <n-tab-pane name="tasks" :tab="tasksTabLabel">
+        <n-tab-pane name="tasks" :tab="tasksTabLabel" display-directive="show:lazy">
             <ProjectTasks :project-id="project.id" />
         </n-tab-pane>
     </n-tabs>
