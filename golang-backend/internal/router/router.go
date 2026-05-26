@@ -1,6 +1,7 @@
 package router
 
 import (
+	"encoding/json"
 	"io/fs"
 	"log"
 	"net/http"
@@ -30,6 +31,14 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 
 	baseRouter.Use(middleware.Logger)
 
+	baseRouter.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{
+			"error": "route not found",
+		})
+	})
+
 	apiRouter := chi.NewRouter()
 
 	apiRouter.Route("/auth", func(r chi.Router) {
@@ -39,16 +48,18 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		r.Post("/renew-access-token", userHandler.RenewAccessToken)
 	})
 
+	uuidPattern := "[0-9a-fA-F-]{36}"
+
 	apiRouter.Route("/users", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
 		userHandler := userhandler.NewUserHandler(db)
 		r.Post("/", userHandler.Add)
 		r.Post("/search", userHandler.Search)
-		r.Get("/{id}", userHandler.Get)
-		r.Put("/{id}", userHandler.Update)
-		r.Patch("/{id}", userHandler.Patch)
-		r.Delete("/{id}", userHandler.Delete)
+		r.Get("/{id:"+uuidPattern+"}", userHandler.Get)
+		r.Put("/{id:"+uuidPattern+"}", userHandler.Update)
+		r.Patch("/{id:"+uuidPattern+"}", userHandler.Patch)
+		r.Delete("/{id:"+uuidPattern+"}", userHandler.Delete)
 	})
 
 	apiRouter.Route("/roles", func(r chi.Router) {
@@ -57,9 +68,9 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		roleHandler := rolehandler.NewRoleHandler(db)
 		r.Post("/", roleHandler.Add)
 		r.Post("/search", roleHandler.Search)
-		r.Get("/{id}", roleHandler.Get)
-		r.Put("/{id}", roleHandler.Update)
-		r.Delete("/{id}", roleHandler.Delete)
+		r.Get("/{id:"+uuidPattern+"}", roleHandler.Get)
+		r.Put("/{id:"+uuidPattern+"}", roleHandler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", roleHandler.Delete)
 	})
 
 	apiRouter.Route("/project-types", func(r chi.Router) {
@@ -68,9 +79,9 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		projectTypeHandler := projecttypehandler.NewProjectTypeHandler(db)
 		r.Post("/", projectTypeHandler.Add)
 		r.Post("/search", projectTypeHandler.Search)
-		r.Get("/{id}", projectTypeHandler.Get)
-		r.Put("/{id}", projectTypeHandler.Update)
-		r.Delete("/{id}", projectTypeHandler.Delete)
+		r.Get("/{id:"+uuidPattern+"}", projectTypeHandler.Get)
+		r.Put("/{id:"+uuidPattern+"}", projectTypeHandler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", projectTypeHandler.Delete)
 	})
 
 	apiRouter.Route("/project-statuses", func(r chi.Router) {
@@ -79,9 +90,9 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		projectStatusHandler := projectstatushandler.NewProjectStatusHandler(db)
 		r.Post("/", projectStatusHandler.Add)
 		r.Post("/search", projectStatusHandler.Search)
-		r.Get("/{id}", projectStatusHandler.Get)
-		r.Put("/{id}", projectStatusHandler.Update)
-		r.Delete("/{id}", projectStatusHandler.Delete)
+		r.Get("/{id:"+uuidPattern+"}", projectStatusHandler.Get)
+		r.Put("/{id:"+uuidPattern+"}", projectStatusHandler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", projectStatusHandler.Delete)
 	})
 
 	apiRouter.Route("/project-priorities", func(r chi.Router) {
@@ -90,9 +101,9 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		projectTypeHandler := projectpriorityhandler.NewProjectPriorityHandler(db)
 		r.Post("/", projectTypeHandler.Add)
 		r.Post("/search", projectTypeHandler.Search)
-		r.Get("/{id}", projectTypeHandler.Get)
-		r.Put("/{id}", projectTypeHandler.Update)
-		r.Delete("/{id}", projectTypeHandler.Delete)
+		r.Get("/{id:"+uuidPattern+"}", projectTypeHandler.Get)
+		r.Put("/{id:"+uuidPattern+"}", projectTypeHandler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", projectTypeHandler.Delete)
 	})
 
 	apiRouter.Route("/task-statuses", func(r chi.Router) {
@@ -101,9 +112,9 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		taskStatusHandler := taskstatushandler.NewTaskStatusHandler(db)
 		r.Post("/", taskStatusHandler.Add)
 		r.Post("/search", taskStatusHandler.Search)
-		r.Get("/{id}", taskStatusHandler.Get)
-		r.Put("/{id}", taskStatusHandler.Update)
-		r.Delete("/{id}", taskStatusHandler.Delete)
+		r.Get("/{id:"+uuidPattern+"}", taskStatusHandler.Get)
+		r.Put("/{id:"+uuidPattern+"}", taskStatusHandler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", taskStatusHandler.Delete)
 	})
 
 	apiRouter.Route("/task-priorities", func(r chi.Router) {
@@ -112,9 +123,9 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		taskPriorityHandler := taskpriorityhandler.NewTaskPriorityHandler(db)
 		r.Post("/", taskPriorityHandler.Add)
 		r.Post("/search", taskPriorityHandler.Search)
-		r.Get("/{id}", taskPriorityHandler.Get)
-		r.Put("/{id}", taskPriorityHandler.Update)
-		r.Delete("/{id}", taskPriorityHandler.Delete)
+		r.Get("/{id:"+uuidPattern+"}", taskPriorityHandler.Get)
+		r.Put("/{id:"+uuidPattern+"}", taskPriorityHandler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", taskPriorityHandler.Delete)
 	})
 
 	apiRouter.Route("/projects", func(r chi.Router) {
@@ -123,12 +134,13 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		projectPermissionHandler := projectpermissionhandler.NewProjectPermissionHandler(db)
 		r.Post("/", projectHandler.Add)
 		r.Post("/search", projectHandler.Search)
-		r.Get("/{id}", projectHandler.Get)
-		r.Get("/{id}/permissions", projectPermissionHandler.Search)
-		r.Put("/{id}", projectHandler.Update)
-		r.Delete("/{id}", projectHandler.Delete)
+		r.Get("/{id:"+uuidPattern+"}", projectHandler.Get)
+		r.Put("/{id:"+uuidPattern+"}", projectHandler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", projectHandler.Delete)
+		r.Get("/{id:"+uuidPattern+"}/permissions", projectPermissionHandler.Search)
 	})
 
+	// TODO: 404 route ?
 	baseRouter.Mount("/api", apiRouter)
 
 	subFS, err := fs.Sub(ui.Dist, "dist")
