@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { ref, reactive, computed, nextTick, onMounted } from 'vue';
     import { useI18n } from "vue-i18n";
-    import { useRoute } from 'vue-router'
+    import { useRoute, useRouter } from 'vue-router';
 
     import { NTabs, NTabPane } from 'naive-ui';
 
@@ -27,6 +27,7 @@
 
     const { t } = useI18n();
     const route = useRoute();
+    const router = useRouter();
 
     const projectId = route.params.id as string
 
@@ -64,7 +65,18 @@
         }
     ));
 
-    const currentTab = ref<string>("project_metadata");
+    const tab = computed({
+        get: () => route.params.tab as string,
+        set: (value: string) => {
+            router.push({
+                name: 'project-tab',
+                params: {
+                    id: route.params.id,
+                    tab: value
+                }
+            });
+        }
+    });
 
     const tasksTabLabel = computed(() => project.value.tasksCount > 0 ? `Tasks (${project.value.tasksCount})` : 'Tasks')
     const permissionsTabLabel = computed(() => project.value.permissionsCount > 0 ? `Permissions (${project.value.permissionsCount})` : 'Permissions')
@@ -124,23 +136,23 @@
 </script>
 
 <template>
-    <n-tabs placement="top" type="line" animated v-model:value="currentTab">
-        <n-tab-pane name="project_metadata" tab="Metadata">
+    <n-tabs placement="top" type="line" animated v-model:value="tab">
+        <n-tab-pane name="metadata" tab="Metadata">
             <ProjectMetadataForm mode="add" :project-id="projectId" v-model:project="project" />
         </n-tab-pane>
-        <n-tab-pane name="project_permissions" :tab="permissionsTabLabel">
+        <n-tab-pane name="permissions" :tab="permissionsTabLabel">
             <ProjectPermissions :project-id="project.id" />
         </n-tab-pane>
-        <n-tab-pane name="project_notes" :tab="notesTabLabel">
+        <n-tab-pane name="notes" :tab="notesTabLabel">
             <ProjectNotes :project-id="project.id" />
         </n-tab-pane>
-        <n-tab-pane name="project_attachments" :tab="attachmentsTabLabel">
+        <n-tab-pane name="attachments" :tab="attachmentsTabLabel">
             <ProjectAttachments :project-id="project.id" />
         </n-tab-pane>
-        <n-tab-pane name="project_history" :tab="historyTabLabel">
+        <n-tab-pane name="history" :tab="historyTabLabel">
             <ProjectHistoryOperations :project-id="project.id" />
         </n-tab-pane>
-        <n-tab-pane name="project_tasks" :tab="tasksTabLabel">
+        <n-tab-pane name="tasks" :tab="tasksTabLabel">
             <ProjectTasks :project-id="project.id" />
         </n-tab-pane>
     </n-tabs>
