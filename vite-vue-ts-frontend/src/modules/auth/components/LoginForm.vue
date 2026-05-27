@@ -13,7 +13,7 @@
     import { authService } from '../../../modules/auth/services/auth';
     import type { SignInRequest, SignInResponse } from '../../../modules/auth/types/dto';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import { maxEmailLength, minPasswordLength, User } from "../../../modules/users/models/user";
+    import { MAX_EMAIL_LENGTH, MIN_PASSWORD_LENGTH, User } from "../../../modules/users/models/user";
 
     type signInFormValuesInterface = {
         email: string;
@@ -57,7 +57,7 @@
                 else if (!isValidEmail(value)) {
                     return new Error(t("shared.warningMessages.fieldHasInvalidFormat"));
                 }
-                else if (value.length > maxEmailLength) {
+                else if (value.length > MAX_EMAIL_LENGTH) {
                     return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
                 } else if (serverErrors.value.email) {
                     return new Error(t(serverErrors.value.email));
@@ -73,7 +73,7 @@
                 if (!value?.trim()) {
                     return new Error(t("shared.warningMessages.fieldIsRequired"));
                 }
-                else if (value.length < minPasswordLength) {
+                else if (value.length < MIN_PASSWORD_LENGTH) {
                     return new Error(t("shared.warningMessages.fieldIsBelowMinimumLength"));
                 } else if (serverErrors.value.password) {
                     return new Error(t(serverErrors.value.password));

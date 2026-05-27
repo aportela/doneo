@@ -5,7 +5,7 @@
     import { NSpin, NCard, NInput, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette } from '@tabler/icons-vue';
 
-    import { TaskStatus, maxNameLength } from '../models/task-status';
+    import { TaskStatus, MAX_NAME_LENGTH } from '../models/task-status';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { taskStatusService } from '../services/task-status';
     import { handleAPIError } from '../../../api/client/errorHandler';
@@ -48,7 +48,7 @@
                 if (!value?.trim()) {
                     return new Error(t("shared.warningMessages.fieldIsRequired"));
                 }
-                else if (value.length > maxNameLength) {
+                else if (value.length > MAX_NAME_LENGTH) {
                     return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
                 } else if (serverErrors.value.name) {
                     return new Error(t(serverErrors.value.name));
@@ -263,7 +263,7 @@
                 show-feedback>
                 <n-input type="text"
                     :placeholder="t('modules.taskStatus.components.TaskStatusForm.inputs.name.placeholder')"
-                    v-model:value="taskStatus.name" :maxlength="maxNameLength" :show-count="true" clearable required
+                    v-model:value="taskStatus.name" :maxlength="MAX_NAME_LENGTH" :show-count="true" clearable required
                     autofocus>
                     <template #prefix>
                         <n-icon :component="IconUser" />

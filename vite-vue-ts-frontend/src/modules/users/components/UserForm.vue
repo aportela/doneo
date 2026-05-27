@@ -6,7 +6,7 @@
     import { IconCancel, IconDeviceFloppy, IconEye, IconEyeCancel, IconMail, IconUser, IconUserEdit, IconUserPlus, IconKey } from '@tabler/icons-vue';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
-    import { User, maxNameLength, maxEmailLength, minPasswordLength } from '../models/user';
+    import { User, MAX_NAME_LENGTH, MAX_EMAIL_LENGTH, MIN_PASSWORD_LENGTH } from '../models/user';
     import { userService } from '../services/user'
     import { handleAPIError } from '../../../api/client/errorHandler';
     import type { UserResponse, AddRequest, UpdateRequest } from '../types/dto';
@@ -52,7 +52,7 @@
                 if (!value?.trim()) {
                     return new Error(t("shared.warningMessages.fieldIsRequired"));
                 }
-                else if (value.length > maxNameLength) {
+                else if (value.length > MAX_NAME_LENGTH) {
                     return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
                 } else if (serverErrors.value.name) {
                     return new Error(t(serverErrors.value.name));
@@ -74,7 +74,7 @@
                 else if (!isValidEmail(value)) {
                     return new Error(t("shared.warningMessages.fieldHasInvalidFormat"));
                 }
-                else if (value.length > maxEmailLength) {
+                else if (value.length > MAX_EMAIL_LENGTH) {
                     return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
                 } else if (serverErrors.value.email) {
                     return new Error(t(serverErrors.value.email));
@@ -95,7 +95,7 @@
                 if (!value?.trim()) {
                     return new Error(t("shared.warningMessages.fieldIsRequired"));
                 }
-                else if (value.length < minPasswordLength) {
+                else if (value.length < MIN_PASSWORD_LENGTH) {
                     return new Error(t("shared.warningMessages.fieldIsBelowMinimumLength"));
                 } else if (serverErrors.value.password) {
                     return new Error(t(serverErrors.value.password));
@@ -331,7 +331,7 @@
             :disabled="state.ajaxRunning">
             <n-form-item :label="t('modules.user.components.UserForm.inputs.name.label')" path="name" show-feedback>
                 <n-input type="text" :placeholder="t('modules.user.components.UserForm.inputs.name.placeholder')"
-                    v-model:value="user.name" :maxlength="maxNameLength" :show-count="true" clearable required
+                    v-model:value="user.name" :maxlength="MAX_NAME_LENGTH" :show-count="true" clearable required
                     autofocus>
                     <template #prefix>
                         <n-icon :component="IconUser" />
@@ -340,7 +340,7 @@
             </n-form-item>
             <n-form-item :label="t('modules.user.components.UserForm.inputs.email.label')" path="email" show-feedback>
                 <n-input type="text" :placeholder="t('modules.user.components.UserForm.inputs.email.placeholder')"
-                    v-model:value="user.email" :maxlength="maxEmailLength" :show-count="true" clearable required
+                    v-model:value="user.email" :maxlength="MAX_EMAIL_LENGTH" :show-count="true" clearable required
                     autofocus>
                     <template #prefix>
                         <n-icon :component="IconMail" />
@@ -374,7 +374,7 @@
                 </n-input>
                 <n-button v-else @click="onShowPasswordFormItem" block :disabled="state.ajaxRunning">{{
                     t("modules.user.components.UserForm.buttons.changePassword.label")
-                }}</n-button>
+                    }}</n-button>
             </n-form-item>
             <n-form-item :label="t('userFormPermissionsLabel')">
                 <n-radio-group v-model:value="user.permissions.isSuperUser" name="radiogroup">

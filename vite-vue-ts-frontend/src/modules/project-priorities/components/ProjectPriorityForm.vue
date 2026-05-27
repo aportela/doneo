@@ -5,7 +5,7 @@
     import { NSpin, NCard, NInput, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette } from '@tabler/icons-vue';
 
-    import { ProjectPriority, maxNameLength } from '../models/project-priority';
+    import { ProjectPriority, MAX_NAME_LENGTH } from '../models/project-priority';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { projectPriorityService } from '../services/project-priority';
     import { handleAPIError } from '../../../api/client/errorHandler';
@@ -48,7 +48,7 @@
                 if (!value?.trim()) {
                     return new Error(t("shared.warningMessages.fieldIsRequired"));
                 }
-                else if (value.length > maxNameLength) {
+                else if (value.length > MAX_NAME_LENGTH) {
                     return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
                 } else if (serverErrors.value.name) {
                     return new Error(t(serverErrors.value.name));
@@ -269,7 +269,7 @@
                 path="name" show-feedback>
                 <n-input type="text"
                     :placeholder="t('modules.projectPriority.components.ProjectPriorityForm.inputs.name.placeholder')"
-                    v-model:value="projectPriority.name" :maxlength="maxNameLength" :show-count="true" clearable
+                    v-model:value="projectPriority.name" :maxlength="MAX_NAME_LENGTH" :show-count="true" clearable
                     required autofocus>
                     <template #prefix>
                         <n-icon :component="IconUser" />

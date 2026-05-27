@@ -4,7 +4,7 @@
     import { NCard, NForm, NFormItem, NInput } from 'naive-ui';
 
     import type { FormMode } from '../../../shared/types/form-mode';
-    import { Project, maxKeyLength, maxSummaryLength } from "../models/project";
+    import { Project, MAX_KEY_LENGTH, MAX_SUMMARY_LENGTH } from "../models/project";
     import ProjectPrioritySelector from "../../project-priorities/components/ProjectPrioritySelector.vue";
     import ProjectStatusSelector from "../../project-statuses/components/ProjectStatusSelector.vue";
     import ProjectTypeSelector from "../../project-types/components/ProjectTypeSelector.vue";
@@ -33,10 +33,10 @@
         </n-form-item>
         <n-form>
             <n-form-item label="Key">
-                <n-input v-model:value="project.key" :show-count="true" :maxlength="maxKeyLength" />
+                <n-input v-model:value="project.key" :show-count="true" :maxlength="MAX_KEY_LENGTH" />
             </n-form-item>
             <n-form-item label="Summary">
-                <n-input v-model:value="project.summary" :show-count="true" :maxlength="maxSummaryLength" />
+                <n-input v-model:value="project.summary" :show-count="true" :maxlength="MAX_SUMMARY_LENGTH" />
             </n-form-item>
             <n-form-item label="Description">
                 <n-input v-model:value="project.description" type="textarea" clearable />

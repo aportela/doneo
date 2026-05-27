@@ -5,7 +5,7 @@
     import { NSpin, NCard, NInput, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette } from '@tabler/icons-vue';
 
-    import { ProjectType, maxNameLength } from '../models/project-type';
+    import { ProjectType, MAX_NAME_LENGTH } from '../models/project-type';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { projectTypeService } from '../services/project-type';
     import { handleAPIError } from '../../../api/client/errorHandler';
@@ -48,7 +48,7 @@
                 if (!value?.trim()) {
                     return new Error(t("shared.warningMessages.fieldIsRequired"));
                 }
-                else if (value.length > maxNameLength) {
+                else if (value.length > MAX_NAME_LENGTH) {
                     return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
                 } else if (serverErrors.value.name) {
                     return new Error(t(serverErrors.value.name));
@@ -264,7 +264,7 @@
                 show-feedback>
                 <n-input type="text"
                     :placeholder="t('modules.projectType.components.ProjectTypeForm.inputs.name.placeholder')"
-                    v-model:value="projectType.name" :maxlength="maxNameLength" :show-count="true" clearable required
+                    v-model:value="projectType.name" :maxlength="MAX_NAME_LENGTH" :show-count="true" clearable required
                     autofocus>
                     <template #prefix>
                         <n-icon :component="IconUser" />

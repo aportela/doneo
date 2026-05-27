@@ -6,7 +6,7 @@
     import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus } from '@tabler/icons-vue';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
-    import { Role, maxNameLength } from '../models/role';
+    import { Role, MAX_NAME_LENGTH } from '../models/role';
     import { roleService } from '../services/role'
     import { handleAPIError } from '../../../api/client/errorHandler';
     import type { RoleResponse, AddRequest, UpdateRequest } from '../types/dto';
@@ -63,7 +63,7 @@
                 if (!value?.trim()) {
                     return new Error(t("shared.warningMessages.fieldIsRequired"));
                 }
-                else if (value.length > maxNameLength) {
+                else if (value.length > MAX_NAME_LENGTH) {
                     return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
                 } else if (serverErrors.value.name) {
                     return new Error(t(serverErrors.value.name));
@@ -280,7 +280,7 @@
             :disabled="state.ajaxRunning">
             <n-form-item :label="t('modules.role.components.RoleForm.inputs.name.label')" path="name" show-feedback>
                 <n-input type="text" :placeholder="t('modules.role.components.RoleForm.inputs.name.placeholder')"
-                    v-model:value="role.name" :maxlength="maxNameLength" :show-count="true" clearable required
+                    v-model:value="role.name" :maxlength="MAX_NAME_LENGTH" :show-count="true" clearable required
                     autofocus>
                     <template #prefix>
                         <n-icon :component="IconUser" />
@@ -293,7 +293,7 @@
                 <n-gi>
                     <h4 class="doneo-permission-group-header">{{
                         t("modules.role.components.RoleForm.headers.projectPermissions")
-                        }}</h4>
+                    }}</h4>
                     <n-switch v-model:value="role.permissions.allowUpdateProject" class="doneo-permission-switch">
                         <template #checked>
                             {{ t("modules.role.components.RoleForm.permissionSwitches.updateProjectAllowed") }}
@@ -322,7 +322,7 @@
                 <n-gi>
                     <h4 class="doneo-permission-group-header">{{
                         t("modules.role.components.RoleForm.headers.taskPermissions")
-                        }}
+                    }}
                     </h4>
                     <n-switch v-model:value="role.permissions.allowAddTask" class="doneo-permission-switch">
                         <template #checked>

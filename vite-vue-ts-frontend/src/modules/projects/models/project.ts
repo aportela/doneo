@@ -58,5 +58,5 @@ export class Project {
   }
 }
 
-export const maxKeyLength = 8;
-export const maxSummaryLength = 128;
+export const MAX_KEY_LENGTH = 8;
+export const MAX_SUMMARY_LENGTH = 128;

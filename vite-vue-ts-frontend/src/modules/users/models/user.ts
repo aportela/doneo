@@ -63,7 +63,7 @@ export class User {
   }
 }
 
-export const maxNameLength = 32;
-export const maxEmailLength = 255;
+export const MAX_NAME_LENGTH = 32;
+export const MAX_EMAIL_LENGTH = 255;
 
-export const minPasswordLength = 4;
+export const MIN_PASSWORD_LENGTH = 4;

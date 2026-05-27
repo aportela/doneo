@@ -20,4 +20,4 @@ export class TaskPriority {
   }
 }
 
-export const maxNameLength = 32;
+export const MAX_NAME_LENGTH = 32;
