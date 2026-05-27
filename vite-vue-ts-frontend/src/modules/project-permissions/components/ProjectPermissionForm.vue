@@ -15,6 +15,7 @@
     import type { FormMode } from '../../../shared/types/form-mode';
     import { appBus } from '../../../shared/composables/bus';
     import UserSelector from '../../users/components/UserSelector.vue';
+    import RoleSelector from '../../roles/components/RoleSelector.vue';
 
     interface ProjectPermissionFormProps {
         mode: FormMode;
@@ -160,7 +161,7 @@
                     :placeholder="t('modules.projectPermission.components.ProjectPermissionForm.inputs.user.placeholder')" />
             </n-form-item>
             <n-form-item :label="t('modules.projectPermission.components.ProjectPermissionForm.inputs.role.label')">
-                <UserSelector v-model:id="projectPermission.role.id"
+                <RoleSelector v-model:id="projectPermission.role.id"
                     :placeholder="t('modules.projectPermission.components.ProjectPermissionForm.inputs.role.placeholder')" />
             </n-form-item>
         </n-form>

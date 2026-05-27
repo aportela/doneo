@@ -47,10 +47,20 @@ export type SearchRequest = {
   filter?: SearchRequestFilter;
 };
 
+export type RoleBaseResponse = {
+  id: string;
+  name: string;
+};
+
+// TODO: inherit
 export type RoleResponse = {
   id: string;
   name: string;
   permissions: Permissions;
+};
+
+export type SearchBaseResponse = {
+  roles: RoleBaseResponse[];
 };
 
 export type SearchResponse = {

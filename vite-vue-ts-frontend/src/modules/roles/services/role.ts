@@ -5,6 +5,7 @@ import type {
   UpdateRequest,
   SearchRequest,
   RoleResponse,
+  SearchBaseResponse,
   SearchResponse,
 } from "../types/dto";
 
@@ -25,6 +26,11 @@ export const roleService = {
   },
   async get(id: string): Promise<RoleResponse> {
     const { data } = await axiosInstance.get<RoleResponse>("/roles/" + id);
+    return data;
+  },
+  async searchBase(): Promise<SearchBaseResponse> {
+    const { data } =
+      await axiosInstance.get<SearchBaseResponse>("/entities/roles");
     return data;
   },
   async search(payload: SearchRequest): Promise<SearchResponse> {

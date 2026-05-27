@@ -65,9 +65,25 @@ func permissionDomainToResponsePermissionsFlags(bitmaskPermission domain.Permiss
 
 func DomainToResponse(role domain.Role) RoleResponse {
 	return RoleResponse{
-		ID:          role.ID,
-		Name:        role.Name,
+		RoleBaseResponse: RoleBaseResponse{
+			ID:   role.ID,
+			Name: role.Name,
+		},
 		Permissions: permissionDomainToResponsePermissionsFlags(role.PermissionsBitmask),
+	}
+}
+
+func baseDomainToBaseResponse(role domain.RoleBase) RoleBaseResponse {
+	return RoleBaseResponse{
+		ID:   role.ID,
+		Name: role.Name,
+	}
+}
+
+func domainToBaseResponse(role domain.Role) RoleBaseResponse {
+	return RoleBaseResponse{
+		ID:   role.ID,
+		Name: role.Name,
 	}
 }
 
@@ -77,6 +93,20 @@ func domainArrayToResponseArray(roles []domain.Role) []RoleResponse {
 		roleResponses = append(roleResponses, DomainToResponse(role))
 	}
 	return roleResponses
+}
+
+func domainArrayToBaseResponseArray(roles []domain.Role) []RoleBaseResponse {
+	roleResponses := []RoleBaseResponse{}
+	for _, role := range roles {
+		roleResponses = append(roleResponses, domainToBaseResponse(role))
+	}
+	return roleResponses
+}
+
+func toSearchBaseResponse(roles []domain.Role) searchBaseResponse {
+	return searchBaseResponse{
+		Roles: domainArrayToBaseResponseArray(roles),
+	}
 }
 
 func toSearchResponse(roles []domain.Role, pager browser.Result) searchResponse {

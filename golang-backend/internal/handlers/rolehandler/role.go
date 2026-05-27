@@ -86,6 +86,23 @@ func (h *RoleHandler) Get(w http.ResponseWriter, r *http.Request) {
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(user), nil)
 }
 
+func (h *RoleHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	roles, _, err := h.role.Search(r.Context(),
+		browser.Params{
+			CurrentPage: 1,
+			ResultsPage: 0,
+		},
+		browser.Order{
+			Field: "name",
+			Sort:  "ASC",
+		},
+		domain.SearchRolesFilter{},
+	)
+	handlers.ToHandlerJSONResponse(w, toSearchBaseResponse(roles), err)
+}
+
 func (h *RoleHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request searchRequest

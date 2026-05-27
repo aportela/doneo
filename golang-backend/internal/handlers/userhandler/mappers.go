@@ -44,8 +44,10 @@ func permissionsDomainToResponsePermissionsFlags(permissionsBitmask domain.Permi
 
 func domainToResponse(user domain.User) userResponse {
 	return userResponse{
-		ID:          user.ID,
-		Name:        user.Name,
+		UserBaseResponse: UserBaseResponse{
+			ID:   user.ID,
+			Name: user.Name,
+		},
 		Email:       user.Email,
 		CreatedAt:   user.CreatedAt.UnixMilli(),
 		UpdatedAt:   utils.TimePtrToInt64Ptr(user.UpdatedAt),
