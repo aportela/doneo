@@ -2,7 +2,7 @@
     import { ref, reactive, computed, onMounted, onBeforeUnmount, type CSSProperties, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSpin, NCard, NFlex, NButton, NForm, type FormInst, type FormRules, NIcon } from 'naive-ui';
+    import { NSpin, NCard, NFlex, NButton, NForm, NFormItem, type FormInst, type FormRules, NIcon } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconEdit, IconPlus } from '@tabler/icons-vue';
 
     import { ProjectPermission } from '../models/project-permission.ts';
@@ -14,6 +14,7 @@
     import RemoteAPIAlert from '../../../shared/components/alerts/RemoteAPIAlert.vue';
     import type { FormMode } from '../../../shared/types/form-mode';
     import { appBus } from '../../../shared/composables/bus';
+    import UserSelector from '../../users/components/UserSelector.vue';
 
     interface ProjectPermissionFormProps {
         mode: FormMode;
@@ -93,19 +94,21 @@
                                 break;
                             case 409:
                                 // TODO
-                                if (apiError.details?.field === "name") {
-                                    serverErrors.value.name = "modules.projectType.components.ProjectPermissionForm.warnings.nameAlreadyExists";
+                                if (apiError.details?.field === "userId") {
+                                    serverErrors.value.name = "modules.projectPermission.components.ProjectPermissionForm.warnings.userAlreadyExists";
+                                } else if (apiError.details?.field === "roleId") {
+                                    serverErrors.value.name = "modules.projectPermission.components.ProjectPermissionForm.warnings.roleAlreadyExists";
                                 } else {
-                                    state.ajaxErrorMessage = t("modules.projectType.components.ProjectPermissionForm.errors.addError");
+                                    state.ajaxErrorMessage = t("modules.projectPermission.components.ProjectPermissionForm.errors.addError");
                                 }
                                 break;
                             default:
-                                state.ajaxErrorMessage = t("modules.projectType.components.ProjectPermissionForm.errors.addError");
+                                state.ajaxErrorMessage = t("modules.projectPermission.components.ProjectPermissionForm.errors.addError");
                                 break;
                         }
                     },
                     (fatalError) => {
-                        state.ajaxErrorMessage = t("modules.projectType.components.ProjectPermissionForm.errors.addError");
+                        state.ajaxErrorMessage = t("modules.projectPermission.components.ProjectPermissionForm.errors.addError");
                         console.error("Unhandled API error", { file: "ProjectPermissionForm.vue", method: "onAdd" }, { err: fatalError });
                     });
             } finally {
@@ -142,17 +145,24 @@
     <n-card :style="style" bordered>
         <template #header>
             <div class="doneo-flex-center-align">
+                <!-- TOOD: icon alignment ??? -->
                 <n-icon :component="props.mode == 'add' ? IconPlus : IconEdit" />
-                {{ t(props.mode == "add" ? "modules.projectType.components.ProjectPermissionForm.headers.addProjectType"
-                    :
-                    "modules.projectType.components.ProjectPermissionForm.headers.updateProjectType") }}
+                {{ t("modules.projectPermission.components.ProjectPermissionForm.headers.addProjectPermission") }}
             </div>
         </template>
         <template #header-extra>
             <n-spin v-if="state.ajaxRunning" size="small" />
         </template>
-        <n-form ref="projectTypeFormRef" :model="projectPermission" :rules="projectPermissionFormRules"
+        <n-form ref="projectPermissionFormRef" :model="projectPermission" :rules="projectPermissionFormRules"
             :disabled="state.ajaxRunning">
+            <n-form-item :label="t('modules.projectPermission.components.ProjectPermissionForm.inputs.user.label')">
+                <UserSelector v-model:id="projectPermission.user.id"
+                    :placeholder="t('modules.projectPermission.components.ProjectPermissionForm.inputs.user.placeholder')" />
+            </n-form-item>
+            <n-form-item :label="t('modules.projectPermission.components.ProjectPermissionForm.inputs.role.label')">
+                <UserSelector v-model:id="projectPermission.role.id"
+                    :placeholder="t('modules.projectPermission.components.ProjectPermissionForm.inputs.role.placeholder')" />
+            </n-form-item>
         </n-form>
         <template #footer v-if="state.ajaxErrorMessage">
             <RemoteAPIAlert type="error" :title="t('shared.errorMessages.Error')" :message="state.ajaxErrorMessage" />

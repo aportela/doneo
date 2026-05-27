@@ -650,6 +650,35 @@ export default {
     },
     projectPermission: {
       components: {
+        ProjectPermissionForm: {
+          headers: {
+            addProjectPermission: "Add project permission",
+          },
+          inputs: {
+            user: {
+              label: "User",
+              placeholder: "Select user",
+              errors: {
+                alreadyExists: "User already exists",
+              },
+            },
+            role: {
+              label: "Role",
+              placeholder: "Select role",
+              errors: {
+                alreadyExists: "Role already exists",
+              },
+            },
+          },
+          errors: {
+            addError:
+              "There was a problem while adding the project permission data",
+          },
+          warnings: {
+            userAlreadyExists: "User already exists",
+            roleAlreadyExists: "Role already exists",
+          },
+        },
         projectPermissionsTable: {
           header: {
             columns: {
