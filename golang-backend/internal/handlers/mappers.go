@@ -31,7 +31,7 @@ func mapError(err error) (int, string, any) {
 	var validationError *domain.ValidationError
 	if errors.As(err, &validationError) {
 		return http.StatusBadRequest, "bad request", map[string]string{
-			"field": alreadyExistsError.Field,
+			"field": validationError.Field,
 		}
 	}
 
