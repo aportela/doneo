@@ -108,7 +108,7 @@
                 </n-icon>
             </template>
         </n-button>
-        <n-select v-model:value="projectPriorityId" :options="options" :placeholder="props.placeholder"
+        <n-select filterable v-model:value="projectPriorityId" :options="options" :placeholder="props.placeholder"
             :size="props.size" :disabled="isDisabled" />
         <n-button secondary :disabled="true" class="doneo-cursor-default doneo-disable-opacity" v-if="state.ajaxErrors">
             <template #icon>
