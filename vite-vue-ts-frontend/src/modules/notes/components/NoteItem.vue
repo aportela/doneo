@@ -2,14 +2,6 @@
     import { ref, h, watch, computed, nextTick, onMounted } from "vue";
     import { useI18n } from "vue-i18n";
 
-    // @ts-expect-error
-    import TurndownService from 'turndown'
-
-    const turndownService = new TurndownService()
-
-    import MarkdownIt from "markdown-it"
-    import DOMPurify from "dompurify"
-
     import { NCard, NFlex, NButtonGroup, NButton, NIcon, NFormItem, NInput, useDialog, type InputInst } from 'naive-ui';
     import { IconDeviceFloppy, IconCancel, IconEdit, IconTrash } from '@tabler/icons-vue';
 
@@ -18,6 +10,8 @@
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
 
     import type { NoteItemMode } from "../types/item-mode.ts";
+
+    import { useMarkdown } from "../../../shared/composables/useMarkdown.ts";
 
     interface NoteItemProps {
         note: Note;
@@ -29,22 +23,13 @@
 
     const { t } = useI18n();
     const dialog = useDialog();
+    const { render, toMarkdown } = useMarkdown();
 
     const currentMode = ref<NoteItemMode>(!!props.note.id ? "view" : "add");
 
     const body = ref<string>("");
 
-    const md = new MarkdownIt({
-        html: false,
-        linkify: true,
-        typographer: true,
-        breaks: true,
-    })
-
-    const htmlMarkDownBodyPreview = computed(() => {
-        const rawHtml = md.render(props.note.body);
-        return DOMPurify.sanitize(rawHtml);
-    })
+    const htmlMarkDownBodyPreview = computed(() => render(props.note.body));
 
     const onConfirmDelete = () => {
         dialog.warning({
@@ -127,7 +112,7 @@
         let markdown = plain
 
         if (html) {
-            markdown = turndownService.turndown(html)
+            markdown = toMarkdown(html)
         }
 
         e.preventDefault()
