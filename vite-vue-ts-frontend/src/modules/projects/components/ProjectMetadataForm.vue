@@ -1,7 +1,8 @@
 <script setup lang="ts">
     import type { CSSProperties } from 'vue';
+    import { useI18n } from "vue-i18n";
 
-    import { NCard, NForm, NFormItem, NInput } from 'naive-ui';
+    import { NCard, NForm, NFormItem, NInput, NButton, NIcon } from 'naive-ui';
 
     import type { FormMode } from '../../../shared/types/form-mode';
     import { Project, MAX_KEY_LENGTH, MAX_SUMMARY_LENGTH } from "../models/project";
@@ -9,6 +10,7 @@
     import ProjectStatusSelector from "../../project-statuses/components/ProjectStatusSelector.vue";
     import ProjectTypeSelector from "../../project-types/components/ProjectTypeSelector.vue";
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
+    import { IconDeviceFloppy } from '@tabler/icons-vue';
 
     interface ProjectFormProps {
         mode: FormMode;
@@ -17,7 +19,15 @@
 
     const props = defineProps<ProjectFormProps>();
 
+    const emit = defineEmits(["save"]);
+
     const project = defineModel<Project>("project", { required: true });
+
+    const { t } = useI18n();
+
+    const onSave = () => {
+        emit("save");
+    };
 
 </script>
 
@@ -51,6 +61,12 @@
                 <ProjectStatusSelector v-model:id="project.status.id" />
             </n-form-item>
         </n-form>
+        <n-button @click="onSave">
+            <template #icon>
+                <n-icon :component="IconDeviceFloppy"></n-icon>
+            </template>
+            {{ t("shared.buttons.Save.label") }}
+        </n-button>
     </n-card>
 </template>
 
