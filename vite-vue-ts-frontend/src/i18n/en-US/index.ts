@@ -798,6 +798,15 @@ export default {
             noItemsFound: "No projects found",
           },
         },
+        ProjectPage: {
+          errors: {
+            loadError: "There was a problem while loading the project data",
+            // TODO: deduplicate
+            notFoundError: "We couldn’t find the specified project",
+            addError: "There was a problem while adding the project data",
+            updateError: "There was a problem while updating the project data",
+          },
+        },
       },
     },
     taskStatus: {

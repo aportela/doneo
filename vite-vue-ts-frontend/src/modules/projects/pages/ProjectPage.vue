@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, nextTick, onMounted } from 'vue';
+    import { ref, reactive, computed, nextTick, onMounted, onBeforeUnmount } from 'vue';
     import { useI18n } from "vue-i18n";
     import { useRoute, useRouter } from 'vue-router';
 
@@ -19,7 +19,7 @@
     import { handleAPIError } from '../../../api/client/errorHandler';
     //import RemoteAPIAlert from '../../../shared/components/alerts/RemoteAPIAlert.vue';
     import { appBus } from '../../../shared/composables/bus';
-    import type { ProjectResponse } from '../types/dto';
+    import type { AddRequest, ProjectResponse, UpdateRequest } from '../types/dto';
 
     const { t } = useI18n();
     const route = useRoute();
@@ -60,7 +60,7 @@
             if (response.id === id) {
                 project.value = new Project(response);
             } else {
-                state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.loadError");
+                state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.loadError");
             }
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -69,19 +69,19 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPriorityForm.onGet" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPage.onGet" } });
                             break;
                         case 404:
-                            state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.notFoundError");
+                            state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.notFoundError");
                             break;
                         default:
-                            state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.loadError");
+                            state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.loadError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.loadError");
-                    console.error("Unhandled API error", { file: "ProjectPriorityForm.vue", method: "onGet" }, { err: fatalError });
+                    state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.loadError");
+                    console.error("Unhandled API error", { file: "ProjectPage.vue", method: "onGet" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
@@ -91,10 +91,113 @@
         }
     };
 
+    const onSave = async () => {
+        if (project.value.id) {
+            onUpdate();
+        } else {
+            onAdd();
+        }
+    };
+
+    const onAdd = async () => {
+        serverErrors.value = {};
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const payload: AddRequest = {
+                key: project.value.key ?? "",
+                summary: project.value.summary ?? "",
+                description: project.value.description
+            };
+            const response: ProjectResponse = await projectService.add(payload);
+            if (response.id === project.value.id) {
+                project.value = new Project(response);
+            } else {
+                state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.addError");
+            }
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPage.onAdd" } });
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.addError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.addError");
+                    console.error("Unhandled API error", { file: "ProjectPage.vue", method: "onAdd" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+        }
+    };
+
+    const onUpdate = async () => {
+        serverErrors.value = {};
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const payload: UpdateRequest = {
+                id: project.value.id ?? "",
+                key: project.value.key ?? "",
+                summary: project.value.summary ?? "",
+                description: project.value.description
+            };
+            const response: ProjectResponse = await projectService.update(payload);
+            if (response.id === project.value.id) {
+                project.value = new Project(response);
+            } else {
+                state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.updateError");
+            }
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPage.onUpdate" } });
+                            break;
+                        case 404:
+                            state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.notFoundError");
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.updateError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.updateError");
+                    console.error("Unhandled API error", { file: "ProjectPage.vue", method: "onUpdate" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+        }
+    };
+
+    let stopBusReauthListener: () => void;
+
     onMounted(() => {
         if (projectId) {
             onGet(projectId);
         }
+        stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
+            if (payload.to.includes("ProjectPage.onGet")) {
+                onGet(projectId);
+            } else if (payload.to.includes("ProjectPage.onAdd")) {
+                // TODO:
+            } else if (payload.to.includes("ProjectPage.onUpdate")) {
+                // TODO:
+            }
+        });
+    });
+
+    onBeforeUnmount(() => {
+        stopBusReauthListener();
     });
 
     // TODO: skeleton while loading ???
@@ -104,7 +207,7 @@
 <template>
     <n-tabs placement="top" type="line" animated v-model:value="tab">
         <n-tab-pane name="metadata" tab="Metadata" display-directive="show:lazy">
-            <ProjectMetadataForm mode="add" :project-id="projectId" v-model:project="project" />
+            <ProjectMetadataForm mode="add" :project-id="projectId" v-model:project="project" @save="onSave" />
         </n-tab-pane>
         <n-tab-pane name="permissions" :tab="permissionsTabLabel" display-directive="show:lazy">
             <ProjectPermissions :project-id="project.id" v-model:item-count="project.permissionsCount" />
