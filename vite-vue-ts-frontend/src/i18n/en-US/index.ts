@@ -230,11 +230,12 @@ export default {
             },
           },
           radios: {
-            Permissions: {
-              SuperUser: {
+            permissions: {
+              label: "Permissions",
+              superUser: {
                 label: "Administrator",
               },
-              NormalUser: {
+              normalUser: {
                 label: "Normal user",
               },
             },

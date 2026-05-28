@@ -374,13 +374,13 @@
                     t("modules.user.components.UserForm.buttons.changePassword.label")
                     }}</n-button>
             </n-form-item>
-            <n-form-item :label="t('userFormPermissionsLabel')">
+            <n-form-item :label="t('modules.user.components.UserForm.radios.permissions.label')">
                 <n-radio-group v-model:value="user.permissions.isSuperUser" name="radiogroup">
                     <n-radio :value="true" name="isSuperUser"
-                        :label="t('modules.user.components.UserForm.radios.Permissions.SuperUser.label')">
+                        :label="t('modules.user.components.UserForm.radios.permissions.superUser.label')">
                     </n-radio>
                     <n-radio :value="false" name="isSuperUser"
-                        :label="t('modules.user.components.UserForm.radios.Permissions.NormalUser.label')">
+                        :label="t('modules.user.components.UserForm.radios.permissions.normalUser.label')">
                     </n-radio>
                 </n-radio-group>
             </n-form-item>
