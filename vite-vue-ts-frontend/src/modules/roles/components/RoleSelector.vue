@@ -14,11 +14,12 @@
         placeholder?: string;
         clearable?: boolean;
         size?: SelectSize;
+        disabled?: boolean;
     }
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    const isDisabled = computed(() => state.ajaxRunning);
+    const isDisabled = computed(() => props.disabled || state.ajaxRunning);
 
     const roleId = defineModel<string | null>('id');
 

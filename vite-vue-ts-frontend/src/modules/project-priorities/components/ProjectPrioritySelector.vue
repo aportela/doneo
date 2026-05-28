@@ -16,11 +16,12 @@
         clearable?: boolean;
         size?: SelectSize;
         hidePrefix?: boolean;
+        disabled?: boolean;
     }
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    const isDisabled = computed(() => state.ajaxRunning);
+    const isDisabled = computed(() => props.disabled || state.ajaxRunning);
 
     const projectPriorityId = defineModel<string | null>('id');
 
