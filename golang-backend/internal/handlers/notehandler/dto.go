@@ -8,6 +8,13 @@ type addRequest struct {
 	Body string `json:"body"`
 }
 
+type updateRequest struct {
+	ID        string                       `json:"id"`
+	User      userhandler.UserBaseResponse `json:"user"`
+	CreatedAt int64                        `json:"createdAt"`
+	Body      string                       `json:"body"`
+}
+
 type NoteResponse struct {
 	ID        string                       `json:"id"`
 	User      userhandler.UserBaseResponse `json:"user"`

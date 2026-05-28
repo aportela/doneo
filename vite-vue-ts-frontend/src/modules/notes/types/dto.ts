@@ -4,6 +4,14 @@ export type AddRequest = {
   body: string;
 };
 
+export type UpdateRequest = {
+  id: string;
+  user: UserBaseResponse;
+  createdAt: number;
+  updatedAt: number | null;
+  body: string;
+};
+
 export type NoteResponse = {
   id: string;
   user: UserBaseResponse;

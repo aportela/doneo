@@ -1,8 +1,8 @@
 <script setup lang="ts">
-    import { ref, h } from "vue";
+    import { ref, h, watch, nextTick, onMounted } from "vue";
     import { useI18n } from "vue-i18n";
 
-    import { NCard, NFlex, NButtonGroup, NButton, NIcon, NFormItem, NInput, useDialog } from 'naive-ui';
+    import { NCard, NFlex, NButtonGroup, NButton, NIcon, NFormItem, NInput, useDialog, type InputInst } from 'naive-ui';
     import { IconDeviceFloppy, IconCancel, IconEdit, IconTrash } from '@tabler/icons-vue';
 
     import { renderIcon } from "../../../shared/composables/naive-ui-icon.ts";
@@ -10,7 +10,6 @@
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
 
     import type { NoteItemMode } from "../types/item-mode.ts";
-    //import { noteService } from "../services/note.ts";
 
     interface NoteItemProps {
         note: Note;
@@ -24,6 +23,7 @@
     const dialog = useDialog();
 
     const currentMode = ref<NoteItemMode>(!!props.note.id ? "view" : "add");
+
     const body = ref<string>("");
 
     const onConfirmDelete = () => {
@@ -60,6 +60,31 @@
         currentMode.value = "view";
     }
 
+    const bodyRef = ref<InputInst | null>(null);
+
+    watch(currentMode, (newValue: NoteItemMode) => {
+        if (newValue === "update") {
+            nextTick(() => {
+                bodyRef.value?.focus();
+            });
+        }
+    });
+
+    watch(() => props.note.updatedAt, (newValue) => {
+        if (newValue && props.note.id) {
+            currentMode.value = "view";
+        }
+    });
+
+
+    onMounted(() => {
+        if (!props.note.id) {
+            nextTick(() => {
+                bodyRef.value?.focus();
+            });
+        }
+    });
+
 </script>
 
 <template>
@@ -81,7 +106,7 @@
             {{ props.note.body }}
         </div>
         <n-form-item v-else>
-            <n-input placeholder="Type note body" v-model:value="body" type="textarea" rows="6" />
+            <n-input placeholder="Type note body" v-model:value="body" type="textarea" rows="6" ref="bodyRef" />
         </n-form-item>
 
         <n-flex justify="end">

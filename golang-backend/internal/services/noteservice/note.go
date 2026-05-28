@@ -10,6 +10,7 @@ import (
 
 type NoteService interface {
 	AddProjectNote(ctx context.Context, projectId string, note domain.Note) error
+	UpdateProjectNote(ctx context.Context, note domain.Note) error
 	DeleteProjectNote(ctx context.Context, projectId string) error
 	SearchProjectNotes(ctx context.Context, projectId string) ([]domain.Note, error)
 }
@@ -24,6 +25,10 @@ func NewNoteService(repository noterepository.NoteRepository) NoteService {
 
 func (s *noteService) AddProjectNote(ctx context.Context, projectId string, note domain.Note) error {
 	return s.repository.AddProjectNote(ctx, projectId, noterepository.DomainToDTO(note))
+}
+
+func (s *noteService) UpdateProjectNote(ctx context.Context, note domain.Note) error {
+	return s.repository.UpdateProjectNote(ctx, noterepository.DomainToDTO(note))
 }
 
 func (s *noteService) DeleteProjectNote(ctx context.Context, projectId string) error {

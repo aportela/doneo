@@ -14,6 +14,7 @@ import (
 
 type NoteRepository interface {
 	AddProjectNote(ctx context.Context, projectId string, note noteDTO) error
+	UpdateProjectNote(ctx context.Context, note noteDTO) error
 	DeleteProjectNote(ctx context.Context, id string) error
 	SearchProjectNotes(ctx context.Context, projectId string) ([]noteDTO, error)
 }
@@ -27,6 +28,7 @@ func NewNoteRepository(database database.Database) NoteRepository {
 }
 
 func (noteRepository *noteRepository) AddProjectNote(ctx context.Context, projectId string, note noteDTO) error {
+	fmt.Println(note.CreatedAt)
 	_, err := noteRepository.database.ExecContext(
 		ctx,
 		`
@@ -56,6 +58,23 @@ func (noteRepository *noteRepository) AddProjectNote(ctx context.Context, projec
 			}
 		}
 	}
+	return err
+}
+
+func (noteRepository *noteRepository) UpdateProjectNote(ctx context.Context, note noteDTO) error {
+	_, err := noteRepository.database.ExecContext(
+		ctx,
+		`
+            UPDATE project_notes SET
+				updated_at = ?,
+				body = ?
+			WHERE
+				id = ?
+        `,
+		note.UpdatedAt,
+		note.Body,
+		note.ID,
+	)
 	return err
 }
 

@@ -9,6 +9,7 @@
     //    import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
     import { Note } from "../../notes/models/note.ts";
+    import type { AddRequest, UpdateRequest } from "../../notes/types/dto.ts";
     import { noteService } from "../../notes/services/note.ts";
     import { handleAPIError } from '../../../api/client/errorHandler';
     import type { SearchResponse } from "../../notes/types/dto.ts";
@@ -45,7 +46,7 @@
         if (props.projectId) {
             Object.assign(state, defaultAjaxStateRunning);
             try {
-                const results: SearchResponse = await noteService.search(props.projectId);
+                const results: SearchResponse = await noteService.getProjectNotes(props.projectId);
                 items.value = results.notes.map((note) => new Note(note));
                 itemCount.value = items.value?.length ?? 0;
             } catch (error: unknown) {
@@ -108,12 +109,45 @@
         stopBusReauthListener();
     });
 
-    const onSaveNote = (note: Note) => {
-        console.log(note);
+    const onSaveNote = async (note: Note) => {
+        if (props.projectId) {
+            try {
+                if (!note.id) {
+                    const payload: AddRequest = {
+                        body: note.body
+                    };
+                    await noteService.addProjectNote(props.projectId, payload);
+                    onRefresh();
+                } else if (note.id) {
+                    const payload: UpdateRequest = {
+                        id: note.id,
+                        user: {
+                            id: note.user.id ?? "",
+                            name: note.user.name ?? "",
+                        },
+                        createdAt: note.createdAt?.msTimestamp ?? 0,
+                        updatedAt: null,
+                        body: note.body
+                    };
+                    await noteService.updateProjectNote(props.projectId, note.id, payload);
+                    onRefresh();
+                }
+            } catch { }
+        } else {
+            console.error("project id not set", { file: "ProjectNotes.vue", method: "onSaveNote" });
+        }
     }
 
-    const onDeleteNote = (id: string) => {
-        console.log("delete " + id);
+    const onDeleteNote = async (id: string) => {
+        if (props.projectId) {
+            try {
+                const response = await noteService.deleteProjectNote(props.projectId, id);
+                console.log(response);
+                onRefresh();
+            } catch { }
+        } else {
+            console.error("project id not set", { file: "ProjectNotes.vue", method: "onDeleteNote" });
+        }
     }
 </script>
 

@@ -39,8 +39,8 @@ func (h *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] failed to signin with email %s: %w", request.Email, err))
 		return
 	}
-	//accessToken, err := jwt.GenerateToken(user, time.Now().Add(time.Duration(h.accessTokenExpirationHours)*time.Hour), h.secretKey)
-	accessToken, err := jwt.GenerateToken(user, time.Now().Add(time.Duration(10)*time.Second), h.secretKey)
+	accessToken, err := jwt.GenerateToken(user, time.Now().Add(time.Duration(h.accessTokenExpirationHours)*time.Hour), h.secretKey)
+	//accessToken, err := jwt.GenerateToken(user, time.Now().Add(time.Duration(10)*time.Second), h.secretKey)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] failed to generate access token: %w", err))
 		return
@@ -112,8 +112,8 @@ func (h *AuthHandler) RenewAccessToken(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] failed to get user info: %w", err))
 		return
 	}
-	//accessToken, err := jwt.GenerateToken(user, time.Now().Add(time.Duration(h.accessTokenExpirationHours)*time.Hour), h.secretKey)
-	accessToken, err := jwt.GenerateToken(user, time.Now().Add(time.Duration(10)*time.Second), h.secretKey)
+	accessToken, err := jwt.GenerateToken(user, time.Now().Add(time.Duration(h.accessTokenExpirationHours)*time.Hour), h.secretKey)
+	//accessToken, err := jwt.GenerateToken(user, time.Now().Add(time.Duration(10)*time.Second), h.secretKey)
 	if err != nil {
 		// TODO: return APIError JSON HERE !
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] failed to generate access token: %w", err))

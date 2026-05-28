@@ -9,6 +9,19 @@ import (
 func addRequestToDomain(request addRequest) domain.Note {
 	return domain.Note{
 		Body: request.Body,
+		User: domain.UserBase{},
+	}
+}
+
+func updateRequestToDomain(request updateRequest) domain.Note {
+	return domain.Note{
+		ID:   request.ID,
+		Body: request.Body,
+		User: domain.UserBase{
+			ID:   request.User.ID,
+			Name: request.User.Name,
+		},
+		CreatedAt: utils.MSTimestampToTime(request.CreatedAt),
 	}
 }
 

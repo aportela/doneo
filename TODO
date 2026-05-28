@@ -1,0 +1,1 @@
+move api services on client from subcomponents to parent manager component (ex: projectPriorityForm, ProjectStatusForm...)
