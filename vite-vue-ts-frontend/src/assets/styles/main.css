@@ -24,7 +24,11 @@
 
 .doneo-disable-opacity {
         opacity: 1 !important;
-    }
+}
+
+.doneo-disable-user-select {
+    user-select: none;
+}
 
 /* deny select text (clicking at element) */
 th, td, .n-menu, .n-menu-item, .n-tabs-nav, .n-notification-container {
