@@ -18,12 +18,14 @@
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
+    import RemoteAPIAlert from '../../../shared/components/alerts/RemoteAPIAlert.vue';
 
     interface Props {
         loading: boolean;
         projects: Project[];
         sortField: string;
         sortOrder: SortOrder;
+        errorMessage?: string | null;
     }
 
     const { t } = useI18n();
@@ -111,7 +113,7 @@
                 </th>
                 <th class="doneo-table-actions-column">{{ t("shared.components.table.header.columns.actions") }}</th>
             </tr>
-            <tr class="hide-mobile">
+            <tr>
                 <th>
                     <TextFilterInput clearable size="small"
                         :placeholder="t('modules.project.components.ProjectsTable.header.filters.key.placeholder')"
@@ -140,7 +142,7 @@
                 </th>
             </tr>
         </template>
-        <template #tbody>
+        <template #tbody v-if="!props.errorMessage">
             <tr v-for="project, index in projects" :key="project.id ?? index">
                 <td>
                     {{ project.key }}
@@ -182,18 +184,15 @@
                 </td>
             </tr>
         </template>
+        <template #error v-else>
+            <tr>
+                <td :colspan="columns.length + 1" v-if="props.errorMessage && !props.loading">
+                    <RemoteAPIAlert type="error" :title="t('shared.errorMessages.Error')"
+                        :message="props.errorMessage" />
+                </td>
+            </tr>
+        </template>
     </ManageTable>
 </template>
 
-<style lang="css" scoped>
-
-    .doneo-table-header-click-action th:not(:last-of-type) .n-icon {
-        margin-top: 4px;
-    }
-
-    @media (max-width: 768px) {
-        .hide-mobile {
-            display: none;
-        }
-    }
-</style>
+<style lang="css" scoped></style>

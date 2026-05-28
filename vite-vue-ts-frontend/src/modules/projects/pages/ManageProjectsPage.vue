@@ -98,7 +98,7 @@
             totalResults.value = response.pager.totalResults;
             items.value = response.projects.map((project: ProjectResponse) => new Project(project))
         } catch (error: unknown) {
-            items.value.length = 0;
+            items.value = [];
             state.ajaxErrors = true;
             handleAPIError(error,
                 (apiError) => {
@@ -187,7 +187,7 @@
         </Pager>
         <ProjectsTable :projects="items" :loading="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
             @update="onShowUpdateForm" @delete="onDelete" @textfilter-keydown-enter="onRefresh" :sort-field="sort.field"
-            :sort-order="sort.order" @toggle-sort="onToggleSort" />
+            :sort-order="sort.order" @toggle-sort="onToggleSort" :error-message="state.ajaxErrorMessage" />
     </n-card>
 </template>
 
