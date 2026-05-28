@@ -2,7 +2,7 @@
     import { shallowRef, reactive, onMounted, onBeforeUnmount, watch, type CSSProperties } from "vue";
     import { useI18n } from "vue-i18n";
 
-    import { NSpace, NCard } from "naive-ui";
+    import { NSpace, NCard, NButton } from "naive-ui";
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { useLoadingStore } from '../../../stores/loading';
@@ -12,8 +12,7 @@
     import { noteService } from "../../notes/services/note.ts";
     import { handleAPIError } from '../../../api/client/errorHandler';
     import type { SearchResponse } from "../../notes/types/dto.ts";
-    import AvatarUserName from "../../../shared/components/AvatarUserName.vue";
-
+    import NoteItem from "../../notes/components/NoteItem.vue";
 
     interface ProjectNotesProps {
         style?: string | CSSProperties;
@@ -75,6 +74,21 @@
         }
     };
 
+    const onAddNote = () => {
+        items.value = [new Note({
+            id: "",
+            user: {
+                id: "019e6db9-6f4a-702f-94cd-7dd645a4d03a",
+                name: "John doe",
+            },
+            createdAt: new Date().getTime(),
+            updatedAt: null,
+            body: "",
+        }),
+        ...items.value
+        ];
+    };
+
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -93,27 +107,23 @@
     onBeforeUnmount(() => {
         stopBusReauthListener();
     });
+
+    const onSaveNote = (note: Note) => {
+        console.log(note);
+    }
+
+    const onDeleteNote = (id: string) => {
+        console.log("delete " + id);
+    }
 </script>
 
 <template>
     <n-card bordered :style="props.style">
+        <n-button @click="onAddNote" style="margin-bottom: 16px;">Add Note</n-button>
+
         <n-space vertical size="large" style="margin-right: 12px;">
-            <n-card v-for="note, index in items" :key="note.id ?? index" size="small" bordered>
-                <div class="note-header">
-                    <div class="note-user">
-                        <AvatarUserName :user-id="note.user.id" :user-name="note.user.name" />
-                    </div>
-                    <span class="note-date">
-                        {{ note.createdAt?.toLocaleString() }}
-                    </span>
-                </div>
-                <div class="note-content">
-                    <p>
-                        random note text {{ index }}
-                    </p>
-                    {{ note.body }}
-                </div>
-            </n-card>
+            <NoteItem v-for="note, index in items" :key="note.id ?? index" :note="note" @save="onSaveNote"
+                @delete="onDeleteNote" />
         </n-space>
     </n-card>
 </template>
@@ -142,6 +152,4 @@
         font-size: 14px;
         white-space: pre-line;
     }
-
-
 </style>
