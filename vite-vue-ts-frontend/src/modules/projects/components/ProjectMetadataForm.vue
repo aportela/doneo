@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, type CSSProperties, nextTick } from 'vue';
+    import { ref, computed, type CSSProperties, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NCard, NForm, NFormItem, NInput, NInputGroup, NButton, NIcon, type InputInst } from 'naive-ui';
@@ -10,7 +10,8 @@
     import ProjectStatusSelector from "../../project-statuses/components/ProjectStatusSelector.vue";
     import ProjectTypeSelector from "../../project-types/components/ProjectTypeSelector.vue";
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
-    import { IconCheck, IconDeviceFloppy, IconPencil } from '@tabler/icons-vue';
+    import { IconCheck, IconDeviceFloppy } from '@tabler/icons-vue';
+    import { useMarkdown } from "../../../shared/composables/useMarkdown.ts";
 
     interface ProjectFormProps {
         mode: FormMode;
@@ -26,11 +27,16 @@
     const project = defineModel<Project>("project", { required: true });
 
     const { t } = useI18n();
+    const { render, toMarkdown } = useMarkdown();
 
 
     const keyEditMode = ref<boolean>(false);
 
     const summaryEditMode = ref<boolean>(false);
+
+    const descriptionEditMode = ref<boolean>(false);
+
+    const htmlMarkDownDescriptionPreview = computed(() => render(project.value.description ?? ""));
 
     const onSave = () => {
         emit("save");
@@ -38,16 +44,8 @@
 
     const keyRef = ref<InputInst | null>(null);
     const summaryRef = ref<InputInst | null>(null);
+    const descriptionRef = ref<InputInst | null>(null);
 
-    const onToggleSummaryMode = () => {
-        summaryEditMode.value = !summaryEditMode.value;
-        if (summaryEditMode) {
-            nextTick(() => {
-                summaryRef.value?.focus();
-            });
-
-        }
-    };
 
     const onToggleKeyMode = () => {
         keyEditMode.value = !keyEditMode.value;
@@ -55,8 +53,64 @@
             nextTick(() => {
                 keyRef.value?.focus();
             });
-
         }
+    };
+
+    const onToggleSummaryMode = () => {
+        summaryEditMode.value = !summaryEditMode.value;
+        if (summaryEditMode.value) {
+            nextTick(() => {
+                summaryRef.value?.focus();
+            });
+        }
+    };
+
+    const onToggleDescriptionMode = () => {
+        descriptionEditMode.value = !descriptionEditMode.value;
+        if (descriptionEditMode.value) {
+            nextTick(() => {
+                descriptionRef.value?.focus();
+            });
+        }
+    };
+
+    const insertAtCursor = (value: string) => {
+        const el = document.activeElement as HTMLTextAreaElement
+        if (!el) {
+            project.value.description += value
+            return
+        }
+
+        const start = el.selectionStart ?? project.value.description?.length
+        const end = el.selectionEnd ?? project.value.description?.length
+
+        project.value.description =
+            project.value.description?.slice(0, start) +
+            value +
+            project.value.description?.slice(end)
+
+        // restore cursor
+        requestAnimationFrame(() => {
+            el.selectionStart = el.selectionEnd = start + value.length
+        })
+    }
+
+    const onPaste = (e: ClipboardEvent) => {
+        const clipboard = e.clipboardData
+        if (!clipboard) return
+
+        const html = clipboard.getData('text/html')
+        const plain = clipboard.getData('text/plain')
+
+        let markdown = plain
+
+        if (html) {
+            markdown = toMarkdown(html)
+        }
+
+        e.preventDefault()
+
+        insertAtCursor(markdown)
     };
 
 </script>
@@ -74,16 +128,9 @@
         <n-form>
             <n-form-item label="Key">
                 <n-input-group>
-                    <n-input v-if="keyEditMode" v-model:value="project.key" :show-count="true"
-                        :maxlength="MAX_KEY_LENGTH" ref="keyRef" :disabled="props.disabled" />
-                    <div class="doneo-form-item-view" v-else>{{
-                        project.summary
-                    }}</div>
-                    <n-button v-if="!keyEditMode" @click="onToggleKeyMode" :disabled="props.disabled">
-                        <template #icon>
-                            <n-icon :component="IconPencil" />
-                        </template>
-                    </n-button>
+                    <n-input :readonly="!keyEditMode" v-model:value="project.key" :show-count="keyEditMode"
+                        :maxlength="MAX_KEY_LENGTH" ref="keyRef" :disabled="props.disabled"
+                        @click="() => { if (!keyEditMode) { onToggleKeyMode(); } }" />
                     <n-button v-if="keyEditMode" @click="onToggleKeyMode" :disabled="props.disabled">
                         <template #icon>
                             <n-icon :component="IconCheck" />
@@ -93,16 +140,9 @@
             </n-form-item>
             <n-form-item label="Summary">
                 <n-input-group>
-                    <n-input v-if="summaryEditMode" v-model:value="project.summary" :show-count="true"
-                        :maxlength="MAX_SUMMARY_LENGTH" ref="summaryRef" :disabled="props.disabled" />
-                    <div class="doneo-form-item-view" v-else>{{
-                        project.summary
-                    }}</div>
-                    <n-button v-if="!summaryEditMode" @click="onToggleSummaryMode" :disabled="props.disabled">
-                        <template #icon>
-                            <n-icon :component="IconPencil" />
-                        </template>
-                    </n-button>
+                    <n-input :readonly="!summaryEditMode" v-model:value="project.summary" :show-count="summaryEditMode"
+                        :maxlength="MAX_SUMMARY_LENGTH" ref="summaryRef" :disabled="props.disabled"
+                        @click="() => { if (!summaryEditMode) { onToggleSummaryMode(); } }" />
                     <n-button v-if="summaryEditMode" @click="onToggleSummaryMode" :disabled="props.disabled">
                         <template #icon>
                             <n-icon :component="IconCheck" />
@@ -111,7 +151,18 @@
                 </n-input-group>
             </n-form-item>
             <n-form-item label="Description">
-                <n-input v-model:value="project.description" type="textarea" clearable :disabled="props.disabled" />
+                <n-input-group v-if="descriptionEditMode">
+                    <n-input v-model:value="project.description" type="textarea" clearable :disabled="props.disabled"
+                        @paste="onPaste" ref="descriptionRef" :rows="8" />
+                    <n-button @click="onToggleDescriptionMode" :disabled="props.disabled">
+                        <template #icon>
+                            <n-icon :component="IconCheck" />
+                        </template>
+                    </n-button>
+                </n-input-group>
+                <div v-else v-html="htmlMarkDownDescriptionPreview"
+                    class="doneo-project-description-markdown-preview doneo-cursor-pointer"
+                    @click="onToggleDescriptionMode" />
             </n-form-item>
             <n-form-item label="Type">
                 <ProjectTypeSelector v-model:id="project.type.id" :disabled="props.disabled" />
@@ -133,15 +184,11 @@
 </template>
 
 <style lang="css" scoped>
-
-    .doneo-form-item-view {
-        display: block;
+    .doneo-project-description-markdown-preview {
         width: 100%;
-        border: 1px solid #ccc;
-        word-break: break-word;
-        color: var(--n-text-color);
+        border: 1px solid #e0e0e6;
         border-radius: var(--n-border-radius);
         padding: 4px 12px;
-        user-select: none;
+        color: var(--n-text-color);
     }
 </style>
