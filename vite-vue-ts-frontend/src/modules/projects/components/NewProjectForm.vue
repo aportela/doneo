@@ -2,7 +2,7 @@
     import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, type CSSProperties, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
+    import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NSwitch } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconPlus } from '@tabler/icons-vue';
 
     import { Project, MAX_KEY_LENGTH, MAX_SUMMARY_LENGTH } from '../models/project';
@@ -11,6 +11,9 @@
     import { handleAPIError } from '../../../api/client/errorHandler';
     import type { ProjectResponse, AddRequest } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
+    import ProjectTypeSelector from '../../project-types/components/ProjectTypeSelector.vue';
+    import ProjectPrioritySelector from '../../project-priorities/components/ProjectPrioritySelector.vue';
+    import ProjectStatusSelector from '../../project-statuses/components/ProjectStatusSelector.vue';
 
     interface NewProjectFormProps {
         style?: string | CSSProperties;
@@ -21,6 +24,8 @@
     const props = defineProps<NewProjectFormProps>();
 
     const { t } = useI18n();
+
+    const openProjectAfterCreate = ref<boolean>(true);
 
     const project = ref<Project>(new Project());
 
@@ -75,7 +80,7 @@
     const serverErrors = ref<Record<string, string>>({});
 
     const isSaveDisabled = computed<boolean>(() => {
-        return !project.value.key || !project.value.summary;
+        return !project.value.key || !project.value.summary || !project.value.type.id || !project.value.priority.id || !project.value.status.id;
     });
 
     const onSave = async () => {
@@ -109,7 +114,7 @@
                 status: { id: project.value.status.id ?? "" },
             };
             const addedProject: ProjectResponse = await projectService.add(payload);
-            emit('add', addedProject)
+            emit('add', { project: addedProject, openAfterCreate: openProjectAfterCreate.value })
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -188,9 +193,27 @@
                 show-feedback>
                 <n-input type="text"
                     :placeholder="t('modules.project.components.NewProjectForm.inputs.summary.placeholder')"
-                    v-model:value="project.summary" :maxlength="MAX_KEY_LENGTH" :show-count="true" clearable required
-                    autofocus>
+                    v-model:value="project.summary" :maxlength="MAX_KEY_LENGTH" :show-count="true" clearable required>
                 </n-input>
+            </n-form-item>
+            <n-form-item :label="t('modules.project.components.NewProjectForm.inputs.description.label')" path="key"
+                show-feedback>
+                <n-input type="textarea"
+                    :placeholder="t('modules.project.components.NewProjectForm.inputs.description.placeholder')"
+                    v-model:value="project.description" clearable>
+                </n-input>
+            </n-form-item>
+            <n-form-item :label="t('modules.project.components.NewProjectForm.selectors.projectType.label')">
+                <ProjectTypeSelector v-model:id="project.type.id"
+                    :placeholder="t('modules.project.components.NewProjectForm.selectors.projectType.placeholder')" />
+            </n-form-item>
+            <n-form-item :label="t('modules.project.components.NewProjectForm.selectors.projectPriority.label')">
+                <ProjectPrioritySelector v-model:id="project.priority.id"
+                    :placeholder="t('modules.project.components.NewProjectForm.selectors.projectPriority.placeholder')" />
+            </n-form-item>
+            <n-form-item :label="t('modules.project.components.NewProjectForm.selectors.projectStatus.label')">
+                <ProjectStatusSelector v-model:id="project.status.id"
+                    :placeholder="t('modules.project.components.NewProjectForm.selectors.projectStatus.placeholder')" />
             </n-form-item>
         </n-form>
         <template #action>
@@ -207,10 +230,27 @@
                     </template>
                     {{ t("shared.buttons.Cancel.label") }}
                 </n-button>
+                <n-switch size="large" class="doneo-open-project-after-create-switch"
+                    v-model:value="openProjectAfterCreate">
+                    <template #checked>
+                        {{
+                            t('modules.project.components.NewProjectForm.selectors.switches.openProjectAfterCreate.label')
+                        }}
+                    </template>
+                    <template #unchecked>
+                        {{
+                            t('modules.project.components.NewProjectForm.selectors.switches.openProjectAfterCreate.label')
+                        }}
+                    </template>
+                </n-switch>
             </n-flex>
         </template>
     </n-card>
 
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+    .doneo-open-project-after-create-switch {
+        margin-top: 4px;
+    }
+</style>

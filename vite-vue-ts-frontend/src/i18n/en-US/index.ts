@@ -751,6 +751,47 @@ export default {
     },
     project: {
       components: {
+        NewProjectForm: {
+          headers: {
+            addProject: "Add project",
+          },
+          inputs: {
+            key: {
+              label: "Key",
+              placeholder: "Enter project key",
+            },
+            summary: {
+              label: "Summary",
+              placeholder: "Enter project summary",
+            },
+            description: {
+              label: "Description",
+              placeholder: "Enter project description",
+            },
+          },
+          selectors: {
+            projectType: {
+              label: "Project type",
+              placeholder: "Select project type",
+            },
+            projectPriority: {
+              label: "Project priority",
+              placeholder: "Select project priority",
+            },
+            projectStatus: {
+              label: "Project status",
+              placeholder: "Select project status",
+            },
+            switches: {
+              openProjectAfterCreate: {
+                label: "Open project after create",
+              },
+            },
+          },
+          errors: {
+            addError: "There was a problem while adding the project data",
+          },
+        },
         ManageProjectsPage: {
           header: {
             title: "Manage projects",
