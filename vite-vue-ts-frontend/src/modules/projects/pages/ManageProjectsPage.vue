@@ -27,7 +27,7 @@
 
     const items = shallowRef<Project[]>([]);
 
-    const sort = ref<Sort>(new Sort("name", "ASC"));
+    const sort = ref<Sort>(new Sort("createdAt", "DESC"));
 
     const keyFilter = ref<string>("");
 
@@ -80,7 +80,7 @@
 
     const onAdd = (project: Project) => {
         showForm.value = false;
-        notify('success', t("modules.project.components.ManageProjectsPage.notifications.projectStatusAdded", { summary: project.summary }));
+        notify('success', t("modules.project.components.ManageProjectsPage.notifications.projectAdded", { summary: project.summary }));
         onRefresh();
     };
 
