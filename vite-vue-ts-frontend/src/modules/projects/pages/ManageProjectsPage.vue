@@ -2,7 +2,7 @@
     import { onMounted, onBeforeUnmount, ref, reactive, shallowRef, watch } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NCard } from 'naive-ui';
+    import { NCard, NModal } from 'naive-ui';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { useLoadingStore } from '../../../stores/loading';
@@ -14,6 +14,7 @@
     import { Project } from '../models/project';
     import ProjectsTable from '../components/ProjectsTable.vue';
     import Pager from '../../../shared/components/tables/Pager.vue';
+    import NewProjectForm from '../components/NewProjectForm.vue';
     import { Sort } from '../../../shared/types/models/sort';
     import type { FormMode } from '../../../shared/types/form-mode';
 
@@ -76,6 +77,16 @@
         showForm.value = true;
     };
 
+
+    const onAdd = (project: Project) => {
+        showForm.value = false;
+        notify('success', t("modules.project.components.ManageProjectsPage.notifications.projectStatusAdded", { summary: project.summary }));
+        onRefresh();
+    };
+
+    const onCancel = () => {
+        showForm.value = false;
+    };
 
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
@@ -184,6 +195,10 @@
 </script>
 
 <template>
+
+    <n-modal v-model:show="showForm">
+        <NewProjectForm style="width: 40%;" @add="onAdd" @cancel="onCancel" />
+    </n-modal>
     <n-card :title="t('modules.project.components.ManageProjectsPage.header.title')">
         <Pager v-model:current-page="currentPage" v-model:page-size="pageSize" :total-pages="totalPages"
             :total-results="totalResults" class="doneo-pager-container">
