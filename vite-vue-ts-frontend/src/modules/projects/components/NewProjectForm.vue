@@ -193,7 +193,8 @@
                 show-feedback>
                 <n-input type="text"
                     :placeholder="t('modules.project.components.NewProjectForm.inputs.summary.placeholder')"
-                    v-model:value="project.summary" :maxlength="MAX_KEY_LENGTH" :show-count="true" clearable required>
+                    v-model:value="project.summary" :maxlength="MAX_SUMMARY_LENGTH" :show-count="true" clearable
+                    required>
                 </n-input>
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.inputs.description.label')" path="key"
