@@ -54,7 +54,7 @@ type projectResponse struct {
 	ID                     string                                         `json:"id"`
 	Key                    string                                         `json:"key"`
 	Summary                string                                         `json:"summary"`
-	Description            string                                         `json:"description"`
+	Description            *string                                        `json:"description"`
 	CreatedBy              userhandler.UserBaseResponse                   `json:"createdBy"`
 	CreatedAt              int64                                          `json:"createdAt"`
 	Type                   projecttypehandler.ProjectTypeResponse         `json:"type"`

@@ -51,7 +51,7 @@ func DomainToResponse(project domain.Project) projectResponse {
 		ID:                     project.ID,
 		Key:                    project.Key,
 		Summary:                project.Summary,
-		Description:            *project.Description,
+		Description:            project.Description,
 		CreatedBy:              userhandler.BaseDomainToBaseResponse(project.CreatedBy),
 		CreatedAt:              project.CreatedAt,
 		Type:                   projecttypehandler.DomainToResponse(project.Type),
