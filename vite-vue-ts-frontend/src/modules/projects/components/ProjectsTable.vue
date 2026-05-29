@@ -19,6 +19,7 @@
     import UserSelector from '../../users/components/UserSelector.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
+    import type { TimestampRange } from '../../../shared/composables/timestamps.ts';
 
     interface Props {
         loading: boolean;
@@ -79,6 +80,17 @@
         default: "",
     });
 
+    const createdAtFilter = defineModel<TimestampRange>("createdAtFilter", {
+        default: {
+            from: null,
+            to: null
+        }
+    });
+
+    const projectCreatedByUserIdFilter = defineModel<string | null>("projectCreatedByUserIdFilter", {
+        default: "",
+    });
+
     const onToggleSort = (field: string) => {
         emit("toggleSort", field);
     };
@@ -133,10 +145,10 @@
                         v-model:value="projectSummaryFilter" @keydown-enter="onTextFilterKeyDownEnter" />
                 </th>
                 <th>
-                    <DateFilterSelect />
+                    <DateFilterSelect v-model:range="createdAtFilter" />
                 </th>
                 <th>
-                    <UserSelector hideAvatar clearable />
+                    <UserSelector hideAvatar clearable v-model:id="projectCreatedByUserIdFilter" />
                 </th>
                 <th class="doneo-text-center">
                     <RefreshAddActionsColumn @refresh="onRefresh" @add="onAdd" />

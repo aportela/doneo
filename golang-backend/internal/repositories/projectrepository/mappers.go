@@ -2,6 +2,7 @@ package projectrepository
 
 import (
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/repositories"
 )
 
 func DomainToDTO(project domain.Project) projectDTO {
@@ -66,7 +67,9 @@ func DTOArrayToDomainArray(projects []projectDTO) []domain.Project {
 func DomainFilterToDTO(filter domain.SearchProjectFilter) searchFilterDTO {
 
 	return searchFilterDTO{
-		Key:     filter.Key,
-		Summary: filter.Summary,
+		Key:             filter.Key,
+		Summary:         filter.Summary,
+		CreatedAt:       repositories.TimestampFilterToDTO(filter.CreatedAt),
+		CreatedByUserId: filter.CreatedByUserId,
 	}
 }

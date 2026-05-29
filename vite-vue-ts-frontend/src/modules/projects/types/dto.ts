@@ -8,6 +8,7 @@ import type { ProjectTypeResponse } from "../../project-types/types/dto";
 import type { ProjectPriorityResponse } from "../../project-priorities/types/dto";
 import type { ProjectStatusResponse } from "../../project-statuses/types/dto";
 import type { UserBaseResponse } from "../../users/types/dto";
+import type { TimestampRange } from "../../../shared/composables/timestamps";
 
 export type AddRequest = {
   key: string;
@@ -43,6 +44,11 @@ export type UpdateRequest = {
 type SearchRequestFilter = {
   key?: string;
   summary?: string;
+  projectTypeId?: string;
+  projectPriorityId?: string;
+  projectStatusId?: string;
+  createdAt?: TimestampRange;
+  createdByUserId?: string;
 };
 
 export type SearchRequest = {

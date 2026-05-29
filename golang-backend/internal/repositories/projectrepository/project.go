@@ -312,7 +312,21 @@ func (projectRepository *projectRepository) Search(ctx context.Context, pager br
 	}
 	if filter.Summary != nil && len(*filter.Summary) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "P.summary LIKE ?")
-		filterArgs = append(filterArgs, "%"+*filter.Key+"%")
+		filterArgs = append(filterArgs, "%"+*filter.Summary+"%")
+	}
+	if filter.CreatedAt != nil {
+		if filter.CreatedAt.From != nil && *filter.CreatedAt.From > 0 {
+			sqlWhereConditions = append(sqlWhereConditions, "P.created_at >= ?")
+			filterArgs = append(filterArgs, filter.CreatedAt.From)
+		}
+		if filter.CreatedAt.To != nil && *filter.CreatedAt.To > 0 {
+			sqlWhereConditions = append(sqlWhereConditions, "P.created_at <= ?")
+			filterArgs = append(filterArgs, filter.CreatedAt.To)
+		}
+	}
+	if filter.CreatedByUserId != nil && len(*filter.CreatedByUserId) > 0 {
+		sqlWhereConditions = append(sqlWhereConditions, "P.creator_id = ?")
+		filterArgs = append(filterArgs, *filter.CreatedByUserId)
 	}
 	if len(sqlWhereConditions) > 0 {
 		sqlWhere = " WHERE " + strings.Join(sqlWhereConditions, " AND ")

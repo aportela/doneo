@@ -18,6 +18,7 @@
     import NewProjectForm from '../components/NewProjectForm.vue';
     import { Sort } from '../../../shared/types/models/sort';
     import type { FormMode } from '../../../shared/types/form-mode';
+    import type { TimestampRange } from '../../../shared/composables/timestamps.ts';
 
     const router = useRouter();
     const { t } = useI18n();
@@ -31,8 +32,11 @@
 
     const sort = ref<Sort>(new Sort("createdAt", "DESC"));
 
+
     const keyFilter = ref<string | null>(null);
     const summaryFilter = ref<string | null>(null);
+    const createdAtFilter = ref<TimestampRange>({ from: null, to: null });
+    const createdByUserIdFilter = ref<string | null>(null);
 
     const showForm = ref<boolean>(false);
     const formMode = ref<FormMode>("add");
@@ -120,6 +124,8 @@
                 filter: {
                     key: keyFilter.value ?? undefined,
                     summary: summaryFilter.value ?? undefined,
+                    createdAt: createdAtFilter.value,
+                    createdByUserId: createdByUserIdFilter.value ?? undefined,
                 }
             };
             const response = await projectService.search(payload);
@@ -226,7 +232,8 @@
         </Pager>
         <ProjectsTable :projects="items" :loading="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
             @update="onShowUpdateForm" @delete="onDelete" v-model:project-key-filter="keyFilter"
-            v-model:project-summary-filter="summaryFilter" @textfilter-keydown-enter="onRefresh"
+            v-model:project-summary-filter="summaryFilter" v-model:created-at-filter="createdAtFilter"
+            v-model:project-created-by-user-id-filter="createdByUserIdFilter" @textfilter-keydown-enter="onRefresh"
             :sort-field="sort.field" :sort-order="sort.order" @toggle-sort="onToggleSort" />
     </n-card>
 </template>

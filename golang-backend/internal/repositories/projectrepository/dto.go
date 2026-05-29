@@ -1,5 +1,7 @@
 package projectrepository
 
+import "github.com/aportela/doneo/internal/repositories"
+
 type projectDTO struct {
 	ID                     string  `db:"id"`
 	Key                    string  `db:"key"`
@@ -29,6 +31,8 @@ type projectDTO struct {
 }
 
 type searchFilterDTO struct {
-	Key     *string
-	Summary *string
+	Key             *string
+	Summary         *string
+	CreatedAt       *repositories.TimestampFilter
+	CreatedByUserId *string
 }

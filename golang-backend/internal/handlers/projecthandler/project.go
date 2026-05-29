@@ -113,6 +113,18 @@ func (h *ProjectHandler) Search(w http.ResponseWriter, r *http.Request) {
 		if request.Filter.Summary != nil {
 			filter.Summary = request.Filter.Summary
 		}
+		if request.Filter.CreatedAt != nil {
+			filter.CreatedAt = &domain.TimestampFilter{From: nil, To: nil}
+			if request.Filter.CreatedAt.From != nil {
+				filter.CreatedAt.From = request.Filter.CreatedAt.From
+			}
+			if request.Filter.CreatedAt.To != nil {
+				filter.CreatedAt.To = request.Filter.CreatedAt.To
+			}
+		}
+		if request.Filter.CreatedByUserId != nil {
+			filter.CreatedByUserId = request.Filter.CreatedByUserId
+		}
 	}
 	projects, pagerResult, err := h.service.Search(r.Context(),
 		browser.Params{

@@ -41,8 +41,10 @@ type updateRequest struct {
 }
 
 type filterRequest struct {
-	Key     *string `json:"key"`
-	Summary *string `json:"summary"`
+	Key             *string                   `json:"key"`
+	Summary         *string                   `json:"summary"`
+	CreatedAt       *handlers.TimestampFilter `json:"createdAt"`
+	CreatedByUserId *string                   `json:"createdByUserId"`
 }
 
 type searchRequest struct {
