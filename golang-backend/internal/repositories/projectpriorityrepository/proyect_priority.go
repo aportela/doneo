@@ -15,11 +15,11 @@ import (
 )
 
 type ProjectPriorityRepository interface {
-	Add(ctx context.Context, projectPriority projectPriorityDTO) error
-	Update(ctx context.Context, projectPriority projectPriorityDTO) error
-	Get(ctx context.Context, id string) (projectPriorityDTO, error)
+	Add(ctx context.Context, projectPriority ProjectPriorityDTO) error
+	Update(ctx context.Context, projectPriority ProjectPriorityDTO) error
+	Get(ctx context.Context, id string) (ProjectPriorityDTO, error)
 	Delete(ctx context.Context, id string) error
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter searchFilterDTO) ([]projectPriorityDTO, browser.Result, error)
+	Search(ctx context.Context, pager browser.Params, order browser.Order, filter searchFilterDTO) ([]ProjectPriorityDTO, browser.Result, error)
 }
 
 type projectPriorityRepository struct {
@@ -30,7 +30,7 @@ func NewProjectPriorityRepository(database database.Database) ProjectPriorityRep
 	return &projectPriorityRepository{database: database}
 }
 
-func (projectPriorityRepository *projectPriorityRepository) Add(ctx context.Context, projectPriority projectPriorityDTO) error {
+func (projectPriorityRepository *projectPriorityRepository) Add(ctx context.Context, projectPriority ProjectPriorityDTO) error {
 	_, err := projectPriorityRepository.database.ExecContext(
 		ctx,
 		`
@@ -67,7 +67,7 @@ func (projectPriorityRepository *projectPriorityRepository) Add(ctx context.Cont
 	return err
 }
 
-func (projectPriorityRepository *projectPriorityRepository) Update(ctx context.Context, projectPriority projectPriorityDTO) error {
+func (projectPriorityRepository *projectPriorityRepository) Update(ctx context.Context, projectPriority ProjectPriorityDTO) error {
 	_, err := projectPriorityRepository.database.ExecContext(
 		ctx,
 		`
@@ -118,8 +118,8 @@ func (projectPriorityRepository *projectPriorityRepository) Delete(ctx context.C
 	return err
 }
 
-func (projectPriorityRepository *projectPriorityRepository) Get(ctx context.Context, id string) (projectPriorityDTO, error) {
-	var projectPriority projectPriorityDTO
+func (projectPriorityRepository *projectPriorityRepository) Get(ctx context.Context, id string) (ProjectPriorityDTO, error) {
+	var projectPriority ProjectPriorityDTO
 	err := projectPriorityRepository.database.QueryRowContext(
 		ctx,
 		`
@@ -131,14 +131,14 @@ func (projectPriorityRepository *projectPriorityRepository) Get(ctx context.Cont
 		id).Scan(&projectPriority.ID, &projectPriority.Name, &projectPriority.HexColor)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return projectPriorityDTO{}, domain.NotFoundError
+			return ProjectPriorityDTO{}, domain.NotFoundError
 		}
-		return projectPriorityDTO{}, err
+		return ProjectPriorityDTO{}, err
 	}
 	return projectPriority, err
 }
 
-func (projectPriorityRepository *projectPriorityRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter searchFilterDTO) ([]projectPriorityDTO, browser.Result, error) {
+func (projectPriorityRepository *projectPriorityRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter searchFilterDTO) ([]ProjectPriorityDTO, browser.Result, error) {
 	var filterArgs []any
 	var queryArgs []any
 	sqlQuery := `
@@ -187,9 +187,9 @@ func (projectPriorityRepository *projectPriorityRepository) Search(ctx context.C
 		return nil, browser.Result{}, err
 	}
 	defer rows.Close()
-	projectPriorities := make([]projectPriorityDTO, 0)
+	projectPriorities := make([]ProjectPriorityDTO, 0)
 	for rows.Next() {
-		var projectPriority projectPriorityDTO
+		var projectPriority ProjectPriorityDTO
 		if err := rows.Scan(
 			&projectPriority.ID, &projectPriority.Name, &projectPriority.HexColor,
 		); err != nil {
