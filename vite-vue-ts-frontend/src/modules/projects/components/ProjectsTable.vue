@@ -16,6 +16,7 @@
     import ProjectTypeSelector from '../../project-types/components/ProjectTypeSelector.vue';
     import ProjectStatusSelector from '../../project-statuses/components/ProjectStatusSelector.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
+    import UserSelector from '../../users/components/UserSelector.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
 
@@ -118,13 +119,13 @@
                         v-model:value="projectKeyFilter" @keydown-enter="onTextFilterKeyDownEnter" />
                 </th>
                 <th>
-                    <ProjectTypeSelector :hide-prefix="true" />
+                    <ProjectTypeSelector :hide-prefix="true" clearable />
                 </th>
                 <th>
-                    <ProjectPrioritySelector :hide-prefix="true" />
+                    <ProjectPrioritySelector :hide-prefix="true" clearable />
                 </th>
                 <th>
-                    <ProjectStatusSelector :hide-prefix="true" />
+                    <ProjectStatusSelector :hide-prefix="true" clearable />
                 </th>
                 <th>
                     <TextFilterInput clearable size="small"
@@ -134,7 +135,9 @@
                 <th>
                     <DateFilterSelect />
                 </th>
-                <th></th>
+                <th>
+                    <UserSelector hideAvatar clearable />
+                </th>
                 <th class="doneo-text-center">
                     <RefreshAddActionsColumn @refresh="onRefresh" @add="onAdd" />
                 </th>
