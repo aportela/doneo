@@ -210,11 +210,9 @@
         border-radius: var(--n-border-radius);
         padding: 4px 12px;
         color: var(--n-text-color);
-        min-height: 1em;
-
+        min-height: 1.5em;
         overflow: hidden;
         max-height: 12em;
-        /* aprox 6 líneas */
         transition: max-height 0.3s ease;
     }
 
