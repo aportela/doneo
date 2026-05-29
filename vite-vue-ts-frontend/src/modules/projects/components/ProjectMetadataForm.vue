@@ -100,19 +100,19 @@
             </div>
         </n-form-item>
         <n-flex>
-            <n-form-item label="Created at">
+            <n-form-item label="Created at" style="width: 12em">
                 {{ project.createdAt.toLocaleString() }}
             </n-form-item>
-            <n-form-item label="Updated at">
+            <n-form-item label="Updated at" style="width: 12em">
                 {{ project.updatedAt?.toLocaleString() }}
             </n-form-item>
-            <n-form-item label="Started at">
+            <n-form-item label="Started at" style="width: 12em">
                 {{ project.updatedAt?.toLocaleString() }}
             </n-form-item>
-            <n-form-item label="Finished at">
+            <n-form-item label="Finished at" style="width: 12em">
                 {{ project.updatedAt?.toLocaleString() }}
             </n-form-item>
-            <n-form-item label="Due at">
+            <n-form-item label="Due at" style="width: 12em">
                 {{ project.updatedAt?.toLocaleString() }}
             </n-form-item>
         </n-flex>
@@ -130,10 +130,12 @@
             </n-flex>
 
             <n-form-item label="Key">
-                <ToggleInput v-model:value="project.key" show-count :max-length="MAX_KEY_LENGTH" />
+                <ToggleInput v-model:value="project.key" show-count :max-length="MAX_KEY_LENGTH"
+                    :disabled="props.disabled" />
             </n-form-item>
             <n-form-item label="Summary">
-                <ToggleInput v-model:value="project.summary" show-count :max-length="MAX_SUMMARY_LENGTH" />
+                <ToggleInput v-model:value="project.summary" show-count :max-length="MAX_SUMMARY_LENGTH"
+                    :disabled="props.disabled" />
             </n-form-item>
             <n-form-item label="description">
                 <template #label>
