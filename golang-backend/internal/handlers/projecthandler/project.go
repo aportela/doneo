@@ -9,6 +9,7 @@ import (
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
+	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
 	"github.com/aportela/doneo/internal/services/projectservice"
 	"github.com/aportela/doneo/internal/utils"
@@ -34,9 +35,16 @@ func (h *ProjectHandler) Add(w http.ResponseWriter, r *http.Request) {
 	}
 	project := addRequestToDomain(request)
 	project.ID = utils.UUID()
+	project.CreatedBy = domain.UserBase{}
+	project.CreatedBy.ID, _ = middlewares.GetUserIDFromContext(r.Context())
 	err := h.service.Add(r.Context(), project)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to add project with ID %s: %w", request.ID, err))
+		return
+	}
+	project, err = h.service.Get(r.Context(), project.ID)
+	if err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to get new project with ID %s: %w", request.ID, err))
 		return
 	}
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(project), nil, http.StatusCreated)
