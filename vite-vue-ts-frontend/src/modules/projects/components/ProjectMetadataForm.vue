@@ -2,7 +2,7 @@
     import { ref, computed, type CSSProperties, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NCard, NForm, NFormItem, NInput, NInputGroup, NButton, NIcon, type InputInst, NFlex } from 'naive-ui';
+    import { NCard, NForm, NFormItem, NInput, NInputGroup, NButton, NButtonGroup, NIcon, type InputInst, NFlex } from 'naive-ui';
 
     import type { FormMode } from '../../../shared/types/form-mode';
     import { Project, MAX_KEY_LENGTH, MAX_SUMMARY_LENGTH } from "../models/project";
@@ -10,7 +10,7 @@
     import ProjectStatusSelector from "../../project-statuses/components/ProjectStatusSelector.vue";
     import ProjectTypeSelector from "../../project-types/components/ProjectTypeSelector.vue";
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
-    import { IconCheck, IconChevronsDown, IconChevronsUp, IconDeviceFloppy } from '@tabler/icons-vue';
+    import { IconX, IconCheck, IconChevronsDown, IconChevronsUp, IconDeviceFloppy } from '@tabler/icons-vue';
     import { useMarkdown } from "../../../shared/composables/useMarkdown.ts";
 
     interface ProjectFormProps {
@@ -197,15 +197,24 @@
                         </div>
                     </n-flex>
                 </template>
-                <n-input-group v-if="descriptionEditMode">
+                <div v-if="descriptionEditMode" style="width: 100%;">
                     <n-input v-model:value="project.description" type="textarea" clearable :disabled="props.disabled"
                         @paste="onPaste" ref="descriptionRef" :rows="8" />
-                    <n-button @click="onToggleDescriptionMode" :disabled="props.disabled">
-                        <template #icon>
-                            <n-icon :component="IconCheck" />
-                        </template>
-                    </n-button>
-                </n-input-group>
+                    <n-flex justify="end">
+                        <n-button-group>
+                            <n-button @click="onToggleDescriptionMode" :disabled="props.disabled">
+                                <template #icon>
+                                    <n-icon :component="IconCheck" />
+                                </template>
+                            </n-button>
+                            <n-button @click="onToggleDescriptionMode" :disabled="props.disabled">
+                                <template #icon>
+                                    <n-icon :component="IconX" />
+                                </template>
+                            </n-button>
+                        </n-button-group>
+                    </n-flex>
+                </div>
                 <div v-else v-html="htmlMarkDownDescriptionPreview"
                     class="doneo-project-description-markdown-preview doneo-cursor-pointer"
                     :class="{ 'doneo-project-description-markdown-preview-expanded': descriptionExpanded }"
@@ -223,10 +232,12 @@
 
 <style lang="css" scoped>
     .doneo-project-description-markdown-preview {
+        width: 100%;
         border: 1px solid #e0e0e6;
         border-radius: var(--n-border-radius);
         padding: 4px 12px;
         color: var(--n-text-color);
+        min-height: 1em;
 
         overflow: hidden;
         max-height: 12em;
