@@ -69,6 +69,9 @@ func DomainFilterToDTO(filter domain.SearchProjectFilter) searchFilterDTO {
 	return searchFilterDTO{
 		Key:             filter.Key,
 		Summary:         filter.Summary,
+		TypeId:          filter.TypeId,
+		PriorityId:      filter.PriorityId,
+		StatusId:        filter.StatusId,
 		CreatedAt:       repositories.TimestampFilterToDTO(filter.CreatedAt),
 		CreatedByUserId: filter.CreatedByUserId,
 	}

@@ -314,6 +314,18 @@ func (projectRepository *projectRepository) Search(ctx context.Context, pager br
 		sqlWhereConditions = append(sqlWhereConditions, "P.summary LIKE ?")
 		filterArgs = append(filterArgs, "%"+*filter.Summary+"%")
 	}
+	if filter.TypeId != nil && len(*filter.TypeId) > 0 {
+		sqlWhereConditions = append(sqlWhereConditions, "P.type_id = ?")
+		filterArgs = append(filterArgs, *filter.TypeId)
+	}
+	if filter.PriorityId != nil && len(*filter.PriorityId) > 0 {
+		sqlWhereConditions = append(sqlWhereConditions, "P.priority_id = ?")
+		filterArgs = append(filterArgs, *filter.PriorityId)
+	}
+	if filter.StatusId != nil && len(*filter.StatusId) > 0 {
+		sqlWhereConditions = append(sqlWhereConditions, "P.status_id = ?")
+		filterArgs = append(filterArgs, *filter.StatusId)
+	}
 	if filter.CreatedAt != nil {
 		if filter.CreatedAt.From != nil && *filter.CreatedAt.From > 0 {
 			sqlWhereConditions = append(sqlWhereConditions, "P.created_at >= ?")

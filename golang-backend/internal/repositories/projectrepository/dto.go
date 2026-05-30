@@ -33,6 +33,9 @@ type projectDTO struct {
 type searchFilterDTO struct {
 	Key             *string
 	Summary         *string
+	TypeId          *string
+	PriorityId      *string
+	StatusId        *string
 	CreatedAt       *repositories.TimestampFilter
 	CreatedByUserId *string
 }

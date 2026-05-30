@@ -26,6 +26,9 @@ type Project struct {
 type SearchProjectFilter struct {
 	Key             *string
 	Summary         *string
+	TypeId          *string
+	StatusId        *string
+	PriorityId      *string
 	CreatedAt       *TimestampFilter
 	CreatedByUserId *string
 }

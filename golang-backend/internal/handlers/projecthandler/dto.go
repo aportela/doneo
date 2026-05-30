@@ -43,6 +43,9 @@ type updateRequest struct {
 type filterRequest struct {
 	Key             *string                   `json:"key"`
 	Summary         *string                   `json:"summary"`
+	TypeId          *string                   `json:"typeId"`
+	PriorityId      *string                   `json:"priorityId"`
+	StatusId        *string                   `json:"statusId"`
 	CreatedAt       *handlers.TimestampFilter `json:"createdAt"`
 	CreatedByUserId *string                   `json:"createdByUserId"`
 }

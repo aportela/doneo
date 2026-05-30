@@ -44,9 +44,9 @@ export type UpdateRequest = {
 type SearchRequestFilter = {
   key?: string;
   summary?: string;
-  projectTypeId?: string;
-  projectPriorityId?: string;
-  projectStatusId?: string;
+  typeId?: string;
+  priorityId?: string;
+  statusId?: string;
   createdAt?: TimestampRange;
   createdByUserId?: string;
 };

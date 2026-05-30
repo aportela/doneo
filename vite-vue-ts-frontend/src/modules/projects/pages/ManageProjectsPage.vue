@@ -35,6 +35,9 @@
 
     const keyFilter = ref<string | null>(null);
     const summaryFilter = ref<string | null>(null);
+    const typeIdFilter = ref<string | null>(null);
+    const priorityIdFilter = ref<string | null>(null);
+    const statusIdFilter = ref<string | null>(null);
     const createdAtFilter = ref<TimestampRange>({ from: null, to: null });
     const createdByUserIdFilter = ref<string | null>(null);
 
@@ -124,6 +127,9 @@
                 filter: {
                     key: keyFilter.value ?? undefined,
                     summary: summaryFilter.value ?? undefined,
+                    typeId: typeIdFilter.value ?? undefined,
+                    priorityId: priorityIdFilter.value ?? undefined,
+                    statusId: statusIdFilter.value ?? undefined,
                     createdAt: createdAtFilter.value,
                     createdByUserId: createdByUserIdFilter.value ?? undefined,
                 }
@@ -231,10 +237,12 @@
             </template>
         </Pager>
         <ProjectsTable :projects="items" :loading="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
-            @update="onShowUpdateForm" @delete="onDelete" v-model:project-key-filter="keyFilter"
-            v-model:project-summary-filter="summaryFilter" v-model:created-at-filter="createdAtFilter"
-            v-model:project-created-by-user-id-filter="createdByUserIdFilter" @textfilter-keydown-enter="onRefresh"
-            :sort-field="sort.field" :sort-order="sort.order" @toggle-sort="onToggleSort" />
+            @update="onShowUpdateForm" @delete="onDelete" v-model:keyFilter="keyFilter"
+            v-model:summaryFilter="summaryFilter" v-model:type-id-filter="typeIdFilter"
+            v-model:priority-id-filter="priorityIdFilter" v-model:status-id-filter="statusIdFilter"
+            v-model:created-at-filter="createdAtFilter" v-model:createdByUserIdFilter="createdByUserIdFilter"
+            @textfilter-keydown-enter="onRefresh" :sort-field="sort.field" :sort-order="sort.order"
+            @toggle-sort="onToggleSort" />
     </n-card>
 </template>
 

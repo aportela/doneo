@@ -72,11 +72,23 @@
         },
     ]);
 
-    const projectKeyFilter = defineModel<string | null>("projectKeyFilter", {
+    const keyFilter = defineModel<string | null>("keyFilter", {
         default: "",
     });
 
-    const projectSummaryFilter = defineModel<string | null>("projectSummaryFilter", {
+    const summaryFilter = defineModel<string | null>("summaryFilter", {
+        default: "",
+    });
+
+    const typeIdFilter = defineModel<string | null>("typeIdFilter", {
+        default: "",
+    });
+
+    const priorityIdFilter = defineModel<string | null>("priorityIdFilter", {
+        default: "",
+    });
+
+    const statusIdFilter = defineModel<string | null>("statusIdFilter", {
         default: "",
     });
 
@@ -87,7 +99,7 @@
         }
     });
 
-    const projectCreatedByUserIdFilter = defineModel<string | null>("projectCreatedByUserIdFilter", {
+    const createdByUserIdFilter = defineModel<string | null>("createdByUserIdFilter", {
         default: "",
     });
 
@@ -128,27 +140,27 @@
                 <th>
                     <TextFilterInput clearable size="small"
                         :placeholder="t('modules.project.components.ProjectsTable.header.filters.key.placeholder')"
-                        v-model:value="projectKeyFilter" @keydown-enter="onTextFilterKeyDownEnter" />
+                        v-model:value="keyFilter" @keydown-enter="onTextFilterKeyDownEnter" />
                 </th>
                 <th>
-                    <ProjectTypeSelector :hide-prefix="true" clearable />
+                    <ProjectTypeSelector v-model:id="typeIdFilter" :hide-prefix="true" clearable />
                 </th>
                 <th>
-                    <ProjectPrioritySelector :hide-prefix="true" clearable />
+                    <ProjectPrioritySelector v-model:id="priorityIdFilter" :hide-prefix="true" clearable />
                 </th>
                 <th>
-                    <ProjectStatusSelector :hide-prefix="true" clearable />
+                    <ProjectStatusSelector v-model:id="statusIdFilter" :hide-prefix="true" clearable />
                 </th>
                 <th>
                     <TextFilterInput clearable size="small"
                         :placeholder="t('modules.project.components.ProjectsTable.header.filters.summary.placeholder')"
-                        v-model:value="projectSummaryFilter" @keydown-enter="onTextFilterKeyDownEnter" />
+                        v-model:value="summaryFilter" @keydown-enter="onTextFilterKeyDownEnter" />
                 </th>
                 <th>
                     <DateFilterSelect v-model:range="createdAtFilter" />
                 </th>
                 <th>
-                    <UserSelector hideAvatar clearable v-model:id="projectCreatedByUserIdFilter" />
+                    <UserSelector hideAvatar clearable v-model:id="createdByUserIdFilter" />
                 </th>
                 <th class="doneo-text-center">
                     <RefreshAddActionsColumn @refresh="onRefresh" @add="onAdd" />

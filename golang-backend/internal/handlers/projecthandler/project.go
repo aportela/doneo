@@ -113,6 +113,15 @@ func (h *ProjectHandler) Search(w http.ResponseWriter, r *http.Request) {
 		if request.Filter.Summary != nil {
 			filter.Summary = request.Filter.Summary
 		}
+		if request.Filter.TypeId != nil {
+			filter.TypeId = request.Filter.TypeId
+		}
+		if request.Filter.PriorityId != nil {
+			filter.PriorityId = request.Filter.PriorityId
+		}
+		if request.Filter.StatusId != nil {
+			filter.StatusId = request.Filter.StatusId
+		}
 		if request.Filter.CreatedAt != nil {
 			filter.CreatedAt = &domain.TimestampFilter{From: nil, To: nil}
 			if request.Filter.CreatedAt.From != nil {
