@@ -83,8 +83,8 @@
 <template>
     <n-input-group>
         <n-input :readonly="!editMode" v-model:value="editValue" :show-count="editMode && props.showCount"
-            :maxlength="props.maxLength" ref="keyRef" :disabled="props.disabled"
-            @click="() => { if (!editMode) { toggleMode(); } }" @keydown="onKeydown" />
+            :maxlength="props.maxLength" :disabled="props.disabled" @click="() => { if (!editMode) { toggleMode(); } }"
+            @keydown="onKeydown" />
         <n-button-group v-if="editMode">
             <n-tooltip trigger="hover">
                 <template #trigger>
