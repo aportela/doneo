@@ -12,6 +12,7 @@
     import { handleAPIError } from '../../../api/client/errorHandler';
 
     interface ProjectPrioritySelectorProps {
+        required?: boolean;
         placeholder?: string;
         clearable?: boolean;
         size?: SelectSize;
@@ -110,8 +111,8 @@
                 </n-icon>
             </template>
         </n-button>
-        <n-select filterable :clearable="props.clearable" v-model:value="projectPriorityId" :options="options"
-            :placeholder="props.placeholder" :size="props.size" :disabled="isDisabled" />
+        <n-select filterable :required="props.required" :clearable="props.clearable" v-model:value="projectPriorityId"
+            :options="options" :placeholder="props.placeholder" :size="props.size" :disabled="isDisabled" />
         <n-button secondary :disabled="true" class="doneo-cursor-default doneo-disable-opacity" v-if="state.ajaxErrors">
             <template #icon>
                 <n-icon color="red" :component="IconAlertCircle">

@@ -11,6 +11,7 @@
     import { handleAPIError } from '../../../api/client/errorHandler';
 
     interface UserSelectorProps {
+        required?: boolean;
         placeholder?: string;
         clearable?: boolean;
         size?: SelectSize;
@@ -86,8 +87,8 @@
                 </template>
             </n-button>
         </div>
-        <n-select filterable :clearable="props.clearable" v-model:value="userId" :options="options"
-            :placeholder="props.placeholder" :size="props.size" :disabled="isDisabled" />
+        <n-select filterable :required="props.required" :clearable="props.clearable" v-model:value="userId"
+            :options="options" :placeholder="props.placeholder" :size="props.size" :disabled="isDisabled" />
         <n-button secondary :disabled="true" class="doneo-cursor-default doneo-disable-opacity" v-if="state.ajaxErrors">
             <template #icon>
                 <n-icon color="red" :component="IconAlertCircle">
