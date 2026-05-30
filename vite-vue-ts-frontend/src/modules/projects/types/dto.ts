@@ -39,6 +39,9 @@ export type UpdateRequest = {
   status: {
     id: string;
   };
+  startedAt: number | null;
+  finishedAt: number | null;
+  dueAt: number | null;
 };
 
 type SearchRequestFilter = {
@@ -67,6 +70,10 @@ export type ProjectResponse = {
   status: ProjectStatusResponse;
   createdAt: number;
   createdBy: UserBaseResponse;
+  updatedAt?: number;
+  startedAt?: number;
+  finishedAt?: number;
+  dueAt?: number;
   tasksCount: number;
   permissionsCount: number;
   attachmentsCount: number;

@@ -1,8 +1,11 @@
 package projectrepository
 
 import (
+	"time"
+
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories"
+	"github.com/aportela/doneo/internal/utils"
 )
 
 func DomainToDTO(project domain.Project) projectDTO {
@@ -10,14 +13,14 @@ func DomainToDTO(project domain.Project) projectDTO {
 		ID:                     project.ID,
 		Key:                    project.Key,
 		Summary:                project.Summary,
-		Description:            project.Description,
+		Description:            utils.StrPtrToSQLNullStr(project.Description),
 		CreatorId:              project.CreatedBy.ID,
 		CreatorName:            project.CreatedBy.Name,
-		CreatedAt:              project.CreatedAt,
-		UpdatedAt:              project.UpdatedAt,
-		StartedAt:              project.StartedAt,
-		FinishedAt:             project.FinishedAt,
-		DueAt:                  project.DueAt,
+		CreatedAt:              project.CreatedAt.UnixMilli(),
+		UpdatedAt:              utils.TimePtrToSQLNullInt64(project.UpdatedAt),
+		StartedAt:              utils.TimePtrToSQLNullInt64(project.StartedAt),
+		FinishedAt:             utils.TimePtrToSQLNullInt64(project.FinishedAt),
+		DueAt:                  utils.TimePtrToSQLNullInt64(project.DueAt),
 		TypeId:                 project.Type.ID,
 		TypeName:               project.Type.Name,
 		TypeHexColor:           project.Type.HexColor,
@@ -38,13 +41,13 @@ func DTOToDomain(project projectDTO) domain.Project {
 		ID:                     project.ID,
 		Key:                    project.Key,
 		Summary:                project.Summary,
-		Description:            project.Description,
+		Description:            utils.SQLStrPtr(project.Description),
 		CreatedBy:              domain.UserBase{ID: project.CreatorId, Name: project.CreatorName},
-		CreatedAt:              project.CreatedAt,
-		UpdatedAt:              project.UpdatedAt,
-		StartedAt:              project.StartedAt,
-		FinishedAt:             project.FinishedAt,
-		DueAt:                  project.DueAt,
+		CreatedAt:              time.UnixMilli(project.CreatedAt),
+		UpdatedAt:              utils.SQLNullInt64ToTimePtr(project.UpdatedAt),
+		StartedAt:              utils.SQLNullInt64ToTimePtr(project.StartedAt),
+		FinishedAt:             utils.SQLNullInt64ToTimePtr(project.FinishedAt),
+		DueAt:                  utils.SQLNullInt64ToTimePtr(project.DueAt),
 		Type:                   domain.ProjectType{ID: project.TypeId, Name: project.TypeName, HexColor: project.TypeHexColor},
 		Priority:               domain.ProjectPriority{ID: project.PriorityId, Name: project.PriorityName, HexColor: project.PriorityHexColor},
 		Status:                 domain.ProjectStatus{ID: project.StatusId, Name: project.StatusName, HexColor: project.StatusHexColor},

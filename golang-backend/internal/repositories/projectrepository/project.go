@@ -43,12 +43,12 @@ func (projectRepository *projectRepository) Add(ctx context.Context, project pro
 		project.ID,
 		project.Key,
 		project.Summary,
-		utils.NullableStringToSQL(project.Description),
+		project.Description,
 		project.CreatorId,
 		project.CreatedAt,
-		utils.NullableInt64ToSQL(project.StartedAt),
-		utils.NullableInt64ToSQL(project.FinishedAt),
-		utils.NullableInt64ToSQL(project.DueAt),
+		project.StartedAt,
+		project.FinishedAt,
+		project.DueAt,
 		project.PriorityId,
 		project.StatusId,
 		project.TypeId,
@@ -100,11 +100,12 @@ func (projectRepository *projectRepository) Update(ctx context.Context, project 
         `,
 		project.Key,
 		project.Summary,
-		utils.NullableStringToSQL(project.Description),
+		project.Description,
+		// TODO: use received value
 		utils.CurrentMSTimestamp(),
-		utils.NullableInt64ToSQL(project.StartedAt),
-		utils.NullableInt64ToSQL(project.UpdatedAt),
-		utils.NullableInt64ToSQL(project.DueAt),
+		project.StartedAt,
+		project.FinishedAt,
+		project.DueAt,
 		project.PriorityId,
 		project.StatusId,
 		project.TypeId,
@@ -152,8 +153,6 @@ func (projectRepository *projectRepository) Delete(ctx context.Context, id strin
 
 func (projectRepository *projectRepository) Get(ctx context.Context, id string) (projectDTO, error) {
 	var project projectDTO
-	var description sql.NullString
-	var updated_at, started_at, finished_at, due_at sql.NullInt64
 	err := projectRepository.database.QueryRowContext(
 		ctx,
 		`
@@ -205,12 +204,12 @@ func (projectRepository *projectRepository) Get(ctx context.Context, id string) 
 		&project.ID,
 		&project.Key,
 		&project.Summary,
-		&description,
+		&project.Description,
 		&project.CreatedAt,
-		&updated_at,
-		&started_at,
-		&finished_at,
-		&due_at,
+		&project.UpdatedAt,
+		&project.StartedAt,
+		&project.FinishedAt,
+		&project.DueAt,
 		&project.StatusId,
 		&project.StatusName,
 		&project.StatusHexColor,
@@ -234,11 +233,6 @@ func (projectRepository *projectRepository) Get(ctx context.Context, id string) 
 		}
 		return projectDTO{}, err
 	}
-	project.Description = utils.SQLStrPtr(description)
-	project.UpdatedAt = utils.SQLInt64Ptr(updated_at)
-	project.StartedAt = utils.SQLInt64Ptr(started_at)
-	project.FinishedAt = utils.SQLInt64Ptr(finished_at)
-	project.DueAt = utils.SQLInt64Ptr(due_at)
 	return project, err
 }
 
@@ -360,18 +354,16 @@ func (projectRepository *projectRepository) Search(ctx context.Context, pager br
 	projects := make([]projectDTO, 0)
 	for rows.Next() {
 		var project projectDTO
-		var description sql.NullString
-		var updated_at, started_at, finished_at, due_at sql.NullInt64
 		if err := rows.Scan(
 			&project.ID,
 			&project.Key,
 			&project.Summary,
-			&description,
+			&project.Description,
 			&project.CreatedAt,
-			&updated_at,
-			&started_at,
-			&finished_at,
-			&due_at,
+			&project.UpdatedAt,
+			&project.StartedAt,
+			&project.FinishedAt,
+			&project.DueAt,
 			&project.StatusId,
 			&project.StatusName,
 			&project.StatusHexColor,
@@ -386,11 +378,6 @@ func (projectRepository *projectRepository) Search(ctx context.Context, pager br
 		); err != nil {
 			return nil, browser.Result{}, err
 		}
-		project.Description = utils.SQLStrPtr(description)
-		project.UpdatedAt = utils.SQLInt64Ptr(updated_at)
-		project.StartedAt = utils.SQLInt64Ptr(started_at)
-		project.FinishedAt = utils.SQLInt64Ptr(finished_at)
-		project.DueAt = utils.SQLInt64Ptr(due_at)
 		projects = append(projects, project)
 	}
 	var totalResults int

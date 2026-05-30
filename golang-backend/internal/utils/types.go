@@ -5,6 +5,14 @@ import (
 	"time"
 )
 
+func Int64PtrToTimePtr(msTimestamp *int64) *time.Time {
+	if msTimestamp == nil {
+		return nil
+	} else {
+		t := time.UnixMilli(*msTimestamp)
+		return &t
+	}
+}
 func TimePtrToSQLNullInt64(t *time.Time) sql.NullInt64 {
 	if t == nil {
 		return sql.NullInt64{Valid: false}
@@ -52,6 +60,18 @@ func SQLStrPtr(s sql.NullString) *string {
 	return nil
 }
 
+func StrPtrToSQLNullStr(s *string) sql.NullString {
+	if s != nil {
+		return sql.NullString{
+			Valid:  true,
+			String: *s,
+		}
+	} else {
+		return sql.NullString{
+			Valid: false,
+		}
+	}
+}
 func NullableInt64ToSQL(i *int64) interface{} {
 	if i != nil {
 		return i

@@ -8,6 +8,7 @@ import (
 	"github.com/aportela/doneo/internal/handlers/projectstatushandler"
 	"github.com/aportela/doneo/internal/handlers/projecttypehandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
+	"github.com/aportela/doneo/internal/utils"
 )
 
 func addRequestToDomain(request addRequest) domain.Project {
@@ -43,6 +44,9 @@ func updateRequestToDomain(request updateRequest) domain.Project {
 		Status: domain.ProjectStatus{
 			ID: request.Status.ID,
 		},
+		StartedAt:  utils.Int64PtrToTimePtr(request.StartedAt),
+		FinishedAt: utils.Int64PtrToTimePtr(request.FinishedAt),
+		DueAt:      utils.Int64PtrToTimePtr(request.DueAt),
 	}
 }
 
@@ -53,11 +57,11 @@ func DomainToResponse(project domain.Project) projectResponse {
 		Summary:                project.Summary,
 		Description:            project.Description,
 		CreatedBy:              userhandler.BaseDomainToBaseResponse(project.CreatedBy),
-		CreatedAt:              project.CreatedAt,
-		UpdatedAt:              project.UpdatedAt,
-		StartedAt:              project.StartedAt,
-		FinishedAt:             project.FinishedAt,
-		DueAt:                  project.DueAt,
+		CreatedAt:              project.CreatedAt.UnixMilli(),
+		UpdatedAt:              utils.TimePtrToInt64Ptr(project.UpdatedAt),
+		StartedAt:              utils.TimePtrToInt64Ptr(project.StartedAt),
+		FinishedAt:             utils.TimePtrToInt64Ptr(project.FinishedAt),
+		DueAt:                  utils.TimePtrToInt64Ptr(project.DueAt),
 		Type:                   projecttypehandler.DomainToResponse(project.Type),
 		Priority:               projectpriorityhandler.DomainToResponse(project.Priority),
 		Status:                 projectstatushandler.DomainToResponse(project.Status),

@@ -38,7 +38,7 @@ func (h *ProjectHandler) Add(w http.ResponseWriter, r *http.Request) {
 	project.ID = utils.UUID()
 	project.CreatedBy = domain.UserBase{}
 	project.CreatedBy.ID, _ = middlewares.GetUserIDFromContext(r.Context())
-	project.CreatedAt = time.Now().UnixMilli()
+	project.CreatedAt = time.Now()
 	err := h.service.Add(r.Context(), project)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to add project with ID %s: %w", request.ID, err))
@@ -61,7 +61,7 @@ func (h *ProjectHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	project := updateRequestToDomain(request)
 	project.ID = chi.URLParam(r, "id")
-	project.UpdatedAt = utils.CurrentMSTimestampPtr()
+	project.UpdatedAt = utils.NowToTimePtr()
 	err := h.service.Update(r.Context(), project)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to update project with ID %s: %w", project.ID, err))

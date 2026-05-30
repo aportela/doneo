@@ -38,6 +38,9 @@ type updateRequest struct {
 	Type        projectType     `json:"type"`
 	Priority    projectPriority `json:"priority"`
 	Status      projectStatus   `json:"status"`
+	StartedAt   *int64          `json:"startedAt"`
+	FinishedAt  *int64          `json:"finishedAt"`
+	DueAt       *int64          `json:"dueAt"`
 }
 
 type filterRequest struct {

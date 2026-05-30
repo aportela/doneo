@@ -173,7 +173,10 @@
                 },
                 status: {
                     id: project.value.status.id ?? ""
-                }
+                },
+                startedAt: project.value.startedAt?.msTimestamp ?? null,
+                finishedAt: project.value.finishedAt?.msTimestamp ?? null,
+                dueAt: project.value.dueAt?.msTimestamp ?? null,
             };
             const response: ProjectResponse = await projectService.update(payload);
             if (response.id === project.value.id) {

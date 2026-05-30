@@ -34,7 +34,12 @@ export class Project {
     this.priority = new ProjectPriority(data?.priority);
     this.status = new ProjectStatus(data?.status);
     this.createdAt = new IDate(data?.createdAt ?? new Date().getTime());
-    this.updatedAt = data?.createdAt ? new IDate(data?.createdAt) : undefined;
+    this.updatedAt = data?.updatedAt ? new IDate(data?.updatedAt) : undefined;
+    this.startedAt = data?.startedAt ? new IDate(data?.startedAt) : undefined;
+    this.finishedAt = data?.finishedAt
+      ? new IDate(data?.finishedAt)
+      : undefined;
+    this.dueAt = data?.dueAt ? new IDate(data?.dueAt) : undefined;
     this.createdBy = new UserBase(data?.createdBy);
     this.tasksCount = data?.tasksCount ?? 0;
     this.permissionsCount = data?.permissionsCount ?? 0;

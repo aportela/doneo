@@ -13,6 +13,11 @@ func CurrentMSTimestamp() int64 {
 	return time.Now().UnixMilli()
 }
 
+func CurrentTimePtr() *time.Time {
+	currentTime := time.Now()
+	return &currentTime
+}
+
 func CurrentMSTimestampPtr() *int64 {
 	currentTimeMS := time.Now().UnixMilli()
 	return &currentTimeMS
