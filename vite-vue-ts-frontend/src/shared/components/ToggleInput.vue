@@ -11,6 +11,7 @@
         maxLength?: number;
         disabled?: boolean;
         readOnly?: boolean;
+        clearable?: boolean;
         onConfirm?: (newValue: string | null) => void;
         onCancel?: () => void;
     };
@@ -20,6 +21,7 @@
         showCount: false,
         disabled: false,
         readOnly: false,
+        clearable: false,
     });
 
     const { t } = useI18n();
@@ -83,8 +85,8 @@
 <template>
     <n-input-group>
         <n-input :readonly="!editMode" v-model:value="editValue" :show-count="editMode && props.showCount"
-            :maxlength="props.maxLength" :disabled="props.disabled" @click="() => { if (!editMode) { toggleMode(); } }"
-            @keydown="onKeydown" />
+            :maxlength="props.maxLength" :disabled="props.disabled" :clearable="props.clearable"
+            @click="() => { if (!editMode) { toggleMode(); } }" @keydown="onKeydown" />
         <n-button-group v-if="editMode">
             <n-tooltip trigger="hover">
                 <template #trigger>
