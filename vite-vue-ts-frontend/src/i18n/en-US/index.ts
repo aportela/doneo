@@ -75,6 +75,11 @@ export default {
           placeholder: "select date",
         },
       },
+      pickers: {
+        ToggleDateTimePicker: {
+          placeholder: "Select date and time",
+        },
+      },
       table: {
         header: {
           columns: {
