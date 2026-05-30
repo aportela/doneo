@@ -2,7 +2,9 @@
     import { ref, computed, watch, nextTick } from 'vue';
     import { useRoute, useRouter } from 'vue-router';
 
-    import { NTabs, NTabPane, type TabsInst } from 'naive-ui';
+    import { NTabs, NTabPane, type TabsInst, NIcon } from 'naive-ui';
+
+    import { IconAlertTriangle } from '@tabler/icons-vue';
 
     import ProjectMetadataTab from '../components/ProjectMetadataTab.vue';
     import ProjectTasksTab from '../components/ProjectTasksTab.vue';
@@ -68,23 +70,25 @@
         <n-tab-pane name="permissions" display-directive="show:lazy">
             <template #tab>
                 {{ permissionsTabLabel }}
+                <n-icon :component="IconAlertTriangle" color="red" style="margin-left: 8px;"
+                    v-if="permissionCount < 1" />
             </template>
             <ProjectPermissionsTab :project-id="projectId" v-model:item-count="permissionCount" />
         </n-tab-pane>
-        <n-tab-pane name="notes" display-directive="show:lazy">
-            <template #tab>
-                {{ notesTabLabel }}
-            </template>
+        <n-tab-pane name="notes" :tab="notesTabLabel" display-directive="show:lazy">
             <ProjectNotesTab :project-id="projectId" v-model:item-count="noteCount" />
         </n-tab-pane>
-        <n-tab-pane name="attachments" :tab="attachmentsTabLabel" display-directive="show:lazy"
-            :key="attachmentsTabLabel">
+        <n-tab-pane name="attachments" :tab="attachmentsTabLabel" display-directive="show:lazy">
             <ProjectAttachmentsTab :project-id="projectId" v-model:item-count="attachmentCount" />
         </n-tab-pane>
-        <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy" :key="historyTabLabel">
+        <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy">
             <ProjectHistoryOperationsTab :project-id="projectId" v-model:item-count="historyOperationCount" />
         </n-tab-pane>
-        <n-tab-pane name="tasks" :tab="tasksTabLabel" display-directive="show:lazy" :key="tasksTabLabel">
+        <n-tab-pane name="tasks" display-directive="show:lazy">
+            <template #tab>
+                {{ tasksTabLabel }}
+                <n-icon :component="IconAlertTriangle" color="red" style="margin-left: 8px;" v-if="taskCount < 1" />
+            </template>
             <ProjectTasksTab :project-id="projectId" v-model:item-count="taskCount" />
         </n-tab-pane>
     </n-tabs>
