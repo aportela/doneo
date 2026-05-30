@@ -1,7 +1,7 @@
 <script setup lang="ts">
-    import { shallowRef, reactive, computed, onMounted, onBeforeUnmount } from 'vue';
+    import { ref, shallowRef, reactive, computed, onMounted, onBeforeUnmount } from 'vue';
 
-    import { NInputGroup, NButton, NSelect, NIcon, type SelectOption, type SelectSize } from 'naive-ui';
+    import { NInputGroup, NButton, NSelect, NIcon, type SelectOption, type SelectSize, type SelectInst } from 'naive-ui';
     import { IconAlertCircle } from '@tabler/icons-vue';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
@@ -11,6 +11,8 @@
     import { handleAPIError } from '../../../api/client/errorHandler';
 
     interface RoleSelectorProps {
+        autoFocus?: boolean;
+        required?: boolean;
         placeholder?: string;
         clearable?: boolean;
         size?: SelectSize;
@@ -18,6 +20,8 @@
     }
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
+
+    const selectInstRef = ref<SelectInst | null>(null)
 
     const isDisabled = computed(() => props.disabled || state.ajaxRunning);
 
@@ -32,6 +36,9 @@
         try {
             const response = await roleService.searchBase();
             options.value = response.roles.map((role: RoleBaseResponse) => ({ label: role.name, value: role.id }));
+            if (props.autoFocus) {
+                focus();
+            }
         } catch (error: unknown) {
             options.value.length = 0;
             state.ajaxErrors = true;
@@ -56,6 +63,12 @@
         }
     };
 
+    const focus = () => {
+        nextTick(() => {
+            selectInstRef.value?.focus();
+        });
+    };
+
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -74,8 +87,9 @@
 
 <template>
     <n-input-group>
-        <n-select filterable :clearable="props.clearable" v-model:value="roleId" :options="options"
-            :placeholder="props.placeholder" :size="props.size" :disabled="isDisabled" />
+        <n-select filterable ref="selectInstRef" :required="props.required" :clearable="props.clearable"
+            v-model:value="roleId" :options="options" :placeholder="props.placeholder" :size="props.size"
+            :disabled="isDisabled" />
         <n-button secondary :disabled="true" class="doneo-cursor-default doneo-disable-opacity" v-if="state.ajaxErrors">
             <template #icon>
                 <n-icon color="red" :component="IconAlertCircle">
