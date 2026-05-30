@@ -2,7 +2,7 @@
     import { ref, reactive, computed, onMounted, onBeforeUnmount, type CSSProperties, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSpin, NCard, NFlex, NButton, NForm, NFormItem, type FormInst, type FormRules, NIcon } from 'naive-ui';
+    import { NSpin, NCard, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconEdit, IconPlus } from '@tabler/icons-vue';
 
     import { ProjectPermission } from '../models/project-permission.ts';
@@ -36,6 +36,38 @@
 
     const projectPermissionFormRules: FormRules =
     {
+        user: {
+            id: {
+                required: true,
+                validator: (_rule: FormItemRule, value: string) => {
+                    if (state.ajaxRunning) {
+                        return true;
+                    }
+                    if (!value?.trim()) {
+                        return new Error(t("shared.warningMessages.fieldIsRequired"));
+                    } else {
+                        return true;
+                    }
+                },
+                trigger: ['blur'],
+            },
+        },
+        role: {
+            id: {
+                required: true,
+                validator: (_rule: FormItemRule, value: string) => {
+                    if (state.ajaxRunning) {
+                        return true;
+                    }
+                    if (!value?.trim()) {
+                        return new Error(t("shared.warningMessages.fieldIsRequired"));
+                    } else {
+                        return true;
+                    }
+                },
+                trigger: ['blur'],
+            },
+        },
     };
 
     const serverErrors = ref<Record<string, string>>({});
@@ -159,12 +191,14 @@
         </template>
         <n-form ref="projectPermissionFormRef" :model="projectPermission" :rules="projectPermissionFormRules"
             :disabled="state.ajaxRunning">
-            <n-form-item :label="t('modules.projectPermission.components.ProjectPermissionForm.inputs.user.label')">
-                <UserSelector v-model:id="projectPermission.user.id"
+            <n-form-item :label="t('modules.projectPermission.components.ProjectPermissionForm.inputs.user.label')"
+                path="user.id">
+                <UserSelector auto-focus required v-model:id="projectPermission.user.id"
                     :placeholder="t('modules.projectPermission.components.ProjectPermissionForm.inputs.user.placeholder')" />
             </n-form-item>
-            <n-form-item :label="t('modules.projectPermission.components.ProjectPermissionForm.inputs.role.label')">
-                <RoleSelector v-model:id="projectPermission.role.id"
+            <n-form-item :label="t('modules.projectPermission.components.ProjectPermissionForm.inputs.role.label')"
+                path="role.id">
+                <RoleSelector required v-model:id="projectPermission.role.id"
                     :placeholder="t('modules.projectPermission.components.ProjectPermissionForm.inputs.role.placeholder')" />
             </n-form-item>
         </n-form>
