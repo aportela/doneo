@@ -196,9 +196,8 @@
 
     <n-card :title="t('modules.projectStatus.components.ManageProjectStatusesPage.header.title')">
         <ProjectStatusesTable :projectStatuses="filteredItems" :loading="state.ajaxRunning" @refresh="onRefresh"
-            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" @textfilter-keydown-enter="onRefresh"
-            :sort-field="sort.field" :sort-order="sort.order" @toggle-sort="onToggleSort"
-            v-model:project-status-name-filter="nameFilter" />
+            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" :sort-field="sort.field"
+            :sort-order="sort.order" @toggle-sort="onToggleSort" v-model:project-status-name-filter="nameFilter" />
     </n-card>
 </template>
 
