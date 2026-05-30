@@ -8,6 +8,9 @@ export class IDate {
   }
 
   toLocaleString = () => {
+    if (this.date === null && this.msTimestamp !== null) {
+      this.date = new Date(this.msTimestamp);
+    }
     return this.date?.toLocaleString();
   };
 }
