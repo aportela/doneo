@@ -130,13 +130,13 @@
                 {{ project.updatedAt?.toLocaleString() }}
             </n-form-item>
             <n-form-item label="Started at" style="width: 12em">
-                {{ project.updatedAt?.toLocaleString() }}
+                {{ project.startedAt?.toLocaleString() }}
             </n-form-item>
             <n-form-item label="Finished at" style="width: 12em">
-                {{ project.updatedAt?.toLocaleString() }}
+                {{ project.finishedAt?.toLocaleString() }}
             </n-form-item>
             <n-form-item label="Due at" style="width: 12em">
-                {{ project.updatedAt?.toLocaleString() }}
+                {{ project.dueAt?.toLocaleString() }}
             </n-form-item>
         </n-flex>
         <n-form>

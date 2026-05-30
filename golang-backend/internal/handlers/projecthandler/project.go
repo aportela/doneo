@@ -61,6 +61,7 @@ func (h *ProjectHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	project := updateRequestToDomain(request)
 	project.ID = chi.URLParam(r, "id")
+	project.UpdatedAt = utils.CurrentMSTimestampPtr()
 	err := h.service.Update(r.Context(), project)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to update project with ID %s: %w", project.ID, err))

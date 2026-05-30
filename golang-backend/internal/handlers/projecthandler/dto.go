@@ -63,6 +63,10 @@ type projectResponse struct {
 	Description            *string                                        `json:"description"`
 	CreatedBy              userhandler.UserBaseResponse                   `json:"createdBy"`
 	CreatedAt              int64                                          `json:"createdAt"`
+	UpdatedAt              *int64                                         `json:"updatedAt"`
+	StartedAt              *int64                                         `json:"startedAt"`
+	FinishedAt             *int64                                         `json:"finishedAt"`
+	DueAt                  *int64                                         `json:"dueAt"`
 	Type                   projecttypehandler.ProjectTypeResponse         `json:"type"`
 	Priority               projectpriorityhandler.ProjectPriorityResponse `json:"priority"`
 	Status                 projectstatushandler.ProjectStatusResponse     `json:"status"`

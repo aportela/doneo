@@ -15,6 +15,9 @@ export class Project {
   status: ProjectStatus;
   createdAt: IDate;
   updatedAt?: IDate;
+  startedAt?: IDate;
+  finishedAt?: IDate;
+  dueAt?: IDate;
   createdBy: UserBase;
   tasksCount: number;
   permissionsCount: number;
@@ -31,6 +34,7 @@ export class Project {
     this.priority = new ProjectPriority(data?.priority);
     this.status = new ProjectStatus(data?.status);
     this.createdAt = new IDate(data?.createdAt ?? new Date().getTime());
+    this.updatedAt = data?.createdAt ? new IDate(data?.createdAt) : undefined;
     this.createdBy = new UserBase(data?.createdBy);
     this.tasksCount = data?.tasksCount ?? 0;
     this.permissionsCount = data?.permissionsCount ?? 0;
