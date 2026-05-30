@@ -112,6 +112,8 @@
         let markdown = plain
 
         if (html) {
+
+            // TODO: if we paste code, some markdown is escaped & fail next with hljs
             markdown = toMarkdown(html)
         }
 
