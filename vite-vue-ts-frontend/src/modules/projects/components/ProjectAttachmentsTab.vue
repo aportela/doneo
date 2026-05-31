@@ -1,13 +1,14 @@
 <script setup lang="ts">
-    import type { CSSProperties } from "vue";
+    import { ref, type CSSProperties } from "vue";
     import { useI18n } from "vue-i18n";
 
-    import { NCard } from "naive-ui";
+    import { NCard, NButton } from "naive-ui";
 
     import { UserBase } from "../../users/models/user.ts";
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
     import AvatarUserName from "../../../shared/components/AvatarUserName.vue";
+    import UploadDialog from "../../attachments/components/UploadDialog.vue";
 
     interface ProjectAttachmentsProps {
         style?: string | CSSProperties;
@@ -22,9 +23,14 @@
 
     const itemCount = defineModel<number>("itemCount", { default: 0 });
     itemCount.value = 0;
+
+    const showUploadDialog = ref<boolean>(false);
 </script>
 
 <template>
+
+    <UploadDialog v-model:show="showUploadDialog" />
+    <n-button @click="showUploadDialog = true">add attachment</n-button>
     <n-card bordered :style="props.style">
         <ManageTable size="small">
             <template #thead>
