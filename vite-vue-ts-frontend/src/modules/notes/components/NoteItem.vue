@@ -33,11 +33,11 @@
 
     const onConfirmDelete = () => {
         dialog.warning({
-            title: t("modules.projectPriority.components.ProjectPrioritiesTable.dialogs.deleteConfirmation.title"),
+            title: t("modules.note.components.NoteItem.dialogs.deleteConfirmation.title"),
             icon: renderIcon(IconTrash)(24),
             content: () =>
                 h('div', [
-                    t("modules.projectPriority.components.ProjectPrioritiesTable.dialogs.deleteConfirmation.message", { name: "AAAAAAA" }),
+                    t("modules.note.components.NoteItem.dialogs.deleteConfirmation.message"),
                     h('br'),
                     h('br'),
                     t("shared.components.dialogs.confirmation.continueMessage"),

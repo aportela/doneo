@@ -432,6 +432,18 @@ export default {
         },
       },
     },
+    note: {
+      components: {
+        NoteItem: {
+          dialogs: {
+            deleteConfirmation: {
+              title: "Delete note",
+              message: "You are about to delete the note from the system.",
+            },
+          },
+        },
+      },
+    },
     projectPriority: {
       components: {
         ProjectPriorityForm: {
