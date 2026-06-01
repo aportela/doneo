@@ -146,7 +146,6 @@ var installSchemaQueries = []string{
 			attachment_id TEXT NOT NULL CHECK(length(attachment_id) == 36),
 			PRIMARY KEY (id),
 			FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE,
-			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 			FOREIGN KEY(attachment_id) REFERENCES attachments(id) ON DELETE CASCADE
 		) STRICT;
 	`,
