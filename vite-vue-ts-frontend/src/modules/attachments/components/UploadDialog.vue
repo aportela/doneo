@@ -4,6 +4,12 @@
 
     import { useSessionStore } from '../../../stores/session';
 
+    interface UploadDialogProps {
+        projectId: string;
+    };
+
+    const props = defineProps<UploadDialogProps>();
+
     const sessionStore = useSessionStore();
 
     const show = defineModel<boolean>("show");
@@ -19,7 +25,7 @@
         formData.append('file', file.file as Blob)
 
         const xhr = new XMLHttpRequest()
-        xhr.open('POST', '/api/attachments/')
+        xhr.open('POST', `/api/projects/${props.projectId}/attachments/`)
 
         const headerObj = typeof headers === 'function' ? headers({ file }) : headers
         if (headerObj) {
