@@ -171,6 +171,7 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		r.Delete("/{id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", projectNoteHandler.DeleteProjectNote)
 
 		r.Get("/{id:"+uuidPattern+"}/attachments", projectAttachmentHandler.GetProjectAttachments)
+		r.Get("/{id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", projectAttachmentHandler.DownloadProjectAttachment)
 		r.Post("/{id:"+uuidPattern+"}/attachments/", projectAttachmentHandler.AddProjectAttachment)
 		r.Delete("/{id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", projectAttachmentHandler.DeleteProjectAttachment)
 	})

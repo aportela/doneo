@@ -116,6 +116,45 @@ func (handler *AttachmentHandler) DeleteProjectAttachment(w http.ResponseWriter,
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
 
+func (handler *AttachmentHandler) DownloadProjectAttachment(w http.ResponseWriter, r *http.Request) {
+
+	//projectId := chi.URLParam(r, "id")
+	attachmentId := chi.URLParam(r, "attachment_id")
+
+	attachment, err := handler.service.GetAttachment(r.Context(), attachmentId)
+	if err != nil {
+		// TODO: works with custom errors (like notFound / 404) ?
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	ext := filepath.Ext(attachment.OriginalName)
+
+	filename := attachment.ID + ext
+
+	dir := filepath.Join(
+		handler.basePath,
+		string(attachment.ID[len(attachment.ID)-2]),
+		string(attachment.ID[len(attachment.ID)-1]),
+	)
+
+	attachmentPath := filepath.Join(dir, filename)
+
+	_, err = os.Stat(attachmentPath)
+
+	if err == nil {
+
+		// TODO: allow previews
+		w.Header().Set("Content-Disposition", `attachment; filename="`+attachment.OriginalName+`"`)
+		w.Header().Set("Content-Type", attachment.ContentType)
+
+		http.ServeFile(w, r, attachmentPath)
+	} else {
+		// TODO: register error ?, attachment found in database but missing on disk
+		handlers.ToHandlerJSONResponse(w, nil, err, http.StatusNotFound)
+	}
+}
+
 func (handler *AttachmentHandler) GetProjectAttachments(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectId := chi.URLParam(r, "id")
