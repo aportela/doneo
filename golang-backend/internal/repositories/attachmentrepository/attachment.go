@@ -8,12 +8,13 @@ import (
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/utils"
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
 )
 
 type AttachmentRepository interface {
-	AddAttachment(ctx context.Context, attachment attachmentDTO) error
+	AddProjectAttachment(ctx context.Context, projectId string, attachment attachmentDTO) error
 	DeleteAttachment(ctx context.Context, id string) error
 }
 
@@ -25,8 +26,20 @@ func NewAttachmentRepository(database database.Database) AttachmentRepository {
 	return &attachmentRepository{database: database}
 }
 
-func (attachmentRepository *attachmentRepository) AddAttachment(ctx context.Context, attachment attachmentDTO) error {
-	_, err := attachmentRepository.database.ExecContext(
+func (attachmentRepository *attachmentRepository) AddProjectAttachment(ctx context.Context, projectId string, attachment attachmentDTO) error {
+	tx, err := attachmentRepository.database.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+	_, err = attachmentRepository.database.ExecContext(
 		ctx,
 		`
             INSERT INTO attachments (id, original_name, content_type, size, user_id, created_at)
@@ -40,6 +53,7 @@ func (attachmentRepository *attachmentRepository) AddAttachment(ctx context.Cont
 		attachment.CreatedAt,
 	)
 	if err != nil {
+		// TODO: remove ?
 		fmt.Println(err.Error())
 		var sqlErr *sqlite.Error
 		if !errors.As(err, &sqlErr) {
@@ -54,6 +68,35 @@ func (attachmentRepository *attachmentRepository) AddAttachment(ctx context.Cont
 			}
 		}
 	}
+	_, err = attachmentRepository.database.ExecContext(
+		ctx,
+		`
+            INSERT INTO project_attachments (id, project_id, attachmnet_id)
+			VALUES (?, ?, ?, ?, ?, ?)
+        `,
+		utils.UUID(),
+		projectId,
+		attachment.ID,
+	)
+	if err != nil {
+		// TODO: remove ?
+		fmt.Println(err.Error())
+		var sqlErr *sqlite.Error
+		if !errors.As(err, &sqlErr) {
+			return err
+		}
+		switch sqlErr.Code() {
+		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
+			return &domain.ValidationError{Field: "id"}
+		case sqlite3.SQLITE_CONSTRAINT_CHECK:
+			if strings.Contains(sqlErr.Error(), "length(project_id)") {
+				return &domain.ValidationError{Field: "project_id"}
+			} else if strings.Contains(sqlErr.Error(), "length(attachmnet_id)") {
+				return &domain.ValidationError{Field: "attachmnet_id"}
+			}
+		}
+	}
+	err = attachmentRepository.database.Commit(tx)
 	return err
 }
 

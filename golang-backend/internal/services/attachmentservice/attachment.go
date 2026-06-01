@@ -8,7 +8,7 @@ import (
 )
 
 type AttachmentService interface {
-	AddAttachment(ctx context.Context, attachment domain.Attachment) error
+	AddProjectAttachment(ctx context.Context, projectId string, attachment domain.Attachment) error
 	DeleteAttachment(ctx context.Context, attachmentId string) error
 }
 
@@ -20,8 +20,8 @@ func NewAttachmentService(repository attachmentrepository.AttachmentRepository) 
 	return &attachmentService{repository: repository}
 }
 
-func (s *attachmentService) AddAttachment(ctx context.Context, attachment domain.Attachment) error {
-	return s.repository.AddAttachment(ctx, attachmentrepository.DomainToDTO(attachment))
+func (s *attachmentService) AddProjectAttachment(ctx context.Context, projectId string, attachment domain.Attachment) error {
+	return s.repository.AddProjectAttachment(ctx, projectId, attachmentrepository.DomainToDTO(attachment))
 }
 
 func (s *attachmentService) DeleteAttachment(ctx context.Context, attachmentId string) error {

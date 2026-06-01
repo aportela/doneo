@@ -14,6 +14,7 @@ import (
 	"github.com/aportela/doneo/internal/repositories/attachmentrepository"
 	"github.com/aportela/doneo/internal/services/attachmentservice"
 	"github.com/aportela/doneo/internal/utils"
+	"github.com/go-chi/chi/v5"
 )
 
 type AttachmentHandler struct {
@@ -27,7 +28,7 @@ func NewAttachmentHandler(db database.Database, basePath string) *AttachmentHand
 	return &AttachmentHandler{service: service, basePath: basePath}
 }
 
-func (h *AttachmentHandler) AddAttachment(w http.ResponseWriter, r *http.Request) {
+func (h *AttachmentHandler) AddProjectAttachment(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(32 << 20) // 32 MB
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -50,8 +51,6 @@ func (h *AttachmentHandler) AddAttachment(w http.ResponseWriter, r *http.Request
 		CreatedBy:    domain.UserBase{},
 	}
 	attachment.CreatedBy.ID, _ = middlewares.GetUserIDFromContext(r.Context())
-
-	attachment.CreatedBy.ID = "019e7f9a-0f54-769f-a518-cf8496cd4d74"
 
 	ext := filepath.Ext(header.Filename)
 
@@ -83,7 +82,9 @@ func (h *AttachmentHandler) AddAttachment(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = h.service.AddAttachment(r.Context(), attachment)
+	projectId := chi.URLParam(r, "id")
+
+	err = h.service.AddProjectAttachment(r.Context(), projectId, attachment)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

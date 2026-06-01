@@ -124,8 +124,8 @@ var installSchemaQueries = []string{
 		) STRICT;
 	`,
 	`
-		CREATE INDEX IF NOT EXISTS idx_project_note_project_id ON project_notes(project_id);
-		CREATE INDEX IF NOT EXISTS idx_project_note_user_id ON project_notes(user_id);
+		CREATE INDEX IF NOT EXISTS idx_project_notes_project_id ON project_notes(project_id);
+		CREATE INDEX IF NOT EXISTS idx_project_notes_user_id ON project_notes(user_id);
 	`,
 	`
 		CREATE TABLE IF NOT EXISTS attachments (
@@ -138,6 +138,20 @@ var installSchemaQueries = []string{
 			PRIMARY KEY (id),
 			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 		) STRICT;
+	`,
+	`
+		CREATE TABLE IF NOT EXISTS project_attachments (
+			id TEXT NOT NULL CHECK(length(id) == 36),
+			project_id TEXT NOT NULL CHECK(length(project_id) == 36),
+			attachment_id TEXT NOT NULL CHECK(length(attachment_id) == 36),
+			PRIMARY KEY (id),
+			FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE,
+			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+			FOREIGN KEY(attachment_id) REFERENCES attachments(id) ON DELETE CASCADE
+		) STRICT;
+	`,
+	`
+		CREATE INDEX IF NOT EXISTS idx_project_attachments_project_id ON project_attachments(project_id);
 	`,
 	/*
 		`

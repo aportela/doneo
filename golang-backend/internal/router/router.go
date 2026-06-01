@@ -71,12 +71,6 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		r.Get("/roles", roleHandler.SearchBase)
 	})
 
-	apiRouter.Route("/attachments", func(r chi.Router) {
-		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
-		attachmentHandler := attachmenthandler.NewAttachmentHandler(db, cfg.Storage.AttachmentsPath)
-		r.Post("/", attachmentHandler.AddAttachment)
-	})
-
 	apiRouter.Route("/users", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
@@ -159,7 +153,8 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
 		projectHandler := projecthandler.NewProjectHandler(db)
 		projectPermissionHandler := projectpermissionhandler.NewProjectPermissionHandler(db)
-		noteHandler := notehandler.NewNoteHandler(db)
+		projectNoteHandler := notehandler.NewNoteHandler(db)
+		projectAttachmentHandler := attachmenthandler.NewAttachmentHandler(db, cfg.Storage.AttachmentsPath)
 		r.Post("/", projectHandler.Add)
 		r.Post("/search", projectHandler.Search)
 		r.Get("/{id:"+uuidPattern+"}", projectHandler.Get)
@@ -170,10 +165,12 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		r.Post("/{id:"+uuidPattern+"}/permissions/", projectPermissionHandler.Add)
 		r.Delete("/{id:"+uuidPattern+"}/permissions/{permission_id:"+uuidPattern+"}", projectPermissionHandler.Delete)
 
-		r.Get("/{id:"+uuidPattern+"}/notes", noteHandler.SearchProjectNotes)
-		r.Post("/{id:"+uuidPattern+"}/notes/", noteHandler.AddProjectNote)
-		r.Put("/{id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", noteHandler.UpdateProjectNote)
-		r.Delete("/{id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", noteHandler.DeleteProjectNote)
+		r.Get("/{id:"+uuidPattern+"}/notes", projectNoteHandler.SearchProjectNotes)
+		r.Post("/{id:"+uuidPattern+"}/notes/", projectNoteHandler.AddProjectNote)
+		r.Put("/{id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", projectNoteHandler.UpdateProjectNote)
+		r.Delete("/{id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", projectNoteHandler.DeleteProjectNote)
+
+		r.Post("/{id:"+uuidPattern+"}/attachments/", projectAttachmentHandler.AddProjectAttachment)
 	})
 
 	// TODO: 404 route ?
