@@ -8,7 +8,6 @@ import (
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"github.com/aportela/doneo/internal/utils"
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
 )
@@ -72,10 +71,9 @@ func (attachmentRepository *attachmentRepository) AddProjectAttachment(ctx conte
 	_, err = tx.ExecContext(
 		ctx,
 		`
-            INSERT INTO project_attachments (id, project_id, attachment_id)
-			VALUES (?, ?, ?)
+            INSERT INTO project_attachments (project_id, attachment_id)
+			VALUES (?, ?)
         `,
-		utils.UUID(),
 		projectId,
 		attachment.ID,
 	)

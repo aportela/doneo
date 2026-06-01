@@ -141,16 +141,12 @@ var installSchemaQueries = []string{
 	`,
 	`
 		CREATE TABLE IF NOT EXISTS project_attachments (
-			id TEXT NOT NULL CHECK(length(id) == 36),
 			project_id TEXT NOT NULL CHECK(length(project_id) == 36),
 			attachment_id TEXT NOT NULL CHECK(length(attachment_id) == 36),
-			PRIMARY KEY (id),
+			PRIMARY KEY (project_id, attachment_id),
 			FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE,
 			FOREIGN KEY(attachment_id) REFERENCES attachments(id) ON DELETE CASCADE
 		) STRICT;
-	`,
-	`
-		CREATE INDEX IF NOT EXISTS idx_project_attachments_project_id ON project_attachments(project_id);
 	`,
 	/*
 		`
