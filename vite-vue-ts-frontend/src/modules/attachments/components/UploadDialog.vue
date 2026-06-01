@@ -71,11 +71,11 @@
             <div style="height: 90vh;">
                 <n-upload multiple directory-dnd :max="5" list-type="image" :custom-request="uploadFile"
                     @finish="onUploadFinish">
-                    <n-upload-dragger style="height: 40vh;">
+                    <n-upload-dragger class="doneo-upload-dragger">
                         <div style=" margin-bottom: 12px">
-                            <n-icon size="48" :depth="3" :component="IconUpload" />
+                            <n-icon size="64" :depth="3" :component="IconUpload" />
                         </div>
-                        <n-text style="font-size: 16px">
+                        <n-text style="font-size: 24px">
                             Click or drag a file to this area to upload
                         </n-text>
                     </n-upload-dragger>
@@ -85,4 +85,12 @@
     </n-modal>
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+    .doneo-upload-dragger {
+        height: 40vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
