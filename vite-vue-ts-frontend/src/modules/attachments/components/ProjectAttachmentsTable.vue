@@ -57,7 +57,10 @@
         },
     ]);
 
-    const nameFilter = defineModel<string>("userFilter", {
+    const nameFilter = defineModel<string>("nameFilter", {
+        default: "",
+    });
+    const userFilter = defineModel<string>("userFilter", {
         default: "",
     });
 
@@ -109,7 +112,7 @@
                 <th></th>
                 <th></th>
                 <th>
-                    <UserSelector hideAvatar clearable
+                    <UserSelector hideAvatar clearable v-model:id="userFilter"
                         :placeholder="t('modules.projectAttachment.components.projectAttachmentsTable.filters.user.placeholder')" />
                 </th>
                 <th class="doneo-text-center">

@@ -42,15 +42,18 @@
 
     const filterByUser = ref<string>("");
 
-    const userFilter = computed(() =>
-        filterByUser.value?.toLowerCase() ?? ''
+    const filterByName = ref<string>("");
+
+    const nameFilter = computed(() =>
+        filterByName.value?.toLowerCase() ?? ''
     );
 
     const filteredAttachments = computed(() => {
         return items.value.filter((permission) => {
-            const userName = permission.createdBy?.name?.toLowerCase();
+            const fileName = permission.name?.toLowerCase();
             return (
-                (!userFilter.value || userName?.includes(userFilter.value))
+                (!nameFilter.value || fileName?.includes(nameFilter.value)) &&
+                (!filterByUser.value || filterByUser.value === permission.createdBy.id)
             );
         });
     });
@@ -169,7 +172,8 @@
     <UploadDialog v-if="props.projectId" v-model:show="showUploadDialog" :project-id="props.projectId" />
     <n-card bordered :style="props.style">
         <ProjectAttachmentsTable :project-attachments="filteredAttachments" :loading="state.ajaxRunning"
-            @refresh="onRefresh" @add="onShowUploadDialog" @delete="onDelete" v-model:user-filter="filterByUser" />
+            v-model:name-filter="filterByName" v-model:user-filter="filterByUser" @refresh="onRefresh"
+            @add="onShowUploadDialog" @delete="onDelete" />
     </n-card>
 </template>
 
