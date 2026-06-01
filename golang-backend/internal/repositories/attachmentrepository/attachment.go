@@ -2,6 +2,7 @@ package attachmentrepository
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"strings"
@@ -13,6 +14,7 @@ import (
 )
 
 type AttachmentRepository interface {
+	GetAttachment(ctx context.Context, attachmentId string) (attachmentDTO, error)
 	AddProjectAttachment(ctx context.Context, projectId string, attachment attachmentDTO) error
 	DeleteProjectAttachment(ctx context.Context, projectId string, attachmentId string) error
 	GetProjectAttachments(ctx context.Context, projectId string) ([]attachmentDTO, error)
@@ -24,6 +26,28 @@ type attachmentRepository struct {
 
 func NewRepository(database database.Database) AttachmentRepository {
 	return &attachmentRepository{database: database}
+}
+
+func (repository *attachmentRepository) GetAttachment(ctx context.Context, id string) (attachmentDTO, error) {
+	var attachment attachmentDTO
+	err := repository.database.QueryRowContext(
+		ctx,
+		`
+            SELECT
+				A.id, A.user_id, U.name, A.created_at, A.original_name, A.content_type, A.size
+            FROM project_attachments PA
+			INNER JOIN attachments A ON A.id = PA.attachment_id
+			INNER JOIN users U ON U.id = A.user_id
+            WHERE A.id = ?
+        `,
+		id).Scan(&attachment.ID, &attachment.UserId, &attachment.UserName, &attachment.CreatedAt, &attachment.OriginalName, &attachment.ContentType, &attachment.Size)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return attachmentDTO{}, domain.NotFoundError
+		}
+		return attachmentDTO{}, err
+	}
+	return attachment, err
 }
 
 func (repository *attachmentRepository) AddProjectAttachment(ctx context.Context, projectId string, attachment attachmentDTO) error {

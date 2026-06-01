@@ -92,6 +92,13 @@ func (handler *AttachmentHandler) AddProjectAttachment(w http.ResponseWriter, r 
 		return
 	}
 
+	attachment, err = handler.service.GetAttachment(r.Context(), attachment.ID)
+	if err != nil {
+		// TODO: works with custom errors (like notFound / 404) ?
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	handlers.ToHandlerJSONResponse(w, domainToResponse(attachment), nil)

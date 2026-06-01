@@ -9,6 +9,7 @@ import (
 )
 
 type AttachmentService interface {
+	GetAttachment(ctx context.Context, id string) (domain.Attachment, error)
 	AddProjectAttachment(ctx context.Context, projectId string, attachment domain.Attachment) error
 	DeleteProjectAttachment(ctx context.Context, projectId string, attachmentId string) error
 	GetProjectAttachments(ctx context.Context, projectId string) ([]domain.Attachment, error)
@@ -22,6 +23,13 @@ func NewService(repository attachmentrepository.AttachmentRepository) Attachment
 	return &attachmentService{repository: repository}
 }
 
+func (service *attachmentService) GetAttachment(ctx context.Context, id string) (domain.Attachment, error) {
+	attachment, err := service.repository.GetAttachment(ctx, id)
+	if err != nil {
+		return domain.Attachment{}, fmt.Errorf("[AttachmentService] failed to get attachment with ID %s: %w", id, err)
+	}
+	return attachmentrepository.DTOToDomain(attachment), nil
+}
 func (service *attachmentService) AddProjectAttachment(ctx context.Context, projectId string, attachment domain.Attachment) error {
 	return service.repository.AddProjectAttachment(ctx, projectId, attachmentrepository.DomainToDTO(attachment))
 }
@@ -33,7 +41,7 @@ func (service *attachmentService) DeleteProjectAttachment(ctx context.Context, p
 func (service *attachmentService) GetProjectAttachments(ctx context.Context, projectId string) ([]domain.Attachment, error) {
 	attachments, err := service.repository.GetProjectAttachments(ctx, projectId)
 	if err != nil {
-		return nil, fmt.Errorf("[ProjectTypeService] failed to get project attachments: %w", err)
+		return nil, fmt.Errorf("[AttachmentService] failed to get project attachments: %w", err)
 	}
 	return attachmentrepository.DTOArrayToDomainArray(attachments), nil
 }
