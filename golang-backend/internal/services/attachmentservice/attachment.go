@@ -35,6 +35,7 @@ func (service *attachmentService) AddProjectAttachment(ctx context.Context, proj
 }
 
 func (service *attachmentService) DeleteProjectAttachment(ctx context.Context, projectId string, attachmentId string) error {
+	// TODO: remove data/attachments
 	return service.repository.DeleteProjectAttachment(ctx, projectId, attachmentId)
 }
 

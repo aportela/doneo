@@ -121,8 +121,7 @@ func (repository *attachmentRepository) AddProjectAttachment(ctx context.Context
 		}
 		return err
 	}
-	err = tx.Commit()
-	return err
+	return tx.Commit()
 }
 
 func (repository *attachmentRepository) DeleteProjectAttachment(ctx context.Context, projectId string, attachmentId string) error {
@@ -164,7 +163,12 @@ func (repository *attachmentRepository) DeleteProjectAttachment(ctx context.Cont
         `,
 		attachmentId,
 	)
-	return err
+	if err != nil {
+		// TODO: remove ?
+		fmt.Println(err.Error())
+		return err
+	}
+	return tx.Commit()
 }
 
 func (repository *attachmentRepository) GetProjectAttachments(ctx context.Context, projectId string) ([]attachmentDTO, error) {
