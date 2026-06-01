@@ -29,8 +29,8 @@
 
 <template>
 
-    <UploadDialog v-model:show="showUploadDialog" />
-    <n-button @click="showUploadDialog = true">add attachment</n-button>
+    <UploadDialog v-if="props.projectId" v-model:show="showUploadDialog" :project-id="props.projectId" />
+    <n-button v-if="props.projectId" @click="showUploadDialog = true">add attachment</n-button>
     <n-card bordered :style="props.style">
         <ManageTable size="small">
             <template #thead>
