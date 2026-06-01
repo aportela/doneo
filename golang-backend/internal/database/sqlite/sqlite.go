@@ -48,6 +48,18 @@ func (handler *Handler) Open(databaseConfiguration config.DatabaseConfiguration)
 	return nil
 }
 
+func (handler *Handler) Begin() (*sql.Tx, error) {
+	return handler.database.Begin()
+}
+
+func (handler *Handler) Commit(transaction *sql.Tx) error {
+	return transaction.Commit()
+}
+
+func (handler *Handler) Rollback(transaction *sql.Tx) error {
+	return transaction.Rollback()
+}
+
 func (handler *Handler) CreateSchema() error {
 
 	tx, err := handler.database.Begin()
