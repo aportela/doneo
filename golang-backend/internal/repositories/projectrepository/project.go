@@ -241,7 +241,7 @@ func (repository *projectRepository) Get(ctx context.Context, id string) (projec
 				IFNULL(PUR.permissions_count, 0) AS permissions_count,
 				IFNULL(PN.notes_count, 0) AS notes_count,
 				IFNULL(PA.attachments_count, 0) AS attachments_count,
-				0 AS history_operations_count,
+				IFNULL(PHO.history_operations_count, 0) AS history_operations_count,
 				0 AS tasks_count
             FROM projects P
 			INNER JOIN project_priorities PP ON PP.id = P.priority_id
@@ -263,6 +263,11 @@ func (repository *projectRepository) Get(ctx context.Context, id string) (projec
     			FROM project_attachments
     			GROUP BY project_id
 			) PA ON PA.project_id = P.id
+			LEFT JOIN (
+				SELECT project_id, COUNT(*) as history_operations_count
+				FROM project_history_operations
+				GROUP BY project_id
+			) PHO ON PHO.project_id = P.id
             WHERE P.id = ?
 			GROUP BY P.id
         `,
