@@ -19,6 +19,14 @@ export class ProjectAttachment {
     this.size = data?.size ?? 0;
   }
 
+  getDownloadURL = (projectId: string): string => {
+    return `/api/projects/${projectId}/attachments/${this.id}`;
+  };
+
+  getPreviewURL = (projectId: string): string => {
+    return `/api/projects/${projectId}/attachments/${this.id}`;
+  };
+
   toDTO(): AttachmentDTO {
     return {
       id: this.id ?? "",

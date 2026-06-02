@@ -19,13 +19,15 @@
 
     import UploadDialog from "../../attachments/components/UploadDialog.vue";
     import ProjectAttachmentsTable from "../../attachments/components/ProjectAttachmentsTable.vue";
+    import ImagePreview from "../../../shared/components/ImagePreview.vue";
 
     interface ProjectAttachmentsProps {
         style?: string | CSSProperties;
-        projectId: string | null;
+        projectId: string;
     }
 
     const props = defineProps<ProjectAttachmentsProps>();
+
     const emit = defineEmits(['delete']);
 
 
@@ -62,6 +64,12 @@
 
     const showUploadDialog = ref<boolean>(false);
 
+    const showImagePreviewDialog = ref<boolean>(false);
+
+    // TODO: filter only images
+    const imageSources = computed(() => items.value.map((item: ProjectAttachment) => item.getDownloadURL(props.projectId)));
+    const currentImagePreviewIndex = ref<number>(0);
+
     const selectedItem = ref<ProjectAttachment>(new ProjectAttachment());
 
     watch(state, (newValue: AjaxStateInterface) => {
@@ -88,40 +96,36 @@
     };
 
     const onRefresh = async () => {
-        if (props.projectId) {
-            Object.assign(state, defaultAjaxStateRunning);
-            try {
-                const results: SearchResponse = await projectAttachmentService.getProjectAttachments(props.projectId);
-                items.value = results.attachments.map((attachment) => new ProjectAttachment(attachment));
-                itemCount.value = items.value?.length ?? 0;
-            } catch (error: unknown) {
-                state.ajaxErrors = true;
-                handleAPIError(error,
-                    (apiError) => {
-                        switch (apiError.response?.status) {
-                            case 401:
-                                state.ajaxErrors = false;
-                                appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectAttachmentsTab.onRefresh" } });
-                                break;
-                            default:
-                                state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
-                                break;
-                        }
-                    },
-                    (fatalError) => {
-                        state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
-                        console.error("Unhandled API error", { file: "ProjectAttachmentsTab.vue", method: "onRefresh" }, { err: fatalError });
-                    });
-            } finally {
-                state.ajaxRunning = false;
-            }
-        } else {
-            console.error("project id not set", { file: "ProjectAttachmentsTab.vue", method: "onRefresh" });
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const results: SearchResponse = await projectAttachmentService.getProjectAttachments(props.projectId);
+            items.value = results.attachments.map((attachment) => new ProjectAttachment(attachment));
+            itemCount.value = items.value?.length ?? 0;
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectAttachmentsTab.onRefresh" } });
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
+                    console.error("Unhandled API error", { file: "ProjectAttachmentsTab.vue", method: "onRefresh" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
         }
     };
 
     const onDelete = async (projectAttachment: ProjectAttachment, _index?: number) => {
-        if (props.projectId && projectAttachment.id) {
+        if (projectAttachment.id) {
             Object.assign(state, defaultAjaxStateRunning);
             try {
                 await projectAttachmentService.deleteProjectAttachment(props.projectId, projectAttachment.id);
@@ -154,16 +158,14 @@
                 state.ajaxRunning = false;
             }
         } else {
-            console.error("(project permission id || project id) not set", { file: "ProjectAttachmentsTab.vue", method: "onDelete" });
+            console.error("project attachment id not set", { file: "ProjectAttachmentsTab.vue", method: "onDelete" });
         }
     };
 
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
-        if (props.projectId) {
-            onRefresh();
-        }
+        onRefresh();
         stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
             if (payload.to.includes("ProjectAttachmentsTab.onRefresh")) {
                 onRefresh();
@@ -173,19 +175,29 @@
         });
     });
 
+    const onDownload = (projectAttachment: ProjectAttachment, index: number) => { };
+
+    const onPreview = (projectAttachment: ProjectAttachment, index: number) => {
+        // TODO: translate image index to real index (filtered images)
+
+        showImagePreviewDialog.value = true;
+    };
+
     onBeforeUnmount(() => {
         stopBusReauthListener();
     });
 </script>
 
 <template>
-
+    <ImagePreview v-model:show="showImagePreviewDialog" :sources="imageSources"
+        :current-index="currentImagePreviewIndex" />
     <UploadDialog v-if="props.projectId" v-model:show="showUploadDialog" :project-id="props.projectId"
         v-model:upload-count="uploadCount" />
     <n-card bordered :style="props.style">
-        <ProjectAttachmentsTable :project-attachments="filteredAttachments" :loading="state.ajaxRunning"
-            v-model:name-filter="filterByName" v-model:user-filter="filterByUser" @refresh="onRefresh"
-            @add="onShowUploadDialog" @delete="onDelete" />
+        <ProjectAttachmentsTable :project-id="props.projectId" :project-attachments="filteredAttachments"
+            :loading="state.ajaxRunning" v-model:name-filter="filterByName" v-model:user-filter="filterByUser"
+            @refresh="onRefresh" @add="onShowUploadDialog" @delete="onDelete" @download="onDownload"
+            @preview="onPreview" />
     </n-card>
 </template>
 

@@ -17,7 +17,9 @@
     import { formatBytes } from '../../../shared/composables/format.ts';
 
     interface Props {
+        // TODO: refactor to disabled
         loading: boolean;
+        projectId: string;
         projectAttachments: ProjectAttachment[];
         errorMessage?: string | null;
     }
@@ -25,7 +27,7 @@
     const { t } = useI18n();
     const dialog = useDialog();
 
-    const emit = defineEmits(['refresh', 'add', 'delete']);
+    const emit = defineEmits(['refresh', 'add', 'delete', 'download', 'preview']);
 
     const props = defineProps<Props>();
 
@@ -90,6 +92,14 @@
             },
         });
     };
+
+    const onDownload = (projectAttachment: ProjectAttachment, index: number) => {
+        emit("download", projectAttachment, index)
+    };
+
+    const onPreview = (projectAttachment: ProjectAttachment, index: number) => {
+        emit("preview", projectAttachment, index)
+    };
 </script>
 
 <template>
@@ -131,7 +141,10 @@
                         :user-name="projectAttachment.createdBy?.name ?? ''" />
                 </td>
                 <td class="doneo-text-center">
-                    <ManageTableActionButtons show-delete @delete="onConfirmDelete(projectAttachment, index)" />
+                    <ManageTableActionButtons show-delete show-download
+                        @delete="onConfirmDelete(projectAttachment, index)"
+                        @download="onDownload(projectAttachment, index)" @preview="onPreview(projectAttachment, index)"
+                        :disabled="props.loading" />
                 </td>
             </tr>
             <tr>
