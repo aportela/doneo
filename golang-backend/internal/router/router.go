@@ -63,6 +63,13 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		})
 	})
 
+	apiRouter.Route("/attachments", func(r chi.Router) {
+		// TODO: remove project, check attachment permissions on get
+		projectAttachmentHandler := attachmenthandler.NewHandler(db, cfg.Storage.AttachmentsPath)
+		r.Get("/project/{id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}", projectAttachmentHandler.DownloadProjectAttachment)
+
+	})
+
 	apiRouter.Route("/entities", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
 		userHandler := userhandler.NewHandler(db)
@@ -171,7 +178,6 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		r.Delete("/{id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", projectNoteHandler.DeleteProjectNote)
 
 		r.Get("/{id:"+uuidPattern+"}/attachments", projectAttachmentHandler.GetProjectAttachments)
-		r.Get("/{id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", projectAttachmentHandler.DownloadProjectAttachment)
 		r.Post("/{id:"+uuidPattern+"}/attachments/", projectAttachmentHandler.AddProjectAttachment)
 		r.Delete("/{id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", projectAttachmentHandler.DeleteProjectAttachment)
 	})
