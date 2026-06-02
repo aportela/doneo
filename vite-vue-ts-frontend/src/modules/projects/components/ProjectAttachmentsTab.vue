@@ -175,11 +175,10 @@
         });
     });
 
-    const onDownload = (projectAttachment: ProjectAttachment, index: number) => { };
+    const onDownload = (_projectAttachment: ProjectAttachment, _index: number) => { };
 
-    const onPreview = (projectAttachment: ProjectAttachment, index: number) => {
+    const onPreview = (_projectAttachment: ProjectAttachment, _index: number) => {
         // TODO: translate image index to real index (filtered images)
-
         showImagePreviewDialog.value = true;
     };
 
