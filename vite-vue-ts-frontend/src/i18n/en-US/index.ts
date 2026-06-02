@@ -157,6 +157,9 @@ export default {
       Download: {
         label: "Download",
       },
+      Preview: {
+        label: "Preview",
+      },
     },
     errorMessages: {
       Error: "Error",

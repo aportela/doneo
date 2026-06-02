@@ -2,7 +2,7 @@
     import { useI18n } from "vue-i18n";
 
     import { NButtonGroup, NButton, NIcon } from 'naive-ui';
-    import { IconEdit, IconTrash, IconDownload } from '@tabler/icons-vue';
+    import { IconEdit, IconTrash, IconDownload, IconEyeSearch } from '@tabler/icons-vue';
 
 
     interface UpdateDeleteActionsColumnProps {
@@ -10,14 +10,15 @@
         iconSize?: number;
         showUpdate?: boolean;
         updateDisabled?: boolean;
-        deleteDisabled?: boolean;
         showDelete?: boolean;
+        deleteDisabled?: boolean;
         showDownload?: boolean;
         downloadDisabled?: boolean;
-
+        showPreview?: boolean;
+        previewDisabled?: boolean;
     }
 
-    const emit = defineEmits(['update', 'delete', 'donwload'])
+    const emit = defineEmits(['update', 'delete', 'download', 'preview'])
 
     const props = withDefaults(defineProps<UpdateDeleteActionsColumnProps>(), {
         disabled: false,
@@ -28,6 +29,7 @@
         deleteDisabled: false,
         showDownload: false,
         downloadDisabled: false,
+        previewDisabled: false,
     });
 
     const { t } = useI18n();
@@ -41,7 +43,11 @@
     };
 
     const onDownload = () => {
-        emit("donwload");
+        emit("download");
+    };
+
+    const onPreview = () => {
+        emit("preview");
     };
 </script>
 
@@ -63,11 +69,19 @@
                 </n-icon>
             </template>
         </n-button>
-        <n-button @click="onDownload" :disabled="props.disabled || props.downloadDisabled" v-if="showDownload">
+        <n-button @click.prevent="onDownload" :disabled="props.disabled || props.downloadDisabled" v-if="showDownload">
             {{ t("shared.buttons.Download.label") }}
             <template #icon>
                 <n-icon :size="props.iconSize">
                     <IconDownload />
+                </n-icon>
+            </template>
+        </n-button>
+        <n-button @click.prevent="onPreview" :disabled="props.disabled || props.previewDisabled" v-if="showDownload">
+            {{ t("shared.buttons.Preview.label") }}
+            <template #icon>
+                <n-icon :size="props.iconSize">
+                    <IconEyeSearch />
                 </n-icon>
             </template>
         </n-button>
