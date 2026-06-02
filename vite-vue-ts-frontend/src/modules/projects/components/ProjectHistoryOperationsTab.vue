@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { shallowRef, reactive, onMounted, onBeforeUnmount, watch, type CSSProperties } from "vue";
+    import { shallowRef, reactive, onMounted, onBeforeUnmount, watch, type CSSProperties, type Component } from "vue";
     import { useI18n } from "vue-i18n";
 
     import { NCard, NTimeline, NTimelineItem, NIcon } from "naive-ui";
@@ -13,7 +13,7 @@
 
     import type { SearchResponse } from "../../project-history-operations/types/dto";
     import { ProjectHistoryOperation } from "../../project-history-operations/models/project-history-operation";
-    import { IconNews } from "@tabler/icons-vue";
+    import { IconSquarePlus, IconEdit, IconDeviceUnknown } from "@tabler/icons-vue";
     import AvatarUserName from "../../../shared/components/AvatarUserName.vue";
 
     interface ProjectNotesProps {
@@ -87,30 +87,25 @@
         stopBusReauthListener();
     });
 
+    const OperationIcons: Record<number, Component> = {
+        1: IconSquarePlus,
+        2: IconEdit
+    };
+
 </script>
 
 <template>
     <n-card bordered :style="props.style">
-        <n-timeline>
-            <n-timeline-item v-for="item, index in items" :key="index" type="error" :content="item.ToString()"
-                :time="item.createdAt.toLocaleString()">
+        <n-timeline size="large">
+            <n-timeline-item v-for="item, index in items" :key="index" :title="item.getOperationTypeLabel()"
+                :type="item.getNaiveUITimelineItemType()" :time="item.createdAt.toLocaleString()">
                 <template #icon>
-                    <n-icon :component="IconNews" />
+                    <n-icon :size="24" :component="OperationIcons[item.operationType] ?? IconDeviceUnknown" />
                 </template>
-                <template #footer>
-                    {{ item.createdAt.toLocaleString() }} by
+                <template #default>
                     <AvatarUserName :user-id="item.createdBy.id" :user-name="item.createdBy.name" />
                 </template>
             </n-timeline-item>
-            <!--
-            <n-timeline-item content="Oops" />
-            <n-timeline-item type="success" title="Success" content="success content" time="2018-04-03 20:46" />
-            <n-timeline-item type="error" content="Error content" time="2018-04-03 20:46" />
-            <n-timeline-item type="warning" title="Warning" content="warning content" time="2018-04-03 20:46" />
-            <n-timeline-item type="info" title="Info" content="info content" time="2018-04-03 20:46"
-                line-type="dashed" />
-            <n-timeline-item content="Oops" />
-            -->
         </n-timeline>
     </n-card>
 </template>

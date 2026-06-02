@@ -21,7 +21,7 @@ export class ProjectHistoryOperation {
     };
   }
 
-  ToString(): string {
+  getOperationTypeLabel(): string {
     switch (this.operationType) {
       case 1:
         return "project created";
@@ -29,6 +29,21 @@ export class ProjectHistoryOperation {
         return "project updated";
       default:
         return "unknown operation";
+    }
+  }
+  getNaiveUITimelineItemType():
+    | "default"
+    | "success"
+    | "info"
+    | "warning"
+    | "error" {
+    switch (this.operationType) {
+      case 1:
+        return "success";
+      case 2:
+        return "info";
+      default:
+        return "default";
     }
   }
 }
