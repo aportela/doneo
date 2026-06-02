@@ -20,11 +20,11 @@ export class ProjectAttachment {
   }
 
   getDownloadURL = (projectId: string): string => {
-    return `/api/projects/${projectId}/attachments/${this.id}`;
+    return `/api/attachments/project/${projectId}/attachment/${this.id}`;
   };
 
   getPreviewURL = (projectId: string): string => {
-    return `/api/projects/${projectId}/attachments/${this.id}`;
+    return `/api/attachments/project/${projectId}/attachment/${this.id}`;
   };
 
   toDTO(): AttachmentDTO {
