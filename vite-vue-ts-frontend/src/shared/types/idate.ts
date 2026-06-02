@@ -1,4 +1,5 @@
 export class IDate {
+  // TODO: readonly msTimestamp ?, remove nulls
   msTimestamp: number | null;
   date: Date | null;
 
