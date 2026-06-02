@@ -87,7 +87,7 @@ func (handler *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
-	cookie := http.Cookie{
+	refreshTokenCookie := http.Cookie{
 		Name:     "refresh_token",
 		Value:    "",
 		Path:     "/api/auth/renew-access-token",
@@ -96,7 +96,17 @@ func (handler *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteStrictMode,
 		Expires:  time.Now().Add(-time.Hour),
 	}
-	http.SetCookie(w, &cookie)
+	http.SetCookie(w, &refreshTokenCookie)
+	accessTokenCookie := http.Cookie{
+		Name:     "access_token",
+		Value:    "",
+		Path:     "/api/attachments/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		Expires:  time.Now().Add(-time.Hour),
+	}
+	http.SetCookie(w, &accessTokenCookie)
 	utils.ToJSONResponse(w, http.StatusOK, handlers.ToEmptyResponse())
 }
 
