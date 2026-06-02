@@ -64,6 +64,7 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 	})
 
 	apiRouter.Route("/attachments", func(r chi.Router) {
+		r.Use(middlewares.RequireJWTCookieAuthentication(cfg.Auth.SecretKey))
 		// TODO: remove project, check attachment permissions on get
 		projectAttachmentHandler := attachmenthandler.NewHandler(db, cfg.Storage.AttachmentsPath)
 		r.Get("/project/{id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}", projectAttachmentHandler.DownloadProjectAttachment)
