@@ -50,7 +50,7 @@ func (handler *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] failed to generate refresh token: %w", err))
 		return
 	}
-	cookie := http.Cookie{
+	refreshTokenCookie := http.Cookie{
 		Name:     "refresh_token",
 		Value:    refreshToken.Token,
 		Path:     "/api/auth/renew-access-token",
@@ -59,7 +59,17 @@ func (handler *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteStrictMode,
 		Expires:  refreshToken.ExpiresAt,
 	}
-	http.SetCookie(w, &cookie)
+	http.SetCookie(w, &refreshTokenCookie)
+	accessTokenCookie := http.Cookie{
+		Name:     "access_token",
+		Value:    accessToken.Token,
+		Path:     "/api/attachment/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		Expires:  refreshToken.ExpiresAt,
+	}
+	http.SetCookie(w, &accessTokenCookie)
 	utils.ToJSONResponse(w, http.StatusOK,
 		SignInResponse{
 			AccessToken:  TokenResponse{Token: accessToken.Token, ExpiresAt: accessToken.ExpiresAt.UnixMilli()},
@@ -119,6 +129,16 @@ func (handler *AuthHandler) RenewAccessToken(w http.ResponseWriter, r *http.Requ
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] failed to generate access token: %w", err))
 		return
 	}
+	accessTokenCookie := http.Cookie{
+		Name:     "access_token",
+		Value:    accessToken.Token,
+		Path:     "/api/attachment/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		Expires:  refreshToken.ExpiresAt,
+	}
+	http.SetCookie(w, &accessTokenCookie)
 	utils.ToJSONResponse(w, http.StatusOK,
 		RenewAccessTokenResponse{
 			User: userResponse{
