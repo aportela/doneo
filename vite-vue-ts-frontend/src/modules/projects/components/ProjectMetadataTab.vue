@@ -137,6 +137,12 @@
             const response: ProjectResponse = await projectService.update(payload);
             if (response.id === project.value.id) {
                 project.value = new Project(response);
+                project.value = new Project(response);
+                permissionCount.value = project.value.permissionsCount;
+                noteCount.value = project.value.notesCount;
+                attachmentCount.value = project.value.attachmentsCount;
+                historyOperationCount.value = project.value.historyOperationsCount;
+                taskCount.value = project.value.tasksCount;
             } else {
                 state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.updateError");
             }
