@@ -66,8 +66,16 @@
 
     const showImagePreviewDialog = ref<boolean>(false);
 
-    // TODO: filter only images
-    const imageSources = computed(() => items.value.map((item: ProjectAttachment) => item.getDownloadURL(props.projectId)));
+    const imageSources = computed<string[]>(() => items.value.filter((item: ProjectAttachment) => item.allowImagePreview()).map((item: ProjectAttachment) => item.getDownloadURL(props.projectId)));
+    const imageSourcesWithIds = computed(() => items.value.filter((item: ProjectAttachment) => item.allowImagePreview()).map((item: ProjectAttachment) => {
+        return (
+            {
+                id: item.id,
+                url: item.getDownloadURL(props.projectId),
+            });
+    }
+    ));
+
     const currentImagePreviewIndex = ref<number>(0);
 
     const selectedItem = ref<ProjectAttachment>(new ProjectAttachment());
@@ -178,7 +186,7 @@
     const onDownload = (_projectAttachment: ProjectAttachment, _index: number) => { };
 
     const onPreview = (_projectAttachment: ProjectAttachment, _index: number) => {
-        // TODO: translate image index to real index (filtered images)
+        currentImagePreviewIndex.value = imageSourcesWithIds.value.findIndex((item) => item.id == _projectAttachment.id);
         showImagePreviewDialog.value = true;
     };
 
