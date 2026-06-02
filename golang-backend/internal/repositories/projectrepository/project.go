@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
@@ -124,7 +125,6 @@ func (repository *projectRepository) Update(ctx context.Context, project project
 			_ = tx.Rollback()
 		}
 	}()
-
 	_, err = tx.ExecContext(
 		ctx,
 		`
@@ -201,15 +201,53 @@ func (repository *projectRepository) Update(ctx context.Context, project project
 }
 
 func (repository *projectRepository) Delete(ctx context.Context, id string) error {
-	_, err := repository.database.ExecContext(
+	tx, err := repository.database.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+
+	deletedAt := time.Now().UnixMilli()
+	_, err = repository.database.ExecContext(
 		ctx,
 		`
-            DELETE FROM projects
+            UPDATE projects SET
+				deleted_at = ?
 			WHERE id = ?
         `,
+		deletedAt,
 		id,
 	)
-	return err
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+	userId, _ := middlewares.GetUserIDFromContext(ctx)
+	_, err = tx.ExecContext(
+		ctx,
+		`
+			INSERT INTO project_history_operations
+				(project_id, operation_type, user_id, created_at)
+			VALUES
+				(?, ?, ?, ?)
+		`,
+		id,
+		domain.EventProjectDeleted,
+		userId,
+		deletedAt,
+	)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+	return tx.Commit()
 }
 
 func (repository *projectRepository) Get(ctx context.Context, id string) (projectDTO, error) {

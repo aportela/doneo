@@ -13,7 +13,7 @@
 
     import type { SearchResponse } from "../../project-history-operations/types/dto";
     import { ProjectHistoryOperation } from "../../project-history-operations/models/project-history-operation";
-    import { IconSquarePlus, IconEdit, IconDeviceUnknown } from "@tabler/icons-vue";
+    import { IconSquarePlus, IconEdit, IconDeviceUnknown, IconTrash, IconMessagePlus } from "@tabler/icons-vue";
     import AvatarUserName from "../../../shared/components/AvatarUserName.vue";
 
     interface ProjectNotesProps {
@@ -89,7 +89,11 @@
 
     const OperationIcons: Record<number, Component> = {
         1: IconSquarePlus,
-        2: IconEdit
+        2: IconEdit,
+        3: IconTrash,
+        4: IconMessagePlus,
+        5: IconMessagePlus,
+        6: IconTrash,
     };
 
 </script>

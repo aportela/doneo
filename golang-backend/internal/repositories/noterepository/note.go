@@ -5,17 +5,19 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/middlewares"
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
 )
 
 type NoteRepository interface {
 	AddProjectNote(ctx context.Context, projectId string, note noteDTO) error
-	UpdateProjectNote(ctx context.Context, note noteDTO) error
-	DeleteProjectNote(ctx context.Context, id string) error
+	UpdateProjectNote(ctx context.Context, projectId string, note noteDTO) error
+	DeleteProjectNote(ctx context.Context, projectId string, id string) error
 	GetProjectNotes(ctx context.Context, projectId string) ([]noteDTO, error)
 }
 
@@ -28,7 +30,19 @@ func NewRepository(database database.Database) NoteRepository {
 }
 
 func (repository *noteRepository) AddProjectNote(ctx context.Context, projectId string, note noteDTO) error {
-	_, err := repository.database.ExecContext(
+	tx, err := repository.database.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+	_, err = tx.ExecContext(
 		ctx,
 		`
             INSERT INTO project_notes (id, project_id, user_id, created_at, updated_at, body)
@@ -57,11 +71,40 @@ func (repository *noteRepository) AddProjectNote(ctx context.Context, projectId 
 			}
 		}
 	}
-	return err
+	_, err = tx.ExecContext(
+		ctx,
+		`
+			INSERT INTO project_history_operations
+				(project_id, operation_type, user_id, created_at)
+			VALUES
+				(?, ?, ?, ?)
+		`,
+		projectId,
+		domain.EventProjectNoteAdded,
+		note.UserId,
+		note.CreatedAt,
+	)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+	return tx.Commit()
 }
 
-func (repository *noteRepository) UpdateProjectNote(ctx context.Context, note noteDTO) error {
-	_, err := repository.database.ExecContext(
+func (repository *noteRepository) UpdateProjectNote(ctx context.Context, projectId string, note noteDTO) error {
+	tx, err := repository.database.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+	_, err = repository.database.ExecContext(
 		ctx,
 		`
             UPDATE project_notes SET
@@ -74,11 +117,45 @@ func (repository *noteRepository) UpdateProjectNote(ctx context.Context, note no
 		note.Body,
 		note.ID,
 	)
-	return err
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+	userId, _ := middlewares.GetUserIDFromContext(ctx)
+	_, err = tx.ExecContext(
+		ctx,
+		`
+			INSERT INTO project_history_operations
+				(project_id, operation_type, user_id, created_at)
+			VALUES
+				(?, ?, ?, ?)
+		`,
+		projectId,
+		domain.EventProjectNoteUpdated,
+		userId,
+		note.UpdatedAt,
+	)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+	return tx.Commit()
 }
 
-func (repository *noteRepository) DeleteProjectNote(ctx context.Context, id string) error {
-	_, err := repository.database.ExecContext(
+func (repository *noteRepository) DeleteProjectNote(ctx context.Context, projectId string, id string) error {
+	tx, err := repository.database.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+	_, err = repository.database.ExecContext(
 		ctx,
 		`
             DELETE FROM project_notes
@@ -87,7 +164,25 @@ func (repository *noteRepository) DeleteProjectNote(ctx context.Context, id stri
         `,
 		id,
 	)
-	return err
+	userId, _ := middlewares.GetUserIDFromContext(ctx)
+	_, err = tx.ExecContext(
+		ctx,
+		`
+			INSERT INTO project_history_operations
+				(project_id, operation_type, user_id, created_at)
+			VALUES
+				(?, ?, ?, ?)
+		`,
+		projectId,
+		domain.EventProjectNoteDeleted,
+		userId,
+		time.Now().UnixMilli(),
+	)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+	return tx.Commit()
 }
 
 func (repository *noteRepository) GetProjectNotes(ctx context.Context, projectId string) ([]noteDTO, error) {

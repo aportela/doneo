@@ -27,6 +27,14 @@ export class ProjectHistoryOperation {
         return "project created";
       case 2:
         return "project updated";
+      case 3:
+        return "project deleleted";
+      case 4:
+        return "project note added";
+      case 5:
+        return "project note updated";
+      case 6:
+        return "project note deleted";
       default:
         return "unknown operation";
     }
@@ -38,10 +46,18 @@ export class ProjectHistoryOperation {
     | "warning"
     | "error" {
     switch (this.operationType) {
-      case 1:
+      case 1: // add project
         return "success";
-      case 2:
+      case 2: // update project
         return "info";
+      case 3: // delete project
+        return "error";
+      case 4: // add note
+        return "success";
+      case 5: // update note
+        return "info";
+      case 6: // delete note
+        return "error";
       default:
         return "default";
     }

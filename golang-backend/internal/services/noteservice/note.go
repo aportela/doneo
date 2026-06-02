@@ -10,8 +10,8 @@ import (
 
 type NoteService interface {
 	AddProjectNote(ctx context.Context, projectId string, note domain.Note) error
-	UpdateProjectNote(ctx context.Context, note domain.Note) error
-	DeleteProjectNote(ctx context.Context, projectId string) error
+	UpdateProjectNote(ctx context.Context, projectId string, note domain.Note) error
+	DeleteProjectNote(ctx context.Context, projectId string, noteId string) error
 	GetProjectNotes(ctx context.Context, projectId string) ([]domain.Note, error)
 }
 
@@ -27,12 +27,12 @@ func (service *noteService) AddProjectNote(ctx context.Context, projectId string
 	return service.repository.AddProjectNote(ctx, projectId, noterepository.DomainToDTO(note))
 }
 
-func (service *noteService) UpdateProjectNote(ctx context.Context, note domain.Note) error {
-	return service.repository.UpdateProjectNote(ctx, noterepository.DomainToDTO(note))
+func (service *noteService) UpdateProjectNote(ctx context.Context, projectId string, note domain.Note) error {
+	return service.repository.UpdateProjectNote(ctx, projectId, noterepository.DomainToDTO(note))
 }
 
-func (service *noteService) DeleteProjectNote(ctx context.Context, projectId string) error {
-	return service.repository.DeleteProjectNote(ctx, projectId)
+func (service *noteService) DeleteProjectNote(ctx context.Context, projectId string, noteId string) error {
+	return service.repository.DeleteProjectNote(ctx, projectId, noteId)
 }
 
 func (service *noteService) GetProjectNotes(ctx context.Context, projectId string) ([]domain.Note, error) {

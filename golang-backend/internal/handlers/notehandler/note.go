@@ -59,10 +59,11 @@ func (handler *NoteHandler) UpdateProjectNote(w http.ResponseWriter, r *http.Req
 	note := updateRequestToDomain(request)
 	note.ID = chi.URLParam(r, "note_id")
 
+	projectId := chi.URLParam(r, "id")
 	// TODO: move to service ????
 	note.UpdatedAt = utils.NowToTimePtr()
 
-	err := handler.service.UpdateProjectNote(r.Context(), note)
+	err := handler.service.UpdateProjectNote(r.Context(), projectId, note)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to add note: %w", err))
 		return
@@ -72,8 +73,9 @@ func (handler *NoteHandler) UpdateProjectNote(w http.ResponseWriter, r *http.Req
 
 func (handler *NoteHandler) DeleteProjectNote(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	projectId := chi.URLParam(r, "id")
 	noteId := chi.URLParam(r, "note_id")
-	err := handler.service.DeleteProjectNote(r.Context(), noteId)
+	err := handler.service.DeleteProjectNote(r.Context(), projectId, noteId)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to delete note: %w", err))
 		return
