@@ -15,6 +15,7 @@ import (
 	"github.com/aportela/doneo/internal/handlers/authhandler"
 	"github.com/aportela/doneo/internal/handlers/notehandler"
 	"github.com/aportela/doneo/internal/handlers/projecthandler"
+	"github.com/aportela/doneo/internal/handlers/projecthistoryhandler"
 	"github.com/aportela/doneo/internal/handlers/projectpermissionhandler"
 	"github.com/aportela/doneo/internal/handlers/projectpriorityhandler"
 	"github.com/aportela/doneo/internal/handlers/projectstatushandler"
@@ -163,6 +164,7 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		projectPermissionHandler := projectpermissionhandler.NewHandler(db)
 		projectNoteHandler := notehandler.NewHandler(db)
 		projectAttachmentHandler := attachmenthandler.NewHandler(db, cfg.Storage.AttachmentsPath)
+		projectHistoryHandler := projecthistoryhandler.NewHandler(db, cfg.Storage.AttachmentsPath)
 		r.Post("/", projectHandler.Add)
 		r.Post("/search", projectHandler.Search)
 		r.Get("/{id:"+uuidPattern+"}", projectHandler.Get)
@@ -181,6 +183,8 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		r.Get("/{id:"+uuidPattern+"}/attachments", projectAttachmentHandler.GetProjectAttachments)
 		r.Post("/{id:"+uuidPattern+"}/attachments/", projectAttachmentHandler.AddProjectAttachment)
 		r.Delete("/{id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", projectAttachmentHandler.DeleteProjectAttachment)
+
+		r.Get("/{id:"+uuidPattern+"}/history_operations", projectHistoryHandler.GetProjectHistoryOperations)
 	})
 
 	// TODO: 404 route ?

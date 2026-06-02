@@ -10,6 +10,7 @@ import (
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/utils"
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
@@ -32,7 +33,19 @@ func NewRepository(database database.Database) ProjectRepository {
 }
 
 func (repository *projectRepository) Add(ctx context.Context, project projectDTO) error {
-	_, err := repository.database.ExecContext(
+	tx, err := repository.database.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+	_, err = tx.ExecContext(
 		ctx,
 		`
             INSERT INTO projects
@@ -78,11 +91,41 @@ func (repository *projectRepository) Add(ctx context.Context, project projectDTO
 			}
 		}
 	}
-	return err
+	_, err = tx.ExecContext(
+		ctx,
+		`
+			INSERT INTO project_history_operations
+				(project_id, operation_type, user_id, created_at)
+			VALUES
+				(?, ?, ?, ?)
+		`,
+		project.ID,
+		domain.EventProjectCreated,
+		project.CreatorId,
+		project.CreatedAt,
+	)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+	return tx.Commit()
 }
 
 func (repository *projectRepository) Update(ctx context.Context, project projectDTO) error {
-	_, err := repository.database.ExecContext(
+	tx, err := repository.database.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+
+	_, err = tx.ExecContext(
 		ctx,
 		`
             UPDATE projects SET
@@ -136,7 +179,25 @@ func (repository *projectRepository) Update(ctx context.Context, project project
 			}
 		}
 	}
-	return err
+	userId, _ := middlewares.GetUserIDFromContext(ctx)
+	_, err = tx.ExecContext(
+		ctx,
+		`
+			INSERT INTO project_history_operations
+				(project_id, operation_type, user_id, created_at)
+			VALUES
+				(?, ?, ?, ?)
+		`,
+		project.ID,
+		domain.EventProjectUpdated,
+		userId,
+		project.UpdatedAt,
+	)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+	return tx.Commit()
 }
 
 func (repository *projectRepository) Delete(ctx context.Context, id string) error {

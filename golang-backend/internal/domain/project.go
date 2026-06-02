@@ -34,3 +34,11 @@ type SearchProjectFilter struct {
 	CreatedAt       *TimestampFilter
 	CreatedByUserId *string
 }
+
+type ProjectEventType uint
+
+const (
+	EventProjectCreated ProjectEventType = 1
+	EventProjectUpdated ProjectEventType = 2
+	EventProjectDeleted ProjectEventType = 3
+)
