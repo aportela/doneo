@@ -1,6 +1,7 @@
 import type { AttachmentResponse as AttachmentDTO } from "../types/dto";
 import { UserBase } from "../../users/models/user";
 import { IDate } from "../../../shared/types/idate";
+import { isImage } from "../../../shared/composables/fileUtils";
 
 export class ProjectAttachment {
   id: string | null;
@@ -25,6 +26,10 @@ export class ProjectAttachment {
 
   getPreviewURL = (projectId: string): string => {
     return `/api/attachments/project/${projectId}/attachment/${this.id}`;
+  };
+
+  allowImagePreview = (): boolean => {
+    return isImage(this.name) ?? false;
   };
 
   toDTO(): AttachmentDTO {
