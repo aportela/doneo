@@ -5,4 +5,5 @@ export interface TableHeaderColumn {
   field: string;
   sortable: boolean;
   align?: TableHeaderColumnAlign;
+  visible?: boolean;
 }
