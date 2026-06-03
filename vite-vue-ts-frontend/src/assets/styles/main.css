@@ -55,12 +55,9 @@ td,
     text-align: center !important;
 }
 
-.doneo-table thead th:last-of-type {
-    max-width: 1px;
-}
-
-.doneo-table-header-click-action th:not(:last-of-type) .n-icon {
-    margin-top: 4px;
+.doneo-table thead th:last-of-type, .doneo-table tbody td:last-of-type, doneo-table tfoot th:last-of-type {
+    white-space: nowrap;
+    width: 1%;
 }
 
 .doneo-datetime-label-readonly {
