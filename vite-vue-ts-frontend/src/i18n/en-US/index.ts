@@ -809,6 +809,27 @@ export default {
         },
       },
     },
+    projectHistoryOperation: {
+      components: {
+        ProjectHistoryOperationsTable: {
+          header: {
+            columns: {
+              user: "User",
+              createdAt: "Created at",
+              operationType: "Operation type",
+            },
+          },
+          filters: {
+            user: {
+              placeholder: "search by user",
+            },
+          },
+          warnings: {
+            noItemsFound: "No project history operations found",
+          },
+        },
+      },
+    },
     project: {
       components: {
         NewProjectForm: {

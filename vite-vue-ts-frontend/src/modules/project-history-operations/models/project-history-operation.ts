@@ -35,6 +35,10 @@ export class ProjectHistoryOperation {
         return "project note updated";
       case 6:
         return "project note deleted";
+      case 7:
+        return "project attachment added";
+      case 8:
+        return "project attachment deleted";
       default:
         return "unknown operation";
     }
@@ -57,6 +61,10 @@ export class ProjectHistoryOperation {
       case 5: // update note
         return "info";
       case 6: // delete note
+        return "error";
+      case 7: // added attachment
+        return "success";
+      case 8: // delete attachment
         return "error";
       default:
         return "default";

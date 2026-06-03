@@ -82,7 +82,8 @@
             <ProjectAttachmentsTab :project-id="projectId" v-model:item-count="attachmentCount" />
         </n-tab-pane>
         <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy">
-            <ProjectHistoryOperationsTab :project-id="projectId" v-model:item-count="historyOperationCount" />
+            <ProjectHistoryOperationsTab :project-id="projectId" v-model:item-count="historyOperationCount"
+                :key="historyOperationCount" />
         </n-tab-pane>
         <n-tab-pane name="tasks" display-directive="show:lazy">
             <template #tab>

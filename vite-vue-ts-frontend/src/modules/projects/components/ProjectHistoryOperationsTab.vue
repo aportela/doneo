@@ -13,8 +13,9 @@
 
     import type { SearchResponse } from "../../project-history-operations/types/dto";
     import { ProjectHistoryOperation } from "../../project-history-operations/models/project-history-operation";
-    import { IconSquarePlus, IconEdit, IconDeviceUnknown, IconTrash, IconMessagePlus } from "@tabler/icons-vue";
+    import { IconSquarePlus, IconEdit, IconDeviceUnknown, IconTrash, IconMessagePlus, IconFileUpload } from "@tabler/icons-vue";
     import AvatarUserName from "../../../shared/components/AvatarUserName.vue";
+    import ProjectHistoryOperationsTable from "../../project-history-operations/components/ProjectHistoryOperationsTable.vue";
 
     interface ProjectNotesProps {
         style?: string | CSSProperties;
@@ -94,13 +95,15 @@
         4: IconMessagePlus,
         5: IconMessagePlus,
         6: IconTrash,
+        7: IconFileUpload,
+        8: IconTrash,
     };
 
 </script>
 
 <template>
     <n-card bordered :style="props.style">
-        <n-timeline size="large">
+        <n-timeline size="large" v-if="false">
             <n-timeline-item v-for="item, index in items" :key="index" :title="item.getOperationTypeLabel()"
                 :type="item.getNaiveUITimelineItemType()" :time="item.createdAt.toLocaleString()">
                 <template #icon>
@@ -111,6 +114,8 @@
                 </template>
             </n-timeline-item>
         </n-timeline>
+        <ProjectHistoryOperationsTable :project-id="props.projectId" :project-history-operations="items"
+            :loading="state.ajaxRunning" @refresh="onRefresh" />
     </n-card>
 </template>
 
