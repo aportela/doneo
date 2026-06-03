@@ -96,6 +96,13 @@ export default {
             actions: "Actions",
           },
         },
+        filters: {
+          button: {
+            clearFilters: {
+              label: "Clear filters",
+            },
+          },
+        },
       },
       pager: {
         selector: {

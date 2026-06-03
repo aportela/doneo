@@ -184,6 +184,15 @@
         deletedAtFilterRef.value?.reset();
     };
 
+    const hasFilters = computed<boolean>(() =>
+        userPermissionsFilter.value != UserPermissionFilterValue.Any ||
+        userNameFilter.value?.length > 0 ||
+        emailFilter.value?.length > 0 ||
+        createdAtFilter.value?.from != null || createdAtFilter.value?.to != null ||
+        updatedAtFilter.value?.from != null || updatedAtFilter.value?.to != null ||
+        deletedAtFilter.value?.from != null || deletedAtFilter.value?.to != null
+    );
+
 </script>
 
 <template>
@@ -232,11 +241,11 @@
                     <DateFilterSelect v-model:range="deletedAtFilter" ref="deletedAtFilterRef" />
                 </th>
                 <th>
-                    <n-button size="small" block @click="onClearFilters">
+                    <n-button size="small" block @click="onClearFilters" :disabled="props.loading || !hasFilters">
                         <template #icon>
                             <n-icon :component="IconFilterOff" />
                         </template>
-                        clear filters
+                        {{ t("shared.components.table.filters.button.clearFilters.label") }}
                     </n-button>
                 </th>
             </tr>
