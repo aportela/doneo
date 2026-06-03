@@ -36,17 +36,13 @@
     <n-button-group size="small">
         <n-button @click="onRefresh" v-if="!props.hideRefresh">
             <template #icon>
-                <n-icon :size="22">
-                    <IconRefresh />
-                </n-icon>
+                <n-icon :size="22" :component="IconRefresh" />
             </template>
             {{ t("shared.buttons.Refresh.label") }}
         </n-button>
         <n-button @click="onAdd" v-if="!props.hideAdd">
             <template #icon>
-                <n-icon :size="22">
-                    <IconPlus />
-                </n-icon>
+                <n-icon :size="22" :component="IconPlus" />
             </template>
             {{ t("shared.buttons.Add.label") }}
         </n-button>
