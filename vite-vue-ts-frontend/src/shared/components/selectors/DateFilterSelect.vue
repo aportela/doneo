@@ -175,6 +175,12 @@
     };
 
     const isSelectorVisible = computed(() => selectorValue.value !== 1);
+
+    const reset = () => {
+        onClearDate();
+    }
+
+    defineExpose({ reset });
 </script>
 
 <template>

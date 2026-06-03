@@ -98,6 +98,12 @@
         });
     };
 
+    const reset = () => {
+        projectPriorityId.value = null;
+    }
+
+    defineExpose({ reset });
+
     let stopBusReauthListener: () => void;
 
     onMounted(() => {

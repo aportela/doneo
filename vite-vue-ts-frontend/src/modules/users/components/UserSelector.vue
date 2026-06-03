@@ -72,6 +72,12 @@
         });
     };
 
+    const reset = () => {
+        userId.value = null;
+    }
+
+    defineExpose({ reset });
+
     let stopBusReauthListener: () => void;
 
     onMounted(() => {

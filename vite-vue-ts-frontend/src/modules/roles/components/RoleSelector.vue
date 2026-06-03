@@ -69,6 +69,12 @@
         });
     };
 
+    const reset = () => {
+        roleId.value = null;
+    }
+
+    defineExpose({ reset });
+
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
