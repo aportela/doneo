@@ -1,9 +1,9 @@
 <script setup lang="ts">
-    import { h, computed } from 'vue';
+    import { h, computed, ref } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { useDialog, NButtonGroup, NButton, NFlex, NEmpty, NIcon } from 'naive-ui';
-    import { IconUserKey, IconUser, IconEdit, IconTrash, IconTrashOff } from '@tabler/icons-vue';
+    import { IconUserKey, IconUser, IconEdit, IconTrash, IconTrashOff, IconFilterOff, IconFilter } from '@tabler/icons-vue';
 
     import { User } from '../models/user';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
@@ -40,31 +40,37 @@
             label: t("modules.user.components.UsersTable.header.columns.permissions"),
             field: "isSuperUser",
             sortable: true,
+            isFiltered: () => userPermissionsFilter.value != UserPermissionFilterValue.Any,
         },
         {
             label: t("modules.user.components.UsersTable.header.columns.name"),
             field: "name",
             sortable: true,
+            isFiltered: () => userNameFilter.value?.length > 0,
         },
         {
             label: t("modules.user.components.UsersTable.header.columns.email"),
             field: "email",
             sortable: true,
+            isFiltered: () => emailFilter.value?.length > 0,
         },
         {
             label: t("modules.user.components.UsersTable.header.columns.createdAt"),
             field: "createdAt",
             sortable: true,
+            isFiltered: () => createdAtFilter.value?.from != null || createdAtFilter.value?.to != null,
         },
         {
             label: t("modules.user.components.UsersTable.header.columns.updatedAt"),
             field: "updatedAt",
             sortable: true,
+            isFiltered: () => updatedAtFilter.value?.from != null || updatedAtFilter.value?.to != null,
         },
         {
             label: t("modules.user.components.UsersTable.header.columns.deletedAt"),
             field: "deletedAt",
             sortable: true,
+            isFiltered: () => deletedAtFilter.value?.from != null || deletedAtFilter.value?.to != null,
         },
     ]);
 
@@ -160,6 +166,24 @@
     const onTextFilterKeyDownEnter = () => {
         emit("textfilterKeydownEnter");
     };
+
+    interface DateFilterSelectComponent {
+        reset: () => void
+    };
+
+    const createdAtFilterRef = ref<DateFilterSelectComponent | undefined>();
+    const updatedAtFilterRef = ref<DateFilterSelectComponent | undefined>();
+    const deletedAtFilterRef = ref<DateFilterSelectComponent | undefined>();
+
+    const onClearFilters = () => {
+        userPermissionsFilter.value = UserPermissionFilterValue.Any;
+        userNameFilter.value = "";
+        emailFilter.value = "";
+        createdAtFilterRef.value?.reset();
+        updatedAtFilterRef.value?.reset();
+        deletedAtFilterRef.value?.reset();
+    };
+
 </script>
 
 <template>
@@ -170,10 +194,19 @@
                     class="doneo-cursor-pointer">
                     <n-flex justify="space-between">
                         <span>{{ column.label }}</span>
-                        <TableCellHeaderSortIcon v-if="props.sortField === column.field" :order="props.sortOrder" />
+                        <div>
+                            <n-icon :size="16" :component="IconFilter" style="margin-top: 4px;"
+                                v-if="column.isFiltered?.() ?? false" />
+                            <TableCellHeaderSortIcon v-if="props.sortField === column.field" :order="props.sortOrder" />
+                        </div>
                     </n-flex>
                 </th>
+                <!--
                 <th class="doneo-table-actions-column">{{ t("shared.components.table.header.columns.actions") }}</th>
+                -->
+                <th>
+                    <RefreshAddActionsColumn @refresh="onRefresh" @add="onAdd" />
+                </th>
             </tr>
             <tr>
                 <th>
@@ -190,16 +223,21 @@
                         v-model:value="emailFilter" @keydown-enter="onTextFilterKeyDownEnter" />
                 </th>
                 <th>
-                    <DateFilterSelect v-model:range="createdAtFilter" />
+                    <DateFilterSelect v-model:range="createdAtFilter" ref="createdAtFilterRef" />
                 </th>
                 <th>
-                    <DateFilterSelect v-model:range="updatedAtFilter" />
+                    <DateFilterSelect v-model:range="updatedAtFilter" ref="updatedAtFilterRef" />
                 </th>
                 <th>
-                    <DateFilterSelect v-model:range="deletedAtFilter" />
+                    <DateFilterSelect v-model:range="deletedAtFilter" ref="deletedAtFilterRef" />
                 </th>
-                <th class="doneo-text-center">
-                    <RefreshAddActionsColumn @refresh="onRefresh" @add="onAdd" />
+                <th>
+                    <n-button size="small" block @click="onClearFilters">
+                        <template #icon>
+                            <n-icon :component="IconFilterOff" />
+                        </template>
+                        clear filters
+                    </n-button>
                 </th>
             </tr>
         </template>
