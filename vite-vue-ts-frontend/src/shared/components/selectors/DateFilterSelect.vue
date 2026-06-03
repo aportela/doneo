@@ -2,7 +2,7 @@
     import { ref, watch, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSelect, NDatePicker } from 'naive-ui';
+    import { NSelect, NDatePicker, NButton } from 'naive-ui';
     import type { SelectMixedOption } from 'naive-ui/es/select/src/interface';
     import { type TimestampRange, getRange } from '../../composables/timestamps';
 
@@ -187,7 +187,19 @@
     <n-select v-if="isSelectorVisible" v-model:value="selectorValue" :options="options" size="small" />
     <n-date-picker :placeholder="t('shared.components.selectors.dateFilter.placeholder')" v-else
         v-model:value="datepickerValue" type="date" clearable size="small" v-model:show="isDatePickerVisible"
-        @clear="onClearDate" :actions="['clear']" />
+        @clear="onClearDate" :actions="['now', 'clear']">
+        <template #now="{ onNow }">
+            <n-button size="tiny" @click="onNow">
+                {{ t('shared.components.pickers.datepicker.buttons.now.label') }}
+            </n-button>
+        </template>
+        <template #clear="{ onClear }">
+            <n-button size="tiny" @click="onClear">
+                {{ t('shared.components.pickers.datepicker.buttons.clear.label') }}
+            </n-button>
+        </template>
+    </n-date-picker>
+
 </template>
 
 <style lang="css" scoped></style>

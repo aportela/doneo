@@ -76,6 +76,16 @@ export default {
         },
       },
       pickers: {
+        datepicker: {
+          buttons: {
+            now: {
+              label: "now",
+            },
+            clear: {
+              label: "clear",
+            },
+          },
+        },
         ToggleDateTimePicker: {
           placeholder: "Select date and time",
         },
