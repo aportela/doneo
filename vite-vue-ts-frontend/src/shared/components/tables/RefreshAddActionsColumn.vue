@@ -3,22 +3,25 @@
     import { useI18n } from "vue-i18n";
 
     import { NButtonGroup, NButton, NIcon } from 'naive-ui';
-    import { IconRefresh, IconPlus } from '@tabler/icons-vue';
+    import { IconRefresh, IconPlus, IconSettings } from '@tabler/icons-vue';
 
     interface RefreshAddActionsColumnProps {
         disabled?: boolean;
         iconSize?: number;
         hideRefresh?: boolean;
         hideAdd?: boolean;
+        hideSettings?: boolean;
+
     }
 
-    const emit = defineEmits(['refresh', 'add'])
+    const emit = defineEmits(['refresh', 'add', 'settings'])
 
     const props = withDefaults(defineProps<RefreshAddActionsColumnProps>(), {
         disabled: false,
         iconSize: 22,
         hideRefresh: false,
         hideAdd: false,
+        hideSettings: false,
     });
 
     const { t } = useI18n();
@@ -29,6 +32,10 @@
 
     const onAdd = () => {
         emit("add");
+    };
+
+    const onSettings = () => {
+        emit("settings");
     };
 </script>
 
@@ -45,6 +52,12 @@
                 <n-icon :size="22" :component="IconPlus" />
             </template>
             {{ t("shared.buttons.Add.label") }}
+        </n-button>
+        <n-button @click="onSettings" v-if="!props.hideSettings">
+            <template #icon>
+                <n-icon :size="22" :component="IconSettings" />
+            </template>
+            {{ t("shared.buttons.Settings.label") }}
         </n-button>
     </n-button-group>
 </template>

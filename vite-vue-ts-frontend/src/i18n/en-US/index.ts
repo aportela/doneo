@@ -160,6 +160,9 @@ export default {
       Preview: {
         label: "Preview",
       },
+      Settings: {
+        label: "Settings",
+      },
     },
     errorMessages: {
       Error: "Error",
