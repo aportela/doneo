@@ -8,6 +8,8 @@
     interface RefreshAddActionsColumnProps {
         disabled?: boolean;
         iconSize?: number;
+        hideRefresh?: boolean;
+        hideAdd?: boolean;
     }
 
     const emit = defineEmits(['refresh', 'add'])
@@ -15,6 +17,8 @@
     const props = withDefaults(defineProps<RefreshAddActionsColumnProps>(), {
         disabled: false,
         iconSize: 22,
+        hideRefresh: false,
+        hideAdd: false,
     });
 
     const { t } = useI18n();
@@ -30,7 +34,7 @@
 
 <template>
     <n-button-group size="small">
-        <n-button @click="onRefresh">
+        <n-button @click="onRefresh" v-if="!props.hideRefresh">
             <template #icon>
                 <n-icon :size="22">
                     <IconRefresh />
@@ -38,7 +42,7 @@
             </template>
             {{ t("shared.buttons.Refresh.label") }}
         </n-button>
-        <n-button @click="onAdd">
+        <n-button @click="onAdd" v-if="!props.hideAdd">
             <template #icon>
                 <n-icon :size="22">
                     <IconPlus />
