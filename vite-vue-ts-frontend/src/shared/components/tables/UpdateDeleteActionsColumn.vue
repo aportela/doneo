@@ -1,5 +1,6 @@
 <script setup lang="ts">
 
+    // TODO: delete component ?
     import { useI18n } from "vue-i18n";
 
     import { NButtonGroup, NButton, NIcon } from 'naive-ui';
