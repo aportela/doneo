@@ -10,7 +10,7 @@
 </script>
 
 <template>
-    <n-table :size="size" :striped="striped">
+    <n-table :size="size" :striped="striped" class="doneo-table">
         <thead>
             <slot name="thead" />
         </thead>
