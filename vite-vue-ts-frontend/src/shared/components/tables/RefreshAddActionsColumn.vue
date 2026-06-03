@@ -18,7 +18,7 @@
 
     const props = withDefaults(defineProps<RefreshAddActionsColumnProps>(), {
         disabled: false,
-        size: "small",
+        buttonSize: "small",
         iconSize: 22,
         hideRefresh: false,
         hideAdd: false,
