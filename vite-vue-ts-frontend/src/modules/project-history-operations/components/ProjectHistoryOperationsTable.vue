@@ -11,7 +11,7 @@
     import RefreshAddActionsColumn from '../../../shared/components/tables/RefreshAddActionsColumn.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
-    import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
+    import UserSelector from '../../users/components/UserSelector.vue';
 
     interface Props {
         loading: boolean;
@@ -27,11 +27,6 @@
 
     const columns = computed<TableHeaderColumn[]>(() => [
         {
-            label: t("modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.header.columns.user"),
-            field: "createdBy",
-            sortable: false,
-        },
-        {
             label: t("modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.header.columns.createdAt"),
             field: "createdAt",
             sortable: false,
@@ -39,6 +34,11 @@
         {
             label: t("modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.header.columns.operationType"),
             field: "operationType",
+            sortable: false,
+        },
+        {
+            label: t("modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.header.columns.user"),
+            field: "createdBy",
             sortable: false,
         },
     ]);
@@ -64,15 +64,12 @@
                 <th class="doneo-table-actions-column">{{ t("shared.components.table.header.columns.actions") }}</th>
             </tr>
             <tr>
-                <th>
-                    <TextFilterInput clearable size="small"
-                        :placeholder="t('modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.filters.user.placeholder')"
-                        v-model:value="userFilter" />
-                </th>
-                <th>
-
-                </th>
                 <th></th>
+                <th></th>
+                <th>
+                    <UserSelector v-model:id="userFilter" hide-avatar clearable
+                        :placeholder="t('modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.filters.user.placeholder')" />
+                </th>
                 <th class="doneo-text-center">
                     <RefreshAddActionsColumn @refresh="onRefresh" hide-add />
                 </th>
@@ -81,13 +78,13 @@
         <template #tbody v-if="!props.errorMessage">
             <tr v-for="projectHistoryOperation, index in projectHistoryOperations"
                 :key="projectHistoryOperation.createdAt.msTimestamp ?? index">
+                <td>{{ projectHistoryOperation.createdAt.toLocaleString() }}</td>
+                <td>{{ projectHistoryOperation.getOperationTypeLabel() }}</td>
                 <td>
                     <AvatarUserName :user-id="projectHistoryOperation.createdBy?.id ?? ''"
                         :user-name="projectHistoryOperation.createdBy?.name ?? ''" />
                 </td>
-                <td>{{ projectHistoryOperation.createdAt.toLocaleString() }}</td>
 
-                <td>{{ projectHistoryOperation.getOperationTypeLabel() }}</td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-preview />
                 </td>
