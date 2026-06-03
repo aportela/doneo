@@ -6,9 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/middlewares"
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
 )
@@ -121,6 +123,23 @@ func (repository *attachmentRepository) AddProjectAttachment(ctx context.Context
 		}
 		return err
 	}
+	_, err = tx.ExecContext(
+		ctx,
+		`
+			INSERT INTO project_history_operations
+				(project_id, operation_type, user_id, created_at)
+			VALUES
+				(?, ?, ?, ?)
+		`,
+		projectId,
+		domain.EventProjectAttachmentAdded,
+		attachment.UserId,
+		attachment.CreatedAt,
+	)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
 	return tx.Commit()
 }
 
@@ -165,6 +184,24 @@ func (repository *attachmentRepository) DeleteProjectAttachment(ctx context.Cont
 	)
 	if err != nil {
 		// TODO: remove ?
+		fmt.Println(err.Error())
+		return err
+	}
+	userId, _ := middlewares.GetUserIDFromContext(ctx)
+	_, err = tx.ExecContext(
+		ctx,
+		`
+			INSERT INTO project_history_operations
+				(project_id, operation_type, user_id, created_at)
+			VALUES
+				(?, ?, ?, ?)
+		`,
+		projectId,
+		domain.EventProjectAttachmentDeleted,
+		userId,
+		time.Now().UnixMilli(),
+	)
+	if err != nil {
 		fmt.Println(err.Error())
 		return err
 	}

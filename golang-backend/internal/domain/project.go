@@ -38,10 +38,12 @@ type SearchProjectFilter struct {
 type ProjectEventType uint
 
 const (
-	EventProjectCreated     ProjectEventType = 1
-	EventProjectUpdated     ProjectEventType = 2
-	EventProjectDeleted     ProjectEventType = 3
-	EventProjectNoteAdded   ProjectEventType = 4
-	EventProjectNoteUpdated ProjectEventType = 5
-	EventProjectNoteDeleted ProjectEventType = 6
+	EventProjectCreated           ProjectEventType = 1
+	EventProjectUpdated           ProjectEventType = 2
+	EventProjectDeleted           ProjectEventType = 3
+	EventProjectNoteAdded         ProjectEventType = 4
+	EventProjectNoteUpdated       ProjectEventType = 5
+	EventProjectNoteDeleted       ProjectEventType = 6
+	EventProjectAttachmentAdded   ProjectEventType = 7
+	EventProjectAttachmentDeleted ProjectEventType = 8
 )
