@@ -1,4 +1,5 @@
 <script setup lang="ts">
+    // TODO: remove component
     import { NIcon } from 'naive-ui';
     import { IconSortAscending, IconSortDescending } from '@tabler/icons-vue';
 
