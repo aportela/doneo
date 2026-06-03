@@ -9,6 +9,7 @@
     import { UserPermissionFilterValue, type UserPermissionFilter } from "../types/user-admin-permission-filter";
 
     interface Props {
+        disabled?: boolean;
         size?: SelectSize,
         placeholder?: string;
         clearable?: boolean;
@@ -17,6 +18,7 @@
     const { t } = useI18n();
 
     const props = withDefaults(defineProps<Props>(), {
+        disabled: false,
         size: "medium",
         clearable: false,
     });
@@ -34,8 +36,8 @@
 </script>
 
 <template>
-    <n-select :size="props.size" :options="options" v-model:value="model" :placeholder="props.placeholder"
-        :clearable="props.clearable" />
+    <n-select :size="props.size" :disabled="props.disabled" :options="options" v-model:value="model"
+        :placeholder="props.placeholder" :clearable="props.clearable" />
 </template>
 
 <style lang="css" scoped></style>

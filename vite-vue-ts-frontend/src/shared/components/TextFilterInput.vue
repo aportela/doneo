@@ -4,12 +4,14 @@
     import { IconSearch } from '@tabler/icons-vue';
 
     interface Props {
+        disabled?: boolean;
         size?: InputSize,
         placeholder?: string;
         clearable?: boolean;
     }
 
     const props = withDefaults(defineProps<Props>(), {
+        disabled: false,
         size: "medium",
         clearable: false,
     });
@@ -26,8 +28,8 @@
 </script>
 
 <template>
-    <n-input :size="props.size" v-model:value="model" :placeholder="props.placeholder" :clearable="props.clearable"
-        @keydown.enter="onKeyDownEnter">
+    <n-input :size="props.size" :disabled="props.disabled" v-model:value="model" :placeholder="props.placeholder"
+        :clearable="props.clearable" @keydown.enter="onKeyDownEnter">
         <template #prefix>
             <n-icon>
                 <IconSearch />
