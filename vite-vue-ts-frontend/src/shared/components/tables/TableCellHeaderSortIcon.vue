@@ -13,7 +13,7 @@
 
 <template>
     <n-icon :size="16" class="doneo-table-header-sort-icon"
-        :component="order == 'ASC' ? IconSortAscending : IconSortDescending" />
+        :component="props.order == 'ASC' ? IconSortAscending : IconSortDescending" />
 </template>
 
 <style lang="css" scoped>
