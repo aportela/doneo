@@ -29,6 +29,7 @@
         deleteDisabled: false,
         showDownload: false,
         downloadDisabled: false,
+        showPreview: false,
         previewDisabled: false,
     });
 
@@ -77,7 +78,7 @@
                 </n-icon>
             </template>
         </n-button>
-        <n-button @click.prevent="onPreview" :disabled="props.disabled || props.previewDisabled" v-if="showDownload">
+        <n-button @click.prevent="onPreview" :disabled="props.disabled || props.previewDisabled" v-if="showPreview">
             {{ t("shared.buttons.Preview.label") }}
             <template #icon>
                 <n-icon :size="props.iconSize">
