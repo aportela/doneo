@@ -6,4 +6,5 @@ export interface TableHeaderColumn {
   sortable: boolean;
   align?: TableHeaderColumnAlign;
   visible?: boolean;
+  isFiltered?: () => boolean;
 }
