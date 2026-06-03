@@ -99,11 +99,12 @@
         8: IconTrash,
     };
 
+    const showTimeline = false;
 </script>
 
 <template>
     <n-card bordered :style="props.style">
-        <n-timeline size="large" v-if="false">
+        <n-timeline size="large" v-if="showTimeline">
             <n-timeline-item v-for="item, index in items" :key="index" :title="item.getOperationTypeLabel()"
                 :type="item.getNaiveUITimelineItemType()" :time="item.createdAt.toLocaleString()">
                 <template #icon>
@@ -114,7 +115,7 @@
                 </template>
             </n-timeline-item>
         </n-timeline>
-        <ProjectHistoryOperationsTable :project-id="props.projectId" :project-history-operations="items"
+        <ProjectHistoryOperationsTable v-else :project-id="props.projectId" :project-history-operations="items"
             :loading="state.ajaxRunning" @refresh="onRefresh" />
     </n-card>
 </template>
