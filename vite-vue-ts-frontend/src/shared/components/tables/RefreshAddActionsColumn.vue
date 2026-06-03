@@ -40,20 +40,20 @@
 </script>
 
 <template>
-    <n-button-group size="small">
-        <n-button @click="onRefresh" v-if="!props.hideRefresh">
+    <n-button-group size="small" style="width: 100%">
+        <n-button @click="onRefresh" v-if="!props.hideRefresh" style="flex: 1;">
             <template #icon>
                 <n-icon :size="22" :component="IconRefresh" />
             </template>
             {{ t("shared.buttons.Refresh.label") }}
         </n-button>
-        <n-button @click="onAdd" v-if="!props.hideAdd">
+        <n-button @click="onAdd" v-if="!props.hideAdd" style="flex: 1;">
             <template #icon>
                 <n-icon :size="22" :component="IconPlus" />
             </template>
             {{ t("shared.buttons.Add.label") }}
         </n-button>
-        <n-button @click="onSettings" v-if="!props.hideSettings">
+        <n-button @click="onSettings" v-if="!props.hideSettings" style="flex: 1;">
             <template #icon>
                 <n-icon :size="22" :component="IconSettings" />
             </template>
