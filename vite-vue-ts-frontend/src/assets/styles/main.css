@@ -55,7 +55,9 @@ td,
     text-align: center !important;
 }
 
-.doneo-table thead th:last-of-type, .doneo-table tbody td:last-of-type, doneo-table tfoot th:last-of-type {
+.doneo-table thead th:last-of-type,
+.doneo-table tbody td:last-of-type,
+doneo-table tfoot th:last-of-type {
     white-space: nowrap;
     width: 1%;
 }
@@ -72,4 +74,14 @@ td,
     border: 1px solid #e0e0e6;
     border-radius: 3px;
     padding: 6px;
+}
+
+.doneo-pager-container {
+    margin-bottom: 4px;
+}
+
+@media (max-width: 768px) {
+    .mobile-hidden {
+        display: none;
+    }
 }
