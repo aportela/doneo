@@ -5,7 +5,7 @@
     import { type SortOrder } from '../../types/common';
 
     interface TableCellHeaderSortIconProps {
-        order: SortOrder;
+        order?: SortOrder;
     };
 
     const props = defineProps<TableCellHeaderSortIconProps>();
@@ -13,11 +13,10 @@
 
 <template>
     <n-icon :size="16" class="doneo-table-header-sort-icon"
-        :component="props.order == 'ASC' ? IconSortAscending : IconSortDescending" />
+        :component="props.order == 'DESC' ? IconSortDescending : IconSortAscending" />
 </template>
 
 <style lang="css" scoped>
-
     .doneo-table-header-sort-icon {
         margin-top: 4px;
     }
