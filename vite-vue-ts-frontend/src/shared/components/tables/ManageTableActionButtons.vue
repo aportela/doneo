@@ -1,9 +1,8 @@
 <script setup lang="ts">
     import { useI18n } from "vue-i18n";
 
-    import { NButtonGroup, NButton, NIcon } from 'naive-ui';
+    import { NButtonGroup, NButton, NIcon, type ButtonSize } from 'naive-ui';
     import { IconEdit, IconTrash, IconTrashOff, IconDownload, IconEyeSearch } from '@tabler/icons-vue';
-
 
     interface UpdateDeleteActionsColumnProps {
         disabled?: boolean;
