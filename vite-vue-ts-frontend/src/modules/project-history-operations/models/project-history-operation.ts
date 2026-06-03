@@ -39,6 +39,10 @@ export class ProjectHistoryOperation {
         return "project attachment added";
       case 8:
         return "project attachment deleted";
+      case 9:
+        return "project permission added";
+      case 10:
+        return "project permission deleted";
       default:
         return "unknown operation";
     }
@@ -65,6 +69,10 @@ export class ProjectHistoryOperation {
       case 7: // added attachment
         return "success";
       case 8: // delete attachment
+        return "error";
+      case 9: // added permission
+        return "success";
+      case 10: // delete permission
         return "error";
       default:
         return "default";

@@ -10,7 +10,7 @@ import (
 
 type ProjectPermissionService interface {
 	Add(ctx context.Context, permissionId string, projectId string, userId string, roleId string) error
-	Delete(ctx context.Context, permissionId string) error
+	Delete(ctx context.Context, projectId string, permissionId string) error
 	Search(ctx context.Context, projectId string) ([]domain.ProjectPermission, error)
 }
 
@@ -26,8 +26,8 @@ func (service *projectPermissionService) Add(ctx context.Context, permissionId s
 	return service.repository.Add(ctx, permissionId, projectId, userId, roleId)
 }
 
-func (service *projectPermissionService) Delete(ctx context.Context, permissionId string) error {
-	return service.repository.Delete(ctx, permissionId)
+func (service *projectPermissionService) Delete(ctx context.Context, projectId string, permissionId string) error {
+	return service.repository.Delete(ctx, projectId, permissionId)
 }
 
 func (service *projectPermissionService) Search(ctx context.Context, projectId string) ([]domain.ProjectPermission, error) {

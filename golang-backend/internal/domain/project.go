@@ -46,4 +46,6 @@ const (
 	EventProjectNoteDeleted       ProjectEventType = 6
 	EventProjectAttachmentAdded   ProjectEventType = 7
 	EventProjectAttachmentDeleted ProjectEventType = 8
+	EventProjectPermissionAdded   ProjectEventType = 9
+	EventProjectPermissionDeleted ProjectEventType = 10
 )

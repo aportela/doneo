@@ -45,8 +45,9 @@ func (handler *ProjectPermissionHandler) Add(w http.ResponseWriter, r *http.Requ
 
 func (handler *ProjectPermissionHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	projectId := chi.URLParam(r, "id")
 	permissionId := chi.URLParam(r, "permission_id")
-	err := handler.service.Delete(r.Context(), permissionId)
+	err := handler.service.Delete(r.Context(), projectId, permissionId)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPermissionHandler] failed to delete project permission: %w", err))
 		return

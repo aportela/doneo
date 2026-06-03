@@ -5,16 +5,18 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/middlewares"
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
 )
 
 type ProjectPermissionRepository interface {
 	Add(ctx context.Context, permissionId string, projectId string, userId string, roleId string) error
-	Delete(ctx context.Context, permissionId string) error
+	Delete(ctx context.Context, projectId string, permissionId string) error
 	Search(ctx context.Context, projectId string) ([]projectPermissionDTO, error)
 }
 
@@ -27,7 +29,19 @@ func NewRepository(database database.Database) ProjectPermissionRepository {
 }
 
 func (repository *projectPermissionRepository) Add(ctx context.Context, permissionId string, projectId string, userId string, roleId string) error {
-	_, err := repository.database.ExecContext(
+	tx, err := repository.database.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+	_, err = tx.ExecContext(
 		ctx,
 		`
             INSERT INTO project_user_role (id, project_id, user_id, role_id)
@@ -57,11 +71,43 @@ func (repository *projectPermissionRepository) Add(ctx context.Context, permissi
 			}
 		}
 	}
-	return err
+	userId, _ = middlewares.GetUserIDFromContext(ctx)
+	_, err = tx.ExecContext(
+		ctx,
+		`
+			INSERT INTO project_history_operations
+				(project_id, operation_type, user_id, created_at)
+			VALUES
+				(?, ?, ?, ?)
+		`,
+		projectId,
+		domain.EventProjectPermissionAdded,
+		userId,
+		time.Now().UnixMilli(),
+	)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+	return tx.Commit()
 }
 
-func (repository *projectPermissionRepository) Delete(ctx context.Context, permissionId string) error {
-	_, err := repository.database.ExecContext(
+func (repository *projectPermissionRepository) Delete(ctx context.Context, projectId string, permissionId string) error {
+	tx, err := repository.database.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+
+	// TODO: add project id into WHERE ?
+	_, err = tx.ExecContext(
 		ctx,
 		`
             DELETE FROM project_user_role
@@ -70,7 +116,25 @@ func (repository *projectPermissionRepository) Delete(ctx context.Context, permi
         `,
 		permissionId,
 	)
-	return err
+	userId, _ := middlewares.GetUserIDFromContext(ctx)
+	_, err = tx.ExecContext(
+		ctx,
+		`
+			INSERT INTO project_history_operations
+				(project_id, operation_type, user_id, created_at)
+			VALUES
+				(?, ?, ?, ?)
+		`,
+		projectId,
+		domain.EventProjectPermissionDeleted,
+		userId,
+		time.Now().UnixMilli(),
+	)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+	return tx.Commit()
 }
 
 func (repository *projectPermissionRepository) Search(ctx context.Context, projectId string) ([]projectPermissionDTO, error) {
