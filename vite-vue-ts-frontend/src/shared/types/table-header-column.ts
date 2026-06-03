@@ -1,11 +1,10 @@
-// TODO:
-//type TableHeaderColumnAlign = "left" | "right" | "center";
+type TableHeaderColumnAlign = "left" | "right" | "center";
 
 export interface TableHeaderColumn {
   label: string;
   field: string;
   sortable?: boolean;
-  //align?: TableHeaderColumnAlign;
+  align?: TableHeaderColumnAlign;
   visible?: boolean;
   isFiltered?: () => boolean;
 }
