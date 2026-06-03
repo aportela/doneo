@@ -7,6 +7,7 @@
 
     interface UpdateDeleteActionsColumnProps {
         disabled?: boolean;
+        buttonSize?: ButtonSize;
         iconSize?: number;
         showUpdate?: boolean;
         updateDisabled?: boolean;
@@ -24,6 +25,7 @@
 
     const props = withDefaults(defineProps<UpdateDeleteActionsColumnProps>(), {
         disabled: false,
+        buttonSize: "small",
         iconSize: 22,
         showUpdate: false,
         updateDisabled: false,
@@ -61,7 +63,7 @@
 </script>
 
 <template>
-    <n-button-group size="small">
+    <n-button-group :size="props.buttonSize">
         <n-button @click="onUpdate" :disabled="props.disabled || props.updateDisabled" v-if="showUpdate">
             {{ t("shared.buttons.Update.label") }}
             <template #icon>
