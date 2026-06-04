@@ -4,37 +4,37 @@
 
     import { NCard } from "naive-ui";
 
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { useLoadingStore } from '../../../stores/loading';
     import { useNotify } from '../../../shared/composables/notification';
-
     import { appBus } from '../../../shared/composables/bus';
 
-    import { projectAttachmentService } from "../../attachments/services/project-attachment.ts";
-    import { handleAPIError } from '../../../api/client/errorHandler';
-
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import type { SearchResponse } from "../../attachments/types/dto.ts";
 
     import { ProjectAttachment } from "../../attachments/models/project-attachment.ts";
 
+    import { projectAttachmentService } from "../../attachments/services/project-attachment.ts";
+    import { handleAPIError } from '../../../api/client/errorHandler';
+
     import UploadDialog from "../../attachments/components/UploadDialog.vue";
-    import ProjectAttachmentsTable from "../../attachments/components/ProjectAttachmentsTable.vue";
     import ImagePreview from "../../../shared/components/ImagePreview.vue";
+
+    import ProjectAttachmentsTable from "../../attachments/components/ProjectAttachmentsTable.vue";
+
+    import type { ProjectAttachmentsTableFilters } from "../../attachments/types/project-attachments-table-filter.ts";
 
     interface ProjectAttachmentsProps {
         style?: string | CSSProperties;
         projectId: string;
     }
 
+    const { t } = useI18n();
+    const { notify } = useNotify();
+    const loadingStore = useLoadingStore();
+
     const props = defineProps<ProjectAttachmentsProps>();
 
     const emit = defineEmits(['delete']);
-
-
-    const { t } = useI18n();
-    const { notify } = useNotify();
-
-    const loadingStore = useLoadingStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -44,37 +44,37 @@
 
     const uploadCount = ref<number>(0);
 
-    const filterByUser = ref<string>("");
+    const filters = reactive<ProjectAttachmentsTableFilters>({
+        name: "",
+        createdByUserId: null,
+    });
 
-    const filterByName = ref<string>("");
-
-    const nameFilter = computed(() =>
-        filterByName.value?.toLowerCase() ?? ''
+    const nameFilterLowerCase = computed(() =>
+        filters.name.toLowerCase()
     );
 
-    const filteredAttachments = computed(() => {
-        return items.value.filter((permission) => {
-            const fileName = permission.name?.toLowerCase();
+    const filteredItems = computed(() => {
+        return items.value.filter((attachment: ProjectAttachment) => {
+            const name = attachment.name?.toLowerCase();
             return (
-                (!nameFilter.value || fileName?.includes(nameFilter.value)) &&
-                (!filterByUser.value || filterByUser.value === permission.createdBy.id)
+                (!name || name?.includes(nameFilterLowerCase.value)) &&
+                (filters.createdByUserId === null || filters.createdByUserId === attachment.createdBy.id)
             );
         });
     });
 
-    const showUploadDialog = ref<boolean>(false);
+    const showUploadModal = ref<boolean>(false);
 
-    const showImagePreviewDialog = ref<boolean>(false);
+    const showImagePreviewModal = ref<boolean>(false);
 
     const imageSources = computed<string[]>(() => items.value.filter((item: ProjectAttachment) => item.allowImagePreview()).map((item: ProjectAttachment) => item.getDownloadURL(props.projectId)));
+
     const imageSourcesWithIds = computed(() => items.value.filter((item: ProjectAttachment) => item.allowImagePreview()).map((item: ProjectAttachment) => {
-        return (
-            {
-                id: item.id,
-                url: item.getDownloadURL(props.projectId),
-            });
-    }
-    ));
+        return ({
+            id: item.id,
+            url: item.getDownloadURL(props.projectId),
+        });
+    }));
 
     const currentImagePreviewIndex = ref<number>(0);
 
@@ -90,7 +90,7 @@
         }
     });
 
-    watch(showUploadDialog, (newValue) => {
+    watch(showUploadModal, (newValue) => {
         if (!newValue) {
             if (uploadCount.value > 0) {
                 onRefresh();
@@ -98,9 +98,9 @@
         }
     });
 
-    const onShowUploadDialog = () => {
+    const onShowUploadModal = () => {
         uploadCount.value = 0;
-        showUploadDialog.value = true;
+        showUploadModal.value = true;
     };
 
     const onRefresh = async () => {
@@ -119,12 +119,12 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectAttachmentsTab.onRefresh" } });
                             break;
                         default:
-                            state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
+                            state.ajaxErrorMessage = t("modules.projectAttachment.components.ProjectAttachmentsTab.errors.refreshError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
+                    state.ajaxErrorMessage = t("modules.projectAttachment.components.ProjectAttachmentsTab.errors.refreshError");
                     console.error("Unhandled API error", { file: "ProjectAttachmentsTab.vue", method: "onRefresh" }, { err: fatalError });
                 });
         } finally {
@@ -137,9 +137,8 @@
             Object.assign(state, defaultAjaxStateRunning);
             try {
                 await projectAttachmentService.deleteProjectAttachment(props.projectId, projectAttachment.id);
-                notify('success', t("modules.projectPermission.components.projectPermissions.notifications.projectPermissionDeleted", {}));
+                notify('success', t("modules.projectAttachment.components.ProjectAttachmentsTab.notifications.projectAttachmentDeleted", { name: projectAttachment.name }));
                 onRefresh();
-                // TODO: not refreshing permission count on parent component
             } catch (error: unknown) {
                 state.ajaxErrors = true;
                 handleAPIError(error,
@@ -151,15 +150,15 @@
                                 appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectAttachmentsTab.onDelete" } });
                                 break;
                             case 404:
-                                state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.notFoundError");
+                                state.ajaxErrorMessage = t("modules.projectAttachment.components.ProjectAttachmentsTab.errors.notFoundError");
                                 break;
                             default:
-                                state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.deleteError");
+                                state.ajaxErrorMessage = t("modules.projectAttachment.components.ProjectAttachmentsTab.errors.deleteError");
                                 break;
                         }
                     },
                     (fatalError) => {
-                        state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.deleteError");
+                        state.ajaxErrorMessage = t("modules.projectAttachment.components.ProjectAttachmentsTab.errors.deleteError");
                         console.error("Unhandled API error", { file: "ProjectAttachmentsTab.vue", method: "onRefresh" }, { err: fatalError });
                     });
             } finally {
@@ -168,6 +167,13 @@
         } else {
             console.error("project attachment id not set", { file: "ProjectAttachmentsTab.vue", method: "onDelete" });
         }
+    };
+
+    const onDownload = (_projectAttachment: ProjectAttachment, _index: number) => { };
+
+    const onPreview = (_projectAttachment: ProjectAttachment, _index: number) => {
+        currentImagePreviewIndex.value = imageSourcesWithIds.value.findIndex((item) => item.id == _projectAttachment.id);
+        showImagePreviewModal.value = true;
     };
 
     let stopBusReauthListener: () => void;
@@ -183,28 +189,21 @@
         });
     });
 
-    const onDownload = (_projectAttachment: ProjectAttachment, _index: number) => { };
-
-    const onPreview = (_projectAttachment: ProjectAttachment, _index: number) => {
-        currentImagePreviewIndex.value = imageSourcesWithIds.value.findIndex((item) => item.id == _projectAttachment.id);
-        showImagePreviewDialog.value = true;
-    };
-
     onBeforeUnmount(() => {
         stopBusReauthListener();
     });
 </script>
 
 <template>
-    <ImagePreview v-model:show="showImagePreviewDialog" :sources="imageSources"
+    <ImagePreview v-model:show="showImagePreviewModal" :sources="imageSources"
         :current-index="currentImagePreviewIndex" />
-    <UploadDialog v-if="props.projectId" v-model:show="showUploadDialog" :project-id="props.projectId"
+    <!-- TODO: onupload notification -->
+    <UploadDialog v-if="props.projectId" v-model:show="showUploadModal" :project-id="props.projectId"
         v-model:upload-count="uploadCount" />
     <n-card bordered :style="props.style">
-        <ProjectAttachmentsTable :project-id="props.projectId" :project-attachments="filteredAttachments"
-            :loading="state.ajaxRunning" v-model:name-filter="filterByName" v-model:user-filter="filterByUser"
-            @refresh="onRefresh" @add="onShowUploadDialog" @delete="onDelete" @download="onDownload"
-            @preview="onPreview" />
+        <ProjectAttachmentsTable :project-id="props.projectId" :items="filteredItems" :disabled="state.ajaxRunning"
+            v-model:filters="filters" @refresh="onRefresh" @add="onShowUploadModal" @delete="onDelete"
+            @download="onDownload" @preview="onPreview" />
     </n-card>
 </template>
 

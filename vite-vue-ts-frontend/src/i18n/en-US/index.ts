@@ -787,7 +787,7 @@ export default {
             noItemsFound: "No project permissions found",
           },
         },
-        projectPermissions: {
+        projectPermissionsTab: {
           notifications: {
             projectPermissionAdded:
               'Project permission of user "{user}" with role "{role}" has been added',
@@ -832,6 +832,20 @@ export default {
           },
           warnings: {
             noItemsFound: "No project attachments found",
+          },
+        },
+        ProjectAttachmentsTab: {
+          notifications: {
+            projectAttachmentAdded:
+              'Project attachment "{name}" has been added',
+            projectAttachmentDeleted:
+              'Project attachment "{name}" has been deleted',
+          },
+          errors: {
+            refreshError:
+              "There was a problem while refreshing the project attachment list",
+            deleteError:
+              "There was a problem while deleting the project attachment",
           },
         },
       },

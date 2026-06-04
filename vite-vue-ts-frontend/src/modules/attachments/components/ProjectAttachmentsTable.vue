@@ -5,23 +5,23 @@
     import { useDialog, NEmpty } from 'naive-ui';
     import { IconTrash } from '@tabler/icons-vue';
 
-    import { ProjectAttachment } from '../models/project-attachment.ts';
-    import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
+    import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
+    import type { ProjectAttachmentsTableFilters } from '../types/project-attachments-table-filter.ts';
+    import { ProjectAttachment } from '../models/project-attachment.ts';
+
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
-    import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
-    import RefreshAddActionsColumn from '../../../shared/components/tables/RefreshAddActionsColumn.vue';
-    import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
+    import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
+    import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
+    import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import { formatBytes } from '../../../shared/composables/format.ts';
-    import type { SortOrder } from '../../../shared/types/common.ts';
 
     interface Props {
-        // TODO: refactor to disabled
-        loading: boolean;
+        disabled: boolean;
+        items: ProjectAttachment[];
         projectId: string;
-        projectAttachments: ProjectAttachment[];
         errorMessage?: string | null;
     }
 
@@ -32,40 +32,58 @@
 
     const props = defineProps<Props>();
 
+    const filters = defineModel<ProjectAttachmentsTableFilters>("filters", {
+        default: () => ({
+            name: "",
+            createdByUserId: null,
+        })
+    });
+
+    const isFilteredByName = computed<boolean>(() => filters.value.name.length > 0);
+    const isFilteredByCreator = computed<boolean>(() => filters.value.createdByUserId !== null);
+
+    const hasFilters = computed<boolean>(() =>
+        isFilteredByName.value ||
+        isFilteredByCreator.value
+    );
+
     const columns = computed<TableHeaderColumn[]>(() => [
         {
             label: t("modules.projectAttachment.components.projectAttachmentsTable.header.columns.name"),
             field: "name",
-            sortable: true,
+            visible: true,
+            sortable: false,
+            isFiltered: () => isFilteredByName.value,
         },
         {
             label: t("modules.projectAttachment.components.projectAttachmentsTable.header.columns.size"),
             field: "size",
-            sortable: true,
+            visible: true,
+            sortable: false,
+            isFiltered: () => false,
         },
         {
             label: t("modules.projectAttachment.components.projectAttachmentsTable.header.columns.contentType"),
             field: "contentType",
-            sortable: true,
+            visible: true,
+            sortable: false,
+            isFiltered: () => false,
         },
         {
             label: t("modules.project.components.ProjectsTable.header.columns.createdAt"),
             field: "createdAt",
-            sortable: true,
+            visible: true,
+            sortable: false,
+            isFiltered: () => false,
         },
         {
             label: t("modules.project.components.ProjectsTable.header.columns.createdBy"),
             field: "createdBy",
-            sortable: true,
+            visible: true,
+            sortable: false,
+            isFiltered: () => false,
         },
     ]);
-
-    const nameFilter = defineModel<string>("nameFilter", {
-        default: "",
-    });
-    const userFilter = defineModel<string>("userFilter", {
-        default: "",
-    });
 
     const onRefresh = () => {
         emit("refresh");
@@ -101,39 +119,42 @@
     const onPreview = (projectAttachment: ProjectAttachment, index: number) => {
         emit("preview", projectAttachment, index)
     };
+
+    const onClearFilters = () => {
+        filters.value.name = "";
+        filters.value.createdByUserId = null;
+    };
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" :sort-field="sortField" :sort-order="sortOrder" @sort="onToggleSort"
-        @refresh="onRefresh" @add="onAdd">
+    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
         <template #thead>
             <tr>
-                <th v-for="column in columns" :key="column.field"
-                    :class="{ 'doneo-text-center': column.align === 'center' }">
-                    {{ column.label }}
-                </th>
-                <th class="doneo-table-actions-column">{{ t("shared.components.table.header.columns.actions") }}</th>
-            </tr>
-            <tr>
                 <th>
-                    <TextFilterInput clearable size="small"
+                    <TextFilterInput clearable :disabled="props.disabled" size="small"
                         :placeholder="t('modules.projectAttachment.components.projectAttachmentsTable.filters.name.placeholder')"
-                        v-model:value="nameFilter" />
+                        v-model:value="filters.name" />
                 </th>
-                <th></th>
-                <th></th>
-                <th></th>
                 <th>
-                    <UserSelector hideAvatar clearable v-model:id="userFilter"
+                    <!-- TODO: size filter -->
+                </th>
+                <th>
+                    <!-- TODO: content type filter -->
+                </th>
+                <th>
+                    <!-- TODO: created at filter -->
+                </th>
+                <th>
+                    <UserSelector hideAvatar clearable :disabled="props.disabled" v-model:id="filters.createdByUserId"
                         :placeholder="t('modules.projectAttachment.components.projectAttachmentsTable.filters.user.placeholder')" />
                 </th>
                 <th class="doneo-text-center">
-                    <RefreshAddActionsColumn @refresh="onRefresh" @add="onAdd" />
+                    <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
                 </th>
             </tr>
         </template>
         <template #tbody v-if="!props.errorMessage">
-            <tr v-for="projectAttachment, index in projectAttachments" :key="projectAttachment.id ?? index">
+            <tr v-for="projectAttachment, index in items" :key="projectAttachment.id ?? index">
                 <td>{{ projectAttachment.name }}</td>
                 <td>{{ formatBytes(projectAttachment.size) }}</td>
                 <td>{{ projectAttachment.contentType }}</td>
@@ -146,11 +167,11 @@
                     <ManageTableActionButtons show-delete show-download
                         @delete="onConfirmDelete(projectAttachment, index)"
                         @download="onDownload(projectAttachment, index)" @preview="onPreview(projectAttachment, index)"
-                        :disabled="props.loading" />
+                        :disabled="props.disabled" />
                 </td>
             </tr>
             <tr>
-                <td :colspan="columns.length + 1" v-if="projectAttachments.length < 1 && !props.loading">
+                <td :colspan="columns.length + 1" v-if="items.length < 1 && !props.disabled">
                     <n-empty
                         :description="t('modules.projectAttachment.components.projectAttachmentsTable.warnings.noItemsFound')">
                     </n-empty>

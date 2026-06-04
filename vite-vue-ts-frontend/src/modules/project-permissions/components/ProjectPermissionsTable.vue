@@ -5,18 +5,22 @@
     import { useDialog, NEmpty, NTooltip, NIcon } from 'naive-ui';
     import { IconTrash, IconEdit, IconEyeCheck, IconSquarePlus } from '@tabler/icons-vue';
 
-    import { ProjectPermission } from '../models/project-permission.ts';
-    import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
+    import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
+    import type { ProjectPermissionsTableFilters } from '../types/project-permissions-table-filter.ts';
+
+    import { ProjectPermission } from '../models/project-permission.ts';
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
     import RefreshAddActionsColumn from '../../../shared/components/tables/RefreshAddActionsColumn.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
+    import UserSelector from '../../users/components/UserSelector.vue';
 
     interface Props {
-        loading: boolean;
-        projectPermissions: ProjectPermission[];
+        disabled: boolean;
+        items: ProjectPermission[];
+        projectId: string;
         errorMessage?: string | null;
     }
 
@@ -27,37 +31,52 @@
 
     const props = defineProps<Props>();
 
+    const filters = defineModel<ProjectPermissionsTableFilters>("filters", {
+        default: () => ({
+            userId: null,
+            roleId: null,
+        })
+    });
+
+    const isFilteredByUser = computed<boolean>(() => filters.value.userId !== null);
+    const isFilteredByRole = computed<boolean>(() => filters.value.roleId !== null);
+
+    const hasFilters = computed<boolean>(() =>
+        isFilteredByUser.value || isFilteredByRole.value
+    );
+
     const columns = computed<TableHeaderColumn[]>(() => [
         {
             label: t("modules.projectPermission.components.projectPermissionsTable.header.columns.user"),
-            field: "name",
+            field: "user",
+            visible: true,
             sortable: false,
+            isFiltered: () => isFilteredByUser.value,
         },
         {
             label: t("modules.projectPermission.components.projectPermissionsTable.header.columns.role"),
             field: "role",
+            visible: true,
             sortable: false,
+            isFiltered: () => isFilteredByRole.value,
         },
         {
             label: t("modules.projectPermission.components.projectPermissionsTable.header.columns.projectPermissions"),
             field: "projectPermissions",
+            visible: true,
             sortable: false,
+            isFiltered: () => false,
             align: "center",
         },
         {
             label: t("modules.projectPermission.components.projectPermissionsTable.header.columns.taskPermissions"),
             field: "taskPermissions",
+            visible: true,
             sortable: false,
+            isFiltered: () => false,
             align: "center",
         },
     ]);
-
-    const userFilter = defineModel<string>("userFilter", {
-        default: "",
-    });
-    const roleFilter = defineModel<string>("roleFilter", {
-        default: "",
-    });
 
     const onRefresh = () => {
         emit("refresh");
@@ -85,38 +104,36 @@
             },
         });
     };
+
+    const onClearFilters = () => {
+        filters.value.userId = null;
+        filters.value.roleId = null;
+    };
 </script>
 
 <template>
-    <ManageTable size="small">
+    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
         <template #thead>
-            <tr>
-                <th v-for="column in columns" :key="column.field"
-                    :class="{ 'doneo-text-center': column.align === 'center' }">
-                    {{ column.label }}
-                </th>
-                <th class="doneo-table-actions-column">{{ t("shared.components.table.header.columns.actions") }}</th>
-            </tr>
             <tr>
                 <th>
                     <TextFilterInput clearable size="small"
                         :placeholder="t('modules.projectPermission.components.projectPermissionsTable.filters.user.placeholder')"
-                        v-model:value="userFilter" />
+                        v-model:value="filters.userId" />
                 </th>
                 <th>
                     <TextFilterInput clearable size="small"
                         :placeholder="t('modules.projectPermission.components.projectPermissionsTable.filters.role.placeholder')"
-                        v-model:value="roleFilter" />
+                        v-model:value="filters.roleId" />
                 </th>
                 <th></th>
                 <th></th>
                 <th class="doneo-text-center">
-                    <RefreshAddActionsColumn @refresh="onRefresh" @add="onAdd" />
+                    <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
                 </th>
             </tr>
         </template>
         <template #tbody v-if="!props.errorMessage">
-            <tr v-for="projectPermission, index in projectPermissions" :key="projectPermission.id ?? index">
+            <tr v-for="projectPermission, index in items" :key="projectPermission.id ?? index">
                 <td>
                     <AvatarUserName :user-id="projectPermission.user?.id ?? ''"
                         :user-name="projectPermission.user?.name ?? ''" />
@@ -218,11 +235,12 @@
                     </n-icon>
                 </td>
                 <td class="doneo-text-center">
-                    <ManageTableActionButtons show-delete @delete="onConfirmDelete(projectPermission, index)" />
+                    <ManageTableActionButtons show-delete @delete="onConfirmDelete(projectPermission, index)"
+                        :disabled="props.disabled" />
                 </td>
             </tr>
             <tr>
-                <td :colspan="columns.length + 1" v-if="projectPermissions.length < 1 && !props.loading">
+                <td :colspan="columns.length + 1" v-if="items.length < 1 && !props.disabled">
                     <n-empty
                         :description="t('modules.projectPermission.components.projectPermissionsTable.warnings.noItemsFound')">
                     </n-empty>

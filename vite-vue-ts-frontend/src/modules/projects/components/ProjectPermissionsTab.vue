@@ -4,34 +4,34 @@
 
     import { NCard, NModal } from "naive-ui";
 
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { useLoadingStore } from '../../../stores/loading';
     import { useNotify } from '../../../shared/composables/notification';
-
     import { appBus } from '../../../shared/composables/bus';
+
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
+    import type { SearchResponse } from "../../project-permissions/types/dto.ts";
+
+    import { ProjectPermission } from "../../project-permissions/models/project-permission.ts";
 
     import { projectPermissionService } from "../../project-permissions/services/project-permission.ts";
     import { handleAPIError } from '../../../api/client/errorHandler';
 
-    import type { SearchResponse } from "../../project-permissions/types/dto.ts";
-    import { ProjectPermission } from "../../project-permissions/models/project-permission.ts";
-
-    import ProjectPermissionsTable from "../../project-permissions/components/ProjectPermissionsTable.vue";
     import ProjectPermissionForm from "../../project-permissions/components/ProjectPermissionForm.vue";
+    import ProjectPermissionsTable from "../../project-permissions/components/ProjectPermissionsTable.vue";
+    import type { ProjectPermissionsTableFilters } from "../../project-permissions/types/project-permissions-table-filter.ts";
 
     interface ProjectPermissionsProps {
         style?: string | CSSProperties;
-        projectId: string | null;
+        projectId: string;
     }
+
+    const { t } = useI18n();
+    const { notify } = useNotify();
+    const loadingStore = useLoadingStore();
 
     const props = defineProps<ProjectPermissionsProps>();
 
     const emit = defineEmits(['delete']);
-
-    const { t } = useI18n();
-    const { notify } = useNotify();
-
-    const loadingStore = useLoadingStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -39,25 +39,16 @@
 
     const itemCount = defineModel<number>("itemCount", { default: 0 });
 
-    const filterByUser = ref<string>("");
-    const filterByRole = ref<string>("");
-
-    const userFilter = computed(() =>
-        filterByUser.value?.toLowerCase() ?? ''
-    );
-
-    const roleFilter = computed(() =>
-        filterByRole.value?.toLowerCase() ?? ''
-    );
+    const filters = reactive<ProjectPermissionsTableFilters>({
+        userId: null,
+        roleId: null,
+    });
 
     const filteredPermissions = computed(() => {
         return items.value.filter((permission) => {
-            const userName = permission.user?.name?.toLowerCase();
-            const roleName = permission.role?.name?.toLowerCase();
-
             return (
-                (!userFilter.value || userName?.includes(userFilter.value)) &&
-                (!roleFilter.value || roleName?.includes(roleFilter.value))
+                (filters.userId === null || filters.userId === permission.user.id) &&
+                (filters.roleId === null || filters.roleId === permission.role.id)
             );
         });
     });
@@ -80,14 +71,7 @@
         showForm.value = true;
     };
 
-    const onAdd = (_projectPermission: ProjectPermission) => {
-        showForm.value = false;
-        // TODO:
-        //notify('success', t("modules.projectStatus.components.ManageProjectStatusesPage.notifications.projectStatusAdded", { name: projectPermission.name }));
-        onRefresh();
-    };
-
-    const onCancel = () => {
+    const onCancelForm = () => {
         showForm.value = false;
     };
 
@@ -108,12 +92,12 @@
                                 appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPermissions.onRefresh" } });
                                 break;
                             default:
-                                state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
+                                state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.refreshError");
                                 break;
                         }
                     },
                     (fatalError) => {
-                        state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
+                        state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.refreshError");
                         console.error("Unhandled API error", { file: "ProjectPermissions.vue", method: "onRefresh" }, { err: fatalError });
                     });
             } finally {
@@ -129,9 +113,8 @@
             Object.assign(state, defaultAjaxStateRunning);
             try {
                 await projectPermissionService.delete(props.projectId, projectPermission.id);
-                notify('success', t("modules.projectPermission.components.projectPermissions.notifications.projectPermissionDeleted", { user: projectPermission.user.name, role: projectPermission.role.name }));
+                notify('success', t("modules.projectPermission.components.projectPermissionsTab.notifications.projectPermissionDeleted", { user: projectPermission.user.name, role: projectPermission.role.name }));
                 onRefresh();
-                // TODO: not refreshing permission count on parent component
             } catch (error: unknown) {
                 state.ajaxErrors = true;
                 handleAPIError(error,
@@ -143,15 +126,15 @@
                                 appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPermissions.onDelete" } });
                                 break;
                             case 404:
-                                state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.notFoundError");
+                                state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.notFoundError");
                                 break;
                             default:
-                                state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.deleteError");
+                                state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.deleteError");
                                 break;
                         }
                     },
                     (fatalError) => {
-                        state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.deleteError");
+                        state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.deleteError");
                         console.error("Unhandled API error", { file: "ProjectPermissions.vue", method: "onRefresh" }, { err: fatalError });
                     });
             } finally {
@@ -162,6 +145,11 @@
         }
     };
 
+    const onAdded = (_projectPermission: ProjectPermission) => {
+        showForm.value = false;
+        notify('success', t("modules.projectPermission.components.projectPermissionsTab.notifications.projectPermissionAdded", { name: projectPermission.name }));
+        onRefresh();
+    };
 
     let stopBusReauthListener: () => void;
 
@@ -186,13 +174,13 @@
 
 <template>
     <n-modal v-model:show="showForm">
-        <ProjectPermissionForm :project-id="props.projectId" mode="add" style="width: 40%;" @add="onAdd"
-            @cancel="onCancel" />
+        <ProjectPermissionForm :project-id="props.projectId" mode="add" style="width: 40%;" @add="onAdded"
+            @cancel="onCancelForm" />
     </n-modal>
     <n-card bordered :style="props.style">
-        <ProjectPermissionsTable :project-permissions="filteredPermissions" :loading="state.ajaxRunning"
-            @refresh="onRefresh" @add="onShowAddForm" @delete="onDelete" v-model:user-filter="filterByUser"
-            v-model:role-filter="filterByRole" />
+        <ProjectPermissionsTable :project-id="props.projectId" :items="filteredPermissions"
+            :disabled="state.ajaxRunning" v-model:filters="filters" @refresh="onRefresh" @add="onShowAddForm"
+            @delete="onDelete" />
     </n-card>
 </template>
 
