@@ -145,9 +145,9 @@
         }
     };
 
-    const onAdded = (_projectPermission: ProjectPermission) => {
+    const onAdded = (projectPermission: ProjectPermission) => {
         showForm.value = false;
-        notify('success', t("modules.projectPermission.components.projectPermissionsTab.notifications.projectPermissionAdded", { name: projectPermission.name }));
+        notify('success', t("modules.projectPermission.components.projectPermissionsTab.notifications.projectPermissionAdded", { user: projectPermission.user.name, role: projectPermission.role.name }));
         onRefresh();
     };
 
