@@ -4,22 +4,26 @@
 
     import { NModal, NCard } from 'naive-ui';
 
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { useLoadingStore } from '../../../stores/loading';
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
+
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
+    import type { FormMode } from '../../../shared/types/form-mode';
+    import type { SearchRequest, TaskStatusResponse } from '../types/dto';
+    import type { TaskStatusesTableFilters } from '../types/task-statuses-table-filters.ts';
+
+    import { Sort } from '../../../shared/types/models/sort';
+    import { TaskStatus } from '../models/task-status';
+
     import { taskStatusService } from '../services/task-status';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import type { TaskStatusResponse, SearchRequest } from '../types/dto';
-    import { TaskStatus } from '../models/task-status';
-    import TaskStatusesTable from '../components/TaskStatusesTable.vue';
+
     import TaskStatusForm from '../components/TaskStatusForm.vue';
-    import { Sort } from '../../../shared/types/models/sort';
-    import type { FormMode } from '../../../shared/types/form-mode';
+    import TaskStatusesTable from '../components/TaskStatusesTable.vue';
 
     const { t } = useI18n();
     const { notify } = useNotify();
-
     const loadingStore = useLoadingStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
@@ -28,10 +32,12 @@
 
     const sort = ref<Sort>(new Sort("name", "ASC"));
 
-    const nameFilter = ref<string>("");
+    const filters = reactive<ProjectStatusesTableFilters>({
+        name: "",
+    });
 
     const nameFilterLowerCase = computed(() =>
-        nameFilter.value?.toLowerCase() ?? ''
+        filters.name.toLowerCase()
     );
 
     const filteredItems = computed(() => {
@@ -42,8 +48,8 @@
         });
     });
 
-    const showForm = ref<boolean>(false);
-    const formMode = ref<FormMode>("add");
+    const showModal = ref<boolean>(false);
+    const modalFormMode = ref<FormMode>("add");
 
     const selectedItem = ref<TaskStatus>(new TaskStatus());
 
@@ -51,36 +57,25 @@
         loadingStore.set(newValue.ajaxRunning);
     });
 
-    const onToggleSort = (field: string) => {
-        sort.value.toggleSort(field);
+    const onSort = (newSort: Sort) => {
+        sort.field = newSort.field;
+        sort.order = newSort.order;
         onRefresh();
     };
 
     const onShowAddForm = () => {
-        formMode.value = "add";
-        showForm.value = true;
+        modalFormMode.value = "add";
+        showModal.value = true;
     };
 
     const onShowUpdateForm = (taskStatus: TaskStatus, _index: number) => {
         selectedItem.value = taskStatus;
-        formMode.value = "update";
-        showForm.value = true;
+        modalFormMode.value = "update";
+        showModal.value = true;
     };
 
-    const onAdd = (taskStatus: TaskStatus) => {
-        showForm.value = false;
-        notify('success', t("modules.taskStatus.components.ManageTaskStatusesPage.notifications.taskStatusAdded", { name: taskStatus.name }));
-        onRefresh();
-    };
-
-    const onUpdate = (taskStatus: TaskStatus) => {
-        showForm.value = false;
-        notify('success', t("modules.taskStatus.components.ManageTaskStatusesPage.notifications.taskStatusUpdated", { name: taskStatus.name }));
-        onRefresh();
-    };
-
-    const onCancel = () => {
-        showForm.value = false;
+    const onCancelForm = () => {
+        showModal.value = false;
     };
 
     const onRefresh = async () => {
@@ -96,7 +91,7 @@
                     sort: sort.value.order,
                 },
                 filter: {
-                    name: nameFilter.value,
+                    //name: filters.name.length > 0 ? filters.name : undefined,
                 }
             };
             const response = await taskStatusService.search(payload);
@@ -169,6 +164,18 @@
         }
     };
 
+    const onAdded = (taskStatus: TaskStatus) => {
+        showModal.value = false;
+        notify('success', t("modules.taskStatus.components.ManageTaskStatusesPage.notifications.taskStatusAdded", { name: taskStatus.name }));
+        onRefresh();
+    };
+
+    const onUpdated = (taskStatus: TaskStatus) => {
+        showModal.value = false;
+        notify('success', t("modules.taskStatus.components.ManageTaskStatusesPage.notifications.taskStatusUpdated", { name: taskStatus.name }));
+        onRefresh();
+    };
+
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -188,16 +195,20 @@
 </script>
 
 <template>
-    <n-modal v-model:show="showForm">
-        <TaskStatusForm :mode="formMode == 'add' ? 'add' : 'update'" :taskStatusId="selectedItem.id" style="width: 40%;"
-            @add="onAdd" @update="onUpdate" @cancel="onCancel" />
+    <n-modal v-model:show="showModal">
+        <TaskStatusForm :mode="modalFormMode == 'add' ? 'add' : 'update'" :taskStatusId="selectedItem.id"
+            class="modal-form" @add="onAdded" @update="onUpdated" @cancel="onCancelForm" />
     </n-modal>
 
     <n-card :title="t('modules.taskStatus.components.ManageTaskStatusesPage.header.title')">
-        <TaskStatusesTable :task-statuses="filteredItems" :loading="state.ajaxRunning" @refresh="onRefresh"
-            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" :sort-field="sort.field"
-            :sort-order="sort.order" @toggle-sort="onToggleSort" v-model:task-status-name-filter="nameFilter" />
+        <TaskStatusesTable :items="filteredItems" :disabled="state.ajaxRunning" @refresh="onRefresh"
+            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" :sort="sort" @sort="onSort"
+            v-model:filters="filters" />
     </n-card>
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+    .modal-form {
+        width: 40%;
+    }
+</style>

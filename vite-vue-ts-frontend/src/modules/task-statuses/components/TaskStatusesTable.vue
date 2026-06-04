@@ -5,46 +5,55 @@
     import { useDialog, NFlex, NEmpty, NTag } from 'naive-ui';
     import { IconTrash } from '@tabler/icons-vue';
 
-    import { TaskStatus } from '../models/task-status';
-    import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
-    import { type SortOrder } from '../../../shared/types/common';
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
+    import type { Sort } from '../../../shared/types/models/sort.ts';
+    import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
+    import type { TaskStatusesTableFilters } from '../types/task-statuses-table-filters.ts';
+    import { TaskStatus } from '../models/task-status';
+
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
-    import TableCellHeaderSortIcon from '../../../shared/components/tables/TableCellHeaderSortIcon.vue';
-    import UpdateDeleteActionsColumn from '../../../shared/components/tables/UpdateDeleteActionsColumn.vue';
-    import RefreshAddActionsColumn from '../../../shared/components/tables/RefreshAddActionsColumn.vue';
+    import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
+    import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
 
     interface Props {
-        loading: boolean;
-        taskStatuses: TaskStatus[];
-        sortField: string;
-        sortOrder: SortOrder;
+        disabled: boolean;
+        items: TaskStatus[];
+        sort?: Sort;
     }
 
     const { t } = useI18n();
+    const dialog = useDialog();
 
-    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'toggleSort']);
+    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'sort']);
 
     const props = defineProps<Props>();
+
+    const filters = defineModel<TaskStatusesTableFilters>("filters", {
+        default: () => ({
+            name: "",
+        })
+    });
+
+    const isFilteredByName = computed<boolean>(() => filters.value.name.length > 0);
+
+    const hasFilters = computed<boolean>(() =>
+        isFilteredByName.value
+    );
 
     const columns = computed<TableHeaderColumn[]>(() => [
         {
             label: t("modules.taskStatus.components.TaskStatusesTable.header.columns.name"),
             field: "name",
-            sortable: true,
+            visible: true,
+            sortable: false,
+            isFiltered: () => isFilteredByName.value,
         }
     ]);
 
-    const taskStatusNameFilter = defineModel<string>("taskStatusNameFilter", {
-        default: "",
-    });
-
-    const dialog = useDialog();
-
-    const onToggleSort = (field: string) => {
-        emit("toggleSort", field);
+    const onSort = (sort: Sort) => {
+        emit("sort", sort);
     };
 
     const onRefresh = () => {
@@ -77,46 +86,40 @@
             },
         });
     };
+
+    const onClearFilters = () => {
+        filters.value.name = "";
+    };
 </script>
 
 <template>
-    <ManageTable size="small">
+    <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd">
         <template #thead>
-            <tr class="doneo-table-header-click-action">
-                <th v-for="column in columns" :key="column.field" @click="column.sortable && onToggleSort(column.field)"
-                    :class="{ 'doneo-cursor-pointer': column.sortable, 'doneo-text-center': column.align === 'center' }">
-                    <n-flex justify="space-between" v-if="column.sortable">
-                        <span>{{ column.label }}</span>
-                        <TableCellHeaderSortIcon v-if="props.sortField === column.field" :order="props.sortOrder" />
-                    </n-flex>
-                    <span v-else>{{ column.label }}</span>
-                </th>
-                <th class="doneo-table-actions-column">{{ t("shared.components.table.header.columns.actions") }}</th>
-            </tr>
             <tr>
                 <th>
-                    <TextFilterInput clearable size="small"
+                    <TextFilterInput clearable :disabled="props.disabled" size="small"
                         :placeholder="t('modules.taskStatus.components.TaskStatusesTable.filters.name.placeholder')"
-                        v-model:value="taskStatusNameFilter" />
+                        v-model:value="filters.name" />
                 </th>
                 <th class="doneo-text-center">
-                    <RefreshAddActionsColumn @refresh="onRefresh" @add="onAdd" />
+                    <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
                 </th>
             </tr>
         </template>
         <template #tbody>
-            <tr v-for="taskStatus, index in taskStatuses" :key="taskStatus.id ?? index">
+            <tr v-for="taskStatus, index in items" :key="taskStatus.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(taskStatus.hexColor ?? '#888888')">{{ taskStatus.name
-                    }}</n-tag>
+                        }}</n-tag>
                 </td>
                 <td class="doneo-text-center">
-                    <UpdateDeleteActionsColumn @update="onUpdate(taskStatus, index)"
+                    <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
+                        :delete-disabled="props.disabled" @update="onUpdate(taskStatus, index)"
                         @delete="onConfirmDelete(taskStatus, index)" />
                 </td>
             </tr>
             <tr>
-                <td :colspan="columns.length + 1" v-if="taskStatuses.length < 1 && !props.loading">
+                <td :colspan="columns.length + 1" v-if="items.length < 1 && !props.disabled">
                     <n-empty :description="t('modules.taskStatus.components.TaskStatusesTable.warnings.noItemsFound')">
                     </n-empty>
                 </td>
