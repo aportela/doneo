@@ -104,12 +104,12 @@
             <tr v-for="projectType, index in items" :key="projectType.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(projectType.hexColor ?? '#888888')">{{ projectType.name
-                        }}</n-tag>
+                    }}</n-tag>
                 </td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
-                        :delete-disabled="props.disabled" @update="onUpdate(projectType, index)"
-                        @delete="onConfirmDelete(projectType, index)" />
+                        :delete-disabled="props.disabled" :disabled="props.disabled"
+                        @update="onUpdate(projectType, index)" @delete="onConfirmDelete(projectType, index)" />
                 </td>
             </tr>
             <tr>

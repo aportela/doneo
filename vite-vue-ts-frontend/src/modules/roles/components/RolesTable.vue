@@ -245,7 +245,7 @@
                 </td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
-                        :delete-disabled="props.disabled" @update="onUpdate(role, index)"
+                        :delete-disabled="props.disabled" :disabled="props.disabled" @update="onUpdate(role, index)"
                         @delete="onConfirmDelete(role, index)" />
                 </td>
             </tr>

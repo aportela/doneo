@@ -214,12 +214,10 @@
                     <!-- TODO: use ManageTableActionButtons -->
                     <n-button-group size="small">
                         <router-link :to="{ name: 'projectTab', params: { id: project.id, tab: 'metadata' } }">
-                            <n-button>
+                            <n-button :disabled="props.disabled">
                                 {{ t("shared.buttons.Open.label") }}
                                 <template #icon>
-                                    <n-icon :size="22">
-                                        <IconFilePencil />
-                                    </n-icon>
+                                    <n-icon :size="22" :component="IconFilePencil" />
                                 </template>
                             </n-button>
                         </router-link>

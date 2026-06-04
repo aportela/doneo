@@ -245,7 +245,7 @@
                     <ManageTableActionButtons show-update show-delete show-restore
                         :update-disabled="props.disabled || !!user.deletedAt?.msTimestamp"
                         :delete-disabled="props.disabled || sessionStore.sessionUserId === user.id || !!user.deletedAt?.msTimestamp"
-                        :restored-disabled="props.disabled || !user.deletedAt?.msTimestamp"
+                        :restored-disabled="props.disabled || !user.deletedAt?.msTimestamp" :disabled="props.disabled"
                         @update="onUpdate(user, index)" @delete="onConfirmDelete(user, index)"
                         @restore="onConfirmUnDelete(user, index)" />
                 </td>

@@ -105,12 +105,12 @@
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(projectPriority.hexColor ?? '#888888')">{{
                         projectPriority.name
-                        }}</n-tag>
+                    }}</n-tag>
                 </td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
-                        :delete-disabled="props.disabled" @update="onUpdate(projectPriority, index)"
-                        @delete="onConfirmDelete(projectPriority, index)" />
+                        :delete-disabled="props.disabled" :disabled="props.disabled"
+                        @update="onUpdate(projectPriority, index)" @delete="onConfirmDelete(projectPriority, index)" />
                 </td>
             </tr>
             <tr>

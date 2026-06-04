@@ -104,12 +104,12 @@
             <tr v-for="taskStatus, index in items" :key="taskStatus.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(taskStatus.hexColor ?? '#888888')">{{ taskStatus.name
-                    }}</n-tag>
+                        }}</n-tag>
                 </td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
-                        :delete-disabled="props.disabled" @update="onUpdate(taskStatus, index)"
-                        @delete="onConfirmDelete(taskStatus, index)" />
+                        :delete-disabled="props.disabled" :disabled="props.disabled"
+                        @update="onUpdate(taskStatus, index)" @delete="onConfirmDelete(taskStatus, index)" />
                 </td>
             </tr>
             <tr>

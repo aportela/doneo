@@ -108,8 +108,8 @@
                 </td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
-                        :delete-disabled="props.disabled" @update="onUpdate(projectStatus, index)"
-                        @delete="onConfirmDelete(projectStatus, index)" />
+                        :delete-disabled="props.disabled" :disabled="props.disabled"
+                        @update="onUpdate(projectStatus, index)" @delete="onConfirmDelete(projectStatus, index)" />
                 </td>
             </tr>
             <tr>
