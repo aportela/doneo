@@ -20,7 +20,6 @@
     import ImagePreview from "../../../shared/components/ImagePreview.vue";
 
     import ProjectAttachmentsTable from "../../attachments/components/ProjectAttachmentsTable.vue";
-
     import type { ProjectAttachmentsTableFilters } from "../../attachments/types/project-attachments-table-filter.ts";
 
     interface ProjectAttachmentsProps {
