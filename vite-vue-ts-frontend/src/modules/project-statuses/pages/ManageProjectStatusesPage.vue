@@ -32,7 +32,7 @@
 
     const sort = ref<Sort>(new Sort("name", "ASC"));
 
-    const filters = reactive<ProjectTypesTableFilters>({
+    const filters = reactive<ProjectStatusesTableFilters>({
         name: "",
     });
 
