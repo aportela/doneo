@@ -151,7 +151,7 @@ var installSchemaQueries = []string{
 	`
 		CREATE TABLE IF NOT EXISTS project_history_operations (
 			project_id TEXT NOT NULL CHECK(length(project_id) == 36),
-			operation_type INT NOT NULL,
+			operation_type INTEGER NOT NULL,
 			user_id TEXT NOT NULL CHECK(length(user_id) == 36),
 			created_at INTEGER NOT NULL,
 			PRIMARY KEY (project_id, operation_type, user_id, created_at),
@@ -159,6 +159,35 @@ var installSchemaQueries = []string{
 			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 		) STRICT;
 	`,
+	`
+		CREATE TABLE IF NOT EXISTS project_task_counter (
+			project_id TEXT NOT NULL CHECK(length(project_id) == 36),
+			next_task_index INTEGER NOT NULL DEFAULT 1 CHECK(next_task_index > 0),
+			PRIMARY KEY (project_id),
+			FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+		) STRICT;
+	`,
+	`
+		CREATE TABLE IF NOT EXISTS tasks (
+			id TEXT NOT NULL CHECK(length(id) == 36),
+			project_id TEXT NOT NULL CHECK(length(project_id) == 36),
+			task_index INTEGER NOT NULL,
+			summary TEXT NOT NULL CHECK(length(summary) BETWEEN 1 AND 128),
+			description TEXT,
+			creator_id TEXT NOT NULL CHECK(length(creator_id) == 36),
+			created_at INTEGER NOT NULL,
+			updated_at INTEGER,
+			deleted_at INTEGER,
+			archived_at INTEGER,
+			started_at INTEGER,
+			finished_at INTEGER,
+			due_at INTEGER,
+			PRIMARY KEY (id),
+			FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE,
+			UNIQUE(project_id, task_index)
+		) STRICT;
+	`,
+
 	/*
 		`
 			CREATE TABLE IF NOT EXISTS project_task_status (
