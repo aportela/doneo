@@ -6,7 +6,6 @@
     import { IconTrash } from '@tabler/icons-vue';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
-    import type { Sort } from '../../../shared/types/models/sort.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { ProjectTypesTableFilters } from '../types/project-types-table-filters.ts';
     import { ProjectType } from '../models/project-type';
@@ -105,7 +104,7 @@
             <tr v-for="projectType, index in items" :key="projectType.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(projectType.hexColor ?? '#888888')">{{ projectType.name
-                    }}</n-tag>
+                        }}</n-tag>
                 </td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
