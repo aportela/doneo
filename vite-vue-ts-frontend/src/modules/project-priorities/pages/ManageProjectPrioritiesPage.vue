@@ -197,7 +197,7 @@
 <template>
     <n-modal v-model:show="showModal">
         <ProjectPriorityForm :mode="modalFormMode == 'add' ? 'add' : 'update'" :project-priority-id="selectedItem.id"
-            style="width: 40%;" @add="onAdded" @update="onUpdated" @cancel="onCancelForm" />
+            class="modal-form" @add="onAdded" @update="onUpdated" @cancel="onCancelForm" />
     </n-modal>
 
     <n-card :title="t('modules.projectPriority.components.ManageProjectPrioritiesPage.header.title')">
@@ -207,4 +207,8 @@
     </n-card>
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+    .modal-form {
+        width: 40%;
+    }
+</style>
