@@ -50,9 +50,9 @@ func (repository *projectRepository) Add(ctx context.Context, project projectDTO
 		ctx,
 		`
             INSERT INTO projects
-				(id, key, summary, description, creator_id, created_at, updated_at, started_at, finished_at, due_at, priority_id, status_id, type_id)
+				(id, key, summary, description, creator_id, created_at, updated_at, deleted_at, started_at, finished_at, due_at, priority_id, status_id, type_id)
 			VALUES
-				(?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?, ?, ?)
+				(?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, ?)
         `,
 		project.ID,
 		project.Key,
@@ -91,6 +91,20 @@ func (repository *projectRepository) Add(ctx context.Context, project projectDTO
 				return &domain.ValidationError{Field: "summary"}
 			}
 		}
+	}
+	_, err = tx.ExecContext(
+		ctx,
+		`
+			INSERT INTO project_task_counter
+				(project_id, next_task_index)
+			VALUES
+				(?, 1)
+		`,
+		project.ID,
+	)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
 	}
 	_, err = tx.ExecContext(
 		ctx,
@@ -262,6 +276,7 @@ func (repository *projectRepository) Get(ctx context.Context, id string) (projec
 				P.description,
 				P.created_at,
 				P.updated_at,
+				P.deleted_at,
 				P.started_at,
 				P.finished_at,
 				P.due_at,
@@ -316,6 +331,7 @@ func (repository *projectRepository) Get(ctx context.Context, id string) (projec
 		&project.Description,
 		&project.CreatedAt,
 		&project.UpdatedAt,
+		&project.DeletedAt,
 		&project.StartedAt,
 		&project.FinishedAt,
 		&project.DueAt,
@@ -356,6 +372,7 @@ func (repository *projectRepository) Search(ctx context.Context, pager browser.P
 				P.description,
 				P.created_at,
 				P.updated_at,
+				P.deleted_at,
 				P.started_at,
 				P.finished_at,
 				P.due_at,
@@ -392,6 +409,16 @@ func (repository *projectRepository) Search(ctx context.Context, pager browser.P
 		field = "P.summary COLLATE NOCASE"
 	case "createdAt":
 		field = "P.created_at"
+	case "updatedAt":
+		field = "P.updated_at"
+	case "deletedAt":
+		field = "P.deleted_at"
+	case "startedAt":
+		field = "P.started_at"
+	case "finishedAt":
+		field = "P.finished_at"
+	case "dueAt":
+		field = "P.due_at"
 	case "createdBy":
 		field = "U.name COLLATE NOCASE"
 	default:
@@ -439,6 +466,7 @@ func (repository *projectRepository) Search(ctx context.Context, pager browser.P
 			filterArgs = append(filterArgs, filter.CreatedAt.To)
 		}
 	}
+	// TODO: updatedat, deletedat, startedat, finishedat, dueat
 	if filter.CreatedByUserId != nil && len(*filter.CreatedByUserId) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "P.creator_id = ?")
 		filterArgs = append(filterArgs, *filter.CreatedByUserId)
@@ -470,6 +498,7 @@ func (repository *projectRepository) Search(ctx context.Context, pager browser.P
 			&project.Description,
 			&project.CreatedAt,
 			&project.UpdatedAt,
+			&project.DeletedAt,
 			&project.StartedAt,
 			&project.FinishedAt,
 			&project.DueAt,
