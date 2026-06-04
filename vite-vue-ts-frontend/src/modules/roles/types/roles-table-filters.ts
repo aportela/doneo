@@ -1,5 +1,8 @@
+import type { ProjectPermissionSelectValue } from "../../../shared/types/project-permission-select-value";
+import type { TaskPermissionSelectValue } from "../../../shared/types/task-permission-select-value";
+
 export interface RolesTableFilters {
   name: string;
-  allowedProjectPermissions: number[];
-  allowedTaskPermissions: number[];
+  projectPermission: ProjectPermissionSelectValue | null;
+  taskPermission: TaskPermissionSelectValue | null;
 }

@@ -1,17 +1,21 @@
 <script setup lang="ts">
-    import { h, computed } from 'vue';
+    import { h, ref, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { useDialog, NEmpty, NIcon, NTooltip, NSelect, type SelectOption } from 'naive-ui';
+    import { useDialog, NEmpty, NIcon, NTooltip } from 'naive-ui';
     import { IconEdit, IconEyeCheck, IconSquarePlus, IconTrash } from '@tabler/icons-vue';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { RolesTableFilters } from '../types/roles-table-filters.ts';
+
+    import type { ReseteableComponent } from '../../../shared/types/ReseteableComponent.ts';
     import { Role } from '../models/role';
 
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
+    import ProjectPermissionSelect from '../../../shared/components/selectors/ProjectPermissionSelect.vue';
+    import TaskPermissionSelect from '../../../shared/components/selectors/TaskPermissionSelect.vue';
     import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
 
@@ -27,21 +31,23 @@
 
     const props = defineProps<Props>();
 
+    const projectPermissionSelectorRef = ref<ReseteableComponent | undefined>();
+    const taskPermissionSelectorRef = ref<ReseteableComponent | undefined>();
+
     const filters = defineModel<RolesTableFilters>("filters", {
         default: () => ({
             name: "",
-            allowedProjectPermissions: [],
-            allowedTaskPermissions: [],
+            projectPermission: null,
+            taskPermission: null,
         })
     });
 
     const isFilteredByName = computed<boolean>(() => filters.value.name.length > 0);
-    const isFilteredByAllowedProjectPermissions = computed<boolean>(() => filters.value.allowedProjectPermissions.length > 0);
-    const isFilteredByAllowedTaskPermissions = computed<boolean>(() => filters.value.allowedTaskPermissions.length > 0);
-
+    const isFilteredByProjectPermission = computed<boolean>(() => filters.value.projectPermission !== null);
+    const isFilteredByTaskPermission = computed<boolean>(() => filters.value.taskPermission !== null);
 
     const hasFilters = computed<boolean>(() =>
-        isFilteredByName.value || isFilteredByAllowedProjectPermissions.value || isFilteredByAllowedTaskPermissions.value
+        isFilteredByName.value || isFilteredByProjectPermission.value || isFilteredByTaskPermission.value
     );
 
     const columns = computed<TableHeaderColumn[]>(() => [
@@ -58,7 +64,7 @@
             visible: true,
             sortable: false,
             align: "center",
-            isFiltered: () => isFilteredByAllowedProjectPermissions.value,
+            isFiltered: () => isFilteredByProjectPermission.value,
         },
         {
             label: t("modules.role.components.RolesTable.header.columns.taskPermissions"),
@@ -66,43 +72,7 @@
             visible: true,
             sortable: false,
             align: "center",
-            isFiltered: () => isFilteredByAllowedTaskPermissions.value,
-        },
-    ]);
-
-    // TODO:
-    const projectPermissionsSelectorOptions = computed<SelectOption[]>(() => [
-        {
-            label: t("modules.role.components.RolesTable.body.columns.permissionsHints.updateProjectAllowed"),
-            value: 1
-        },
-        {
-            label: t("modules.role.components.RolesTable.body.columns.permissionsHints.deleteProjectAllowed"),
-            value: 2
-        },
-        {
-            label: t("modules.role.components.RolesTable.body.columns.permissionsHints.viewProjectAllowed"),
-            value: 3
-        },
-    ]);
-
-    // TODO:
-    const taskPermissionsSelectorOptions = computed<SelectOption[]>(() => [
-        {
-            label: t("modules.role.components.RolesTable.body.columns.permissionsHints.addTaskAllowed"),
-            value: 1
-        },
-        {
-            label: t("modules.role.components.RolesTable.body.columns.permissionsHints.updateTaskAllowed"),
-            value: 2
-        },
-        {
-            label: t("modules.role.components.RolesTable.body.columns.permissionsHints.deleteTaskAllowed"),
-            value: 3
-        },
-        {
-            label: t("modules.role.components.RolesTable.body.columns.permissionsHints.viewTaskAllowed"),
-            value: 4
+            isFiltered: () => isFilteredByTaskPermission.value,
         },
     ]);
 
@@ -139,8 +109,8 @@
 
     const onClearFilters = () => {
         filters.value.name = "";
-        filters.value.allowedProjectPermissions = [];
-        filters.value.allowedTaskPermissions = [];
+        projectPermissionSelectorRef.value?.reset();
+        taskPermissionSelectorRef.value?.reset();
     };
 
     const permissionIconSize = 22;
@@ -156,13 +126,14 @@
                         v-model:value="filters.name" />
                 </th>
                 <th>
-                    <n-select size="small" clearable :disabled="true || props.disabled" multiple
-                        :options="projectPermissionsSelectorOptions"
-                        v-model:value="filters.allowedProjectPermissions" />
+                    <ProjectPermissionSelect v-model:permission="filters.projectPermission"
+                        :placeholder="t('shared.components.selectors.ProjectPermissionSelect.placeholder')" clearable
+                        ref="projectPermissionSelectorRef" />
                 </th>
                 <th>
-                    <n-select size="small" clearable :disabled="true || props.disabled" multiple
-                        :options="taskPermissionsSelectorOptions" v-model:value="filters.allowedTaskPermissions" />
+                    <TaskPermissionSelect v-model:permission="filters.taskPermission"
+                        :placeholder="t('shared.components.selectors.TaskPermissionSelect.placeholder')" clearable
+                        ref="taskPermissionSelectorRef" />
                 </th>
                 <th class="doneo-text-center">
                     <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
@@ -204,8 +175,6 @@
                             "modules.role.components.RolesTable.body.columns.permissionsHints.viewProjectAllowed" :
                             "modules.role.components.RolesTable.body.columns.permissionsHints.viewProjectDenied") }}
                     </n-tooltip>
-                </td>
-                <td class="doneo-text-center">
                     <n-tooltip trigger="hover">
                         <template #trigger>
                             <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconSquarePlus"
@@ -215,6 +184,8 @@
                             "modules.role.components.RolesTable.body.columns.permissionsHints.addTaskAllowed" :
                             "modules.role.components.RolesTable.body.columns.permissionsHints.addTaskDenied") }}
                     </n-tooltip>
+                </td>
+                <td class="doneo-text-center">
                     <n-tooltip trigger="hover">
                         <template #trigger>
                             <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconEdit"

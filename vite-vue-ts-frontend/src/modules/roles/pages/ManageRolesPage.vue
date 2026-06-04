@@ -35,8 +35,8 @@
 
     const filters = reactive<RolesTableFilters>({
         name: "",
-        allowedProjectPermissions: [],
-        allowedTaskPermissions: [],
+        projectPermission: null,
+        taskPermission: null,
     });
 
     const nameFilterLowerCase = computed(() =>
@@ -44,9 +44,30 @@
     );
 
     const filteredItems = computed(() => {
-        return items.value.filter((projectPriority) => {
-            const name = projectPriority.name?.toLowerCase();
-            return ((!name || name?.includes(nameFilterLowerCase.value))
+        return items.value.filter((role: Role) => {
+            const name = role.name?.toLowerCase();
+            return (
+                (!name || name?.includes(nameFilterLowerCase.value)) &&
+                (filters.projectPermission === null || (filters.projectPermission !== null && (
+                    (filters.projectPermission === "updateProjectAllowed" && role.permissions.allowUpdateProject) ||
+                    (filters.projectPermission === "updateProjectDenied" && !role.permissions.allowUpdateProject) ||
+                    (filters.projectPermission === "deleteProjectAllowed" && role.permissions.allowDeleteProject) ||
+                    (filters.projectPermission === "deleteProjectDenied" && !role.permissions.allowDeleteProject) ||
+                    (filters.projectPermission === "viewProjectAllowed" && role.permissions.allowViewProject) ||
+                    (filters.projectPermission === "viewProjectDenied" && !role.permissions.allowViewProject) ||
+                    (filters.projectPermission === "addTaskAllowed" && role.permissions.allowAddTask) ||
+                    (filters.projectPermission === "addTaskDenied" && !role.permissions.allowAddTask)
+                ))
+                ) &&
+                (filters.taskPermission === null || (filters.taskPermission !== null && (
+                    (filters.taskPermission === "updateTaskAllowed" && role.permissions.allowUpdateTask) ||
+                    (filters.taskPermission === "updateTaskDenied" && !role.permissions.allowUpdateTask) ||
+                    (filters.taskPermission === "deleteTaskAllowed" && role.permissions.allowDeleteTask) ||
+                    (filters.taskPermission === "deleteTaskDenied" && !role.permissions.allowDeleteTask) ||
+                    (filters.taskPermission === "viewTaskAllowed" && role.permissions.allowViewTask) ||
+                    (filters.taskPermission === "viewTaskDenied" && !role.permissions.allowViewTask)
+                ))
+                )
             );
         });
     });

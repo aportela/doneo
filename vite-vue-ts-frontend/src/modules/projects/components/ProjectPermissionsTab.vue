@@ -47,7 +47,7 @@
     });
 
     const filteredPermissions = computed(() => {
-        return items.value.filter((permission) => {
+        return items.value.filter((permission: ProjectPermission) => {
             return (
                 (filters.userId === null || filters.userId === permission.user.id) &&
                 (filters.roleId === null || filters.roleId === permission.role.id) &&
