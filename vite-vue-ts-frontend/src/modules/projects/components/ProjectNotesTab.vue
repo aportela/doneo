@@ -134,6 +134,7 @@
                     };
                     await noteService.updateProjectNote(props.projectId, note.id, payload);
                     notify('success', t("modules.note.components.ProjectNotesTab.notifications.projectNoteUpdated"));
+                    // TODO: this will remove pending notes, do not allow add more than 1 one without saving
                     onRefresh();
                 }
             } catch { }
