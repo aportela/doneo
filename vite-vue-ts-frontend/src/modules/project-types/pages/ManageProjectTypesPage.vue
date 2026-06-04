@@ -81,8 +81,8 @@
                     resultsPage: 0,
                 },
                 order: {
-                    field: sort.value.field,
-                    sort: sort.value.order,
+                    field: sort.field,
+                    sort: sort.order,
                 },
                 filter: {
                     //name: filters.name.length > 0 ? filters.name : undefined,
