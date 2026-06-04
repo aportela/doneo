@@ -2,7 +2,7 @@
     import { ref, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NFlex, NEmpty, NTag, NButtonGroup, NButton, NIcon } from 'naive-ui';
+    import { NEmpty, NTag, NButtonGroup, NButton, NIcon } from 'naive-ui';
     import { IconFilePencil } from '@tabler/icons-vue';
 
     import type { Sort } from '../../../shared/types/models/sort.ts';
