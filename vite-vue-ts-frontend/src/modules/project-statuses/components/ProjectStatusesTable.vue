@@ -2,7 +2,7 @@
     import { h, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { useDialog, NFlex, NEmpty, NTag } from 'naive-ui';
+    import { useDialog, NEmpty, NTag } from 'naive-ui';
     import { IconTrash } from '@tabler/icons-vue';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
@@ -11,13 +11,11 @@
     import type { ProjectStatusesTableFilters } from '../types/project-statuses-table-filters.ts';
     import { ProjectStatus } from '../models/project-status';
 
-
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
     import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
-
 
     interface Props {
         disabled: boolean;
@@ -32,7 +30,7 @@
 
     const props = defineProps<Props>();
 
-    const filters = defineModel<ProjectTypesTableFilters>("filters", {
+    const filters = defineModel<ProjectStatusesTableFilters>("filters", {
         default: () => ({
             name: "",
         })
