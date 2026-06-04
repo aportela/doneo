@@ -2,11 +2,10 @@
     import { h, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { useDialog, NFlex, NEmpty, NTag } from 'naive-ui';
+    import { useDialog, NEmpty, NTag } from 'naive-ui';
     import { IconTrash } from '@tabler/icons-vue';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
-    import type { Sort } from '../../../shared/types/models/sort.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { TaskPrioritiesTableFilters } from '../types/task-priorities-table-filters.ts';
     import { TaskPriority } from '../models/task-priority';
@@ -20,13 +19,12 @@
     interface Props {
         disabled: boolean;
         items: TaskPriority[];
-        sort?: Sort;
     }
 
     const { t } = useI18n();
     const dialog = useDialog();
 
-    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'sort']);
+    const emit = defineEmits(['refresh', 'add', 'update', 'delete']);
 
     const props = defineProps<Props>();
 
@@ -51,10 +49,6 @@
             isFiltered: () => isFilteredByName.value,
         },
     ]);
-
-    const onSort = (sort: Sort) => {
-        emit("sort", sort);
-    };
 
     const onRefresh = () => {
         emit("refresh");
@@ -93,7 +87,7 @@
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd">
+    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
         <template #thead>
             <tr>
                 <th>
@@ -110,10 +104,11 @@
             <tr v-for="taskPriority, index in items" :key="taskPriority.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(taskPriority.hexColor ?? '#888888')">{{ taskPriority.name
-                        }}</n-tag>
+                    }}</n-tag>
                 </td>
                 <td class="doneo-text-center">
-                    <UpdateDeleteActionsColumn @update="onUpdate(taskPriority, index)"
+                    <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
+                        :delete-disabled="props.disabled" @update="onUpdate(taskPriority, index)"
                         @delete="onConfirmDelete(taskPriority, index)" />
                 </td>
             </tr>
