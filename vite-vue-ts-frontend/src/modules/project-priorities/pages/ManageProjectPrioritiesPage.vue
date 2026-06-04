@@ -1,25 +1,29 @@
 <script setup lang="ts">
-    import { onMounted, onBeforeUnmount, ref, reactive, shallowRef, watch, computed } from 'vue';
+    import { ref, reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NModal, NCard } from 'naive-ui';
 
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { useLoadingStore } from '../../../stores/loading';
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
+
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
+    import type { FormMode } from '../../../shared/types/form-mode';
+    import type { SearchRequest, ProjectPriorityResponse } from '../types/dto';
+    import type { ProjectPrioritiesTableFilters } from '../types/project-priorities-table-filters.ts';
+
+    import { Sort } from '../../../shared/types/models/sort';
+    import { ProjectPriority } from '../models/project-priority';
+
     import { projectPriorityService } from '../services/project-priority';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import type { ProjectPriorityResponse, SearchRequest } from '../types/dto';
-    import { ProjectPriority } from '../models/project-priority';
-    import ProjectPrioritiesTable from '../components/ProjectPrioritiesTable.vue';
+
     import ProjectPriorityForm from '../components/ProjectPriorityForm.vue';
-    import { Sort } from '../../../shared/types/models/sort';
-    import type { FormMode } from '../../../shared/types/form-mode';
+    import ProjectPrioritiesTable from '../components/ProjectPrioritiesTable.vue';
 
     const { t } = useI18n();
     const { notify } = useNotify();
-
     const loadingStore = useLoadingStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
@@ -28,11 +32,12 @@
 
     const sort = ref<Sort>(new Sort("name", "ASC"));
 
-    const nameFilter = ref<string>("");
-
+    const filters = reactive<ProjectPrioritiesTableFilters>({
+        name: "",
+    });
 
     const nameFilterLowerCase = computed(() =>
-        nameFilter.value?.toLowerCase() ?? ''
+        filters.name.toLowerCase()
     );
 
     const filteredItems = computed(() => {
@@ -43,8 +48,8 @@
         });
     });
 
-    const showForm = ref<boolean>(false);
-    const formMode = ref<FormMode>("add");
+    const showModal = ref<boolean>(false);
+    const modalFormMode = ref<FormMode>("add");
 
     const selectedItem = ref<ProjectPriority>(new ProjectPriority());
 
@@ -52,36 +57,25 @@
         loadingStore.set(newValue.ajaxRunning);
     });
 
-    const onToggleSort = (field: string) => {
-        sort.value.toggleSort(field);
+    const onSort = (newSort: Sort) => {
+        sort.field = newSort.field;
+        sort.order = newSort.order;
         onRefresh();
     };
 
     const onShowAddForm = () => {
-        formMode.value = "add";
-        showForm.value = true;
+        modalFormMode.value = "add";
+        showModal.value = true;
     };
 
     const onShowUpdateForm = (projectPriority: ProjectPriority, _index: number) => {
         selectedItem.value = projectPriority;
-        formMode.value = "update";
-        showForm.value = true;
+        modalFormMode.value = "update";
+        showModal.value = true;
     };
 
-    const onAdd = (projectPriority: ProjectPriority) => {
-        showForm.value = false;
-        notify('success', t("modules.projectPriority.components.ManageProjectPrioritiesPage.notifications.projectPriorityAdded", { name: projectPriority.name }));
-        onRefresh();
-    };
-
-    const onUpdate = (projectPriority: ProjectPriority) => {
-        showForm.value = false;
-        notify('success', t("modules.projectPriority.components.ManageProjectPrioritiesPage.notifications.projectPriorityUpdated", { name: projectPriority.name }));
-        onRefresh();
-    };
-
-    const onCancel = () => {
-        showForm.value = false;
+    const onCancelForm = () => {
+        showModal.value = false;
     };
 
     const onRefresh = async () => {
@@ -95,6 +89,9 @@
                 order: {
                     field: sort.value.field,
                     sort: sort.value.order,
+                },
+                filter: {
+                    //name: filters.name.length > 0 ? filters.name : undefined,
                 },
             };
             const response = await projectPriorityService.search(payload);
@@ -167,6 +164,18 @@
         }
     };
 
+    const onAdded = (projectPriority: ProjectPriority) => {
+        showModal.value = false;
+        notify('success', t("modules.projectPriority.components.ManageProjectPrioritiesPage.notifications.projectPriorityAdded", { name: projectPriority.name }));
+        onRefresh();
+    };
+
+    const onUpdated = (projectPriority: ProjectPriority) => {
+        showModal.value = false;
+        notify('success', t("modules.projectPriority.components.ManageProjectPrioritiesPage.notifications.projectPriorityUpdated", { name: projectPriority.name }));
+        onRefresh();
+    };
+
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -186,15 +195,15 @@
 </script>
 
 <template>
-    <n-modal v-model:show="showForm">
-        <ProjectPriorityForm :mode="formMode == 'add' ? 'add' : 'update'" :project-priority-id="selectedItem.id"
-            style="width: 40%;" @add="onAdd" @update="onUpdate" @cancel="onCancel" />
+    <n-modal v-model:show="showModal">
+        <ProjectPriorityForm :mode="modalFormMode == 'add' ? 'add' : 'update'" :project-priority-id="selectedItem.id"
+            style="width: 40%;" @add="onAdded" @update="onUpdated" @cancel="onCancelForm" />
     </n-modal>
 
     <n-card :title="t('modules.projectPriority.components.ManageProjectPrioritiesPage.header.title')">
-        <ProjectPrioritiesTable :projectPriorities="filteredItems" :loading="state.ajaxRunning" @refresh="onRefresh"
-            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" :sort-field="sort.field"
-            :sort-order="sort.order" @toggle-sort="onToggleSort" v-model:project-priority-name-filter="nameFilter" />
+        <ProjectPrioritiesTable :items="filteredItems" :disabled="state.ajaxRunning" @refresh="onRefresh"
+            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" :sort="sort" @sort="onSort"
+            v-model:filters="filters" />
     </n-card>
 </template>
 

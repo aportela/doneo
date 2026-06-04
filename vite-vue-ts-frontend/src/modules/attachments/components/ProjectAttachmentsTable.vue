@@ -15,6 +15,7 @@
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
     import { formatBytes } from '../../../shared/composables/format.ts';
+    import type { SortOrder } from '../../../shared/types/common.ts';
 
     interface Props {
         // TODO: refactor to disabled
@@ -103,7 +104,8 @@
 </script>
 
 <template>
-    <ManageTable size="small">
+    <ManageTable size="small" :columns="columns" :sort-field="sortField" :sort-order="sortOrder" @sort="onToggleSort"
+        @refresh="onRefresh" @add="onAdd">
         <template #thead>
             <tr>
                 <th v-for="column in columns" :key="column.field"
