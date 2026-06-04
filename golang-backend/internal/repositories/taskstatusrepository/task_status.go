@@ -15,11 +15,11 @@ import (
 )
 
 type ProjectStatusRepository interface {
-	Add(ctx context.Context, taskStatus taskStatusDTO) error
-	Update(ctx context.Context, taskStatus taskStatusDTO) error
+	Add(ctx context.Context, taskStatus domain.TaskStatus) error
+	Update(ctx context.Context, taskStatus domain.TaskStatus) error
 	Delete(ctx context.Context, id string) error
-	Get(ctx context.Context, id string) (taskStatusDTO, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter searchFilterDTO) ([]taskStatusDTO, browser.Result, error)
+	Get(ctx context.Context, id string) (domain.TaskStatus, error)
+	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskStatusesFilter) ([]domain.TaskStatus, browser.Result, error)
 }
 
 type taskStatusRepository struct {
@@ -30,16 +30,17 @@ func NewRepository(database database.Database) ProjectStatusRepository {
 	return &taskStatusRepository{database: database}
 }
 
-func (repository *taskStatusRepository) Add(ctx context.Context, taskStatus taskStatusDTO) error {
+func (repository *taskStatusRepository) Add(ctx context.Context, taskStatus domain.TaskStatus) error {
+	dto := toDTO(taskStatus)
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
             INSERT INTO task_statuses (id, name, item_hex_color)
 			VALUES (?, ?, ?)
         `,
-		taskStatus.ID,
-		taskStatus.Name,
-		taskStatus.HexColor,
+		dto.ID,
+		dto.Name,
+		dto.HexColor,
 	)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -67,7 +68,8 @@ func (repository *taskStatusRepository) Add(ctx context.Context, taskStatus task
 	return err
 }
 
-func (repository *taskStatusRepository) Update(ctx context.Context, taskStatus taskStatusDTO) error {
+func (repository *taskStatusRepository) Update(ctx context.Context, taskStatus domain.TaskStatus) error {
+	dto := toDTO(taskStatus)
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
@@ -76,9 +78,9 @@ func (repository *taskStatusRepository) Update(ctx context.Context, taskStatus t
 				item_hex_color = ?
 			WHERE id = ?
         `,
-		taskStatus.Name,
-		taskStatus.HexColor,
-		taskStatus.ID,
+		dto.Name,
+		dto.HexColor,
+		dto.ID,
 	)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -118,7 +120,7 @@ func (repository *taskStatusRepository) Delete(ctx context.Context, id string) e
 	return err
 }
 
-func (repository *taskStatusRepository) Get(ctx context.Context, id string) (taskStatusDTO, error) {
+func (repository *taskStatusRepository) Get(ctx context.Context, id string) (domain.TaskStatus, error) {
 	var taskStatus taskStatusDTO
 	err := repository.database.QueryRowContext(
 		ctx,
@@ -131,14 +133,15 @@ func (repository *taskStatusRepository) Get(ctx context.Context, id string) (tas
 		id).Scan(&taskStatus.ID, &taskStatus.Name, &taskStatus.HexColor)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return taskStatusDTO{}, domain.NotFoundError
+			return domain.TaskStatus{}, domain.NotFoundError
 		}
-		return taskStatusDTO{}, err
+		return domain.TaskStatus{}, err
 	}
-	return taskStatus, err
+	return toDomain(taskStatus), err
 }
 
-func (repository *taskStatusRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter searchFilterDTO) ([]taskStatusDTO, browser.Result, error) {
+func (repository *taskStatusRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskStatusesFilter) ([]domain.TaskStatus, browser.Result, error) {
+	filterDTO := toFilterDTO(filter)
 	var filterArgs []any
 	var queryArgs []any
 	sqlQuery := `
@@ -165,9 +168,9 @@ func (repository *taskStatusRepository) Search(ctx context.Context, pager browse
 	sqlOrder := fmt.Sprintf(" ORDER BY %s %s ", field, sort)
 	sqlWhere := ""
 	var sqlWhereConditions []string
-	if filter.Name != nil && len(*filter.Name) > 0 {
+	if filterDTO.Name != nil && len(*filterDTO.Name) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "TS.name LIKE ?")
-		filterArgs = append(filterArgs, "%"+*filter.Name+"%")
+		filterArgs = append(filterArgs, "%"+*filterDTO.Name+"%")
 	}
 
 	if len(sqlWhereConditions) > 0 {
@@ -223,5 +226,5 @@ func (repository *taskStatusRepository) Search(ctx context.Context, pager browse
 		totalResults = len(taskStatuses)
 	}
 
-	return taskStatuses, browser.NewResult(pager, totalResults), nil
+	return toDomainArray(taskStatuses), browser.NewResult(pager, totalResults), nil
 }

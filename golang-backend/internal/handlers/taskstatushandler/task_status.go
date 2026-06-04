@@ -6,10 +6,8 @@ import (
 	"net/http"
 
 	"github.com/aportela/doneo/internal/browser"
-	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
-	"github.com/aportela/doneo/internal/repositories/taskstatusrepository"
 	"github.com/aportela/doneo/internal/services/taskstatusservice"
 	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
@@ -19,10 +17,8 @@ type TaskStatusHandler struct {
 	service taskstatusservice.TaskStatusService
 }
 
-func NewHandler(db database.Database) *TaskStatusHandler {
-	taskStatusRepository := taskstatusrepository.NewRepository(db)
-	taskStatusService := taskstatusservice.NewService(taskStatusRepository)
-	return &TaskStatusHandler{service: taskStatusService}
+func NewHandler(service taskstatusservice.TaskStatusService) *TaskStatusHandler {
+	return &TaskStatusHandler{service: service}
 }
 
 func (handler *TaskStatusHandler) Add(w http.ResponseWriter, r *http.Request) {

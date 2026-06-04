@@ -17,8 +17,7 @@ func createTaskStatuses(database database.Database) []string {
 		"Pending", "Started", "Stopped", "Finished", "Aborted",
 	}
 	var newTaskStatusIds []string
-	taskStatusRepository := taskstatusrepository.NewRepository(database)
-	projectStatusService := taskstatusservice.NewService(taskStatusRepository)
+	projectStatusService := taskstatusservice.NewService(database, taskstatusrepository.NewRepository(database))
 	for _, taskStatusName := range taskStatusNames {
 		taskStatusID := func() string { u, _ := uuid.NewV7(); return u.String() }()
 		err := projectStatusService.Add(context.Background(), domain.TaskStatus{

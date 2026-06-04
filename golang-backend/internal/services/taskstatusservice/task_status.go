@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/aportela/doneo/internal/browser"
+	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/taskstatusrepository"
 )
@@ -18,19 +19,20 @@ type TaskStatusService interface {
 }
 
 type taskStatusService struct {
+	database   database.Database
 	repository taskstatusrepository.ProjectStatusRepository
 }
 
-func NewService(repository taskstatusrepository.ProjectStatusRepository) TaskStatusService {
-	return &taskStatusService{repository: repository}
+func NewService(db database.Database, repository taskstatusrepository.ProjectStatusRepository) TaskStatusService {
+	return &taskStatusService{database: db, repository: repository}
 }
 
 func (service *taskStatusService) Add(ctx context.Context, taskStatus domain.TaskStatus) error {
-	return service.repository.Add(ctx, taskstatusrepository.DomainToDTO(taskStatus))
+	return service.repository.Add(ctx, taskStatus)
 }
 
 func (service *taskStatusService) Update(ctx context.Context, taskStatus domain.TaskStatus) error {
-	return service.repository.Update(ctx, taskstatusrepository.DomainToDTO(taskStatus))
+	return service.repository.Update(ctx, taskStatus)
 }
 
 func (service *taskStatusService) Delete(ctx context.Context, id string) error {
@@ -40,15 +42,15 @@ func (service *taskStatusService) Delete(ctx context.Context, id string) error {
 func (service *taskStatusService) Get(ctx context.Context, id string) (domain.TaskStatus, error) {
 	taskStatus, err := service.repository.Get(ctx, id)
 	if err != nil {
-		return taskstatusrepository.DTOToDomain(taskStatus), fmt.Errorf("[TaskStatusService] failed to get task status with ID %s: %w", id, err)
+		return taskStatus, fmt.Errorf("[TaskStatusService] failed to get task status with ID %s: %w", id, err)
 	}
-	return taskstatusrepository.DTOToDomain(taskStatus), nil
+	return taskStatus, nil
 }
 
 func (service *taskStatusService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskStatusesFilter) ([]domain.TaskStatus, browser.Result, error) {
-	taskStatuses, pagerResult, err := service.repository.Search(ctx, pager, order, taskstatusrepository.DomainFilterToDTO(filter))
+	taskStatuses, pagerResult, err := service.repository.Search(ctx, pager, order, filter)
 	if err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[TaskStatusService] failed to search task statuses: %w", err)
 	}
-	return taskstatusrepository.DTOArrayToDomainArray(taskStatuses), pagerResult, nil
+	return taskStatuses, pagerResult, nil
 }

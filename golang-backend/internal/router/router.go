@@ -25,8 +25,10 @@ import (
 	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 	"github.com/aportela/doneo/internal/middlewares"
+	"github.com/aportela/doneo/internal/repositories/taskstatusrepository"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"github.com/aportela/doneo/internal/services/authservice"
+	"github.com/aportela/doneo/internal/services/taskstatusservice"
 	"github.com/aportela/doneo/internal/services/userservice"
 
 	"github.com/aportela/doneo/internal/ui"
@@ -144,7 +146,7 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 	apiRouter.Route("/task-statuses", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		taskStatusHandler := taskstatushandler.NewHandler(db)
+		taskStatusHandler := taskstatushandler.NewHandler(taskstatusservice.NewService(db, taskstatusrepository.NewRepository(db)))
 		r.Post("/", taskStatusHandler.Add)
 		r.Post("/search", taskStatusHandler.Search)
 		r.Get("/{id:"+uuidPattern+"}", taskStatusHandler.Get)

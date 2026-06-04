@@ -4,7 +4,7 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 )
 
-func DomainToDTO(taskStatus domain.TaskStatus) taskStatusDTO {
+func toDTO(taskStatus domain.TaskStatus) taskStatusDTO {
 	return taskStatusDTO{
 		ID:       taskStatus.ID,
 		Name:     taskStatus.Name,
@@ -12,7 +12,7 @@ func DomainToDTO(taskStatus domain.TaskStatus) taskStatusDTO {
 	}
 }
 
-func DTOToDomain(taskStatus taskStatusDTO) domain.TaskStatus {
+func toDomain(taskStatus taskStatusDTO) domain.TaskStatus {
 	return domain.TaskStatus{
 		ID:       taskStatus.ID,
 		Name:     taskStatus.Name,
@@ -20,15 +20,15 @@ func DTOToDomain(taskStatus taskStatusDTO) domain.TaskStatus {
 	}
 }
 
-func DTOArrayToDomainArray(taskStatuses []taskStatusDTO) []domain.TaskStatus {
+func toDomainArray(taskStatuses []taskStatusDTO) []domain.TaskStatus {
 	results := make([]domain.TaskStatus, 0, len(taskStatuses))
 	for _, projectStatus := range taskStatuses {
-		results = append(results, DTOToDomain(projectStatus))
+		results = append(results, toDomain(projectStatus))
 	}
 	return results
 }
 
-func DomainFilterToDTO(filter domain.SearchTaskStatusesFilter) searchFilterDTO {
+func toFilterDTO(filter domain.SearchTaskStatusesFilter) searchFilterDTO {
 	return searchFilterDTO{
 		Name: filter.Name,
 	}
