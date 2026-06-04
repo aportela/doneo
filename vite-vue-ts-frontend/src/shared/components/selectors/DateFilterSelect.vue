@@ -8,13 +8,14 @@
 
     interface Props {
         disabled?: boolean;
+        clearable?: boolean;
     }
-
 
     const { t } = useI18n();
 
     const props = withDefaults(defineProps<Props>(), {
         disabled: false,
+        clearable: false,
     });
 
     const options = computed<SelectMixedOption[]>(() => [
@@ -193,7 +194,7 @@
 
 <template>
     <n-select v-if="isSelectorVisible" :disabled="props.disabled" v-model:value="selectorValue" :options="options"
-        size="small" />
+        size="small" :clearable="props.clearable" />
     <n-date-picker :disabled="props.disabled" :placeholder="t('shared.components.selectors.dateFilter.placeholder')"
         v-else v-model:value="datepickerValue" type="date" clearable size="small" v-model:show="isDatePickerVisible"
         @clear="onClearDate" :actions="['now', 'clear']">

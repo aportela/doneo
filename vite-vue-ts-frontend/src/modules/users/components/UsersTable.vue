@@ -205,15 +205,15 @@
                         v-model:value="filters.email" @keydown-enter="onRefresh" :disabled="props.disabled" />
                 </th>
                 <th>
-                    <DateFilterSelect v-model:range="filters.createdAt" ref="createdAtFilterRef"
+                    <DateFilterSelect clearable v-model:range="filters.createdAt" ref="createdAtFilterRef"
                         :disabled="props.disabled" />
                 </th>
                 <th>
-                    <DateFilterSelect v-model:range="filters.updatedAt" ref="updatedAtFilterRef"
+                    <DateFilterSelect clearable v-model:range="filters.updatedAt" ref="updatedAtFilterRef"
                         :disabled="props.disabled" />
                 </th>
                 <th>
-                    <DateFilterSelect v-model:range="filters.deletedAt" ref="deletedAtFilterRef"
+                    <DateFilterSelect clearable v-model:range="filters.deletedAt" ref="deletedAtFilterRef"
                         :disabled="props.disabled" />
                 </th>
                 <th>
