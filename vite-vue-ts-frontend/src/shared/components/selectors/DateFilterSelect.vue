@@ -159,6 +159,7 @@
             return;
         }
         isDatePickerVisible.value = true
+        recalcTimestamps();
     });
 
     watch(isDatePickerVisible, (visible: boolean) => {
