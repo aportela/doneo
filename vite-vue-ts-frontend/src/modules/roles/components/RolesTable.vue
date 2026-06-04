@@ -6,7 +6,6 @@
     import { IconEdit, IconEyeCheck, IconSquarePlus, IconTrash } from '@tabler/icons-vue';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
-    import type { Sort } from '../../../shared/types/models/sort.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { RolesTableFilters } from '../types/roles-table-filters.ts';
     import { Role } from '../models/role';
@@ -19,13 +18,12 @@
     interface Props {
         disabled: boolean;
         items: Role[];
-        sort?: Sort;
     }
 
     const { t } = useI18n();
     const dialog = useDialog();
 
-    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'sort']);
+    const emit = defineEmits(['refresh', 'add', 'update', 'delete']);
 
     const props = defineProps<Props>();
 
@@ -108,10 +106,6 @@
         },
     ]);
 
-    const onSort = (sort: Sort) => {
-        emit("sort", sort);
-    };
-
     const onRefresh = () => {
         emit("refresh");
     };
@@ -153,7 +147,7 @@
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd">
+    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
         <template #thead>
             <tr>
                 <th>
@@ -162,14 +156,13 @@
                         v-model:value="filters.name" />
                 </th>
                 <th>
-                    <n-select size="small" clearable :disabled="props.disabled" multiple
-                        :options="projectPermissionsSelectorOptions" v-model:value="filters.allowedProjectPermissions"
-                        disabled />
+                    <n-select size="small" clearable :disabled="true || props.disabled" multiple
+                        :options="projectPermissionsSelectorOptions"
+                        v-model:value="filters.allowedProjectPermissions" />
                 </th>
                 <th>
-                    <n-select size="small" clearable :disabled="props.disabled" multiple
-                        :options="taskPermissionsSelectorOptions" v-model:value="filters.allowedTaskPermissions"
-                        disabled />
+                    <n-select size="small" clearable :disabled="true || props.disabled" multiple
+                        :options="taskPermissionsSelectorOptions" v-model:value="filters.allowedTaskPermissions" />
                 </th>
                 <th class="doneo-text-center">
                     <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />

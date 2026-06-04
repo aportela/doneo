@@ -60,12 +60,6 @@
         loadingStore.set(newValue.ajaxRunning);
     });
 
-    const onSort = (newSort: Sort) => {
-        sort.field = newSort.field;
-        sort.order = newSort.order;
-        onRefresh();
-    };
-
     const onShowAddForm = () => {
         modalFormMode.value = "add";
         showModal.value = true;
@@ -206,7 +200,7 @@
 
     <n-card :title="t('modules.role.components.ManageRolesPage.header.title')">
         <RolesTable :items="filteredItems" :disabled="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
-            @update="onShowUpdateForm" @delete="onDelete" :sort="sort" @sort="onSort" v-model:filters="filters" />
+            @update="onShowUpdateForm" @delete="onDelete" v-model:filters="filters" />
     </n-card>
 </template>
 
