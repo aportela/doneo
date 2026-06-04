@@ -51,10 +51,6 @@
         },
     ]);
 
-    const onSort = (sort: Sort) => {
-        emit("sort", sort);
-    };
-
     const onRefresh = () => {
         emit("refresh");
     };
@@ -109,7 +105,7 @@
             <tr v-for="projectType, index in items" :key="projectType.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(projectType.hexColor ?? '#888888')">{{ projectType.name
-                        }}</n-tag>
+                    }}</n-tag>
                 </td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
