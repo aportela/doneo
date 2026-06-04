@@ -31,7 +31,7 @@ func NewRepository(database database.Database) TaskPriorityRepository {
 }
 
 func (repository *taskPriorityRepository) Add(ctx context.Context, taskPriority domain.TaskPriority) error {
-	dto := DomainToDTO(taskPriority)
+	dto := toDTO(taskPriority)
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
@@ -69,7 +69,7 @@ func (repository *taskPriorityRepository) Add(ctx context.Context, taskPriority 
 }
 
 func (repository *taskPriorityRepository) Update(ctx context.Context, taskPriority domain.TaskPriority) error {
-	dto := DomainToDTO(taskPriority)
+	dto := toDTO(taskPriority)
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
@@ -137,11 +137,11 @@ func (repository *taskPriorityRepository) Get(ctx context.Context, id string) (d
 		}
 		return domain.TaskPriority{}, err
 	}
-	return DTOToDomain(dto), err
+	return toDomain(dto), err
 }
 
 func (repository *taskPriorityRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskPrioritiesFilter) ([]domain.TaskPriority, browser.Result, error) {
-	filterDTO := DomainFilterToDTO(filter)
+	filterDTO := toFilterDTO(filter)
 	var filterArgs []any
 	var queryArgs []any
 	sqlQuery := `
@@ -226,5 +226,5 @@ func (repository *taskPriorityRepository) Search(ctx context.Context, pager brow
 		totalResults = len(dtos)
 	}
 
-	return DTOArrayToDomainArray(dtos), browser.NewResult(pager, totalResults), nil
+	return toDomainArray(dtos), browser.NewResult(pager, totalResults), nil
 }
