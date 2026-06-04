@@ -63,7 +63,8 @@
             return (
                 (!name || name?.includes(nameFilterLowerCase.value)) &&
                 (filters.createdByUserId === null || filters.createdByUserId === attachment.createdBy.id) &&
-                (filters.contentType === null || filters.contentType === attachment.contentType)
+                (filters.contentType === null || filters.contentType === attachment.contentType) &&
+                ((filters.createdAt.from === null && filters.createdAt.to === null) || (attachment.createdAt.msTimestamp != null && filters.createdAt.from != null && filters.createdAt.from <= attachment.createdAt.msTimestamp && filters.createdAt.to != null && filters.createdAt.to >= attachment.createdAt.msTimestamp))
             );
         });
     });
