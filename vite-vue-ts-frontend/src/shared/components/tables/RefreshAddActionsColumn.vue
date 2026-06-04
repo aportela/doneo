@@ -55,7 +55,7 @@
             </template>
             {{ t("shared.buttons.Add.label") }}
         </n-button>
-        <n-button @click="onSettings" :disabled="props.disabled" v-if="!props.hideSettings"
+        <n-button @click="onSettings" :disabled="props.disabled || true" v-if="!props.hideSettings"
             class="doneo-table-actions-button">
             <template #icon>
                 <n-icon :size="props.iconSize" :component="IconSettings" />
