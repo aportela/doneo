@@ -35,6 +35,7 @@ func (handler *ProjectPermissionHandler) Add(w http.ResponseWriter, r *http.Requ
 	projectPermission.ID = utils.UUID()
 	projectId := chi.URLParam(r, "id")
 
+	// TODO: fill User.Name && Role.Name for added notification on client
 	err := handler.service.Add(r.Context(), projectPermission.ID, projectId, projectPermission.User.ID, projectPermission.Role.ID)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPermissionHandler] failed to add project permission: %w", err))
