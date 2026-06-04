@@ -30,7 +30,7 @@
 
     const items = shallowRef<ProjectStatus[]>([]);
 
-    const sort = ref<Sort>(new Sort("name", "ASC"));
+    const sort = reactive<Sort>(new Sort("name", "ASC"));
 
     const filters = reactive<ProjectStatusesTableFilters>({
         name: "",
@@ -57,12 +57,6 @@
         loadingStore.set(newValue.ajaxRunning);
     });
 
-    const onSort = (newSort: Sort) => {
-        sort.field = newSort.field;
-        sort.order = newSort.order;
-        onRefresh();
-    };
-
     const onShowAddForm = () => {
         modalFormMode.value = "add";
         showModal.value = true;
@@ -87,8 +81,8 @@
                     resultsPage: 0,
                 },
                 order: {
-                    field: sort.value.field,
-                    sort: sort.value.order,
+                    field: sort.field,
+                    sort: sort.order,
                 },
                 filter: {
                     //name: filters.name.length > 0 ? filters.name : undefined,
@@ -202,8 +196,7 @@
 
     <n-card :title="t('modules.projectStatus.components.ManageProjectStatusesPage.header.title')">
         <ProjectStatusesTable :items="filteredItems" :disabled="state.ajaxRunning" @refresh="onRefresh"
-            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" :sort="sort" @sort="onSort"
-            v-model:filters="filters" />
+            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" v-model:filters="filters" />
     </n-card>
 </template>
 
