@@ -151,7 +151,7 @@
         }
     };
 
-    watch(selectorValue, async (val) => {
+    watch(selectorValue, (val) => {
         if (val !== 1) { // NOT custom date
             datepickerValue.value = null;
             isDatePickerVisible.value = false;
@@ -195,7 +195,7 @@
 
 <template>
     <n-select v-if="isSelectorVisible" :disabled="props.disabled" v-model:value="selectorValue" :options="options"
-        size="small" :clearable="props.clearable" />
+        size="small" :clearable="props.clearable" @clear="onClearDate" />
     <n-date-picker :disabled="props.disabled" :placeholder="t('shared.components.selectors.dateFilter.placeholder')"
         v-else v-model:value="datepickerValue" type="date" clearable size="small" v-model:show="isDatePickerVisible"
         @clear="onClearDate" :actions="['now', 'clear']">
