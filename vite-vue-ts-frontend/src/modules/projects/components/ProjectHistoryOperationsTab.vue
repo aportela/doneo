@@ -1,28 +1,30 @@
 <script setup lang="ts">
-    import { shallowRef, reactive, onMounted, onBeforeUnmount, watch, type CSSProperties, type Component } from "vue";
+    import { reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount, type CSSProperties, type Component } from "vue";
     import { useI18n } from "vue-i18n";
 
     import { NCard, NTimeline, NTimelineItem, NIcon } from "naive-ui";
 
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { useLoadingStore } from '../../../stores/loading';
     import { appBus } from '../../../shared/composables/bus';
+
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
+    import type { SearchResponse } from "../../project-history-operations/types/dto";
+    import type { ProjectHistoryOperationsTableFilters } from "../../project-history-operations/types/project-history-operations-table-filters.ts";
 
     import { projectHistoryOperationsService } from "../../project-history-operations/services/project-history-operations";
     import { handleAPIError } from '../../../api/client/errorHandler';
 
-    import type { SearchResponse } from "../../project-history-operations/types/dto";
     import { ProjectHistoryOperation } from "../../project-history-operations/models/project-history-operation";
     import { IconSquarePlus, IconEdit, IconDeviceUnknown, IconTrash, IconMessagePlus, IconFileUpload } from "@tabler/icons-vue";
     import AvatarUserName from "../../../shared/components/AvatarUserName.vue";
     import ProjectHistoryOperationsTable from "../../project-history-operations/components/ProjectHistoryOperationsTable.vue";
 
-    interface ProjectNotesProps {
+    interface ProjectHistoryOperationsTabProps {
         style?: string | CSSProperties;
         projectId: string;
     }
 
-    const props = defineProps<ProjectNotesProps>();
+    const props = defineProps<ProjectHistoryOperationsTabProps>();
 
     const { t } = useI18n();
 
@@ -33,6 +35,16 @@
     const items = shallowRef<ProjectHistoryOperation[]>([]);
 
     const itemCount = defineModel<number>("itemCount", { default: 0 });
+
+    const filters = reactive<ProjectHistoryOperationsTableFilters>({
+        userId: null,
+    });
+
+    const filteredItems = computed(() => {
+        return items.value.filter((operation: ProjectHistoryOperation) => {
+            return (filters.userId === null || filters.userId == operation.createdBy.id);
+        });
+    });
 
     watch(state, (newValue: AjaxStateInterface) => {
         loadingStore.set(newValue.ajaxRunning);
@@ -115,8 +127,8 @@
                 </template>
             </n-timeline-item>
         </n-timeline>
-        <ProjectHistoryOperationsTable v-else :project-id="props.projectId" :project-history-operations="items"
-            :loading="state.ajaxRunning" @refresh="onRefresh" />
+        <ProjectHistoryOperationsTable v-else :project-id="props.projectId" :items="filteredItems"
+            :disabled="state.ajaxRunning" v-model:filters="filters" @refresh="onRefresh" />
     </n-card>
 </template>
 
