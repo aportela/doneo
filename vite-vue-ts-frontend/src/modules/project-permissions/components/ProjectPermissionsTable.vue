@@ -11,11 +11,11 @@
 
     import { ProjectPermission } from '../models/project-permission.ts';
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
+    import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
-    import RefreshAddActionsColumn from '../../../shared/components/tables/RefreshAddActionsColumn.vue';
-    import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
-    import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
+    import RoleSelector from '../../roles/components/RoleSelector.vue';
+    import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
 
     interface Props {
         disabled: boolean;
@@ -116,14 +116,12 @@
         <template #thead>
             <tr>
                 <th>
-                    <TextFilterInput clearable size="small"
-                        :placeholder="t('modules.projectPermission.components.projectPermissionsTable.filters.user.placeholder')"
-                        v-model:value="filters.userId" />
+                    <UserSelector hideAvatar clearable :disabled="props.disabled" v-model:id="filters.userId"
+                        :placeholder="t('modules.projectPermission.components.projectPermissionsTable.filters.user.placeholder')" />
                 </th>
                 <th>
-                    <TextFilterInput clearable size="small"
-                        :placeholder="t('modules.projectPermission.components.projectPermissionsTable.filters.role.placeholder')"
-                        v-model:value="filters.roleId" />
+                    <RoleSelector clearable :disabled="props.disabled" v-model:id="filters.roleId"
+                        :placeholder="t('modules.projectPermission.components.projectPermissionsTable.filters.role.placeholder')" />
                 </th>
                 <th></th>
                 <th></th>
