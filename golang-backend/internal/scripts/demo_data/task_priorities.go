@@ -15,8 +15,7 @@ import (
 func createTaskPriorities(database database.Database) []string {
 	taskPriorityNames := []string{"Low", "Medium", "High"}
 	var newTaskPriorityIds []string
-	taskPriorityRepository := taskpriorityrepository.NewRepository(database)
-	taskPriorityService := taskpriorityservice.NewService(taskPriorityRepository)
+	taskPriorityService := taskpriorityservice.NewService(database, taskpriorityrepository.NewRepository(database))
 	for _, taskPriorityName := range taskPriorityNames {
 		taskPriorityID := func() string { u, _ := uuid.NewV7(); return u.String() }()
 		err := taskPriorityService.Add(context.Background(), domain.TaskPriority{

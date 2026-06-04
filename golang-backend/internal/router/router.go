@@ -25,9 +25,11 @@ import (
 	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 	"github.com/aportela/doneo/internal/middlewares"
+	"github.com/aportela/doneo/internal/repositories/taskpriorityrepository"
 	"github.com/aportela/doneo/internal/repositories/taskstatusrepository"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"github.com/aportela/doneo/internal/services/authservice"
+	"github.com/aportela/doneo/internal/services/taskpriorityservice"
 	"github.com/aportela/doneo/internal/services/taskstatusservice"
 	"github.com/aportela/doneo/internal/services/userservice"
 
@@ -157,7 +159,7 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 	apiRouter.Route("/task-priorities", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		taskPriorityHandler := taskpriorityhandler.NewHandler(db)
+		taskPriorityHandler := taskpriorityhandler.NewHandler(taskpriorityservice.NewService(db, taskpriorityrepository.NewRepository(db)))
 		r.Post("/", taskPriorityHandler.Add)
 		r.Post("/search", taskPriorityHandler.Search)
 		r.Get("/{id:"+uuidPattern+"}", taskPriorityHandler.Get)

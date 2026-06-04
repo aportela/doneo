@@ -6,10 +6,8 @@ import (
 	"net/http"
 
 	"github.com/aportela/doneo/internal/browser"
-	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
-	"github.com/aportela/doneo/internal/repositories/taskpriorityrepository"
 	"github.com/aportela/doneo/internal/services/taskpriorityservice"
 	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
@@ -19,10 +17,8 @@ type TaskPriorityHandler struct {
 	service taskpriorityservice.TaskPriorityService
 }
 
-func NewHandler(db database.Database) *TaskPriorityHandler {
-	taskPriorityRepository := taskpriorityrepository.NewRepository(db)
-	taskPriorityService := taskpriorityservice.NewService(taskPriorityRepository)
-	return &TaskPriorityHandler{service: taskPriorityService}
+func NewHandler(service taskpriorityservice.TaskPriorityService) *TaskPriorityHandler {
+	return &TaskPriorityHandler{service: service}
 }
 
 func (handler *TaskPriorityHandler) Add(w http.ResponseWriter, r *http.Request) {
@@ -93,7 +89,7 @@ func (handler *TaskPriorityHandler) Search(w http.ResponseWriter, r *http.Reques
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskPriorityHandler] invalid request payload: %w", err))
 		return
 	}
-	filter := domain.SearchProjectPrioritiesFilter{
+	filter := domain.SearchTaskPrioritiesFilter{
 		Name: nil,
 	}
 	if request.Filter != nil {

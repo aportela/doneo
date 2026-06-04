@@ -28,7 +28,7 @@ func DTOArrayToDomainArray(taskPriorities []taskPriorityDTO) []domain.TaskPriori
 	return results
 }
 
-func DomainFilterToDTO(filter domain.SearchProjectPrioritiesFilter) searchFilterDTO {
+func DomainFilterToDTO(filter domain.SearchTaskPrioritiesFilter) searchFilterDTO {
 	return searchFilterDTO{
 		Name: filter.Name,
 	}
