@@ -20,13 +20,12 @@
     interface Props {
         disabled: boolean;
         items: ProjectType[];
-        sort?: Sort;
     }
 
     const { t } = useI18n();
     const dialog = useDialog();
 
-    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'sort']);
+    const emit = defineEmits(['refresh', 'add', 'update', 'delete']);
 
     const props = defineProps<Props>();
 
@@ -93,7 +92,7 @@
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd">
+    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
         <template #thead>
             <tr>
                 <th>
