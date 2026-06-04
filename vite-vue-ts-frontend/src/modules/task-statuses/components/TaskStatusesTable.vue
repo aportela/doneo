@@ -6,7 +6,6 @@
     import { IconTrash } from '@tabler/icons-vue';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
-    import type { Sort } from '../../../shared/types/models/sort.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { TaskStatusesTableFilters } from '../types/task-statuses-table-filters.ts';
     import { TaskStatus } from '../models/task-status';
@@ -105,7 +104,7 @@
             <tr v-for="taskStatus, index in items" :key="taskStatus.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(taskStatus.hexColor ?? '#888888')">{{ taskStatus.name
-                        }}</n-tag>
+                    }}</n-tag>
                 </td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
