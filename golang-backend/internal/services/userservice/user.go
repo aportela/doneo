@@ -29,8 +29,8 @@ type userService struct {
 	repository userrepository.UserRepository
 }
 
-func NewService(db database.Database, repository userrepository.UserRepository) UserService {
-	return &userService{database: db, repository: repository}
+func NewService(database database.Database, repository userrepository.UserRepository) UserService {
+	return &userService{database: database, repository: repository}
 }
 
 func (service *userService) Add(ctx context.Context, user domain.User, password string) error {

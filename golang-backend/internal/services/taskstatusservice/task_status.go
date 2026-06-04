@@ -23,8 +23,8 @@ type taskStatusService struct {
 	repository taskstatusrepository.ProjectStatusRepository
 }
 
-func NewService(db database.Database, repository taskstatusrepository.ProjectStatusRepository) TaskStatusService {
-	return &taskStatusService{database: db, repository: repository}
+func NewService(database database.Database, repository taskstatusrepository.ProjectStatusRepository) TaskStatusService {
+	return &taskStatusService{database: database, repository: repository}
 }
 
 func (service *taskStatusService) Add(ctx context.Context, taskStatus domain.TaskStatus) error {
