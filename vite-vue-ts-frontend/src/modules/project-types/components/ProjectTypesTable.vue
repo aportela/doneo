@@ -2,7 +2,7 @@
     import { h, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { useDialog, NFlex, NEmpty, NTag } from 'naive-ui';
+    import { useDialog, NEmpty, NTag } from 'naive-ui';
     import { IconTrash } from '@tabler/icons-vue';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
@@ -30,7 +30,6 @@
 
     const props = defineProps<Props>();
 
-
     const filters = defineModel<ProjectTypesTableFilters>("filters", {
         default: () => ({
             name: "",
@@ -52,7 +51,6 @@
             isFiltered: () => isFilteredByName.value,
         },
     ]);
-
 
     const onSort = (sort: Sort) => {
         emit("sort", sort);
@@ -112,7 +110,7 @@
             <tr v-for="projectType, index in items" :key="projectType.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(projectType.hexColor ?? '#888888')">{{ projectType.name
-                        }}</n-tag>
+                    }}</n-tag>
                 </td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
