@@ -240,7 +240,7 @@
             </template>
         </Pager>
         <ProjectsTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
-            @delete="onDelete" :sort="sort" @sort="onSort" v-model:filters="filters" />
+            :sort="sort" @sort="onSort" v-model:filters="filters" />
     </n-card>
 </template>
 
