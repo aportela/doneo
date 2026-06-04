@@ -84,7 +84,7 @@
             field: "taskPermissions",
             visible: true,
             sortable: false,
-            isFiltered: () => false,
+            isFiltered: () => isFilteredByTaskPermission.value,
             align: "center",
         },
     ]);
