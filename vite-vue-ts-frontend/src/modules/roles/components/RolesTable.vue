@@ -256,8 +256,7 @@
             </tr>
             <tr>
                 <td :colspan="columns.length + 1" v-if="!props.disabled && items.length < 1">
-                    <n-empty :description="t('modules.role.components.RolesTable.warnings.noItemsFound')">
-                    </n-empty>
+                    <n-empty :description="t('modules.role.components.RolesTable.warnings.noItemsFound')" />
                 </td>
             </tr>
         </template>
