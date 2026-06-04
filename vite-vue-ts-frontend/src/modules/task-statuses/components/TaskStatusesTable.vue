@@ -2,7 +2,7 @@
     import { h, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { useDialog, NFlex, NEmpty, NTag } from 'naive-ui';
+    import { useDialog, NEmpty, NTag } from 'naive-ui';
     import { IconTrash } from '@tabler/icons-vue';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
@@ -110,7 +110,7 @@
             <tr v-for="taskStatus, index in items" :key="taskStatus.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(taskStatus.hexColor ?? '#888888')">{{ taskStatus.name
-                        }}</n-tag>
+                    }}</n-tag>
                 </td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"

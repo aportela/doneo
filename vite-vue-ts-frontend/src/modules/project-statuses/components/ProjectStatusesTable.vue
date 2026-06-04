@@ -6,7 +6,6 @@
     import { IconTrash } from '@tabler/icons-vue';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
-    import type { Sort } from '../../../shared/types/models/sort.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { ProjectStatusesTableFilters } from '../types/project-statuses-table-filters.ts';
     import { ProjectStatus } from '../models/project-status';

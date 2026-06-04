@@ -6,7 +6,6 @@
     import { IconTrash } from '@tabler/icons-vue';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
-    import type { Sort } from '../../../shared/types/models/sort.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { ProjectPrioritiesTableFilters } from '../types/project-priorities-table-filters.ts';
     import { ProjectPriority } from '../models/project-priority';
@@ -106,7 +105,7 @@
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(projectPriority.hexColor ?? '#888888')">{{
                         projectPriority.name
-                    }}</n-tag>
+                        }}</n-tag>
                 </td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
