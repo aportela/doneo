@@ -42,7 +42,7 @@
         }
     });
 
-    const selectorValue = ref<number>(0)
+    const selectorValue = ref<number | null>(0)
     const datepickerValue = ref<number | null>(null)
     const isDatePickerVisible = ref<boolean>(false);
 
@@ -152,7 +152,14 @@
     };
 
     watch(selectorValue, (val) => {
-        if (val !== 1) { // NOT custom date
+        if (val === null) {
+            selectorValue.value = 0;
+            datepickerValue.value = null;
+            isDatePickerVisible.value = false;
+            recalcTimestamps();
+            return;
+        }
+        else if (val !== 1) { // NOT custom date
             datepickerValue.value = null;
             isDatePickerVisible.value = false;
             recalcTimestamps();
