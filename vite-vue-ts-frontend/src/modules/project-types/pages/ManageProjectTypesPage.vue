@@ -91,8 +91,8 @@
                     sort: sort.value.order,
                 },
                 filter: {
-                    name: filters.name.length > 0 ? filters.name : undefined,
-                }
+                    //name: filters.name.length > 0 ? filters.name : undefined,
+                },
             };
             const response = await projectTypeService.search(payload);
             items.value = response.projectTypes.map((projectType: ProjectTypeResponse) => new ProjectType(projectType))
@@ -175,7 +175,6 @@
         notify('success', t("modules.projectType.components.ManageProjectTypesPage.notifications.projectTypeUpdated", { name: projectType.name }));
         onRefresh();
     };
-
 
     let stopBusReauthListener: () => void;
 
