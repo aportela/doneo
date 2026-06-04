@@ -17,9 +17,9 @@
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
     import RoleSelector from '../../roles/components/RoleSelector.vue';
-    import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import ProjectPermissionSelect from '../../../shared/components/selectors/ProjectPermissionSelect.vue';
     import TaskPermissionSelect from '../../../shared/components/selectors/TaskPermissionSelect.vue';
+    import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
 
     interface Props {
         disabled: boolean;
@@ -122,6 +122,8 @@
         projectPermissionSelectorRef.value?.reset();
         taskPermissionSelectorRef.value?.reset();
     };
+
+    const permissionIconSize = 22;
 </script>
 
 <template>
@@ -161,7 +163,7 @@
                 <td class="doneo-text-center">
                     <n-tooltip trigger="hover" v-if="projectPermission.role?.permissions?.allowUpdateProject">
                         <template #trigger>
-                            <n-icon :size="22" class="doneo-cursor-help">
+                            <n-icon :size="permissionIconSize" class="doneo-cursor-help">
                                 <IconEdit />
                             </n-icon>
                         </template>
@@ -169,12 +171,12 @@
                             t("modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.updateProjectAllowed")
                         }}
                     </n-tooltip>
-                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
+                    <n-icon :size="permissionIconSize" class="doneo-disabled-permission-icon" v-else>
                         <IconEdit />
                     </n-icon>
                     <n-tooltip trigger="hover" v-if="projectPermission.role?.permissions?.allowDeleteProject">
                         <template #trigger>
-                            <n-icon :size="22" class="doneo-cursor-help">
+                            <n-icon :size="permissionIconSize" class="doneo-cursor-help">
                                 <IconTrash />
                             </n-icon>
                         </template>
@@ -182,12 +184,12 @@
                             t("modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.deleteProjectAllowed")
                         }}
                     </n-tooltip>
-                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
+                    <n-icon :size="permissionIconSize" class="doneo-disabled-permission-icon" v-else>
                         <IconTrash />
                     </n-icon>
                     <n-tooltip trigger="hover" v-if="projectPermission.role?.permissions?.allowViewProject">
                         <template #trigger>
-                            <n-icon :size="22" class="doneo-cursor-help">
+                            <n-icon :size="permissionIconSize" class="doneo-cursor-help">
                                 <IconEyeCheck />
                             </n-icon>
                         </template>
@@ -195,12 +197,12 @@
                             t("modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.viewProjectAllowed")
                         }}
                     </n-tooltip>
-                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
+                    <n-icon :size="permissionIconSize" class="doneo-disabled-permission-icon" v-else>
                         <IconEyeCheck />
                     </n-icon>
                     <n-tooltip trigger="hover" v-if="projectPermission.role?.permissions?.allowAddTask">
                         <template #trigger>
-                            <n-icon :size="22" class="doneo-cursor-help">
+                            <n-icon :size="permissionIconSize" class="doneo-cursor-help">
                                 <IconSquarePlus />
                             </n-icon>
                         </template>
@@ -208,14 +210,14 @@
                             t("modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.addTaskAllowed")
                         }}
                     </n-tooltip>
-                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
+                    <n-icon :size="permissionIconSize" class="doneo-disabled-permission-icon" v-else>
                         <IconSquarePlus />
                     </n-icon>
                 </td>
                 <td class="doneo-text-center">
                     <n-tooltip trigger="hover" v-if="projectPermission.role?.permissions?.allowUpdateTask">
                         <template #trigger>
-                            <n-icon :size="22" class="doneo-cursor-help">
+                            <n-icon :size="permissionIconSize" class="doneo-cursor-help">
                                 <IconEdit />
                             </n-icon>
                         </template>
@@ -223,12 +225,12 @@
                             t("modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.updateTaskAllowed")
                         }}
                     </n-tooltip>
-                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
+                    <n-icon :size="permissionIconSize" class="doneo-disabled-permission-icon" v-else>
                         <IconEdit />
                     </n-icon>
                     <n-tooltip trigger="hover" v-if="projectPermission.role?.permissions?.allowDeleteTask">
                         <template #trigger>
-                            <n-icon :size="22" class="doneo-cursor-help">
+                            <n-icon :size="permissionIconSize" class="doneo-cursor-help">
                                 <IconTrash />
                             </n-icon>
                         </template>
@@ -236,12 +238,12 @@
                             t("modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.deleteTaskAllowed")
                         }}
                     </n-tooltip>
-                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
+                    <n-icon :size="permissionIconSize" class="doneo-disabled-permission-icon" v-else>
                         <IconTrash />
                     </n-icon>
                     <n-tooltip trigger="hover" v-if="projectPermission.role?.permissions?.allowViewTask">
                         <template #trigger>
-                            <n-icon :size="22" class="doneo-cursor-help">
+                            <n-icon :size="permissionIconSize" class="doneo-cursor-help">
                                 <IconEyeCheck />
                             </n-icon>
                         </template>
@@ -249,7 +251,7 @@
                             t("modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.viewTaskAllowed")
                         }}
                     </n-tooltip>
-                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
+                    <n-icon :size="permissionIconSize" class="doneo-disabled-permission-icon" v-else>
                         <IconEyeCheck />
                     </n-icon>
                 </td>
