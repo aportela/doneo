@@ -177,8 +177,6 @@
                     <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
                         <IconEyeCheck />
                     </n-icon>
-                </td>
-                <td class="doneo-text-center">
                     <n-tooltip trigger="hover" v-if="projectPermission.role?.permissions?.allowAddTask">
                         <template #trigger>
                             <n-icon :size="22" class="doneo-cursor-help">
@@ -192,6 +190,8 @@
                     <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
                         <IconSquarePlus />
                     </n-icon>
+                </td>
+                <td class="doneo-text-center">
                     <n-tooltip trigger="hover" v-if="projectPermission.role?.permissions?.allowUpdateTask">
                         <template #trigger>
                             <n-icon :size="22" class="doneo-cursor-help">
