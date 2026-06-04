@@ -121,7 +121,7 @@ func (repository *taskStatusRepository) Delete(ctx context.Context, id string) e
 }
 
 func (repository *taskStatusRepository) Get(ctx context.Context, id string) (domain.TaskStatus, error) {
-	var taskStatus taskStatusDTO
+	var dto taskStatusDTO
 	err := repository.database.QueryRowContext(
 		ctx,
 		`
@@ -130,14 +130,14 @@ func (repository *taskStatusRepository) Get(ctx context.Context, id string) (dom
             FROM task_statuses TS
             WHERE TS.id = ?
         `,
-		id).Scan(&taskStatus.ID, &taskStatus.Name, &taskStatus.HexColor)
+		id).Scan(&dto.ID, &dto.Name, &dto.HexColor)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.TaskStatus{}, domain.NotFoundError
 		}
 		return domain.TaskStatus{}, err
 	}
-	return toDomain(taskStatus), err
+	return toDomain(dto), err
 }
 
 func (repository *taskStatusRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskStatusesFilter) ([]domain.TaskStatus, browser.Result, error) {
@@ -190,15 +190,15 @@ func (repository *taskStatusRepository) Search(ctx context.Context, pager browse
 		return nil, browser.Result{}, err
 	}
 	defer rows.Close()
-	taskStatuses := make([]taskStatusDTO, 0)
+	dtos := make([]taskStatusDTO, 0)
 	for rows.Next() {
-		var taskStatus taskStatusDTO
+		var dto taskStatusDTO
 		if err := rows.Scan(
-			&taskStatus.ID, &taskStatus.Name, &taskStatus.HexColor,
+			&dto.ID, &dto.Name, &dto.HexColor,
 		); err != nil {
 			return nil, browser.Result{}, err
 		}
-		taskStatuses = append(taskStatuses, taskStatus)
+		dtos = append(dtos, dto)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, browser.Result{}, err
@@ -223,8 +223,8 @@ func (repository *taskStatusRepository) Search(ctx context.Context, pager browse
 			return nil, browser.Result{}, err
 		}
 	} else {
-		totalResults = len(taskStatuses)
+		totalResults = len(dtos)
 	}
 
-	return toDomainArray(taskStatuses), browser.NewResult(pager, totalResults), nil
+	return toDomainArray(dtos), browser.NewResult(pager, totalResults), nil
 }
