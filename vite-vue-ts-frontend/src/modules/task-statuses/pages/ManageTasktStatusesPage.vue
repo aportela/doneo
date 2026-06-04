@@ -30,9 +30,9 @@
 
     const items = shallowRef<TaskStatus[]>([]);
 
-    const sort = ref<Sort>(new Sort("name", "ASC"));
+    const sort = reactive<Sort>(new Sort("name", "ASC"));
 
-    const filters = reactive<ProjectStatusesTableFilters>({
+    const filters = reactive<TaskStatusesTableFilters>({
         name: "",
     });
 
@@ -56,12 +56,6 @@
     watch(state, (newValue: AjaxStateInterface) => {
         loadingStore.set(newValue.ajaxRunning);
     });
-
-    const onSort = (newSort: Sort) => {
-        sort.field = newSort.field;
-        sort.order = newSort.order;
-        onRefresh();
-    };
 
     const onShowAddForm = () => {
         modalFormMode.value = "add";
@@ -87,8 +81,8 @@
                     resultsPage: 0,
                 },
                 order: {
-                    field: sort.value.field,
-                    sort: sort.value.order,
+                    field: sort.field,
+                    sort: sort.order,
                 },
                 filter: {
                     //name: filters.name.length > 0 ? filters.name : undefined,
@@ -202,8 +196,7 @@
 
     <n-card :title="t('modules.taskStatus.components.ManageTaskStatusesPage.header.title')">
         <TaskStatusesTable :items="filteredItems" :disabled="state.ajaxRunning" @refresh="onRefresh"
-            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" :sort="sort" @sort="onSort"
-            v-model:filters="filters" />
+            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" v-model:filters="filters" />
     </n-card>
 </template>
 
