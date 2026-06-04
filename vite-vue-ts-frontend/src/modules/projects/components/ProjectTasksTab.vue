@@ -28,7 +28,7 @@
 
 <template>
     <n-card bordered :style="props.style">
-        <ManageTable size="small">
+        <ManageTable size="small" :columns="[]">
             <template #thead>
                 <tr>
                     <th>Identifier</th>
