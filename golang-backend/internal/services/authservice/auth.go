@@ -3,6 +3,7 @@ package authservice
 import (
 	"context"
 
+	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"golang.org/x/crypto/bcrypt"
@@ -14,17 +15,17 @@ type AuthService interface {
 }
 
 type authService struct {
+	database   database.Database
 	repository userrepository.UserRepository
 }
 
-func NewService(repository userrepository.UserRepository) AuthService {
-	return &authService{
-		repository: repository,
-	}
+func NewService(db database.Database, repository userrepository.UserRepository) AuthService {
+	return &authService{database: db, repository: repository}
 }
 
 func (service *authService) SignIn(ctx context.Context, user domain.User) (domain.User, error) {
-	credentialUser, err := service.repository.GetByEmailForVerifyCredentials(ctx, user.Email, user.Password)
+	// TODO: remove PasswordHash from domain & return userId, email, password Hash ?
+	credentialUser, err := service.repository.GetByEmail(ctx, user.Email)
 	if err != nil {
 		return domain.User{}, err
 	}
@@ -35,7 +36,7 @@ func (service *authService) SignIn(ctx context.Context, user domain.User) (domai
 	if err != nil {
 		return domain.User{}, domain.InvalidCredentialsError
 	}
-	return userrepository.DTOToDomain(credentialUser), nil
+	return user, nil
 }
 
 func (service *authService) GetUserInfo(ctx context.Context, userId string) (domain.User, error) {
@@ -43,9 +44,8 @@ func (service *authService) GetUserInfo(ctx context.Context, userId string) (dom
 	if err != nil {
 		return domain.User{}, err
 	}
-	if !user.DeletedAt.Valid {
-		// TODO: FAIL
-		//return domain.User{}, domain.ErrDeleted
+	if user.DeletedAt != nil {
+		return domain.User{}, domain.DeletedError
 	}
-	return userrepository.DTOToDomain(user), nil
+	return user, nil
 }

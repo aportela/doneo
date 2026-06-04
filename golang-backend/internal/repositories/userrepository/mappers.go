@@ -8,18 +8,17 @@ import (
 	"github.com/aportela/doneo/internal/utils"
 )
 
-func BaseDomainToBaseDTO(user domain.UserBase) UserBaseDTO {
-	return UserBaseDTO{
+func toBaseDTO(user domain.UserBase) userBaseDTO {
+	return userBaseDTO{
 		ID:   user.ID,
 		Name: user.Name,
 	}
 }
 
-func DomainToDTO(user domain.User) UserDTO {
-	return UserDTO{
-		UserBaseDTO:        BaseDomainToBaseDTO(user.UserBase),
+func toDTO(user domain.User) userDTO {
+	return userDTO{
+		userBaseDTO:        toBaseDTO(user.UserBase),
 		Email:              user.Email,
-		PasswordHash:       user.PasswordHash,
 		CreatedAt:          user.CreatedAt.UnixMilli(),
 		UpdatedAt:          utils.TimePtrToSQLNullInt64(user.UpdatedAt),
 		DeletedAt:          utils.TimePtrToSQLNullInt64(user.DeletedAt),
@@ -27,17 +26,18 @@ func DomainToDTO(user domain.User) UserDTO {
 	}
 }
 
-func BaseDTOToBaseDomain(user UserBaseDTO) domain.UserBase {
+func toBaseDomain(user userBaseDTO) domain.UserBase {
 	return domain.UserBase{
 		ID:   user.ID,
 		Name: user.Name,
 	}
 }
 
-func DTOToDomain(user UserDTO) domain.User {
+func toDomain(user userDTO) domain.User {
 	return domain.User{
-		UserBase:           BaseDTOToBaseDomain(user.UserBaseDTO),
+		UserBase:           toBaseDomain(user.userBaseDTO),
 		Email:              user.Email,
+		PasswordHash:       user.PasswordHash,
 		CreatedAt:          time.UnixMilli(user.CreatedAt),
 		UpdatedAt:          utils.SQLNullInt64ToTimePtr(user.UpdatedAt),
 		DeletedAt:          utils.SQLNullInt64ToTimePtr(user.DeletedAt),
@@ -45,15 +45,15 @@ func DTOToDomain(user UserDTO) domain.User {
 	}
 }
 
-func DTOArrayToDomainArray(users []UserDTO) []domain.User {
+func toDomainArray(users []userDTO) []domain.User {
 	results := make([]domain.User, 0, len(users))
 	for _, user := range users {
-		results = append(results, DTOToDomain(user))
+		results = append(results, toDomain(user))
 	}
 	return results
 }
 
-func DomainFilterToDTO(filter domain.SearchUsersFilter) searchFilterDTO {
+func toFilterDTO(filter domain.SearchUsersFilter) searchFilterDTO {
 	return searchFilterDTO{
 		Name:                        filter.Name,
 		Email:                       filter.Email,

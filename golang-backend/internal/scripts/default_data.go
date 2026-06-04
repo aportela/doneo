@@ -12,23 +12,21 @@ import (
 	"github.com/aportela/doneo/internal/utils"
 )
 
-func CreateDefaultData(db database.Database) {
-	userRepository := userrepository.NewRepository(db)
-	userService := userservice.NewService(userRepository)
+func CreateDefaultAdminUser(db database.Database) {
 	permissionsBitmask := domain.PermissionsBitmask(0)
 	permissionsBitmask.AddPermission(domain.UserPermissionAdmin)
-	err := userService.Add(context.Background(), domain.User{
+	service := userservice.NewService(db, userrepository.NewRepository(db))
+	err := service.Add(context.Background(), domain.User{
 		UserBase: domain.UserBase{
 			ID:   utils.UUID(),
 			Name: "administrator",
 		},
 		Email:              "admin@localhost.localnet",
-		Password:           "secret",
 		CreatedAt:          time.Now(),
 		UpdatedAt:          nil,
 		DeletedAt:          nil,
 		PermissionsBitmask: permissionsBitmask,
-	})
+	}, "secret")
 	if err != nil {
 		fmt.Printf("Error creating user %s\n", err.Error())
 	}

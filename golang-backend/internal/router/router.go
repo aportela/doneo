@@ -25,6 +25,9 @@ import (
 	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 	"github.com/aportela/doneo/internal/middlewares"
+	"github.com/aportela/doneo/internal/repositories/userrepository"
+	"github.com/aportela/doneo/internal/services/authservice"
+	"github.com/aportela/doneo/internal/services/userservice"
 
 	"github.com/aportela/doneo/internal/ui"
 )
@@ -45,7 +48,7 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 	apiRouter := chi.NewRouter()
 
 	apiRouter.Route("/auth", func(r chi.Router) {
-		userHandler := authhandler.NewHandler(db, cfg.Auth.SecretKey, cfg.Auth.AccessTokenExpirationHours, cfg.Auth.RefreshTokenExpirationDays)
+		userHandler := authhandler.NewHandler(authservice.NewService(db, userrepository.NewRepository(db)), cfg.Auth.SecretKey, cfg.Auth.AccessTokenExpirationHours, cfg.Auth.RefreshTokenExpirationDays)
 		r.Post("/signin", userHandler.SignIn)
 		r.Post("/signout", userHandler.SignOut)
 		r.Post("/renew-access-token", userHandler.RenewAccessToken)
@@ -74,7 +77,9 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 
 	apiRouter.Route("/entities", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
-		userHandler := userhandler.NewHandler(db)
+		userRepository := userrepository.NewRepository(db)
+		userService := userservice.NewService(db, userRepository)
+		userHandler := userhandler.NewHandler(userService)
 		roleHandler := rolehandler.NewHandler(db)
 		r.Get("/users", userHandler.SearchBase)
 		r.Get("/roles", roleHandler.SearchBase)
@@ -83,7 +88,7 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 	apiRouter.Route("/users", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		userHandler := userhandler.NewHandler(db)
+		userHandler := userhandler.NewHandler(userservice.NewService(db, userrepository.NewRepository(db)))
 		r.Post("/", userHandler.Add)
 		r.Post("/search", userHandler.Search)
 		r.Get("/{id:"+uuidPattern+"}", userHandler.Get)

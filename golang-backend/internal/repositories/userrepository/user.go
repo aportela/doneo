@@ -6,24 +6,24 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"golang.org/x/crypto/bcrypt"
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
 )
 
 type UserRepository interface {
-	Add(ctx context.Context, user UserDTO) error
-	Update(ctx context.Context, user UserDTO) error
-	Delete(ctx context.Context, id string) error
+	Add(ctx context.Context, user domain.User, password string) error
+	Update(ctx context.Context, user domain.User) error
+	Delete(ctx context.Context, id string, deletedAt int64) error
 	UnDelete(ctx context.Context, id string) error
 	Purge(ctx context.Context, id string) error
-	Get(ctx context.Context, id string) (UserDTO, error)
-	GetByEmailForVerifyCredentials(ctx context.Context, email string, password string) (UserDTO, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter searchFilterDTO) ([]UserDTO, browser.Result, error)
+	Get(ctx context.Context, id string) (domain.User, error)
+	GetByEmail(ctx context.Context, email string) (domain.User, error)
+	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchUsersFilter) ([]domain.User, browser.Result, error)
 }
 
 type userRepository struct {
@@ -34,19 +34,26 @@ func NewRepository(database database.Database) UserRepository {
 	return &userRepository{database: database}
 }
 
-func (repository *userRepository) Add(ctx context.Context, user UserDTO) error {
-	_, err := repository.database.ExecContext(
+func (repository *userRepository) Add(ctx context.Context, user domain.User, password string) error {
+	hashedPasswordBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	dto := toDTO(user)
+	dto.PasswordHash = string(hashedPasswordBytes)
+
+	_, err = repository.database.ExecContext(
 		ctx,
 		`
             INSERT INTO users (id, email, name, password_hash, created_at, updated_at, deleted_at, permissions_bitmask)
 			VALUES (?, ?, ?, ?, ?, NULL, NULL, ?)
         `,
-		user.ID,
-		user.Email,
-		user.Name,
-		user.PasswordHash,
-		user.CreatedAt,
-		user.PermissionsBitmask,
+		dto.ID,
+		dto.Email,
+		dto.Name,
+		dto.PasswordHash,
+		dto.CreatedAt,
+		dto.PermissionsBitmask,
 	)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -78,10 +85,18 @@ func (repository *userRepository) Add(ctx context.Context, user UserDTO) error {
 	return err
 }
 
-func (repository *userRepository) Update(ctx context.Context, user UserDTO) error {
+func (repository *userRepository) Update(ctx context.Context, user domain.User) error {
+	dto := toDTO(user)
+	if len(user.Password) > 0 {
+		hashedPasswordBytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return err
+		}
+		dto.PasswordHash = string(hashedPasswordBytes)
+	}
 	var query string
 	var args []any
-	if user.PasswordHash != "" {
+	if dto.PasswordHash != "" {
 		query = `
 			UPDATE users SET
 				email = ?,
@@ -90,7 +105,7 @@ func (repository *userRepository) Update(ctx context.Context, user UserDTO) erro
 				updated_at = ?,
 				permissions_bitmask = ?
 			WHERE id = ?`
-		args = append(args, user.Email, user.Name, user.PasswordHash, user.UpdatedAt, user.PermissionsBitmask, user.ID)
+		args = append(args, dto.Email, dto.Name, dto.PasswordHash, dto.UpdatedAt, dto.PermissionsBitmask, dto.ID)
 	} else {
 		query = `
 			UPDATE users SET
@@ -99,7 +114,7 @@ func (repository *userRepository) Update(ctx context.Context, user UserDTO) erro
 				updated_at = ?,
 				permissions_bitmask = ?
 			WHERE id = ?`
-		args = append(args, user.Email, user.Name, user.UpdatedAt, user.PermissionsBitmask, user.ID)
+		args = append(args, dto.Email, dto.Name, dto.UpdatedAt, dto.PermissionsBitmask, dto.ID)
 	}
 	_, err := repository.database.ExecContext(ctx, query, args...)
 	if err != nil {
@@ -126,7 +141,7 @@ func (repository *userRepository) Update(ctx context.Context, user UserDTO) erro
 	return err
 }
 
-func (repository *userRepository) Delete(ctx context.Context, id string) error {
+func (repository *userRepository) Delete(ctx context.Context, id string, deletedAt int64) error {
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
@@ -134,7 +149,7 @@ func (repository *userRepository) Delete(ctx context.Context, id string) error {
 				deleted_at = ?
 			WHERE id = ?
         `,
-		time.Now().UnixMilli(),
+		deletedAt,
 		id,
 	)
 	return err
@@ -165,8 +180,8 @@ func (repository *userRepository) Purge(ctx context.Context, id string) error {
 	return err
 }
 
-func (repository *userRepository) Get(ctx context.Context, id string) (UserDTO, error) {
-	var user UserDTO
+func (repository *userRepository) Get(ctx context.Context, id string) (domain.User, error) {
+	var dto userDTO
 	err := repository.database.QueryRowContext(
 		ctx,
 		`
@@ -175,18 +190,18 @@ func (repository *userRepository) Get(ctx context.Context, id string) (UserDTO, 
             FROM users U
             WHERE U.id = ?
         `,
-		id).Scan(&user.ID, &user.Email, &user.Name, &user.PasswordHash, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt, &user.PermissionsBitmask)
+		id).Scan(&dto.ID, &dto.Email, &dto.Name, &dto.PasswordHash, &dto.CreatedAt, &dto.UpdatedAt, &dto.DeletedAt, &dto.PermissionsBitmask)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return UserDTO{}, domain.NotFoundError
+			return domain.User{}, domain.NotFoundError
 		}
-		return UserDTO{}, err
+		return domain.User{}, err
 	}
-	return user, err
+	return toDomain(dto), err
 }
 
-func (repository *userRepository) GetByEmailForVerifyCredentials(ctx context.Context, email string, password string) (UserDTO, error) {
-	var user UserDTO
+func (repository *userRepository) GetByEmail(ctx context.Context, email string) (domain.User, error) {
+	var dto userDTO
 	err := repository.database.QueryRowContext(
 		ctx,
 		`
@@ -195,17 +210,18 @@ func (repository *userRepository) GetByEmailForVerifyCredentials(ctx context.Con
             FROM users U
             WHERE U.email = ?
         `,
-		email).Scan(&user.ID, &user.Email, &user.Name, &user.PasswordHash, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt, &user.PermissionsBitmask)
+		email).Scan(&dto.ID, &dto.Email, &dto.Name, &dto.PasswordHash, &dto.CreatedAt, &dto.UpdatedAt, &dto.DeletedAt, &dto.PermissionsBitmask)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return UserDTO{}, domain.NotFoundError
+			return domain.User{}, domain.NotFoundError
 		}
-		return UserDTO{}, err
+		return domain.User{}, err
 	}
-	return user, err
+	return toDomain(dto), err
 }
 
-func (repository *userRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter searchFilterDTO) ([]UserDTO, browser.Result, error) {
+func (repository *userRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchUsersFilter) ([]domain.User, browser.Result, error) {
+	filterDTO := toFilterDTO(filter)
 	var filterArgs []any
 	var queryArgs []any
 	sqlQuery := `
@@ -242,50 +258,50 @@ func (repository *userRepository) Search(ctx context.Context, pager browser.Para
 	sqlOrder := fmt.Sprintf(" ORDER BY %s %s ", field, sort)
 	sqlWhere := ""
 	var sqlWhereConditions []string
-	if filter.Name != nil && len(*filter.Name) > 0 {
+	if filterDTO.Name != nil && len(*filterDTO.Name) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "U.name LIKE ?")
-		filterArgs = append(filterArgs, "%"+*filter.Name+"%")
+		filterArgs = append(filterArgs, "%"+*filterDTO.Name+"%")
 	}
-	if filter.Email != nil && len(*filter.Email) > 0 {
+	if filterDTO.Email != nil && len(*filterDTO.Email) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "U.email LIKE ?")
-		filterArgs = append(filterArgs, "%"+*filter.Email+"%")
+		filterArgs = append(filterArgs, "%"+*filterDTO.Email+"%")
 	}
-	if filter.RequiredPermissionsBitmask != nil {
+	if filterDTO.RequiredPermissionsBitmask != nil {
 		sqlWhereConditions = append(sqlWhereConditions, "(U.permissions_bitmask & ?) = ?")
-		filterArgs = append(filterArgs, filter.RequiredPermissionsBitmask, filter.RequiredPermissionsBitmask)
+		filterArgs = append(filterArgs, filterDTO.RequiredPermissionsBitmask, filterDTO.RequiredPermissionsBitmask)
 	}
-	if filter.ForbiddenPermissionsBitmask != nil {
+	if filterDTO.ForbiddenPermissionsBitmask != nil {
 		sqlWhereConditions = append(sqlWhereConditions, "(U.permissions_bitmask & ?) = 0")
-		filterArgs = append(filterArgs, filter.ForbiddenPermissionsBitmask)
+		filterArgs = append(filterArgs, filterDTO.ForbiddenPermissionsBitmask)
 	}
-	if filter.CreatedAt != nil {
-		if filter.CreatedAt.From != nil && *filter.CreatedAt.From > 0 {
+	if filterDTO.CreatedAt != nil {
+		if filterDTO.CreatedAt.From != nil && *filterDTO.CreatedAt.From > 0 {
 			sqlWhereConditions = append(sqlWhereConditions, "U.created_at >= ?")
-			filterArgs = append(filterArgs, filter.CreatedAt.From)
+			filterArgs = append(filterArgs, filterDTO.CreatedAt.From)
 		}
-		if filter.CreatedAt.To != nil && *filter.CreatedAt.To > 0 {
+		if filterDTO.CreatedAt.To != nil && *filterDTO.CreatedAt.To > 0 {
 			sqlWhereConditions = append(sqlWhereConditions, "U.created_at <= ?")
-			filterArgs = append(filterArgs, filter.CreatedAt.To)
+			filterArgs = append(filterArgs, filterDTO.CreatedAt.To)
 		}
 	}
-	if filter.UpdatedAt != nil {
-		if filter.UpdatedAt.From != nil && *filter.UpdatedAt.From > 0 {
+	if filterDTO.UpdatedAt != nil {
+		if filterDTO.UpdatedAt.From != nil && *filterDTO.UpdatedAt.From > 0 {
 			sqlWhereConditions = append(sqlWhereConditions, "U.updated_at >= ?")
-			filterArgs = append(filterArgs, filter.UpdatedAt.From)
+			filterArgs = append(filterArgs, filterDTO.UpdatedAt.From)
 		}
-		if filter.UpdatedAt.To != nil && *filter.UpdatedAt.To > 0 {
+		if filterDTO.UpdatedAt.To != nil && *filterDTO.UpdatedAt.To > 0 {
 			sqlWhereConditions = append(sqlWhereConditions, "U.updated_at <= ?")
-			filterArgs = append(filterArgs, filter.UpdatedAt.To)
+			filterArgs = append(filterArgs, filterDTO.UpdatedAt.To)
 		}
 	}
-	if filter.DeletedAt != nil {
-		if filter.DeletedAt.From != nil && *filter.DeletedAt.From > 0 {
+	if filterDTO.DeletedAt != nil {
+		if filterDTO.DeletedAt.From != nil && *filterDTO.DeletedAt.From > 0 {
 			sqlWhereConditions = append(sqlWhereConditions, "U.deleted_at >= ?")
-			filterArgs = append(filterArgs, filter.DeletedAt.From)
+			filterArgs = append(filterArgs, filterDTO.DeletedAt.From)
 		}
-		if filter.DeletedAt.To != nil && *filter.DeletedAt.To > 0 {
+		if filterDTO.DeletedAt.To != nil && *filterDTO.DeletedAt.To > 0 {
 			sqlWhereConditions = append(sqlWhereConditions, "U.deleted_at <= ?")
-			filterArgs = append(filterArgs, filter.DeletedAt.To)
+			filterArgs = append(filterArgs, filterDTO.DeletedAt.To)
 		}
 	}
 	if len(sqlWhereConditions) > 0 {
@@ -305,9 +321,9 @@ func (repository *userRepository) Search(ctx context.Context, pager browser.Para
 		return nil, browser.Result{}, err
 	}
 	defer rows.Close()
-	users := make([]UserDTO, 0)
+	users := make([]userDTO, 0)
 	for rows.Next() {
-		var user UserDTO
+		var user userDTO
 		if err := rows.Scan(&user.ID, &user.Email, &user.Name, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt, &user.PermissionsBitmask); err != nil {
 			return nil, browser.Result{}, err
 		}
@@ -339,5 +355,5 @@ func (repository *userRepository) Search(ctx context.Context, pager browser.Para
 		totalResults = len(users)
 	}
 
-	return users, browser.NewResult(pager, totalResults), nil
+	return toDomainArray(users), browser.NewResult(pager, totalResults), nil
 }

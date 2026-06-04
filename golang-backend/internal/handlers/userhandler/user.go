@@ -6,10 +6,8 @@ import (
 	"net/http"
 
 	"github.com/aportela/doneo/internal/browser"
-	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
-	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"github.com/aportela/doneo/internal/services/userservice"
 	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
@@ -19,10 +17,8 @@ type UserHandler struct {
 	service userservice.UserService
 }
 
-func NewHandler(db database.Database) *UserHandler {
-	userRepository := userrepository.NewRepository(db)
-	userService := userservice.NewService(userRepository)
-	return &UserHandler{service: userService}
+func NewHandler(service userservice.UserService) *UserHandler {
+	return &UserHandler{service: service}
 }
 
 func (handler *UserHandler) Add(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +30,7 @@ func (handler *UserHandler) Add(w http.ResponseWriter, r *http.Request) {
 	}
 	user := addRequestToDomain(request)
 	user.ID = utils.UUID()
-	err := handler.service.Add(r.Context(), user)
+	err := handler.service.Add(r.Context(), user, request.Password)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] failed to add user: %w", err))
 		return

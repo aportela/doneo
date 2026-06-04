@@ -6,13 +6,13 @@ import (
 	"github.com/aportela/doneo/internal/repositories"
 )
 
-type UserBaseDTO struct {
+type userBaseDTO struct {
 	ID   string `db:"id"`
 	Name string `db:"name"`
 }
 
-type UserDTO struct {
-	UserBaseDTO
+type userDTO struct {
+	userBaseDTO
 	Email              string        `db:"email"`
 	PasswordHash       string        `db:"password_hash"`
 	CreatedAt          int64         `db:"created_at"`

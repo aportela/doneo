@@ -49,7 +49,7 @@ func main() {
 			if err != nil {
 				log.Fatal("Error creating database schema:", err)
 			}
-			scripts.CreateDefaultData(databaseHandler)
+			scripts.CreateDefaultAdminUser(databaseHandler)
 		}
 
 		params, err := cli.HandleFlags()

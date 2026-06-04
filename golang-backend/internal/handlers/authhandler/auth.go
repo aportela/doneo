@@ -6,11 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
 	"github.com/aportela/doneo/internal/jwt"
-	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"github.com/aportela/doneo/internal/services/authservice"
 	"github.com/aportela/doneo/internal/utils"
 )
@@ -22,10 +20,8 @@ type AuthHandler struct {
 	refreshTokenExpirationDays int
 }
 
-func NewHandler(db database.Database, secretKey string, accessTokenExpirationHours int, refreshTokenExpirationDays int) *AuthHandler {
-	userRepository := userrepository.NewRepository(db)
-	authService := authservice.NewService(userRepository)
-	return &AuthHandler{service: authService, secretKey: secretKey, accessTokenExpirationHours: accessTokenExpirationHours, refreshTokenExpirationDays: refreshTokenExpirationDays}
+func NewHandler(service authservice.AuthService, secretKey string, accessTokenExpirationHours int, refreshTokenExpirationDays int) *AuthHandler {
+	return &AuthHandler{service: service, secretKey: secretKey, accessTokenExpirationHours: accessTokenExpirationHours, refreshTokenExpirationDays: refreshTokenExpirationDays}
 }
 
 func (handler *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {

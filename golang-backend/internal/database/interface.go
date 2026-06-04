@@ -16,15 +16,3 @@ type Database interface {
 	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
 	QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row
 }
-
-type DB interface {
-	Open(cfg config.DatabaseConfiguration) error
-	Close() error
-	Begin(ctx context.Context) (*sql.Tx, error)
-}
-
-type DBTX interface {
-	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
-	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
-	QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row
-}
