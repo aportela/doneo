@@ -114,7 +114,7 @@
                     }
                 };
                 const addedPermission: ProjectPermissionResponse = await projectPermissionService.add(props.projectId, payload);
-                emit('add', addedPermission)
+                emit('add', new ProjectPermission(addedPermission));
             } catch (error: unknown) {
                 state.ajaxErrors = true;
                 handleAPIError(error,
