@@ -2,11 +2,18 @@ package projecthistoryrespository
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/aportela/doneo/internal/database"
+	"github.com/aportela/doneo/internal/domain"
+	"modernc.org/sqlite"
+	sqlite3 "modernc.org/sqlite/lib"
 )
 
 type ProjectHistoryRepository interface {
+	AddProjectHistoryOperation(ctx context.Context, projectId string, operationType uint, operationDate int64, operationUserId string) error
 	GetProjectHistoryOperations(ctx context.Context, projectId string) ([]projectHistoryOperationDTO, error)
 }
 
@@ -16,6 +23,39 @@ type projectHistoryRepository struct {
 
 func NewRepository(database database.Database) ProjectHistoryRepository {
 	return &projectHistoryRepository{database: database}
+}
+
+func (repository *projectHistoryRepository) AddProjectHistoryOperation(ctx context.Context, projectId string, operationType uint, operationDate int64, operationUserId string) error {
+	_, err := repository.database.ExecContext(
+		ctx,
+		`
+			INSERT INTO project_history_operations
+				(project_id, operation_type, user_id, created_at)
+			VALUES
+				(?, ?, ?, ?)
+		`,
+		projectId,
+		operationType,
+		operationUserId,
+		operationDate,
+	)
+	if err != nil {
+		fmt.Println(err.Error())
+		var sqlErr *sqlite.Error
+		if !errors.As(err, &sqlErr) {
+			return err
+		}
+		switch sqlErr.Code() {
+		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
+			return &domain.ValidationError{Field: "project_id, operation_type, user_id, created_at"}
+		case sqlite3.SQLITE_CONSTRAINT_CHECK:
+			if strings.Contains(sqlErr.Error(), "length(project_id)") {
+				return &domain.ValidationError{Field: "project_id"}
+			} else if strings.Contains(sqlErr.Error(), "length(user_id)") {
+				return &domain.ValidationError{Field: "user_id"}
+			}
+		}
+	}
 }
 
 func (repository *projectHistoryRepository) GetProjectHistoryOperations(ctx context.Context, projectId string) ([]projectHistoryOperationDTO, error) {
