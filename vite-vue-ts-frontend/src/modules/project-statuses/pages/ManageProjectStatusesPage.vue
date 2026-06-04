@@ -4,22 +4,26 @@
 
     import { NModal, NCard } from 'naive-ui';
 
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { useLoadingStore } from '../../../stores/loading';
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
+
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
+    import type { FormMode } from '../../../shared/types/form-mode';
+    import type { SearchRequest, ProjectStatusResponse } from '../types/dto';
+    import type { ProjectStatusesTableFilters } from '../types/project-statuses-table-filters.ts';
+
+    import { Sort } from '../../../shared/types/models/sort';
+    import { ProjectStatus } from '../models/project-status';
+
     import { projectStatusService } from '../services/project-status';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import type { ProjectStatusResponse, SearchRequest } from '../types/dto';
-    import { ProjectStatus } from '../models/project-status';
-    import ProjectStatusesTable from '../components/ProjectStatusesTable.vue';
+
     import ProjectStatusForm from '../components/ProjectStatusForm.vue';
-    import { Sort } from '../../../shared/types/models/sort';
-    import type { FormMode } from '../../../shared/types/form-mode';
+    import ProjectStatusesTable from '../components/ProjectStatusesTable.vue';
 
     const { t } = useI18n();
     const { notify } = useNotify();
-
     const loadingStore = useLoadingStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
@@ -28,10 +32,12 @@
 
     const sort = ref<Sort>(new Sort("name", "ASC"));
 
-    const nameFilter = ref<string>("");
+    const filters = reactive<ProjectTypesTableFilters>({
+        name: "",
+    });
 
     const nameFilterLowerCase = computed(() =>
-        nameFilter.value?.toLowerCase() ?? ''
+        filters.name.toLowerCase()
     );
 
     const filteredItems = computed(() => {
@@ -42,9 +48,8 @@
         });
     });
 
-
-    const showForm = ref<boolean>(false);
-    const formMode = ref<FormMode>("add");
+    const showModal = ref<boolean>(false);
+    const modalFormMode = ref<FormMode>("add");
 
     const selectedItem = ref<ProjectStatus>(new ProjectStatus());
 
@@ -52,36 +57,25 @@
         loadingStore.set(newValue.ajaxRunning);
     });
 
-    const onToggleSort = (field: string) => {
-        sort.value.toggleSort(field);
+    const onSort = (newSort: Sort) => {
+        sort.field = newSort.field;
+        sort.order = newSort.order;
         onRefresh();
     };
 
     const onShowAddForm = () => {
-        formMode.value = "add";
-        showForm.value = true;
+        modalFormMode.value = "add";
+        showModal.value = true;
     };
 
     const onShowUpdateForm = (projectStatus: ProjectStatus, _index: number) => {
         selectedItem.value = projectStatus;
-        formMode.value = "update";
-        showForm.value = true;
+        modalFormMode.value = "update";
+        showModal.value = true;
     };
 
-    const onAdd = (projectStatus: ProjectStatus) => {
-        showForm.value = false;
-        notify('success', t("modules.projectStatus.components.ManageProjectStatusesPage.notifications.projectStatusAdded", { name: projectStatus.name }));
-        onRefresh();
-    };
-
-    const onUpdate = (projectStatus: ProjectStatus) => {
-        showForm.value = false;
-        notify('success', t("modules.projectStatus.components.ManageProjectStatusesPage.notifications.projectStatusUpdated", { name: projectStatus.name }));
-        onRefresh();
-    };
-
-    const onCancel = () => {
-        showForm.value = false;
+    const onCancelForm = () => {
+        showModal.value = false;
     };
 
     const onRefresh = async () => {
@@ -97,7 +91,7 @@
                     sort: sort.value.order,
                 },
                 filter: {
-                    name: nameFilter.value,
+                    //name: filters.name.length > 0 ? filters.name : undefined,
                 }
             };
             const response = await projectStatusService.search(payload);
@@ -170,6 +164,18 @@
         }
     };
 
+    const onAdded = (projectStatus: ProjectStatus) => {
+        showModal.value = false;
+        notify('success', t("modules.projectStatus.components.ManageProjectStatusesPage.notifications.projectStatusAdded", { name: projectStatus.name }));
+        onRefresh();
+    };
+
+    const onUpdated = (projectStatus: ProjectStatus) => {
+        showModal.value = false;
+        notify('success', t("modules.projectStatus.components.ManageProjectStatusesPage.notifications.projectStatusUpdated", { name: projectStatus.name }));
+        onRefresh();
+    };
+
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -189,16 +195,20 @@
 </script>
 
 <template>
-    <n-modal v-model:show="showForm">
-        <ProjectStatusForm :mode="formMode == 'add' ? 'add' : 'update'" :project-status-id="selectedItem.id"
-            style="width: 40%;" @add="onAdd" @update="onUpdate" @cancel="onCancel" />
+    <n-modal v-model:show="showModal">
+        <ProjectStatusForm :mode="modalFormMode == 'add' ? 'add' : 'update'" :project-status-id="selectedItem.id"
+            class="modal-form" @add="onAdded" @update="onUpdated" @cancel="onCancelForm" />
     </n-modal>
 
     <n-card :title="t('modules.projectStatus.components.ManageProjectStatusesPage.header.title')">
-        <ProjectStatusesTable :projectStatuses="filteredItems" :loading="state.ajaxRunning" @refresh="onRefresh"
-            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" :sort-field="sort.field"
-            :sort-order="sort.order" @toggle-sort="onToggleSort" v-model:project-status-name-filter="nameFilter" />
+        <ProjectStatusesTable :items="filteredItems" :disabled="state.ajaxRunning" @refresh="onRefresh"
+            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" :sort="sort" @sort="onSort"
+            v-model:filters="filters" />
     </n-card>
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+    .modal-form {
+        width: 40%;
+    }
+</style>
