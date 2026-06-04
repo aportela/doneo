@@ -46,6 +46,11 @@
     const filters = reactive<ProjectAttachmentsTableFilters>({
         name: "",
         createdByUserId: null,
+        createdAt: {
+            from: null,
+            to: null,
+        },
+        contentType: null,
     });
 
     const nameFilterLowerCase = computed(() =>
@@ -57,7 +62,8 @@
             const name = attachment.name?.toLowerCase();
             return (
                 (!name || name?.includes(nameFilterLowerCase.value)) &&
-                (filters.createdByUserId === null || filters.createdByUserId === attachment.createdBy.id)
+                (filters.createdByUserId === null || filters.createdByUserId === attachment.createdBy.id) &&
+                (filters.contentType === null || filters.contentType === attachment.contentType)
             );
         });
     });

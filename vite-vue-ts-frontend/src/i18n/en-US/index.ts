@@ -846,6 +846,9 @@ export default {
             user: {
               placeholder: "search by user",
             },
+            contentType: {
+              placeholder: "search by content type",
+            },
           },
           dialogs: {
             deleteConfirmation: {

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-    import { h, computed } from 'vue';
+    import { h, ref, computed, watch } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { useDialog, NEmpty } from 'naive-ui';
+    import { useDialog, NSelect, NEmpty, type SelectOption } from 'naive-ui';
     import { IconTrash } from '@tabler/icons-vue';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
@@ -11,12 +11,15 @@
     import { ProjectAttachment } from '../models/project-attachment.ts';
 
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
+    import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
-    import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
+    import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
+
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import { formatBytes } from '../../../shared/composables/format.ts';
+    import type { DateFilterSelectComponent } from '../../users/components/date-filter-select-component.ts';
 
     interface Props {
         disabled: boolean;
@@ -32,19 +35,40 @@
 
     const props = defineProps<Props>();
 
+    const createdAtFilterRef = ref<DateFilterSelectComponent | undefined>();
+
     const filters = defineModel<ProjectAttachmentsTableFilters>("filters", {
         default: () => ({
             name: "",
             createdByUserId: null,
+            createdAt: {
+                from: null,
+                to: null,
+            },
+            contentType: null,
         })
     });
 
+
     const isFilteredByName = computed<boolean>(() => filters.value.name.length > 0);
     const isFilteredByCreator = computed<boolean>(() => filters.value.createdByUserId !== null);
+    const isFilteredByCreatedAt = computed<boolean>(() => filters.value.createdAt.from != null || filters.value.createdAt.to != null);
+    const isFilteredByContentType = computed<boolean>(() => filters.value.contentType !== null);
+
+    const contentTypeOptions = ref<SelectOption[]>([]);
+
+    watch(() => props.items, (newValue: ProjectAttachment[], oldValue: ProjectAttachment[]) => {
+        if (oldValue.length === 0) {
+            contentTypeOptions.value = [...new Set(newValue.map((item: ProjectAttachment) => { return (item.contentType) }))].map((contentType) => { return ({ label: contentType, value: contentType }); });
+        }
+    });
+
 
     const hasFilters = computed<boolean>(() =>
         isFilteredByName.value ||
-        isFilteredByCreator.value
+        isFilteredByCreator.value ||
+        isFilteredByCreatedAt.value ||
+        isFilteredByContentType.value
     );
 
     const columns = computed<TableHeaderColumn[]>(() => [
@@ -67,23 +91,24 @@
             field: "contentType",
             visible: true,
             sortable: false,
-            isFiltered: () => false,
+            isFiltered: () => isFilteredByContentType.value,
         },
         {
             label: t("modules.project.components.ProjectsTable.header.columns.createdAt"),
             field: "createdAt",
             visible: true,
             sortable: false,
-            isFiltered: () => false,
+            isFiltered: () => isFilteredByCreatedAt.value,
         },
         {
             label: t("modules.project.components.ProjectsTable.header.columns.createdBy"),
             field: "createdBy",
             visible: true,
             sortable: false,
-            isFiltered: () => false,
+            isFiltered: () => isFilteredByCreator.value,
         },
     ]);
+
 
     const onRefresh = () => {
         emit("refresh");
@@ -123,7 +148,10 @@
     const onClearFilters = () => {
         filters.value.name = "";
         filters.value.createdByUserId = null;
+        createdAtFilterRef.value?.reset();
+        filters.value.contentType = null;
     };
+
 </script>
 
 <template>
@@ -139,10 +167,13 @@
                     <!-- TODO: size filter -->
                 </th>
                 <th>
-                    <!-- TODO: content type filter -->
+                    <n-select size="small" clearable :disabled="props.disabled" :options="contentTypeOptions"
+                        v-model:value="filters.contentType"
+                        :placeholder="t('modules.projectAttachment.components.projectAttachmentsTable.filters.contentType.placeholder')" />
                 </th>
                 <th>
-                    <!-- TODO: created at filter -->
+                    <DateFilterSelect v-model:range="filters.createdAt" ref="createdAtFilterRef"
+                        :disabled="props.disabled" />
                 </th>
                 <th>
                     <UserSelector hideAvatar clearable :disabled="props.disabled" v-model:id="filters.createdByUserId"
