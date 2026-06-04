@@ -74,7 +74,7 @@
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" @refresh="onRefresh">
+    <ManageTable size="small" :columns="columns" hide-add @refresh="onRefresh">
         <template #thead>
             <tr>
                 <th></th>
