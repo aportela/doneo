@@ -2,60 +2,114 @@
     import { h, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { useDialog, NFlex, NEmpty, NIcon, NTooltip } from 'naive-ui';
+    import { useDialog, NEmpty, NIcon, NTooltip, NSelect, type SelectOption } from 'naive-ui';
     import { IconEdit, IconEyeCheck, IconSquarePlus, IconTrash } from '@tabler/icons-vue';
 
-    import { Role } from '../models/role';
-    import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
-    import { type SortOrder } from '../../../shared/types/common';
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
+    import type { Sort } from '../../../shared/types/models/sort.ts';
+    import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
+    import type { RolesTableFilters } from '../types/roles-table-filters.ts';
+    import { Role } from '../models/role';
+
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
-    import TableCellHeaderSortIcon from '../../../shared/components/tables/TableCellHeaderSortIcon.vue';
-    import UpdateDeleteActionsColumn from '../../../shared/components/tables/UpdateDeleteActionsColumn.vue';
-    import RefreshAddActionsColumn from '../../../shared/components/tables/RefreshAddActionsColumn.vue';
+    import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
+    import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
 
     interface Props {
-        loading: boolean;
-        roles: Role[];
-        sortField: string;
-        sortOrder: SortOrder;
+        disabled: boolean;
+        items: Role[];
+        sort?: Sort;
     }
 
     const { t } = useI18n();
+    const dialog = useDialog();
 
-    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'toggleSort']);
+    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'sort']);
 
     const props = defineProps<Props>();
+
+    const filters = defineModel<RolesTableFilters>("filters", {
+        default: () => ({
+            name: "",
+            allowedProjectPermissions: [],
+            allowedTaskPermissions: [],
+        })
+    });
+
+    const isFilteredByName = computed<boolean>(() => filters.value.name.length > 0);
+    const isFilteredByAllowedProjectPermissions = computed<boolean>(() => filters.value.allowedProjectPermissions.length > 0);
+    const isFilteredByAllowedTaskPermissions = computed<boolean>(() => filters.value.allowedTaskPermissions.length > 0);
+
+
+    const hasFilters = computed<boolean>(() =>
+        isFilteredByName.value || isFilteredByAllowedProjectPermissions.value || isFilteredByAllowedTaskPermissions.value
+    );
 
     const columns = computed<TableHeaderColumn[]>(() => [
         {
             label: t("modules.role.components.RolesTable.header.columns.name"),
             field: "name",
-            sortable: true,
+            visible: true,
+            sortable: false,
+            isFiltered: () => isFilteredByName.value,
         },
         {
             label: t("modules.role.components.RolesTable.header.columns.projectPermissions"),
             field: "projectPermissions",
+            visible: true,
             sortable: false,
             align: "center",
+            isFiltered: () => isFilteredByAllowedProjectPermissions.value,
         },
         {
             label: t("modules.role.components.RolesTable.header.columns.taskPermissions"),
             field: "taskPermissions",
+            visible: true,
             sortable: false,
             align: "center",
+            isFiltered: () => isFilteredByAllowedTaskPermissions.value,
         },
     ]);
 
-    const roleNameFilter = defineModel<string>("roleNameFilter", {
-        default: "",
-    });
+    // TODO:
+    const projectPermissionsSelectorOptions = computed<SelectOption[]>(() => [
+        {
+            label: t("modules.role.components.RolesTable.body.columns.permissionsHints.updateProjectAllowed"),
+            value: 1
+        },
+        {
+            label: t("modules.role.components.RolesTable.body.columns.permissionsHints.deleteProjectAllowed"),
+            value: 2
+        },
+        {
+            label: t("modules.role.components.RolesTable.body.columns.permissionsHints.viewProjectAllowed"),
+            value: 3
+        },
+    ]);
 
-    const dialog = useDialog();
+    // TODO:
+    const taskPermissionsSelectorOptions = computed<SelectOption[]>(() => [
+        {
+            label: t("modules.role.components.RolesTable.body.columns.permissionsHints.addTaskAllowed"),
+            value: 1
+        },
+        {
+            label: t("modules.role.components.RolesTable.body.columns.permissionsHints.updateTaskAllowed"),
+            value: 2
+        },
+        {
+            label: t("modules.role.components.RolesTable.body.columns.permissionsHints.deleteTaskAllowed"),
+            value: 3
+        },
+        {
+            label: t("modules.role.components.RolesTable.body.columns.permissionsHints.viewTaskAllowed"),
+            value: 4
+        },
+    ]);
 
-    const onToggleSort = (field: string) => {
-        emit("toggleSort", field);
+    const onSort = (sort: Sort) => {
+        emit("sort", sort);
     };
 
     const onRefresh = () => {
@@ -88,129 +142,120 @@
             },
         });
     };
+
+    const onClearFilters = () => {
+        filters.value.name = "";
+        filters.value.allowedProjectPermissions = [];
+        filters.value.allowedTaskPermissions = [];
+    };
+
+    const permissionIconSize = 22;
 </script>
 
 <template>
-    <ManageTable size="small">
+    <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd">
         <template #thead>
-            <tr class="doneo-table-header-click-action">
-                <th v-for="column in columns" :key="column.field" @click="column.sortable && onToggleSort(column.field)"
-                    :class="{ 'doneo-cursor-pointer': column.sortable, 'doneo-text-center': column.align === 'center' }">
-                    <n-flex justify="space-between" v-if="column.sortable">
-                        <span>{{ column.label }}</span>
-                        <TableCellHeaderSortIcon v-if="props.sortField === column.field" :order="props.sortOrder" />
-                    </n-flex>
-                    <span v-else>{{ column.label }}</span>
-                </th>
-                <th class="doneo-table-actions-column">{{ t("shared.components.table.header.columns.actions") }}</th>
-            </tr>
             <tr>
                 <th>
                     <TextFilterInput clearable size="small"
                         :placeholder="t('modules.role.components.RolesTable.filters.name.placeholder')"
-                        v-model:value="roleNameFilter" />
+                        v-model:value="filters.name" />
                 </th>
-                <th></th>
-                <th></th>
+                <th>
+                    <n-select size="small" clearable multiple :options="projectPermissionsSelectorOptions"
+                        v-model:value="filters.allowedProjectPermissions" disabled />
+                </th>
+                <th>
+                    <n-select size="small" clearable multiple :options="taskPermissionsSelectorOptions"
+                        v-model:value="filters.allowedTaskPermissions" disabled />
+                </th>
                 <th class="doneo-text-center">
-                    <RefreshAddActionsColumn @refresh="onRefresh" @add="onAdd" />
+                    <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
                 </th>
             </tr>
         </template>
         <template #tbody>
-            <tr v-for="role, index in roles" :key="role.id ?? index">
+            <tr v-for="role, index in items" :key="role.id ?? index">
                 <td>
                     <div class="doneo-flex-center-align" style="gap: 8px;">
                         {{ role.name }}
                     </div>
                 </td>
                 <td class="doneo-text-center">
-                    <n-tooltip trigger="hover" v-if="role.permissions.allowUpdateProject">
+                    <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :size="22" class="doneo-cursor-help">
-                                <IconEdit />
-                            </n-icon>
+                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconEdit"
+                                :class="{ 'doneo-disabled-permission-icon': !role.permissions.allowUpdateProject }" />
                         </template>
-                        {{ t("modules.role.components.RolesTable.body.columns.permissionsHints.updateProjectAllowed") }}
+                        {{ t(role.permissions.allowUpdateProject ?
+                            "modules.role.components.RolesTable.body.columns.permissionsHints.updateProjectAllowed" :
+                            "modules.role.components.RolesTable.body.columns.permissionsHints.updateProjectDenied") }}
                     </n-tooltip>
-                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
-                        <IconEdit class="doneo-cursor-help" />
-                    </n-icon>
-                    <n-tooltip trigger="hover" v-if="role.permissions.allowDeleteProject">
+                    <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :size="22" class="doneo-cursor-help">
-                                <IconTrash />
-                            </n-icon>
+                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconTrash"
+                                :class="{ 'doneo-disabled-permission-icon': !role.permissions.allowDeleteProject }" />
                         </template>
-                        {{ t("modules.role.components.RolesTable.body.columns.permissionsHints.deleteProjectAllowed") }}
+                        {{ t(role.permissions.allowDeleteProject ?
+                            "modules.role.components.RolesTable.body.columns.permissionsHints.deleteProjectAllowed" :
+                            "modules.role.components.RolesTable.body.columns.permissionsHints.deleteProjectDenied") }}
                     </n-tooltip>
-                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
-                        <IconTrash class="doneo-cursor-help" />
-                    </n-icon>
-                    <n-tooltip trigger="hover" v-if="role.permissions.allowViewProject">
+                    <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :size="22" class="doneo-cursor-help">
-                                <IconEyeCheck />
-                            </n-icon>
+                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconEyeCheck"
+                                :class="{ 'doneo-disabled-permission-icon': !role.permissions.allowViewProject }" />
                         </template>
-                        {{ t("modules.role.components.RolesTable.body.columns.permissionsHints.viewProjectAllowed") }}
+                        {{ t(role.permissions.allowViewProject ?
+                            "modules.role.components.RolesTable.body.columns.permissionsHints.viewProjectAllowed" :
+                            "modules.role.components.RolesTable.body.columns.permissionsHints.viewProjectDenied") }}
                     </n-tooltip>
-                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
-                        <IconEyeCheck />
-                    </n-icon>
                 </td>
                 <td class="doneo-text-center">
-                    <n-tooltip trigger="hover" v-if="role.permissions.allowAddTask">
+                    <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :size="22" class="doneo-cursor-help">
-                                <IconSquarePlus />
-                            </n-icon>
+                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconSquarePlus"
+                                :class="{ 'doneo-disabled-permission-icon': !role.permissions.allowAddTask }" />
                         </template>
-                        {{ t("modules.role.components.RolesTable.body.columns.permissionsHints.addTaskAllowed") }}
+                        {{ t(role.permissions.allowAddTask ?
+                            "modules.role.components.RolesTable.body.columns.permissionsHints.addTaskAllowed" :
+                            "modules.role.components.RolesTable.body.columns.permissionsHints.addTaskDenied") }}
                     </n-tooltip>
-                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
-                        <IconSquarePlus />
-                    </n-icon>
-                    <n-tooltip trigger="hover" v-if="role.permissions.allowUpdateTask">
+                    <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :size="22" class="doneo-cursor-help">
-                                <IconEdit />
-                            </n-icon>
+                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconEdit"
+                                :class="{ 'doneo-disabled-permission-icon': !role.permissions.allowUpdateTask }" />
                         </template>
-                        {{ t("modules.role.components.RolesTable.body.columns.permissionsHints.updateTaskAllowed") }}
+                        {{ t(role.permissions.allowUpdateTask ?
+                            "modules.role.components.RolesTable.body.columns.permissionsHints.updateTaskAllowed" :
+                            "modules.role.components.RolesTable.body.columns.permissionsHints.updateTaskDenied") }}
                     </n-tooltip>
-                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
-                        <IconEdit />
-                    </n-icon>
-                    <n-tooltip trigger="hover" v-if="role.permissions.allowDeleteTask">
+                    <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :size="22" class="doneo-cursor-help">
-                                <IconTrash />
-                            </n-icon>
+                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconTrash"
+                                :class="{ 'doneo-disabled-permission-icon': !role.permissions.allowDeleteTask }" />
                         </template>
-                        {{ t("modules.role.components.RolesTable.body.columns.permissionsHints.deleteTaskAllowed") }}
+                        {{ t(role.permissions.allowDeleteTask ?
+                            "modules.role.components.RolesTable.body.columns.permissionsHints.deleteTaskAllowed" :
+                            "modules.role.components.RolesTable.body.columns.permissionsHints.deleteTaskDenied") }}
                     </n-tooltip>
-                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
-                        <IconTrash />
-                    </n-icon>
-                    <n-tooltip trigger="hover" v-if="role.permissions.allowViewTask">
+                    <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :size="22" class="doneo-cursor-help">
-                                <IconEyeCheck />
-                            </n-icon>
+                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconEyeCheck"
+                                :class="{ 'doneo-disabled-permission-icon': !role.permissions.allowViewTask }" />
                         </template>
-                        {{ t("modules.role.components.RolesTable.body.columns.permissionsHints.viewTaskAllowed") }}
+                        {{ t(role.permissions.allowViewTask ?
+                            "modules.role.components.RolesTable.body.columns.permissionsHints.viewTaskAllowed" :
+                            "modules.role.components.RolesTable.body.columns.permissionsHints.viewTaskDenied") }}
                     </n-tooltip>
-                    <n-icon :size="22" class="doneo-disabled-permission-icon" v-else>
-                        <IconEyeCheck />
-                    </n-icon>
                 </td>
                 <td class="doneo-text-center">
-                    <UpdateDeleteActionsColumn @update="onUpdate(role, index)" @delete="onConfirmDelete(role, index)" />
+                    <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
+                        :delete-disabled="props.disabled" @update="onUpdate(role, index)"
+                        @delete="onConfirmDelete(role, index)" />
                 </td>
             </tr>
             <tr>
-                <td :colspan="columns.length + 1" v-if="roles.length < 1 && !props.loading">
+                <td :colspan="columns.length + 1" v-if="!props.disabled && items.length < 1">
                     <n-empty :description="t('modules.role.components.RolesTable.warnings.noItemsFound')">
                     </n-empty>
                 </td>

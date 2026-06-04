@@ -1,68 +1,79 @@
 <script setup lang="ts">
-    import { onMounted, onBeforeUnmount, ref, reactive, shallowRef, watch } from 'vue';
+    import { ref, reactive, shallowRef, watch, onMounted, onBeforeUnmount } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NModal, NCard } from 'naive-ui';
 
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { useLoadingStore } from '../../../stores/loading';
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
+
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
+    import type { FormMode } from '../../../shared/types/form-mode';
+    import type { SearchRequest, UserResponse } from '../types/dto';
+    import type { UsersTableFilters } from '../types/users-table-filters.ts';
+    import { UserPermissionFilterValue } from '../types/user-admin-permission-filter';
+
+    import { Sort } from '../../../shared/types/models/sort';
+    import { User } from '../models/user';
+
     import { userService } from '../services/user';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import type { SearchRequest, UserResponse } from '../types/dto';
-    import { User } from '../models/user';
-    import { type UserPermissionFilter, UserPermissionFilterValue } from '../types/user-admin-permission-filter';
-    import UsersTable from '../components/UsersTable.vue';
-    import UserForm from '../components/UserForm.vue';
-    import Pager from '../../../shared/components/tables/Pager.vue';
-    import { Sort } from '../../../shared/types/models/sort';
-    import type { TimestampRange } from '../../../shared/composables/timestamps';
-    import type { FormMode } from '../../../shared/types/form-mode';
 
-    const { notify } = useNotify();
+    import Pager from '../../../shared/components/tables/Pager.vue';
+    import UserForm from '../components/UserForm.vue';
+    import UsersTable from '../components/UsersTable.vue';
 
     const { t } = useI18n();
-
+    const { notify } = useNotify();
     const loadingStore = useLoadingStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
     const items = shallowRef<User[]>([]);
 
-    const sort = ref<Sort>(new Sort("name", "ASC"));
+    const sort = reactive<Sort>(new Sort("name", "ASC"));
 
-    const nameFilter = ref<string>("");
-    const emailFilter = ref<string>("");
-    const typeFilter = ref<UserPermissionFilter>(UserPermissionFilterValue.Any);
-
-    const createdAtFilter = ref<TimestampRange>({ from: null, to: null });
-    const updatedAtFilter = ref<TimestampRange>({ from: null, to: null });
-    const deletedAtFilter = ref<TimestampRange>({ from: null, to: null });
-
+    const resetPager = ref<boolean>(false);
     const currentPage = ref(1);
     const pageSize = ref(10);
     const totalResults = ref(0);
     const totalPages = ref(0);
 
-    const showUserDialogForm = ref<boolean>(false);
-    const userDialogFormMode = ref<FormMode>("add");
+    const filters = reactive<UsersTableFilters>({
+        permissions: UserPermissionFilterValue.Any,
+        name: "",
+        email: "",
+        createdAt: {
+            from: null,
+            to: null,
+        },
+        updatedAt: {
+            from: null,
+            to: null,
+        },
+        deletedAt: {
+            from: null,
+            to: null,
+        }
+    });
 
-    const selectedUser = ref<User>(
-        new User({ "id": "", name: "", email: "", permissions: { isSuperUser: false }, createdAt: 0, updatedAt: 0, deletedAt: 0 })
-    );
+    const showModal = ref<boolean>(false);
+    const modalFormMode = ref<FormMode>("add");
+
+    const selectedItem = ref<User>(new User());
 
     watch(state, (newValue: AjaxStateInterface) => {
         loadingStore.set(newValue.ajaxRunning);
     });
 
-    watch([nameFilter, emailFilter, typeFilter], () => {
-        currentPage.value = 1;
-    });
+    watch(() => filters, () => {
+        resetPager.value = true;
+    }, { deep: true });
 
     watch(pageSize, () => {
         if (currentPage.value != 1) {
-            currentPage.value = 1;
+            resetPager.value = true;
         } else {
             onRefresh();
         }
@@ -72,36 +83,25 @@
         onRefresh();
     });
 
-    const onToggleSort = (field: string) => {
-        sort.value.toggleSort(field);
+    const onSort = (newSort: Sort) => {
+        sort.field = newSort.field;
+        sort.order = newSort.order;
         onRefresh();
     };
 
     const onShowAddForm = () => {
-        userDialogFormMode.value = "add";
-        showUserDialogForm.value = true;
+        modalFormMode.value = "add";
+        showModal.value = true;
     };
 
-    const onShowUpdateForm = (user: User, _index?: number) => {
-        selectedUser.value = user;
-        userDialogFormMode.value = "update";
-        showUserDialogForm.value = true;
+    const onShowUpdateForm = (user: User, _index: number) => {
+        selectedItem.value = user;
+        modalFormMode.value = "update";
+        showModal.value = true;
     };
 
-    const onAdd = (user: User) => {
-        showUserDialogForm.value = false;
-        notify('success', t("modules.user.components.ManageUsersPage.notifications.userAdded", { name: user.name }));
-        onRefresh();
-    };
-
-    const onUpdate = (user: User) => {
-        showUserDialogForm.value = false;
-        notify('success', t("modules.user.components.ManageUsersPage.notifications.userUpdated", { name: user.name }));
-        onRefresh();
-    };
-
-    const onCancel = () => {
-        showUserDialogForm.value = false;
+    const onCancelForm = () => {
+        showModal.value = false;
     };
 
     const onRefresh = async () => {
@@ -109,28 +109,30 @@
         try {
             const payload: SearchRequest = {
                 pager: {
-                    currentPage: currentPage.value,
+                    currentPage: resetPager.value ? 1 : currentPage.value,
                     resultsPage: pageSize.value,
                 },
                 order: {
-                    field: sort.value.field,
-                    sort: sort.value.order,
+                    field: sort.field,
+                    sort: sort.order,
                 },
                 filter: {
-                    name: nameFilter.value,
-                    email: emailFilter.value,
+                    name: filters.name,
+                    email: filters.email,
                     permissions: {
-                        isSuperUser: typeFilter.value == UserPermissionFilterValue.Any ? undefined : (typeFilter.value === UserPermissionFilterValue.OnlyAdministrators ? true : false),
+                        isSuperUser: filters.permissions == UserPermissionFilterValue.Any ? undefined : (filters.permissions === UserPermissionFilterValue.OnlyAdministrators ? true : false),
                     },
-                    createdAt: createdAtFilter.value,
-                    updatedAt: updatedAtFilter.value,
-                    deletedAt: deletedAtFilter.value
+                    createdAt: filters.createdAt,
+                    updatedAt: filters.updatedAt,
+                    deletedAt: filters.deletedAt,
                 }
             };
             const response = await userService.search(payload);
             totalPages.value = response.pager.totalPages;
             totalResults.value = response.pager.totalResults;
+            currentPage.value = response.pager.currentPage;
             items.value = response.users.map((user: UserResponse) => new User(user));
+            resetPager.value = false;
         } catch (error: unknown) {
             items.value = [];
             state.ajaxErrors = true;
@@ -173,15 +175,13 @@
                         switch (apiError.response?.status) {
                             case 401:
                                 state.ajaxErrors = false;
-                                selectedUser.value = user;
+                                selectedItem.value = user;
                                 appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onDelete" } });
                                 break;
                             case 404:
-                                // TODO: notification vs error ?
                                 state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.notFoundError");
                                 break;
                             default:
-                                // TODO: notification vs error ?
                                 state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.deleteError");
                                 break;
                         }
@@ -215,15 +215,13 @@
                         switch (apiError.response?.status) {
                             case 401:
                                 state.ajaxErrors = false;
-                                selectedUser.value = user;
+                                selectedItem.value = user;
                                 appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onUnDelete" } });
                                 break;
                             case 404:
-                                // TODO: notification vs error ?
                                 state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.notFoundError");
                                 break;
                             default:
-                                // TODO: notification vs error ?
                                 state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.restoreError");
                                 break;
                         }
@@ -243,6 +241,18 @@
         }
     };
 
+    const onAdded = (user: User) => {
+        showModal.value = false;
+        notify('success', t("modules.user.components.ManageUsersPage.notifications.userAdded", { name: user.name }));
+        onRefresh();
+    };
+
+    const onUpdated = (user: User) => {
+        showModal.value = false;
+        notify('success', t("modules.user.components.ManageUsersPage.notifications.userUpdated", { name: user.name }));
+        onRefresh();
+    };
+
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -251,9 +261,9 @@
             if (payload.to.includes("ManageUsersPage.onRefresh")) {
                 onRefresh();
             } else if (payload.to.includes("ManageUsersPage.onDelete")) {
-                onDelete(selectedUser.value)
+                onDelete(selectedItem.value)
             } else if (payload.to.includes("ManageUsersPage.onUnDelete")) {
-                onUnDelete(selectedUser.value);
+                onUnDelete(selectedItem.value);
             }
         });
     });
@@ -264,9 +274,9 @@
 </script>
 
 <template>
-    <n-modal v-model:show="showUserDialogForm">
-        <UserForm :mode="userDialogFormMode == 'add' ? 'add' : 'update'" :user-id="selectedUser.id" style="width: 40%;"
-            @add="onAdd" @update="onUpdate" @cancel="onCancel" />
+    <n-modal v-model:show="showModal">
+        <UserForm :mode="modalFormMode == 'add' ? 'add' : 'update'" :user-id="selectedItem.id" class="modal-form"
+            @add="onAdded" @update="onUpdated" @cancel="onCancelForm" />
     </n-modal>
 
     <n-card :title="t('modules.user.components.ManageUsersPage.header.title')">
@@ -276,17 +286,14 @@
                 {{ t("modules.user.components.ManageUsersPage.pager.totalItemsLabel", { total: totalResults }) }}
             </template>
         </Pager>
-        <UsersTable :users="items" :loading="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
-            @update="onShowUpdateForm" @delete="onDelete" @undelete="onUnDelete" @textfilter-keydown-enter="onRefresh"
-            :sort-field="sort.field" :sort-order="sort.order" @toggle-sort="onToggleSort"
-            v-model:user-type-filter="typeFilter" v-model:user-name-filter="nameFilter"
-            v-model:email-filter="emailFilter" v-model:created-at-filter="createdAtFilter"
-            v-model:updated-at-filter="updatedAtFilter" v-model:deleted-at-filter="deletedAtFilter" />
+        <UsersTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
+            @update="onShowUpdateForm" @delete="onDelete" @undelete="onUnDelete" :sort="sort" @sort="onSort"
+            v-model:filters="filters" />
     </n-card>
 </template>
 
-<style lang="css">
-    .doneo-pager-container {
-        margin-bottom: 4px;
+<style lang="css" scoped>
+    .modal-form {
+        width: 40%;
     }
 </style>

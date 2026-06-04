@@ -1,38 +1,46 @@
 <script setup lang="ts">
-    import { onMounted, onBeforeUnmount, ref, reactive, shallowRef, watch, computed } from 'vue';
+    import { ref, reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NModal, NCard } from 'naive-ui';
 
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { useLoadingStore } from '../../../stores/loading';
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
+
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
+    import type { FormMode } from '../../../shared/types/form-mode';
+    import type { SearchRequest, RoleResponse } from '../types/dto';
+    import type { RolesTableFilters } from '../types/roles-table-filters.ts';
+
+    import { Sort } from '../../../shared/types/models/sort';
+    import { Role } from '../models/role';
+
     import { roleService as roleService } from '../services/role';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import type { RoleResponse, SearchRequest } from '../types/dto';
-    import { Role } from '../models/role';
-    import RolesTable from '../components/RolesTable.vue';
+
     import RoleForm from '../components/RoleForm.vue';
-    import { Sort } from '../../../shared/types/models/sort';
-    import type { FormMode } from '../../../shared/types/form-mode';
+    import RolesTable from '../components/RolesTable.vue';
 
 
     const { t } = useI18n();
     const { notify } = useNotify();
-
     const loadingStore = useLoadingStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
     const items = shallowRef<Role[]>([]);
 
-    const sort = ref<Sort>(new Sort("name", "ASC"));
+    const sort = reactive<Sort>(new Sort("name", "ASC"));
 
-    const nameFilter = ref<string>("");
+    const filters = reactive<RolesTableFilters>({
+        name: "",
+        allowedProjectPermissions: [],
+        allowedTaskPermissions: [],
+    });
 
     const nameFilterLowerCase = computed(() =>
-        nameFilter.value?.toLowerCase() ?? ''
+        filters.name.toLowerCase()
     );
 
     const filteredItems = computed(() => {
@@ -43,8 +51,8 @@
         });
     });
 
-    const showForm = ref<boolean>(false);
-    const formMode = ref<FormMode>("add");
+    const showModal = ref<boolean>(false);
+    const modalFormMode = ref<FormMode>("add");
 
     const selectedItem = ref<Role>(new Role());
 
@@ -52,36 +60,25 @@
         loadingStore.set(newValue.ajaxRunning);
     });
 
-    const onToggleSort = (field: string) => {
-        sort.value.toggleSort(field);
+    const onSort = (newSort: Sort) => {
+        sort.field = newSort.field;
+        sort.order = newSort.order;
         onRefresh();
     };
 
     const onShowAddForm = () => {
-        formMode.value = "add";
-        showForm.value = true;
+        modalFormMode.value = "add";
+        showModal.value = true;
     };
 
     const onShowUpdateForm = (role: Role, _index?: number) => {
         selectedItem.value = role;
-        formMode.value = "update";
-        showForm.value = true;
+        modalFormMode.value = "update";
+        showModal.value = true;
     };
 
-    const onAdd = (role: Role) => {
-        showForm.value = false;
-        notify('success', t("modules.role.components.ManageRolesPage.notifications.roleAdded", { name: role.name }));
-        onRefresh();
-    };
-
-    const onUpdate = (role: Role) => {
-        showForm.value = false;
-        notify('success', t("modules.role.components.ManageRolesPage.notifications.roleUpdated", { name: role.name }));
-        onRefresh();
-    };
-
-    const onCancel = () => {
-        showForm.value = false;
+    const onCancelForm = () => {
+        showModal.value = false;
     };
 
     const onRefresh = async () => {
@@ -93,11 +90,11 @@
                     resultsPage: 0,
                 },
                 order: {
-                    field: sort.value.field,
-                    sort: sort.value.order,
+                    field: sort.field,
+                    sort: sort.order,
                 },
                 filter: {
-                    name: nameFilter.value,
+                    name: filters.name.length > 0 ? filters.name : undefined,
                 }
             };
             const response = await roleService.search(payload);
@@ -171,6 +168,18 @@
         }
     };
 
+    const onAdded = (role: Role) => {
+        showModal.value = false;
+        notify('success', t("modules.role.components.ManageRolesPage.notifications.roleAdded", { name: role.name }));
+        onRefresh();
+    };
+
+    const onUpdated = (role: Role) => {
+        showModal.value = false;
+        notify('success', t("modules.role.components.ManageRolesPage.notifications.roleUpdated", { name: role.name }));
+        onRefresh();
+    };
+
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -190,16 +199,19 @@
 </script>
 
 <template>
-    <n-modal v-model:show="showForm">
-        <RoleForm :mode="formMode == 'add' ? 'add' : 'update'" :role-id="selectedItem.id" style="width: 40%;"
-            @add="onAdd" @update="onUpdate" @cancel="onCancel" />
+    <n-modal v-model:show="showModal">
+        <RoleForm :mode="modalFormMode == 'add' ? 'add' : 'update'" :role-id="selectedItem.id" class="modal-form"
+            @add="onAdded" @update="onUpdated" @cancel="onCancelForm" />
     </n-modal>
 
     <n-card :title="t('modules.role.components.ManageRolesPage.header.title')">
-        <RolesTable :roles="filteredItems" :loading="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
-            @update="onShowUpdateForm" @delete="onDelete" :sort-field="sort.field" :sort-order="sort.order"
-            @toggle-sort="onToggleSort" v-model:role-name-filter="nameFilter" />
+        <RolesTable :items="filteredItems" :disabled="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
+            @update="onShowUpdateForm" @delete="onDelete" :sort="sort" @sort="onSort" v-model:filters="filters" />
     </n-card>
 </template>
 
-<style lang="css"></style>
+<style lang="css">
+    .modal-form {
+        width: 40%;
+    }
+</style>
