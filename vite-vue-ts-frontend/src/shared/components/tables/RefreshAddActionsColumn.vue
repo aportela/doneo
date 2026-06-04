@@ -65,12 +65,4 @@
     </n-button-group>
 </template>
 
-<style lang="css" scoped>
-    .doneo-table-actions-button-group {
-        width: 100%;
-    }
-
-    .doneo-table-actions-button {
-        flex: 1;
-    }
-</style>
+<style lang="css" scoped></style>

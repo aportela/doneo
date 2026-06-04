@@ -55,6 +55,14 @@ td,
     text-align: center !important;
 }
 
+.doneo-table-actions-button-group {
+    width: 100%;
+}
+
+.doneo-table-actions-button {
+    flex: 1;
+}
+
 .doneo-table thead th:last-of-type,
 .doneo-table tbody td:last-of-type,
 doneo-table tfoot th:last-of-type {

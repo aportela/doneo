@@ -62,32 +62,37 @@
 </script>
 
 <template>
-    <n-button-group :size="props.buttonSize">
-        <n-button @click="onUpdate" :disabled="props.disabled || props.updateDisabled" v-if="showUpdate">
+    <n-button-group :size="props.buttonSize" class="doneo-table-actions-button-group">
+        <n-button @click="onUpdate" :disabled="props.disabled || props.updateDisabled" v-if="showUpdate"
+            class="doneo-table-actions-button">
             {{ t("shared.buttons.Update.label") }}
             <template #icon>
                 <n-icon :size="props.iconSize" :component="IconEdit" />
             </template>
         </n-button>
-        <n-button @click="onDelete" :disabled="props.disabled || props.deleteDisabled" v-if="showDelete">
+        <n-button @click="onDelete" :disabled="props.disabled || props.deleteDisabled" v-if="showDelete"
+            class="doneo-table-actions-button">
             {{ t("shared.buttons.Delete.label") }}
             <template #icon>
                 <n-icon :size="props.iconSize" :component="IconTrash" />
             </template>
         </n-button>
-        <n-button @click="onRestore" :disabled="props.disabled || props.restoredDisabled" v-if="showRestore">
+        <n-button @click="onRestore" :disabled="props.disabled || props.restoredDisabled" v-if="showRestore"
+            class="doneo-table-actions-button">
             {{ t("shared.buttons.Restore.label") }}
             <template #icon>
                 <n-icon :size="props.iconSize" :component="IconTrashOff" />
             </template>
         </n-button>
-        <n-button @click.prevent="onDownload" :disabled="props.disabled || props.downloadDisabled" v-if="showDownload">
+        <n-button @click.prevent="onDownload" :disabled="props.disabled || props.downloadDisabled" v-if="showDownload"
+            class="doneo-table-actions-button">
             {{ t("shared.buttons.Download.label") }}
             <template #icon>
                 <n-icon :size="props.iconSize" :component="IconDownload" />
             </template>
         </n-button>
-        <n-button @click.prevent="onPreview" :disabled="props.disabled || props.previewDisabled" v-if="showPreview">
+        <n-button @click.prevent="onPreview" :disabled="props.disabled || props.previewDisabled" v-if="showPreview"
+            class="doneo-table-actions-button">
             {{ t("shared.buttons.Preview.label") }}
             <template #icon>
                 <n-icon :size="props.iconSize" :component="IconEyeSearch" />
