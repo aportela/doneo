@@ -4,22 +4,26 @@
 
     import { NModal, NCard } from 'naive-ui';
 
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { useLoadingStore } from '../../../stores/loading';
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
+
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
+    import type { FormMode } from '../../../shared/types/form-mode';
+    import type { SearchRequest, TaskPriorityResponse } from '../types/dto';
+    import type { TaskPrioritiesTableFilters } from '../types/task-priorities-table-filters.ts';
+
+    import { Sort } from '../../../shared/types/models/sort';
+    import { TaskPriority } from '../models/task-priority';
+
     import { taskPriorityService } from '../services/task-priority';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import type { TaskPriorityResponse, SearchRequest } from '../types/dto';
-    import { TaskPriority } from '../models/task-priority';
-    import TaskPrioritiesTable from '../components/TaskPrioritiesTable.vue';
+
     import TaskPriorityForm from '../components/TaskPriorityForm.vue';
-    import { Sort } from '../../../shared/types/models/sort';
-    import type { FormMode } from '../../../shared/types/form-mode';
+    import TaskPrioritiesTable from '../components/TaskPrioritiesTable.vue';
 
     const { t } = useI18n();
     const { notify } = useNotify();
-
     const loadingStore = useLoadingStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
@@ -28,10 +32,12 @@
 
     const sort = ref<Sort>(new Sort("name", "ASC"));
 
-    const nameFilter = ref<string>("");
+    const filters = reactive<ProjectTypesTableFilters>({
+        name: "",
+    });
 
     const nameFilterLowerCase = computed(() =>
-        nameFilter.value?.toLowerCase() ?? ''
+        filters.name.toLowerCase()
     );
 
     const filteredItems = computed(() => {
@@ -42,8 +48,8 @@
         });
     });
 
-    const showForm = ref<boolean>(false);
-    const formMode = ref<FormMode>("add");
+    const showModal = ref<boolean>(false);
+    const modalFormMode = ref<FormMode>("add");
 
     const selectedItem = ref<TaskPriority>(new TaskPriority());
 
@@ -51,36 +57,25 @@
         loadingStore.set(newValue.ajaxRunning);
     });
 
-    const onToggleSort = (field: string) => {
-        sort.value.toggleSort(field);
+    const onSort = (newSort: Sort) => {
+        sort.field = newSort.field;
+        sort.order = newSort.order;
         onRefresh();
     };
 
     const onShowAddForm = () => {
-        formMode.value = "add";
-        showForm.value = true;
+        modalFormMode.value = "add";
+        showModal.value = true;
     };
 
     const onShowUpdateForm = (taskPriority: TaskPriority, _index: number) => {
         selectedItem.value = taskPriority;
-        formMode.value = "update";
-        showForm.value = true;
+        modalFormMode.value = "update";
+        showModal.value = true;
     };
 
-    const onAdd = (taskPriority: TaskPriority) => {
-        showForm.value = false;
-        notify('success', t("modules.taskPriority.components.ManageTaskPrioritiesPage.notifications.taskPriorityAdded", { name: taskPriority.name }));
-        onRefresh();
-    };
-
-    const onUpdate = (taskPriority: TaskPriority) => {
-        showForm.value = false;
-        notify('success', t("modules.taskPriority.components.ManageTaskPrioritiesPage.notifications.taskPriorityUpdated", { name: taskPriority.name }));
-        onRefresh();
-    };
-
-    const onCancel = () => {
-        showForm.value = false;
+    const onCancelForm = () => {
+        showModal.value = false;
     };
 
     const onRefresh = async () => {
@@ -96,7 +91,7 @@
                     sort: sort.value.order,
                 },
                 filter: {
-                    name: nameFilter.value,
+                    //name: filters.name.length > 0 ? filters.name : undefined,
                 }
             };
             const response = await taskPriorityService.search(payload);
@@ -169,6 +164,18 @@
         }
     };
 
+    const onAdd = (taskPriority: TaskPriority) => {
+        showModal.value = false;
+        notify('success', t("modules.taskPriority.components.ManageTaskPrioritiesPage.notifications.taskPriorityAdded", { name: taskPriority.name }));
+        onRefresh();
+    };
+
+    const onUpdate = (taskPriority: TaskPriority) => {
+        showModal.value = false;
+        notify('success', t("modules.taskPriority.components.ManageTaskPrioritiesPage.notifications.taskPriorityUpdated", { name: taskPriority.name }));
+        onRefresh();
+    };
+
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -188,15 +195,15 @@
 </script>
 
 <template>
-    <n-modal v-model:show="showForm">
-        <TaskPriorityForm :mode="formMode == 'add' ? 'add' : 'update'" :taskPriorityId="selectedItem.id"
-            style="width: 40%;" @add="onAdd" @update="onUpdate" @cancel="onCancel" />
+    <n-modal v-model:show="showModal">
+        <TaskPriorityForm :mode="modalFormMode == 'add' ? 'add' : 'update'" :taskPriorityId="selectedItem.id"
+            style="width: 40%;" @add="onAdd" @update="onUpdate" @cancel="onCancelForm" />
     </n-modal>
 
     <n-card :title="t('modules.taskPriority.components.ManageTaskPrioritiesPage.header.title')">
-        <TaskPrioritiesTable :task-priorities="filteredItems" :loading="state.ajaxRunning" @refresh="onRefresh"
-            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" :sort-field="sort.field"
-            :sort-order="sort.order" @toggle-sort="onToggleSort" v-model:task-priority-name-filter="nameFilter" />
+        <TaskPrioritiesTable :items="filteredItems" :disabled="state.ajaxRunning" @refresh="onRefresh"
+            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" :sort="sort" @sort="onSort"
+            v-model:filters="filters" />
     </n-card>
 </template>
 
