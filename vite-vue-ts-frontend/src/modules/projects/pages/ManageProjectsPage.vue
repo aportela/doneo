@@ -5,44 +5,57 @@
 
     import { NCard, NModal } from 'naive-ui';
 
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { useLoadingStore } from '../../../stores/loading';
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
+
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
+    import type { FormMode } from '../../../shared/types/form-mode';
+    import type { SearchRequest, ProjectResponse } from '../types/dto';
+    import type { ProjectsTableFilters } from '../types/projects-table-filters.ts';
+
+    import { Sort } from '../../../shared/types/models/sort';
+    import { Project } from '../models/project';
+
     import { projectService } from '../services/project';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import type { ProjectResponse, SearchRequest } from '../types/dto';
-    import { Project } from '../models/project';
+
+    import NewProjectForm from '../components/NewProjectForm.vue';
     import ProjectsTable from '../components/ProjectsTable.vue';
     import Pager from '../../../shared/components/tables/Pager.vue';
-    import NewProjectForm from '../components/NewProjectForm.vue';
-    import { Sort } from '../../../shared/types/models/sort';
-    import type { FormMode } from '../../../shared/types/form-mode';
-    import type { TimestampRange } from '../../../shared/composables/timestamps.ts';
 
     const router = useRouter();
     const { t } = useI18n();
     const { notify } = useNotify();
-
     const loadingStore = useLoadingStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
     const items = shallowRef<Project[]>([]);
 
-    const sort = ref<Sort>(new Sort("createdAt", "DESC"));
+    const sort = reactive<Sort>(new Sort("createdAt", "DESC"));
 
+    const resetPager = ref<boolean>(false);
+    const currentPage = ref(1);
+    const pageSize = ref(10);
+    const totalResults = ref(0);
+    const totalPages = ref(0);
 
-    const keyFilter = ref<string | null>(null);
-    const summaryFilter = ref<string | null>(null);
-    const typeIdFilter = ref<string | null>(null);
-    const priorityIdFilter = ref<string | null>(null);
-    const statusIdFilter = ref<string | null>(null);
-    const createdAtFilter = ref<TimestampRange>({ from: null, to: null });
-    const createdByUserIdFilter = ref<string | null>(null);
+    const filters = reactive<ProjectsTableFilters>({
+        key: "",
+        typeId: null,
+        priorityId: null,
+        statusId: null,
+        summary: "",
+        createdAt: {
+            from: null,
+            to: null,
+        },
+        createdByUserId: null,
+    });
 
-    const showForm = ref<boolean>(false);
-    const formMode = ref<FormMode>("add");
+    const showModal = ref<boolean>(false);
+    const modalFormMode = ref<FormMode>("add");
 
     const selectedItem = ref<Project>(new Project());
 
@@ -50,24 +63,9 @@
         loadingStore.set(newValue.ajaxRunning);
     });
 
-    const onToggleSort = (field: string) => {
-        sort.value.toggleSort(field);
-        onRefresh();
-    };
-
-    const onShowAddForm = () => {
-        formMode.value = "add";
-        showForm.value = true;
-    };
-
-    const currentPage = ref(1);
-    const pageSize = ref(10);
-    const totalResults = ref(0);
-    const totalPages = ref(0);
-
-    watch([keyFilter], () => {
-        currentPage.value = 1;
-    });
+    watch(() => filters, () => {
+        resetPager.value = true;
+    }, { deep: true });
 
     watch(pageSize, () => {
         if (currentPage.value != 1) {
@@ -81,35 +79,19 @@
         onRefresh();
     });
 
-    const onShowUpdateForm = (project: Project, _index: number) => {
-        selectedItem.value = project;
-        formMode.value = "update";
-        showForm.value = true;
+    const onSort = (newSort: Sort) => {
+        sort.field = newSort.field;
+        sort.order = newSort.order;
+        onRefresh();
     };
 
-
-    const onAdd = (project: Project, openProjectAfterCreate: boolean) => {
-        showForm.value = false;
-        notify('success', t("modules.project.components.ManageProjectsPage.notifications.projectAdded", { summary: project.summary }));
-        if (openProjectAfterCreate) {
-            router.push(
-                {
-                    name: "projectTab",
-                    params: {
-                        id: project.id,
-                        tab: "metadata",
-                    }
-                },
-            ).catch((e) => {
-                console.error(e);
-            });
-        } else {
-            onRefresh();
-        }
+    const onShowAddForm = () => {
+        modalFormMode.value = "add";
+        showModal.value = true;
     };
 
-    const onCancel = () => {
-        showForm.value = false;
+    const onCancelForm = () => {
+        showModal.value = false;
     };
 
     const onRefresh = async () => {
@@ -121,17 +103,17 @@
                     resultsPage: pageSize.value,
                 },
                 order: {
-                    field: sort.value.field,
-                    sort: sort.value.order,
+                    field: sort.field,
+                    sort: sort.order,
                 },
                 filter: {
-                    key: keyFilter.value ?? undefined,
-                    summary: summaryFilter.value ?? undefined,
-                    typeId: typeIdFilter.value ?? undefined,
-                    priorityId: priorityIdFilter.value ?? undefined,
-                    statusId: statusIdFilter.value ?? undefined,
-                    createdAt: createdAtFilter.value,
-                    createdByUserId: createdByUserIdFilter.value ?? undefined,
+                    key: filters.key.length > 0 ? filters.key : undefined,
+                    summary: filters.summary.length > 0 ? filters.summary : undefined,
+                    typeId: filters.typeId !== null ? filters.typeId : undefined,
+                    priorityId: filters.priorityId !== null ? filters.priorityId : undefined,
+                    statusId: filters.statusId !== null ? filters.statusId : undefined,
+                    createdAt: filters.createdAt,
+                    createdByUserId: filters.createdByUserId !== null ? filters.createdByUserId : undefined,
                 }
             };
             const response = await projectService.search(payload);
@@ -166,6 +148,7 @@
         }
     };
 
+    // TODO:
     const onDelete = async (project: Project, _index?: number) => {
         if (project.id) {
             Object.assign(state, defaultAjaxStateRunning);
@@ -206,6 +189,26 @@
         }
     };
 
+    const onAdded = (project: Project, openProjectAfterCreate: boolean) => {
+        showModal.value = false;
+        notify('success', t("modules.project.components.ManageProjectsPage.notifications.projectAdded", { summary: project.summary }));
+        if (openProjectAfterCreate) {
+            router.push(
+                {
+                    name: "projectTab",
+                    params: {
+                        id: project.id,
+                        tab: "metadata",
+                    }
+                },
+            ).catch((e) => {
+                console.error(e);
+            });
+        } else {
+            onRefresh();
+        }
+    };
+
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -226,8 +229,8 @@
 
 <template>
 
-    <n-modal v-model:show="showForm">
-        <NewProjectForm style="width: 40%;" @add="onAdd" @cancel="onCancel" />
+    <n-modal v-model:show="showModal">
+        <NewProjectForm class="modal-form" @add="onAdded" @cancel="onCancelForm" />
     </n-modal>
     <n-card :title="t('modules.project.components.ManageProjectsPage.header.title')">
         <Pager v-model:current-page="currentPage" v-model:page-size="pageSize" :total-pages="totalPages"
@@ -236,14 +239,13 @@
                 {{ t("modules.project.components.ManageProjectsPage.pager.totalItemsLabel", { total: totalResults }) }}
             </template>
         </Pager>
-        <ProjectsTable :projects="items" :loading="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
-            @update="onShowUpdateForm" @delete="onDelete" v-model:keyFilter="keyFilter"
-            v-model:summaryFilter="summaryFilter" v-model:type-id-filter="typeIdFilter"
-            v-model:priority-id-filter="priorityIdFilter" v-model:status-id-filter="statusIdFilter"
-            v-model:created-at-filter="createdAtFilter" v-model:createdByUserIdFilter="createdByUserIdFilter"
-            @textfilter-keydown-enter="onRefresh" :sort-field="sort.field" :sort-order="sort.order"
-            @toggle-sort="onToggleSort" />
+        <ProjectsTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
+            @delete="onDelete" :sort="sort" @sort="onSort" v-model:filters="filters" />
     </n-card>
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+    .modal-form {
+        width: 40%;
+    }
+</style>

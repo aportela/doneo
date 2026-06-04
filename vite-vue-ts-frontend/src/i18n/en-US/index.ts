@@ -936,8 +936,20 @@ export default {
               key: {
                 placeholder: "search by key",
               },
+              type: {
+                placeholder: "search by type",
+              },
+              priority: {
+                placeholder: "search by priority",
+              },
+              status: {
+                placeholder: "search by status",
+              },
               summary: {
                 placeholder: "search by summary",
+              },
+              creator: {
+                placeholder: "search by creator",
               },
             },
           },
