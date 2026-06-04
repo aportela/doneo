@@ -172,7 +172,7 @@
                         :placeholder="t('modules.projectAttachment.components.projectAttachmentsTable.filters.contentType.placeholder')" />
                 </th>
                 <th>
-                    <DateFilterSelect v-model:range="filters.createdAt" ref="createdAtFilterRef"
+                    <DateFilterSelect clearable v-model:range="filters.createdAt" ref="createdAtFilterRef"
                         :disabled="props.disabled" />
                 </th>
                 <th>
