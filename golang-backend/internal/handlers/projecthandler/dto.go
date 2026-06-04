@@ -67,6 +67,7 @@ type projectResponse struct {
 	CreatedBy              userhandler.UserBaseResponse                   `json:"createdBy"`
 	CreatedAt              int64                                          `json:"createdAt"`
 	UpdatedAt              *int64                                         `json:"updatedAt"`
+	DeletedAt              *int64                                         `json:"deletedAt"`
 	StartedAt              *int64                                         `json:"startedAt"`
 	FinishedAt             *int64                                         `json:"finishedAt"`
 	DueAt                  *int64                                         `json:"dueAt"`

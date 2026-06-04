@@ -10,6 +10,7 @@ type Project struct {
 	CreatedBy              UserBase
 	CreatedAt              time.Time
 	UpdatedAt              *time.Time
+	DeletedAt              *time.Time
 	StartedAt              *time.Time
 	FinishedAt             *time.Time
 	DueAt                  *time.Time

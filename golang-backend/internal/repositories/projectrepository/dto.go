@@ -15,6 +15,7 @@ type projectDTO struct {
 	CreatorName            string         `db:"creator_name"`
 	CreatedAt              int64          `db:"created_at"`
 	UpdatedAt              sql.NullInt64  `db:"updated_at"`
+	DeletedAt              sql.NullInt64  `db:"deleted_at"`
 	StartedAt              sql.NullInt64  `db:"started_at"`
 	FinishedAt             sql.NullInt64  `db:"finished_at"`
 	DueAt                  sql.NullInt64  `db:"due_at"`

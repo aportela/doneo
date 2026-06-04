@@ -59,6 +59,7 @@ func DomainToResponse(project domain.Project) projectResponse {
 		CreatedBy:              userhandler.BaseDomainToBaseResponse(project.CreatedBy),
 		CreatedAt:              project.CreatedAt.UnixMilli(),
 		UpdatedAt:              utils.TimePtrToInt64Ptr(project.UpdatedAt),
+		DeletedAt:              utils.TimePtrToInt64Ptr(project.DeletedAt),
 		StartedAt:              utils.TimePtrToInt64Ptr(project.StartedAt),
 		FinishedAt:             utils.TimePtrToInt64Ptr(project.FinishedAt),
 		DueAt:                  utils.TimePtrToInt64Ptr(project.DueAt),
