@@ -74,6 +74,30 @@ export default {
           },
           placeholder: "select date",
         },
+        ProjectPermissionSelect: {
+          options: {
+            updateProjectAllowed: "Update project allowed",
+            updateProjectDenied: "Update project denied",
+            deleteProjectAllowed: "Delete project allowed",
+            deleteProjectDenied: "Delete project denied",
+            viewProjectAllowed: "View project allowed",
+            viewProjectDenied: "View project denied",
+            addTaskAllowed: "Add task allowed",
+            addTaskDenied: "Add task denied",
+          },
+          placeholder: "search by permission",
+        },
+        TaskPermissionSelect: {
+          options: {
+            updateTaskAllowed: "Update task allowed",
+            updateTaskDenied: "Update task denied",
+            deleteTaskAllowed: "Delete task allowed",
+            deleteTaskDenied: "Delete task denied",
+            viewTaskAllowed: "View task allowed",
+            viewTaskDenied: "View task denied",
+          },
+          placeholder: "search by permission",
+        },
       },
       pickers: {
         datepicker: {

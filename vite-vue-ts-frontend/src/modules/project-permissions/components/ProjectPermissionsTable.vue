@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { h, computed } from 'vue';
+    import { h, ref, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { useDialog, NEmpty, NTooltip, NIcon } from 'naive-ui';
@@ -9,13 +9,17 @@
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { ProjectPermissionsTableFilters } from '../types/project-permissions-table-filter.ts';
 
+    import type { ReseteableComponent } from '../../../shared/types/ReseteableComponent.ts';
     import { ProjectPermission } from '../models/project-permission.ts';
+
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
     import RoleSelector from '../../roles/components/RoleSelector.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
+    import ProjectPermissionSelect from '../../../shared/components/selectors/ProjectPermissionSelect.vue';
+    import TaskPermissionSelect from '../../../shared/components/selectors/TaskPermissionSelect.vue';
 
     interface Props {
         disabled: boolean;
@@ -31,18 +35,25 @@
 
     const props = defineProps<Props>();
 
+    const projectPermissionSelectorRef = ref<ReseteableComponent | undefined>();
+    const taskPermissionSelectorRef = ref<ReseteableComponent | undefined>();
+
     const filters = defineModel<ProjectPermissionsTableFilters>("filters", {
         default: () => ({
             userId: null,
             roleId: null,
+            projectPermission: null,
+            taskPermission: null,
         })
     });
 
     const isFilteredByUser = computed<boolean>(() => filters.value.userId !== null);
     const isFilteredByRole = computed<boolean>(() => filters.value.roleId !== null);
+    const isFilteredByProjectPermission = computed<boolean>(() => filters.value.projectPermission !== null);
+    const isFilteredByTaskPermission = computed<boolean>(() => filters.value.taskPermission !== null);
 
     const hasFilters = computed<boolean>(() =>
-        isFilteredByUser.value || isFilteredByRole.value
+        isFilteredByUser.value || isFilteredByRole.value || isFilteredByProjectPermission.value || isFilteredByTaskPermission.value
     );
 
     const columns = computed<TableHeaderColumn[]>(() => [
@@ -65,7 +76,7 @@
             field: "projectPermissions",
             visible: true,
             sortable: false,
-            isFiltered: () => false,
+            isFiltered: () => isFilteredByProjectPermission.value,
             align: "center",
         },
         {
@@ -108,6 +119,8 @@
     const onClearFilters = () => {
         filters.value.userId = null;
         filters.value.roleId = null;
+        projectPermissionSelectorRef.value?.reset();
+        taskPermissionSelectorRef.value?.reset();
     };
 </script>
 
@@ -123,8 +136,16 @@
                     <RoleSelector clearable :disabled="props.disabled" v-model:id="filters.roleId"
                         :placeholder="t('modules.projectPermission.components.projectPermissionsTable.filters.role.placeholder')" />
                 </th>
-                <th></th>
-                <th></th>
+                <th>
+                    <ProjectPermissionSelect v-model:permission="filters.projectPermission"
+                        :placeholder="t('shared.components.selectors.ProjectPermissionSelect.placeholder')" clearable
+                        ref="projectPermissionSelectorRef" />
+                </th>
+                <th>
+                    <TaskPermissionSelect v-model:permission="filters.taskPermission"
+                        :placeholder="t('shared.components.selectors.TaskPermissionSelect.placeholder')" clearable
+                        ref="taskPermissionSelectorRef" />
+                </th>
                 <th class="doneo-text-center">
                     <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
                 </th>
