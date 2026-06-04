@@ -157,17 +157,19 @@
         <template #thead>
             <tr>
                 <th>
-                    <TextFilterInput clearable size="small"
+                    <TextFilterInput clearable :disabled="props.disabled" size="small"
                         :placeholder="t('modules.role.components.RolesTable.filters.name.placeholder')"
                         v-model:value="filters.name" />
                 </th>
                 <th>
-                    <n-select size="small" clearable multiple :options="projectPermissionsSelectorOptions"
-                        v-model:value="filters.allowedProjectPermissions" disabled />
+                    <n-select size="small" clearable :disabled="props.disabled" multiple
+                        :options="projectPermissionsSelectorOptions" v-model:value="filters.allowedProjectPermissions"
+                        disabled />
                 </th>
                 <th>
-                    <n-select size="small" clearable multiple :options="taskPermissionsSelectorOptions"
-                        v-model:value="filters.allowedTaskPermissions" disabled />
+                    <n-select size="small" clearable :disabled="props.disabled" multiple
+                        :options="taskPermissionsSelectorOptions" v-model:value="filters.allowedTaskPermissions"
+                        disabled />
                 </th>
                 <th class="doneo-text-center">
                     <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />

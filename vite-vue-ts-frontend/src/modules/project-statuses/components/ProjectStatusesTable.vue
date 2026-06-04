@@ -97,7 +97,7 @@
         <template #thead>
             <tr>
                 <th>
-                    <TextFilterInput clearable size="small"
+                    <TextFilterInput clearable :disabled="props.disabled" size="small"
                         :placeholder="t('modules.projectStatus.components.ProjectStatusesTable.filters.name.placeholder')"
                         v-model:value="filters.name" />
                 </th>

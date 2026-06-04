@@ -97,7 +97,7 @@
         <template #thead>
             <tr>
                 <th>
-                    <TextFilterInput clearable size="small"
+                    <TextFilterInput clearable :disabled="props.disabled" size="small"
                         :placeholder="t('modules.projectType.components.ProjectTypesTable.filters.name.placeholder')"
                         v-model:value="filters.name" />
                 </th>
@@ -110,7 +110,7 @@
             <tr v-for="projectType, index in items" :key="projectType.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(projectType.hexColor ?? '#888888')">{{ projectType.name
-                    }}</n-tag>
+                        }}</n-tag>
                 </td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"

@@ -97,7 +97,7 @@
         <template #thead>
             <tr>
                 <th>
-                    <TextFilterInput clearable size="small"
+                    <TextFilterInput clearable :disabled="props.disabled" size="small"
                         :placeholder="t('modules.projectPriority.components.ProjectPrioritiesTable.filters.name.placeholder')"
                         v-model:value="filters.name" />
                 </th>
@@ -111,7 +111,7 @@
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(projectPriority.hexColor ?? '#888888')">{{
                         projectPriority.name
-                    }}</n-tag>
+                        }}</n-tag>
                 </td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
