@@ -176,7 +176,8 @@
                         v-model:value="filters.summary" @keydown-enter="onRefresh" />
                 </th>
                 <th>
-                    <DateFilterSelect clearable :disabled="props.disabled" v-model:range="filters.createdAt" />
+                    <DateFilterSelect clearable ref="createdAtFilterRef" :disabled="props.disabled"
+                        v-model:range="filters.createdAt" />
                 </th>
                 <th>
                     <UserSelector hideAvatar clearable :disabled="props.disabled" v-model:id="filters.createdByUserId"
