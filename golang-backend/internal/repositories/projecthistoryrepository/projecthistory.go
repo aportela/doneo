@@ -41,6 +41,7 @@ func (repository *projectHistoryRepository) Add(ctx context.Context, projectId s
 		dto.CreatedAt,
 	)
 	if err != nil {
+		// TODO: remove ?
 		fmt.Println(err.Error())
 		var sqlErr *sqlite.Error
 		if !errors.As(err, &sqlErr) {

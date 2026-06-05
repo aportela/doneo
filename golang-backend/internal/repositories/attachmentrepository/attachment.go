@@ -79,6 +79,7 @@ func (repository *attachmentRepository) DeleteAttachment(ctx context.Context, at
 	)
 	if err != nil {
 		// TODO: remove ?
+		// TODO: check sql error
 		fmt.Println(err.Error())
 		return err
 	}
@@ -156,6 +157,7 @@ func (repository *attachmentRepository) DeleteProjectAttachment(ctx context.Cont
 	)
 	if err != nil {
 		// TODO: remove ?
+		// TODO: check sql error
 		fmt.Println(err.Error())
 		return err
 	}

@@ -40,6 +40,7 @@ func (repository *projectPermissionRepository) Add(ctx context.Context, permissi
 		roleId,
 	)
 	if err != nil {
+		// TODO: remove ?
 		fmt.Println(err.Error())
 		var sqlErr *sqlite.Error
 		if !errors.As(err, &sqlErr) {
@@ -75,6 +76,8 @@ func (repository *projectPermissionRepository) Delete(ctx context.Context, proje
 		permissionId,
 	)
 	if err != nil {
+		// TODO: remove ?
+		// TODO: check sql error
 		fmt.Println(err.Error())
 		return err
 	}

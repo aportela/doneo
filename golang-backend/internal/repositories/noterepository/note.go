@@ -42,6 +42,7 @@ func (repository *noteRepository) AddProjectNote(ctx context.Context, projectId 
 		dto.Body,
 	)
 	if err != nil {
+		// TODO: remove ?
 		fmt.Println(err.Error())
 		var sqlErr *sqlite.Error
 		if !errors.As(err, &sqlErr) {
@@ -80,6 +81,8 @@ func (repository *noteRepository) UpdateProjectNote(ctx context.Context, project
 		dto.ID,
 	)
 	if err != nil {
+		// TODO: remove ?
+		// TODO: check sql error
 		fmt.Println(err.Error())
 		return err
 	}
@@ -97,6 +100,8 @@ func (repository *noteRepository) DeleteProjectNote(ctx context.Context, project
 		id,
 	)
 	if err != nil {
+		// TODO: remove ?
+		// TODO: check sql error
 		fmt.Println(err.Error())
 		return err
 	}

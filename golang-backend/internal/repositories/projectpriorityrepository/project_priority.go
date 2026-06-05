@@ -43,6 +43,7 @@ func (repository *projectPriorityRepository) Add(ctx context.Context, projectPri
 		dto.HexColor,
 	)
 	if err != nil {
+		// TODO: remove ?
 		fmt.Println(err.Error())
 		var sqlErr *sqlite.Error
 		if !errors.As(err, &sqlErr) {
@@ -87,6 +88,7 @@ func (repository *projectPriorityRepository) Update(ctx context.Context, project
 		dto.ID,
 	)
 	if err != nil {
+		// TODO: remove ?
 		fmt.Println(err.Error())
 		var sqlErr *sqlite.Error
 		if !errors.As(err, &sqlErr) {

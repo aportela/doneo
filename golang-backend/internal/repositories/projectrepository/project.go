@@ -56,6 +56,7 @@ func (repository *projectRepository) Add(ctx context.Context, project domain.Pro
 		dto.TypeId,
 	)
 	if err != nil {
+		// TODO: remove ?
 		fmt.Println(err.Error())
 		var sqlErr *sqlite.Error
 		if !errors.As(err, &sqlErr) {
@@ -99,6 +100,7 @@ func (repository *projectRepository) AddTaskCounter(ctx context.Context, project
 		projectId,
 	)
 	if err != nil {
+		// TODO: remove ?
 		fmt.Println(err.Error())
 		var sqlErr *sqlite.Error
 		if !errors.As(err, &sqlErr) {
@@ -151,6 +153,7 @@ func (repository *projectRepository) Update(ctx context.Context, project domain.
 		dto.ID,
 	)
 	if err != nil {
+		// TODO: remove ?
 		fmt.Println(err.Error())
 		var sqlErr *sqlite.Error
 		if !errors.As(err, &sqlErr) {
@@ -194,6 +197,8 @@ func (repository *projectRepository) Delete(ctx context.Context, id string, dele
 		id,
 	)
 	if err != nil {
+		// TODO: remove ?
+		// TODO: check sql error
 		fmt.Println(err.Error())
 		return err
 	}

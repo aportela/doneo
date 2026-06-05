@@ -43,6 +43,7 @@ func (repository *projectStatusRepository) Add(ctx context.Context, projectStatu
 		dto.HexColor,
 	)
 	if err != nil {
+		// TODO: remove ?
 		fmt.Println(err.Error())
 		var sqlErr *sqlite.Error
 		if !errors.As(err, &sqlErr) {
@@ -87,6 +88,7 @@ func (repository *projectStatusRepository) Update(ctx context.Context, projectSt
 		dto.ID,
 	)
 	if err != nil {
+		// TODO: remove ?
 		fmt.Println(err.Error())
 		var sqlErr *sqlite.Error
 		if !errors.As(err, &sqlErr) {

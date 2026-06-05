@@ -43,6 +43,7 @@ func (repository *roleRepository) Add(ctx context.Context, role domain.Role) err
 		dto.PermissionsBitmask,
 	)
 	if err != nil {
+		// TODO: remove ?
 		fmt.Println(err.Error())
 		var sqlErr *sqlite.Error
 		if !errors.As(err, &sqlErr) {
@@ -87,6 +88,7 @@ func (repository *roleRepository) Update(ctx context.Context, role domain.Role) 
 		dto.ID,
 	)
 	if err != nil {
+		// TODO: remove ?
 		fmt.Println(err.Error())
 		var sqlErr *sqlite.Error
 		if !errors.As(err, &sqlErr) {

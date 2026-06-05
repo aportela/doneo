@@ -56,6 +56,7 @@ func (repository *userRepository) Add(ctx context.Context, user domain.User, pas
 		dto.PermissionsBitmask,
 	)
 	if err != nil {
+		// TODO: remove ?
 		fmt.Println(err.Error())
 		var sqlErr *sqlite.Error
 		if !errors.As(err, &sqlErr) {
@@ -122,6 +123,7 @@ func (repository *userRepository) Update(ctx context.Context, user domain.User) 
 	}
 	_, err := repository.database.ExecContext(ctx, query, args...)
 	if err != nil {
+		// TODO: remove ?
 		fmt.Println(err.Error())
 		var sqlErr *sqlite.Error
 		if !errors.As(err, &sqlErr) {
