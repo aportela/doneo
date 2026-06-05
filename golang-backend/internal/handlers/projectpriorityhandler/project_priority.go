@@ -6,10 +6,8 @@ import (
 	"net/http"
 
 	"github.com/aportela/doneo/internal/browser"
-	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
-	"github.com/aportela/doneo/internal/repositories/projectpriorityrepository"
 	"github.com/aportela/doneo/internal/services/projectpriorityservice"
 	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
@@ -19,10 +17,8 @@ type ProjectPriorityHandler struct {
 	service projectpriorityservice.ProjectPriorityService
 }
 
-func NewHandler(db database.Database) *ProjectPriorityHandler {
-	projectPriorityRepository := projectpriorityrepository.NewRepository(db)
-	projectPriorityService := projectpriorityservice.NewService(projectPriorityRepository)
-	return &ProjectPriorityHandler{service: projectPriorityService}
+func NewHandler(service projectpriorityservice.ProjectPriorityService) *ProjectPriorityHandler {
+	return &ProjectPriorityHandler{service: service}
 }
 
 func (handler *ProjectPriorityHandler) Add(w http.ResponseWriter, r *http.Request) {

@@ -25,6 +25,7 @@ import (
 	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 	"github.com/aportela/doneo/internal/middlewares"
+	"github.com/aportela/doneo/internal/repositories/projectpriorityrepository"
 	"github.com/aportela/doneo/internal/repositories/projectstatusrepository"
 	"github.com/aportela/doneo/internal/repositories/projecttyperepository"
 	"github.com/aportela/doneo/internal/repositories/rolerepository"
@@ -32,6 +33,7 @@ import (
 	"github.com/aportela/doneo/internal/repositories/taskstatusrepository"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"github.com/aportela/doneo/internal/services/authservice"
+	"github.com/aportela/doneo/internal/services/projectpriorityservice"
 	"github.com/aportela/doneo/internal/services/projectstatusservice"
 	"github.com/aportela/doneo/internal/services/projecttypeservice"
 	"github.com/aportela/doneo/internal/services/roleservice"
@@ -141,7 +143,7 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 	apiRouter.Route("/project-priorities", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		handler := projectpriorityhandler.NewHandler(db)
+		handler := projectpriorityhandler.NewHandler(projectpriorityservice.NewService(db, projectpriorityrepository.NewRepository(db)))
 		r.Post("/", handler.Add)
 		r.Post("/search", handler.Search)
 		r.Get("/{id:"+uuidPattern+"}", handler.Get)
