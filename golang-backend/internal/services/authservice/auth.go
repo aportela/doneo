@@ -10,7 +10,7 @@ import (
 )
 
 type AuthService interface {
-	SignIn(ctx context.Context, user domain.User) (domain.User, error)
+	SignIn(ctx context.Context, email string, password string) (domain.User, error)
 	GetUserInfo(ctx context.Context, userId string) (domain.User, error)
 }
 
@@ -23,16 +23,16 @@ func NewService(database database.Database, repository userrepository.UserReposi
 	return &authService{database: database, repository: repository}
 }
 
-func (service *authService) SignIn(ctx context.Context, user domain.User) (domain.User, error) {
+func (service *authService) SignIn(ctx context.Context, email string, password string) (domain.User, error) {
 	// TODO: remove PasswordHash from domain & return userId, email, password Hash ?
-	credentialUser, err := service.repository.GetByEmail(ctx, user.Email)
+	user, err := service.repository.GetByEmail(ctx, email)
 	if err != nil {
 		return domain.User{}, err
 	}
 	if user.DeletedAt != nil {
 		return domain.User{}, domain.DeletedError
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(credentialUser.PasswordHash), []byte(user.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 	if err != nil {
 		return domain.User{}, domain.InvalidCredentialsError
 	}

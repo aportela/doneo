@@ -30,7 +30,7 @@ func (handler *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] invalid request payload: %w", err))
 		return
 	}
-	user, err := handler.service.SignIn(r.Context(), signinRequestToUserDomain(request))
+	user, err := handler.service.SignIn(r.Context(), request.Email, request.Password)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] failed to signin with email %s: %w", request.Email, err))
 		return
