@@ -15,10 +15,10 @@ import (
 )
 
 type NoteRepository interface {
-	AddProjectNote(ctx context.Context, projectId string, note noteDTO) error
-	UpdateProjectNote(ctx context.Context, projectId string, note noteDTO) error
+	AddProjectNote(ctx context.Context, projectId string, note domain.Note) error
+	UpdateProjectNote(ctx context.Context, projectId string, note domain.Note) error
 	DeleteProjectNote(ctx context.Context, projectId string, id string) error
-	GetProjectNotes(ctx context.Context, projectId string) ([]noteDTO, error)
+	GetProjectNotes(ctx context.Context, projectId string) ([]domain.Note, error)
 }
 
 type noteRepository struct {
@@ -29,7 +29,8 @@ func NewRepository(database database.Database) NoteRepository {
 	return &noteRepository{database: database}
 }
 
-func (repository *noteRepository) AddProjectNote(ctx context.Context, projectId string, note noteDTO) error {
+func (repository *noteRepository) AddProjectNote(ctx context.Context, projectId string, note domain.Note) error {
+	dto := toDTO(note)
 	tx, err := repository.database.Begin()
 	if err != nil {
 		return err
@@ -48,11 +49,11 @@ func (repository *noteRepository) AddProjectNote(ctx context.Context, projectId 
             INSERT INTO project_notes (id, project_id, user_id, created_at, updated_at, body)
 			VALUES (?, ?, ?, ?, NULL, ?)
         `,
-		note.ID,
+		dto.ID,
 		projectId,
-		note.UserId,
-		note.CreatedAt,
-		note.Body,
+		dto.UserId,
+		dto.CreatedAt,
+		dto.Body,
 	)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -81,8 +82,8 @@ func (repository *noteRepository) AddProjectNote(ctx context.Context, projectId 
 		`,
 		projectId,
 		domain.EventProjectNoteAdded,
-		note.UserId,
-		note.CreatedAt,
+		dto.UserId,
+		dto.CreatedAt,
 	)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -91,7 +92,8 @@ func (repository *noteRepository) AddProjectNote(ctx context.Context, projectId 
 	return tx.Commit()
 }
 
-func (repository *noteRepository) UpdateProjectNote(ctx context.Context, projectId string, note noteDTO) error {
+func (repository *noteRepository) UpdateProjectNote(ctx context.Context, projectId string, note domain.Note) error {
+	dto := toDTO(note)
 	tx, err := repository.database.Begin()
 	if err != nil {
 		return err
@@ -113,9 +115,9 @@ func (repository *noteRepository) UpdateProjectNote(ctx context.Context, project
 			WHERE
 				id = ?
         `,
-		note.UpdatedAt,
-		note.Body,
-		note.ID,
+		dto.UpdatedAt,
+		dto.Body,
+		dto.ID,
 	)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -133,7 +135,7 @@ func (repository *noteRepository) UpdateProjectNote(ctx context.Context, project
 		projectId,
 		domain.EventProjectNoteUpdated,
 		userId,
-		note.UpdatedAt,
+		dto.UpdatedAt,
 	)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -185,7 +187,7 @@ func (repository *noteRepository) DeleteProjectNote(ctx context.Context, project
 	return tx.Commit()
 }
 
-func (repository *noteRepository) GetProjectNotes(ctx context.Context, projectId string) ([]noteDTO, error) {
+func (repository *noteRepository) GetProjectNotes(ctx context.Context, projectId string) ([]domain.Note, error) {
 	rows, err := repository.database.QueryContext(
 		ctx,
 		`
@@ -201,18 +203,18 @@ func (repository *noteRepository) GetProjectNotes(ctx context.Context, projectId
 		return nil, err
 	}
 	defer rows.Close()
-	notes := make([]noteDTO, 0)
+	dtos := make([]noteDTO, 0)
 	for rows.Next() {
-		var note noteDTO
+		var dto noteDTO
 		if err := rows.Scan(
-			&note.ID, &note.UserId, &note.UserName, &note.CreatedAt, &note.UpdatedAt, &note.Body,
+			&dto.ID, &dto.UserId, &dto.UserName, &dto.CreatedAt, &dto.UpdatedAt, &dto.Body,
 		); err != nil {
 			return nil, err
 		}
-		notes = append(notes, note)
+		dtos = append(dtos, dto)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-	return notes, nil
+	return toDomainArray(dtos), nil
 }

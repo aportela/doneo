@@ -6,10 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/handlers"
 	"github.com/aportela/doneo/internal/middlewares"
-	"github.com/aportela/doneo/internal/repositories/noterepository"
 	"github.com/aportela/doneo/internal/services/noteservice"
 	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
@@ -19,11 +17,8 @@ type NoteHandler struct {
 	service noteservice.NoteService
 }
 
-func NewHandler(database database.Database) *NoteHandler {
-	// TODO: rename to repository/service
-	noteRepository := noterepository.NewRepository(database)
-	noteService := noteservice.NewService(noteRepository)
-	return &NoteHandler{service: noteService}
+func NewHandler(service noteservice.NoteService) *NoteHandler {
+	return &NoteHandler{service: service}
 }
 
 func (handler *NoteHandler) AddProjectNote(w http.ResponseWriter, r *http.Request) {

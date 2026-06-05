@@ -7,7 +7,7 @@ import (
 	"github.com/aportela/doneo/internal/utils"
 )
 
-func DomainToDTO(note domain.Note) noteDTO {
+func toDTO(note domain.Note) noteDTO {
 	return noteDTO{
 		ID:        note.ID,
 		UserId:    note.User.ID,
@@ -18,7 +18,7 @@ func DomainToDTO(note domain.Note) noteDTO {
 	}
 }
 
-func DTOToDomain(note noteDTO) domain.Note {
+func toDomain(note noteDTO) domain.Note {
 	return domain.Note{
 		ID: note.ID,
 		User: domain.UserBase{
@@ -31,10 +31,10 @@ func DTOToDomain(note noteDTO) domain.Note {
 	}
 }
 
-func DTOArrayToDomainArray(notes []noteDTO) []domain.Note {
+func toDomainArray(notes []noteDTO) []domain.Note {
 	results := make([]domain.Note, 0, len(notes))
 	for _, note := range notes {
-		results = append(results, DTOToDomain(note))
+		results = append(results, toDomain(note))
 	}
 	return results
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/noterepository"
 )
@@ -16,19 +17,20 @@ type NoteService interface {
 }
 
 type noteService struct {
+	database   database.Database
 	repository noterepository.NoteRepository
 }
 
-func NewService(repository noterepository.NoteRepository) NoteService {
-	return &noteService{repository: repository}
+func NewService(database database.Database, repository noterepository.NoteRepository) NoteService {
+	return &noteService{database: database, repository: repository}
 }
 
 func (service *noteService) AddProjectNote(ctx context.Context, projectId string, note domain.Note) error {
-	return service.repository.AddProjectNote(ctx, projectId, noterepository.DomainToDTO(note))
+	return service.repository.AddProjectNote(ctx, projectId, note)
 }
 
 func (service *noteService) UpdateProjectNote(ctx context.Context, projectId string, note domain.Note) error {
-	return service.repository.UpdateProjectNote(ctx, projectId, noterepository.DomainToDTO(note))
+	return service.repository.UpdateProjectNote(ctx, projectId, note)
 }
 
 func (service *noteService) DeleteProjectNote(ctx context.Context, projectId string, noteId string) error {
@@ -40,5 +42,5 @@ func (service *noteService) GetProjectNotes(ctx context.Context, projectId strin
 	if err != nil {
 		return nil, fmt.Errorf("[ProjectTypeService] failed to get project permissions: %w", err)
 	}
-	return noterepository.DTOArrayToDomainArray(notes), nil
+	return notes, nil
 }
