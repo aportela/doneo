@@ -321,13 +321,13 @@ func (repository *userRepository) Search(ctx context.Context, pager browser.Para
 		return nil, browser.Result{}, err
 	}
 	defer rows.Close()
-	users := make([]userDTO, 0)
+	dtos := make([]userDTO, 0)
 	for rows.Next() {
-		var user userDTO
-		if err := rows.Scan(&user.ID, &user.Email, &user.Name, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt, &user.PermissionsBitmask); err != nil {
+		var dto userDTO
+		if err := rows.Scan(&dto.ID, &dto.Email, &dto.Name, &dto.CreatedAt, &dto.UpdatedAt, &dto.DeletedAt, &dto.PermissionsBitmask); err != nil {
 			return nil, browser.Result{}, err
 		}
-		users = append(users, user)
+		dtos = append(dtos, dto)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, browser.Result{}, err
@@ -352,8 +352,8 @@ func (repository *userRepository) Search(ctx context.Context, pager browser.Para
 			return nil, browser.Result{}, err
 		}
 	} else {
-		totalResults = len(users)
+		totalResults = len(dtos)
 	}
 
-	return toDomainArray(users), browser.NewResult(pager, totalResults), nil
+	return toDomainArray(dtos), browser.NewResult(pager, totalResults), nil
 }

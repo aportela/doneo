@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/aportela/doneo/internal/browser"
+	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/projecttyperepository"
 )
@@ -18,19 +19,20 @@ type ProjectTypeService interface {
 }
 
 type projectTypeService struct {
+	database   database.Database
 	repository projecttyperepository.ProjectTypeRepository
 }
 
-func NewService(repository projecttyperepository.ProjectTypeRepository) ProjectTypeService {
-	return &projectTypeService{repository: repository}
+func NewService(database database.Database, repository projecttyperepository.ProjectTypeRepository) ProjectTypeService {
+	return &projectTypeService{database: database, repository: repository}
 }
 
 func (service *projectTypeService) Add(ctx context.Context, projectType domain.ProjectType) error {
-	return service.repository.Add(ctx, projecttyperepository.DomainToDTO(projectType))
+	return service.repository.Add(ctx, projectType)
 }
 
 func (service *projectTypeService) Update(ctx context.Context, projectType domain.ProjectType) error {
-	return service.repository.Update(ctx, projecttyperepository.DomainToDTO(projectType))
+	return service.repository.Update(ctx, projectType)
 }
 
 func (service *projectTypeService) Delete(ctx context.Context, id string) error {
@@ -40,15 +42,15 @@ func (service *projectTypeService) Delete(ctx context.Context, id string) error 
 func (service *projectTypeService) Get(ctx context.Context, id string) (domain.ProjectType, error) {
 	projectType, err := service.repository.Get(ctx, id)
 	if err != nil {
-		return projecttyperepository.DTOToDomain(projectType), fmt.Errorf("[ProjectTypeService] failed to get project type with ID %s: %w", id, err)
+		return projectType, fmt.Errorf("[ProjectTypeService] failed to get project type with ID %s: %w", id, err)
 	}
-	return projecttyperepository.DTOToDomain(projectType), nil
+	return projectType, nil
 }
 
 func (service *projectTypeService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectTypesFilter) ([]domain.ProjectType, browser.Result, error) {
-	projectTypes, pagerResult, err := service.repository.Search(ctx, pager, order, projecttyperepository.DomainFilterToDTO(filter))
+	projectTypes, pagerResult, err := service.repository.Search(ctx, pager, order, filter)
 	if err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[ProjectTypeService] failed to search project types: %w", err)
 	}
-	return projecttyperepository.DTOArrayToDomainArray(projectTypes), pagerResult, nil
+	return projectTypes, pagerResult, nil
 }

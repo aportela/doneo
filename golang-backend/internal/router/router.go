@@ -25,11 +25,13 @@ import (
 	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 	"github.com/aportela/doneo/internal/middlewares"
+	"github.com/aportela/doneo/internal/repositories/projecttyperepository"
 	"github.com/aportela/doneo/internal/repositories/rolerepository"
 	"github.com/aportela/doneo/internal/repositories/taskpriorityrepository"
 	"github.com/aportela/doneo/internal/repositories/taskstatusrepository"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"github.com/aportela/doneo/internal/services/authservice"
+	"github.com/aportela/doneo/internal/services/projecttypeservice"
 	"github.com/aportela/doneo/internal/services/roleservice"
 	"github.com/aportela/doneo/internal/services/taskpriorityservice"
 	"github.com/aportela/doneo/internal/services/taskstatusservice"
@@ -54,10 +56,10 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 	apiRouter := chi.NewRouter()
 
 	apiRouter.Route("/auth", func(r chi.Router) {
-		userHandler := authhandler.NewHandler(authservice.NewService(db, userrepository.NewRepository(db)), cfg.Auth.SecretKey, cfg.Auth.AccessTokenExpirationHours, cfg.Auth.RefreshTokenExpirationDays)
-		r.Post("/signin", userHandler.SignIn)
-		r.Post("/signout", userHandler.SignOut)
-		r.Post("/renew-access-token", userHandler.RenewAccessToken)
+		handler := authhandler.NewHandler(authservice.NewService(db, userrepository.NewRepository(db)), cfg.Auth.SecretKey, cfg.Auth.AccessTokenExpirationHours, cfg.Auth.RefreshTokenExpirationDays)
+		r.Post("/signin", handler.SignIn)
+		r.Post("/signout", handler.SignOut)
+		r.Post("/renew-access-token", handler.RenewAccessToken)
 	})
 
 	uuidPattern := "[0-9a-fA-F-]{36}"
@@ -76,8 +78,8 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 	apiRouter.Route("/attachments", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTCookieAuthentication(cfg.Auth.SecretKey))
 		// TODO: remove project, check attachment permissions on get
-		projectAttachmentHandler := attachmenthandler.NewHandler(db, cfg.Storage.AttachmentsPath)
-		r.Get("/project/{id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}", projectAttachmentHandler.DownloadProjectAttachment)
+		handler := attachmenthandler.NewHandler(db, cfg.Storage.AttachmentsPath)
+		r.Get("/project/{id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}", handler.DownloadProjectAttachment)
 
 	})
 
@@ -92,79 +94,79 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 	apiRouter.Route("/users", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		userHandler := userhandler.NewHandler(userservice.NewService(db, userrepository.NewRepository(db)))
-		r.Post("/", userHandler.Add)
-		r.Post("/search", userHandler.Search)
-		r.Get("/{id:"+uuidPattern+"}", userHandler.Get)
-		r.Put("/{id:"+uuidPattern+"}", userHandler.Update)
-		r.Patch("/{id:"+uuidPattern+"}", userHandler.Patch)
-		r.Delete("/{id:"+uuidPattern+"}", userHandler.Delete)
+		handler := userhandler.NewHandler(userservice.NewService(db, userrepository.NewRepository(db)))
+		r.Post("/", handler.Add)
+		r.Post("/search", handler.Search)
+		r.Get("/{id:"+uuidPattern+"}", handler.Get)
+		r.Put("/{id:"+uuidPattern+"}", handler.Update)
+		r.Patch("/{id:"+uuidPattern+"}", handler.Patch)
+		r.Delete("/{id:"+uuidPattern+"}", handler.Delete)
 	})
 
 	apiRouter.Route("/roles", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		roleHandler := rolehandler.NewHandler(roleservice.NewService(db, rolerepository.NewRepository(db)))
-		r.Post("/", roleHandler.Add)
-		r.Post("/search", roleHandler.Search)
-		r.Get("/{id:"+uuidPattern+"}", roleHandler.Get)
-		r.Put("/{id:"+uuidPattern+"}", roleHandler.Update)
-		r.Delete("/{id:"+uuidPattern+"}", roleHandler.Delete)
+		handler := rolehandler.NewHandler(roleservice.NewService(db, rolerepository.NewRepository(db)))
+		r.Post("/", handler.Add)
+		r.Post("/search", handler.Search)
+		r.Get("/{id:"+uuidPattern+"}", handler.Get)
+		r.Put("/{id:"+uuidPattern+"}", handler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", handler.Delete)
 	})
 
 	apiRouter.Route("/project-types", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		projectTypeHandler := projecttypehandler.NewHandler(db)
-		r.Post("/", projectTypeHandler.Add)
-		r.Post("/search", projectTypeHandler.Search)
-		r.Get("/{id:"+uuidPattern+"}", projectTypeHandler.Get)
-		r.Put("/{id:"+uuidPattern+"}", projectTypeHandler.Update)
-		r.Delete("/{id:"+uuidPattern+"}", projectTypeHandler.Delete)
+		handler := projecttypehandler.NewHandler(projecttypeservice.NewService(db, projecttyperepository.NewRepository(db)))
+		r.Post("/", handler.Add)
+		r.Post("/search", handler.Search)
+		r.Get("/{id:"+uuidPattern+"}", handler.Get)
+		r.Put("/{id:"+uuidPattern+"}", handler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", handler.Delete)
 	})
 
 	apiRouter.Route("/project-statuses", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		projectStatusHandler := projectstatushandler.NewHandler(db)
-		r.Post("/", projectStatusHandler.Add)
-		r.Post("/search", projectStatusHandler.Search)
-		r.Get("/{id:"+uuidPattern+"}", projectStatusHandler.Get)
-		r.Put("/{id:"+uuidPattern+"}", projectStatusHandler.Update)
-		r.Delete("/{id:"+uuidPattern+"}", projectStatusHandler.Delete)
+		handler := projectstatushandler.NewHandler(db)
+		r.Post("/", handler.Add)
+		r.Post("/search", handler.Search)
+		r.Get("/{id:"+uuidPattern+"}", handler.Get)
+		r.Put("/{id:"+uuidPattern+"}", handler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", handler.Delete)
 	})
 
 	apiRouter.Route("/project-priorities", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		projectTypeHandler := projectpriorityhandler.NewHandler(db)
-		r.Post("/", projectTypeHandler.Add)
-		r.Post("/search", projectTypeHandler.Search)
-		r.Get("/{id:"+uuidPattern+"}", projectTypeHandler.Get)
-		r.Put("/{id:"+uuidPattern+"}", projectTypeHandler.Update)
-		r.Delete("/{id:"+uuidPattern+"}", projectTypeHandler.Delete)
+		handler := projectpriorityhandler.NewHandler(db)
+		r.Post("/", handler.Add)
+		r.Post("/search", handler.Search)
+		r.Get("/{id:"+uuidPattern+"}", handler.Get)
+		r.Put("/{id:"+uuidPattern+"}", handler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", handler.Delete)
 	})
 
 	apiRouter.Route("/task-statuses", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		taskStatusHandler := taskstatushandler.NewHandler(taskstatusservice.NewService(db, taskstatusrepository.NewRepository(db)))
-		r.Post("/", taskStatusHandler.Add)
-		r.Post("/search", taskStatusHandler.Search)
-		r.Get("/{id:"+uuidPattern+"}", taskStatusHandler.Get)
-		r.Put("/{id:"+uuidPattern+"}", taskStatusHandler.Update)
-		r.Delete("/{id:"+uuidPattern+"}", taskStatusHandler.Delete)
+		handler := taskstatushandler.NewHandler(taskstatusservice.NewService(db, taskstatusrepository.NewRepository(db)))
+		r.Post("/", handler.Add)
+		r.Post("/search", handler.Search)
+		r.Get("/{id:"+uuidPattern+"}", handler.Get)
+		r.Put("/{id:"+uuidPattern+"}", handler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", handler.Delete)
 	})
 
 	apiRouter.Route("/task-priorities", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		taskPriorityHandler := taskpriorityhandler.NewHandler(taskpriorityservice.NewService(db, taskpriorityrepository.NewRepository(db)))
-		r.Post("/", taskPriorityHandler.Add)
-		r.Post("/search", taskPriorityHandler.Search)
-		r.Get("/{id:"+uuidPattern+"}", taskPriorityHandler.Get)
-		r.Put("/{id:"+uuidPattern+"}", taskPriorityHandler.Update)
-		r.Delete("/{id:"+uuidPattern+"}", taskPriorityHandler.Delete)
+		handler := taskpriorityhandler.NewHandler(taskpriorityservice.NewService(db, taskpriorityrepository.NewRepository(db)))
+		r.Post("/", handler.Add)
+		r.Post("/search", handler.Search)
+		r.Get("/{id:"+uuidPattern+"}", handler.Get)
+		r.Put("/{id:"+uuidPattern+"}", handler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", handler.Delete)
 	})
 
 	apiRouter.Route("/projects", func(r chi.Router) {
