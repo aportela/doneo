@@ -162,8 +162,7 @@ func createProjects(database database.Database, projectTypeIds []string, project
 	projectService := projectservice.NewService(database, projectrepository.NewRepository(database))
 	noteRepository := noterepository.NewRepository(database)
 	noteService := noteservice.NewService(noteRepository)
-	projectPermissionRepository := projectpermissionrepository.NewRepository(database)
-	projectPermissionService := projectpermissionservice.NewService(projectPermissionRepository)
+	projectPermissionService := projectpermissionservice.NewService(database, projectpermissionrepository.NewRepository(database))
 	for i := 1; i <= count; i++ {
 		newProject := getRandomProject(userIds, projectTypeIds, projectPriorityIds, projectStatusIds)
 		err := projectService.Add(context.Background(), newProject)

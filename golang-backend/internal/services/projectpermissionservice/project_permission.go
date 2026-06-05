@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 )
@@ -15,11 +16,12 @@ type ProjectPermissionService interface {
 }
 
 type projectPermissionService struct {
+	database   database.Database
 	repository projectpermissionrepository.ProjectPermissionRepository
 }
 
-func NewService(repository projectpermissionrepository.ProjectPermissionRepository) ProjectPermissionService {
-	return &projectPermissionService{repository: repository}
+func NewService(database database.Database, repository projectpermissionrepository.ProjectPermissionRepository) ProjectPermissionService {
+	return &projectPermissionService{database: database, repository: repository}
 }
 
 func (service *projectPermissionService) Add(ctx context.Context, permissionId string, projectId string, userId string, roleId string) error {
@@ -35,5 +37,5 @@ func (service *projectPermissionService) Search(ctx context.Context, projectId s
 	if err != nil {
 		return nil, fmt.Errorf("[ProjectTypeService] failed to get project permissions: %w", err)
 	}
-	return projectpermissionrepository.DTOArrayToDomainArray(projectPermissions), nil
+	return projectPermissions, nil
 }

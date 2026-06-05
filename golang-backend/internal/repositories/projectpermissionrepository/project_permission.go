@@ -17,7 +17,7 @@ import (
 type ProjectPermissionRepository interface {
 	Add(ctx context.Context, permissionId string, projectId string, userId string, roleId string) error
 	Delete(ctx context.Context, projectId string, permissionId string) error
-	Search(ctx context.Context, projectId string) ([]projectPermissionDTO, error)
+	Search(ctx context.Context, projectId string) ([]domain.ProjectPermission, error)
 }
 
 type projectPermissionRepository struct {
@@ -28,6 +28,7 @@ func NewRepository(database database.Database) ProjectPermissionRepository {
 	return &projectPermissionRepository{database: database}
 }
 
+// TODO: remove userId (add history operation on service)
 func (repository *projectPermissionRepository) Add(ctx context.Context, permissionId string, projectId string, userId string, roleId string) error {
 	tx, err := repository.database.Begin()
 	if err != nil {
@@ -137,7 +138,7 @@ func (repository *projectPermissionRepository) Delete(ctx context.Context, proje
 	return tx.Commit()
 }
 
-func (repository *projectPermissionRepository) Search(ctx context.Context, projectId string) ([]projectPermissionDTO, error) {
+func (repository *projectPermissionRepository) Search(ctx context.Context, projectId string) ([]domain.ProjectPermission, error) {
 	rows, err := repository.database.QueryContext(
 		ctx,
 		`
@@ -154,18 +155,18 @@ func (repository *projectPermissionRepository) Search(ctx context.Context, proje
 		return nil, err
 	}
 	defer rows.Close()
-	projectPermissions := make([]projectPermissionDTO, 0)
+	dtos := make([]projectPermissionDTO, 0)
 	for rows.Next() {
-		var projectPermission projectPermissionDTO
+		var dto projectPermissionDTO
 		if err := rows.Scan(
-			&projectPermission.ID, &projectPermission.UserId, &projectPermission.UserName, &projectPermission.RoleId, &projectPermission.RoleName, &projectPermission.PermissionsBitmask,
+			&dto.ID, &dto.UserId, &dto.UserName, &dto.RoleId, &dto.RoleName, &dto.PermissionsBitmask,
 		); err != nil {
 			return nil, err
 		}
-		projectPermissions = append(projectPermissions, projectPermission)
+		dtos = append(dtos, dto)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-	return projectPermissions, nil
+	return toDomainArray(dtos), nil
 }

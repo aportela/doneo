@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/handlers"
-	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/services/projectpermissionservice"
 	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
@@ -17,11 +15,8 @@ type ProjectPermissionHandler struct {
 	service projectpermissionservice.ProjectPermissionService
 }
 
-func NewHandler(db database.Database) *ProjectPermissionHandler {
-	// TODO: rename to repository/service
-	projectPermissionRepository := projectpermissionrepository.NewRepository(db)
-	projectPermissionService := projectpermissionservice.NewService(projectPermissionRepository)
-	return &ProjectPermissionHandler{service: projectPermissionService}
+func NewHandler(service projectpermissionservice.ProjectPermissionService) *ProjectPermissionHandler {
+	return &ProjectPermissionHandler{service: service}
 }
 
 func (handler *ProjectPermissionHandler) Add(w http.ResponseWriter, r *http.Request) {
