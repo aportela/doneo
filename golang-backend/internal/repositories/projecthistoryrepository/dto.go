@@ -1,6 +1,7 @@
 package projecthistoryrepository
 
 type projectHistoryOperationDTO struct {
+	ID            string `db:"id"`
 	UserId        string `db:"user_id"`
 	UserName      string `db:"user_name"`
 	CreatedAt     int64  `db:"operation_date"`

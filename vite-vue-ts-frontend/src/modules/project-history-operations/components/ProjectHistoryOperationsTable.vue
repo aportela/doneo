@@ -102,8 +102,7 @@
             </tr>
         </template>
         <template #tbody v-if="!props.errorMessage">
-            <tr v-for="projectHistoryOperation, index in items"
-                :key="projectHistoryOperation.createdAt.msTimestamp ?? index">
+            <tr v-for="projectHistoryOperation, index in items" :key="projectHistoryOperation.id ?? index">
                 <td>{{ projectHistoryOperation.createdAt.toLocaleString() }}</td>
                 <td>{{ projectHistoryOperation.getOperationTypeLabel() }}</td>
                 <td>

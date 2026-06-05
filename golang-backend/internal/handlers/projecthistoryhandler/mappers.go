@@ -7,6 +7,7 @@ import (
 
 func domainToResponse(operation domain.ProjectHistoryOperation) ProjectHistoryOperationResponse {
 	return ProjectHistoryOperationResponse{
+		ID:            operation.ID,
 		CreatedBy:     userhandler.BaseDomainToBaseResponse(operation.CreatedBy),
 		CreatedAt:     operation.CreatedAt.UnixMilli(),
 		OperationType: uint(operation.OperationType),

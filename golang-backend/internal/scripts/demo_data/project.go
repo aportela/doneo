@@ -175,13 +175,9 @@ func createProjects(database database.Database, projectTypeIds []string, project
 			userIds[i], userIds[j] = userIds[j], userIds[i]
 		})
 		projectPermissionService.Add(ctx, utils.UUID(), newProject.ID, userIds[0], roleIds[0])
-		time.Sleep(2 * time.Millisecond)
 		projectPermissionService.Add(ctx, utils.UUID(), newProject.ID, userIds[1], roleIds[1])
-		time.Sleep(2 * time.Millisecond)
 		projectPermissionService.Add(ctx, utils.UUID(), newProject.ID, userIds[2], roleIds[1])
-		time.Sleep(2 * time.Millisecond)
 		projectPermissionService.Add(ctx, utils.UUID(), newProject.ID, userIds[3], roleIds[1])
-		time.Sleep(2 * time.Millisecond)
 		newProjectIds = append(newProjectIds, newProject.ID)
 		for j := 0; j < 5; j++ {
 			note := domain.Note{

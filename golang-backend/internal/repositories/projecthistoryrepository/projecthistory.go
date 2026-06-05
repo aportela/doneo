@@ -31,10 +31,11 @@ func (repository *projectHistoryRepository) Add(ctx context.Context, projectId s
 		ctx,
 		`
 			INSERT INTO project_history_operations
-				(project_id, operation_type, user_id, operation_date)
+				(id, project_id, operation_type, user_id, operation_date)
 			VALUES
-				(?, ?, ?, ?)
+				(?, ?, ?, ?, ?)
 		`,
+		dto.ID,
 		projectId,
 		dto.OperationType,
 		dto.UserId,
@@ -69,7 +70,7 @@ func (repository *projectHistoryRepository) Search(ctx context.Context, projectI
 		ctx,
 		`
             SELECT
-				PHO.user_id, U.name, PHO.operation_date, PHO.operation_type
+				PHO.id, PHO.user_id, U.name, PHO.operation_date, PHO.operation_type
             FROM project_history_operations PHO
 			INNER JOIN users U ON U.id = PHO.user_id
             WHERE PHO.project_id = ?
@@ -84,7 +85,7 @@ func (repository *projectHistoryRepository) Search(ctx context.Context, projectI
 	for rows.Next() {
 		var dto projectHistoryOperationDTO
 		if err := rows.Scan(
-			&dto.UserId, &dto.UserName, &dto.CreatedAt, &dto.OperationType,
+			&dto.ID, &dto.UserId, &dto.UserName, &dto.CreatedAt, &dto.OperationType,
 		); err != nil {
 			return nil, err
 		}

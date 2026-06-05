@@ -10,6 +10,7 @@ import (
 	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/noterepository"
 	"github.com/aportela/doneo/internal/repositories/projecthistoryrepository"
+	"github.com/aportela/doneo/internal/utils"
 )
 
 type NoteService interface {
@@ -49,7 +50,7 @@ func (service *noteService) AddProjectNote(ctx context.Context, projectId string
 	if err != nil {
 		return err
 	}
-	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: note.CreatedAt, OperationType: domain.EventProjectNoteAdded})
+	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: note.CreatedAt, OperationType: domain.EventProjectNoteAdded})
 	return tx.Commit()
 }
 
@@ -74,7 +75,7 @@ func (service *noteService) UpdateProjectNote(ctx context.Context, projectId str
 	if err != nil {
 		return err
 	}
-	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectNoteUpdated})
+	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectNoteUpdated})
 	return tx.Commit()
 }
 
@@ -99,7 +100,7 @@ func (service *noteService) DeleteProjectNote(ctx context.Context, projectId str
 	if err != nil {
 		return err
 	}
-	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectNoteDeleted})
+	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectNoteDeleted})
 	return tx.Commit()
 }
 
