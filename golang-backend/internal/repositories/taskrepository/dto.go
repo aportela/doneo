@@ -7,22 +7,34 @@ import (
 )
 
 type taskDTO struct {
-	ID          string         `db:"id"`
-	Index       uint           `db:"task_index"`
-	Summary     string         `db:"summary"`
-	Description sql.NullString `db:"description"`
-	CreatorId   string         `db:"creator_id"`
-	CreatorName string         `db:"creator_name"`
-	CreatedAt   int64          `db:"created_at"`
-	UpdatedAt   sql.NullInt64  `db:"updated_at"`
-	DeletedAt   sql.NullInt64  `db:"deleted_at"`
-	StartedAt   sql.NullInt64  `db:"started_at"`
-	FinishedAt  sql.NullInt64  `db:"finished_at"`
-	DueAt       sql.NullInt64  `db:"due_at"`
+	ID                     string         `db:"id"`
+	Index                  uint           `db:"task_index"`
+	Slug                   string         `db:"task_slug"`
+	Summary                string         `db:"summary"`
+	Description            sql.NullString `db:"description"`
+	CreatorId              string         `db:"creator_id"`
+	CreatorName            string         `db:"creator_name"`
+	CreatedAt              int64          `db:"created_at"`
+	UpdatedAt              sql.NullInt64  `db:"updated_at"`
+	DeletedAt              sql.NullInt64  `db:"deleted_at"`
+	StartedAt              sql.NullInt64  `db:"started_at"`
+	FinishedAt             sql.NullInt64  `db:"finished_at"`
+	DueAt                  sql.NullInt64  `db:"due_at"`
+	StatusId               string         `db:"status_id"`
+	StatusName             string         `db:"status_name"`
+	StatusHexColor         string         `db:"status_hex_color"`
+	PriorityId             string         `db:"priority_id"`
+	PriorityName           string         `db:"priority_name"`
+	PriorityHexColor       string         `db:"priority_hex_color"`
+	AttachmentsCount       uint           `db:"attachments_count"`
+	NotesCount             uint           `db:"notes_count"`
+	HistoryOperationsCount uint           `db:"history_operations_count"`
 }
 
 type searchFilterDTO struct {
 	Summary         *string
+	PriorityId      *string
+	StatusId        *string
 	CreatedAt       *repositories.TimestampFilter
 	CreatedByUserId *string
 }

@@ -1,24 +1,31 @@
 package domain
 
-type TaskBase struct {
-	ID   string
-	Slug string
-}
+import "time"
 
 type Task struct {
-	ID          string
-	Slug        string
-	Summary     string
-	Description string
-	Status      TaskStatus
-	Priority    TaskPriority
-	CreatedBy   UserBase
-	CreatedAt   int64
-	StartedAt   *int64
-	FinishedAt  *int64
-	DueAt       *int64
-	Tags        []string
-	Notes       []Note
-	Attachments []Attachment
-	LinkedTasks []TaskBase
+	ID                     string
+	Slug                   string
+	Summary                string
+	Description            *string
+	CreatedBy              UserBase
+	CreatedAt              time.Time
+	UpdatedAt              *time.Time
+	DeletedAt              *time.Time
+	StartedAt              *time.Time
+	FinishedAt             *time.Time
+	DueAt                  *time.Time
+	Priority               TaskPriority
+	Status                 TaskStatus
+	PermissionsCount       uint
+	AttachmentsCount       uint
+	NotesCount             uint
+	HistoryOperationsCount uint
+}
+
+type SearchTaskFilter struct {
+	Summary         *string
+	StatusId        *string
+	PriorityId      *string
+	CreatedAt       *TimestampFilter
+	CreatedByUserId *string
 }
