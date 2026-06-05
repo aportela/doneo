@@ -153,8 +153,8 @@ var installSchemaQueries = []string{
 			project_id TEXT NOT NULL CHECK(length(project_id) == 36),
 			operation_type INTEGER NOT NULL,
 			user_id TEXT NOT NULL CHECK(length(user_id) == 36),
-			created_at INTEGER NOT NULL,
-			PRIMARY KEY (project_id, operation_type, user_id, created_at),
+			operation_date INTEGER NOT NULL,
+			PRIMARY KEY (project_id, operation_type, user_id, operation_date),
 			FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE,
 			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 		) STRICT;

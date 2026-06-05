@@ -31,7 +31,7 @@ func (repository *projectHistoryRepository) Add(ctx context.Context, projectId s
 		ctx,
 		`
 			INSERT INTO project_history_operations
-				(project_id, operation_type, user_id, created_at)
+				(project_id, operation_type, user_id, operation_date)
 			VALUES
 				(?, ?, ?, ?)
 		`,
@@ -48,7 +48,7 @@ func (repository *projectHistoryRepository) Add(ctx context.Context, projectId s
 		}
 		switch sqlErr.Code() {
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "project_id, operation_type, user_id, created_at"}
+			return &domain.ValidationError{Field: "project_id, operation_type, user_id, operation_date"}
 		case sqlite3.SQLITE_CONSTRAINT_CHECK:
 			if strings.Contains(sqlErr.Error(), "length(project_id)") {
 				return &domain.ValidationError{Field: "project_id"}
@@ -68,11 +68,11 @@ func (repository *projectHistoryRepository) Search(ctx context.Context, projectI
 		ctx,
 		`
             SELECT
-				PHO.user_id, U.name, PHO.created_at, PHO.operation_type
+				PHO.user_id, U.name, PHO.operation_date, PHO.operation_type
             FROM project_history_operations PHO
 			INNER JOIN users U ON U.id = PHO.user_id
             WHERE PHO.project_id = ?
-			ORDER BY PHO.created_at DESC
+			ORDER BY PHO.operation_date DESC
         `,
 		projectId)
 	if err != nil {
