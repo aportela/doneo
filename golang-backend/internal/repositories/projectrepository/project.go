@@ -10,7 +10,6 @@ import (
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"github.com/aportela/doneo/internal/utils"
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
 )
@@ -142,8 +141,7 @@ func (repository *projectRepository) Update(ctx context.Context, project domain.
 		dto.Key,
 		dto.Summary,
 		dto.Description,
-		// TODO: use received value
-		utils.CurrentMSTimestamp(),
+		dto.UpdatedAt,
 		dto.StartedAt,
 		dto.FinishedAt,
 		dto.DueAt,

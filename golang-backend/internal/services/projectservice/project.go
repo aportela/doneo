@@ -78,6 +78,7 @@ func (service *projectService) Update(ctx context.Context, project domain.Projec
 	if !ok {
 		return fmt.Errorf("user ID not found in context")
 	}
+	project.UpdatedAt = utils.CurrentTimePtr()
 	err = service.repository.Update(ctx, project)
 	if err != nil {
 		return err
