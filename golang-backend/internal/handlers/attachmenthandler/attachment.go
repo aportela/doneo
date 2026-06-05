@@ -23,8 +23,8 @@ type AttachmentHandler struct {
 	basePath string
 }
 
-func NewHandler(db database.Database, basePath string) *AttachmentHandler {
-	repository := attachmentrepository.NewRepository(db)
+func NewHandler(database database.Database, basePath string) *AttachmentHandler {
+	repository := attachmentrepository.NewRepository(database)
 	service := attachmentservice.NewService(repository)
 	return &AttachmentHandler{service: service, basePath: basePath}
 }

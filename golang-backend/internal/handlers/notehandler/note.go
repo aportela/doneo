@@ -19,9 +19,9 @@ type NoteHandler struct {
 	service noteservice.NoteService
 }
 
-func NewHandler(db database.Database) *NoteHandler {
+func NewHandler(database database.Database) *NoteHandler {
 	// TODO: rename to repository/service
-	noteRepository := noterepository.NewRepository(db)
+	noteRepository := noterepository.NewRepository(database)
 	noteService := noteservice.NewService(noteRepository)
 	return &NoteHandler{service: noteService}
 }
