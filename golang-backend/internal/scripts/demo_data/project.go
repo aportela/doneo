@@ -9,6 +9,7 @@ import (
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/noterepository"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
@@ -164,17 +165,19 @@ func createProjects(database database.Database, projectTypeIds []string, project
 	projectPermissionService := projectpermissionservice.NewService(database, projectpermissionrepository.NewRepository(database))
 	for i := 1; i <= count; i++ {
 		newProject := getRandomProject(userIds, projectTypeIds, projectPriorityIds, projectStatusIds)
-		err := projectService.Add(context.Background(), newProject)
+		ctx := context.Background()
+		ctx = middlewares.SetUserIDIntoContext(ctx, userIds[0])
+		err := projectService.Add(ctx, newProject)
 		if err != nil {
 			fmt.Printf("Error creating project %s\n", err.Error())
 		}
 		rand.Shuffle(len(userIds), func(i, j int) {
 			userIds[i], userIds[j] = userIds[j], userIds[i]
 		})
-		projectPermissionService.Add(context.Background(), utils.UUID(), newProject.ID, userIds[0], roleIds[0])
-		projectPermissionService.Add(context.Background(), utils.UUID(), newProject.ID, userIds[1], roleIds[1])
-		projectPermissionService.Add(context.Background(), utils.UUID(), newProject.ID, userIds[2], roleIds[1])
-		projectPermissionService.Add(context.Background(), utils.UUID(), newProject.ID, userIds[3], roleIds[1])
+		projectPermissionService.Add(ctx, utils.UUID(), newProject.ID, userIds[0], roleIds[0])
+		projectPermissionService.Add(ctx, utils.UUID(), newProject.ID, userIds[1], roleIds[1])
+		projectPermissionService.Add(ctx, utils.UUID(), newProject.ID, userIds[2], roleIds[1])
+		projectPermissionService.Add(ctx, utils.UUID(), newProject.ID, userIds[3], roleIds[1])
 		newProjectIds = append(newProjectIds, newProject.ID)
 		for j := 0; j < 5; j++ {
 			note := domain.Note{
@@ -185,7 +188,7 @@ func createProjects(database database.Database, projectTypeIds []string, project
 				Body:      "Note index " + strconv.Itoa(j) + ": " + randomText(rand.Intn(384)+128),
 				CreatedAt: time.Now().Add(time.Duration(j*5) * time.Minute),
 			}
-			noteService.AddProjectNote(context.Background(), newProject.ID, note)
+			noteService.AddProjectNote(ctx, newProject.ID, note)
 		}
 	}
 	return newProjectIds

@@ -11,18 +11,22 @@ func toDTO(operation domain.ProjectHistoryOperation) projectHistoryOperationDTO 
 		UserId:        operation.CreatedBy.ID,
 		UserName:      operation.CreatedBy.Name,
 		CreatedAt:     operation.CreatedAt.UnixMilli(),
-		OperationType: operation.OperationType,
+		OperationType: uint(operation.OperationType),
 	}
 }
 
 func toDomain(operation projectHistoryOperationDTO) domain.ProjectHistoryOperation {
+	switch operation.OperationType {
+	case 1:
+		break
+	}
 	return domain.ProjectHistoryOperation{
 		CreatedBy: domain.UserBase{
 			ID:   operation.UserId,
 			Name: operation.UserName,
 		},
 		CreatedAt:     time.UnixMilli(operation.CreatedAt),
-		OperationType: operation.OperationType,
+		OperationType: domain.ProjectEventType(operation.OperationType),
 	}
 }
 

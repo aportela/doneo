@@ -1,9 +1,11 @@
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 type ProjectHistoryOperation struct {
 	CreatedBy     UserBase
 	CreatedAt     time.Time
-	OperationType uint
+	OperationType ProjectEventType
 }

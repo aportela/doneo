@@ -3,10 +3,13 @@ package attachmentservice
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/attachmentrepository"
+	"github.com/aportela/doneo/internal/repositories/projecthistoryrepository"
 )
 
 type AttachmentService interface {
@@ -33,12 +36,62 @@ func (service *attachmentService) GetAttachment(ctx context.Context, id string) 
 	return attachment, nil
 }
 func (service *attachmentService) AddProjectAttachment(ctx context.Context, projectId string, attachment domain.Attachment) error {
-	return service.repository.AddProjectAttachment(ctx, projectId, attachment)
+	tx, err := service.database.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return fmt.Errorf("user ID not found in context")
+	}
+	err = attachmentrepository.NewRepository(service.database).AddAttachment(ctx, attachment)
+	if err != nil {
+		return err
+	}
+	err = service.repository.AddProjectAttachment(ctx, projectId, attachment.ID)
+	if err != nil {
+		return err
+	}
+	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectAttachmentAdded})
+	return tx.Commit()
 }
 
 func (service *attachmentService) DeleteProjectAttachment(ctx context.Context, projectId string, attachmentId string) error {
-	// TODO: remove data/attachments
-	return service.repository.DeleteProjectAttachment(ctx, projectId, attachmentId)
+	// TODO: remove data/attachments file from storage
+	tx, err := service.database.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return fmt.Errorf("user ID not found in context")
+	}
+	err = service.repository.DeleteProjectAttachment(ctx, projectId, attachmentId)
+	if err != nil {
+		return err
+	}
+	err = service.repository.DeleteProjectAttachment(ctx, projectId, attachmentId)
+	if err != nil {
+		return err
+	}
+	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectAttachmentDeleted})
+	return tx.Commit()
 }
 
 func (service *attachmentService) GetProjectAttachments(ctx context.Context, projectId string) ([]domain.Attachment, error) {

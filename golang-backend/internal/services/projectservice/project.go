@@ -3,10 +3,13 @@ package projectservice
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/middlewares"
+	"github.com/aportela/doneo/internal/repositories/projecthistoryrepository"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
 )
 
@@ -28,15 +31,78 @@ func NewService(database database.Database, repository projectrepository.Project
 }
 
 func (service *projectService) Add(ctx context.Context, project domain.Project) error {
-	return service.repository.Add(ctx, project)
+	tx, err := service.database.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return fmt.Errorf("user ID not found in context")
+	}
+	err = service.repository.Add(ctx, project)
+	if err != nil {
+		return err
+	}
+	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, project.ID, domain.ProjectHistoryOperation{CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectCreated})
+	return tx.Commit()
 }
 
 func (service *projectService) Update(ctx context.Context, project domain.Project) error {
-	return service.repository.Update(ctx, project)
+	tx, err := service.database.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return fmt.Errorf("user ID not found in context")
+	}
+	err = service.repository.Update(ctx, project)
+	if err != nil {
+		return err
+	}
+	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, project.ID, domain.ProjectHistoryOperation{CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectUpdated})
+	return tx.Commit()
 }
 
 func (service *projectService) Delete(ctx context.Context, id string) error {
-	return service.repository.Delete(ctx, id)
+	tx, err := service.database.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return fmt.Errorf("user ID not found in context")
+	}
+	err = service.repository.Delete(ctx, id)
+	if err != nil {
+		return err
+	}
+	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, id, domain.ProjectHistoryOperation{CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectDeleted})
+	return tx.Commit()
 }
 
 func (service *projectService) Get(ctx context.Context, id string) (domain.Project, error) {

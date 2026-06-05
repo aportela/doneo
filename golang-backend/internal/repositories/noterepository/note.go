@@ -5,11 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"github.com/aportela/doneo/internal/middlewares"
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
 )
@@ -31,19 +29,7 @@ func NewRepository(database database.Database) NoteRepository {
 
 func (repository *noteRepository) AddProjectNote(ctx context.Context, projectId string, note domain.Note) error {
 	dto := toDTO(note)
-	tx, err := repository.database.Begin()
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if p := recover(); p != nil {
-			_ = tx.Rollback()
-			panic(p)
-		} else if err != nil {
-			_ = tx.Rollback()
-		}
-	}()
-	_, err = tx.ExecContext(
+	_, err := repository.database.ExecContext(
 		ctx,
 		`
             INSERT INTO project_notes (id, project_id, user_id, created_at, updated_at, body)
@@ -72,41 +58,12 @@ func (repository *noteRepository) AddProjectNote(ctx context.Context, projectId 
 			}
 		}
 	}
-	_, err = tx.ExecContext(
-		ctx,
-		`
-			INSERT INTO project_history_operations
-				(project_id, operation_type, user_id, created_at)
-			VALUES
-				(?, ?, ?, ?)
-		`,
-		projectId,
-		domain.EventProjectNoteAdded,
-		dto.UserId,
-		dto.CreatedAt,
-	)
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-	return tx.Commit()
+	return nil
 }
 
 func (repository *noteRepository) UpdateProjectNote(ctx context.Context, projectId string, note domain.Note) error {
 	dto := toDTO(note)
-	tx, err := repository.database.Begin()
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if p := recover(); p != nil {
-			_ = tx.Rollback()
-			panic(p)
-		} else if err != nil {
-			_ = tx.Rollback()
-		}
-	}()
-	_, err = repository.database.ExecContext(
+	_, err := repository.database.ExecContext(
 		ctx,
 		`
             UPDATE project_notes SET
@@ -123,41 +80,11 @@ func (repository *noteRepository) UpdateProjectNote(ctx context.Context, project
 		fmt.Println(err.Error())
 		return err
 	}
-	userId, _ := middlewares.GetUserIDFromContext(ctx)
-	_, err = tx.ExecContext(
-		ctx,
-		`
-			INSERT INTO project_history_operations
-				(project_id, operation_type, user_id, created_at)
-			VALUES
-				(?, ?, ?, ?)
-		`,
-		projectId,
-		domain.EventProjectNoteUpdated,
-		userId,
-		dto.UpdatedAt,
-	)
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-	return tx.Commit()
+	return nil
 }
 
 func (repository *noteRepository) DeleteProjectNote(ctx context.Context, projectId string, id string) error {
-	tx, err := repository.database.Begin()
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if p := recover(); p != nil {
-			_ = tx.Rollback()
-			panic(p)
-		} else if err != nil {
-			_ = tx.Rollback()
-		}
-	}()
-	_, err = repository.database.ExecContext(
+	_, err := repository.database.ExecContext(
 		ctx,
 		`
             DELETE FROM project_notes
@@ -166,25 +93,11 @@ func (repository *noteRepository) DeleteProjectNote(ctx context.Context, project
         `,
 		id,
 	)
-	userId, _ := middlewares.GetUserIDFromContext(ctx)
-	_, err = tx.ExecContext(
-		ctx,
-		`
-			INSERT INTO project_history_operations
-				(project_id, operation_type, user_id, created_at)
-			VALUES
-				(?, ?, ?, ?)
-		`,
-		projectId,
-		domain.EventProjectNoteDeleted,
-		userId,
-		time.Now().UnixMilli(),
-	)
 	if err != nil {
 		fmt.Println(err.Error())
 		return err
 	}
-	return tx.Commit()
+	return nil
 }
 
 func (repository *noteRepository) GetProjectNotes(ctx context.Context, projectId string) ([]domain.Note, error) {

@@ -11,7 +11,6 @@ import (
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/utils"
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
@@ -35,19 +34,7 @@ func NewRepository(database database.Database) ProjectRepository {
 
 func (repository *projectRepository) Add(ctx context.Context, project domain.Project) error {
 	dto := toDTO(project)
-	tx, err := repository.database.Begin()
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if p := recover(); p != nil {
-			_ = tx.Rollback()
-			panic(p)
-		} else if err != nil {
-			_ = tx.Rollback()
-		}
-	}()
-	_, err = tx.ExecContext(
+	_, err := repository.database.ExecContext(
 		ctx,
 		`
             INSERT INTO projects
@@ -93,7 +80,7 @@ func (repository *projectRepository) Add(ctx context.Context, project domain.Pro
 			}
 		}
 	}
-	_, err = tx.ExecContext(
+	_, err = repository.database.ExecContext(
 		ctx,
 		`
 			INSERT INTO project_task_counter
@@ -107,41 +94,12 @@ func (repository *projectRepository) Add(ctx context.Context, project domain.Pro
 		fmt.Println(err.Error())
 		return err
 	}
-	_, err = tx.ExecContext(
-		ctx,
-		`
-			INSERT INTO project_history_operations
-				(project_id, operation_type, user_id, created_at)
-			VALUES
-				(?, ?, ?, ?)
-		`,
-		dto.ID,
-		domain.EventProjectCreated,
-		dto.CreatorId,
-		dto.CreatedAt,
-	)
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-	return tx.Commit()
+	return nil
 }
 
 func (repository *projectRepository) Update(ctx context.Context, project domain.Project) error {
 	dto := toDTO(project)
-	tx, err := repository.database.Begin()
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if p := recover(); p != nil {
-			_ = tx.Rollback()
-			panic(p)
-		} else if err != nil {
-			_ = tx.Rollback()
-		}
-	}()
-	_, err = tx.ExecContext(
+	_, err := repository.database.ExecContext(
 		ctx,
 		`
             UPDATE projects SET
@@ -195,43 +153,13 @@ func (repository *projectRepository) Update(ctx context.Context, project domain.
 			}
 		}
 	}
-	userId, _ := middlewares.GetUserIDFromContext(ctx)
-	_, err = tx.ExecContext(
-		ctx,
-		`
-			INSERT INTO project_history_operations
-				(project_id, operation_type, user_id, created_at)
-			VALUES
-				(?, ?, ?, ?)
-		`,
-		dto.ID,
-		domain.EventProjectUpdated,
-		userId,
-		dto.UpdatedAt,
-	)
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-	return tx.Commit()
+	return nil
 }
 
 func (repository *projectRepository) Delete(ctx context.Context, id string) error {
-	tx, err := repository.database.Begin()
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if p := recover(); p != nil {
-			_ = tx.Rollback()
-			panic(p)
-		} else if err != nil {
-			_ = tx.Rollback()
-		}
-	}()
-
+	// TODO: pass date on params
 	deletedAt := time.Now().UnixMilli()
-	_, err = repository.database.ExecContext(
+	_, err := repository.database.ExecContext(
 		ctx,
 		`
             UPDATE projects SET
@@ -245,25 +173,7 @@ func (repository *projectRepository) Delete(ctx context.Context, id string) erro
 		fmt.Println(err.Error())
 		return err
 	}
-	userId, _ := middlewares.GetUserIDFromContext(ctx)
-	_, err = tx.ExecContext(
-		ctx,
-		`
-			INSERT INTO project_history_operations
-				(project_id, operation_type, user_id, created_at)
-			VALUES
-				(?, ?, ?, ?)
-		`,
-		id,
-		domain.EventProjectDeleted,
-		userId,
-		deletedAt,
-	)
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-	return tx.Commit()
+	return nil
 }
 
 func (repository *projectRepository) Get(ctx context.Context, id string) (domain.Project, error) {

@@ -9,7 +9,7 @@ func domainToResponse(operation domain.ProjectHistoryOperation) ProjectHistoryOp
 	return ProjectHistoryOperationResponse{
 		CreatedBy:     userhandler.BaseDomainToBaseResponse(operation.CreatedBy),
 		CreatedAt:     operation.CreatedAt.UnixMilli(),
-		OperationType: operation.OperationType,
+		OperationType: uint(operation.OperationType),
 	}
 }
 

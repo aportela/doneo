@@ -6,18 +6,18 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"github.com/aportela/doneo/internal/middlewares"
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
 )
 
 type AttachmentRepository interface {
+	AddAttachment(ctx context.Context, attachment domain.Attachment) error
+	DeleteAttachment(ctx context.Context, attachmentId string) error
 	GetAttachment(ctx context.Context, attachmentId string) (domain.Attachment, error)
-	AddProjectAttachment(ctx context.Context, projectId string, attachment domain.Attachment) error
+	AddProjectAttachment(ctx context.Context, projectId string, attachmentId string) error
 	DeleteProjectAttachment(ctx context.Context, projectId string, attachmentId string) error
 	GetProjectAttachments(ctx context.Context, projectId string) ([]domain.Attachment, error)
 }
@@ -30,43 +30,9 @@ func NewRepository(database database.Database) AttachmentRepository {
 	return &attachmentRepository{database: database}
 }
 
-func (repository *attachmentRepository) GetAttachment(ctx context.Context, id string) (domain.Attachment, error) {
-	var dto attachmentDTO
-	err := repository.database.QueryRowContext(
-		ctx,
-		`
-            SELECT
-				A.id, A.user_id, U.name, A.created_at, A.original_name, A.content_type, A.size
-            FROM project_attachments PA
-			INNER JOIN attachments A ON A.id = PA.attachment_id
-			INNER JOIN users U ON U.id = A.user_id
-            WHERE A.id = ?
-        `,
-		id).Scan(&dto.ID, &dto.UserId, &dto.UserName, &dto.CreatedAt, &dto.OriginalName, &dto.ContentType, &dto.Size)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return domain.Attachment{}, domain.NotFoundError
-		}
-		return domain.Attachment{}, err
-	}
-	return toDomain(dto), err
-}
-
-func (repository *attachmentRepository) AddProjectAttachment(ctx context.Context, projectId string, attachment domain.Attachment) error {
+func (repository *attachmentRepository) AddAttachment(ctx context.Context, attachment domain.Attachment) error {
 	dto := toDTO(attachment)
-	tx, err := repository.database.Begin()
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if p := recover(); p != nil {
-			_ = tx.Rollback()
-			panic(p)
-		} else if err != nil {
-			_ = tx.Rollback()
-		}
-	}()
-	_, err = tx.ExecContext(
+	_, err := repository.database.ExecContext(
 		ctx,
 		`
             INSERT INTO attachments (id, original_name, content_type, size, user_id, created_at)
@@ -96,14 +62,58 @@ func (repository *attachmentRepository) AddProjectAttachment(ctx context.Context
 		}
 		return err
 	}
-	_, err = tx.ExecContext(
+	return nil
+}
+
+func (repository *attachmentRepository) DeleteAttachment(ctx context.Context, attachmentId string) error {
+	_, err := repository.database.ExecContext(
+		ctx,
+		`
+            DELETE FROM attachments
+			WHERE
+				id = ?
+        `,
+		attachmentId,
+	)
+	if err != nil {
+		// TODO: remove ?
+		fmt.Println(err.Error())
+		return err
+	}
+	return nil
+}
+
+func (repository *attachmentRepository) GetAttachment(ctx context.Context, id string) (domain.Attachment, error) {
+	var dto attachmentDTO
+	err := repository.database.QueryRowContext(
+		ctx,
+		`
+            SELECT
+				A.id, A.user_id, U.name, A.created_at, A.original_name, A.content_type, A.size
+            FROM project_attachments PA
+			INNER JOIN attachments A ON A.id = PA.attachment_id
+			INNER JOIN users U ON U.id = A.user_id
+            WHERE A.id = ?
+        `,
+		id).Scan(&dto.ID, &dto.UserId, &dto.UserName, &dto.CreatedAt, &dto.OriginalName, &dto.ContentType, &dto.Size)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.Attachment{}, domain.NotFoundError
+		}
+		return domain.Attachment{}, err
+	}
+	return toDomain(dto), err
+}
+
+func (repository *attachmentRepository) AddProjectAttachment(ctx context.Context, projectId string, attachmentId string) error {
+	_, err := repository.database.ExecContext(
 		ctx,
 		`
             INSERT INTO project_attachments (project_id, attachment_id)
 			VALUES (?, ?)
         `,
 		projectId,
-		dto.ID,
+		attachmentId,
 	)
 	if err != nil {
 		// TODO: remove ?
@@ -114,50 +124,21 @@ func (repository *attachmentRepository) AddProjectAttachment(ctx context.Context
 		}
 		switch sqlErr.Code() {
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
+			return &domain.ValidationError{Field: "project_id, attachment_id"}
 		case sqlite3.SQLITE_CONSTRAINT_CHECK:
 			if strings.Contains(sqlErr.Error(), "length(project_id)") {
 				return &domain.ValidationError{Field: "project_id"}
-			} else if strings.Contains(sqlErr.Error(), "length(attachmnet_id)") {
-				return &domain.ValidationError{Field: "attachmnet_id"}
+			} else if strings.Contains(sqlErr.Error(), "length(attachment_id)") {
+				return &domain.ValidationError{Field: "attachment_id"}
 			}
 		}
 		return err
 	}
-	_, err = tx.ExecContext(
-		ctx,
-		`
-			INSERT INTO project_history_operations
-				(project_id, operation_type, user_id, created_at)
-			VALUES
-				(?, ?, ?, ?)
-		`,
-		projectId,
-		domain.EventProjectAttachmentAdded,
-		dto.UserId,
-		dto.CreatedAt,
-	)
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-	return tx.Commit()
+	return nil
 }
 
 func (repository *attachmentRepository) DeleteProjectAttachment(ctx context.Context, projectId string, attachmentId string) error {
-	tx, err := repository.database.Begin()
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if p := recover(); p != nil {
-			_ = tx.Rollback()
-			panic(p)
-		} else if err != nil {
-			_ = tx.Rollback()
-		}
-	}()
-	_, err = tx.ExecContext(
+	_, err := repository.database.ExecContext(
 		ctx,
 		`
             DELETE FROM project_attachments
@@ -174,39 +155,7 @@ func (repository *attachmentRepository) DeleteProjectAttachment(ctx context.Cont
 		fmt.Println(err.Error())
 		return err
 	}
-	_, err = tx.ExecContext(
-		ctx,
-		`
-            DELETE FROM attachments
-			WHERE
-				id = ?
-        `,
-		attachmentId,
-	)
-	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		return err
-	}
-	userId, _ := middlewares.GetUserIDFromContext(ctx)
-	_, err = tx.ExecContext(
-		ctx,
-		`
-			INSERT INTO project_history_operations
-				(project_id, operation_type, user_id, created_at)
-			VALUES
-				(?, ?, ?, ?)
-		`,
-		projectId,
-		domain.EventProjectAttachmentDeleted,
-		userId,
-		time.Now().UnixMilli(),
-	)
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-	return tx.Commit()
+	return nil
 }
 
 func (repository *attachmentRepository) GetProjectAttachments(ctx context.Context, projectId string) ([]domain.Attachment, error) {
@@ -226,7 +175,7 @@ func (repository *attachmentRepository) GetProjectAttachments(ctx context.Contex
 		return nil, err
 	}
 	defer rows.Close()
-	attachments := make([]attachmentDTO, 0)
+	dtos := make([]attachmentDTO, 0)
 	for rows.Next() {
 		var dto attachmentDTO
 		if err := rows.Scan(
@@ -234,10 +183,10 @@ func (repository *attachmentRepository) GetProjectAttachments(ctx context.Contex
 		); err != nil {
 			return nil, err
 		}
-		attachments = append(attachments, dto)
+		dtos = append(dtos, dto)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-	return toDomainArray(attachments), nil
+	return toDomainArray(dtos), nil
 }
