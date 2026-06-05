@@ -883,7 +883,7 @@ export default {
           header: {
             columns: {
               user: "User",
-              createdAt: "Created at",
+              operationDate: "Operation date",
               operationType: "Operation type",
             },
           },

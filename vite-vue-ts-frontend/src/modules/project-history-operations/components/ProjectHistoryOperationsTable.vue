@@ -14,6 +14,7 @@
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
+    import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
 
     interface Props {
         disabled: boolean;
@@ -42,7 +43,7 @@
 
     const columns = computed<TableHeaderColumn[]>(() => [
         {
-            label: t("modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.header.columns.createdAt"),
+            label: t("modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.header.columns.operationDate"),
             field: "createdAt",
             visible: true,
             sortable: false,
@@ -77,7 +78,9 @@
     <ManageTable size="small" :columns="columns" hide-add @refresh="onRefresh">
         <template #thead>
             <tr>
-                <th></th>
+                <th>
+                    <DateFilterSelect />
+                </th>
                 <th></th>
                 <th>
                     <UserSelector v-model:id="filters.userId" :disabled="props.disabled" hide-avatar clearable
