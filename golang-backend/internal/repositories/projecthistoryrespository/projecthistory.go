@@ -13,8 +13,8 @@ import (
 )
 
 type ProjectHistoryRepository interface {
-	AddProjectHistoryOperation(ctx context.Context, projectId string, operationType uint, operationDate int64, operationUserId string) error
-	GetProjectHistoryOperations(ctx context.Context, projectId string) ([]projectHistoryOperationDTO, error)
+	Add(ctx context.Context, projectId string, operationType uint, operationDate int64, operationUserId string) error
+	Search(ctx context.Context, projectId string) ([]domain.ProjectHistoryOperation, error)
 }
 
 type projectHistoryRepository struct {
@@ -25,7 +25,7 @@ func NewRepository(database database.Database) ProjectHistoryRepository {
 	return &projectHistoryRepository{database: database}
 }
 
-func (repository *projectHistoryRepository) AddProjectHistoryOperation(ctx context.Context, projectId string, operationType uint, operationDate int64, operationUserId string) error {
+func (repository *projectHistoryRepository) Add(ctx context.Context, projectId string, operationType uint, operationDate int64, operationUserId string) error {
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
@@ -62,7 +62,7 @@ func (repository *projectHistoryRepository) AddProjectHistoryOperation(ctx conte
 	return nil
 }
 
-func (repository *projectHistoryRepository) GetProjectHistoryOperations(ctx context.Context, projectId string) ([]projectHistoryOperationDTO, error) {
+func (repository *projectHistoryRepository) Search(ctx context.Context, projectId string) ([]domain.ProjectHistoryOperation, error) {
 	rows, err := repository.database.QueryContext(
 		ctx,
 		`
@@ -78,18 +78,18 @@ func (repository *projectHistoryRepository) GetProjectHistoryOperations(ctx cont
 		return nil, err
 	}
 	defer rows.Close()
-	operations := make([]projectHistoryOperationDTO, 0)
+	dtos := make([]projectHistoryOperationDTO, 0)
 	for rows.Next() {
-		var operation projectHistoryOperationDTO
+		var dto projectHistoryOperationDTO
 		if err := rows.Scan(
-			&operation.UserId, &operation.UserName, &operation.CreatedAt, &operation.OperationType,
+			&dto.UserId, &dto.UserName, &dto.CreatedAt, &dto.OperationType,
 		); err != nil {
 			return nil, err
 		}
-		operations = append(operations, operation)
+		dtos = append(dtos, dto)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-	return operations, nil
+	return toDomainArray(dtos), nil
 }

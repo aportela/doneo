@@ -6,7 +6,7 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 )
 
-func DomainToDTO(operation domain.ProjectHistoryOperation) projectHistoryOperationDTO {
+func toDTO(operation domain.ProjectHistoryOperation) projectHistoryOperationDTO {
 	return projectHistoryOperationDTO{
 		UserId:        operation.CreatedBy.ID,
 		UserName:      operation.CreatedBy.Name,
@@ -15,7 +15,7 @@ func DomainToDTO(operation domain.ProjectHistoryOperation) projectHistoryOperati
 	}
 }
 
-func DTOToDomain(operation projectHistoryOperationDTO) domain.ProjectHistoryOperation {
+func toDomain(operation projectHistoryOperationDTO) domain.ProjectHistoryOperation {
 	return domain.ProjectHistoryOperation{
 		CreatedBy: domain.UserBase{
 			ID:   operation.UserId,
@@ -26,10 +26,10 @@ func DTOToDomain(operation projectHistoryOperationDTO) domain.ProjectHistoryOper
 	}
 }
 
-func DTOArrayToDomainArray(operations []projectHistoryOperationDTO) []domain.ProjectHistoryOperation {
+func toDomainArray(operations []projectHistoryOperationDTO) []domain.ProjectHistoryOperation {
 	results := make([]domain.ProjectHistoryOperation, 0, len(operations))
 	for _, operation := range operations {
-		results = append(results, DTOToDomain(operation))
+		results = append(results, toDomain(operation))
 	}
 	return results
 }

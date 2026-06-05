@@ -25,6 +25,7 @@ import (
 	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 	"github.com/aportela/doneo/internal/middlewares"
+	"github.com/aportela/doneo/internal/repositories/projecthistoryrespository"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/projectpriorityrepository"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
@@ -35,6 +36,7 @@ import (
 	"github.com/aportela/doneo/internal/repositories/taskstatusrepository"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"github.com/aportela/doneo/internal/services/authservice"
+	"github.com/aportela/doneo/internal/services/projecthistoryservice"
 	"github.com/aportela/doneo/internal/services/projectpermissionservice"
 	"github.com/aportela/doneo/internal/services/projectpriorityservice"
 	"github.com/aportela/doneo/internal/services/projectservice"
@@ -183,7 +185,7 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		projectPermissionHandler := projectpermissionhandler.NewHandler(projectpermissionservice.NewService(db, projectpermissionrepository.NewRepository(db)))
 		projectNoteHandler := notehandler.NewHandler(db)
 		projectAttachmentHandler := attachmenthandler.NewHandler(db, cfg.Storage.AttachmentsPath)
-		projectHistoryHandler := projecthistoryhandler.NewHandler(db, cfg.Storage.AttachmentsPath)
+		projectHistoryHandler := projecthistoryhandler.NewHandler(projecthistoryservice.NewService(db, projecthistoryrespository.NewRepository(db)))
 		r.Post("/", projectHandler.Add)
 		r.Post("/search", projectHandler.Search)
 		r.Get("/{id:"+uuidPattern+"}", projectHandler.Get)
@@ -203,7 +205,7 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 		r.Post("/{id:"+uuidPattern+"}/attachments/", projectAttachmentHandler.AddProjectAttachment)
 		r.Delete("/{id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", projectAttachmentHandler.DeleteProjectAttachment)
 
-		r.Get("/{id:"+uuidPattern+"}/history_operations", projectHistoryHandler.GetProjectHistoryOperations)
+		r.Get("/{id:"+uuidPattern+"}/history_operations", projectHistoryHandler.Search)
 	})
 
 	// TODO: 404 route ?

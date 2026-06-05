@@ -4,26 +4,33 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/projecthistoryrespository"
 )
 
 type ProjectHistoryService interface {
-	GetProjectHistoryOperations(ctx context.Context, projectId string) ([]domain.ProjectHistoryOperation, error)
+	Add(ctx context.Context, projectId string, operationType uint, operationDate int64, operationUserId string) error
+	Search(ctx context.Context, projectId string) ([]domain.ProjectHistoryOperation, error)
 }
 
 type projectHistoryService struct {
+	database   database.Database
 	repository projecthistoryrespository.ProjectHistoryRepository
 }
 
-func NewService(repository projecthistoryrespository.ProjectHistoryRepository) ProjectHistoryService {
-	return &projectHistoryService{repository: repository}
+func NewService(database database.Database, repository projecthistoryrespository.ProjectHistoryRepository) ProjectHistoryService {
+	return &projectHistoryService{database: database, repository: repository}
 }
 
-func (service *projectHistoryService) GetProjectHistoryOperations(ctx context.Context, projectId string) ([]domain.ProjectHistoryOperation, error) {
-	operations, err := service.repository.GetProjectHistoryOperations(ctx, projectId)
+func (service *projectHistoryService) Add(ctx context.Context, projectId string, operationType uint, operationDate int64, operationUserId string) error {
+	return service.repository.Add(ctx, projectId, operationType, operationDate, operationUserId)
+}
+
+func (service *projectHistoryService) Search(ctx context.Context, projectId string) ([]domain.ProjectHistoryOperation, error) {
+	operations, err := service.repository.Search(ctx, projectId)
 	if err != nil {
 		return nil, fmt.Errorf("[ProjectHistoryService] failed to get project history operations: %w", err)
 	}
-	return projecthistoryrespository.DTOArrayToDomainArray(operations), nil
+	return operations, nil
 }
