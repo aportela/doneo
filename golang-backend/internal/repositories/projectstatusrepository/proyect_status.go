@@ -121,7 +121,7 @@ func (repository *projectStatusRepository) Delete(ctx context.Context, id string
 }
 
 func (repository *projectStatusRepository) Get(ctx context.Context, id string) (domain.ProjectStatus, error) {
-	var dto ProjectStatusDTO
+	var dto projectStatusDTO
 	err := repository.database.QueryRowContext(
 		ctx,
 		`
@@ -190,9 +190,9 @@ func (repository *projectStatusRepository) Search(ctx context.Context, pager bro
 		return nil, browser.Result{}, err
 	}
 	defer rows.Close()
-	dtos := make([]ProjectStatusDTO, 0)
+	dtos := make([]projectStatusDTO, 0)
 	for rows.Next() {
-		var dto ProjectStatusDTO
+		var dto projectStatusDTO
 		if err := rows.Scan(
 			&dto.ID, &dto.Name, &dto.HexColor,
 		); err != nil {
