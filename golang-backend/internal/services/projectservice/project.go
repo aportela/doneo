@@ -47,6 +47,7 @@ func (service *projectService) Add(ctx context.Context, project domain.Project) 
 	if !ok {
 		return fmt.Errorf("user ID not found in context")
 	}
+	project.CreatedAt = time.Now()
 	err = service.repository.Add(ctx, project)
 	if err != nil {
 		return err
@@ -55,7 +56,7 @@ func (service *projectService) Add(ctx context.Context, project domain.Project) 
 	if err != nil {
 		return err
 	}
-	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, project.ID, domain.ProjectHistoryOperation{CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectCreated})
+	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, project.ID, domain.ProjectHistoryOperation{CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: project.CreatedAt, OperationType: domain.EventProjectCreated})
 	return tx.Commit()
 }
 
