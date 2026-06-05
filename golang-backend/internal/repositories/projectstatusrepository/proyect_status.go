@@ -15,11 +15,11 @@ import (
 )
 
 type ProjectStatusRepository interface {
-	Add(ctx context.Context, projectStatus ProjectStatusDTO) error
-	Update(ctx context.Context, projectStatus ProjectStatusDTO) error
+	Add(ctx context.Context, projectStatus domain.ProjectStatus) error
+	Update(ctx context.Context, projectStatus domain.ProjectStatus) error
 	Delete(ctx context.Context, id string) error
-	Get(ctx context.Context, id string) (ProjectStatusDTO, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter searchFilterDTO) ([]ProjectStatusDTO, browser.Result, error)
+	Get(ctx context.Context, id string) (domain.ProjectStatus, error)
+	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.Result, error)
 }
 
 type projectStatusRepository struct {
@@ -30,16 +30,17 @@ func NewRepository(database database.Database) ProjectStatusRepository {
 	return &projectStatusRepository{database: database}
 }
 
-func (repository *projectStatusRepository) Add(ctx context.Context, projectStatus ProjectStatusDTO) error {
+func (repository *projectStatusRepository) Add(ctx context.Context, projectStatus domain.ProjectStatus) error {
+	dto := DomainToDTO(projectStatus)
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
             INSERT INTO project_statuses (id, name, item_hex_color)
 			VALUES (?, ?, ?)
         `,
-		projectStatus.ID,
-		projectStatus.Name,
-		projectStatus.HexColor,
+		dto.ID,
+		dto.Name,
+		dto.HexColor,
 	)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -67,7 +68,8 @@ func (repository *projectStatusRepository) Add(ctx context.Context, projectStatu
 	return err
 }
 
-func (repository *projectStatusRepository) Update(ctx context.Context, projectStatus ProjectStatusDTO) error {
+func (repository *projectStatusRepository) Update(ctx context.Context, projectStatus domain.ProjectStatus) error {
+	dto := DomainToDTO(projectStatus)
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
@@ -76,9 +78,9 @@ func (repository *projectStatusRepository) Update(ctx context.Context, projectSt
 				item_hex_color = ?
 			WHERE id = ?
         `,
-		projectStatus.Name,
-		projectStatus.HexColor,
-		projectStatus.ID,
+		dto.Name,
+		dto.HexColor,
+		dto.ID,
 	)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -118,8 +120,8 @@ func (repository *projectStatusRepository) Delete(ctx context.Context, id string
 	return err
 }
 
-func (repository *projectStatusRepository) Get(ctx context.Context, id string) (ProjectStatusDTO, error) {
-	var projectStatus ProjectStatusDTO
+func (repository *projectStatusRepository) Get(ctx context.Context, id string) (domain.ProjectStatus, error) {
+	var dto ProjectStatusDTO
 	err := repository.database.QueryRowContext(
 		ctx,
 		`
@@ -128,17 +130,18 @@ func (repository *projectStatusRepository) Get(ctx context.Context, id string) (
             FROM project_statuses PS
             WHERE PS.id = ?
         `,
-		id).Scan(&projectStatus.ID, &projectStatus.Name, &projectStatus.HexColor)
+		id).Scan(&dto.ID, &dto.Name, &dto.HexColor)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return ProjectStatusDTO{}, domain.NotFoundError
+			return domain.ProjectStatus{}, domain.NotFoundError
 		}
-		return ProjectStatusDTO{}, err
+		return domain.ProjectStatus{}, err
 	}
-	return projectStatus, err
+	return DTOToDomain(dto), err
 }
 
-func (repository *projectStatusRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter searchFilterDTO) ([]ProjectStatusDTO, browser.Result, error) {
+func (repository *projectStatusRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.Result, error) {
+	filterDTO := DomainFilterToDTO(filter)
 	var filterArgs []any
 	var queryArgs []any
 	sqlQuery := `
@@ -165,9 +168,9 @@ func (repository *projectStatusRepository) Search(ctx context.Context, pager bro
 	sqlOrder := fmt.Sprintf(" ORDER BY %s %s ", field, sort)
 	sqlWhere := ""
 	var sqlWhereConditions []string
-	if filter.Name != nil && len(*filter.Name) > 0 {
+	if filterDTO.Name != nil && len(*filterDTO.Name) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "PS.name LIKE ?")
-		filterArgs = append(filterArgs, "%"+*filter.Name+"%")
+		filterArgs = append(filterArgs, "%"+*filterDTO.Name+"%")
 	}
 
 	if len(sqlWhereConditions) > 0 {
@@ -187,15 +190,15 @@ func (repository *projectStatusRepository) Search(ctx context.Context, pager bro
 		return nil, browser.Result{}, err
 	}
 	defer rows.Close()
-	projectStatuses := make([]ProjectStatusDTO, 0)
+	dtos := make([]ProjectStatusDTO, 0)
 	for rows.Next() {
-		var projectStatus ProjectStatusDTO
+		var dto ProjectStatusDTO
 		if err := rows.Scan(
-			&projectStatus.ID, &projectStatus.Name, &projectStatus.HexColor,
+			&dto.ID, &dto.Name, &dto.HexColor,
 		); err != nil {
 			return nil, browser.Result{}, err
 		}
-		projectStatuses = append(projectStatuses, projectStatus)
+		dtos = append(dtos, dto)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, browser.Result{}, err
@@ -220,8 +223,8 @@ func (repository *projectStatusRepository) Search(ctx context.Context, pager bro
 			return nil, browser.Result{}, err
 		}
 	} else {
-		totalResults = len(projectStatuses)
+		totalResults = len(dtos)
 	}
 
-	return projectStatuses, browser.NewResult(pager, totalResults), nil
+	return DTOArrayToDomainArray(dtos), browser.NewResult(pager, totalResults), nil
 }

@@ -6,10 +6,8 @@ import (
 	"net/http"
 
 	"github.com/aportela/doneo/internal/browser"
-	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
-	"github.com/aportela/doneo/internal/repositories/projectstatusrepository"
 	"github.com/aportela/doneo/internal/services/projectstatusservice"
 	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
@@ -19,10 +17,8 @@ type ProjectStatusHandler struct {
 	service projectstatusservice.ProjectStatusService
 }
 
-func NewHandler(db database.Database) *ProjectStatusHandler {
-	projectStatusRepository := projectstatusrepository.NewRepository(db)
-	projectStatusService := projectstatusservice.NewService(projectStatusRepository)
-	return &ProjectStatusHandler{service: projectStatusService}
+func NewHandler(service projectstatusservice.ProjectStatusService) *ProjectStatusHandler {
+	return &ProjectStatusHandler{service: service}
 }
 
 func (handler *ProjectStatusHandler) Add(w http.ResponseWriter, r *http.Request) {

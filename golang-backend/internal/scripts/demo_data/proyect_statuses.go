@@ -17,11 +17,10 @@ func createProjectStatuses(database database.Database) []string {
 		"Pending", "Started", "Stopped", "Finished", "Aborted",
 	}
 	var newProjectStatusIds []string
-	projectStatusRepository := projectstatusrepository.NewRepository(database)
-	projectStatusService := projectstatusservice.NewService(projectStatusRepository)
+	service := projectstatusservice.NewService(database, projectstatusrepository.NewRepository(database))
 	for _, projectStatusName := range projectStatusNames {
 		projectStatusID := func() string { u, _ := uuid.NewV7(); return u.String() }()
-		err := projectStatusService.Add(context.Background(), domain.ProjectStatus{
+		err := service.Add(context.Background(), domain.ProjectStatus{
 			ID:       projectStatusID,
 			Name:     projectStatusName,
 			HexColor: utils.RandomSoftHexColor(),
