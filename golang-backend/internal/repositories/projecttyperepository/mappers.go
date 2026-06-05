@@ -4,15 +4,15 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 )
 
-func toDTO(projectType domain.ProjectType) ProjectTypeDTO {
-	return ProjectTypeDTO{
+func toDTO(projectType domain.ProjectType) projectTypeDTO {
+	return projectTypeDTO{
 		ID:       projectType.ID,
 		Name:     projectType.Name,
 		HexColor: projectType.HexColor,
 	}
 }
 
-func toDomain(projectType ProjectTypeDTO) domain.ProjectType {
+func toDomain(projectType projectTypeDTO) domain.ProjectType {
 	return domain.ProjectType{
 		ID:       projectType.ID,
 		Name:     projectType.Name,
@@ -20,7 +20,7 @@ func toDomain(projectType ProjectTypeDTO) domain.ProjectType {
 	}
 }
 
-func toDomainArray(projectTypes []ProjectTypeDTO) []domain.ProjectType {
+func toDomainArray(projectTypes []projectTypeDTO) []domain.ProjectType {
 	results := make([]domain.ProjectType, 0, len(projectTypes))
 	for _, projectType := range projectTypes {
 		results = append(results, toDomain(projectType))
