@@ -55,6 +55,7 @@ func (repository *roleRepository) Add(ctx context.Context, role domain.Role) err
 			} else if strings.Contains(sqlErr.Error(), "roles.id") {
 				return &domain.AlreadyExistsError{Field: "id"}
 			}
+			return err
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
 			return &domain.ValidationError{Field: "id"}
 		case sqlite3.SQLITE_CONSTRAINT_CHECK:
@@ -63,9 +64,12 @@ func (repository *roleRepository) Add(ctx context.Context, role domain.Role) err
 			} else if strings.Contains(sqlErr.Error(), "length(id)") {
 				return &domain.ValidationError{Field: "id"}
 			}
+			return err
+		default:
+			return err
 		}
 	}
-	return err
+	return nil
 }
 
 func (repository *roleRepository) Update(ctx context.Context, role domain.Role) error {
@@ -93,13 +97,17 @@ func (repository *roleRepository) Update(ctx context.Context, role domain.Role) 
 			if strings.Contains(sqlErr.Error(), "roles.name") {
 				return &domain.AlreadyExistsError{Field: "name"}
 			}
+			return err
 		case sqlite3.SQLITE_CONSTRAINT_CHECK:
 			if strings.Contains(sqlErr.Error(), "length(name)") {
 				return &domain.ValidationError{Field: "name"}
 			}
+			return err
+		default:
+			return err
 		}
 	}
-	return err
+	return nil
 }
 
 func (repository *roleRepository) Delete(ctx context.Context, id string) error {

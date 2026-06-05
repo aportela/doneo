@@ -17,6 +17,7 @@ import (
 
 type ProjectRepository interface {
 	Add(ctx context.Context, project domain.Project) error
+	AddTaskCounter(ctx context.Context, projectId string) error
 	Update(ctx context.Context, project domain.Project) error
 	Get(ctx context.Context, id string) (domain.Project, error)
 	Delete(ctx context.Context, id string, deletedAt int64) error
@@ -67,6 +68,7 @@ func (repository *projectRepository) Add(ctx context.Context, project domain.Pro
 			} else if strings.Contains(sqlErr.Error(), "projects.id") {
 				return &domain.AlreadyExistsError{Field: "id"}
 			}
+			return err
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
 			return &domain.ValidationError{Field: "id"}
 		case sqlite3.SQLITE_CONSTRAINT_CHECK:
@@ -77,9 +79,16 @@ func (repository *projectRepository) Add(ctx context.Context, project domain.Pro
 			} else if strings.Contains(sqlErr.Error(), "length(summary)") {
 				return &domain.ValidationError{Field: "summary"}
 			}
+			return err
+		default:
+			return err
 		}
 	}
-	_, err = repository.database.ExecContext(
+	return nil
+}
+
+func (repository *projectRepository) AddTaskCounter(ctx context.Context, projectId string) error {
+	_, err := repository.database.ExecContext(
 		ctx,
 		`
 			INSERT INTO project_task_counter
@@ -87,11 +96,25 @@ func (repository *projectRepository) Add(ctx context.Context, project domain.Pro
 			VALUES
 				(?, 1)
 		`,
-		dto.ID,
+		projectId,
 	)
 	if err != nil {
 		fmt.Println(err.Error())
-		return err
+		var sqlErr *sqlite.Error
+		if !errors.As(err, &sqlErr) {
+			return err
+		}
+		switch sqlErr.Code() {
+		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
+			return &domain.ValidationError{Field: "project_id"}
+		case sqlite3.SQLITE_CONSTRAINT_CHECK:
+			if strings.Contains(sqlErr.Error(), "length(project_id)") {
+				return &domain.ValidationError{Field: "project_id"}
+			}
+			return err
+		default:
+			return err
+		}
 	}
 	return nil
 }
@@ -140,6 +163,7 @@ func (repository *projectRepository) Update(ctx context.Context, project domain.
 			} else if strings.Contains(sqlErr.Error(), "projects.id") {
 				return &domain.AlreadyExistsError{Field: "id"}
 			}
+			return err
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
 			return &domain.ValidationError{Field: "id"}
 		case sqlite3.SQLITE_CONSTRAINT_CHECK:
@@ -150,6 +174,9 @@ func (repository *projectRepository) Update(ctx context.Context, project domain.
 			} else if strings.Contains(sqlErr.Error(), "length(summary)") {
 				return &domain.ValidationError{Field: "summary"}
 			}
+			return err
+		default:
+			return err
 		}
 	}
 	return nil

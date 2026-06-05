@@ -56,6 +56,9 @@ func (repository *noteRepository) AddProjectNote(ctx context.Context, projectId 
 			} else if strings.Contains(sqlErr.Error(), "length(user_id)") {
 				return &domain.ValidationError{Field: "userId"}
 			}
+			return err
+		default:
+			return err
 		}
 	}
 	return nil

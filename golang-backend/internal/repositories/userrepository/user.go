@@ -70,6 +70,7 @@ func (repository *userRepository) Add(ctx context.Context, user domain.User, pas
 			} else if strings.Contains(sqlErr.Error(), "users.id") {
 				return &domain.AlreadyExistsError{Field: "id"}
 			}
+			return err
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
 			return &domain.ValidationError{Field: "id"}
 		case sqlite3.SQLITE_CONSTRAINT_CHECK:
@@ -80,9 +81,12 @@ func (repository *userRepository) Add(ctx context.Context, user domain.User, pas
 			} else if strings.Contains(sqlErr.Error(), "length(id)") {
 				return &domain.ValidationError{Field: "id"}
 			}
+			return err
+		default:
+			return err
 		}
 	}
-	return err
+	return nil
 }
 
 func (repository *userRepository) Update(ctx context.Context, user domain.User) error {
@@ -130,12 +134,16 @@ func (repository *userRepository) Update(ctx context.Context, user domain.User) 
 			} else if strings.Contains(sqlErr.Error(), "users.email") {
 				return &domain.AlreadyExistsError{Field: "email"}
 			}
+			return err
 		case sqlite3.SQLITE_CONSTRAINT_CHECK:
 			if strings.Contains(sqlErr.Error(), "length(name)") {
 				return &domain.ValidationError{Field: "name"}
 			} else if strings.Contains(sqlErr.Error(), "length(email)") {
 				return &domain.ValidationError{Field: "email"}
 			}
+			return err
+		default:
+			return err
 		}
 	}
 	return err

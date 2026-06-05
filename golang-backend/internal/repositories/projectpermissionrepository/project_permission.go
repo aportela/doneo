@@ -56,6 +56,9 @@ func (repository *projectPermissionRepository) Add(ctx context.Context, permissi
 			} else if strings.Contains(sqlErr.Error(), "length(role_id)") {
 				return &domain.ValidationError{Field: "roleId"}
 			}
+			return err
+		default:
+			return err
 		}
 	}
 	return nil

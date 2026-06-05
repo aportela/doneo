@@ -55,8 +55,8 @@ func (repository *projectHistoryRepository) Add(ctx context.Context, projectId s
 			} else if strings.Contains(sqlErr.Error(), "length(user_id)") {
 				return &domain.ValidationError{Field: "user_id"}
 			}
+			return err
 		default:
-			// TODO: return sqlErr ??? (check other repositories)
 			return err
 		}
 	}

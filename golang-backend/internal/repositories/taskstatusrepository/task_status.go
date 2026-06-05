@@ -55,6 +55,7 @@ func (repository *taskStatusRepository) Add(ctx context.Context, taskStatus doma
 			} else if strings.Contains(sqlErr.Error(), "task_statuses.id") {
 				return &domain.AlreadyExistsError{Field: "id"}
 			}
+			return err
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
 			return &domain.ValidationError{Field: "id"}
 		case sqlite3.SQLITE_CONSTRAINT_CHECK:
@@ -63,9 +64,12 @@ func (repository *taskStatusRepository) Add(ctx context.Context, taskStatus doma
 			} else if strings.Contains(sqlErr.Error(), "length(id)") {
 				return &domain.ValidationError{Field: "id"}
 			}
+			return err
+		default:
+			return err
 		}
 	}
-	return err
+	return nil
 }
 
 func (repository *taskStatusRepository) Update(ctx context.Context, taskStatus domain.TaskStatus) error {
@@ -95,6 +99,7 @@ func (repository *taskStatusRepository) Update(ctx context.Context, taskStatus d
 			} else if strings.Contains(sqlErr.Error(), "task_statuses.id") {
 				return &domain.AlreadyExistsError{Field: "id"}
 			}
+			return err
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
 			return &domain.ValidationError{Field: "id"}
 		case sqlite3.SQLITE_CONSTRAINT_CHECK:
@@ -103,9 +108,12 @@ func (repository *taskStatusRepository) Update(ctx context.Context, taskStatus d
 			} else if strings.Contains(sqlErr.Error(), "length(id)") {
 				return &domain.ValidationError{Field: "id"}
 			}
+			return err
+		default:
+			return err
 		}
 	}
-	return err
+	return nil
 }
 
 func (repository *taskStatusRepository) Delete(ctx context.Context, id string) error {

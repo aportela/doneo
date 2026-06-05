@@ -59,8 +59,10 @@ func (repository *attachmentRepository) AddAttachment(ctx context.Context, attac
 			if strings.Contains(sqlErr.Error(), "length(user_id)") {
 				return &domain.ValidationError{Field: "userId"}
 			}
+			return err
+		default:
+			return err
 		}
-		return err
 	}
 	return nil
 }
@@ -131,8 +133,10 @@ func (repository *attachmentRepository) AddProjectAttachment(ctx context.Context
 			} else if strings.Contains(sqlErr.Error(), "length(attachment_id)") {
 				return &domain.ValidationError{Field: "attachment_id"}
 			}
+			return err
+		default:
+			return err
 		}
-		return err
 	}
 	return nil
 }

@@ -55,6 +55,7 @@ func (repository *projectStatusRepository) Add(ctx context.Context, projectStatu
 			} else if strings.Contains(sqlErr.Error(), "project_statuses.id") {
 				return &domain.AlreadyExistsError{Field: "id"}
 			}
+			return err
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
 			return &domain.ValidationError{Field: "id"}
 		case sqlite3.SQLITE_CONSTRAINT_CHECK:
@@ -63,9 +64,12 @@ func (repository *projectStatusRepository) Add(ctx context.Context, projectStatu
 			} else if strings.Contains(sqlErr.Error(), "length(id)") {
 				return &domain.ValidationError{Field: "id"}
 			}
+			return err
+		default:
+			return err
 		}
 	}
-	return err
+	return nil
 }
 
 func (repository *projectStatusRepository) Update(ctx context.Context, projectStatus domain.ProjectStatus) error {
@@ -95,6 +99,7 @@ func (repository *projectStatusRepository) Update(ctx context.Context, projectSt
 			} else if strings.Contains(sqlErr.Error(), "project_statuses.id") {
 				return &domain.AlreadyExistsError{Field: "id"}
 			}
+			return err
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
 			return &domain.ValidationError{Field: "id"}
 		case sqlite3.SQLITE_CONSTRAINT_CHECK:
@@ -103,9 +108,12 @@ func (repository *projectStatusRepository) Update(ctx context.Context, projectSt
 			} else if strings.Contains(sqlErr.Error(), "length(id)") {
 				return &domain.ValidationError{Field: "id"}
 			}
+			return err
+		default:
+			return err
 		}
 	}
-	return err
+	return nil
 }
 
 func (repository *projectStatusRepository) Delete(ctx context.Context, id string) error {
