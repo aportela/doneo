@@ -51,6 +51,10 @@ func (service *projectService) Add(ctx context.Context, project domain.Project) 
 	if err != nil {
 		return err
 	}
+	err = service.repository.AddTaskCounter(ctx, project.ID)
+	if err != nil {
+		return err
+	}
 	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, project.ID, domain.ProjectHistoryOperation{CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectCreated})
 	return tx.Commit()
 }
