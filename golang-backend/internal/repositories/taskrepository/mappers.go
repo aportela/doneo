@@ -10,6 +10,7 @@ import (
 func toDTO(task domain.Task) taskDTO {
 	return taskDTO{
 		ID:                     task.ID,
+		Index:                  task.Index,
 		Slug:                   task.Slug,
 		Summary:                task.Summary,
 		Description:            utils.StrPtrToSQLNullStr(task.Description),
@@ -34,6 +35,7 @@ func toDTO(task domain.Task) taskDTO {
 func toDomain(task taskDTO) domain.Task {
 	return domain.Task{
 		ID:                     task.ID,
+		Index:                  task.Index,
 		Slug:                   task.Slug,
 		Summary:                task.Summary,
 		Description:            utils.SQLStrPtr(task.Description),

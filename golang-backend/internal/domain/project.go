@@ -49,4 +49,14 @@ const (
 	EventProjectAttachmentDeleted ProjectEventType = 8
 	EventProjectPermissionAdded   ProjectEventType = 9
 	EventProjectPermissionDeleted ProjectEventType = 10
+
+	EventTaskCreated           ProjectEventType = 20
+	EventTaskUpdated           ProjectEventType = 21
+	EventTaskDeleted           ProjectEventType = 22
+	EventTaskNoteAdded         ProjectEventType = 23
+	EventTaskNoteUpdated       ProjectEventType = 24
+	EventTaskNoteDeleted       ProjectEventType = 25
+	EventTaskAttachmentAdded   ProjectEventType = 26
+	EventTaskAttachmentUpdated ProjectEventType = 27
+	EventTaskAttachmentDeleted ProjectEventType = 28
 )

@@ -13,9 +13,11 @@ import (
 	"github.com/aportela/doneo/internal/repositories/noterepository"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
+	"github.com/aportela/doneo/internal/repositories/taskrepository"
 	"github.com/aportela/doneo/internal/services/noteservice"
 	"github.com/aportela/doneo/internal/services/projectpermissionservice"
 	"github.com/aportela/doneo/internal/services/projectservice"
+	"github.com/aportela/doneo/internal/services/taskservice"
 	"github.com/aportela/doneo/internal/utils"
 )
 
@@ -147,6 +149,38 @@ func getRandomProject(userIds []string, projectTypeIds []string, projectPriority
 	}
 }
 
+func getRandomTask(userIds []string, taskStatusIds []string, taskPriorityIds []string) domain.Task {
+	taskID := utils.UUID()
+	taskDescription := getRandomProjectDescription()
+	startOffset := rand.Int63n(48)
+	finishOffset := rand.Int63n(96)
+	dueOffset := rand.Int63n(144)
+	ctime := utils.GetRandomMSTimestamp(time.Now().AddDate(-5, 0, 0), time.Now())
+	utime := ctime + startOffset*int64(time.Hour/time.Millisecond)
+	stime := ctime + startOffset*int64(time.Hour/time.Millisecond)
+	ftime := stime + finishOffset*int64(time.Hour/time.Millisecond)
+	dtime := ftime + dueOffset*int64(time.Hour/time.Millisecond)
+	rand.Shuffle(len(userIds), func(i, j int) {
+		userIds[i], userIds[j] = userIds[j], userIds[i]
+	})
+	rand.Shuffle(len(taskStatusIds), func(i, j int) {
+		taskStatusIds[i], taskStatusIds[j] = taskStatusIds[j], taskStatusIds[i]
+	})
+	return domain.Task{
+		ID:          taskID,
+		Summary:     getRandomProjectSummary(),
+		Description: &taskDescription,
+		CreatedBy:   domain.UserBase{ID: userIds[rand.Intn(len(userIds))]},
+		CreatedAt:   time.UnixMilli(ctime),
+		UpdatedAt:   utils.Int64PtrToTimePtr(&utime),
+		StartedAt:   utils.Int64PtrToTimePtr(&stime),
+		FinishedAt:  utils.Int64PtrToTimePtr(&ftime),
+		DueAt:       utils.Int64PtrToTimePtr(&dtime),
+		Priority:    domain.TaskPriority{ID: taskPriorityIds[rand.Intn(len(taskPriorityIds))]},
+		Status:      domain.TaskStatus{ID: taskStatusIds[rand.Intn(len(taskStatusIds))]},
+	}
+}
+
 func randomText(n int) string {
 	const chars = "abcdefghijklmnopqrstuvwxyz "
 
@@ -158,11 +192,12 @@ func randomText(n int) string {
 
 	return string(b)
 }
-func createProjects(database database.Database, projectTypeIds []string, projectPriorityIds []string, projectStatusIds []string, userIds []string, roleIds []string, count int) []string {
+func createProjects(database database.Database, projectTypeIds []string, projectPriorityIds []string, projectStatusIds []string, userIds []string, roleIds []string, taskStatusIds []string, taskPriorityIds []string, count int) []string {
 	var newProjectIds []string
 	projectService := projectservice.NewService(database, projectrepository.NewRepository(database))
 	noteService := noteservice.NewService(database, noterepository.NewRepository(database))
 	projectPermissionService := projectpermissionservice.NewService(database, projectpermissionrepository.NewRepository(database))
+	taskService := taskservice.NewService(database, taskrepository.NewRepository(database))
 	for i := 1; i <= count; i++ {
 		newProject := getRandomProject(userIds, projectTypeIds, projectPriorityIds, projectStatusIds)
 		ctx := context.Background()
@@ -189,6 +224,10 @@ func createProjects(database database.Database, projectTypeIds []string, project
 				CreatedAt: time.Now().Add(time.Duration(j*5) * time.Minute),
 			}
 			noteService.AddProjectNote(ctx, newProject.ID, note)
+		}
+		for j := 0; j < 5; j++ {
+			newTask := getRandomTask(userIds, taskStatusIds, taskPriorityIds)
+			taskService.Add(ctx, newProject.ID, newTask)
 		}
 	}
 	return newProjectIds

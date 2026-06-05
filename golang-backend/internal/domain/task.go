@@ -4,6 +4,7 @@ import "time"
 
 type Task struct {
 	ID                     string
+	Index                  uint
 	Slug                   string
 	Summary                string
 	Description            *string

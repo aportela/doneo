@@ -71,7 +71,7 @@ func (repository *taskRepository) Add(ctx context.Context, projectId string, tas
             INSERT INTO tasks
 				(id, project_id, task_index, summary, description, creator_id, created_at, updated_at, deleted_at, started_at, finished_at, due_at, priority_id, status_id)
 			VALUES
-				(?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, ?)
+				(?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?)
         `,
 		dto.ID,
 		projectId,
@@ -128,8 +128,7 @@ func (repository *taskRepository) Update(ctx context.Context, task domain.Task) 
 				finished_at = ?,
 				due_at = ?,
 				priority_id = ?,
-				status_id = ?,
-				type_id = ?
+				status_id = ?
 			WHERE id = ?
         `,
 		dto.Summary,
