@@ -31,7 +31,7 @@ func NewRepository(database database.Database) ProjectStatusRepository {
 }
 
 func (repository *projectStatusRepository) Add(ctx context.Context, projectStatus domain.ProjectStatus) error {
-	dto := DomainToDTO(projectStatus)
+	dto := toDTO(projectStatus)
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
@@ -69,7 +69,7 @@ func (repository *projectStatusRepository) Add(ctx context.Context, projectStatu
 }
 
 func (repository *projectStatusRepository) Update(ctx context.Context, projectStatus domain.ProjectStatus) error {
-	dto := DomainToDTO(projectStatus)
+	dto := toDTO(projectStatus)
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
@@ -137,11 +137,11 @@ func (repository *projectStatusRepository) Get(ctx context.Context, id string) (
 		}
 		return domain.ProjectStatus{}, err
 	}
-	return DTOToDomain(dto), err
+	return toDomain(dto), err
 }
 
 func (repository *projectStatusRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.Result, error) {
-	filterDTO := DomainFilterToDTO(filter)
+	filterDTO := toFilterDTO(filter)
 	var filterArgs []any
 	var queryArgs []any
 	sqlQuery := `
@@ -226,5 +226,5 @@ func (repository *projectStatusRepository) Search(ctx context.Context, pager bro
 		totalResults = len(dtos)
 	}
 
-	return DTOArrayToDomainArray(dtos), browser.NewResult(pager, totalResults), nil
+	return toDomainArray(dtos), browser.NewResult(pager, totalResults), nil
 }
