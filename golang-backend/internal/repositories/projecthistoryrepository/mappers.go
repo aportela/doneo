@@ -1,4 +1,4 @@
-package projecthistoryrespository
+package projecthistoryrepository
 
 import (
 	"time"

@@ -27,7 +27,7 @@ import (
 	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/attachmentrepository"
 	"github.com/aportela/doneo/internal/repositories/noterepository"
-	"github.com/aportela/doneo/internal/repositories/projecthistoryrespository"
+	projecthistoryrepository "github.com/aportela/doneo/internal/repositories/projecthistoryrepository"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/projectpriorityrepository"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
@@ -189,7 +189,7 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		projectPermissionHandler := projectpermissionhandler.NewHandler(projectpermissionservice.NewService(database, projectpermissionrepository.NewRepository(database)))
 		projectNoteHandler := notehandler.NewHandler(noteservice.NewService(database, noterepository.NewRepository(database)))
 		projectAttachmentHandler := attachmenthandler.NewHandler(attachmentservice.NewService(database, attachmentrepository.NewRepository(database)), cfg.Storage.AttachmentsPath)
-		projectHistoryHandler := projecthistoryhandler.NewHandler(projecthistoryservice.NewService(database, projecthistoryrespository.NewRepository(database)))
+		projectHistoryHandler := projecthistoryhandler.NewHandler(projecthistoryservice.NewService(database, projecthistoryrepository.NewRepository(database)))
 		r.Post("/", projectHandler.Add)
 		r.Post("/search", projectHandler.Search)
 		r.Get("/{id:"+uuidPattern+"}", projectHandler.Get)

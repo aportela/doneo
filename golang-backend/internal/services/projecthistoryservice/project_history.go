@@ -6,7 +6,7 @@ import (
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"github.com/aportela/doneo/internal/repositories/projecthistoryrespository"
+	projecthistoryrepository "github.com/aportela/doneo/internal/repositories/projecthistoryrepository"
 )
 
 type ProjectHistoryService interface {
@@ -16,10 +16,10 @@ type ProjectHistoryService interface {
 
 type projectHistoryService struct {
 	database   database.Database
-	repository projecthistoryrespository.ProjectHistoryRepository
+	repository projecthistoryrepository.ProjectHistoryRepository
 }
 
-func NewService(database database.Database, repository projecthistoryrespository.ProjectHistoryRepository) ProjectHistoryService {
+func NewService(database database.Database, repository projecthistoryrepository.ProjectHistoryRepository) ProjectHistoryService {
 	return &projectHistoryService{database: database, repository: repository}
 }
 

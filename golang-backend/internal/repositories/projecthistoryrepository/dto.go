@@ -1,4 +1,4 @@
-package projecthistoryrespository
+package projecthistoryrepository
 
 type projectHistoryOperationDTO struct {
 	UserId        string `db:"user_id"`
