@@ -38,11 +38,18 @@
 
     const filters = reactive<ProjectHistoryOperationsTableFilters>({
         userId: null,
+        createdAt: {
+            from: null,
+            to: null,
+        },
     });
 
     const filteredItems = computed(() => {
         return items.value.filter((operation: ProjectHistoryOperation) => {
-            return (filters.userId === null || filters.userId == operation.createdBy.id);
+            return (
+                (filters.userId === null || filters.userId == operation.createdBy.id) &&
+                ((filters.createdAt.from === null && filters.createdAt.to === null) || (operation.createdAt.msTimestamp != null && filters.createdAt.from != null && filters.createdAt.from <= operation.createdAt.msTimestamp && filters.createdAt.to != null && filters.createdAt.to >= operation.createdAt.msTimestamp))
+            );
         });
     });
 

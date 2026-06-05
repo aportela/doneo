@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { computed } from 'vue';
+    import { ref, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NEmpty } from 'naive-ui';
@@ -15,6 +15,7 @@
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
+    import type { DateFilterSelectComponent } from '../../users/components/date-filter-select-component.ts';
 
     interface Props {
         disabled: boolean;
@@ -29,16 +30,23 @@
 
     const props = defineProps<Props>();
 
+    const createdAtFilterRef = ref<DateFilterSelectComponent | undefined>();
+
     const filters = defineModel<ProjectHistoryOperationsTableFilters>("filters", {
         default: () => ({
             userId: "",
+            createdAt: {
+                from: null,
+                to: null,
+            },
         })
     });
 
     const isFilteredByUser = computed<boolean>(() => filters.value.userId !== null);
+    const isFilteredByCreatedAt = computed<boolean>(() => filters.value.createdAt.from != null || filters.value.createdAt.to != null);
 
     const hasFilters = computed<boolean>(() =>
-        isFilteredByUser.value
+        isFilteredByUser.value || isFilteredByCreatedAt.value
     );
 
     const columns = computed<TableHeaderColumn[]>(() => [
@@ -47,7 +55,7 @@
             field: "createdAt",
             visible: true,
             sortable: false,
-            isFiltered: () => false,
+            isFiltered: () => isFilteredByCreatedAt.value,
         },
         {
             label: t("modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.header.columns.operationType"),
@@ -61,7 +69,7 @@
             field: "createdBy",
             visible: true,
             sortable: false,
-            isFiltered: () => false,
+            isFiltered: () => isFilteredByUser.value,
         },
     ]);
 
@@ -71,6 +79,7 @@
 
     const onClearFilters = () => {
         filters.value.userId = null;
+        createdAtFilterRef.value?.reset();
     };
 </script>
 
@@ -79,7 +88,8 @@
         <template #thead>
             <tr>
                 <th>
-                    <DateFilterSelect />
+                    <DateFilterSelect clearable v-model:range="filters.createdAt" ref="createdAtFilterRef"
+                        :disabled="props.disabled" />
                 </th>
                 <th></th>
                 <th>
