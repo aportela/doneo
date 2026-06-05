@@ -8,11 +8,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
 	"github.com/aportela/doneo/internal/middlewares"
-	"github.com/aportela/doneo/internal/repositories/attachmentrepository"
 	"github.com/aportela/doneo/internal/services/attachmentservice"
 	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
@@ -23,9 +21,7 @@ type AttachmentHandler struct {
 	basePath string
 }
 
-func NewHandler(database database.Database, basePath string) *AttachmentHandler {
-	repository := attachmentrepository.NewRepository(database)
-	service := attachmentservice.NewService(repository)
+func NewHandler(service attachmentservice.AttachmentService, basePath string) *AttachmentHandler {
 	return &AttachmentHandler{service: service, basePath: basePath}
 }
 

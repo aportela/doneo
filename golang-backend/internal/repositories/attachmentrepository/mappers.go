@@ -6,7 +6,7 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 )
 
-func DomainToDTO(attachment domain.Attachment) attachmentDTO {
+func toDTO(attachment domain.Attachment) attachmentDTO {
 	return attachmentDTO{
 		ID:           attachment.ID,
 		UserId:       attachment.CreatedBy.ID,
@@ -18,7 +18,7 @@ func DomainToDTO(attachment domain.Attachment) attachmentDTO {
 	}
 }
 
-func DTOToDomain(attachment attachmentDTO) domain.Attachment {
+func toDomain(attachment attachmentDTO) domain.Attachment {
 	return domain.Attachment{
 		ID: attachment.ID,
 		CreatedBy: domain.UserBase{
@@ -32,10 +32,10 @@ func DTOToDomain(attachment attachmentDTO) domain.Attachment {
 	}
 }
 
-func DTOArrayToDomainArray(attachments []attachmentDTO) []domain.Attachment {
+func toDomainArray(attachments []attachmentDTO) []domain.Attachment {
 	results := make([]domain.Attachment, 0, len(attachments))
 	for _, attachment := range attachments {
-		results = append(results, DTOToDomain(attachment))
+		results = append(results, toDomain(attachment))
 	}
 	return results
 }

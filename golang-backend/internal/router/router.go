@@ -25,6 +25,7 @@ import (
 	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 	"github.com/aportela/doneo/internal/middlewares"
+	"github.com/aportela/doneo/internal/repositories/attachmentrepository"
 	"github.com/aportela/doneo/internal/repositories/noterepository"
 	"github.com/aportela/doneo/internal/repositories/projecthistoryrespository"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
@@ -36,6 +37,7 @@ import (
 	"github.com/aportela/doneo/internal/repositories/taskpriorityrepository"
 	"github.com/aportela/doneo/internal/repositories/taskstatusrepository"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
+	"github.com/aportela/doneo/internal/services/attachmentservice"
 	"github.com/aportela/doneo/internal/services/authservice"
 	"github.com/aportela/doneo/internal/services/noteservice"
 	"github.com/aportela/doneo/internal/services/projecthistoryservice"
@@ -90,7 +92,7 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 	apiRouter.Route("/attachments", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTCookieAuthentication(cfg.Auth.SecretKey))
 		// TODO: remove project, check attachment permissions on get
-		handler := attachmenthandler.NewHandler(database, cfg.Storage.AttachmentsPath)
+		handler := attachmenthandler.NewHandler(attachmentservice.NewService(database, attachmentrepository.NewRepository(database)), cfg.Storage.AttachmentsPath)
 		r.Get("/project/{id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}", handler.DownloadProjectAttachment)
 
 	})
@@ -186,7 +188,7 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		projectHandler := projecthandler.NewHandler(projectservice.NewService(database, projectrepository.NewRepository(database)))
 		projectPermissionHandler := projectpermissionhandler.NewHandler(projectpermissionservice.NewService(database, projectpermissionrepository.NewRepository(database)))
 		projectNoteHandler := notehandler.NewHandler(noteservice.NewService(database, noterepository.NewRepository(database)))
-		projectAttachmentHandler := attachmenthandler.NewHandler(database, cfg.Storage.AttachmentsPath)
+		projectAttachmentHandler := attachmenthandler.NewHandler(attachmentservice.NewService(database, attachmentrepository.NewRepository(database)), cfg.Storage.AttachmentsPath)
 		projectHistoryHandler := projecthistoryhandler.NewHandler(projecthistoryservice.NewService(database, projecthistoryrespository.NewRepository(database)))
 		r.Post("/", projectHandler.Add)
 		r.Post("/search", projectHandler.Search)

@@ -16,10 +16,10 @@ import (
 )
 
 type AttachmentRepository interface {
-	GetAttachment(ctx context.Context, attachmentId string) (attachmentDTO, error)
-	AddProjectAttachment(ctx context.Context, projectId string, attachment attachmentDTO) error
+	GetAttachment(ctx context.Context, attachmentId string) (domain.Attachment, error)
+	AddProjectAttachment(ctx context.Context, projectId string, attachment domain.Attachment) error
 	DeleteProjectAttachment(ctx context.Context, projectId string, attachmentId string) error
-	GetProjectAttachments(ctx context.Context, projectId string) ([]attachmentDTO, error)
+	GetProjectAttachments(ctx context.Context, projectId string) ([]domain.Attachment, error)
 }
 
 type attachmentRepository struct {
@@ -30,8 +30,8 @@ func NewRepository(database database.Database) AttachmentRepository {
 	return &attachmentRepository{database: database}
 }
 
-func (repository *attachmentRepository) GetAttachment(ctx context.Context, id string) (attachmentDTO, error) {
-	var attachment attachmentDTO
+func (repository *attachmentRepository) GetAttachment(ctx context.Context, id string) (domain.Attachment, error) {
+	var dto attachmentDTO
 	err := repository.database.QueryRowContext(
 		ctx,
 		`
@@ -42,17 +42,18 @@ func (repository *attachmentRepository) GetAttachment(ctx context.Context, id st
 			INNER JOIN users U ON U.id = A.user_id
             WHERE A.id = ?
         `,
-		id).Scan(&attachment.ID, &attachment.UserId, &attachment.UserName, &attachment.CreatedAt, &attachment.OriginalName, &attachment.ContentType, &attachment.Size)
+		id).Scan(&dto.ID, &dto.UserId, &dto.UserName, &dto.CreatedAt, &dto.OriginalName, &dto.ContentType, &dto.Size)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return attachmentDTO{}, domain.NotFoundError
+			return domain.Attachment{}, domain.NotFoundError
 		}
-		return attachmentDTO{}, err
+		return domain.Attachment{}, err
 	}
-	return attachment, err
+	return toDomain(dto), err
 }
 
-func (repository *attachmentRepository) AddProjectAttachment(ctx context.Context, projectId string, attachment attachmentDTO) error {
+func (repository *attachmentRepository) AddProjectAttachment(ctx context.Context, projectId string, attachment domain.Attachment) error {
+	dto := toDTO(attachment)
 	tx, err := repository.database.Begin()
 	if err != nil {
 		return err
@@ -71,12 +72,12 @@ func (repository *attachmentRepository) AddProjectAttachment(ctx context.Context
             INSERT INTO attachments (id, original_name, content_type, size, user_id, created_at)
 			VALUES (?, ?, ?, ?, ?, ?)
         `,
-		attachment.ID,
-		attachment.OriginalName,
-		attachment.ContentType,
-		attachment.Size,
-		attachment.UserId,
-		attachment.CreatedAt,
+		dto.ID,
+		dto.OriginalName,
+		dto.ContentType,
+		dto.Size,
+		dto.UserId,
+		dto.CreatedAt,
 	)
 	if err != nil {
 		// TODO: remove ?
@@ -102,7 +103,7 @@ func (repository *attachmentRepository) AddProjectAttachment(ctx context.Context
 			VALUES (?, ?)
         `,
 		projectId,
-		attachment.ID,
+		dto.ID,
 	)
 	if err != nil {
 		// TODO: remove ?
@@ -133,8 +134,8 @@ func (repository *attachmentRepository) AddProjectAttachment(ctx context.Context
 		`,
 		projectId,
 		domain.EventProjectAttachmentAdded,
-		attachment.UserId,
-		attachment.CreatedAt,
+		dto.UserId,
+		dto.CreatedAt,
 	)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -208,7 +209,7 @@ func (repository *attachmentRepository) DeleteProjectAttachment(ctx context.Cont
 	return tx.Commit()
 }
 
-func (repository *attachmentRepository) GetProjectAttachments(ctx context.Context, projectId string) ([]attachmentDTO, error) {
+func (repository *attachmentRepository) GetProjectAttachments(ctx context.Context, projectId string) ([]domain.Attachment, error) {
 	rows, err := repository.database.QueryContext(
 		ctx,
 		`
@@ -227,16 +228,16 @@ func (repository *attachmentRepository) GetProjectAttachments(ctx context.Contex
 	defer rows.Close()
 	attachments := make([]attachmentDTO, 0)
 	for rows.Next() {
-		var attachment attachmentDTO
+		var dto attachmentDTO
 		if err := rows.Scan(
-			&attachment.ID, &attachment.UserId, &attachment.UserName, &attachment.CreatedAt, &attachment.OriginalName, &attachment.ContentType, &attachment.Size,
+			&dto.ID, &dto.UserId, &dto.UserName, &dto.CreatedAt, &dto.OriginalName, &dto.ContentType, &dto.Size,
 		); err != nil {
 			return nil, err
 		}
-		attachments = append(attachments, attachment)
+		attachments = append(attachments, dto)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-	return attachments, nil
+	return toDomainArray(attachments), nil
 }
