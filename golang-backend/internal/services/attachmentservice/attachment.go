@@ -60,7 +60,7 @@ func (service *attachmentService) AddProjectAttachment(ctx context.Context, proj
 	if err != nil {
 		return err
 	}
-	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectAttachmentAdded})
+	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: attachment.CreatedAt, OperationType: domain.EventProjectAttachmentAdded})
 	return tx.Commit()
 }
 
