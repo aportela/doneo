@@ -6,23 +6,19 @@ import (
 	"net/http"
 
 	"github.com/aportela/doneo/internal/browser"
-	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
-	"github.com/aportela/doneo/internal/repositories/rolerepository"
 	"github.com/aportela/doneo/internal/services/roleservice"
 	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
 )
 
 type RoleHandler struct {
-	role roleservice.RoleService
+	service roleservice.RoleService
 }
 
-func NewHandler(db database.Database) *RoleHandler {
-	roleRepository := rolerepository.NewRepository(db)
-	roleService := roleservice.NewService(roleRepository)
-	return &RoleHandler{role: roleService}
+func NewHandler(service roleservice.RoleService) *RoleHandler {
+	return &RoleHandler{service: service}
 }
 
 func (handler *RoleHandler) Add(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +30,7 @@ func (handler *RoleHandler) Add(w http.ResponseWriter, r *http.Request) {
 	}
 	role := addRequestToDomain(request)
 	role.ID = utils.UUID()
-	err := handler.role.Add(r.Context(), role)
+	err := handler.service.Add(r.Context(), role)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[RoleHandler] failed to add role: %w", err))
 		return
@@ -51,7 +47,7 @@ func (handler *RoleHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	role := updateRequestToDomain(request)
 	role.ID = chi.URLParam(r, "id")
-	err := handler.role.Update(r.Context(), role)
+	err := handler.service.Update(r.Context(), role)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[RoleHandler] failed to update role: %w", err))
 		return
@@ -62,7 +58,7 @@ func (handler *RoleHandler) Update(w http.ResponseWriter, r *http.Request) {
 func (handler *RoleHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	roleId := chi.URLParam(r, "id")
-	err := handler.role.Delete(r.Context(), roleId)
+	err := handler.service.Delete(r.Context(), roleId)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[RoleHandler] failed to delete role: %w", err))
 		return
@@ -73,7 +69,7 @@ func (handler *RoleHandler) Delete(w http.ResponseWriter, r *http.Request) {
 func (handler *RoleHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	roleId := chi.URLParam(r, "id")
-	user, err := handler.role.Get(r.Context(), roleId)
+	user, err := handler.service.Get(r.Context(), roleId)
 	if err != nil {
 		if err == domain.NotFoundError {
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[RoleHandler] failed to get non existent role: %w", err))
@@ -89,7 +85,7 @@ func (handler *RoleHandler) Get(w http.ResponseWriter, r *http.Request) {
 func (handler *RoleHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	roles, _, err := handler.role.Search(r.Context(),
+	roles, _, err := handler.service.Search(r.Context(),
 		browser.Params{
 			CurrentPage: 1,
 			ResultsPage: 0,
@@ -120,7 +116,7 @@ func (handler *RoleHandler) Search(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	roles, pagerResult, err := handler.role.Search(r.Context(),
+	roles, pagerResult, err := handler.service.Search(r.Context(),
 		browser.Params{
 			CurrentPage: request.Pager.CurrentPage,
 			ResultsPage: request.Pager.ResultsPage,

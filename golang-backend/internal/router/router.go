@@ -25,10 +25,12 @@ import (
 	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 	"github.com/aportela/doneo/internal/middlewares"
+	"github.com/aportela/doneo/internal/repositories/rolerepository"
 	"github.com/aportela/doneo/internal/repositories/taskpriorityrepository"
 	"github.com/aportela/doneo/internal/repositories/taskstatusrepository"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"github.com/aportela/doneo/internal/services/authservice"
+	"github.com/aportela/doneo/internal/services/roleservice"
 	"github.com/aportela/doneo/internal/services/taskpriorityservice"
 	"github.com/aportela/doneo/internal/services/taskstatusservice"
 	"github.com/aportela/doneo/internal/services/userservice"
@@ -81,10 +83,8 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 
 	apiRouter.Route("/entities", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
-		userRepository := userrepository.NewRepository(db)
-		userService := userservice.NewService(db, userRepository)
-		userHandler := userhandler.NewHandler(userService)
-		roleHandler := rolehandler.NewHandler(db)
+		userHandler := userhandler.NewHandler(userservice.NewService(db, userrepository.NewRepository(db)))
+		roleHandler := rolehandler.NewHandler(roleservice.NewService(db, rolerepository.NewRepository(db)))
 		r.Get("/users", userHandler.SearchBase)
 		r.Get("/roles", roleHandler.SearchBase)
 	})
@@ -104,7 +104,7 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 	apiRouter.Route("/roles", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		roleHandler := rolehandler.NewHandler(db)
+		roleHandler := rolehandler.NewHandler(roleservice.NewService(db, rolerepository.NewRepository(db)))
 		r.Post("/", roleHandler.Add)
 		r.Post("/search", roleHandler.Search)
 		r.Get("/{id:"+uuidPattern+"}", roleHandler.Get)

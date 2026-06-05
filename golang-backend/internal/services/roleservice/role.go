@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/aportela/doneo/internal/browser"
+	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/rolerepository"
 )
@@ -18,22 +19,23 @@ type RoleService interface {
 }
 
 type roleService struct {
+	database   database.Database
 	repository rolerepository.RoleRepository
 }
 
-func NewService(role rolerepository.RoleRepository) RoleService {
-	return &roleService{repository: role}
+func NewService(database database.Database, role rolerepository.RoleRepository) RoleService {
+	return &roleService{database: database, repository: role}
 }
 
 func (service *roleService) Add(ctx context.Context, role domain.Role) error {
-	if err := service.repository.Add(ctx, rolerepository.DomainToDTO(role)); err != nil {
+	if err := service.repository.Add(ctx, role); err != nil {
 		return fmt.Errorf("[RoleService] failed to add role with ID %s\n%w", role.ID, err)
 	}
 	return nil
 }
 
 func (service *roleService) Update(ctx context.Context, role domain.Role) error {
-	if err := service.repository.Update(ctx, rolerepository.DomainToDTO(role)); err != nil {
+	if err := service.repository.Update(ctx, role); err != nil {
 		return fmt.Errorf("[RoleService] failed to update role with ID %s: %w", role.ID, err)
 	}
 	return nil
@@ -51,13 +53,13 @@ func (service *roleService) Get(ctx context.Context, id string) (domain.Role, er
 	if err != nil {
 		return domain.Role{}, fmt.Errorf("[RoleService] failed to get role with ID %s: %w", id, err)
 	}
-	return rolerepository.DTOToDomain(role), nil
+	return role, nil
 }
 
 func (service *roleService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error) {
-	roles, pagerResult, err := service.repository.Search(ctx, pager, order, rolerepository.DomainFilterToDTO(filter))
+	roles, pagerResult, err := service.repository.Search(ctx, pager, order, filter)
 	if err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[RoleService] failed to search roles: %w", err)
 	}
-	return rolerepository.DTOArrayToDomainArray(roles), pagerResult, nil
+	return roles, pagerResult, nil
 }

@@ -4,7 +4,7 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 )
 
-func DomainToDTO(role domain.Role) roleDTO {
+func toDTO(role domain.Role) roleDTO {
 	return roleDTO{
 		ID:                 role.ID,
 		Name:               role.Name,
@@ -12,7 +12,7 @@ func DomainToDTO(role domain.Role) roleDTO {
 	}
 }
 
-func DTOToDomain(role roleDTO) domain.Role {
+func toDomain(role roleDTO) domain.Role {
 	return domain.Role{
 		RoleBase: domain.RoleBase{
 			ID:   role.ID,
@@ -22,15 +22,15 @@ func DTOToDomain(role roleDTO) domain.Role {
 	}
 }
 
-func DTOArrayToDomainArray(roles []roleDTO) []domain.Role {
+func toDomainArray(roles []roleDTO) []domain.Role {
 	results := make([]domain.Role, 0, len(roles))
 	for _, role := range roles {
-		results = append(results, DTOToDomain(role))
+		results = append(results, toDomain(role))
 	}
 	return results
 }
 
-func DomainFilterToDTO(filter domain.SearchRolesFilter) searchFilterDTO {
+func toFilterDTO(filter domain.SearchRolesFilter) searchFilterDTO {
 	return searchFilterDTO{
 		Name: filter.Name,
 	}
