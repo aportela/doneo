@@ -97,7 +97,7 @@ func (service *projectService) Delete(ctx context.Context, id string) error {
 	if !ok {
 		return fmt.Errorf("user ID not found in context")
 	}
-	err = service.repository.Delete(ctx, id)
+	err = service.repository.Delete(ctx, id, time.Now().UnixMilli())
 	if err != nil {
 		return err
 	}

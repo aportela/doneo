@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
@@ -20,7 +19,7 @@ type ProjectRepository interface {
 	Add(ctx context.Context, project domain.Project) error
 	Update(ctx context.Context, project domain.Project) error
 	Get(ctx context.Context, id string) (domain.Project, error)
-	Delete(ctx context.Context, id string) error
+	Delete(ctx context.Context, id string, deletedAt int64) error
 	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.Result, error)
 }
 
@@ -156,9 +155,7 @@ func (repository *projectRepository) Update(ctx context.Context, project domain.
 	return nil
 }
 
-func (repository *projectRepository) Delete(ctx context.Context, id string) error {
-	// TODO: pass date on params
-	deletedAt := time.Now().UnixMilli()
+func (repository *projectRepository) Delete(ctx context.Context, id string, deletedAt int64) error {
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
