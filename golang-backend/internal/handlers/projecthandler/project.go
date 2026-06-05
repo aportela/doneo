@@ -7,11 +7,9 @@ import (
 	"time"
 
 	"github.com/aportela/doneo/internal/browser"
-	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
 	"github.com/aportela/doneo/internal/middlewares"
-	"github.com/aportela/doneo/internal/repositories/projectrepository"
 	"github.com/aportela/doneo/internal/services/projectservice"
 	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
@@ -21,10 +19,8 @@ type ProjectHandler struct {
 	service projectservice.ProjectService
 }
 
-func NewHandler(db database.Database) *ProjectHandler {
-	projectRepository := projectrepository.NewRepository(db)
-	projectService := projectservice.NewService(projectRepository)
-	return &ProjectHandler{service: projectService}
+func NewHandler(service projectservice.ProjectService) *ProjectHandler {
+	return &ProjectHandler{service: service}
 }
 
 func (handler *ProjectHandler) Add(w http.ResponseWriter, r *http.Request) {

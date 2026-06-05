@@ -159,11 +159,9 @@ func randomText(n int) string {
 }
 func createProjects(database database.Database, projectTypeIds []string, projectPriorityIds []string, projectStatusIds []string, userIds []string, roleIds []string, count int) []string {
 	var newProjectIds []string
-	projectRepository := projectrepository.NewRepository(database)
-	projectService := projectservice.NewService(projectRepository)
+	projectService := projectservice.NewService(database, projectrepository.NewRepository(database))
 	noteRepository := noterepository.NewRepository(database)
 	noteService := noteservice.NewService(noteRepository)
-
 	projectPermissionRepository := projectpermissionrepository.NewRepository(database)
 	projectPermissionService := projectpermissionservice.NewService(projectPermissionRepository)
 	for i := 1; i <= count; i++ {

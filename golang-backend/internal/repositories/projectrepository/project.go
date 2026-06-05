@@ -18,11 +18,11 @@ import (
 )
 
 type ProjectRepository interface {
-	Add(ctx context.Context, project projectDTO) error
-	Update(ctx context.Context, project projectDTO) error
-	Get(ctx context.Context, id string) (projectDTO, error)
+	Add(ctx context.Context, project domain.Project) error
+	Update(ctx context.Context, project domain.Project) error
+	Get(ctx context.Context, id string) (domain.Project, error)
 	Delete(ctx context.Context, id string) error
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter searchFilterDTO) ([]projectDTO, browser.Result, error)
+	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.Result, error)
 }
 
 type projectRepository struct {
@@ -33,7 +33,8 @@ func NewRepository(database database.Database) ProjectRepository {
 	return &projectRepository{database: database}
 }
 
-func (repository *projectRepository) Add(ctx context.Context, project projectDTO) error {
+func (repository *projectRepository) Add(ctx context.Context, project domain.Project) error {
+	dto := toDTO(project)
 	tx, err := repository.database.Begin()
 	if err != nil {
 		return err
@@ -54,18 +55,18 @@ func (repository *projectRepository) Add(ctx context.Context, project projectDTO
 			VALUES
 				(?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, ?)
         `,
-		project.ID,
-		project.Key,
-		project.Summary,
-		project.Description,
-		project.CreatorId,
-		project.CreatedAt,
-		project.StartedAt,
-		project.FinishedAt,
-		project.DueAt,
-		project.PriorityId,
-		project.StatusId,
-		project.TypeId,
+		dto.ID,
+		dto.Key,
+		dto.Summary,
+		dto.Description,
+		dto.CreatorId,
+		dto.CreatedAt,
+		dto.StartedAt,
+		dto.FinishedAt,
+		dto.DueAt,
+		dto.PriorityId,
+		dto.StatusId,
+		dto.TypeId,
 	)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -100,7 +101,7 @@ func (repository *projectRepository) Add(ctx context.Context, project projectDTO
 			VALUES
 				(?, 1)
 		`,
-		project.ID,
+		dto.ID,
 	)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -114,10 +115,10 @@ func (repository *projectRepository) Add(ctx context.Context, project projectDTO
 			VALUES
 				(?, ?, ?, ?)
 		`,
-		project.ID,
+		dto.ID,
 		domain.EventProjectCreated,
-		project.CreatorId,
-		project.CreatedAt,
+		dto.CreatorId,
+		dto.CreatedAt,
 	)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -126,7 +127,8 @@ func (repository *projectRepository) Add(ctx context.Context, project projectDTO
 	return tx.Commit()
 }
 
-func (repository *projectRepository) Update(ctx context.Context, project projectDTO) error {
+func (repository *projectRepository) Update(ctx context.Context, project domain.Project) error {
+	dto := toDTO(project)
 	tx, err := repository.database.Begin()
 	if err != nil {
 		return err
@@ -155,18 +157,18 @@ func (repository *projectRepository) Update(ctx context.Context, project project
 				type_id = ?
 			WHERE id = ?
         `,
-		project.Key,
-		project.Summary,
-		project.Description,
+		dto.Key,
+		dto.Summary,
+		dto.Description,
 		// TODO: use received value
 		utils.CurrentMSTimestamp(),
-		project.StartedAt,
-		project.FinishedAt,
-		project.DueAt,
-		project.PriorityId,
-		project.StatusId,
-		project.TypeId,
-		project.ID,
+		dto.StartedAt,
+		dto.FinishedAt,
+		dto.DueAt,
+		dto.PriorityId,
+		dto.StatusId,
+		dto.TypeId,
+		dto.ID,
 	)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -202,10 +204,10 @@ func (repository *projectRepository) Update(ctx context.Context, project project
 			VALUES
 				(?, ?, ?, ?)
 		`,
-		project.ID,
+		dto.ID,
 		domain.EventProjectUpdated,
 		userId,
-		project.UpdatedAt,
+		dto.UpdatedAt,
 	)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -264,8 +266,8 @@ func (repository *projectRepository) Delete(ctx context.Context, id string) erro
 	return tx.Commit()
 }
 
-func (repository *projectRepository) Get(ctx context.Context, id string) (projectDTO, error) {
-	var project projectDTO
+func (repository *projectRepository) Get(ctx context.Context, id string) (domain.Project, error) {
+	var dto projectDTO
 	err := repository.database.QueryRowContext(
 		ctx,
 		`
@@ -325,43 +327,44 @@ func (repository *projectRepository) Get(ctx context.Context, id string) (projec
 			GROUP BY P.id
         `,
 		id).Scan(
-		&project.ID,
-		&project.Key,
-		&project.Summary,
-		&project.Description,
-		&project.CreatedAt,
-		&project.UpdatedAt,
-		&project.DeletedAt,
-		&project.StartedAt,
-		&project.FinishedAt,
-		&project.DueAt,
-		&project.StatusId,
-		&project.StatusName,
-		&project.StatusHexColor,
-		&project.PriorityId,
-		&project.PriorityName,
-		&project.PriorityHexColor,
-		&project.TypeId,
-		&project.TypeName,
-		&project.TypeHexColor,
-		&project.CreatorId,
-		&project.CreatorName,
-		&project.PermissionsCount,
-		&project.NotesCount,
-		&project.AttachmentsCount,
-		&project.HistoryOperationsCount,
-		&project.TasksCount,
+		&dto.ID,
+		&dto.Key,
+		&dto.Summary,
+		&dto.Description,
+		&dto.CreatedAt,
+		&dto.UpdatedAt,
+		&dto.DeletedAt,
+		&dto.StartedAt,
+		&dto.FinishedAt,
+		&dto.DueAt,
+		&dto.StatusId,
+		&dto.StatusName,
+		&dto.StatusHexColor,
+		&dto.PriorityId,
+		&dto.PriorityName,
+		&dto.PriorityHexColor,
+		&dto.TypeId,
+		&dto.TypeName,
+		&dto.TypeHexColor,
+		&dto.CreatorId,
+		&dto.CreatorName,
+		&dto.PermissionsCount,
+		&dto.NotesCount,
+		&dto.AttachmentsCount,
+		&dto.HistoryOperationsCount,
+		&dto.TasksCount,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return projectDTO{}, domain.NotFoundError
+			return domain.Project{}, domain.NotFoundError
 		}
-		return projectDTO{}, err
+		return domain.Project{}, err
 	}
-	return project, err
+	return toDomain(dto), err
 }
 
-func (repository *projectRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter searchFilterDTO) ([]projectDTO, browser.Result, error) {
+func (repository *projectRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.Result, error) {
+	filterDTO := toFilterDTO(filter)
 	var filterArgs []any
 	var queryArgs []any
 	sqlQuery := `
@@ -436,40 +439,40 @@ func (repository *projectRepository) Search(ctx context.Context, pager browser.P
 	sqlOrder := fmt.Sprintf(" ORDER BY %s %s ", field, sort)
 	sqlWhere := ""
 	var sqlWhereConditions []string
-	if filter.Key != nil && len(*filter.Key) > 0 {
+	if filterDTO.Key != nil && len(*filterDTO.Key) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "P.key LIKE ?")
-		filterArgs = append(filterArgs, "%"+*filter.Key+"%")
+		filterArgs = append(filterArgs, "%"+*filterDTO.Key+"%")
 	}
-	if filter.Summary != nil && len(*filter.Summary) > 0 {
+	if filterDTO.Summary != nil && len(*filterDTO.Summary) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "P.summary LIKE ?")
-		filterArgs = append(filterArgs, "%"+*filter.Summary+"%")
+		filterArgs = append(filterArgs, "%"+*filterDTO.Summary+"%")
 	}
-	if filter.TypeId != nil && len(*filter.TypeId) > 0 {
+	if filterDTO.TypeId != nil && len(*filterDTO.TypeId) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "P.type_id = ?")
-		filterArgs = append(filterArgs, *filter.TypeId)
+		filterArgs = append(filterArgs, *filterDTO.TypeId)
 	}
-	if filter.PriorityId != nil && len(*filter.PriorityId) > 0 {
+	if filterDTO.PriorityId != nil && len(*filterDTO.PriorityId) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "P.priority_id = ?")
-		filterArgs = append(filterArgs, *filter.PriorityId)
+		filterArgs = append(filterArgs, *filterDTO.PriorityId)
 	}
-	if filter.StatusId != nil && len(*filter.StatusId) > 0 {
+	if filterDTO.StatusId != nil && len(*filterDTO.StatusId) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "P.status_id = ?")
-		filterArgs = append(filterArgs, *filter.StatusId)
+		filterArgs = append(filterArgs, *filterDTO.StatusId)
 	}
-	if filter.CreatedAt != nil {
-		if filter.CreatedAt.From != nil && *filter.CreatedAt.From > 0 {
+	if filterDTO.CreatedAt != nil {
+		if filterDTO.CreatedAt.From != nil && *filterDTO.CreatedAt.From > 0 {
 			sqlWhereConditions = append(sqlWhereConditions, "P.created_at >= ?")
-			filterArgs = append(filterArgs, filter.CreatedAt.From)
+			filterArgs = append(filterArgs, filterDTO.CreatedAt.From)
 		}
-		if filter.CreatedAt.To != nil && *filter.CreatedAt.To > 0 {
+		if filterDTO.CreatedAt.To != nil && *filterDTO.CreatedAt.To > 0 {
 			sqlWhereConditions = append(sqlWhereConditions, "P.created_at <= ?")
-			filterArgs = append(filterArgs, filter.CreatedAt.To)
+			filterArgs = append(filterArgs, filterDTO.CreatedAt.To)
 		}
 	}
 	// TODO: updatedat, deletedat, startedat, finishedat, dueat
-	if filter.CreatedByUserId != nil && len(*filter.CreatedByUserId) > 0 {
+	if filterDTO.CreatedByUserId != nil && len(*filterDTO.CreatedByUserId) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "P.creator_id = ?")
-		filterArgs = append(filterArgs, *filter.CreatedByUserId)
+		filterArgs = append(filterArgs, *filterDTO.CreatedByUserId)
 	}
 	if len(sqlWhereConditions) > 0 {
 		sqlWhere = " WHERE " + strings.Join(sqlWhereConditions, " AND ")
@@ -488,35 +491,35 @@ func (repository *projectRepository) Search(ctx context.Context, pager browser.P
 		return nil, browser.Result{}, err
 	}
 	defer rows.Close()
-	projects := make([]projectDTO, 0)
+	dtos := make([]projectDTO, 0)
 	for rows.Next() {
-		var project projectDTO
+		var dto projectDTO
 		if err := rows.Scan(
-			&project.ID,
-			&project.Key,
-			&project.Summary,
-			&project.Description,
-			&project.CreatedAt,
-			&project.UpdatedAt,
-			&project.DeletedAt,
-			&project.StartedAt,
-			&project.FinishedAt,
-			&project.DueAt,
-			&project.StatusId,
-			&project.StatusName,
-			&project.StatusHexColor,
-			&project.PriorityId,
-			&project.PriorityName,
-			&project.PriorityHexColor,
-			&project.TypeId,
-			&project.TypeName,
-			&project.TypeHexColor,
-			&project.CreatorId,
-			&project.CreatorName,
+			&dto.ID,
+			&dto.Key,
+			&dto.Summary,
+			&dto.Description,
+			&dto.CreatedAt,
+			&dto.UpdatedAt,
+			&dto.DeletedAt,
+			&dto.StartedAt,
+			&dto.FinishedAt,
+			&dto.DueAt,
+			&dto.StatusId,
+			&dto.StatusName,
+			&dto.StatusHexColor,
+			&dto.PriorityId,
+			&dto.PriorityName,
+			&dto.PriorityHexColor,
+			&dto.TypeId,
+			&dto.TypeName,
+			&dto.TypeHexColor,
+			&dto.CreatorId,
+			&dto.CreatorName,
 		); err != nil {
 			return nil, browser.Result{}, err
 		}
-		projects = append(projects, project)
+		dtos = append(dtos, dto)
 	}
 	var totalResults int
 
@@ -537,8 +540,8 @@ func (repository *projectRepository) Search(ctx context.Context, pager browser.P
 			return nil, browser.Result{}, err
 		}
 	} else {
-		totalResults = len(projects)
+		totalResults = len(dtos)
 	}
 
-	return projects, browser.NewResult(pager, totalResults), nil
+	return toDomainArray(dtos), browser.NewResult(pager, totalResults), nil
 }

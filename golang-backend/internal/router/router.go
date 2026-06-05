@@ -26,6 +26,7 @@ import (
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/projectpriorityrepository"
+	"github.com/aportela/doneo/internal/repositories/projectrepository"
 	"github.com/aportela/doneo/internal/repositories/projectstatusrepository"
 	"github.com/aportela/doneo/internal/repositories/projecttyperepository"
 	"github.com/aportela/doneo/internal/repositories/rolerepository"
@@ -34,6 +35,7 @@ import (
 	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"github.com/aportela/doneo/internal/services/authservice"
 	"github.com/aportela/doneo/internal/services/projectpriorityservice"
+	"github.com/aportela/doneo/internal/services/projectservice"
 	"github.com/aportela/doneo/internal/services/projectstatusservice"
 	"github.com/aportela/doneo/internal/services/projecttypeservice"
 	"github.com/aportela/doneo/internal/services/roleservice"
@@ -175,7 +177,7 @@ func NewRouter(db database.Database, cfg config.Configuration) http.Handler {
 
 	apiRouter.Route("/projects", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
-		projectHandler := projecthandler.NewHandler(db)
+		projectHandler := projecthandler.NewHandler(projectservice.NewService(db, projectrepository.NewRepository(db)))
 		projectPermissionHandler := projectpermissionhandler.NewHandler(db)
 		projectNoteHandler := notehandler.NewHandler(db)
 		projectAttachmentHandler := attachmenthandler.NewHandler(db, cfg.Storage.AttachmentsPath)
