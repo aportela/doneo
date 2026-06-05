@@ -13,7 +13,7 @@ import (
 )
 
 type ProjectHistoryRepository interface {
-	Add(ctx context.Context, projectId string, operationType uint, operationDate int64, operationUserId string) error
+	Add(ctx context.Context, projectId string, operation domain.ProjectHistoryOperation) error
 	Search(ctx context.Context, projectId string) ([]domain.ProjectHistoryOperation, error)
 }
 
@@ -25,7 +25,8 @@ func NewRepository(database database.Database) ProjectHistoryRepository {
 	return &projectHistoryRepository{database: database}
 }
 
-func (repository *projectHistoryRepository) Add(ctx context.Context, projectId string, operationType uint, operationDate int64, operationUserId string) error {
+func (repository *projectHistoryRepository) Add(ctx context.Context, projectId string, operation domain.ProjectHistoryOperation) error {
+	dto := toDTO(operation)
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
@@ -35,9 +36,9 @@ func (repository *projectHistoryRepository) Add(ctx context.Context, projectId s
 				(?, ?, ?, ?)
 		`,
 		projectId,
-		operationType,
-		operationUserId,
-		operationDate,
+		dto.OperationType,
+		dto.UserId,
+		dto.CreatedAt,
 	)
 	if err != nil {
 		fmt.Println(err.Error())

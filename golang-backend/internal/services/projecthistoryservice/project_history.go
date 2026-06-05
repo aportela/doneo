@@ -10,7 +10,7 @@ import (
 )
 
 type ProjectHistoryService interface {
-	Add(ctx context.Context, projectId string, operationType uint, operationDate int64, operationUserId string) error
+	Add(ctx context.Context, projectId string, operation domain.ProjectHistoryOperation) error
 	Search(ctx context.Context, projectId string) ([]domain.ProjectHistoryOperation, error)
 }
 
@@ -23,8 +23,8 @@ func NewService(database database.Database, repository projecthistoryrepository.
 	return &projectHistoryService{database: database, repository: repository}
 }
 
-func (service *projectHistoryService) Add(ctx context.Context, projectId string, operationType uint, operationDate int64, operationUserId string) error {
-	return service.repository.Add(ctx, projectId, operationType, operationDate, operationUserId)
+func (service *projectHistoryService) Add(ctx context.Context, projectId string, operation domain.ProjectHistoryOperation) error {
+	return service.repository.Add(ctx, projectId, operation)
 }
 
 func (service *projectHistoryService) Search(ctx context.Context, projectId string) ([]domain.ProjectHistoryOperation, error) {
