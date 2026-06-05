@@ -151,7 +151,6 @@
         createdAtFilterRef.value?.reset();
         filters.value.contentType = null;
     };
-
 </script>
 
 <template>
