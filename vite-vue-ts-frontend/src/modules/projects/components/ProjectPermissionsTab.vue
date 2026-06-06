@@ -135,8 +135,9 @@
             Object.assign(state, defaultAjaxStateRunning);
             try {
                 await projectPermissionService.delete(props.projectId, projectPermission.id);
+                items.value = items.value.filter((item) => item.id != projectPermission.id)
+                itemCount.value = items.value?.length ?? 0;
                 notify('success', t("modules.projectPermission.components.projectPermissionsTab.notifications.projectPermissionDeleted", { user: projectPermission.user.name, role: projectPermission.role.name }));
-                onRefresh();
             } catch (error: unknown) {
                 state.ajaxErrors = true;
                 handleAPIError(error,
@@ -169,8 +170,9 @@
 
     const onAdded = (projectPermission: ProjectPermission) => {
         showForm.value = false;
+        items.value = [projectPermission, ...items.value]
+        itemCount.value = items.value?.length ?? 0;
         notify('success', t("modules.projectPermission.components.projectPermissionsTab.notifications.projectPermissionAdded", { user: projectPermission.user.name, role: projectPermission.role.name }));
-        onRefresh();
     };
 
     let stopBusReauthListener: () => void;
