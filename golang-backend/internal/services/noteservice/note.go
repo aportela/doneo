@@ -52,6 +52,9 @@ func (service *noteService) AddProjectNote(ctx context.Context, projectId string
 		return err
 	}
 	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: note.CreatedAt, OperationType: domain.EventProjectNoteAdded})
+	if err != nil {
+		return err
+	}
 	return tx.Commit()
 }
 
@@ -77,6 +80,9 @@ func (service *noteService) UpdateProjectNote(ctx context.Context, projectId str
 		return err
 	}
 	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectNoteUpdated})
+	if err != nil {
+		return err
+	}
 	return tx.Commit()
 }
 
@@ -102,6 +108,9 @@ func (service *noteService) DeleteProjectNote(ctx context.Context, projectId str
 		return err
 	}
 	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectNoteDeleted})
+	if err != nil {
+		return err
+	}
 	return tx.Commit()
 }
 

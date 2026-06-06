@@ -50,6 +50,9 @@ func (service *projectPermissionService) Add(ctx context.Context, permissionId s
 		return err
 	}
 	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectPermissionAdded})
+	if err != nil {
+		return err
+	}
 	return tx.Commit()
 }
 
@@ -75,6 +78,9 @@ func (service *projectPermissionService) Delete(ctx context.Context, projectId s
 		return err
 	}
 	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectPermissionDeleted})
+	if err != nil {
+		return err
+	}
 	return tx.Commit()
 }
 
