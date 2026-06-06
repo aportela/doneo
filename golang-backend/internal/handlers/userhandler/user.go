@@ -9,7 +9,6 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
 	"github.com/aportela/doneo/internal/services/userservice"
-	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -29,7 +28,6 @@ func (handler *UserHandler) Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := addRequestToDomain(request)
-	user.ID = utils.UUID()
 	user, err := handler.service.Add(r.Context(), user, request.Password)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] failed to add user: %w", err))

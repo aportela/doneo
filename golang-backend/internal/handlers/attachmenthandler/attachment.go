@@ -6,12 +6,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
 	"github.com/aportela/doneo/internal/services/attachmentservice"
-	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -39,16 +37,14 @@ func (handler *AttachmentHandler) AddProjectAttachment(w http.ResponseWriter, r 
 	defer file.Close()
 
 	attachment := domain.Attachment{
-		ID:           utils.UUID(),
 		OriginalName: header.Filename,
 		ContentType:  header.Header.Get("Content-Type"),
 		Size:         uint32(header.Size),
-		CreatedAt:    time.Now(),
-		CreatedBy:    domain.UserBase{},
 	}
 
 	ext := filepath.Ext(header.Filename)
 
+	// TODO: move to service ???
 	filename := attachment.ID + ext
 	dir := filepath.Join(
 		handler.basePath,
@@ -79,7 +75,7 @@ func (handler *AttachmentHandler) AddProjectAttachment(w http.ResponseWriter, r 
 
 	projectId := chi.URLParam(r, "id")
 
-	err = handler.service.AddProjectAttachment(r.Context(), projectId, attachment)
+	attachment, err = handler.service.AddProjectAttachment(r.Context(), projectId, attachment)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

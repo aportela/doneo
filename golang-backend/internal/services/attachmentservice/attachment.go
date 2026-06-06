@@ -15,7 +15,7 @@ import (
 
 type AttachmentService interface {
 	GetAttachment(ctx context.Context, id string) (domain.Attachment, error)
-	AddProjectAttachment(ctx context.Context, projectId string, attachment domain.Attachment) error
+	AddProjectAttachment(ctx context.Context, projectId string, attachment domain.Attachment) (domain.Attachment, error)
 	DeleteProjectAttachment(ctx context.Context, projectId string, attachmentId string) error
 	GetProjectAttachments(ctx context.Context, projectId string) ([]domain.Attachment, error)
 }
@@ -36,10 +36,10 @@ func (service *attachmentService) GetAttachment(ctx context.Context, id string) 
 	}
 	return attachment, nil
 }
-func (service *attachmentService) AddProjectAttachment(ctx context.Context, projectId string, attachment domain.Attachment) error {
+func (service *attachmentService) AddProjectAttachment(ctx context.Context, projectId string, attachment domain.Attachment) (domain.Attachment, error) {
 	tx, err := service.database.Begin()
 	if err != nil {
-		return err
+		return domain.Attachment{}, err
 	}
 	defer func() {
 		if p := recover(); p != nil {
@@ -51,22 +51,27 @@ func (service *attachmentService) AddProjectAttachment(ctx context.Context, proj
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("user ID not found in context")
+		return domain.Attachment{}, fmt.Errorf("user ID not found in context")
 	}
 	attachment.CreatedBy.ID = currentUserId
+	attachment.CreatedAt = time.Now()
 	err = attachmentrepository.NewRepository(service.database).AddAttachment(ctx, attachment)
 	if err != nil {
-		return err
+		return domain.Attachment{}, err
 	}
 	err = service.repository.AddProjectAttachment(ctx, projectId, attachment.ID)
 	if err != nil {
-		return err
+		return domain.Attachment{}, err
 	}
 	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: attachment.CreatedAt, OperationType: domain.EventProjectAttachmentAdded})
 	if err != nil {
-		return err
+		return domain.Attachment{}, err
 	}
-	return tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return domain.Attachment{}, err
+	}
+	return attachment, nil
 }
 
 func (service *attachmentService) DeleteProjectAttachment(ctx context.Context, projectId string, attachmentId string) error {

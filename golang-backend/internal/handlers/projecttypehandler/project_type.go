@@ -9,7 +9,6 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
 	"github.com/aportela/doneo/internal/services/projecttypeservice"
-	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -29,7 +28,6 @@ func (handler *ProjectTypeHandler) Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	projectType := addRequestToDomain(request)
-	projectType.ID = utils.UUID()
 	projectType, err := handler.service.Add(r.Context(), projectType)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeHandler] failed to add project type: %w", err))

@@ -7,7 +7,6 @@ import (
 
 	"github.com/aportela/doneo/internal/handlers"
 	"github.com/aportela/doneo/internal/services/noteservice"
-	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -27,12 +26,16 @@ func (handler *NoteHandler) AddProjectNote(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	note := addRequestToDomain(request)
-	note.ID = utils.UUID()
 	projectId := chi.URLParam(r, "id")
 
-	err := handler.service.AddProjectNote(r.Context(), projectId, note)
+	note, err := handler.service.AddProjectNote(r.Context(), projectId, note)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to add note: %w", err))
+		return
+	}
+	note, err = handler.service.GetProjectNote(r.Context(), note.ID)
+	if err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to get new note: %w", err))
 		return
 	}
 	handlers.ToHandlerJSONResponse(w, domainToResponse(note), nil, http.StatusCreated)
@@ -47,14 +50,16 @@ func (handler *NoteHandler) UpdateProjectNote(w http.ResponseWriter, r *http.Req
 	}
 	note := updateRequestToDomain(request)
 	note.ID = chi.URLParam(r, "note_id")
-
 	projectId := chi.URLParam(r, "id")
-	// TODO: move to service ????
-	note.UpdatedAt = utils.NowToTimePtr()
 
-	err := handler.service.UpdateProjectNote(r.Context(), projectId, note)
+	note, err := handler.service.UpdateProjectNote(r.Context(), projectId, note)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to add note: %w", err))
+		return
+	}
+	note, err = handler.service.GetProjectNote(r.Context(), note.ID)
+	if err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to get updated note: %w", err))
 		return
 	}
 	handlers.ToHandlerJSONResponse(w, domainToResponse(note), nil)

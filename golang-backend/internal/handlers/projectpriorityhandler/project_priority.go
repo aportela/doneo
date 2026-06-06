@@ -9,7 +9,6 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
 	"github.com/aportela/doneo/internal/services/projectpriorityservice"
-	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -29,7 +28,6 @@ func (handler *ProjectPriorityHandler) Add(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	projectPriority := addRequestToDomain(request)
-	projectPriority.ID = utils.UUID()
 	projectPriority, err := handler.service.Add(r.Context(), projectPriority)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityHandler] failed to add project priority: %w", err))

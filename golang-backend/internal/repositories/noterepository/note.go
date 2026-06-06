@@ -2,6 +2,7 @@ package noterepository
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"strings"
@@ -16,6 +17,7 @@ type NoteRepository interface {
 	AddProjectNote(ctx context.Context, projectId string, note domain.Note) error
 	UpdateProjectNote(ctx context.Context, projectId string, note domain.Note) error
 	DeleteProjectNote(ctx context.Context, projectId string, id string) error
+	GetProjectNote(ctx context.Context, noteId string) (domain.Note, error)
 	GetProjectNotes(ctx context.Context, projectId string) ([]domain.Note, error)
 }
 
@@ -106,6 +108,27 @@ func (repository *noteRepository) DeleteProjectNote(ctx context.Context, project
 		return err
 	}
 	return nil
+}
+
+func (repository *noteRepository) GetProjectNote(ctx context.Context, noteId string) (domain.Note, error) {
+	var dto noteDTO
+	err := repository.database.QueryRowContext(
+		ctx,
+		`
+            SELECT
+				PN.id, PN.user_id, U.name, PN.created_at, PN.updated_at, PN.body
+            FROM project_notes PN
+			INNER JOIN users U ON U.id = PN.user_id
+            WHERE PN.id = ?
+        `,
+		noteId).Scan(&dto.ID, &dto.UserId, &dto.UserName, &dto.CreatedAt, &dto.UpdatedAt, &dto.Body)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.Note{}, domain.NotFoundError
+		}
+		return domain.Note{}, err
+	}
+	return toDomain(dto), err
 }
 
 func (repository *noteRepository) GetProjectNotes(ctx context.Context, projectId string) ([]domain.Note, error) {

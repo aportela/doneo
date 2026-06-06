@@ -113,7 +113,6 @@ func getRandomProjectKey() string {
 }
 
 func getRandomProject(userIds []string, projectTypeIds []string, projectPriorityIds []string, projectStatusIds []string) domain.Project {
-	projectID := utils.UUID()
 	projectDescription := getRandomProjectDescription()
 	startOffset := rand.Int63n(48)
 	finishOffset := rand.Int63n(96)
@@ -133,7 +132,6 @@ func getRandomProject(userIds []string, projectTypeIds []string, projectPriority
 		projectStatusIds[i], projectStatusIds[j] = projectStatusIds[j], projectStatusIds[i]
 	})
 	return domain.Project{
-		ID:          projectID,
 		Key:         getRandomProjectKey(),
 		Summary:     getRandomProjectSummary(),
 		Description: &projectDescription,
@@ -150,7 +148,6 @@ func getRandomProject(userIds []string, projectTypeIds []string, projectPriority
 }
 
 func getRandomTask(userIds []string, taskStatusIds []string, taskPriorityIds []string) domain.Task {
-	taskID := utils.UUID()
 	taskDescription := getRandomProjectDescription()
 	startOffset := rand.Int63n(48)
 	finishOffset := rand.Int63n(96)
@@ -167,7 +164,6 @@ func getRandomTask(userIds []string, taskStatusIds []string, taskPriorityIds []s
 		taskStatusIds[i], taskStatusIds[j] = taskStatusIds[j], taskStatusIds[i]
 	})
 	return domain.Task{
-		ID:          taskID,
 		Summary:     getRandomProjectSummary(),
 		Description: &taskDescription,
 		CreatedBy:   domain.UserBase{ID: userIds[rand.Intn(len(userIds))]},
@@ -209,14 +205,13 @@ func createProjects(database database.Database, projectTypeIds []string, project
 		rand.Shuffle(len(userIds), func(i, j int) {
 			userIds[i], userIds[j] = userIds[j], userIds[i]
 		})
-		projectPermissionService.Add(ctx, utils.UUID(), newProject.ID, userIds[0], roleIds[0])
-		projectPermissionService.Add(ctx, utils.UUID(), newProject.ID, userIds[1], roleIds[1])
-		projectPermissionService.Add(ctx, utils.UUID(), newProject.ID, userIds[2], roleIds[1])
-		projectPermissionService.Add(ctx, utils.UUID(), newProject.ID, userIds[3], roleIds[1])
+		projectPermissionService.Add(ctx, newProject.ID, domain.ProjectPermission{User: domain.UserBase{ID: userIds[0]}, Role: domain.Role{RoleBase: domain.RoleBase{ID: roleIds[0]}}})
+		projectPermissionService.Add(ctx, newProject.ID, domain.ProjectPermission{User: domain.UserBase{ID: userIds[1]}, Role: domain.Role{RoleBase: domain.RoleBase{ID: roleIds[1]}}})
+		projectPermissionService.Add(ctx, newProject.ID, domain.ProjectPermission{User: domain.UserBase{ID: userIds[2]}, Role: domain.Role{RoleBase: domain.RoleBase{ID: roleIds[1]}}})
+		projectPermissionService.Add(ctx, newProject.ID, domain.ProjectPermission{User: domain.UserBase{ID: userIds[3]}, Role: domain.Role{RoleBase: domain.RoleBase{ID: roleIds[1]}}})
 		newProjectIds = append(newProjectIds, newProject.ID)
 		for j := 0; j < 5; j++ {
 			note := domain.Note{
-				ID: utils.UUID(),
 				User: domain.UserBase{
 					ID: userIds[j],
 				},

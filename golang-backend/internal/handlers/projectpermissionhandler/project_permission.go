@@ -7,7 +7,6 @@ import (
 
 	"github.com/aportela/doneo/internal/handlers"
 	"github.com/aportela/doneo/internal/services/projectpermissionservice"
-	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -27,15 +26,20 @@ func (handler *ProjectPermissionHandler) Add(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	projectPermission := addRequestToDomain(request)
-	projectPermission.ID = utils.UUID()
 	projectId := chi.URLParam(r, "id")
 
-	// TODO: fill User.Name && Role.Name for added notification on client
-	err := handler.service.Add(r.Context(), projectPermission.ID, projectId, projectPermission.User.ID, projectPermission.Role.ID)
+	projectPermission, err := handler.service.Add(r.Context(), projectId, projectPermission)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPermissionHandler] failed to add project permission: %w", err))
 		return
 	}
+
+	projectPermission, err = handler.service.Get(r.Context(), projectPermission.ID)
+	if err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPermissionHandler] failed to get new project permission: %w", err))
+		return
+	}
+
 	handlers.ToHandlerJSONResponse(w, domainToResponse(projectPermission), nil, http.StatusCreated)
 }
 

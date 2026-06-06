@@ -9,7 +9,6 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
 	"github.com/aportela/doneo/internal/services/taskservice"
-	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -32,12 +31,12 @@ func (handler *TaskHandler) Add(w http.ResponseWriter, r *http.Request) {
 	projectId := chi.URLParam(r, "id")
 	task, err := handler.service.Add(r.Context(), projectId, task)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to add project with ID %s: %w", request.ID, err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to add task with ID %s: %w", request.ID, err))
 		return
 	}
 	task, err = handler.service.Get(r.Context(), task.ID)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to get new project with ID %s: %w", task.ID, err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to get new task with ID %s: %w", task.ID, err))
 		return
 	}
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(task), nil, http.StatusCreated)
@@ -52,15 +51,14 @@ func (handler *TaskHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	task := updateRequestToDomain(request)
 	task.ID = chi.URLParam(r, "id")
-	task.UpdatedAt = utils.NowToTimePtr()
 	task, err := handler.service.Update(r.Context(), task)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to update project with ID %s: %w", task.ID, err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to update task with ID %s: %w", task.ID, err))
 		return
 	}
 	task, err = handler.service.Get(r.Context(), task.ID)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to get updated project with ID %s: %w", request.ID, err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to get updated task with ID %s: %w", request.ID, err))
 		return
 	}
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(task), nil)

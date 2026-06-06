@@ -4,6 +4,16 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 )
 
+func toDTO(projectPermission domain.ProjectPermission) projectPermissionDTO {
+	return projectPermissionDTO{
+		ID:       projectPermission.ID,
+		UserId:   projectPermission.User.ID,
+		UserName: projectPermission.User.Name,
+		RoleId:   projectPermission.Role.ID,
+		RoleName: projectPermission.Role.Name,
+	}
+}
+
 func toDomain(projectPermission projectPermissionDTO) domain.ProjectPermission {
 	return domain.ProjectPermission{
 		ID: projectPermission.ID,
@@ -16,15 +26,14 @@ func toDomain(projectPermission projectPermissionDTO) domain.ProjectPermission {
 				ID:   projectPermission.RoleId,
 				Name: projectPermission.RoleName,
 			},
-			PermissionsBitmask: domain.PermissionsBitmask(projectPermission.PermissionsBitmask),
 		},
 	}
 }
 
 func toDomainArray(projectPermissions []projectPermissionDTO) []domain.ProjectPermission {
 	results := make([]domain.ProjectPermission, 0, len(projectPermissions))
-	for _, projectType := range projectPermissions {
-		results = append(results, toDomain(projectType))
+	for _, projectPermission := range projectPermissions {
+		results = append(results, toDomain(projectPermission))
 	}
 	return results
 }

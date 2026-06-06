@@ -11,7 +11,6 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"github.com/aportela/doneo/internal/services/userservice"
-	"github.com/aportela/doneo/internal/utils"
 )
 
 func getRandomUserName() string {
@@ -47,7 +46,6 @@ func getRandomUser() domain.User {
 	//permissionsBitmask.AddPermission(domain.UserPermissionAdmin)
 	return domain.User{
 		UserBase: domain.UserBase{
-			ID:   utils.UUID(),
 			Name: name,
 		},
 		Email:              generateRandomEmail(name),

@@ -7,10 +7,11 @@ import (
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	projecthistoryrepository "github.com/aportela/doneo/internal/repositories/projecthistoryrepository"
+	"github.com/aportela/doneo/internal/utils"
 )
 
 type ProjectHistoryService interface {
-	Add(ctx context.Context, projectId string, operation domain.ProjectHistoryOperation) error
+	Add(ctx context.Context, projectId string, operation domain.ProjectHistoryOperation) (domain.ProjectHistoryOperation, error)
 	Search(ctx context.Context, projectId string) ([]domain.ProjectHistoryOperation, error)
 }
 
@@ -23,8 +24,13 @@ func NewService(database database.Database, repository projecthistoryrepository.
 	return &projectHistoryService{database: database, repository: repository}
 }
 
-func (service *projectHistoryService) Add(ctx context.Context, projectId string, operation domain.ProjectHistoryOperation) error {
-	return service.repository.Add(ctx, projectId, operation)
+func (service *projectHistoryService) Add(ctx context.Context, projectId string, operation domain.ProjectHistoryOperation) (domain.ProjectHistoryOperation, error) {
+	operation.ID = utils.UUID()
+	err := service.repository.Add(ctx, projectId, operation)
+	if err != nil {
+		return domain.ProjectHistoryOperation{}, err
+	}
+	return operation, nil
 }
 
 func (service *projectHistoryService) Search(ctx context.Context, projectId string) ([]domain.ProjectHistoryOperation, error) {

@@ -9,7 +9,6 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
 	"github.com/aportela/doneo/internal/services/roleservice"
-	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -29,7 +28,6 @@ func (handler *RoleHandler) Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	role := addRequestToDomain(request)
-	role.ID = utils.UUID()
 	role, err := handler.service.Add(r.Context(), role)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[RoleHandler] failed to add role: %w", err))

@@ -9,7 +9,6 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"github.com/aportela/doneo/internal/services/userservice"
-	"github.com/aportela/doneo/internal/utils"
 )
 
 func CreateDefaultAdminUser(database database.Database) {
@@ -18,7 +17,6 @@ func CreateDefaultAdminUser(database database.Database) {
 	service := userservice.NewService(database, userrepository.NewRepository(database))
 	_, err := service.Add(context.Background(), domain.User{
 		UserBase: domain.UserBase{
-			ID:   utils.UUID(),
 			Name: "administrator",
 		},
 		Email:              "admin@localhost.localnet",

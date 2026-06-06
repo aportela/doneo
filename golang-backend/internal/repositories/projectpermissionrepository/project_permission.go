@@ -2,6 +2,7 @@ package projectpermissionrepository
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"strings"
@@ -13,8 +14,9 @@ import (
 )
 
 type ProjectPermissionRepository interface {
-	Add(ctx context.Context, permissionId string, projectId string, userId string, roleId string) error
+	Add(ctx context.Context, projectId string, permission domain.ProjectPermission) error
 	Delete(ctx context.Context, projectId string, permissionId string) error
+	Get(ctx context.Context, permissionId string) (domain.ProjectPermission, error)
 	Search(ctx context.Context, projectId string) ([]domain.ProjectPermission, error)
 }
 
@@ -26,18 +28,18 @@ func NewRepository(database database.Database) ProjectPermissionRepository {
 	return &projectPermissionRepository{database: database}
 }
 
-// TODO: remove userId (add history operation on service)
-func (repository *projectPermissionRepository) Add(ctx context.Context, permissionId string, projectId string, userId string, roleId string) error {
+func (repository *projectPermissionRepository) Add(ctx context.Context, projectId string, permission domain.ProjectPermission) error {
+	dto := toDTO(permission)
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
             INSERT INTO project_user_role (id, project_id, user_id, role_id)
 			VALUES (?, ?, ?, ?)
         `,
-		permissionId,
+		dto.ID,
 		projectId,
-		userId,
-		roleId,
+		dto.UserId,
+		dto.RoleId,
 	)
 	if err != nil {
 		// TODO: remove ?
@@ -84,6 +86,29 @@ func (repository *projectPermissionRepository) Delete(ctx context.Context, proje
 	return nil
 }
 
+func (repository *projectPermissionRepository) Get(ctx context.Context, permissionId string) (domain.ProjectPermission, error) {
+	var dto projectPermissionDTO
+	err := repository.database.QueryRowContext(
+		ctx,
+		`
+            SELECT
+                PUR.id, PUR.user_id, U.name, PUR.role_id, R.name, R.permissions_bitmask
+            FROM project_user_role PUR
+			INNER JOIN users U ON U.id = PUR.user_id
+			INNER JOIN roles R ON R.id = PUR.role_id
+            WHERE PUR.project_id = ?
+			ORDER BY U.name
+        `,
+		permissionId).Scan(&dto.ID, &dto.UserId, &dto.UserName, &dto.RoleId, &dto.RoleName, &dto.RolePermissionsBitmask)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.ProjectPermission{}, domain.NotFoundError
+		}
+		return domain.ProjectPermission{}, err
+	}
+	return toDomain(dto), err
+}
+
 func (repository *projectPermissionRepository) Search(ctx context.Context, projectId string) ([]domain.ProjectPermission, error) {
 	rows, err := repository.database.QueryContext(
 		ctx,
@@ -105,7 +130,7 @@ func (repository *projectPermissionRepository) Search(ctx context.Context, proje
 	for rows.Next() {
 		var dto projectPermissionDTO
 		if err := rows.Scan(
-			&dto.ID, &dto.UserId, &dto.UserName, &dto.RoleId, &dto.RoleName, &dto.PermissionsBitmask,
+			&dto.ID, &dto.UserId, &dto.UserName, &dto.RoleId, &dto.RoleName, &dto.RolePermissionsBitmask,
 		); err != nil {
 			return nil, err
 		}

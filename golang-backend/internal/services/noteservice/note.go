@@ -14,9 +14,10 @@ import (
 )
 
 type NoteService interface {
-	AddProjectNote(ctx context.Context, projectId string, note domain.Note) error
-	UpdateProjectNote(ctx context.Context, projectId string, note domain.Note) error
+	AddProjectNote(ctx context.Context, projectId string, note domain.Note) (domain.Note, error)
+	UpdateProjectNote(ctx context.Context, projectId string, note domain.Note) (domain.Note, error)
 	DeleteProjectNote(ctx context.Context, projectId string, noteId string) error
+	GetProjectNote(ctx context.Context, noteId string) (domain.Note, error)
 	GetProjectNotes(ctx context.Context, projectId string) ([]domain.Note, error)
 }
 
@@ -29,10 +30,10 @@ func NewService(database database.Database, repository noterepository.NoteReposi
 	return &noteService{database: database, repository: repository}
 }
 
-func (service *noteService) AddProjectNote(ctx context.Context, projectId string, note domain.Note) error {
+func (service *noteService) AddProjectNote(ctx context.Context, projectId string, note domain.Note) (domain.Note, error) {
 	tx, err := service.database.Begin()
 	if err != nil {
-		return err
+		return domain.Note{}, err
 	}
 	defer func() {
 		if p := recover(); p != nil {
@@ -44,24 +45,30 @@ func (service *noteService) AddProjectNote(ctx context.Context, projectId string
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("user ID not found in context")
+		return domain.Note{}, fmt.Errorf("user ID not found in context")
 	}
+	note.ID = utils.UUID()
 	note.User.ID = currentUserId
+	note.CreatedAt = time.Now()
 	err = service.repository.AddProjectNote(ctx, projectId, note)
 	if err != nil {
-		return err
+		return domain.Note{}, err
 	}
 	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: note.CreatedAt, OperationType: domain.EventProjectNoteAdded})
 	if err != nil {
-		return err
+		return domain.Note{}, err
 	}
-	return tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return domain.Note{}, err
+	}
+	return note, nil
 }
 
-func (service *noteService) UpdateProjectNote(ctx context.Context, projectId string, note domain.Note) error {
+func (service *noteService) UpdateProjectNote(ctx context.Context, projectId string, note domain.Note) (domain.Note, error) {
 	tx, err := service.database.Begin()
 	if err != nil {
-		return err
+		return domain.Note{}, err
 	}
 	defer func() {
 		if p := recover(); p != nil {
@@ -73,17 +80,22 @@ func (service *noteService) UpdateProjectNote(ctx context.Context, projectId str
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("user ID not found in context")
+		return domain.Note{}, fmt.Errorf("user ID not found in context")
 	}
+	note.UpdatedAt = utils.CurrentTimePtr()
 	err = service.repository.UpdateProjectNote(ctx, projectId, note)
 	if err != nil {
-		return err
+		return domain.Note{}, err
 	}
 	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectNoteUpdated})
 	if err != nil {
-		return err
+		return domain.Note{}, err
 	}
-	return tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return domain.Note{}, err
+	}
+	return note, nil
 }
 
 func (service *noteService) DeleteProjectNote(ctx context.Context, projectId string, noteId string) error {
@@ -114,10 +126,18 @@ func (service *noteService) DeleteProjectNote(ctx context.Context, projectId str
 	return tx.Commit()
 }
 
+func (service *noteService) GetProjectNote(ctx context.Context, noteId string) (domain.Note, error) {
+	note, err := service.repository.GetProjectNote(ctx, noteId)
+	if err != nil {
+		return domain.Note{}, fmt.Errorf("[ProjectTypeService] failed to get project note: %w", err)
+	}
+	return note, nil
+}
+
 func (service *noteService) GetProjectNotes(ctx context.Context, projectId string) ([]domain.Note, error) {
 	notes, err := service.repository.GetProjectNotes(ctx, projectId)
 	if err != nil {
-		return nil, fmt.Errorf("[ProjectTypeService] failed to get project permissions: %w", err)
+		return nil, fmt.Errorf("[ProjectTypeService] failed to get project notes: %w", err)
 	}
 	return notes, nil
 }

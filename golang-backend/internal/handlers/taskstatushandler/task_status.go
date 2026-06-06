@@ -9,7 +9,6 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
 	"github.com/aportela/doneo/internal/services/taskstatusservice"
-	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -29,7 +28,6 @@ func (handler *TaskStatusHandler) Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	taskStatus := addRequestToDomain(request)
-	taskStatus.ID = utils.UUID()
 	taskStatus, err := handler.service.Add(r.Context(), taskStatus)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskStatusHandler] failed to add project status: %w", err))

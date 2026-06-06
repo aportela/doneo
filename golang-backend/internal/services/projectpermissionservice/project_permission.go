@@ -14,8 +14,9 @@ import (
 )
 
 type ProjectPermissionService interface {
-	Add(ctx context.Context, permissionId string, projectId string, userId string, roleId string) error
+	Add(ctx context.Context, projectId string, permission domain.ProjectPermission) (domain.ProjectPermission, error)
 	Delete(ctx context.Context, projectId string, permissionId string) error
+	Get(ctx context.Context, permissionId string) (domain.ProjectPermission, error)
 	Search(ctx context.Context, projectId string) ([]domain.ProjectPermission, error)
 }
 
@@ -28,10 +29,10 @@ func NewService(database database.Database, repository projectpermissionreposito
 	return &projectPermissionService{database: database, repository: repository}
 }
 
-func (service *projectPermissionService) Add(ctx context.Context, permissionId string, projectId string, userId string, roleId string) error {
+func (service *projectPermissionService) Add(ctx context.Context, projectId string, permission domain.ProjectPermission) (domain.ProjectPermission, error) {
 	tx, err := service.database.Begin()
 	if err != nil {
-		return err
+		return domain.ProjectPermission{}, err
 	}
 	defer func() {
 		if p := recover(); p != nil {
@@ -43,17 +44,22 @@ func (service *projectPermissionService) Add(ctx context.Context, permissionId s
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("user ID not found in context")
+		return domain.ProjectPermission{}, fmt.Errorf("user ID not found in context")
 	}
-	err = service.repository.Add(ctx, permissionId, projectId, userId, roleId)
+	permission.ID = utils.UUID()
+	err = service.repository.Add(ctx, projectId, permission)
 	if err != nil {
-		return err
+		return domain.ProjectPermission{}, err
 	}
 	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectPermissionAdded})
 	if err != nil {
-		return err
+		return domain.ProjectPermission{}, err
 	}
-	return tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return domain.ProjectPermission{}, err
+	}
+	return permission, nil
 }
 
 func (service *projectPermissionService) Delete(ctx context.Context, projectId string, permissionId string) error {
@@ -82,6 +88,14 @@ func (service *projectPermissionService) Delete(ctx context.Context, projectId s
 		return err
 	}
 	return tx.Commit()
+}
+
+func (service *projectPermissionService) Get(ctx context.Context, permissionId string) (domain.ProjectPermission, error) {
+	projectPermission, err := service.repository.Get(ctx, permissionId)
+	if err != nil {
+		return domain.ProjectPermission{}, fmt.Errorf("[ProjectTypeService] failed to get project permission: %w", err)
+	}
+	return projectPermission, nil
 }
 
 func (service *projectPermissionService) Search(ctx context.Context, projectId string) ([]domain.ProjectPermission, error) {
