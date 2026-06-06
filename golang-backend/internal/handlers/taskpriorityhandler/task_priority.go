@@ -30,7 +30,7 @@ func (handler *TaskPriorityHandler) Add(w http.ResponseWriter, r *http.Request) 
 	}
 	taskPriority := addRequestToDomain(request)
 	taskPriority.ID = utils.UUID()
-	err := handler.service.Add(r.Context(), taskPriority)
+	taskPriority, err := handler.service.Add(r.Context(), taskPriority)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskPriorityHandler] failed to add task priority: %w", err))
 		return
@@ -47,7 +47,7 @@ func (handler *TaskPriorityHandler) Update(w http.ResponseWriter, r *http.Reques
 	}
 	taskPriority := updateRequestToDomain(request)
 	taskPriority.ID = chi.URLParam(r, "id")
-	err := handler.service.Update(r.Context(), taskPriority)
+	taskPriority, err := handler.service.Update(r.Context(), taskPriority)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskPriorityHandler] failed to update task priority: %w", err))
 		return

@@ -8,11 +8,12 @@ import (
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/rolerepository"
+	"github.com/aportela/doneo/internal/utils"
 )
 
 type RoleService interface {
-	Add(ctx context.Context, role domain.Role) error
-	Update(ctx context.Context, role domain.Role) error
+	Add(ctx context.Context, role domain.Role) (domain.Role, error)
+	Update(ctx context.Context, role domain.Role) (domain.Role, error)
 	Delete(ctx context.Context, id string) error
 	Get(ctx context.Context, id string) (domain.Role, error)
 	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error)
@@ -27,18 +28,19 @@ func NewService(database database.Database, role rolerepository.RoleRepository) 
 	return &roleService{database: database, repository: role}
 }
 
-func (service *roleService) Add(ctx context.Context, role domain.Role) error {
+func (service *roleService) Add(ctx context.Context, role domain.Role) (domain.Role, error) {
+	role.ID = utils.UUID()
 	if err := service.repository.Add(ctx, role); err != nil {
-		return fmt.Errorf("[RoleService] failed to add role with ID %s\n%w", role.ID, err)
+		return domain.Role{}, fmt.Errorf("[RoleService] failed to add role with ID %s\n%w", role.ID, err)
 	}
-	return nil
+	return role, nil
 }
 
-func (service *roleService) Update(ctx context.Context, role domain.Role) error {
+func (service *roleService) Update(ctx context.Context, role domain.Role) (domain.Role, error) {
 	if err := service.repository.Update(ctx, role); err != nil {
-		return fmt.Errorf("[RoleService] failed to update role with ID %s: %w", role.ID, err)
+		return domain.Role{}, fmt.Errorf("[RoleService] failed to update role with ID %s: %w", role.ID, err)
 	}
-	return nil
+	return role, nil
 }
 
 func (service *roleService) Delete(ctx context.Context, id string) error {

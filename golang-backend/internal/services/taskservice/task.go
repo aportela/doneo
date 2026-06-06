@@ -63,7 +63,11 @@ func (service *taskService) Add(ctx context.Context, projectId string, task doma
 	if err != nil {
 		return domain.Task{}, err
 	}
-	return task, tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return domain.Task{}, err
+	}
+	return task, nil
 }
 
 func (service *taskService) Update(ctx context.Context, task domain.Task) (domain.Task, error) {
@@ -92,7 +96,11 @@ func (service *taskService) Update(ctx context.Context, task domain.Task) (domai
 	if err != nil {
 		return domain.Task{}, err
 	}
-	return task, tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return domain.Task{}, err
+	}
+	return task, nil
 }
 
 func (service *taskService) Delete(ctx context.Context, id string) error {
@@ -126,7 +134,7 @@ func (service *taskService) Delete(ctx context.Context, id string) error {
 func (service *taskService) Get(ctx context.Context, id string) (domain.Task, error) {
 	task, err := service.repository.Get(ctx, id)
 	if err != nil {
-		return task, fmt.Errorf("[TaskService] failed to get task with ID %s: %w", id, err)
+		return domain.Task{}, fmt.Errorf("[TaskService] failed to get task with ID %s: %w", id, err)
 	}
 	return task, nil
 }

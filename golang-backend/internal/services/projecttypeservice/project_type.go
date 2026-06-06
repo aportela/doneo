@@ -8,11 +8,12 @@ import (
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/projecttyperepository"
+	"github.com/aportela/doneo/internal/utils"
 )
 
 type ProjectTypeService interface {
-	Add(ctx context.Context, projectType domain.ProjectType) error
-	Update(ctx context.Context, projectType domain.ProjectType) error
+	Add(ctx context.Context, projectType domain.ProjectType) (domain.ProjectType, error)
+	Update(ctx context.Context, projectType domain.ProjectType) (domain.ProjectType, error)
 	Delete(ctx context.Context, id string) error
 	Get(ctx context.Context, id string) (domain.ProjectType, error)
 	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectTypesFilter) ([]domain.ProjectType, browser.Result, error)
@@ -27,12 +28,21 @@ func NewService(database database.Database, repository projecttyperepository.Pro
 	return &projectTypeService{database: database, repository: repository}
 }
 
-func (service *projectTypeService) Add(ctx context.Context, projectType domain.ProjectType) error {
-	return service.repository.Add(ctx, projectType)
+func (service *projectTypeService) Add(ctx context.Context, projectType domain.ProjectType) (domain.ProjectType, error) {
+	projectType.ID = utils.UUID()
+	err := service.repository.Add(ctx, projectType)
+	if err != nil {
+		return domain.ProjectType{}, err
+	}
+	return projectType, nil
 }
 
-func (service *projectTypeService) Update(ctx context.Context, projectType domain.ProjectType) error {
-	return service.repository.Update(ctx, projectType)
+func (service *projectTypeService) Update(ctx context.Context, projectType domain.ProjectType) (domain.ProjectType, error) {
+	err := service.repository.Update(ctx, projectType)
+	if err != nil {
+		return domain.ProjectType{}, err
+	}
+	return projectType, nil
 }
 
 func (service *projectTypeService) Delete(ctx context.Context, id string) error {
@@ -42,7 +52,7 @@ func (service *projectTypeService) Delete(ctx context.Context, id string) error 
 func (service *projectTypeService) Get(ctx context.Context, id string) (domain.ProjectType, error) {
 	projectType, err := service.repository.Get(ctx, id)
 	if err != nil {
-		return projectType, fmt.Errorf("[ProjectTypeService] failed to get project type with ID %s: %w", id, err)
+		return domain.ProjectType{}, fmt.Errorf("[ProjectTypeService] failed to get project type with ID %s: %w", id, err)
 	}
 	return projectType, nil
 }

@@ -21,16 +21,15 @@ func createProjectTypes(database database.Database) []string {
 	var newProjectTypeIds []string
 	service := projecttypeservice.NewService(database, projecttyperepository.NewRepository(database))
 	for _, projectTypeName := range projectTypeNames {
-		projectTypeID := utils.UUID()
-		err := service.Add(context.Background(), domain.ProjectType{
-			ID:       projectTypeID,
+		projectType := domain.ProjectType{
 			Name:     projectTypeName,
 			HexColor: utils.RandomSoftHexColor(),
-		})
+		}
+		projectType, err := service.Add(context.Background(), projectType)
 		if err != nil {
 			fmt.Printf("Error creating project type %s\n", err.Error())
 		} else {
-			newProjectTypeIds = append(newProjectTypeIds, projectTypeID)
+			newProjectTypeIds = append(newProjectTypeIds, projectType.ID)
 		}
 	}
 	return newProjectTypeIds

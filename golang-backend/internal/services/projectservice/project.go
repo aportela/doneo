@@ -63,7 +63,11 @@ func (service *projectService) Add(ctx context.Context, project domain.Project) 
 	if err != nil {
 		return domain.Project{}, err
 	}
-	return project, tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return domain.Project{}, err
+	}
+	return project, nil
 }
 
 func (service *projectService) Update(ctx context.Context, project domain.Project) (domain.Project, error) {
@@ -92,7 +96,11 @@ func (service *projectService) Update(ctx context.Context, project domain.Projec
 	if err != nil {
 		return domain.Project{}, err
 	}
-	return project, tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return domain.Project{}, err
+	}
+	return project, nil
 }
 
 func (service *projectService) Delete(ctx context.Context, id string) error {
@@ -126,7 +134,7 @@ func (service *projectService) Delete(ctx context.Context, id string) error {
 func (service *projectService) Get(ctx context.Context, id string) (domain.Project, error) {
 	project, err := service.repository.Get(ctx, id)
 	if err != nil {
-		return project, fmt.Errorf("[ProjectService] failed to get project with ID %s: %w", id, err)
+		return domain.Project{}, fmt.Errorf("[ProjectService] failed to get project with ID %s: %w", id, err)
 	}
 	return project, nil
 }

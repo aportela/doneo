@@ -9,7 +9,6 @@ import (
 	"github.com/aportela/doneo/internal/repositories/projectpriorityrepository"
 	"github.com/aportela/doneo/internal/services/projectpriorityservice"
 	"github.com/aportela/doneo/internal/utils"
-	"github.com/gofrs/uuid"
 )
 
 func createProjectPriorities(database database.Database) []string {
@@ -17,16 +16,15 @@ func createProjectPriorities(database database.Database) []string {
 	var newProjectPriorityIds []string
 	service := projectpriorityservice.NewService(database, projectpriorityrepository.NewRepository(database))
 	for _, projectPriorityName := range projectPriorityNames {
-		projectPriorityID := func() string { u, _ := uuid.NewV7(); return u.String() }()
-		err := service.Add(context.Background(), domain.ProjectPriority{
-			ID:       projectPriorityID,
+		projectPriority := domain.ProjectPriority{
 			Name:     projectPriorityName,
 			HexColor: utils.RandomSoftHexColor(),
-		})
+		}
+		projectPriority, err := service.Add(context.Background(), projectPriority)
 		if err != nil {
 			fmt.Printf("Error creating project priority %s\n", err.Error())
 		}
-		newProjectPriorityIds = append(newProjectPriorityIds, projectPriorityID)
+		newProjectPriorityIds = append(newProjectPriorityIds, projectPriority.ID)
 	}
 	return newProjectPriorityIds
 }

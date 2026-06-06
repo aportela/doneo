@@ -8,11 +8,12 @@ import (
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/taskpriorityrepository"
+	"github.com/aportela/doneo/internal/utils"
 )
 
 type TaskPriorityService interface {
-	Add(ctx context.Context, taskPriority domain.TaskPriority) error
-	Update(ctx context.Context, taskPriority domain.TaskPriority) error
+	Add(ctx context.Context, taskPriority domain.TaskPriority) (domain.TaskPriority, error)
+	Update(ctx context.Context, taskPriority domain.TaskPriority) (domain.TaskPriority, error)
 	Delete(ctx context.Context, id string) error
 	Get(ctx context.Context, id string) (domain.TaskPriority, error)
 	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskPrioritiesFilter) ([]domain.TaskPriority, browser.Result, error)
@@ -27,12 +28,21 @@ func NewService(database database.Database, repository taskpriorityrepository.Ta
 	return &taskPriorityService{database: database, repository: repository}
 }
 
-func (service *taskPriorityService) Add(ctx context.Context, taskPriority domain.TaskPriority) error {
-	return service.repository.Add(ctx, taskPriority)
+func (service *taskPriorityService) Add(ctx context.Context, taskPriority domain.TaskPriority) (domain.TaskPriority, error) {
+	taskPriority.ID = utils.UUID()
+	err := service.repository.Add(ctx, taskPriority)
+	if err != nil {
+		return domain.TaskPriority{}, err
+	}
+	return taskPriority, nil
 }
 
-func (service *taskPriorityService) Update(ctx context.Context, taskPriority domain.TaskPriority) error {
-	return service.repository.Update(ctx, taskPriority)
+func (service *taskPriorityService) Update(ctx context.Context, taskPriority domain.TaskPriority) (domain.TaskPriority, error) {
+	err := service.repository.Update(ctx, taskPriority)
+	if err != nil {
+		return domain.TaskPriority{}, err
+	}
+	return taskPriority, nil
 }
 
 func (service *taskPriorityService) Delete(ctx context.Context, id string) error {
@@ -42,7 +52,7 @@ func (service *taskPriorityService) Delete(ctx context.Context, id string) error
 func (service *taskPriorityService) Get(ctx context.Context, id string) (domain.TaskPriority, error) {
 	taskPriority, err := service.repository.Get(ctx, id)
 	if err != nil {
-		return taskPriority, fmt.Errorf("[TaskPriorityService] failed to get task priority with ID %s: %w", id, err)
+		return domain.TaskPriority{}, fmt.Errorf("[TaskPriorityService] failed to get task priority with ID %s: %w", id, err)
 	}
 	return taskPriority, nil
 }

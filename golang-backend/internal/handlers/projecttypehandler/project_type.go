@@ -30,7 +30,7 @@ func (handler *ProjectTypeHandler) Add(w http.ResponseWriter, r *http.Request) {
 	}
 	projectType := addRequestToDomain(request)
 	projectType.ID = utils.UUID()
-	err := handler.service.Add(r.Context(), projectType)
+	projectType, err := handler.service.Add(r.Context(), projectType)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeHandler] failed to add project type: %w", err))
 		return
@@ -47,7 +47,7 @@ func (handler *ProjectTypeHandler) Update(w http.ResponseWriter, r *http.Request
 	}
 	projectType := updateRequestToDomain(request)
 	projectType.ID = chi.URLParam(r, "id")
-	err := handler.service.Update(r.Context(), projectType)
+	projectType, err := handler.service.Update(r.Context(), projectType)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeHandler] failed to update project type: %w", err))
 		return

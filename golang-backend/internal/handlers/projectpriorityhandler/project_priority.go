@@ -30,7 +30,7 @@ func (handler *ProjectPriorityHandler) Add(w http.ResponseWriter, r *http.Reques
 	}
 	projectPriority := addRequestToDomain(request)
 	projectPriority.ID = utils.UUID()
-	err := handler.service.Add(r.Context(), projectPriority)
+	projectPriority, err := handler.service.Add(r.Context(), projectPriority)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityHandler] failed to add project priority: %w", err))
 		return
@@ -47,7 +47,7 @@ func (handler *ProjectPriorityHandler) Update(w http.ResponseWriter, r *http.Req
 	}
 	projectPriority := updateRequestToDomain(request)
 	projectPriority.ID = chi.URLParam(r, "id")
-	err := handler.service.Update(r.Context(), projectPriority)
+	projectPriority, err := handler.service.Update(r.Context(), projectPriority)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityHandler] failed to update project priority: %w", err))
 		return

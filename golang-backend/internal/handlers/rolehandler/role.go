@@ -30,7 +30,7 @@ func (handler *RoleHandler) Add(w http.ResponseWriter, r *http.Request) {
 	}
 	role := addRequestToDomain(request)
 	role.ID = utils.UUID()
-	err := handler.service.Add(r.Context(), role)
+	role, err := handler.service.Add(r.Context(), role)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[RoleHandler] failed to add role: %w", err))
 		return
@@ -47,7 +47,7 @@ func (handler *RoleHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	role := updateRequestToDomain(request)
 	role.ID = chi.URLParam(r, "id")
-	err := handler.service.Update(r.Context(), role)
+	role, err := handler.service.Update(r.Context(), role)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[RoleHandler] failed to update role: %w", err))
 		return

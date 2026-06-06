@@ -30,7 +30,7 @@ func (handler *TaskHandler) Add(w http.ResponseWriter, r *http.Request) {
 	}
 	task := addRequestToDomain(request)
 	projectId := chi.URLParam(r, "id")
-	err := handler.service.Add(r.Context(), projectId, task)
+	task, err := handler.service.Add(r.Context(), projectId, task)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to add project with ID %s: %w", request.ID, err))
 		return
@@ -50,20 +50,20 @@ func (handler *TaskHandler) Update(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] invalid request payload: %w", err))
 		return
 	}
-	project := updateRequestToDomain(request)
-	project.ID = chi.URLParam(r, "id")
-	project.UpdatedAt = utils.NowToTimePtr()
-	err := handler.service.Update(r.Context(), project)
+	task := updateRequestToDomain(request)
+	task.ID = chi.URLParam(r, "id")
+	task.UpdatedAt = utils.NowToTimePtr()
+	task, err := handler.service.Update(r.Context(), task)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to update project with ID %s: %w", project.ID, err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to update project with ID %s: %w", task.ID, err))
 		return
 	}
-	project, err = handler.service.Get(r.Context(), project.ID)
+	task, err = handler.service.Get(r.Context(), task.ID)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to get updated project with ID %s: %w", request.ID, err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, DomainToResponse(project), nil)
+	handlers.ToHandlerJSONResponse(w, DomainToResponse(task), nil)
 }
 
 func (handler *TaskHandler) Delete(w http.ResponseWriter, r *http.Request) {

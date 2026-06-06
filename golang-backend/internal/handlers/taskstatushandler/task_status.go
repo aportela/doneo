@@ -30,7 +30,7 @@ func (handler *TaskStatusHandler) Add(w http.ResponseWriter, r *http.Request) {
 	}
 	taskStatus := addRequestToDomain(request)
 	taskStatus.ID = utils.UUID()
-	err := handler.service.Add(r.Context(), taskStatus)
+	taskStatus, err := handler.service.Add(r.Context(), taskStatus)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskStatusHandler] failed to add project status: %w", err))
 		return
@@ -47,7 +47,7 @@ func (handler *TaskStatusHandler) Update(w http.ResponseWriter, r *http.Request)
 	}
 	taskStatus := updateRequestToDomain(request)
 	taskStatus.ID = chi.URLParam(r, "id")
-	err := handler.service.Update(r.Context(), taskStatus)
+	taskStatus, err := handler.service.Update(r.Context(), taskStatus)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskStatusHandler] failed to update project status: %w", err))
 		return
