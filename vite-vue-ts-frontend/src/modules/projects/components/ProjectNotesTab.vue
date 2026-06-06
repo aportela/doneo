@@ -150,7 +150,8 @@
             try {
                 await noteService.deleteProjectNote(props.projectId, id);
                 notify('success', t("modules.note.components.ProjectNotesTab.notifications.projectNoteDeleted"));
-                onRefresh();
+                items.value = items.value.filter((note) => note.id != id)
+                itemCount.value = items.value?.length ?? 0;
             } catch { }
         } else {
             console.error("project id not set", { file: "ProjectNotes.vue", method: "onDeleteNote" });
