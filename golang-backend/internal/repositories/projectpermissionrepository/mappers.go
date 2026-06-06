@@ -26,6 +26,7 @@ func toDomain(projectPermission projectPermissionDTO) domain.ProjectPermission {
 				ID:   projectPermission.RoleId,
 				Name: projectPermission.RoleName,
 			},
+			PermissionsBitmask: domain.PermissionsBitmask(projectPermission.RolePermissionsBitmask),
 		},
 	}
 }
