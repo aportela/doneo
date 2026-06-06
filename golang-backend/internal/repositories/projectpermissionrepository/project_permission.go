@@ -118,7 +118,7 @@ func (repository *projectPermissionRepository) Search(ctx context.Context, proje
 			INNER JOIN users U ON U.id = PUR.user_id
 			INNER JOIN roles R ON R.id = PUR.role_id
             WHERE PUR.project_id = ?
-			ORDER BY U.name
+			ORDER BY U.name COLLATE NOCASE
         `,
 		projectId)
 	if err != nil {
