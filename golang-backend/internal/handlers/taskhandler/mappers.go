@@ -72,9 +72,9 @@ func domainArrayToResponseArray(tasks []domain.Task) []taskResponse {
 	return taskResponses
 }
 
-func toSearchResponse(users []domain.Project, pager browser.Result) searchTasksResponse {
+func toSearchResponse(tasks []domain.Task, pager browser.Result) searchTasksResponse {
 	return searchTasksResponse{
-		Tasks: domainArrayToResponseArray(users),
+		Tasks: domainArrayToResponseArray(tasks),
 		Pager: handlers.PagerResponse{
 			Enabled:      pager.ResultsPage > 0,
 			CurrentPage:  pager.CurrentPage,

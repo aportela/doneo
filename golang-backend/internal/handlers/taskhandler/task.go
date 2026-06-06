@@ -100,18 +100,10 @@ func (handler *TaskHandler) Search(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] invalid request payload: %w", err))
 		return
 	}
-	filter := domain.SearchProjectFilter{
-		Key: nil,
-	}
+	filter := domain.SearchTaskFilter{}
 	if request.Filter != nil {
-		if request.Filter.Key != nil {
-			filter.Key = request.Filter.Key
-		}
 		if request.Filter.Summary != nil {
 			filter.Summary = request.Filter.Summary
-		}
-		if request.Filter.TypeId != nil {
-			filter.TypeId = request.Filter.TypeId
 		}
 		if request.Filter.PriorityId != nil {
 			filter.PriorityId = request.Filter.PriorityId
