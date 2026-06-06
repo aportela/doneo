@@ -24,13 +24,13 @@ type searchRequest struct {
 	Filter *filterRequest        `json:"filter"`
 }
 
-type taskStatusResponse struct {
+type TaskStatusResponse struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	HexColor string `json:"hexColor"`
 }
 
 type searchResponse struct {
-	TaskStatuses []taskStatusResponse   `json:"taskStatuses"`
+	TaskStatuses []TaskStatusResponse   `json:"taskStatuses"`
 	Pager        handlers.PagerResponse `json:"pager"`
 }

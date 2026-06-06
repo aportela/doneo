@@ -35,7 +35,7 @@ func (handler *TaskPriorityHandler) Add(w http.ResponseWriter, r *http.Request) 
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskPriorityHandler] failed to add task priority: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(taskPriority), nil, http.StatusCreated)
+	handlers.ToHandlerJSONResponse(w, DomainToResponse(taskPriority), nil, http.StatusCreated)
 }
 
 func (handler *TaskPriorityHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -52,7 +52,7 @@ func (handler *TaskPriorityHandler) Update(w http.ResponseWriter, r *http.Reques
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskPriorityHandler] failed to update task priority: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(taskPriority), nil)
+	handlers.ToHandlerJSONResponse(w, DomainToResponse(taskPriority), nil)
 }
 
 func (handler *TaskPriorityHandler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +79,7 @@ func (handler *TaskPriorityHandler) Get(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(taskPriority), nil)
+	handlers.ToHandlerJSONResponse(w, DomainToResponse(taskPriority), nil)
 }
 
 func (handler *TaskPriorityHandler) Search(w http.ResponseWriter, r *http.Request) {

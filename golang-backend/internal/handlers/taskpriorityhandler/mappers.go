@@ -20,18 +20,18 @@ func updateRequestToDomain(request updateRequest) domain.TaskPriority {
 	}
 }
 
-func domainToResponse(taskPriority domain.TaskPriority) taskPriorityResponse {
-	return taskPriorityResponse{
+func DomainToResponse(taskPriority domain.TaskPriority) TaskPriorityResponse {
+	return TaskPriorityResponse{
 		ID:       taskPriority.ID,
 		Name:     taskPriority.Name,
 		HexColor: taskPriority.HexColor,
 	}
 }
 
-func domainArrayToResponseArray(taskPriorities []domain.TaskPriority) []taskPriorityResponse {
-	taskPriorityResponses := []taskPriorityResponse{}
+func domainArrayToResponseArray(taskPriorities []domain.TaskPriority) []TaskPriorityResponse {
+	taskPriorityResponses := []TaskPriorityResponse{}
 	for _, taskPriority := range taskPriorities {
-		taskPriorityResponses = append(taskPriorityResponses, domainToResponse(taskPriority))
+		taskPriorityResponses = append(taskPriorityResponses, DomainToResponse(taskPriority))
 	}
 	return taskPriorityResponses
 }

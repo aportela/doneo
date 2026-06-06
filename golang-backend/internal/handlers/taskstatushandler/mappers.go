@@ -22,18 +22,18 @@ func updateRequestToDomain(request updateRequest) domain.TaskStatus {
 	}
 }
 
-func domainToResponse(taskStatus domain.TaskStatus) taskStatusResponse {
-	return taskStatusResponse{
+func DomainToResponse(taskStatus domain.TaskStatus) TaskStatusResponse {
+	return TaskStatusResponse{
 		ID:       taskStatus.ID,
 		Name:     taskStatus.Name,
 		HexColor: taskStatus.HexColor,
 	}
 }
 
-func domainArrayToResponseArray(taskStatuses []domain.TaskStatus) []taskStatusResponse {
-	projectStatusResponses := []taskStatusResponse{}
+func domainArrayToResponseArray(taskStatuses []domain.TaskStatus) []TaskStatusResponse {
+	projectStatusResponses := []TaskStatusResponse{}
 	for _, projectStatus := range taskStatuses {
-		projectStatusResponses = append(projectStatusResponses, domainToResponse(projectStatus))
+		projectStatusResponses = append(projectStatusResponses, DomainToResponse(projectStatus))
 	}
 	return projectStatusResponses
 }

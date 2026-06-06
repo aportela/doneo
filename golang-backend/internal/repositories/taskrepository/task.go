@@ -43,6 +43,7 @@ func (repository *taskRepository) GetNextTaskIndex(ctx context.Context, projectI
         `,
 		projectId,
 	).Scan(&taskIndex)
+	// TODO: no rows in result set ?
 	if err != nil {
 		// TODO: remove ?
 		fmt.Println(err.Error())

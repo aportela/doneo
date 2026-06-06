@@ -48,6 +48,8 @@ func (service *taskService) Add(ctx context.Context, projectId string, task doma
 	if !ok {
 		return fmt.Errorf("user ID not found in context")
 	}
+	task.ID = utils.UUID()
+	task.CreatedBy.ID = currentUserId
 	task.CreatedAt = time.Now()
 	task.Index, err = service.repository.GetNextTaskIndex(ctx, projectId)
 	if err != nil {
