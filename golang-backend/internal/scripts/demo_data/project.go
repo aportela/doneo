@@ -202,7 +202,7 @@ func createProjects(database database.Database, projectTypeIds []string, project
 		newProject := getRandomProject(userIds, projectTypeIds, projectPriorityIds, projectStatusIds)
 		ctx := context.Background()
 		ctx = middlewares.SetUserIDIntoContext(ctx, userIds[0])
-		err := projectService.Add(ctx, newProject)
+		newProject, err := projectService.Add(ctx, newProject)
 		if err != nil {
 			fmt.Printf("Error creating project %s\n", err.Error())
 		}

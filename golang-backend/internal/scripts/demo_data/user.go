@@ -63,7 +63,7 @@ func createUsers(database database.Database, count int) []string {
 	service := userservice.NewService(database, userrepository.NewRepository(database))
 	for i := 1; i <= count; i++ {
 		newUser := getRandomUser()
-		err := service.Add(context.Background(), newUser, "secret")
+		newUser, err := service.Add(context.Background(), newUser, "secret")
 		if err != nil {
 			fmt.Printf("Error creating user %s\n", err.Error())
 		} else {

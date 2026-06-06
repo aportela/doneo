@@ -14,8 +14,8 @@ import (
 )
 
 type UserService interface {
-	Add(ctx context.Context, user domain.User, password string) error
-	Update(ctx context.Context, user domain.User) error
+	Add(ctx context.Context, user domain.User, password string) (domain.User, error)
+	Update(ctx context.Context, user domain.User) (domain.User, error)
 	Patch(ctx context.Context, user domain.User) error
 	Delete(ctx context.Context, id string) error
 	UnDelete(ctx context.Context, id string) error
@@ -33,93 +33,62 @@ func NewService(database database.Database, repository userrepository.UserReposi
 	return &userService{database: database, repository: repository}
 }
 
-func (service *userService) Add(ctx context.Context, user domain.User, password string) error {
+func (service *userService) Add(ctx context.Context, user domain.User, password string) (domain.User, error) {
+	user.ID = utils.UUID()
 	user.CreatedAt = time.Now()
-	tx, err := service.database.Begin()
-	if err != nil {
-		return err
-	}
 	if err := service.repository.Add(ctx, user, password); err != nil {
-		tx.Rollback()
-		return fmt.Errorf("[UserService] failed to add user with ID %s: %w", user.ID, err)
+		return domain.User{}, fmt.Errorf("[UserService] failed to add user with ID %s: %w", user.ID, err)
 	}
-	return tx.Commit()
+	return user, nil
 }
 
-func (service *userService) Update(ctx context.Context, user domain.User) error {
+func (service *userService) Update(ctx context.Context, user domain.User) (domain.User, error) {
 	if user.Password != "" {
 		hashedPasswordBytes, hashErr := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 		if hashErr != nil {
-			return hashErr
+			return domain.User{}, hashErr
 		}
 		user.PasswordHash = string(hashedPasswordBytes)
 	}
 	user.UpdatedAt = utils.NowToTimePtr()
-	tx, err := service.database.Begin()
-	if err != nil {
-		return err
-	}
 	if err := service.repository.Update(ctx, user); err != nil {
-		tx.Rollback()
-		return fmt.Errorf("[UserService] failed to update user with ID %s: %w", user.ID, err)
+		return domain.User{}, fmt.Errorf("[UserService] failed to update user with ID %s: %w", user.ID, err)
 	}
-	return tx.Commit()
+	return user, nil
 }
 
 func (service *userService) Patch(ctx context.Context, user domain.User) error {
-	tx, err := service.database.Begin()
-	if err != nil {
-		return err
-	}
 	if user.DeletedAt == nil {
 		if err := service.repository.UnDelete(ctx, user.ID); err != nil {
-			tx.Rollback()
 			return fmt.Errorf("[UserService] failed to patch user with ID %s: %w", user.ID, err)
 		}
 	} else {
 		if err := service.repository.Delete(ctx, user.ID, time.Now().UnixMilli()); err != nil {
-			tx.Rollback()
 			return fmt.Errorf("[UserService] failed to patch user with ID %s: %w", user.ID, err)
 		}
 	}
-	return tx.Commit()
+	return nil
 }
 
 func (service *userService) Delete(ctx context.Context, id string) error {
-	tx, err := service.database.Begin()
-	if err != nil {
-		return err
-	}
-	// TODO: set user.DeletedAt & use this property ?
 	if err := service.repository.Delete(ctx, id, time.Now().UnixMilli()); err != nil {
-		tx.Rollback()
 		return fmt.Errorf("[UserService] failed to delete user with ID %s: %w", id, err)
 	}
-	return tx.Commit()
+	return nil
 }
 
 func (service *userService) UnDelete(ctx context.Context, id string) error {
-	tx, err := service.database.Begin()
-	if err != nil {
-		return err
-	}
 	if err := service.repository.UnDelete(ctx, id); err != nil {
-		tx.Rollback()
 		return fmt.Errorf("[UserService] failed to undelete user with ID %s: %w", id, err)
 	}
-	return tx.Commit()
+	return nil
 }
 
 func (service *userService) Purge(ctx context.Context, id string) error {
-	tx, err := service.database.Begin()
-	if err != nil {
-		return err
-	}
 	if err := service.repository.Purge(ctx, id); err != nil {
-		tx.Rollback()
 		return fmt.Errorf("[UserService] failed to purge user with ID %s: %w", id, err)
 	}
-	return tx.Commit()
+	return nil
 }
 
 func (service *userService) Get(ctx context.Context, id string) (domain.User, error) {

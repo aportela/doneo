@@ -29,7 +29,7 @@ func (handler *ProjectHandler) Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	project := addRequestToDomain(request)
-	err := handler.service.Add(r.Context(), project)
+	project, err := handler.service.Add(r.Context(), project)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to add project with ID %s: %w", request.ID, err))
 		return
@@ -52,7 +52,7 @@ func (handler *ProjectHandler) Update(w http.ResponseWriter, r *http.Request) {
 	project := updateRequestToDomain(request)
 	project.ID = chi.URLParam(r, "id")
 	project.UpdatedAt = utils.NowToTimePtr()
-	err := handler.service.Update(r.Context(), project)
+	project, err := handler.service.Update(r.Context(), project)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to update project with ID %s: %w", project.ID, err))
 		return

@@ -15,8 +15,8 @@ import (
 )
 
 type TaskService interface {
-	Add(ctx context.Context, projectId string, Project domain.Task) error
-	Update(ctx context.Context, Project domain.Task) error
+	Add(ctx context.Context, projectId string, task domain.Task) (domain.Task, error)
+	Update(ctx context.Context, task domain.Task) (domain.Task, error)
 	Delete(ctx context.Context, id string) error
 	Get(ctx context.Context, id string) (domain.Task, error)
 	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskFilter) ([]domain.Task, browser.Result, error)
@@ -31,10 +31,10 @@ func NewService(database database.Database, repository taskrepository.TaskReposi
 	return &taskService{database: database, repository: repository}
 }
 
-func (service *taskService) Add(ctx context.Context, projectId string, task domain.Task) error {
+func (service *taskService) Add(ctx context.Context, projectId string, task domain.Task) (domain.Task, error) {
 	tx, err := service.database.Begin()
 	if err != nil {
-		return err
+		return domain.Task{}, err
 	}
 	defer func() {
 		if p := recover(); p != nil {
@@ -46,27 +46,30 @@ func (service *taskService) Add(ctx context.Context, projectId string, task doma
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("user ID not found in context")
+		return domain.Task{}, fmt.Errorf("user ID not found in context")
 	}
 	task.ID = utils.UUID()
 	task.CreatedBy.ID = currentUserId
 	task.CreatedAt = time.Now()
 	task.Index, err = service.repository.GetNextTaskIndex(ctx, projectId)
 	if err != nil {
-		return err
+		return domain.Task{}, err
 	}
 	err = service.repository.Add(ctx, projectId, task)
 	if err != nil {
-		return err
+		return domain.Task{}, err
 	}
 	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, task.ID, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: task.CreatedAt, OperationType: domain.EventTaskCreated})
-	return tx.Commit()
+	if err != nil {
+		return domain.Task{}, err
+	}
+	return task, tx.Commit()
 }
 
-func (service *taskService) Update(ctx context.Context, task domain.Task) error {
+func (service *taskService) Update(ctx context.Context, task domain.Task) (domain.Task, error) {
 	tx, err := service.database.Begin()
 	if err != nil {
-		return err
+		return domain.Task{}, err
 	}
 	defer func() {
 		if p := recover(); p != nil {
@@ -78,15 +81,18 @@ func (service *taskService) Update(ctx context.Context, task domain.Task) error 
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("user ID not found in context")
+		return domain.Task{}, fmt.Errorf("user ID not found in context")
 	}
 	task.UpdatedAt = utils.CurrentTimePtr()
 	err = service.repository.Update(ctx, task)
 	if err != nil {
-		return err
+		return domain.Task{}, err
 	}
 	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, task.ID, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskUpdated})
-	return tx.Commit()
+	if err != nil {
+		return domain.Task{}, err
+	}
+	return task, tx.Commit()
 }
 
 func (service *taskService) Delete(ctx context.Context, id string) error {
@@ -111,6 +117,9 @@ func (service *taskService) Delete(ctx context.Context, id string) error {
 		return err
 	}
 	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, id, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskDeleted})
+	if err != nil {
+		return err
+	}
 	return tx.Commit()
 }
 

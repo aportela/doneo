@@ -30,7 +30,7 @@ func (handler *UserHandler) Add(w http.ResponseWriter, r *http.Request) {
 	}
 	user := addRequestToDomain(request)
 	user.ID = utils.UUID()
-	err := handler.service.Add(r.Context(), user, request.Password)
+	user, err := handler.service.Add(r.Context(), user, request.Password)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] failed to add user: %w", err))
 		return
@@ -47,7 +47,7 @@ func (handler *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	user := updateRequestToDomain(request)
 	user.ID = chi.URLParam(r, "id")
-	err := handler.service.Update(r.Context(), user)
+	user, err := handler.service.Update(r.Context(), user)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] failed to update user: %w", err))
 		return
