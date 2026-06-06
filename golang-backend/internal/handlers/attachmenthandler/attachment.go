@@ -10,7 +10,6 @@ import (
 
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
-	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/services/attachmentservice"
 	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
@@ -47,7 +46,6 @@ func (handler *AttachmentHandler) AddProjectAttachment(w http.ResponseWriter, r 
 		CreatedAt:    time.Now(),
 		CreatedBy:    domain.UserBase{},
 	}
-	attachment.CreatedBy.ID, _ = middlewares.GetUserIDFromContext(r.Context())
 
 	ext := filepath.Ext(header.Filename)
 

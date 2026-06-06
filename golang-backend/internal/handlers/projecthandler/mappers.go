@@ -17,6 +17,7 @@ func addRequestToDomain(request addRequest) domain.Project {
 		Key:         request.Key,
 		Summary:     request.Summary,
 		Description: request.Description,
+		CreatedBy:   domain.UserBase{},
 		Type: domain.ProjectType{
 			ID: request.Type.ID,
 		},

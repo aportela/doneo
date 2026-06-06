@@ -48,6 +48,8 @@ func (service *projectService) Add(ctx context.Context, project domain.Project) 
 	if !ok {
 		return fmt.Errorf("user ID not found in context")
 	}
+	project.ID = utils.UUID()
+	project.CreatedBy.ID = currentUserId
 	project.CreatedAt = time.Now()
 	err = service.repository.Add(ctx, project)
 	if err != nil {

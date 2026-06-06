@@ -53,6 +53,7 @@ func (service *attachmentService) AddProjectAttachment(ctx context.Context, proj
 	if !ok {
 		return fmt.Errorf("user ID not found in context")
 	}
+	attachment.CreatedBy.ID = currentUserId
 	err = attachmentrepository.NewRepository(service.database).AddAttachment(ctx, attachment)
 	if err != nil {
 		return err

@@ -4,10 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/aportela/doneo/internal/handlers"
-	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/services/noteservice"
 	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
@@ -31,10 +29,6 @@ func (handler *NoteHandler) AddProjectNote(w http.ResponseWriter, r *http.Reques
 	note := addRequestToDomain(request)
 	note.ID = utils.UUID()
 	projectId := chi.URLParam(r, "id")
-	note.User.ID, _ = middlewares.GetUserIDFromContext(r.Context())
-	// TODO
-	note.User.Name = ""
-	note.CreatedAt = time.Now()
 
 	err := handler.service.AddProjectNote(r.Context(), projectId, note)
 	if err != nil {

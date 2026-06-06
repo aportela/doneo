@@ -46,6 +46,7 @@ func (service *noteService) AddProjectNote(ctx context.Context, projectId string
 	if !ok {
 		return fmt.Errorf("user ID not found in context")
 	}
+	note.User.ID = currentUserId
 	err = service.repository.AddProjectNote(ctx, projectId, note)
 	if err != nil {
 		return err
