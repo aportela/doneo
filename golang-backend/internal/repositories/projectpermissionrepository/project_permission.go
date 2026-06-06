@@ -96,8 +96,7 @@ func (repository *projectPermissionRepository) Get(ctx context.Context, permissi
             FROM project_user_role PUR
 			INNER JOIN users U ON U.id = PUR.user_id
 			INNER JOIN roles R ON R.id = PUR.role_id
-            WHERE PUR.project_id = ?
-			ORDER BY U.name
+            WHERE PUR.id = ?
         `,
 		permissionId).Scan(&dto.ID, &dto.UserId, &dto.UserName, &dto.RoleId, &dto.RoleName, &dto.RolePermissionsBitmask)
 	if err != nil {
