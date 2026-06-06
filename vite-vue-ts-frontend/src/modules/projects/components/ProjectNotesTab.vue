@@ -118,9 +118,10 @@
                     const payload: AddRequest = {
                         body: note.body
                     };
-                    await noteService.addProjectNote(props.projectId, payload);
+                    note = new Note(await noteService.addProjectNote(props.projectId, payload));
+                    items.value = [note, ...items.value.filter((note) => !!note.id)]
+                    itemCount.value = items.value?.length ?? 0;
                     notify('success', t("modules.note.components.ProjectNotesTab.notifications.projectNoteAdded"));
-                    onRefresh();
                 } else if (note.id) {
                     const payload: UpdateRequest = {
                         id: note.id,
@@ -132,10 +133,11 @@
                         updatedAt: null,
                         body: note.body
                     };
-                    await noteService.updateProjectNote(props.projectId, note.id, payload);
+                    note = new Note(await noteService.updateProjectNote(props.projectId, note.id, payload));
+                    items.value = items.value.map((item) => item.id === note.id ? note : item)
+                    itemCount.value = items.value?.length ?? 0;
                     notify('success', t("modules.note.components.ProjectNotesTab.notifications.projectNoteUpdated"));
                     // TODO: this will remove pending notes, do not allow add more than 1 one without saving
-                    onRefresh();
                 }
             } catch { }
         } else {
