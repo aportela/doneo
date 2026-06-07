@@ -1172,6 +1172,39 @@ export default {
     },
     task: {
       components: {
+        NewTaskForm: {
+          headers: {
+            addTask: "Add task",
+          },
+          inputs: {
+            summary: {
+              label: "Summary",
+              placeholder: "Enter task summary",
+            },
+            description: {
+              label: "Description",
+              placeholder: "Enter task description",
+            },
+          },
+          selectors: {
+            taskPriority: {
+              label: "Task priority",
+              placeholder: "Select task priority",
+            },
+            taskStatus: {
+              label: "Task status",
+              placeholder: "Select task status",
+            },
+            switches: {
+              openTaskAfterCreate: {
+                label: "Open task after create",
+              },
+            },
+          },
+          errors: {
+            addError: "There was a problem while adding the task data",
+          },
+        },
         ProjectTasksTable: {
           header: {
             columns: {

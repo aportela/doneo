@@ -1,24 +1,29 @@
 <script setup lang="ts">
     import { ref, reactive, shallowRef, watch, onMounted, onBeforeUnmount, type CSSProperties } from "vue";
     import { useI18n } from "vue-i18n";
+    import { useRouter } from 'vue-router';
 
-    import { NCard } from "naive-ui";
+    import { NCard, NModal } from "naive-ui";
 
     import { useLoadingStore } from '../../../stores/loading';
+    import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
+    import type { FormMode } from "../../../shared/types/form-mode.ts";
+    import type { SearchRequest } from "../types/dto.ts";
     import type { SearchResponse } from "../../project-tasks/types/dto.ts";
     import type { ProjectTasksTableFilters } from "../../project-tasks/types/project-tasks-table-filters.ts";
+
+    import { Sort } from '../../../shared/types/models/sort';
+    import { ProjectTask } from "../../project-tasks/models/tasks.ts";
 
     import { projectTaskService } from "../../project-tasks/services/task.ts";
     import { handleAPIError } from '../../../api/client/errorHandler';
 
-    import { Sort } from '../../../shared/types/models/sort';
-    import { ProjectTask } from "../../project-tasks/models/tasks.ts";
-    import Pager from '../../../shared/components/tables/Pager.vue';
-    import type { SearchRequest } from "../types/dto.ts";
+    import NewTaskForm from "../../project-tasks/components/NewTaskForm.vue";
     import ProjectTasksTable from "../../project-tasks/components/ProjectTasksTable.vue";
+    import Pager from '../../../shared/components/tables/Pager.vue';
 
     interface ProjectTasksProps {
         style?: string | CSSProperties;
@@ -27,8 +32,9 @@
 
     const props = defineProps<ProjectTasksProps>();
 
+    const router = useRouter();
     const { t } = useI18n();
-
+    const { notify } = useNotify();
     const loadingStore = useLoadingStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
@@ -58,6 +64,9 @@
         createdByUserId: null,
     });
 
+    const showModal = ref<boolean>(false);
+    const modalFormMode = ref<FormMode>("add");
+
     watch(state, (newValue: AjaxStateInterface) => {
         loadingStore.set(newValue.ajaxRunning);
     });
@@ -82,6 +91,15 @@
         sort.field = newSort.field;
         sort.order = newSort.order;
         onRefresh();
+    };
+
+    const onShowAddForm = () => {
+        modalFormMode.value = "add";
+        showModal.value = true;
+    };
+
+    const onCancelForm = () => {
+        showModal.value = false;
     };
 
     watch(() => props.projectId, (newValue, oldValue) => {
@@ -132,6 +150,26 @@
         }
     };
 
+    const onAdded = (task: ProjectTask, openTaskAfterCreate: boolean) => {
+        showModal.value = false;
+        notify('success', t("modules.project.components.ProjectTasksTab.notifications.taskAdded", { summary: task.summary }));
+        if (openTaskAfterCreate) {
+            router.push(
+                {
+                    name: "taskTab",
+                    params: {
+                        id: task.id,
+                        tab: "metadata",
+                    }
+                },
+            ).catch((e) => {
+                console.error(e);
+            });
+        } else {
+            onRefresh();
+        }
+    };
+
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -149,6 +187,9 @@
 </script>
 
 <template>
+    <n-modal v-model:show="showModal">
+        <NewTaskForm class="modal-form" :project-id="props.projectId" @add="onAdded" @cancel="onCancelForm" />
+    </n-modal>
     <n-card bordered :style="props.style">
         <Pager v-model:current-page="currentPage" v-model:page-size="pageSize" :total-pages="totalPages"
             :total-results="totalResults" class="doneo-pager-container">
@@ -156,9 +197,13 @@
                 {{ t("modules.task.components.ProjectTasksTab.pager.totalItemsLabel", { total: totalResults }) }}
             </template>
         </Pager>
-        <ProjectTasksTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" :sort="sort" @sort="onSort"
-            v-model:filters="filters" />
+        <ProjectTasksTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
+            :sort="sort" @sort="onSort" v-model:filters="filters" />
     </n-card>
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+    .modal-form {
+        width: 40%;
+    }
+</style>
