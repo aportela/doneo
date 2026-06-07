@@ -100,11 +100,11 @@ func (handler *ProjectHandler) Search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	filter := domain.SearchProjectFilter{
-		Key: nil,
+		Slug: nil,
 	}
 	if request.Filter != nil {
-		if request.Filter.Key != nil {
-			filter.Key = request.Filter.Key
+		if request.Filter.Slug != nil {
+			filter.Slug = request.Filter.Slug
 		}
 		if request.Filter.Summary != nil {
 			filter.Summary = request.Filter.Summary

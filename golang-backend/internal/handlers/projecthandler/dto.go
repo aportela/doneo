@@ -22,7 +22,7 @@ type projectStatus struct {
 
 type addRequest struct {
 	ID          string          `json:"id"`
-	Key         string          `json:"key"`
+	Slug        string          `json:"slug"`
 	Summary     string          `json:"summary"`
 	Description *string         `json:"description"`
 	Type        projectType     `json:"type"`
@@ -32,7 +32,7 @@ type addRequest struct {
 
 type updateRequest struct {
 	ID          string          `json:"id"`
-	Key         string          `json:"key"`
+	Slug        string          `json:"slug"`
 	Summary     string          `json:"summary"`
 	Description *string         `json:"description"`
 	Type        projectType     `json:"type"`
@@ -44,7 +44,7 @@ type updateRequest struct {
 }
 
 type filterRequest struct {
-	Key             *string                   `json:"key"`
+	Slug            *string                   `json:"slug"`
 	Summary         *string                   `json:"summary"`
 	TypeId          *string                   `json:"typeId"`
 	PriorityId      *string                   `json:"priorityId"`
@@ -61,7 +61,7 @@ type searchRequest struct {
 
 type projectResponse struct {
 	ID                     string                                         `json:"id"`
-	Key                    string                                         `json:"key"`
+	SLug                   string                                         `json:"slug"`
 	Summary                string                                         `json:"summary"`
 	Description            *string                                        `json:"description"`
 	CreatedBy              userhandler.UserBaseResponse                   `json:"createdBy"`

@@ -65,7 +65,7 @@ var installSchemaQueries = []string{
 	`
 		CREATE TABLE IF NOT EXISTS projects (
 			id TEXT NOT NULL CHECK(length(id) == 36),
-			key TEXT NOT NULL UNIQUE CHECK(length(key) BETWEEN 1 AND 8),
+			slug TEXT NOT NULL UNIQUE CHECK(length(slug) BETWEEN 1 AND 8),
 			summary TEXT NOT NULL CHECK(length(summary) BETWEEN 1 AND 128),
 			description TEXT,
 			creator_id TEXT NOT NULL CHECK(length(creator_id) == 36),

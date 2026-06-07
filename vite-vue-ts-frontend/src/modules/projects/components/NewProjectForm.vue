@@ -5,7 +5,7 @@
     import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NSwitch } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconPlus } from '@tabler/icons-vue';
 
-    import { Project, MAX_KEY_LENGTH, MAX_SUMMARY_LENGTH } from '../models/project';
+    import { Project, MAX_SLUG_LENGTH, MAX_SUMMARY_LENGTH } from '../models/project';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { projectService } from '../services/project';
     import { handleAPIError } from '../../../api/client/errorHandler';
@@ -35,7 +35,7 @@
 
     const newProjectFormRules: FormRules =
     {
-        key: {
+        slug: {
             required: true,
             validator: (_rule: FormItemRule, value: string) => {
                 if (state.ajaxRunning) {
@@ -44,7 +44,7 @@
                 if (!value?.trim()) {
                     return new Error(t("shared.warningMessages.fieldIsRequired"));
                 }
-                else if (value.length > MAX_KEY_LENGTH) {
+                else if (value.length > MAX_SLUG_LENGTH) {
                     return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
                 } else if (serverErrors.value.name) {
                     return new Error(t(serverErrors.value.name));
@@ -124,12 +124,12 @@
 
     };
 
-    watch(() => project.value.key, () => { delete serverErrors.value.name });
+    watch(() => project.value.slug, () => { delete serverErrors.value.name });
 
     const serverErrors = ref<Record<string, string>>({});
 
     const isSaveDisabled = computed<boolean>(() => {
-        return !project.value.key || !project.value.summary || !project.value.type.id || !project.value.priority.id || !project.value.status.id;
+        return !project.value.slug || !project.value.summary || !project.value.type.id || !project.value.priority.id || !project.value.status.id;
     });
 
     const onSave = async () => {
@@ -155,7 +155,7 @@
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const payload: AddRequest = {
-                key: project.value.key ?? "",
+                slug: project.value.slug ?? "",
                 summary: project.value.summary ?? "",
                 description: project.value.description,
                 type: { id: project.value.type.id ?? "" },
@@ -230,11 +230,11 @@
             <n-spin v-if="state.ajaxRunning" size="small" />
         </template>
         <n-form ref="projectTypeFormRef" :model="project" :rules="newProjectFormRules" :disabled="state.ajaxRunning">
-            <n-form-item :label="t('modules.project.components.NewProjectForm.inputs.key.label')" path="key"
+            <n-form-item :label="t('modules.project.components.NewProjectForm.inputs.slug.label')" path="slug"
                 show-feedback>
                 <n-input type="text"
-                    :placeholder="t('modules.project.components.NewProjectForm.inputs.key.placeholder')"
-                    v-model:value="project.key" :maxlength="MAX_KEY_LENGTH" :show-count="true" clearable required
+                    :placeholder="t('modules.project.components.NewProjectForm.inputs.slug.placeholder')"
+                    v-model:value="project.slug" :maxlength="MAX_SLUG_LENGTH" :show-count="true" clearable required
                     autofocus>
                 </n-input>
             </n-form-item>

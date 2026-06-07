@@ -42,7 +42,7 @@
     const totalPages = ref(0);
 
     const filters = reactive<ProjectsTableFilters>({
-        key: "",
+        slug: "",
         typeId: null,
         priorityId: null,
         statusId: null,
@@ -107,7 +107,7 @@
                     sort: sort.order,
                 },
                 filter: {
-                    key: filters.key.length > 0 ? filters.key : undefined,
+                    slug: filters.slug.length > 0 ? filters.slug : undefined,
                     summary: filters.summary.length > 0 ? filters.summary : undefined,
                     typeId: filters.typeId !== null ? filters.typeId : undefined,
                     priorityId: filters.priorityId !== null ? filters.priorityId : undefined,

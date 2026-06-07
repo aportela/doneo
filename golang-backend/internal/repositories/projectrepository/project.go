@@ -37,12 +37,12 @@ func (repository *projectRepository) Add(ctx context.Context, project domain.Pro
 		ctx,
 		`
             INSERT INTO projects
-				(id, key, summary, description, creator_id, created_at, updated_at, deleted_at, started_at, finished_at, due_at, priority_id, status_id, type_id)
+				(id, slug, summary, description, creator_id, created_at, updated_at, deleted_at, started_at, finished_at, due_at, priority_id, status_id, type_id)
 			VALUES
 				(?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, ?)
         `,
 		dto.ID,
-		dto.Key,
+		dto.Slug,
 		dto.Summary,
 		dto.Description,
 		dto.CreatorId,
@@ -63,8 +63,8 @@ func (repository *projectRepository) Add(ctx context.Context, project domain.Pro
 		}
 		switch sqlErr.Code() {
 		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			if strings.Contains(sqlErr.Error(), "projects.key") {
-				return &domain.AlreadyExistsError{Field: "key"}
+			if strings.Contains(sqlErr.Error(), "projects.slug") {
+				return &domain.AlreadyExistsError{Field: "slug"}
 			} else if strings.Contains(sqlErr.Error(), "projects.id") {
 				return &domain.AlreadyExistsError{Field: "id"}
 			}
@@ -72,8 +72,8 @@ func (repository *projectRepository) Add(ctx context.Context, project domain.Pro
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
 			return &domain.ValidationError{Field: "id"}
 		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(key)") {
-				return &domain.ValidationError{Field: "key"}
+			if strings.Contains(sqlErr.Error(), "length(slug)") {
+				return &domain.ValidationError{Field: "slug"}
 			} else if strings.Contains(sqlErr.Error(), "length(id)") {
 				return &domain.ValidationError{Field: "id"}
 			} else if strings.Contains(sqlErr.Error(), "length(summary)") {
@@ -126,7 +126,7 @@ func (repository *projectRepository) Update(ctx context.Context, project domain.
 		ctx,
 		`
             UPDATE projects SET
-				key = ?,
+				slug = ?,
 				summary = ?,
 				description = ?,
 				updated_at = ?,
@@ -138,7 +138,7 @@ func (repository *projectRepository) Update(ctx context.Context, project domain.
 				type_id = ?
 			WHERE id = ?
         `,
-		dto.Key,
+		dto.Slug,
 		dto.Summary,
 		dto.Description,
 		dto.UpdatedAt,
@@ -159,8 +159,8 @@ func (repository *projectRepository) Update(ctx context.Context, project domain.
 		}
 		switch sqlErr.Code() {
 		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			if strings.Contains(sqlErr.Error(), "projects.key") {
-				return &domain.AlreadyExistsError{Field: "key"}
+			if strings.Contains(sqlErr.Error(), "projects.slug") {
+				return &domain.AlreadyExistsError{Field: "slug"}
 			} else if strings.Contains(sqlErr.Error(), "projects.id") {
 				return &domain.AlreadyExistsError{Field: "id"}
 			}
@@ -168,8 +168,8 @@ func (repository *projectRepository) Update(ctx context.Context, project domain.
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
 			return &domain.ValidationError{Field: "id"}
 		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(key)") {
-				return &domain.ValidationError{Field: "key"}
+			if strings.Contains(sqlErr.Error(), "length(slug)") {
+				return &domain.ValidationError{Field: "slug"}
 			} else if strings.Contains(sqlErr.Error(), "length(id)") {
 				return &domain.ValidationError{Field: "id"}
 			} else if strings.Contains(sqlErr.Error(), "length(summary)") {
@@ -210,7 +210,7 @@ func (repository *projectRepository) Get(ctx context.Context, id string) (domain
 		`
             SELECT
                 P.id,
-				P.key,
+				P.slug,
 				P.summary,
 				P.description,
 				P.created_at,
@@ -265,7 +265,7 @@ func (repository *projectRepository) Get(ctx context.Context, id string) (domain
         `,
 		id).Scan(
 		&dto.ID,
-		&dto.Key,
+		&dto.Slug,
 		&dto.Summary,
 		&dto.Description,
 		&dto.CreatedAt,
@@ -307,7 +307,7 @@ func (repository *projectRepository) Search(ctx context.Context, pager browser.P
 	sqlQuery := `
 		SELECT
                 P.id,
-				P.key,
+				P.slug,
 				P.summary,
 				P.description,
 				P.created_at,
@@ -337,8 +337,8 @@ func (repository *projectRepository) Search(ctx context.Context, pager browser.P
 	`
 	var field string
 	switch order.Field {
-	case "key":
-		field = "P.key COLLATE NOCASE"
+	case "slug":
+		field = "P.slug COLLATE NOCASE"
 	case "type":
 		field = "PT.name COLLATE NOCASE"
 	case "priority":
@@ -362,7 +362,7 @@ func (repository *projectRepository) Search(ctx context.Context, pager browser.P
 	case "createdBy":
 		field = "U.name COLLATE NOCASE"
 	default:
-		field = "P.key COLLATE NOCASE"
+		field = "P.slug COLLATE NOCASE"
 	}
 	var sort string
 	switch order.Sort {
@@ -376,9 +376,9 @@ func (repository *projectRepository) Search(ctx context.Context, pager browser.P
 	sqlOrder := fmt.Sprintf(" ORDER BY %s %s ", field, sort)
 	sqlWhere := ""
 	var sqlWhereConditions []string
-	if filterDTO.Key != nil && len(*filterDTO.Key) > 0 {
-		sqlWhereConditions = append(sqlWhereConditions, "P.key LIKE ?")
-		filterArgs = append(filterArgs, "%"+*filterDTO.Key+"%")
+	if filterDTO.Slug != nil && len(*filterDTO.Slug) > 0 {
+		sqlWhereConditions = append(sqlWhereConditions, "P.slug LIKE ?")
+		filterArgs = append(filterArgs, "%"+*filterDTO.Slug+"%")
 	}
 	if filterDTO.Summary != nil && len(*filterDTO.Summary) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "P.summary LIKE ?")
@@ -433,7 +433,7 @@ func (repository *projectRepository) Search(ctx context.Context, pager browser.P
 		var dto projectDTO
 		if err := rows.Scan(
 			&dto.ID,
-			&dto.Key,
+			&dto.Slug,
 			&dto.Summary,
 			&dto.Description,
 			&dto.CreatedAt,

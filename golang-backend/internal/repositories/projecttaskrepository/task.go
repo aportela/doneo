@@ -194,7 +194,7 @@ func (repository *taskRepository) Get(ctx context.Context, id string) (domain.Ta
             SELECT
                 T.id,
 				T.task_index,
-				P.key || "-" || T.task_index AS task_slug,
+				P.slug || "-" || T.task_index AS task_slug,
 				T.summary,
 				T.description,
 				T.created_at,
@@ -262,7 +262,7 @@ func (repository *taskRepository) Search(ctx context.Context, pager browser.Para
 		SELECT
 			T.id,
 			T.task_index,
-			P.key || "-" || T.task_index AS task_slug,
+			P.slug || "-" || T.task_index AS task_slug,
 			T.summary,
 			T.description,
 			T.created_at,

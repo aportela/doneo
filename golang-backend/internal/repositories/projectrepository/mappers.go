@@ -11,7 +11,7 @@ import (
 func toDTO(project domain.Project) projectDTO {
 	return projectDTO{
 		ID:                     project.ID,
-		Key:                    project.Key,
+		Slug:                   project.Slug,
 		Summary:                project.Summary,
 		Description:            utils.StrPtrToSQLNullStr(project.Description),
 		CreatorId:              project.CreatedBy.ID,
@@ -40,7 +40,7 @@ func toDTO(project domain.Project) projectDTO {
 func toDomain(project projectDTO) domain.Project {
 	return domain.Project{
 		ID:                     project.ID,
-		Key:                    project.Key,
+		Slug:                   project.Slug,
 		Summary:                project.Summary,
 		Description:            utils.SQLStrPtr(project.Description),
 		CreatedBy:              domain.UserBase{ID: project.CreatorId, Name: project.CreatorName},
@@ -71,7 +71,7 @@ func toDomainArray(projects []projectDTO) []domain.Project {
 
 func toFilterDTO(filter domain.SearchProjectFilter) searchFilterDTO {
 	return searchFilterDTO{
-		Key:             filter.Key,
+		Slug:            filter.Slug,
 		Summary:         filter.Summary,
 		TypeId:          filter.TypeId,
 		PriorityId:      filter.PriorityId,

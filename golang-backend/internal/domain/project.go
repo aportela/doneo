@@ -4,7 +4,7 @@ import "time"
 
 type Project struct {
 	ID                     string
-	Key                    string
+	Slug                   string
 	Summary                string
 	Description            *string
 	CreatedBy              UserBase
@@ -27,7 +27,7 @@ type Project struct {
 }
 
 type SearchProjectFilter struct {
-	Key             *string
+	Slug            *string
 	Summary         *string
 	TypeId          *string
 	StatusId        *string

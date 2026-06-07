@@ -39,7 +39,7 @@
 
     const filters = defineModel<ProjectsTableFilters>("filters", {
         default: () => ({
-            key: "",
+            slug: "",
             typeId: null,
             priorityId: null,
             statusId: null,
@@ -52,7 +52,7 @@
         })
     });
 
-    const isFilteredByKey = computed<boolean>(() => filters.value.key.length > 0);
+    const isFilteredByKey = computed<boolean>(() => filters.value.slug.length > 0);
     const isFilteredByType = computed<boolean>(() => filters.value.typeId !== null);
     const isFilteredByPriority = computed<boolean>(() => filters.value.priorityId !== null);
     const isFilteredByStatus = computed<boolean>(() => filters.value.statusId !== null);
@@ -72,8 +72,8 @@
 
     const columns = computed<TableHeaderColumn[]>(() => [
         {
-            label: t("modules.project.components.ProjectsTable.header.columns.key"),
-            field: "key",
+            label: t("modules.project.components.ProjectsTable.header.columns.slug"),
+            field: "slug",
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByKey.value,
@@ -135,7 +135,7 @@
     };
 
     const onClearFilters = () => {
-        filters.value.key = "";
+        filters.value.slug = "";
         filters.value.typeId = null;
         filters.value.priorityId = null;
         filters.value.statusId = null;
@@ -152,8 +152,8 @@
             <tr>
                 <th>
                     <TextFilterInput clearable :disabled="props.disabled" size="small"
-                        :placeholder="t('modules.project.components.ProjectsTable.header.filters.key.placeholder')"
-                        v-model:value="filters.key" @keydown-enter="onRefresh" />
+                        :placeholder="t('modules.project.components.ProjectsTable.header.filters.slug.placeholder')"
+                        v-model:value="filters.slug" @keydown-enter="onRefresh" />
                 </th>
                 <th>
                     <ProjectTypeSelector :disabled="props.disabled" v-model:id="filters.typeId" :hide-prefix="true"
@@ -191,7 +191,7 @@
         <template #tbody>
             <tr v-for="project, index in items" :key="project.id ?? index">
                 <td>
-                    {{ project.key }}
+                    {{ project.slug }}
                 </td>
                 <td><n-tag :bordered="false" :color="getNaiveUITagColorProperty(project.type.hexColor ?? '#888888')">{{
                     project.type.name }}</n-tag>

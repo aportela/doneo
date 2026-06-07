@@ -7,7 +7,7 @@ import { IDate } from "../../../shared/types/idate";
 
 export class Project {
   id: string | null;
-  key: string | null;
+  slug: string | null;
   summary: string | null;
   description: string | null;
   type: ProjectType;
@@ -27,7 +27,7 @@ export class Project {
 
   constructor(data?: ProjectDTO) {
     this.id = data?.id ?? null;
-    this.key = data?.key ?? null;
+    this.slug = data?.slug ?? null;
     this.summary = data?.summary ?? null;
     this.description = data?.description ?? null;
     this.type = new ProjectType(data?.type);
@@ -49,7 +49,7 @@ export class Project {
   toDTO(): ProjectDTO {
     return {
       id: this.id ?? "",
-      key: this.key ?? "",
+      slug: this.slug ?? "",
       summary: this.summary ?? "",
       description: this.description ?? "",
       type: this.type.toDTO(),
@@ -66,5 +66,5 @@ export class Project {
   }
 }
 
-export const MAX_KEY_LENGTH = 8;
+export const MAX_SLUG_LENGTH = 8;
 export const MAX_SUMMARY_LENGTH = 128;

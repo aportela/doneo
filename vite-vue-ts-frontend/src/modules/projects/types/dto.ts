@@ -11,7 +11,7 @@ import type { UserBaseResponse } from "../../users/types/dto";
 import type { TimestampRange } from "../../../shared/composables/timestamps";
 
 export type AddRequest = {
-  key: string;
+  slug: string;
   summary: string;
   description: string | null;
   type: {
@@ -27,7 +27,7 @@ export type AddRequest = {
 
 export type UpdateRequest = {
   id: string;
-  key: string;
+  slug: string;
   summary: string;
   description: string | null;
   type: {
@@ -45,7 +45,7 @@ export type UpdateRequest = {
 };
 
 type SearchRequestFilter = {
-  key?: string;
+  slug?: string;
   summary?: string;
   typeId?: string;
   priorityId?: string;
@@ -62,7 +62,7 @@ export type SearchRequest = {
 
 export type ProjectResponse = {
   id: string;
-  key: string;
+  slug: string;
   summary: string;
   description: string;
   type: ProjectTypeResponse;

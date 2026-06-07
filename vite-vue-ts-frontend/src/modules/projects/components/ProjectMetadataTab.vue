@@ -12,7 +12,7 @@
     import type { ProjectResponse, UpdateRequest } from '../types/dto';
 
     import type { FormMode } from '../../../shared/types/form-mode';
-    import { Project, MAX_KEY_LENGTH, MAX_SUMMARY_LENGTH } from "../models/project";
+    import { Project, MAX_SLUG_LENGTH, MAX_SUMMARY_LENGTH } from "../models/project";
     import ProjectPrioritySelector from "../../project-priorities/components/ProjectPrioritySelector.vue";
     import ProjectStatusSelector from "../../project-statuses/components/ProjectStatusSelector.vue";
     import ProjectTypeSelector from "../../project-types/components/ProjectTypeSelector.vue";
@@ -28,7 +28,6 @@
         disabled?: boolean;
         projectId: string;
     }
-
 
     const project = ref<Project>(new Project());
 
@@ -59,7 +58,7 @@
     const historyOperationCount = defineModel<number>("historyOperationCount", { default: 0 });
     const taskCount = defineModel<number>("taskCount", { default: 0 });
 
-    const keyRef = ref<ToggleInputComponent | undefined>();
+    const slugRef = ref<ToggleInputComponent | undefined>();
 
     const descriptionEditMode = ref<boolean>(false);
 
@@ -118,7 +117,7 @@
         try {
             const payload: UpdateRequest = {
                 id: project.value.id ?? "",
-                key: project.value.key ?? "",
+                slug: project.value.slug ?? "",
                 summary: project.value.summary ?? "",
                 description: project.value.description,
                 type: {
@@ -178,19 +177,19 @@
 
     const descriptionRef = ref<InputInst | null>(null);
 
-    const onConfirmNewKeyValue = (newValue: string | null) => {
-        if (project.value.key != newValue) {
-            project.value.key = newValue;
+    const onConfirmNewSlugValue = (newValue: string | null) => {
+        if (project.value.slug != newValue) {
+            project.value.slug = newValue;
             // TODO: async, await, check/show errors
             onUpdate();
-            keyRef.value?.setViewMode();
+            slugRef.value?.setViewMode();
         } else {
-            keyRef.value?.setViewMode();
+            slugRef.value?.setViewMode();
         }
     };
 
-    const onCancelNewKeyValue = () => {
-        keyRef.value?.setViewMode();
+    const onCancelNewSlugValue = () => {
+        slugRef.value?.setViewMode();
     };
 
     const onToggleDescriptionMode = () => {
@@ -250,6 +249,7 @@
 </script>
 
 <template>
+    <!-- TODO: add missing i18n labels -->
     <n-card bordered :style="props.style">
         <n-form-item label="Created by">
             <div class="note-user">
@@ -291,10 +291,10 @@
                     <ProjectStatusSelector v-model:id="project.status.id" :disabled="props.disabled" />
                 </n-form-item>
             </n-flex>
-            <n-form-item label="Key">
-                <ToggleInput v-model:value="project.key" show-count :max-length="MAX_KEY_LENGTH"
-                    :disabled="props.disabled" v-on:confirm="onConfirmNewKeyValue" v-on:cancel="onCancelNewKeyValue"
-                    ref="keyRef" />
+            <n-form-item label="Slug">
+                <ToggleInput v-model:value="project.slug" show-count :max-length="MAX_SLUG_LENGTH"
+                    :disabled="props.disabled" v-on:confirm="onConfirmNewSlugValue" v-on:cancel="onCancelNewSlugValue"
+                    ref="slugRef" />
             </n-form-item>
             <n-form-item label="Summary">
                 <ToggleInput v-model:value="project.summary" show-count :max-length="MAX_SUMMARY_LENGTH"

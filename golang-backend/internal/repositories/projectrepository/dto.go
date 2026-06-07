@@ -8,7 +8,7 @@ import (
 
 type projectDTO struct {
 	ID                     string         `db:"id"`
-	Key                    string         `db:"key"`
+	Slug                   string         `db:"slug"`
 	Summary                string         `db:"summary"`
 	Description            sql.NullString `db:"description"`
 	CreatorId              string         `db:"creator_id"`
@@ -36,7 +36,7 @@ type projectDTO struct {
 }
 
 type searchFilterDTO struct {
-	Key             *string
+	Slug            *string
 	Summary         *string
 	TypeId          *string
 	PriorityId      *string

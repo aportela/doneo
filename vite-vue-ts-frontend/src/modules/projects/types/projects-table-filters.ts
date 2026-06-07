@@ -1,7 +1,7 @@
 import type { TimestampRange } from "../../../shared/composables/timestamps";
 
 export interface ProjectsTableFilters {
-  key: string;
+  slug: string;
   typeId: string | null;
   priorityId: string | null;
   statusId: string | null;

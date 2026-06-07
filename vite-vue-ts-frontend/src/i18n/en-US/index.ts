@@ -905,9 +905,9 @@ export default {
             addProject: "Add project",
           },
           inputs: {
-            key: {
-              label: "Key",
-              placeholder: "Enter project key",
+            slug: {
+              label: "Slug",
+              placeholder: "Enter project slug",
             },
             summary: {
               label: "Summary",
@@ -965,7 +965,7 @@ export default {
         ProjectsTable: {
           header: {
             columns: {
-              key: "Key",
+              slug: "Slug",
               type: "Type",
               priority: "Priority",
               status: "Status",
@@ -974,8 +974,8 @@ export default {
               createdBy: "Created by",
             },
             filters: {
-              key: {
-                placeholder: "search by key",
+              slug: {
+                placeholder: "search by slug",
               },
               type: {
                 placeholder: "search by type",

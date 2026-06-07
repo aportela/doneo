@@ -102,11 +102,11 @@ func getRandomProjectDescription() string {
 	return fmt.Sprintf("Approach: %s.\nChallenge: %s.\nSolution: %s.", approach, challenge, solution)
 }
 
-func getRandomProjectKey() string {
+func getRandomProjectSlug() string {
 	const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	keyLength := 6
-	result := make([]byte, keyLength)
-	for i := 0; i < keyLength; i++ {
+	slugLength := 8
+	result := make([]byte, slugLength)
+	for i := 0; i < slugLength; i++ {
 		result[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(result)
@@ -132,7 +132,7 @@ func getRandomProject(userIds []string, projectTypeIds []string, projectPriority
 		projectStatusIds[i], projectStatusIds[j] = projectStatusIds[j], projectStatusIds[i]
 	})
 	return domain.Project{
-		Key:         getRandomProjectKey(),
+		Slug:        getRandomProjectSlug(),
 		Summary:     getRandomProjectSummary(),
 		Description: &projectDescription,
 		CreatedBy:   domain.UserBase{ID: userIds[rand.Intn(len(userIds))]},

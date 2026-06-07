@@ -14,7 +14,7 @@ import (
 func addRequestToDomain(request addRequest) domain.Project {
 	return domain.Project{
 		ID:          request.ID,
-		Key:         request.Key,
+		Slug:        request.Slug,
 		Summary:     request.Summary,
 		Description: request.Description,
 		CreatedBy:   domain.UserBase{},
@@ -33,7 +33,7 @@ func addRequestToDomain(request addRequest) domain.Project {
 func updateRequestToDomain(request updateRequest) domain.Project {
 	return domain.Project{
 		ID:          request.ID,
-		Key:         request.Key,
+		Slug:        request.Slug,
 		Summary:     request.Summary,
 		Description: request.Description,
 		Type: domain.ProjectType{
@@ -54,7 +54,7 @@ func updateRequestToDomain(request updateRequest) domain.Project {
 func DomainToResponse(project domain.Project) projectResponse {
 	return projectResponse{
 		ID:                     project.ID,
-		Key:                    project.Key,
+		SLug:                   project.Slug,
 		Summary:                project.Summary,
 		Description:            project.Description,
 		CreatedBy:              userhandler.BaseDomainToBaseResponse(project.CreatedBy),
