@@ -1,10 +1,10 @@
-import type { TaskResponse as ProjectDTO } from "../types/dto";
+import type { TaskResponse as ProjectTaskDTO } from "../types/dto";
 import { TaskPriority } from "../../task-priorities/models/task-priority";
 import { TaskStatus } from "../../task-statuses/models/task-status";
 import { UserBase } from "../../users/models/user";
 import { IDate } from "../../../shared/types/idate";
 
-export class Project {
+export class ProjectTask {
   id: string | null;
   slug: string | null;
   summary: string | null;
@@ -22,7 +22,7 @@ export class Project {
   notesCount: number;
   historyOperationsCount: number;
 
-  constructor(data?: ProjectDTO) {
+  constructor(data?: ProjectTaskDTO) {
     this.id = data?.id ?? null;
     this.slug = data?.slug ?? null;
     this.summary = data?.summary ?? null;
@@ -41,7 +41,7 @@ export class Project {
     this.historyOperationsCount = data?.historyOperationsCount ?? 0;
   }
 
-  toDTO(): ProjectDTO {
+  toDTO(): ProjectTaskDTO {
     return {
       id: this.id ?? "",
       slug: this.slug ?? "",
