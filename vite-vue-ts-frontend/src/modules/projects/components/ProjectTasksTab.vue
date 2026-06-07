@@ -1,8 +1,8 @@
 <script setup lang="ts">
-    import { ref, reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount, type CSSProperties } from "vue";
+    import { ref, reactive, shallowRef, watch, onMounted, onBeforeUnmount, type CSSProperties } from "vue";
     import { useI18n } from "vue-i18n";
 
-    import { NCard, NTag } from "naive-ui";
+    import { NCard } from "naive-ui";
 
     import { useLoadingStore } from '../../../stores/loading';
     import { appBus } from '../../../shared/composables/bus';
@@ -16,14 +16,9 @@
 
     import { Sort } from '../../../shared/types/models/sort';
     import { ProjectTask } from "../../project-tasks/models/tasks.ts";
-    import AvatarUserName from "../../../shared/components/AvatarUserName.vue";
     import Pager from '../../../shared/components/tables/Pager.vue';
-    import ManageTable from '../../../shared/components/tables/ManageTable.vue';
-    import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
-    import type { TableHeaderColumn } from "../../../shared/types/table-header-column.ts";
     import type { SearchRequest } from "../types/dto.ts";
-
-    import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
+    import ProjectTasksTable from "../../project-tasks/components/ProjectTasksTable.vue";
 
     interface ProjectTasksProps {
         style?: string | CSSProperties;
@@ -61,44 +56,6 @@
         },
         createdByUserId: null,
     });
-
-    const columns = computed<TableHeaderColumn[]>(() => [
-        {
-            label: "Identifier",
-            field: "id",
-            visible: true,
-            sortable: false,
-            isFiltered: () => false,
-        },
-        {
-            label: "Summary",
-            field: "summary",
-            visible: true,
-            sortable: false,
-            isFiltered: () => false,
-        },
-        {
-            label: "Status",
-            field: "status",
-            visible: true,
-            sortable: false,
-            isFiltered: () => false,
-        },
-        {
-            label: "Created at",
-            field: "createdAt",
-            visible: true,
-            sortable: false,
-            isFiltered: () => false,
-        },
-        {
-            label: "Created by",
-            field: "createdBy",
-            visible: true,
-            sortable: false,
-            isFiltered: () => false,
-        },
-    ]);
 
     watch(state, (newValue: AjaxStateInterface) => {
         loadingStore.set(newValue.ajaxRunning);
@@ -173,10 +130,6 @@
         }
     };
 
-    const onAdd = () => {
-
-    };
-
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -201,31 +154,8 @@
                 {{ t("modules.project.components.ManageProjectsPage.pager.totalItemsLabel", { total: totalResults }) }}
             </template>
         </Pager>
-        <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd" @sort="onSort">
-            <template #thead>
-            </template>
-            <template #tbody>
-                <tr v-for="task, index in items" :key="task.id ?? index">
-                    <td>
-                        {{ task.slug }}
-                    </td>
-                    <td>{{ task.summary }}</td>
-                    <td>
-                        <n-tag :bordered="false"
-                            :color="getNaiveUITagColorProperty(task.status.hexColor ?? '#888888')">{{
-                                task.status.name
-                            }}</n-tag>
-                    </td>
-                    <td>{{ task.createdAt.toLocaleString() }}</td>
-                    <td>
-                        <AvatarUserName :user-id="task.createdBy.id" :user-name="task.createdBy.name" />
-                    </td>
-                    <td class="doneo-text-center">
-                        <ManageTableActionButtons show-update show-delete />
-                    </td>
-                </tr>
-            </template>
-        </ManageTable>
+        <ProjectTasksTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" :sort="sort" @sort="onSort"
+            v-model:filters="filters" />
     </n-card>
 </template>
 
