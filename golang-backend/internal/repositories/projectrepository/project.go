@@ -234,7 +234,7 @@ func (repository *projectRepository) Get(ctx context.Context, id string) (domain
 				IFNULL(PN.notes_count, 0) AS notes_count,
 				IFNULL(PA.attachments_count, 0) AS attachments_count,
 				IFNULL(PHO.history_operations_count, 0) AS history_operations_count,
-				0 AS tasks_count
+				IFNULL(PT.tasks_count, 0) AS tasks_count
             FROM projects P
 			INNER JOIN project_priorities PP ON PP.id = P.priority_id
 			INNER JOIN project_statuses PS ON PS.id = P.status_id
@@ -260,6 +260,11 @@ func (repository *projectRepository) Get(ctx context.Context, id string) (domain
 				FROM project_history_operations
 				GROUP BY project_id
 			) PHO ON PHO.project_id = P.id
+			LEFT JOIN (
+				SELECT project_id, COUNT(*) as tasks_count
+				FROM tasks
+				GROUP BY project_id
+			) PT ON PHO.project_id = P.id
             WHERE P.id = ?
 			GROUP BY P.id
         `,
