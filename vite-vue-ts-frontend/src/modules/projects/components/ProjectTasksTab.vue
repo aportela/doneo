@@ -108,6 +108,7 @@
             const results: SearchResponse = await projectTaskService.search(props.projectId, payload);
             items.value = results.tasks.map((task) => new ProjectTask(task));
             itemCount.value = items.value?.length ?? 0;
+            totalResults.value = itemCount.value;
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
