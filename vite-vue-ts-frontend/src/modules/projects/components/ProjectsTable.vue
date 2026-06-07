@@ -52,7 +52,7 @@
         })
     });
 
-    const isFilteredByKey = computed<boolean>(() => filters.value.slug.length > 0);
+    const isFilteredBySlug = computed<boolean>(() => filters.value.slug.length > 0);
     const isFilteredByType = computed<boolean>(() => filters.value.typeId !== null);
     const isFilteredByPriority = computed<boolean>(() => filters.value.priorityId !== null);
     const isFilteredByStatus = computed<boolean>(() => filters.value.statusId !== null);
@@ -61,7 +61,7 @@
     const isFilteredByCreator = computed<boolean>(() => filters.value.createdByUserId !== null);
 
     const hasFilters = computed<boolean>(() =>
-        isFilteredByKey.value ||
+        isFilteredBySlug.value ||
         isFilteredByType.value ||
         isFilteredByPriority.value ||
         isFilteredByStatus.value ||
@@ -76,7 +76,7 @@
             field: "slug",
             visible: true,
             sortable: true,
-            isFiltered: () => isFilteredByKey.value,
+            isFiltered: () => isFilteredBySlug.value,
         },
         {
             label: t("modules.project.components.ProjectsTable.header.columns.type"),
