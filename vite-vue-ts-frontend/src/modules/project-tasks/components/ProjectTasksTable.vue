@@ -13,8 +13,8 @@
     import { ProjectTask } from '../models/tasks.ts';
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
-    import ProjectPrioritySelector from '../../project-priorities/components/ProjectPrioritySelector.vue';
-    import ProjectStatusSelector from '../../project-statuses/components/ProjectStatusSelector.vue';
+    import TaskPrioritySelector from '../../task-priorities/components/TaskPrioritySelector.vue';
+    import TaskStatusSelector from '../../task-statuses/components/TaskStatusSelector.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
     import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
@@ -143,12 +143,12 @@
                         v-model:value="filters.slug" @keydown-enter="onRefresh" />
                 </th>
                 <th>
-                    <ProjectPrioritySelector :disabled="props.disabled" v-model:id="filters.priorityId"
-                        :hide-prefix="true" clearable
+                    <TaskPrioritySelector :disabled="props.disabled" v-model:id="filters.priorityId" :hide-prefix="true"
+                        clearable
                         :placeholder="t('modules.task.components.ProjectTasksTable.header.filters.priority.placeholder')" />
                 </th>
                 <th>
-                    <ProjectStatusSelector :disabled="props.disabled" v-model:id="filters.statusId" :hide-prefix="true"
+                    <TaskStatusSelector :disabled="props.disabled" v-model:id="filters.statusId" :hide-prefix="true"
                         clearable
                         :placeholder="t('modules.task.components.ProjectTasksTable.header.filters.status.placeholder')" />
                 </th>
