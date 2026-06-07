@@ -1,4 +1,4 @@
-package taskhandler
+package projecttaskhandler
 
 import (
 	"encoding/json"
@@ -8,15 +8,15 @@ import (
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
-	"github.com/aportela/doneo/internal/services/taskservice"
+	"github.com/aportela/doneo/internal/services/projecttaskservice"
 	"github.com/go-chi/chi/v5"
 )
 
 type TaskHandler struct {
-	service taskservice.TaskService
+	service projecttaskservice.TaskService
 }
 
-func NewHandler(service taskservice.TaskService) *TaskHandler {
+func NewHandler(service projecttaskservice.TaskService) *TaskHandler {
 	return &TaskHandler{service: service}
 }
 

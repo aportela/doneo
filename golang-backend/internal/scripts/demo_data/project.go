@@ -13,11 +13,11 @@ import (
 	"github.com/aportela/doneo/internal/repositories/noterepository"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
-	"github.com/aportela/doneo/internal/repositories/taskrepository"
+	"github.com/aportela/doneo/internal/repositories/projecttaskrepository"
 	"github.com/aportela/doneo/internal/services/noteservice"
 	"github.com/aportela/doneo/internal/services/projectpermissionservice"
 	"github.com/aportela/doneo/internal/services/projectservice"
-	"github.com/aportela/doneo/internal/services/taskservice"
+	"github.com/aportela/doneo/internal/services/projecttaskservice"
 	"github.com/aportela/doneo/internal/utils"
 )
 
@@ -193,7 +193,7 @@ func createProjects(database database.Database, projectTypeIds []string, project
 	projectService := projectservice.NewService(database, projectrepository.NewRepository(database))
 	noteService := noteservice.NewService(database, noterepository.NewRepository(database))
 	projectPermissionService := projectpermissionservice.NewService(database, projectpermissionrepository.NewRepository(database))
-	taskService := taskservice.NewService(database, taskrepository.NewRepository(database))
+	taskService := projecttaskservice.NewService(database, projecttaskrepository.NewRepository(database))
 	for i := 1; i <= count; i++ {
 		newProject := getRandomProject(userIds, projectTypeIds, projectPriorityIds, projectStatusIds)
 		ctx := context.Background()

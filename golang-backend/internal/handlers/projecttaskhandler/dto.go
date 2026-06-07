@@ -1,4 +1,4 @@
-package taskhandler
+package projecttaskhandler
 
 import (
 	"github.com/aportela/doneo/internal/handlers"

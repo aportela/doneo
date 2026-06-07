@@ -19,6 +19,7 @@ import (
 	"github.com/aportela/doneo/internal/handlers/projectpermissionhandler"
 	"github.com/aportela/doneo/internal/handlers/projectpriorityhandler"
 	"github.com/aportela/doneo/internal/handlers/projectstatushandler"
+	"github.com/aportela/doneo/internal/handlers/projecttaskhandler"
 	"github.com/aportela/doneo/internal/handlers/projecttypehandler"
 	"github.com/aportela/doneo/internal/handlers/rolehandler"
 	"github.com/aportela/doneo/internal/handlers/taskpriorityhandler"
@@ -32,6 +33,7 @@ import (
 	"github.com/aportela/doneo/internal/repositories/projectpriorityrepository"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
 	"github.com/aportela/doneo/internal/repositories/projectstatusrepository"
+	"github.com/aportela/doneo/internal/repositories/projecttaskrepository"
 	"github.com/aportela/doneo/internal/repositories/projecttyperepository"
 	"github.com/aportela/doneo/internal/repositories/rolerepository"
 	"github.com/aportela/doneo/internal/repositories/taskpriorityrepository"
@@ -45,6 +47,7 @@ import (
 	"github.com/aportela/doneo/internal/services/projectpriorityservice"
 	"github.com/aportela/doneo/internal/services/projectservice"
 	"github.com/aportela/doneo/internal/services/projectstatusservice"
+	"github.com/aportela/doneo/internal/services/projecttaskservice"
 	"github.com/aportela/doneo/internal/services/projecttypeservice"
 	"github.com/aportela/doneo/internal/services/roleservice"
 	"github.com/aportela/doneo/internal/services/taskpriorityservice"
@@ -190,6 +193,7 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		projectNoteHandler := notehandler.NewHandler(noteservice.NewService(database, noterepository.NewRepository(database)))
 		projectAttachmentHandler := attachmenthandler.NewHandler(attachmentservice.NewService(database, attachmentrepository.NewRepository(database)), cfg.Storage.AttachmentsPath)
 		projectHistoryHandler := projecthistoryhandler.NewHandler(projecthistoryservice.NewService(database, projecthistoryrepository.NewRepository(database)))
+		projectTaskHandler := projecttaskhandler.NewHandler(projecttaskservice.NewService(database, projecttaskrepository.NewRepository(database)))
 		r.Post("/", projectHandler.Add)
 		r.Post("/search", projectHandler.Search)
 		r.Get("/{id:"+uuidPattern+"}", projectHandler.Get)
@@ -210,6 +214,11 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		r.Delete("/{id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", projectAttachmentHandler.DeleteProjectAttachment)
 
 		r.Get("/{id:"+uuidPattern+"}/history_operations", projectHistoryHandler.Search)
+
+		r.Get("/{id:"+uuidPattern+"}/tasks", projectTaskHandler.Search)
+		r.Post("/{id:"+uuidPattern+"}/tasks/", projectTaskHandler.Add)
+		r.Put("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", projectTaskHandler.Update)
+		r.Delete("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", projectTaskHandler.Delete)
 	})
 
 	// TODO: 404 route ?
