@@ -98,7 +98,10 @@ func (handler *TaskHandler) Search(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] invalid request payload: %w", err))
 		return
 	}
+	projectId := chi.URLParam(r, "id")
 	filter := domain.SearchTaskFilter{}
+	filter.ProjectId = &projectId
+
 	if request.Filter != nil {
 		if request.Filter.Summary != nil {
 			filter.Summary = request.Filter.Summary
