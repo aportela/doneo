@@ -12,7 +12,7 @@ export const projectPermissionService = {
     payload: AddRequest,
   ): Promise<ProjectPermissionResponse> {
     const { data } = await axiosInstance.post<ProjectPermissionResponse>(
-      "/projects/" + projectId + "/permissions/",
+      "/projects/" + projectId + "/permissions",
       payload,
     );
     return data;

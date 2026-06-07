@@ -13,7 +13,7 @@ export const noteService = {
     payload: AddRequest,
   ): Promise<NoteResponse> {
     const { data } = await axiosInstance.post<NoteResponse>(
-      "/projects/" + projectId + "/notes/",
+      "/projects/" + projectId + "/notes",
       payload,
     );
     return data;

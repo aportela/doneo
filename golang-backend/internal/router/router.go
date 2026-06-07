@@ -201,22 +201,22 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		r.Delete("/{id:"+uuidPattern+"}", projectHandler.Delete)
 
 		r.Get("/{id:"+uuidPattern+"}/permissions", projectPermissionHandler.Search)
-		r.Post("/{id:"+uuidPattern+"}/permissions/", projectPermissionHandler.Add)
+		r.Post("/{id:"+uuidPattern+"}/permissions", projectPermissionHandler.Add)
 		r.Delete("/{id:"+uuidPattern+"}/permissions/{permission_id:"+uuidPattern+"}", projectPermissionHandler.Delete)
 
 		r.Get("/{id:"+uuidPattern+"}/notes", projectNoteHandler.GetProjectNotes)
-		r.Post("/{id:"+uuidPattern+"}/notes/", projectNoteHandler.AddProjectNote)
+		r.Post("/{id:"+uuidPattern+"}/notes", projectNoteHandler.AddProjectNote)
 		r.Put("/{id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", projectNoteHandler.UpdateProjectNote)
 		r.Delete("/{id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", projectNoteHandler.DeleteProjectNote)
 
 		r.Get("/{id:"+uuidPattern+"}/attachments", projectAttachmentHandler.GetProjectAttachments)
-		r.Post("/{id:"+uuidPattern+"}/attachments/", projectAttachmentHandler.AddProjectAttachment)
+		r.Post("/{id:"+uuidPattern+"}/attachments", projectAttachmentHandler.AddProjectAttachment)
 		r.Delete("/{id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", projectAttachmentHandler.DeleteProjectAttachment)
 
 		r.Get("/{id:"+uuidPattern+"}/history_operations", projectHistoryHandler.Search)
 
 		r.Post("/{id:"+uuidPattern+"}/tasks/search", projectTaskHandler.Search)
-		r.Post("/{id:"+uuidPattern+"}/tasks/", projectTaskHandler.Add)
+		r.Post("/{id:"+uuidPattern+"}/tasks", projectTaskHandler.Add)
 		r.Put("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", projectTaskHandler.Update)
 		r.Delete("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", projectTaskHandler.Delete)
 	})
