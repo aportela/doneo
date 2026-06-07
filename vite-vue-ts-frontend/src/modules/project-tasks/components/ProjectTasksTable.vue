@@ -38,6 +38,7 @@
 
     const filters = defineModel<ProjectTasksTableFilters>("filters", {
         default: () => ({
+            slug: null,
             priorityId: null,
             statusId: null,
             summary: "",
@@ -49,6 +50,7 @@
         })
     });
 
+    const isFilteredBySlug = computed<boolean>(() => filters.value.slug !== null);
     const isFilteredByPriority = computed<boolean>(() => filters.value.priorityId !== null);
     const isFilteredByStatus = computed<boolean>(() => filters.value.statusId !== null);
     const isFilteredBySummary = computed<boolean>(() => filters.value.summary.length > 0);
@@ -56,6 +58,7 @@
     const isFilteredByCreator = computed<boolean>(() => filters.value.createdByUserId !== null);
 
     const hasFilters = computed<boolean>(() =>
+        isFilteredBySlug.value ||
         isFilteredByPriority.value ||
         isFilteredByStatus.value ||
         isFilteredBySummary.value ||
@@ -65,15 +68,15 @@
 
     const columns = computed<TableHeaderColumn[]>(() => [
         {
-            label: "Identifier",
-            field: "id",
+            label: "Slug",
+            field: "slug",
             visible: true,
             sortable: false,
             isFiltered: () => false,
         },
         {
-            label: "Summary",
-            field: "summary",
+            label: "Priority",
+            field: "priority",
             visible: true,
             sortable: false,
             isFiltered: () => false,
@@ -81,6 +84,13 @@
         {
             label: "Status",
             field: "status",
+            visible: true,
+            sortable: false,
+            isFiltered: () => false,
+        },
+        {
+            label: "Summary",
+            field: "summary",
             visible: true,
             sortable: false,
             isFiltered: () => false,
@@ -128,20 +138,23 @@
         <template #thead>
             <tr>
                 <th>
+                    <TextFilterInput clearable :disabled="props.disabled" size="small"
+                        :placeholder="t('modules.task.components.ProjectTasksTable.header.filters.slug.placeholder')"
+                        v-model:value="filters.slug" @keydown-enter="onRefresh" />
                 </th>
                 <th>
                     <ProjectPrioritySelector :disabled="props.disabled" v-model:id="filters.priorityId"
                         :hide-prefix="true" clearable
-                        :placeholder="t('modules.project.components.ProjectsTable.header.filters.priority.placeholder')" />
+                        :placeholder="t('modules.task.components.ProjectTasksTable.header.filters.priority.placeholder')" />
                 </th>
                 <th>
                     <ProjectStatusSelector :disabled="props.disabled" v-model:id="filters.statusId" :hide-prefix="true"
                         clearable
-                        :placeholder="t('modules.project.components.ProjectsTable.header.filters.status.placeholder')" />
+                        :placeholder="t('modules.task.components.ProjectTasksTable.header.filters.status.placeholder')" />
                 </th>
                 <th>
                     <TextFilterInput clearable :disabled="props.disabled" size="small"
-                        :placeholder="t('modules.project.components.ProjectsTable.header.filters.summary.placeholder')"
+                        :placeholder="t('modules.task.components.ProjectTasksTable.header.filters.summary.placeholder')"
                         v-model:value="filters.summary" @keydown-enter="onRefresh" />
                 </th>
                 <th>
@@ -150,7 +163,7 @@
                 </th>
                 <th>
                     <UserSelector hideAvatar clearable :disabled="props.disabled" v-model:id="filters.createdByUserId"
-                        :placeholder="t('modules.project.components.ProjectsTable.header.filters.creator.placeholder')" />
+                        :placeholder="t('modules.task.components.ProjectTasksTable.header.filters.creator.placeholder')" />
                 </th>
                 <th class="doneo-text-center">
                     <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
@@ -191,7 +204,7 @@
             </tr>
             <tr>
                 <td :colspan="columns.length + 1" v-if="items.length < 1 && !props.disabled">
-                    <n-empty :description="t('modules.project.components.ProjectsTable.warnings.noItemsFound')">
+                    <n-empty :description="t('modules.task.components.ProjectTasksTable.warnings.noItemsFound')">
                     </n-empty>
                 </td>
             </tr>

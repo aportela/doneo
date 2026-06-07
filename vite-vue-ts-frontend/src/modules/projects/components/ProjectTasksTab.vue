@@ -47,6 +47,7 @@
     const totalPages = ref(0);
 
     const filters = reactive<ProjectTasksTableFilters>({
+        slug: null,
         priorityId: null,
         statusId: null,
         summary: "",
@@ -151,7 +152,7 @@
         <Pager v-model:current-page="currentPage" v-model:page-size="pageSize" :total-pages="totalPages"
             :total-results="totalResults" class="doneo-pager-container">
             <template #total-results-label="{ totalResults }">
-                {{ t("modules.project.components.ManageProjectsPage.pager.totalItemsLabel", { total: totalResults }) }}
+                {{ t("modules.task.components.ProjectTasksTab.pager.totalItemsLabel", { total: totalResults }) }}
             </template>
         </Pager>
         <ProjectTasksTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" :sort="sort" @sort="onSort"

@@ -1003,11 +1003,6 @@ export default {
               message:
                 'You are about to delete the project "{summary}" from the system.',
             },
-            undeleteConfirmation: {
-              title: "Restore user",
-              message:
-                'You are about to restore the user "{name}" from the system.',
-            },
           },
           warnings: {
             noItemsFound: "No projects found",
@@ -1171,6 +1166,57 @@ export default {
           },
           warnings: {
             noItemsFound: "No task priorities found",
+          },
+        },
+      },
+    },
+    task: {
+      components: {
+        ProjectTasksTable: {
+          header: {
+            columns: {
+              slug: "Slug",
+              priority: "Priority",
+              status: "Status",
+              summary: "Summary",
+              createdAt: "Created at",
+              createdBy: "Created by",
+            },
+            filters: {
+              slug: {
+                placeholder: "search by slug",
+              },
+              priority: {
+                placeholder: "search by priority",
+              },
+              status: {
+                placeholder: "search by status",
+              },
+              summary: {
+                placeholder: "search by summary",
+              },
+              creator: {
+                placeholder: "search by creator",
+              },
+            },
+          },
+          body: {
+            columns: {},
+          },
+          dialogs: {
+            deleteConfirmation: {
+              title: "Delete task",
+              message:
+                'You are about to delete the task "{summary}" from the system.',
+            },
+          },
+          warnings: {
+            noItemsFound: "No tasks found",
+          },
+        },
+        ProjectTasksTab: {
+          pager: {
+            totalItemsLabel: "Total tasks: {total}",
           },
         },
       },
