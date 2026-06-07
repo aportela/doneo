@@ -406,7 +406,7 @@ func (repository *taskRepository) Search(ctx context.Context, pager browser.Para
 		sqlCountQuery := `
 			SELECT
 				COUNT(*) AS total_tasks
-			FROM tasks P
+			FROM tasks T
 		`
 		sqlCountQuery = fmt.Sprintf("%s %s", sqlCountQuery, sqlWhere)
 		err = repository.database.QueryRowContext(
