@@ -64,6 +64,7 @@ func toDomainArray(tasks []taskDTO) []domain.Task {
 
 func toFilterDTO(filter domain.SearchTaskFilter) searchFilterDTO {
 	return searchFilterDTO{
+		ProjectId:       filter.ProjectId,
 		Summary:         filter.Summary,
 		PriorityId:      filter.PriorityId,
 		StatusId:        filter.StatusId,

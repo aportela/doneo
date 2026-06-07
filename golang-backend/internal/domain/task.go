@@ -24,6 +24,7 @@ type Task struct {
 }
 
 type SearchTaskFilter struct {
+	ProjectId       *string
 	Summary         *string
 	StatusId        *string
 	PriorityId      *string

@@ -324,6 +324,10 @@ func (repository *taskRepository) Search(ctx context.Context, pager browser.Para
 	sqlOrder := fmt.Sprintf(" ORDER BY %s %s ", field, sort)
 	sqlWhere := ""
 	var sqlWhereConditions []string
+	if filterDTO.ProjectId != nil && len(*filterDTO.ProjectId) > 0 {
+		sqlWhereConditions = append(sqlWhereConditions, "T.project_id = ?")
+		filterArgs = append(filterArgs, *filterDTO.ProjectId)
+	}
 	if filterDTO.Summary != nil && len(*filterDTO.Summary) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "T.summary LIKE ?")
 		filterArgs = append(filterArgs, "%"+*filterDTO.Summary+"%")
