@@ -36,11 +36,11 @@ export const projectTaskService = {
     return data;
   },
   async search(
-    projectId: string,
+    projectId: string | null,
     payload: SearchRequest,
   ): Promise<SearchResponse> {
     const { data } = await axiosInstance.post<SearchResponse>(
-      "/projects/" + projectId + "/tasks/search",
+      projectId ? "/projects/" + projectId + "/tasks/search" : "/tasks/search",
       payload,
     );
     return data;

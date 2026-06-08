@@ -222,6 +222,12 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		r.Delete("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", projectTaskHandler.Delete)
 	})
 
+	apiRouter.Route("/tasks", func(r chi.Router) {
+		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
+		handler := projecttaskhandler.NewHandler(projecttaskservice.NewService(database, projecttaskrepository.NewRepository(database)))
+		r.Post("/search", handler.Search)
+	})
+
 	// TODO: 404 route ?
 	baseRouter.Mount("/api", apiRouter)
 
