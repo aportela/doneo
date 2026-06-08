@@ -281,6 +281,11 @@
         </n-flex>
         <n-form>
             <n-flex>
+                <n-form-item label="Slug">
+                    <ToggleInput v-model:value="project.slug" show-count :max-length="MAX_SLUG_LENGTH"
+                        :disabled="props.disabled" v-on:confirm="onConfirmNewSlugValue"
+                        v-on:cancel="onCancelNewSlugValue" ref="slugRef" />
+                </n-form-item>
                 <n-form-item label="Type">
                     <ProjectTypeSelector v-model:id="project.type.id" :disabled="props.disabled" />
                 </n-form-item>
@@ -291,11 +296,7 @@
                     <ProjectStatusSelector v-model:id="project.status.id" :disabled="props.disabled" />
                 </n-form-item>
             </n-flex>
-            <n-form-item label="Slug">
-                <ToggleInput v-model:value="project.slug" show-count :max-length="MAX_SLUG_LENGTH"
-                    :disabled="props.disabled" v-on:confirm="onConfirmNewSlugValue" v-on:cancel="onCancelNewSlugValue"
-                    ref="slugRef" />
-            </n-form-item>
+
             <n-form-item label="Summary">
                 <ToggleInput v-model:value="project.summary" show-count :max-length="MAX_SUMMARY_LENGTH"
                     :disabled="props.disabled" />
