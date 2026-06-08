@@ -197,8 +197,8 @@
                 {{ t("modules.task.components.ProjectTasksTab.pager.totalItemsLabel", { total: totalResults }) }}
             </template>
         </Pager>
-        <ProjectTasksTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
-            :sort="sort" @sort="onSort" v-model:filters="filters" />
+        <ProjectTasksTable :items="items" :disabled="state.ajaxRunning" :project-id="props.projectId"
+            @refresh="onRefresh" @add="onShowAddForm" :sort="sort" @sort="onSort" v-model:filters="filters" />
     </n-card>
 </template>
 

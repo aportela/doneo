@@ -25,6 +25,7 @@
         disabled: boolean;
         items: ProjectTask[];
         sort?: Sort;
+        projectId: string;
     }
 
     const { t } = useI18n();
@@ -191,7 +192,8 @@
                 <td class="doneo-text-center">
                     <!-- TODO: use ManageTableActionButtons -->
                     <n-button-group size="small">
-                        <router-link :to="{ name: 'projectTab', params: { id: task.id, tab: 'metadata' } }">
+                        <router-link
+                            :to="{ name: 'taskTab', params: { projectId: props.projectId, id: task.id, tab: 'metadata' } }">
                             <n-button :disabled="props.disabled">
                                 {{ t("shared.buttons.Open.label") }}
                                 <template #icon>

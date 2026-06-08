@@ -38,6 +38,7 @@
     const historyOperationCount = ref<number>(0);
     const taskCount = ref<number>(0);
 
+    // TODO: i18n
     const permissionsTabLabel = computed(() => permissionCount.value > 0 ? `Permissions (${permissionCount.value})` : 'Permissions')
     const attachmentsTabLabel = computed(() => attachmentCount.value > 0 ? `Attachments (${attachmentCount.value})` : 'Attachments')
     const notesTabLabel = computed(() => noteCount.value > 0 ? `Notes (${noteCount.value})` : 'Notes')

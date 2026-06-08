@@ -48,6 +48,19 @@ const routes: RouteRecordRaw[] = [
         component: () => import("../pages/TasksPage.vue"),
       },
       {
+        name: "task",
+        path: "project/:projectId/tasks/:id",
+        component: () => import("../modules/projects/pages/ProjectPage.vue"),
+        children: [
+          {
+            path: "tab/:tab",
+            name: "taskTab",
+            component: () =>
+              import("../modules/project-tasks/pages/TaskPage.vue"),
+          },
+        ],
+      },
+      {
         name: "reports",
         path: "reports",
         component: () => import("../pages/ReportsPage.vue"),
