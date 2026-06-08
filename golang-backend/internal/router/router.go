@@ -217,6 +217,7 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 
 		r.Post("/{id:"+uuidPattern+"}/tasks/search", projectTaskHandler.Search)
 		r.Post("/{id:"+uuidPattern+"}/tasks", projectTaskHandler.Add)
+		r.Get("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", projectTaskHandler.Get)
 		r.Put("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", projectTaskHandler.Update)
 		r.Delete("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", projectTaskHandler.Delete)
 	})
