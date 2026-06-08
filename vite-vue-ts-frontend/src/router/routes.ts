@@ -31,7 +31,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         name: "project",
-        path: "project/:id",
+        path: "projects/:projectId",
         component: () => import("../modules/projects/pages/ProjectPage.vue"),
         children: [
           {
@@ -90,19 +90,25 @@ const routes: RouteRecordRaw[] = [
         name: "manageProjectStatuses",
         path: "manage/project-statuses",
         component: () =>
-          import("../modules/project-statuses/pages/ManageProjectStatusesPage.vue"),
+          import(
+            "../modules/project-statuses/pages/ManageProjectStatusesPage.vue"
+          ),
       },
       {
         name: "manageProjectPriorities",
         path: "manage/project-priorities",
         component: () =>
-          import("../modules/project-priorities/pages/ManageProjectPrioritiesPage.vue"),
+          import(
+            "../modules/project-priorities/pages/ManageProjectPrioritiesPage.vue"
+          ),
       },
       {
         name: "manageTaskPriorities",
         path: "manage/task-priorities",
         component: () =>
-          import("../modules/task-priorities/pages/ManageTaskPrioritiesPage.vue"),
+          import(
+            "../modules/task-priorities/pages/ManageTaskPrioritiesPage.vue"
+          ),
       },
       {
         name: "manageTaskStatuses",

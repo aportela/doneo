@@ -16,7 +16,7 @@
     const route = useRoute();
     const router = useRouter();
 
-    const projectId = route.params.id as string
+    const projectId = route.params.projectId as string
 
     // TODO: set tab with type (type tab = "metadata" | "permissions"....)
     const tab = computed({
@@ -25,7 +25,7 @@
             router.push({
                 name: 'projectTab',
                 params: {
-                    id: route.params.id,
+                    projectId: route.params.projectId,
                     tab: value
                 }
             });
