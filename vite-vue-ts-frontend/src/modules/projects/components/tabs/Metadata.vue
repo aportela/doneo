@@ -247,11 +247,17 @@
 <template>
     <!-- TODO: add missing i18n labels -->
     <n-card bordered :style="props.style">
-        <n-form-item label="Created by">
-            <div class="note-user">
-                <AvatarUserName :user-id="project.createdBy.id" :user-name="project.createdBy.name" />
+        <n-flex align="center" justify="space-between">
+            <n-form-item label="Created by">
+                <div class="note-user">
+                    <AvatarUserName :user-id="project.createdBy.id" :user-name="project.createdBy.name" />
+                </div>
+            </n-form-item>
+            <div>
+                <div>Created at: {{ project.createdAt.toLocaleString() }}</div>
+                <div>Updated at: {{ project.updatedAt?.toLocaleString() }}</div>
             </div>
-        </n-form-item>
+        </n-flex>
         <n-flex>
             <n-form-item label="Created at">
                 <span class="doneo-datetime-label-readonly">
