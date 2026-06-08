@@ -180,12 +180,8 @@
     const onConfirmNewSlugValue = (newValue: string | null) => {
         if (project.value.slug != newValue) {
             project.value.slug = newValue;
-            // TODO: async, await, check/show errors
-            onUpdate();
-            slugRef.value?.setViewMode();
-        } else {
-            slugRef.value?.setViewMode();
         }
+        slugRef.value?.setViewMode();
     };
 
     const onCancelNewSlugValue = () => {
