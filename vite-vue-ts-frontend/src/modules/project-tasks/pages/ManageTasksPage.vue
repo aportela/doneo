@@ -26,7 +26,7 @@
     const { t } = useI18n();
     const loadingStore = useLoadingStore();
 
-    const tab = ref<string>("List");
+    const tab = ref<string>("Kanban");
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -147,7 +147,7 @@
 </script>
 
 <template>
-    <n-tabs>
+    <n-tabs v-model="tab">
         <n-tab-pane name="List" tab="List" type="segment" animated v-model="tab" display-directive="show:lazy">
             <template #tab>
                 <n-icon size="16" class="tab-icon">
@@ -194,8 +194,6 @@
             </template>
         </n-tab-pane>
     </n-tabs>
-
-
 </template>
 
 <style lang="css" scoped>
