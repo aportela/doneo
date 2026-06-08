@@ -68,7 +68,7 @@
                 attachmentCount.value = task.value.attachmentsCount;
                 historyOperationCount.value = task.value.historyOperationsCount;
             } else {
-                state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.loadError");
+                state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.loadError");
             }
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -80,16 +80,16 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPage.onGet" } });
                             break;
                         case 404:
-                            state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.notFoundError");
+                            state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.notFoundError");
                             break;
                         default:
-                            state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.loadError");
+                            state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.loadError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.loadError");
-                    console.error("Unhandled API error", { file: "ProjectPage.vue", method: "onGet" }, { err: fatalError });
+                    state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.loadError");
+                    console.error("Unhandled API error", { file: "TaskMetadataTab.vue", method: "onGet" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
@@ -125,7 +125,7 @@
                 attachmentCount.value = task.value.attachmentsCount;
                 historyOperationCount.value = task.value.historyOperationsCount;
             } else {
-                state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.updateError");
+                state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.updateError");
             }
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -137,16 +137,16 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPage.onUpdate" } });
                             break;
                         case 404:
-                            state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.notFoundError");
+                            state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.notFoundError");
                             break;
                         default:
-                            state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.updateError");
+                            state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.updateError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.updateError");
-                    console.error("Unhandled API error", { file: "ProjectPage.vue", method: "onUpdate" }, { err: fatalError });
+                    state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.updateError");
+                    console.error("Unhandled API error", { file: "TaskMetadataTab.vue", method: "onUpdate" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
