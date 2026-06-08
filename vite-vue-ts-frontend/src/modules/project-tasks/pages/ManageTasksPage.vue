@@ -20,6 +20,7 @@
 
     import ProjectTasksTable from '../components/ProjectTasksTable.vue';
     import ProjectTasksKanban from '../components/ProjectTasksKanban.vue';
+    import ProjectTasksCalendar from '../components/ProjectTasksCalendar.vue';
     import Pager from '../../../shared/components/tables/Pager.vue';
 
     const { t } = useI18n();
@@ -189,7 +190,7 @@
                 Calendar
             </template>
             <template #default>
-                CALENDAR
+                <ProjectTasksCalendar />
             </template>
         </n-tab-pane>
     </n-tabs>
