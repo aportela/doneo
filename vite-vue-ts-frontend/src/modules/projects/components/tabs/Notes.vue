@@ -4,17 +4,17 @@
 
     import { NSpace, NCard, NButtonGroup, NButton } from "naive-ui";
 
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
-    import { useLoadingStore } from '../../../stores/loading';
-    import { useNotify } from '../../../shared/composables/notification';
-    import { appBus } from '../../../shared/composables/bus';
-    import { Note } from "../../notes/models/note.ts";
-    import type { AddRequest, UpdateRequest } from "../../notes/types/dto.ts";
-    import { noteService } from "../../notes/services/note.ts";
-    import { handleAPIError } from '../../../api/client/errorHandler';
-    import type { SearchResponse } from "../../notes/types/dto.ts";
-    import NoteItem from "../../notes/components/NoteItem.vue";
-    import { useSessionStore } from "../../../stores/session.ts";
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../../shared/types/ajaxState';
+    import { useLoadingStore } from '../../../../stores/loading';
+    import { useNotify } from '../../../../shared/composables/notification';
+    import { appBus } from '../../../../shared/composables/bus';
+    import { Note } from "../../../notes/models/note.ts";
+    import type { AddRequest, UpdateRequest } from "../../../notes/types/dto.ts";
+    import { noteService } from "../../../notes/services/note.ts";
+    import { handleAPIError } from '../../../../api/client/errorHandler';
+    import type { SearchResponse } from "../../../notes/types/dto.ts";
+    import NoteItem from "../../../notes/components/NoteItem.vue";
+    import { useSessionStore } from "../../../../stores/session.ts";
 
     interface ProjectNotesProps {
         style?: string | CSSProperties;

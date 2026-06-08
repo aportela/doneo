@@ -5,25 +5,25 @@
 
     import { NCard, NModal } from "naive-ui";
 
-    import { useLoadingStore } from '../../../stores/loading';
-    import { useNotify } from '../../../shared/composables/notification';
-    import { appBus } from '../../../shared/composables/bus';
+    import { useLoadingStore } from '../../../../stores/loading';
+    import { useNotify } from '../../../../shared/composables/notification';
+    import { appBus } from '../../../../shared/composables/bus';
 
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
-    import type { FormMode } from "../../../shared/types/form-mode.ts";
-    import type { SearchRequest } from "../types/dto.ts";
-    import type { SearchResponse } from "../../project-tasks/types/dto.ts";
-    import type { ProjectTasksTableFilters } from "../../project-tasks/types/project-tasks-table-filters.ts";
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../../shared/types/ajaxState';
+    import type { FormMode } from "../../../../shared/types/form-mode.ts";
+    import type { SearchRequest } from "../../types/dto.ts";
+    import type { SearchResponse } from "../../../project-tasks/types/dto.ts";
+    import type { ProjectTasksTableFilters } from "../../../project-tasks/types/project-tasks-table-filters.ts";
 
-    import { Sort } from '../../../shared/types/models/sort';
-    import { ProjectTask } from "../../project-tasks/models/tasks.ts";
+    import { Sort } from '../../../../shared/types/models/sort';
+    import { ProjectTask } from "../../../project-tasks/models/tasks.ts";
 
-    import { projectTaskService } from "../../project-tasks/services/task.ts";
-    import { handleAPIError } from '../../../api/client/errorHandler';
+    import { projectTaskService } from "../../../project-tasks/services/task.ts";
+    import { handleAPIError } from '../../../../api/client/errorHandler';
 
-    import NewTaskForm from "../../project-tasks/components/NewTaskForm.vue";
-    import ProjectTasksTable from "../../project-tasks/components/ProjectTasksTable.vue";
-    import Pager from '../../../shared/components/tables/Pager.vue';
+    import NewTaskForm from "../../../project-tasks/components/NewTaskForm.vue";
+    import ProjectTasksTable from "../../../project-tasks/components/ProjectTasksTable.vue";
+    import Pager from '../../../../shared/components/tables/Pager.vue';
 
     interface ProjectTasksProps {
         style?: string | CSSProperties;

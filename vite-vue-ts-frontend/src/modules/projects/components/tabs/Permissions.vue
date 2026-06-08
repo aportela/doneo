@@ -4,21 +4,21 @@
 
     import { NCard, NModal } from "naive-ui";
 
-    import { useLoadingStore } from '../../../stores/loading';
-    import { useNotify } from '../../../shared/composables/notification';
-    import { appBus } from '../../../shared/composables/bus';
+    import { useLoadingStore } from '../../../../stores/loading';
+    import { useNotify } from '../../../../shared/composables/notification';
+    import { appBus } from '../../../../shared/composables/bus';
 
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
-    import type { SearchResponse } from "../../project-permissions/types/dto.ts";
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../../shared/types/ajaxState';
+    import type { SearchResponse } from "../../../project-permissions/types/dto.ts";
 
-    import { ProjectPermission } from "../../project-permissions/models/project-permission.ts";
+    import { ProjectPermission } from "../../../project-permissions/models/project-permission.ts";
 
-    import { projectPermissionService } from "../../project-permissions/services/project-permission.ts";
-    import { handleAPIError } from '../../../api/client/errorHandler';
+    import { projectPermissionService } from "../../../project-permissions/services/project-permission.ts";
+    import { handleAPIError } from '../../../../api/client/errorHandler';
 
-    import ProjectPermissionForm from "../../project-permissions/components/ProjectPermissionForm.vue";
-    import ProjectPermissionsTable from "../../project-permissions/components/ProjectPermissionsTable.vue";
-    import type { ProjectPermissionsTableFilters } from "../../project-permissions/types/project-permissions-table-filter.ts";
+    import ProjectPermissionForm from "../../../project-permissions/components/ProjectPermissionForm.vue";
+    import ProjectPermissionsTable from "../../../project-permissions/components/ProjectPermissionsTable.vue";
+    import type { ProjectPermissionsTableFilters } from "../../../project-permissions/types/project-permissions-table-filter.ts";
 
     interface ProjectPermissionsProps {
         style?: string | CSSProperties;

@@ -4,23 +4,23 @@
 
     import { NCard } from "naive-ui";
 
-    import { useLoadingStore } from '../../../stores/loading';
-    import { useNotify } from '../../../shared/composables/notification';
-    import { appBus } from '../../../shared/composables/bus';
+    import { useLoadingStore } from '../../../../stores/loading';
+    import { useNotify } from '../../../../shared/composables/notification';
+    import { appBus } from '../../../../shared/composables/bus';
 
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
-    import type { SearchResponse } from "../../attachments/types/dto.ts";
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../../shared/types/ajaxState';
+    import type { SearchResponse } from "../../../attachments/types/dto.ts";
 
-    import { ProjectAttachment } from "../../attachments/models/project-attachment.ts";
+    import { ProjectAttachment } from "../../../attachments/models/project-attachment.ts";
 
-    import { projectAttachmentService } from "../../attachments/services/project-attachment.ts";
-    import { handleAPIError } from '../../../api/client/errorHandler';
+    import { projectAttachmentService } from "../../../attachments/services/project-attachment.ts";
+    import { handleAPIError } from '../../../../api/client/errorHandler';
 
-    import UploadDialog from "../../attachments/components/UploadDialog.vue";
-    import ImagePreview from "../../../shared/components/ImagePreview.vue";
+    import UploadDialog from "../../../attachments/components/UploadDialog.vue";
+    import ImagePreview from "../../../../shared/components/ImagePreview.vue";
 
-    import ProjectAttachmentsTable from "../../attachments/components/ProjectAttachmentsTable.vue";
-    import type { ProjectAttachmentsTableFilters } from "../../attachments/types/project-attachments-table-filter.ts";
+    import ProjectAttachmentsTable from "../../../attachments/components/ProjectAttachmentsTable.vue";
+    import type { ProjectAttachmentsTableFilters } from "../../../attachments/types/project-attachments-table-filter.ts";
 
     interface ProjectAttachmentsProps {
         style?: string | CSSProperties;

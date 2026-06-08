@@ -4,23 +4,23 @@
 
     import { NCard, NForm, NFormItem, NInput, NButton, NButtonGroup, NIcon, type InputInst, NFlex, NEllipsis } from 'naive-ui';
 
-    import { useLoadingStore } from '../../../stores/loading';
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
-    import { projectService } from '../services/project';
-    import { handleAPIError } from '../../../api/client/errorHandler';
-    import { appBus } from '../../../shared/composables/bus';
-    import type { ProjectResponse, UpdateRequest } from '../types/dto';
+    import { useLoadingStore } from '../../../../stores/loading';
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../../shared/types/ajaxState';
+    import { projectService } from '../../services/project';
+    import { handleAPIError } from '../../../../api/client/errorHandler';
+    import { appBus } from '../../../../shared/composables/bus';
+    import type { ProjectResponse, UpdateRequest } from '../../types/dto';
 
-    import type { FormMode } from '../../../shared/types/form-mode';
-    import { Project, MAX_SLUG_LENGTH, MAX_SUMMARY_LENGTH } from "../models/project";
-    import ProjectPrioritySelector from "../../project-priorities/components/ProjectPrioritySelector.vue";
-    import ProjectStatusSelector from "../../project-statuses/components/ProjectStatusSelector.vue";
-    import ProjectTypeSelector from "../../project-types/components/ProjectTypeSelector.vue";
-    import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
+    import type { FormMode } from '../../../../shared/types/form-mode';
+    import { Project, MAX_SLUG_LENGTH, MAX_SUMMARY_LENGTH } from "../../models/project";
+    import ProjectPrioritySelector from "../../../project-priorities/components/ProjectPrioritySelector.vue";
+    import ProjectStatusSelector from "../../../project-statuses/components/ProjectStatusSelector.vue";
+    import ProjectTypeSelector from "../../../project-types/components/ProjectTypeSelector.vue";
+    import AvatarUserName from '../../../../shared/components/AvatarUserName.vue';
     import { IconX, IconCheck, IconDeviceFloppy } from '@tabler/icons-vue';
-    import { useMarkdown } from "../../../shared/composables/useMarkdown.ts";
-    import ToggleInput from '../../../shared/components/ToggleInput.vue';
-    import ToggleDateTimePicker from '../../../shared/components/ToggleDateTimePicker.vue';
+    import { useMarkdown } from "../../../../shared/composables/useMarkdown.ts";
+    import ToggleInput from '../../../../shared/components/ToggleInput.vue';
+    import ToggleDateTimePicker from '../../../../shared/components/ToggleDateTimePicker.vue';
 
     interface ProjectFormProps {
         mode: FormMode;

@@ -4,20 +4,20 @@
 
     import { NCard, NTimeline, NTimelineItem, NIcon } from "naive-ui";
 
-    import { useLoadingStore } from '../../../stores/loading';
-    import { appBus } from '../../../shared/composables/bus';
+    import { useLoadingStore } from '../../../../stores/loading';
+    import { appBus } from '../../../../shared/composables/bus';
 
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
-    import type { SearchResponse } from "../../project-history-operations/types/dto";
-    import type { ProjectHistoryOperationsTableFilters } from "../../project-history-operations/types/project-history-operations-table-filters.ts";
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../../shared/types/ajaxState';
+    import type { SearchResponse } from "../../../project-history-operations/types/dto";
+    import type { ProjectHistoryOperationsTableFilters } from "../../../project-history-operations/types/project-history-operations-table-filters.ts";
 
-    import { projectHistoryOperationsService } from "../../project-history-operations/services/project-history-operations";
-    import { handleAPIError } from '../../../api/client/errorHandler';
+    import { projectHistoryOperationsService } from "../../../project-history-operations/services/project-history-operations";
+    import { handleAPIError } from '../../../../api/client/errorHandler';
 
-    import { ProjectHistoryOperation } from "../../project-history-operations/models/project-history-operation";
+    import { ProjectHistoryOperation } from "../../../project-history-operations/models/project-history-operation";
     import { IconSquarePlus, IconEdit, IconDeviceUnknown, IconTrash, IconMessagePlus, IconFileUpload } from "@tabler/icons-vue";
-    import AvatarUserName from "../../../shared/components/AvatarUserName.vue";
-    import ProjectHistoryOperationsTable from "../../project-history-operations/components/ProjectHistoryOperationsTable.vue";
+    import AvatarUserName from "../../../../shared/components/AvatarUserName.vue";
+    import ProjectHistoryOperationsTable from "../../../project-history-operations/components/ProjectHistoryOperationsTable.vue";
 
     interface ProjectHistoryOperationsTabProps {
         style?: string | CSSProperties;

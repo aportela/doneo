@@ -6,12 +6,12 @@
 
     import { IconAlertTriangle } from '@tabler/icons-vue';
 
-    import ProjectMetadataTab from '../components/ProjectMetadataTab.vue';
-    import ProjectTasksTab from '../components/ProjectTasksTab.vue';
-    import ProjectPermissionsTab from '../components/ProjectPermissionsTab.vue';
-    import ProjectAttachmentsTab from '../components/ProjectAttachmentsTab.vue';
-    import ProjectNotesTab from '../components/ProjectNotesTab.vue';
-    import ProjectHistoryOperationsTab from '../components/ProjectHistoryOperationsTab.vue';
+    import ProjectMetadataTab from '../components/tabs/Metadata.vue';
+    import ProjectTasksTab from '../components/tabs/Tasks.vue';
+    import ProjectPermissionsTab from '../components/tabs/Permissions.vue';
+    import ProjectAttachmentsTab from '../components/tabs/Attachments.vue';
+    import ProjectNotesTab from '../components/tabs/Notes.vue';
+    import ProjectHistoryTab from '../components/tabs/History.vue';
 
     const route = useRoute();
     const router = useRouter();
@@ -83,7 +83,7 @@
             <ProjectAttachmentsTab :project-id="projectId" v-model:item-count="attachmentCount" />
         </n-tab-pane>
         <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy">
-            <ProjectHistoryOperationsTab :project-id="projectId" v-model:item-count="historyOperationCount"
+            <ProjectHistoryTab :project-id="projectId" v-model:item-count="historyOperationCount"
                 :key="historyOperationCount" />
         </n-tab-pane>
         <n-tab-pane name="tasks" display-directive="show:lazy">
