@@ -60,8 +60,8 @@
                 if (state.ajaxRunning) {
                     return true;
                 }
-                if (serverErrors.value.name) {
-                    return new Error(t(serverErrors.value.name));
+                if (serverErrors.value.index) {
+                    return new Error(t(serverErrors.value.index));
                 } else {
                     return true;
                 }
@@ -71,6 +71,7 @@
     };
 
     watch(() => projectStatus.value.name, () => { delete serverErrors.value.name });
+    watch(() => projectStatus.value.index, () => { delete serverErrors.value.index });
 
     const serverErrors = ref<Record<string, string>>({});
 
@@ -146,7 +147,7 @@
             const payload: AddRequest = {
                 name: projectStatus.value.name ?? "",
                 hexColor: projectStatus.value.hexColor ?? "",
-                index: 0,
+                index: projectStatus.value.index ?? 0,
             };
             const addedRole: ProjectStatusResponse = await projectStatusService.add(payload);
             emit('add', addedRole)
@@ -161,9 +162,9 @@
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
-                                serverErrors.value.name = "modules.projectPriority.components.ProjectStatusForm.warnings.nameAlreadyExists";
+                                serverErrors.value.name = "modules.projectStatus.components.ProjectStatusForm.warnings.nameAlreadyExists";
                             } else if (apiError.details?.field === "index") {
-                                serverErrors.value.index = "modules.projectPriority.components.ProjectStatusForm.warnings.indexAlreadyExists";
+                                serverErrors.value.index = "modules.projectStatus.components.ProjectStatusForm.warnings.indexAlreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("modules.projectStatus.components.ProjectStatusForm.errors.addError");
                             }
@@ -199,7 +200,7 @@
                 id: projectStatus.value.id ?? "",
                 name: projectStatus.value.name ?? "",
                 hexColor: projectStatus.value.hexColor ?? "",
-                index: 0,
+                index: projectStatus.value.index ?? 0,
             };
             const updatedRole: ProjectStatusResponse = await projectStatusService.update(payload);
             emit('update', updatedRole)
@@ -214,9 +215,9 @@
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
-                                serverErrors.value.name = "modules.projectPriority.components.ProjectStatusForm.warnings.nameAlreadyExists";
+                                serverErrors.value.name = "modules.projectStatus.components.ProjectStatusForm.warnings.nameAlreadyExists";
                             } else if (apiError.details?.field === "index") {
-                                serverErrors.value.index = "modules.projectPriority.components.ProjectStatusForm.warnings.indexAlreadyExists";
+                                serverErrors.value.index = "modules.projectStatus.components.ProjectStatusForm.warnings.indexAlreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("modules.projectStatus.components.ProjectStatusForm.errors.updateError");
                             }

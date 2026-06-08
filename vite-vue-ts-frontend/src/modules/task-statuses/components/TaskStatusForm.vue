@@ -60,8 +60,8 @@
                 if (state.ajaxRunning) {
                     return true;
                 }
-                if (serverErrors.value.name) {
-                    return new Error(t(serverErrors.value.name));
+                if (serverErrors.value.index) {
+                    return new Error(t(serverErrors.value.index));
                 } else {
                     return true;
                 }
@@ -71,6 +71,7 @@
     };
 
     watch(() => taskStatus.value.name, () => { delete serverErrors.value.name });
+    watch(() => taskStatus.value.index, () => { delete serverErrors.value.index });
 
     const serverErrors = ref<Record<string, string>>({});
 
@@ -146,7 +147,7 @@
             const payload: AddRequest = {
                 name: taskStatus.value.name ?? "",
                 hexColor: taskStatus.value.hexColor ?? "",
-                index: 0,
+                index: taskStatus.value.index ?? 0,
             };
             const addedRole: TaskStatusResponse = await taskStatusService.add(payload);
             emit('add', addedRole)
@@ -199,7 +200,7 @@
                 id: taskStatus.value.id ?? "",
                 name: taskStatus.value.name ?? "",
                 hexColor: taskStatus.value.hexColor ?? "",
-                index: 0,
+                index: taskStatus.value.index ?? 0,
             };
             const updatedRole: TaskStatusResponse = await taskStatusService.update(payload);
             emit('update', updatedRole)
