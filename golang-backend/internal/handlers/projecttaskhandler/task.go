@@ -50,7 +50,7 @@ func (handler *TaskHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	task := updateRequestToDomain(request)
-	task.ID = chi.URLParam(r, "id")
+	task.ID = chi.URLParam(r, "task_id")
 	task, err := handler.service.Update(r.Context(), task)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to update task with ID %s: %w", task.ID, err))
