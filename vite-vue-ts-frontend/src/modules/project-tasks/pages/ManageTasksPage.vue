@@ -19,10 +19,13 @@
     import { handleAPIError } from '../../../api/client/errorHandler.ts';
 
     import ProjectTasksTable from '../components/ProjectTasksTable.vue';
+    import ProjectTasksKanban from '../components/ProjectTasksKanban.vue';
     import Pager from '../../../shared/components/tables/Pager.vue';
 
     const { t } = useI18n();
     const loadingStore = useLoadingStore();
+
+    const tab = ref<string>("List");
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -129,7 +132,7 @@
     };
 
     onMounted(() => {
-        onRefresh();
+        //onRefresh();
         stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
             if (payload.to.includes("ManageTasksPage.onRefresh")) {
                 onRefresh();
@@ -144,7 +147,7 @@
 
 <template>
     <n-tabs>
-        <n-tab-pane name="List" tab="List" type="segment" animated>
+        <n-tab-pane name="List" tab="List" type="segment" animated v-model="tab" display-directive="show:lazy">
             <template #tab>
                 <n-icon size="16" class="tab-icon">
                     <IconList />
@@ -152,10 +155,22 @@
                 List
             </template>
             <template #default>
-                LIST
+                <n-card :title="t('modules.project.components.ManageTasksPage.header.title')">
+                    <Pager v-model:current-page="currentPage" v-model:page-size="pageSize" :total-pages="totalPages"
+                        :total-results="totalResults" class="doneo-pager-container">
+                        <template #total-results-label="{ totalResults }">
+                            {{ t("modules.project.components.ManageTasksPage.pager.totalItemsLabel", {
+                                total:
+                                    totalResults
+                            }) }}
+                        </template>
+                    </Pager>
+                    <ProjectTasksTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" :sort="sort"
+                        @sort="onSort" v-model:filters="filters" :project-id="''" />
+                </n-card>
             </template>
         </n-tab-pane>
-        <n-tab-pane name="Kanban" tab="Kanban">
+        <n-tab-pane name="Kanban" tab="Kanban" display-directive="show:lazy">
             <template #tab>
                 <n-icon size="16" class="tab-icon">
                     <IconLayoutKanban />
@@ -163,10 +178,10 @@
                 Kanban
             </template>
             <template #default>
-                KANBAN
+                <ProjectTasksKanban />
             </template>
         </n-tab-pane>
-        <n-tab-pane name="Calendar" tab="Calendar">
+        <n-tab-pane name="Calendar" tab="Calendar" display-directive="show:lazy">
             <template #tab>
                 <n-icon size="16" class="tab-icon">
                     <IconCalendarWeek />
@@ -179,16 +194,7 @@
         </n-tab-pane>
     </n-tabs>
 
-    <n-card :title="t('modules.project.components.ManageTasksPage.header.title')">
-        <Pager v-model:current-page="currentPage" v-model:page-size="pageSize" :total-pages="totalPages"
-            :total-results="totalResults" class="doneo-pager-container">
-            <template #total-results-label="{ totalResults }">
-                {{ t("modules.project.components.ManageTasksPage.pager.totalItemsLabel", { total: totalResults }) }}
-            </template>
-        </Pager>
-        <ProjectTasksTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" :sort="sort" @sort="onSort"
-            v-model:filters="filters" :project-id="''" />
-    </n-card>
+
 </template>
 
 <style lang="css" scoped>
