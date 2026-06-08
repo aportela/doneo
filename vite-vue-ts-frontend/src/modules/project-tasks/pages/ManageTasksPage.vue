@@ -156,11 +156,11 @@
                 List
             </template>
             <template #default>
-                <n-card :title="t('modules.project.components.ManageTasksPage.header.title')">
+                <n-card :title="t('modules.task.components.ManageTasksPage.header.title')">
                     <Pager v-model:current-page="currentPage" v-model:page-size="pageSize" :total-pages="totalPages"
                         :total-results="totalResults" class="doneo-pager-container">
                         <template #total-results-label="{ totalResults }">
-                            {{ t("modules.project.components.ManageTasksPage.pager.totalItemsLabel", {
+                            {{ t("modules.task.components.ManageTasksPage.pager.totalItemsLabel", {
                                 total:
                                     totalResults
                             }) }}

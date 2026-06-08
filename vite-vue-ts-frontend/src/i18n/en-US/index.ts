@@ -1223,6 +1223,14 @@ export default {
             addError: "There was a problem while adding the task data",
           },
         },
+        ManageTasksPage: {
+          header: {
+            title: "Manage tasks",
+          },
+          pager: {
+            totalItemsLabel: "Total tasks: {total}",
+          },
+        },
         ProjectTasksTable: {
           header: {
             columns: {
