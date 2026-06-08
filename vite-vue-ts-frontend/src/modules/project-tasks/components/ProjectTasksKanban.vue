@@ -1,23 +1,39 @@
 <script setup lang="ts">
     import { onMounted, ref } from 'vue'
 
-    import { NCard, NButton, NInput, NScrollbar, NIcon, NGrid, NGridItem } from 'naive-ui'
-    import { IconPlus } from '@tabler/icons-vue'
+    import { NCard, NButton, NInput, NScrollbar, NGrid, NGridItem } from 'naive-ui'
+
+    import draggable from 'vuedraggable'
 
     import { taskStatusService } from '../../task-statuses/services/task-status'
     import type { SearchRequest } from '../../task-statuses/types/dto'
     import { Sort } from '../../../shared/types/models/sort'
 
     interface Task {
-        id: number
+        id: string
         title: string
-        description?: string
     }
 
     interface Column {
-        id: number
+        id: string
         title: string
         tasks: Task[]
+    }
+
+    const columns = ref<Column[]>([
+        { id: 'todo', title: 'To Do', tasks: [{ id: '1', title: 'Tarea A' }] },
+        { id: 'doing', title: 'Doing', tasks: [{ id: '2', title: 'Tarea B' }] },
+        { id: 'done', title: 'Done', tasks: [{ id: '3', title: 'Tarea C' }] }
+    ])
+
+    const newTaskTitle = ref('')
+
+    function addTask(columnId: string) {
+        const column = columns.value.find(c => c.id === columnId)
+        if (column && newTaskTitle.value.trim() !== '') {
+            column.tasks.push({ id: Date.now().toString(), title: newTaskTitle.value })
+            newTaskTitle.value = ''
+        }
     }
 
     const sort = new Sort("name", "ASC");
@@ -39,24 +55,6 @@
         taskStatusService.search(payload);
     }
 
-    const columns = ref<Column[]>([
-        { id: 1, title: 'To Do', tasks: [{ id: 1, title: 'Task 1' }, { id: 2, title: 'Task 2' }] },
-        { id: 2, title: 'In Progress', tasks: [{ id: 3, title: 'Task 3' }] },
-        { id: 3, title: 'Done', tasks: [{ id: 4, title: 'Task 4' }] }
-    ])
-
-    const newTaskTitle = ref('')
-    const addTask = (columnId: number) => {
-        if (!newTaskTitle.value.trim()) return
-        const column = columns.value.find(c => c.id === columnId)
-        if (!column) return
-        column.tasks.push({
-            id: Date.now(),
-            title: newTaskTitle.value
-        })
-        newTaskTitle.value = ''
-    }
-
     onMounted(() => {
         refreshStatus();
     });
@@ -68,18 +66,19 @@
             <NCard :title="column.title" size="large" style="height: 500px; display: flex; flex-direction: column;">
                 <div style="flex: 1; overflow: hidden;">
                     <NScrollbar style="height: 100%;">
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <NCard v-for="task in column.tasks" :key="task.id" size="small" style="cursor: grab;">
-                                {{ task.title }}
-                            </NCard>
-                        </div>
+                        <draggable v-model="column.tasks" group="tasks" item-key="id" animation="200"
+                            ghost-class="drag-ghost">
+                            <template #item="{ element }">
+                                <NCard size="small" style="cursor: grab; margin-bottom: 8px;">
+                                    {{ element.title }}
+                                </NCard>
+                            </template>
+                        </draggable>
                     </NScrollbar>
                 </div>
                 <div style="margin-top: 8px; display: flex; gap: 6px;">
-                    <NInput v-model:value="newTaskTitle" placeholder="Nueva tarea..." size="small" />
-                    <NButton size="small" @click="addTask(column.id)">
-                        +
-                    </NButton>
+                    <NInput v-model:value="newTaskTitle" placeholder="New task..." size="small" />
+                    <NButton size="small" @click="addTask(column.id)">+</NButton>
                 </div>
             </NCard>
         </NGridItem>
@@ -87,8 +86,8 @@
 </template>
 
 <style scoped>
-
-    .n-scrollbar__wrap {
-        max-height: 300px;
+    .drag-ghost {
+        opacity: 0.5;
+        background-color: #f0f0f0;
     }
 </style>

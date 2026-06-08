@@ -2,7 +2,7 @@
     import { onMounted, onBeforeUnmount, ref, reactive, shallowRef, watch } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NTabs, NTabPane, NIcon } from 'naive-ui';
+    import { NTabs, NTabPane, NIcon, NCard } from 'naive-ui';
     import { IconList, IconLayoutKanban, IconCalendarWeek } from '@tabler/icons-vue';
 
     import { useLoadingStore } from '../../../stores/loading';
