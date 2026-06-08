@@ -100,7 +100,7 @@
                     createdByUserId: filters.createdByUserId !== null ? filters.createdByUserId : undefined,
                 }
             };
-            const response = await projectTaskService.search("", payload);
+            const response = await projectTaskService.search(null, payload);
             totalPages.value = response.pager.totalPages;
             totalResults.value = response.pager.totalResults;
             items.value = response.tasks.map((task: TaskResponse) => new ProjectTask(task))
@@ -133,7 +133,7 @@
     };
 
     onMounted(() => {
-        //onRefresh();
+        onRefresh();
         stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
             if (payload.to.includes("ManageTasksPage.onRefresh")) {
                 onRefresh();
