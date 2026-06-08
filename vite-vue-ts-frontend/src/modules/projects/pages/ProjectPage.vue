@@ -20,6 +20,7 @@
 
     // TODO: set tab with type (type tab = "metadata" | "permissions"....)
     const tab = computed({
+        // TODO: invalid tab route ???
         get: () => route.params.tab as string,
         set: (value: string) => {
             router.push({
