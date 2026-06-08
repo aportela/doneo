@@ -6,6 +6,7 @@
     import { IconTrash } from '@tabler/icons-vue';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
+    import type { Sort } from '../../../shared/types/models/sort.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { ProjectStatusesTableFilters } from '../types/project-statuses-table-filters.ts';
     import { ProjectStatus } from '../models/project-status';
@@ -19,12 +20,13 @@
     interface Props {
         disabled: boolean;
         items: ProjectStatus[];
+        sort?: Sort;
     }
 
     const { t } = useI18n();
     const dialog = useDialog();
 
-    const emit = defineEmits(['refresh', 'add', 'update', 'delete']);
+    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'sort']);
 
     const props = defineProps<Props>();
 
@@ -45,17 +47,21 @@
             label: t("modules.projectStatus.components.ProjectStatusesTable.header.columns.name"),
             field: "name",
             visible: true,
-            sortable: false,
+            sortable: true,
             isFiltered: () => isFilteredByName.value,
         },
         {
             label: t("modules.projectStatus.components.ProjectStatusesTable.header.columns.index"),
             field: "index",
             visible: true,
-            sortable: false,
+            sortable: true,
             isFiltered: () => false,
         },
     ]);
+
+    const onSort = (sort: Sort) => {
+        emit("sort", sort);
+    };
 
     const onRefresh = () => {
         emit("refresh");
@@ -94,7 +100,7 @@
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
+    <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd">
         <template #thead>
             <tr>
                 <th>
