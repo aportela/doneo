@@ -72,7 +72,7 @@ export function useMenu() {
             RouterLink,
             {
               to: {
-                name: "projects",
+                name: "manageProjects",
                 params: {},
               },
             },
@@ -87,7 +87,7 @@ export function useMenu() {
             RouterLink,
             {
               to: {
-                name: "tasks",
+                name: "manageTasks",
                 params: {},
               },
             },

@@ -24,7 +24,7 @@ const routes: RouteRecordRaw[] = [
         component: () => import("../pages/HomePage.vue"),
       },
       {
-        name: "projects",
+        name: "manageProjects",
         path: "projects",
         component: () =>
           import("../modules/projects/pages/ManageProjectsPage.vue"),
@@ -43,7 +43,7 @@ const routes: RouteRecordRaw[] = [
         ],
       },
       {
-        name: "tasks",
+        name: "manageTasks",
         path: "tasks",
         component: () =>
           import("../modules/project-tasks/pages/ManageTasksPage.vue"),
