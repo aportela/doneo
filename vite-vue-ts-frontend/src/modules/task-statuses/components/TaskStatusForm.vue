@@ -298,10 +298,10 @@
                     </template>
                 </n-input>
             </n-form-item>
-            <n-form-item :label="t('modules.projectStatus.components.TaskStatusForm.inputs.index.label')" path="index"
+            <n-form-item :label="t('modules.taskStatus.components.TaskStatusForm.inputs.index.label')" path="index"
                 show-feedback>
                 <n-input-number :min="0"
-                    :placeholder="t('modules.projectStatus.components.TaskStatusForm.inputs.index.placeholder')"
+                    :placeholder="t('modules.taskStatus.components.TaskStatusForm.inputs.index.placeholder')"
                     v-model:value="taskStatus.index" required>
                 </n-input-number>
             </n-form-item>
