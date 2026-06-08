@@ -17,10 +17,11 @@ func createProjectStatuses(database database.Database) []string {
 	}
 	var newProjectStatusIds []string
 	service := projectstatusservice.NewService(database, projectstatusrepository.NewRepository(database))
-	for _, projectStatusName := range projectStatusNames {
+	for index, projectStatusName := range projectStatusNames {
 		projectStatus := domain.ProjectStatus{
 			Name:     projectStatusName,
 			HexColor: utils.RandomSoftHexColor(),
+			Index:    uint(index),
 		}
 		projectStatus, err := service.Add(context.Background(), projectStatus)
 		if err != nil {

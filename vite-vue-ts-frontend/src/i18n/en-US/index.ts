@@ -603,6 +603,13 @@ export default {
             preview: {
               label: "Preview",
             },
+            index: {
+              label: "Index",
+              placeholder: "Enter project status index",
+              errors: {
+                alreadyExists: "Index",
+              },
+            },
           },
           errors: {
             loadError:
@@ -616,6 +623,7 @@ export default {
           },
           warnings: {
             nameAlreadyExists: "Name already exists",
+            indexAlreadyExists: "Index already exists",
           },
         },
         ManageProjectStatusesPage: {
@@ -643,6 +651,7 @@ export default {
           header: {
             columns: {
               name: "Name",
+              index: "Index",
             },
           },
           filters: {
@@ -1037,6 +1046,13 @@ export default {
             preview: {
               label: "Preview",
             },
+            index: {
+              label: "Index",
+              placeholder: "Enter task status index",
+              errors: {
+                alreadyExists: "Index",
+              },
+            },
           },
           errors: {
             loadError: "There was a problem while loading the task status data",
@@ -1048,6 +1064,7 @@ export default {
           },
           warnings: {
             nameAlreadyExists: "Name already exists",
+            indexAlreadyExists: "Index already exists",
           },
         },
         ManageTaskStatusesPage: {
@@ -1074,6 +1091,7 @@ export default {
           header: {
             columns: {
               name: "Name",
+              index: "Index",
             },
           },
           filters: {

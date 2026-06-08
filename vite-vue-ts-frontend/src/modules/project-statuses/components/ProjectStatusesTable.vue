@@ -47,7 +47,14 @@
             visible: true,
             sortable: false,
             isFiltered: () => isFilteredByName.value,
-        }
+        },
+        {
+            label: t("modules.projectStatus.components.ProjectStatusesTable.header.columns.index"),
+            field: "index",
+            visible: true,
+            sortable: false,
+            isFiltered: () => false,
+        },
     ]);
 
     const onRefresh = () => {
@@ -95,6 +102,7 @@
                         :placeholder="t('modules.projectStatus.components.ProjectStatusesTable.filters.name.placeholder')"
                         v-model:value="filters.name" />
                 </th>
+                <th></th>
                 <th class="doneo-text-center">
                     <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
                 </th>
@@ -106,6 +114,7 @@
                     <n-tag :color="getNaiveUITagColorProperty(projectStatus.hexColor ?? '#888888')">{{
                         projectStatus.name }}</n-tag>
                 </td>
+                <td>{{ projectStatus.index }}</td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
                         :delete-disabled="props.disabled" :disabled="props.disabled"

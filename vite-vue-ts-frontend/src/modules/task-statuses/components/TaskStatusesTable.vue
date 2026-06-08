@@ -47,6 +47,13 @@
             visible: true,
             sortable: false,
             isFiltered: () => isFilteredByName.value,
+        },
+        {
+            label: t("modules.taskStatus.components.TaskStatusesTable.header.columns.index"),
+            field: "index",
+            visible: true,
+            sortable: false,
+            isFiltered: () => false,
         }
     ]);
 
@@ -95,6 +102,7 @@
                         :placeholder="t('modules.taskStatus.components.TaskStatusesTable.filters.name.placeholder')"
                         v-model:value="filters.name" />
                 </th>
+                <th></th>
                 <th class="doneo-text-center">
                     <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
                 </th>
@@ -104,8 +112,9 @@
             <tr v-for="taskStatus, index in items" :key="taskStatus.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(taskStatus.hexColor ?? '#888888')">{{ taskStatus.name
-                        }}</n-tag>
+                    }}</n-tag>
                 </td>
+                <td>{{ taskStatus.index }}</td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
                         :delete-disabled="props.disabled" :disabled="props.disabled"

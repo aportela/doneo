@@ -11,6 +11,7 @@ func addRequestToDomain(request addRequest) domain.ProjectStatus {
 		ID:       request.ID,
 		Name:     request.Name,
 		HexColor: request.HexColor,
+		Index:    request.Index,
 	}
 }
 
@@ -19,6 +20,7 @@ func updateRequestToDomain(request updateRequest) domain.ProjectStatus {
 		ID:       request.ID,
 		Name:     request.Name,
 		HexColor: request.HexColor,
+		Index:    request.Index,
 	}
 }
 
@@ -27,6 +29,7 @@ func DomainToResponse(projectStatus domain.ProjectStatus) ProjectStatusResponse 
 		ID:       projectStatus.ID,
 		Name:     projectStatus.Name,
 		HexColor: projectStatus.HexColor,
+		Index:    projectStatus.Index,
 	}
 }
 

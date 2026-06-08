@@ -30,7 +30,7 @@
 
     const items = shallowRef<TaskStatus[]>([]);
 
-    const sort = reactive<Sort>(new Sort("name", "ASC"));
+    const sort = reactive<Sort>(new Sort("index", "ASC"));
 
     const filters = reactive<TaskStatusesTableFilters>({
         name: "",

@@ -6,12 +6,14 @@ type addRequest struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	HexColor string `json:"hexColor"`
+	Index    uint   `json:"index"`
 }
 
 type updateRequest struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	HexColor string `json:"hexColor"`
+	Index    uint   `json:"index"`
 }
 
 type filterRequest struct {
@@ -28,6 +30,7 @@ type TaskStatusResponse struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	HexColor string `json:"hexColor"`
+	Index    uint   `json:"index"`
 }
 
 type searchResponse struct {

@@ -9,6 +9,7 @@ func toDTO(taskStatus domain.TaskStatus) taskStatusDTO {
 		ID:       taskStatus.ID,
 		Name:     taskStatus.Name,
 		HexColor: taskStatus.HexColor,
+		Index:    taskStatus.Index,
 	}
 }
 
@@ -17,6 +18,7 @@ func toDomain(taskStatus taskStatusDTO) domain.TaskStatus {
 		ID:       taskStatus.ID,
 		Name:     taskStatus.Name,
 		HexColor: taskStatus.HexColor,
+		Index:    taskStatus.Index,
 	}
 }
 

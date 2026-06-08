@@ -9,6 +9,7 @@ func toDTO(projectStatus domain.ProjectStatus) projectStatusDTO {
 		ID:       projectStatus.ID,
 		Name:     projectStatus.Name,
 		HexColor: projectStatus.HexColor,
+		Index:    projectStatus.Index,
 	}
 }
 
@@ -17,6 +18,7 @@ func toDomain(projectStatus projectStatusDTO) domain.ProjectStatus {
 		ID:       projectStatus.ID,
 		Name:     projectStatus.Name,
 		HexColor: projectStatus.HexColor,
+		Index:    projectStatus.Index,
 	}
 }
 

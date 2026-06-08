@@ -2,7 +2,7 @@
     import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, type CSSProperties, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSpin, NCard, NInput, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
+    import { NSpin, NCard, NInput, NInputNumber, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette } from '@tabler/icons-vue';
 
     import { TaskStatus, MAX_NAME_LENGTH } from '../models/task-status';
@@ -47,6 +47,20 @@
                 else if (value.length > MAX_NAME_LENGTH) {
                     return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
                 } else if (serverErrors.value.name) {
+                    return new Error(t(serverErrors.value.name));
+                } else {
+                    return true;
+                }
+            },
+            trigger: ['blur'],
+        },
+        index: {
+            required: true,
+            validator: (_rule: FormItemRule, _value: number) => {
+                if (state.ajaxRunning) {
+                    return true;
+                }
+                if (serverErrors.value.name) {
                     return new Error(t(serverErrors.value.name));
                 } else {
                     return true;
@@ -131,7 +145,8 @@
         try {
             const payload: AddRequest = {
                 name: taskStatus.value.name ?? "",
-                HexColor: taskStatus.value.hexColor ?? "",
+                hexColor: taskStatus.value.hexColor ?? "",
+                index: 0,
             };
             const addedRole: TaskStatusResponse = await taskStatusService.add(payload);
             emit('add', addedRole)
@@ -146,7 +161,9 @@
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
-                                serverErrors.value.name = "modules.taskStatus.components.TaskStatusForm.inputs.name.errors.alreadyExists";
+                                serverErrors.value.name = "modules.taskStatus.components.TaskStatusForm.warnings.nameAlreadyExists";
+                            } else if (apiError.details?.field === "index") {
+                                serverErrors.value.index = "modules.taskStatus.components.TaskStatusForm.warnings.indexAlreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("modules.taskStatus.components.TaskStatusForm.errors.addError");
                             }
@@ -181,7 +198,8 @@
             const payload: UpdateRequest = {
                 id: taskStatus.value.id ?? "",
                 name: taskStatus.value.name ?? "",
-                HexColor: taskStatus.value.hexColor ?? "",
+                hexColor: taskStatus.value.hexColor ?? "",
+                index: 0,
             };
             const updatedRole: TaskStatusResponse = await taskStatusService.update(payload);
             emit('update', updatedRole)
@@ -196,7 +214,9 @@
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
-                                serverErrors.value.name = "modules.taskStatus.components.TaskStatusForm.inputs.name.errors.alreadyExists";
+                                serverErrors.value.name = "modules.taskStatus.components.TaskStatusForm.warnings.nameAlreadyExists";
+                            } else if (apiError.details?.field === "index") {
+                                serverErrors.value.index = "modules.taskStatus.components.TaskStatusForm.warnings.indexAlreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("modules.taskStatus.components.TaskStatusForm.errors.updateError");
                             }
@@ -276,6 +296,13 @@
                         <n-icon :component="IconUser" />
                     </template>
                 </n-input>
+            </n-form-item>
+            <n-form-item :label="t('modules.projectStatus.components.TaskStatusForm.inputs.index.label')" path="index"
+                show-feedback>
+                <n-input-number :min="0"
+                    :placeholder="t('modules.projectStatus.components.TaskStatusForm.inputs.index.placeholder')"
+                    v-model:value="taskStatus.index" required>
+                </n-input-number>
             </n-form-item>
             <n-form-item :label="t('modules.taskStatus.components.TaskStatusForm.inputs.preview.label')">
                 <n-flex style="width: 100%" align="center" :wrap="false">
