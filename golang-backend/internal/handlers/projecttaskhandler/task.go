@@ -77,14 +77,14 @@ func (handler *TaskHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 func (handler *TaskHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "id")
-	project, err := handler.service.Get(r.Context(), projectId)
+	taskId := chi.URLParam(r, "task_id")
+	project, err := handler.service.Get(r.Context(), taskId)
 	if err != nil {
 		if err == domain.NotFoundError {
-			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] not found project with ID %s: %w", projectId, err))
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] not found project with ID %s: %w", taskId, err))
 			return
 		} else {
-			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to get project with ID %s: %w", projectId, err))
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to get project with ID %s: %w", taskId, err))
 			return
 		}
 	}
