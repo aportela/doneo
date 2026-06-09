@@ -3,11 +3,13 @@ import type {
   PagerResponse,
 } from "../../../shared/types/dto/pager";
 import type { Order } from "../../../shared/types/dto/order";
+import type { StatusFlags } from "../../../shared/types/status-flags";
 
 export type AddRequest = {
   name: string;
   hexColor: string;
   index: number;
+  flags: StatusFlags;
 };
 
 export type UpdateRequest = {
@@ -15,6 +17,7 @@ export type UpdateRequest = {
   name: string;
   hexColor: string;
   index: number;
+  flags: StatusFlags;
 };
 
 type SearchRequestFilter = {
@@ -32,6 +35,7 @@ export type ProjectStatusResponse = {
   name: string;
   hexColor: string;
   index: number;
+  flags: StatusFlags;
 };
 
 export type SearchResponse = {

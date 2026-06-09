@@ -2,8 +2,8 @@
     import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, type CSSProperties, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSpin, NCard, NInput, NInputNumber, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
-    import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette } from '@tabler/icons-vue';
+    import { NSpin, NCard, NInput, NInputNumber, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NTooltip } from 'naive-ui';
+    import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette, IconStar, IconCalendarBolt, IconCalendarCancel } from '@tabler/icons-vue';
 
     import { TaskStatus, MAX_NAME_LENGTH } from '../models/task-status';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
@@ -148,6 +148,13 @@
                 name: taskStatus.value.name ?? "",
                 hexColor: taskStatus.value.hexColor ?? "",
                 index: taskStatus.value.index ?? 0,
+                flags: {
+                    defaultStatusOnCreation: taskStatus.value.flags?.defaultStatusOnCreation ?? false,
+                    fillEmptyStartDate: taskStatus.value.flags?.fillEmptyStartDate ?? false,
+                    setStartDate: taskStatus.value.flags?.setStartDate ?? false,
+                    fillEmptyFinishDate: taskStatus.value.flags?.fillEmptyFinishDate ?? false,
+                    setFinishDate: taskStatus.value.flags?.setFinishDate ?? false,
+                }
             };
             const addedRole: TaskStatusResponse = await taskStatusService.add(payload);
             emit('add', addedRole)
@@ -201,6 +208,13 @@
                 name: taskStatus.value.name ?? "",
                 hexColor: taskStatus.value.hexColor ?? "",
                 index: taskStatus.value.index ?? 0,
+                flags: {
+                    defaultStatusOnCreation: taskStatus.value.flags?.defaultStatusOnCreation ?? false,
+                    fillEmptyStartDate: taskStatus.value.flags?.fillEmptyStartDate ?? false,
+                    setStartDate: taskStatus.value.flags?.setStartDate ?? false,
+                    fillEmptyFinishDate: taskStatus.value.flags?.fillEmptyFinishDate ?? false,
+                    setFinishDate: taskStatus.value.flags?.setFinishDate ?? false,
+                }
             };
             const updatedRole: TaskStatusResponse = await taskStatusService.update(payload);
             emit('update', updatedRole)
@@ -272,6 +286,8 @@
     onBeforeUnmount(() => {
         stopBusReauthListener();
     });
+
+    const flagIconSize = 22;
 </script>
 
 <template>
@@ -298,13 +314,77 @@
                     </template>
                 </n-input>
             </n-form-item>
-            <n-form-item :label="t('modules.taskStatus.components.TaskStatusForm.inputs.index.label')" path="index"
-                show-feedback>
-                <n-input-number :min="0"
-                    :placeholder="t('modules.taskStatus.components.TaskStatusForm.inputs.index.placeholder')"
-                    v-model:value="taskStatus.index" required>
-                </n-input-number>
-            </n-form-item>
+            <n-flex>
+                <n-form-item :label="t('modules.taskStatus.components.TaskStatusForm.inputs.index.label')" path="index"
+                    show-feedback>
+                    <n-input-number :min="0"
+                        :placeholder="t('modules.taskStatus.components.TaskStatusForm.inputs.index.placeholder')"
+                        v-model:value="taskStatus.index" required>
+                    </n-input-number>
+                </n-form-item>
+                <n-form-item :label="t('modules.taskStatus.components.TaskStatusForm.inputs.flags.label')">
+                    <n-tooltip trigger="hover">
+                        <template #trigger>
+                            <n-icon :component="IconStar" :size="flagIconSize" class="doneo-cursor-help"
+                                :class="{ 'doneo-disabled-icon': !taskStatus.flags.defaultStatusOnCreation }"
+                                @click="taskStatus.flags.defaultStatusOnCreation = !taskStatus.flags.defaultStatusOnCreation" />
+                        </template>
+                        {{ t(taskStatus.flags.defaultStatusOnCreation ?
+                            "modules.taskStatus.components.TaskStatusesTable.body.columns.permissionsHints.hasDefaultStatusOnCreation"
+                            :
+                            "modules.taskStatus.components.TaskStatusesTable.body.columns.permissionsHints.hasNotdefaultStatusOnCreation")
+                        }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover">
+                        <template #trigger>
+                            <n-icon :component="IconCalendarBolt" :size="flagIconSize" class="doneo-cursor-help"
+                                :class="{ 'doneo-disabled-icon': !taskStatus.flags.fillEmptyStartDate }"
+                                @click="taskStatus.flags.fillEmptyStartDate = !taskStatus.flags.fillEmptyStartDate" />
+                        </template>
+                        {{ t(taskStatus.flags.fillEmptyStartDate ?
+                            "modules.taskStatus.components.TaskStatusesTable.body.columns.permissionsHints.hasFillEmptyStartDate"
+                            :
+                            "modules.taskStatus.components.TaskStatusesTable.body.columns.permissionsHints.hasNotFillEmptyStartDate")
+                        }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover">
+                        <template #trigger>
+                            <n-icon :component="IconCalendarCancel" :size="flagIconSize" class="doneo-cursor-help"
+                                :class="{ 'doneo-disabled-icon': !taskStatus.flags.setStartDate }"
+                                @click="taskStatus.flags.setStartDate = !taskStatus.flags.setStartDate" />
+                        </template>
+                        {{ t(taskStatus.flags.setStartDate ?
+                            "modules.taskStatus.components.TaskStatusesTable.body.columns.permissionsHints.hasSetStartDate"
+                            :
+                            "modules.taskStatus.components.TaskStatusesTable.body.columns.permissionsHints.hasNotSetStartDate")
+                        }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover">
+                        <template #trigger>
+                            <n-icon :component="IconCalendarBolt" :size="flagIconSize" class="doneo-cursor-help"
+                                :class="{ 'doneo-disabled-icon': !taskStatus.flags.fillEmptyFinishDate }"
+                                @click="taskStatus.flags.fillEmptyFinishDate = !taskStatus.flags.fillEmptyFinishDate" />
+                        </template>
+                        {{ t(taskStatus.flags.fillEmptyFinishDate ?
+                            "modules.taskStatus.components.TaskStatusesTable.body.columns.permissionsHints.hasFillEmptyFinishDate"
+                            :
+                            "modules.taskStatus.components.TaskStatusesTable.body.columns.permissionsHints.hasNotFillEmptyFinishDate")
+                        }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover">
+                        <template #trigger>
+                            <n-icon :component="IconCalendarCancel" :size="flagIconSize" class="doneo-cursor-help"
+                                :class="{ 'doneo-disabled-icon': !taskStatus.flags.setFinishDate }"
+                                @click="taskStatus.flags.setFinishDate = !taskStatus.flags.setFinishDate" />
+                        </template>
+                        {{ t(taskStatus.flags.setFinishDate ?
+                            "modules.taskStatus.components.TaskStatusesTable.body.columns.permissionsHints.hasSetFinishDate"
+                            :
+                            "modules.taskStatus.components.TaskStatusesTable.body.columns.permissionsHints.hasNotSetFinishDate")
+                        }}
+                    </n-tooltip>
+                </n-form-item>
+            </n-flex>
             <n-form-item :label="t('modules.taskStatus.components.TaskStatusForm.inputs.preview.label')">
                 <n-flex style="width: 100%" align="center" :wrap="false">
                     <n-tag :color="getNaiveUITagColorProperty(taskStatus.hexColor ?? '#888888')" style="width: 100%;">
@@ -339,7 +419,6 @@
             </n-flex>
         </template>
     </n-card>
-
 </template>
 
 <style lang="css" scoped></style>

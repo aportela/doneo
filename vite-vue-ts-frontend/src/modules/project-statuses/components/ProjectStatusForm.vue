@@ -2,8 +2,8 @@
     import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, type CSSProperties, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSpin, NCard, NInput, NInputNumber, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
-    import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette } from '@tabler/icons-vue';
+    import { NSpin, NCard, NInput, NInputNumber, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NTooltip } from 'naive-ui';
+    import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette, IconStar, IconCalendarBolt, IconCalendarCancel } from '@tabler/icons-vue';
 
     import { ProjectStatus, MAX_NAME_LENGTH } from '../models/project-status';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
@@ -148,6 +148,13 @@
                 name: projectStatus.value.name ?? "",
                 hexColor: projectStatus.value.hexColor ?? "",
                 index: projectStatus.value.index ?? 0,
+                flags: {
+                    defaultStatusOnCreation: projectStatus.value.flags?.defaultStatusOnCreation ?? false,
+                    fillEmptyStartDate: projectStatus.value.flags?.fillEmptyStartDate ?? false,
+                    setStartDate: projectStatus.value.flags?.setStartDate ?? false,
+                    fillEmptyFinishDate: projectStatus.value.flags?.fillEmptyFinishDate ?? false,
+                    setFinishDate: projectStatus.value.flags?.setFinishDate ?? false,
+                }
             };
             const addedRole: ProjectStatusResponse = await projectStatusService.add(payload);
             emit('add', addedRole)
@@ -201,6 +208,13 @@
                 name: projectStatus.value.name ?? "",
                 hexColor: projectStatus.value.hexColor ?? "",
                 index: projectStatus.value.index ?? 0,
+                flags: {
+                    defaultStatusOnCreation: projectStatus.value.flags?.defaultStatusOnCreation ?? false,
+                    fillEmptyStartDate: projectStatus.value.flags?.fillEmptyStartDate ?? false,
+                    setStartDate: projectStatus.value.flags?.setStartDate ?? false,
+                    fillEmptyFinishDate: projectStatus.value.flags?.fillEmptyFinishDate ?? false,
+                    setFinishDate: projectStatus.value.flags?.setFinishDate ?? false,
+                }
             };
             const updatedRole: ProjectStatusResponse = await projectStatusService.update(payload);
             emit('update', updatedRole)
@@ -272,6 +286,8 @@
     onBeforeUnmount(() => {
         stopBusReauthListener();
     });
+
+    const flagIconSize = 22;
 </script>
 
 <template>
@@ -299,13 +315,77 @@
                     </template>
                 </n-input>
             </n-form-item>
-            <n-form-item :label="t('modules.projectStatus.components.ProjectStatusForm.inputs.index.label')"
-                path="index" show-feedback>
-                <n-input-number :min="0"
-                    :placeholder="t('modules.projectStatus.components.ProjectStatusForm.inputs.index.placeholder')"
-                    v-model:value="projectStatus.index" required>
-                </n-input-number>
-            </n-form-item>
+            <n-flex>
+                <n-form-item :label="t('modules.projectStatus.components.ProjectStatusForm.inputs.index.label')"
+                    path="index" show-feedback>
+                    <n-input-number :min="0"
+                        :placeholder="t('modules.projectStatus.components.ProjectStatusForm.inputs.index.placeholder')"
+                        v-model:value="projectStatus.index" required>
+                    </n-input-number>
+                </n-form-item>
+                <n-form-item :label="t('modules.projectStatus.components.ProjectStatusForm.inputs.flags.label')">
+                    <n-tooltip trigger="hover">
+                        <template #trigger>
+                            <n-icon :component="IconStar" :size="flagIconSize" class="doneo-cursor-help"
+                                :class="{ 'doneo-disabled-icon': !projectStatus.flags.defaultStatusOnCreation }"
+                                @click="projectStatus.flags.defaultStatusOnCreation = !projectStatus.flags.defaultStatusOnCreation" />
+                        </template>
+                        {{ t(projectStatus.flags.defaultStatusOnCreation ?
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasDefaultStatusOnCreation"
+                            :
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasNotdefaultStatusOnCreation")
+                        }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover">
+                        <template #trigger>
+                            <n-icon :component="IconCalendarBolt" :size="flagIconSize" class="doneo-cursor-help"
+                                :class="{ 'doneo-disabled-icon': !projectStatus.flags.fillEmptyStartDate }"
+                                @click="projectStatus.flags.fillEmptyStartDate = !projectStatus.flags.fillEmptyStartDate" />
+                        </template>
+                        {{ t(projectStatus.flags.fillEmptyStartDate ?
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasFillEmptyStartDate"
+                            :
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasNotFillEmptyStartDate")
+                        }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover">
+                        <template #trigger>
+                            <n-icon :component="IconCalendarCancel" :size="flagIconSize" class="doneo-cursor-help"
+                                :class="{ 'doneo-disabled-icon': !projectStatus.flags.setStartDate }"
+                                @click="projectStatus.flags.setStartDate = !projectStatus.flags.setStartDate" />
+                        </template>
+                        {{ t(projectStatus.flags.setStartDate ?
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasSetStartDate"
+                            :
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasNotSetStartDate")
+                        }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover">
+                        <template #trigger>
+                            <n-icon :component="IconCalendarBolt" :size="flagIconSize" class="doneo-cursor-help"
+                                :class="{ 'doneo-disabled-icon': !projectStatus.flags.fillEmptyFinishDate }"
+                                @click="projectStatus.flags.fillEmptyFinishDate = !projectStatus.flags.fillEmptyFinishDate" />
+                        </template>
+                        {{ t(projectStatus.flags.fillEmptyFinishDate ?
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasFillEmptyFinishDate"
+                            :
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasNotFillEmptyFinishDate")
+                        }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover">
+                        <template #trigger>
+                            <n-icon :component="IconCalendarCancel" :size="flagIconSize" class="doneo-cursor-help"
+                                :class="{ 'doneo-disabled-icon': !projectStatus.flags.setFinishDate }"
+                                @click="projectStatus.flags.setFinishDate = !projectStatus.flags.setFinishDate" />
+                        </template>
+                        {{ t(projectStatus.flags.setFinishDate ?
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasSetFinishDate"
+                            :
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasNotSetFinishDate")
+                        }}
+                    </n-tooltip>
+                </n-form-item>
+            </n-flex>
             <n-form-item :label="t('modules.projectStatus.components.ProjectStatusForm.inputs.preview.label')">
                 <n-flex style="width: 100%" align="center" :wrap="false">
                     <n-tag :color="getNaiveUITagColorProperty(projectStatus.hexColor ?? '#888888')"
@@ -341,7 +421,6 @@
             </n-flex>
         </template>
     </n-card>
-
 </template>
 
 <style lang="css" scoped></style>

@@ -610,6 +610,9 @@ export default {
                 alreadyExists: "Index",
               },
             },
+            flags: {
+              label: "Flags",
+            },
           },
           errors: {
             loadError:
@@ -652,11 +655,36 @@ export default {
             columns: {
               name: "Name",
               index: "Index",
+              flags: "Flags",
             },
           },
           filters: {
             name: {
               placeholder: "search by name",
+            },
+          },
+          body: {
+            columns: {
+              permissionsHints: {
+                hasDefaultStatusOnCreation:
+                  "set default status value on project creation",
+                hasNotdefaultStatusOnCreation:
+                  "do not set default status value on project creation",
+                hasFillEmptyStartDate:
+                  "set project start date on state change if unset",
+                hasNotFillEmptyStartDate:
+                  "do not set project start date on state change if unset",
+                hasSetStartDate: "set project start date on state change",
+                hasNotSetStartDate:
+                  "do not set project start date on state change",
+                hasFillEmptyFinishDate:
+                  "set project finish date on state change if unset",
+                hasNotFillEmptyFinishDate:
+                  "do not set project finish date on state change if unset",
+                hasSetFinishDate: "set project finish date on state change",
+                hasNotSetFinishDate:
+                  "do not set project finish date on state change",
+              },
             },
           },
           dialogs: {
@@ -1053,6 +1081,9 @@ export default {
                 alreadyExists: "Index",
               },
             },
+            flags: {
+              label: "Flags",
+            },
           },
           errors: {
             loadError: "There was a problem while loading the task status data",
@@ -1092,11 +1123,36 @@ export default {
             columns: {
               name: "Name",
               index: "Index",
+              flags: "Flags",
             },
           },
           filters: {
             name: {
               placeholder: "search by name",
+            },
+          },
+          body: {
+            columns: {
+              permissionsHints: {
+                hasDefaultStatusOnCreation:
+                  "set default status value on task creation",
+                hasNotdefaultStatusOnCreation:
+                  "do not set default status value on task creation",
+                hasFillEmptyStartDate:
+                  "set task start date on state change if unset",
+                hasNotFillEmptyStartDate:
+                  "do not set task start date on state change if unset",
+                hasSetStartDate: "set task start date on state change",
+                hasNotSetStartDate:
+                  "do not set task start date on state change",
+                hasFillEmptyFinishDate:
+                  "set task finish date on state change if unset",
+                hasNotFillEmptyFinishDate:
+                  "do not set task finish date on state change if unset",
+                hasSetFinishDate: "set task finish date on state change",
+                hasNotSetFinishDate:
+                  "do not set task finish date on state change",
+              },
             },
           },
           dialogs: {

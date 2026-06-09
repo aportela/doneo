@@ -2,8 +2,8 @@
     import { h, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { useDialog, NEmpty, NTag } from 'naive-ui';
-    import { IconTrash } from '@tabler/icons-vue';
+    import { useDialog, NEmpty, NTag, NIcon, NTooltip } from 'naive-ui';
+    import { IconTrash, IconStar, IconCalendarBolt, IconCalendarCancel } from '@tabler/icons-vue';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
     import type { Sort } from '../../../shared/types/models/sort.ts';
@@ -57,6 +57,14 @@
             sortable: true,
             isFiltered: () => false,
         },
+        {
+            label: t("modules.projectStatus.components.ProjectStatusesTable.header.columns.flags"),
+            field: "flags",
+            visible: true,
+            sortable: false,
+            align: "center",
+            isFiltered: () => false,
+        },
     ]);
 
     const onSort = (sort: Sort) => {
@@ -97,6 +105,8 @@
     const onClearFilters = () => {
         filters.value.name = "";
     };
+
+    const flagIconSize = 22;
 </script>
 
 <template>
@@ -108,6 +118,7 @@
                         :placeholder="t('modules.projectStatus.components.ProjectStatusesTable.filters.name.placeholder')"
                         v-model:value="filters.name" />
                 </th>
+                <th></th>
                 <th></th>
                 <th class="doneo-text-center">
                     <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
@@ -121,6 +132,63 @@
                         projectStatus.name }}</n-tag>
                 </td>
                 <td>{{ projectStatus.index }}</td>
+                <td class="doneo-text-center">
+                    <n-tooltip trigger="hover">
+                        <template #trigger>
+                            <n-icon :component="IconStar" :size="flagIconSize" class="doneo-cursor-help"
+                                :class="{ 'doneo-disabled-icon': !projectStatus.flags.defaultStatusOnCreation }" />
+                        </template>
+                        {{ t(projectStatus.flags.defaultStatusOnCreation ?
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasDefaultStatusOnCreation"
+                            :
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasNotdefaultStatusOnCreation")
+                        }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover">
+                        <template #trigger>
+                            <n-icon :component="IconCalendarBolt" :size="flagIconSize" class="doneo-cursor-help"
+                                :class="{ 'doneo-disabled-icon': !projectStatus.flags.fillEmptyStartDate }" />
+                        </template>
+                        {{ t(projectStatus.flags.fillEmptyStartDate ?
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasFillEmptyStartDate"
+                            :
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasNotFillEmptyStartDate")
+                        }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover">
+                        <template #trigger>
+                            <n-icon :component="IconCalendarCancel" :size="flagIconSize" class="doneo-cursor-help"
+                                :class="{ 'doneo-disabled-icon': !projectStatus.flags.setStartDate }" />
+                        </template>
+                        {{ t(projectStatus.flags.setStartDate ?
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasSetStartDate"
+                            :
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasNotSetStartDate")
+                        }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover">
+                        <template #trigger>
+                            <n-icon :component="IconCalendarBolt" :size="flagIconSize" class="doneo-cursor-help"
+                                :class="{ 'doneo-disabled-icon': !projectStatus.flags.fillEmptyFinishDate }" />
+                        </template>
+                        {{ t(projectStatus.flags.fillEmptyFinishDate ?
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasFillEmptyFinishDate"
+                            :
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasNotFillEmptyFinishDate")
+                        }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover">
+                        <template #trigger>
+                            <n-icon :component="IconCalendarCancel" :size="flagIconSize" class="doneo-cursor-help"
+                                :class="{ 'doneo-disabled-icon': !projectStatus.flags.setFinishDate }" />
+                        </template>
+                        {{ t(projectStatus.flags.setFinishDate ?
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasSetFinishDate"
+                            :
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasNotSetFinishDate")
+                        }}
+                    </n-tooltip>
+                </td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
                         :delete-disabled="props.disabled" :disabled="props.disabled"
