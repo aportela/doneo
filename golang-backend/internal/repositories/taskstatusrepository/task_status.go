@@ -35,13 +35,14 @@ func (repository *taskStatusRepository) Add(ctx context.Context, taskStatus doma
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
-            INSERT INTO task_statuses (id, name, item_hex_color, item_index)
-			VALUES (?, ?, ?, ?)
+            INSERT INTO task_statuses (id, name, item_hex_color, item_index, flags_bitmask)
+			VALUES (?, ?, ?, ?, ?)
         `,
 		dto.ID,
 		dto.Name,
 		dto.HexColor,
 		dto.Index,
+		dto.FlagsBitmask,
 	)
 	if err != nil {
 		// TODO: remove ?
@@ -58,6 +59,8 @@ func (repository *taskStatusRepository) Add(ctx context.Context, taskStatus doma
 				return &domain.AlreadyExistsError{Field: "id"}
 			} else if strings.Contains(sqlErr.Error(), "task_statuses.item_index") {
 				return &domain.AlreadyExistsError{Field: "index"}
+			} else if strings.Contains(sqlErr.Error(), "task_statuses.flags_bitmask") {
+				return &domain.AlreadyExistsError{Field: "flags"}
 			}
 			return err
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
@@ -84,12 +87,14 @@ func (repository *taskStatusRepository) Update(ctx context.Context, taskStatus d
             UPDATE task_statuses SET
 				name = ?,
 				item_hex_color = ?,
-				item_index = ?
+				item_index = ?,
+				flags_bitmask = ?
 			WHERE id = ?
         `,
 		dto.Name,
 		dto.HexColor,
 		dto.Index,
+		dto.FlagsBitmask,
 		dto.ID,
 	)
 	if err != nil {
@@ -107,6 +112,8 @@ func (repository *taskStatusRepository) Update(ctx context.Context, taskStatus d
 				return &domain.AlreadyExistsError{Field: "id"}
 			} else if strings.Contains(sqlErr.Error(), "task_statuses.item_index") {
 				return &domain.AlreadyExistsError{Field: "index"}
+			} else if strings.Contains(sqlErr.Error(), "task_statuses.flags_bitmask") {
+				return &domain.AlreadyExistsError{Field: "flags"}
 			}
 			return err
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
@@ -143,11 +150,11 @@ func (repository *taskStatusRepository) Get(ctx context.Context, id string) (dom
 		ctx,
 		`
             SELECT
-                TS.id, TS.name, TS.item_hex_color, TS.item_index
+                TS.id, TS.name, TS.item_hex_color, TS.item_index, TS.flags_bitmask
             FROM task_statuses TS
             WHERE TS.id = ?
         `,
-		id).Scan(&dto.ID, &dto.Name, &dto.HexColor, &dto.Index)
+		id).Scan(&dto.ID, &dto.Name, &dto.HexColor, &dto.Index, &dto.FlagsBitmask)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.TaskStatus{}, domain.NotFoundError
@@ -163,7 +170,7 @@ func (repository *taskStatusRepository) Search(ctx context.Context, pager browse
 	var queryArgs []any
 	sqlQuery := `
 			SELECT
-				TS.id, TS.name, TS.item_hex_color, TS.item_index
+				TS.id, TS.name, TS.item_hex_color, TS.item_index, TS.flags_bitmask
 			FROM task_statuses TS
     `
 	var field string
@@ -213,7 +220,7 @@ func (repository *taskStatusRepository) Search(ctx context.Context, pager browse
 	for rows.Next() {
 		var dto taskStatusDTO
 		if err := rows.Scan(
-			&dto.ID, &dto.Name, &dto.HexColor, &dto.Index,
+			&dto.ID, &dto.Name, &dto.HexColor, &dto.Index, &dto.FlagsBitmask,
 		); err != nil {
 			return nil, browser.Result{}, err
 		}

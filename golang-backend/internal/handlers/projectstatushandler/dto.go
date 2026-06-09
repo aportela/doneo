@@ -2,18 +2,28 @@ package projectstatushandler
 
 import "github.com/aportela/doneo/internal/handlers"
 
+type statusFlags struct {
+	DefaultStatusOnCreation bool `json:"defaultStatusOnCreation"`
+	FillEmptyStartDate      bool `json:"fillEmptyStartDate"`
+	SetStartDate            bool `json:"setStartDate"`
+	FillEmptyFinishDate     bool `json:"fillEmptyFinishDate"`
+	SetFinishDate           bool `json:"setFinishDate"`
+}
+
 type addRequest struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	HexColor string `json:"hexColor"`
-	Index    uint   `json:"index"`
+	ID       string      `json:"id"`
+	Name     string      `json:"name"`
+	HexColor string      `json:"hexColor"`
+	Index    uint        `json:"index"`
+	Flags    statusFlags `json:"flags"`
 }
 
 type updateRequest struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	HexColor string `json:"hexColor"`
-	Index    uint   `json:"index"`
+	ID       string      `json:"id"`
+	Name     string      `json:"name"`
+	HexColor string      `json:"hexColor"`
+	Index    uint        `json:"index"`
+	Flags    statusFlags `json:"flags"`
 }
 
 type filterRequest struct {
@@ -27,10 +37,11 @@ type searchRequest struct {
 }
 
 type ProjectStatusResponse struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	HexColor string `json:"hexColor"`
-	Index    uint   `json:"index"`
+	ID       string      `json:"id"`
+	Name     string      `json:"name"`
+	HexColor string      `json:"hexColor"`
+	Index    uint        `json:"index"`
+	Flags    statusFlags `json:"flags"`
 }
 
 type searchResponse struct {

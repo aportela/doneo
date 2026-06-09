@@ -35,13 +35,14 @@ func (repository *projectStatusRepository) Add(ctx context.Context, projectStatu
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
-            INSERT INTO project_statuses (id, name, item_hex_color, item_index)
-			VALUES (?, ?, ?, ?)
+            INSERT INTO project_statuses (id, name, item_hex_color, item_index, flags_bitmask)
+			VALUES (?, ?, ?, ?, ?)
         `,
 		dto.ID,
 		dto.Name,
 		dto.HexColor,
 		dto.Index,
+		dto.FlagsBitmask,
 	)
 	if err != nil {
 		// TODO: remove ?
@@ -58,6 +59,8 @@ func (repository *projectStatusRepository) Add(ctx context.Context, projectStatu
 				return &domain.AlreadyExistsError{Field: "id"}
 			} else if strings.Contains(sqlErr.Error(), "project_statuses.item_index") {
 				return &domain.AlreadyExistsError{Field: "index"}
+			} else if strings.Contains(sqlErr.Error(), "project_statuses.flags_bitmask") {
+				return &domain.AlreadyExistsError{Field: "flags"}
 			}
 			return err
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
@@ -84,12 +87,14 @@ func (repository *projectStatusRepository) Update(ctx context.Context, projectSt
             UPDATE project_statuses SET
 				name = ?,
 				item_hex_color = ?,
-				item_index = ?
+				item_index = ?,
+				flags_bitmask = ?
 			WHERE id = ?
         `,
 		dto.Name,
 		dto.HexColor,
 		dto.Index,
+		dto.FlagsBitmask,
 		dto.ID,
 	)
 	if err != nil {
@@ -107,6 +112,8 @@ func (repository *projectStatusRepository) Update(ctx context.Context, projectSt
 				return &domain.AlreadyExistsError{Field: "id"}
 			} else if strings.Contains(sqlErr.Error(), "project_statuses.item_index") {
 				return &domain.AlreadyExistsError{Field: "index"}
+			} else if strings.Contains(sqlErr.Error(), "project_statuses.flags_bitmask") {
+				return &domain.AlreadyExistsError{Field: "flags"}
 			}
 			return err
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
@@ -143,11 +150,11 @@ func (repository *projectStatusRepository) Get(ctx context.Context, id string) (
 		ctx,
 		`
             SELECT
-                PS.id, PS.name, PS.item_hex_color, PS.item_index
+                PS.id, PS.name, PS.item_hex_color, PS.item_index, PS.flags_bitmask
             FROM project_statuses PS
             WHERE PS.id = ?
         `,
-		id).Scan(&dto.ID, &dto.Name, &dto.HexColor, &dto.Index)
+		id).Scan(&dto.ID, &dto.Name, &dto.HexColor, &dto.Index, &dto.FlagsBitmask)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.ProjectStatus{}, domain.NotFoundError
@@ -163,7 +170,7 @@ func (repository *projectStatusRepository) Search(ctx context.Context, pager bro
 	var queryArgs []any
 	sqlQuery := `
 			SELECT
-				PS.id, PS.name, PS.item_hex_color, PS.item_index
+				PS.id, PS.name, PS.item_hex_color, PS.item_index, PS.flags_bitmask
 			FROM project_statuses PS
     `
 	var field string
@@ -213,7 +220,7 @@ func (repository *projectStatusRepository) Search(ctx context.Context, pager bro
 	for rows.Next() {
 		var dto projectStatusDTO
 		if err := rows.Scan(
-			&dto.ID, &dto.Name, &dto.HexColor, &dto.Index,
+			&dto.ID, &dto.Name, &dto.HexColor, &dto.Index, &dto.FlagsBitmask,
 		); err != nil {
 			return nil, browser.Result{}, err
 		}

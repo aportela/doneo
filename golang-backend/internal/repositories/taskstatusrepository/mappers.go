@@ -6,10 +6,11 @@ import (
 
 func toDTO(taskStatus domain.TaskStatus) taskStatusDTO {
 	return taskStatusDTO{
-		ID:       taskStatus.ID,
-		Name:     taskStatus.Name,
-		HexColor: taskStatus.HexColor,
-		Index:    taskStatus.Index,
+		ID:           taskStatus.ID,
+		Name:         taskStatus.Name,
+		HexColor:     taskStatus.HexColor,
+		Index:        taskStatus.Index,
+		FlagsBitmask: uint64(taskStatus.Flags),
 	}
 }
 
@@ -19,6 +20,7 @@ func toDomain(taskStatus taskStatusDTO) domain.TaskStatus {
 		Name:     taskStatus.Name,
 		HexColor: taskStatus.HexColor,
 		Index:    taskStatus.Index,
+		Flags:    domain.Bitmask(taskStatus.FlagsBitmask),
 	}
 }
 
