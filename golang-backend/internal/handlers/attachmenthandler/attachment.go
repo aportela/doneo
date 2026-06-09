@@ -10,6 +10,7 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
 	"github.com/aportela/doneo/internal/services/attachmentservice"
+	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -37,6 +38,7 @@ func (handler *AttachmentHandler) AddProjectAttachment(w http.ResponseWriter, r 
 	defer file.Close()
 
 	attachment := domain.Attachment{
+		ID:           utils.UUID(),
 		OriginalName: header.Filename,
 		ContentType:  header.Header.Get("Content-Type"),
 		Size:         uint32(header.Size),
