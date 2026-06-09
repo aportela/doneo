@@ -7,11 +7,11 @@ type RoleBase struct {
 
 type Role struct {
 	RoleBase
-	PermissionsBitmask PermissionsBitmask
+	PermissionsBitmask Bitmask
 }
 
 type SearchRolesFilter struct {
 	Name                        *string
-	RequiredPermissionsBitmask  *PermissionsBitmask
-	ForbiddenPermissionsBitmask *PermissionsBitmask
+	RequiredPermissionsBitmask  *Bitmask
+	ForbiddenPermissionsBitmask *Bitmask
 }

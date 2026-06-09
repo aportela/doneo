@@ -1,39 +1,39 @@
 package domain
 
-type PermissionsBitmask uint64
+type Bitmask uint64
 
-func (p PermissionsBitmask) HasPermission(v PermissionsBitmask) bool {
+func (p Bitmask) HasFlag(v Bitmask) bool {
 	return p&v == v
 }
 
-func (p PermissionsBitmask) HasAny(v PermissionsBitmask) bool {
+func (p Bitmask) HasAny(v Bitmask) bool {
 	return p&v != 0
 }
 
-func (p *PermissionsBitmask) AddPermission(v PermissionsBitmask) {
+func (p *Bitmask) AddFlag(v Bitmask) {
 	*p |= v
 }
 
-func (p *PermissionsBitmask) RemovePermission(v PermissionsBitmask) {
+func (p *Bitmask) RemoveFlag(v Bitmask) {
 	*p &^= v
 }
 
-func (p *PermissionsBitmask) TogglePermission(v PermissionsBitmask) {
+func (p *Bitmask) ToggleFlag(v Bitmask) {
 	*p ^= v
 }
 
-func (p *PermissionsBitmask) Clear() {
+func (p *Bitmask) Clear() {
 	*p = 0
 }
 
 // user permissions
 const (
-	UserPermissionAdmin PermissionsBitmask = 1 << iota
+	UserPermissionAdmin Bitmask = 1 << iota
 )
 
 // app permissions
 const (
-	PermissionUpdateProject PermissionsBitmask = 1 << iota
+	PermissionUpdateProject Bitmask = 1 << iota
 	PermissionDeleteProject
 	PermissionViewProject
 	PermissionAddTask
@@ -44,7 +44,7 @@ const (
 
 // app permissions
 const (
-	PermissionCreate PermissionsBitmask = 1 << iota
+	PermissionCreate Bitmask = 1 << iota
 	PermissionUpdate
 	PermissionDelete
 	PermissionView

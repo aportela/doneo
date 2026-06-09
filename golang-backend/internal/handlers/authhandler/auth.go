@@ -75,7 +75,7 @@ func (handler *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 				Name:  user.Name,
 				Email: user.Email,
 				Permissions: userPermissions{
-					IsSuperUser: user.PermissionsBitmask.HasPermission(domain.UserPermissionAdmin),
+					IsSuperUser: user.PermissionsBitmask.HasFlag(domain.UserPermissionAdmin),
 				},
 			},
 		},
@@ -152,7 +152,7 @@ func (handler *AuthHandler) RenewAccessToken(w http.ResponseWriter, r *http.Requ
 				Name:  user.Name,
 				Email: user.Email,
 				Permissions: userPermissions{
-					IsSuperUser: user.PermissionsBitmask.HasPermission(domain.UserPermissionAdmin),
+					IsSuperUser: user.PermissionsBitmask.HasFlag(domain.UserPermissionAdmin),
 				},
 			},
 			AccessToken: TokenResponse{Token: accessToken.Token, ExpiresAt: accessToken.ExpiresAt.UnixMilli()},

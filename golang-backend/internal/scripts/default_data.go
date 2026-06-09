@@ -12,8 +12,8 @@ import (
 )
 
 func CreateDefaultAdminUser(database database.Database) {
-	permissionsBitmask := domain.PermissionsBitmask(0)
-	permissionsBitmask.AddPermission(domain.UserPermissionAdmin)
+	permissionsBitmask := domain.Bitmask(0)
+	permissionsBitmask.AddFlag(domain.UserPermissionAdmin)
 	service := userservice.NewService(database, userrepository.NewRepository(database))
 	_, err := service.Add(context.Background(), domain.User{
 		UserBase: domain.UserBase{

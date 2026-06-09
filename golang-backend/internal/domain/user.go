@@ -17,7 +17,7 @@ type User struct {
 	CreatedAt          time.Time
 	UpdatedAt          *time.Time
 	DeletedAt          *time.Time
-	PermissionsBitmask PermissionsBitmask
+	PermissionsBitmask Bitmask
 }
 
 func (u *User) IsActive() bool {
@@ -25,14 +25,14 @@ func (u *User) IsActive() bool {
 }
 
 func (u *User) IsAdmin() bool {
-	return u.PermissionsBitmask.HasPermission(UserPermissionAdmin)
+	return u.PermissionsBitmask.HasFlag(UserPermissionAdmin)
 }
 
 type SearchUsersFilter struct {
 	Name                        *string
 	Email                       *string
-	RequiredPermissionsBitmask  *PermissionsBitmask
-	ForbiddenPermissionsBitmask *PermissionsBitmask
+	RequiredPermissionsBitmask  *Bitmask
+	ForbiddenPermissionsBitmask *Bitmask
 	CreatedAt                   *TimestampFilter
 	UpdatedAt                   *TimestampFilter
 	DeletedAt                   *TimestampFilter

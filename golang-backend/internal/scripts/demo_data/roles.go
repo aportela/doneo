@@ -13,8 +13,8 @@ import (
 func createRoles(database database.Database) []string {
 	var newRoleIds []string
 	roleService := roleservice.NewService(database, rolerepository.NewRepository(database))
-	permissionBitMask := domain.PermissionsBitmask(0)
-	permissionBitMask.AddPermission(domain.PermissionCreate | domain.PermissionUpdate | domain.PermissionDelete | domain.PermissionView | domain.PermissionList | domain.PermissionExecute)
+	permissionBitMask := domain.Bitmask(0)
+	permissionBitMask.AddFlag(domain.PermissionCreate | domain.PermissionUpdate | domain.PermissionDelete | domain.PermissionView | domain.PermissionList | domain.PermissionExecute)
 	role := domain.Role{
 		RoleBase: domain.RoleBase{
 			Name: "Administrator",
@@ -28,7 +28,7 @@ func createRoles(database database.Database) []string {
 		newRoleIds = append(newRoleIds, role.ID)
 	}
 	permissionBitMask.Clear()
-	permissionBitMask.AddPermission(domain.PermissionView | domain.PermissionList)
+	permissionBitMask.AddFlag(domain.PermissionView | domain.PermissionList)
 	role.Name = "Guest"
 	role.PermissionsBitmask = permissionBitMask
 	role, err = roleService.Add(context.Background(), role)

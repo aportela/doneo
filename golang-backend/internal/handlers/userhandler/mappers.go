@@ -7,10 +7,10 @@ import (
 	"github.com/aportela/doneo/internal/utils"
 )
 
-func permissionsToDomainPermissionsBitmask(permissions permissionsFlags) domain.PermissionsBitmask {
-	var permissionsBitmask domain.PermissionsBitmask
+func permissionsToDomainPermissionsBitmask(permissions permissionsFlags) domain.Bitmask {
+	var permissionsBitmask domain.Bitmask
 	if permissions.IsSuperUser {
-		permissionsBitmask.AddPermission(domain.UserPermissionAdmin)
+		permissionsBitmask.AddFlag(domain.UserPermissionAdmin)
 	}
 	return permissionsBitmask
 }
@@ -36,9 +36,9 @@ func updateRequestToDomain(request updateRequest) domain.User {
 	return user
 }
 
-func permissionsDomainToResponsePermissionsFlags(permissionsBitmask domain.PermissionsBitmask) permissionsFlags {
+func permissionsDomainToResponsePermissionsFlags(permissionsBitmask domain.Bitmask) permissionsFlags {
 	return permissionsFlags{
-		IsSuperUser: permissionsBitmask.HasPermission(domain.UserPermissionAdmin),
+		IsSuperUser: permissionsBitmask.HasFlag(domain.UserPermissionAdmin),
 	}
 }
 

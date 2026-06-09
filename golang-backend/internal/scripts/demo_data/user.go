@@ -42,7 +42,7 @@ func generateRandomEmail(fullName string) string {
 
 func getRandomUser() domain.User {
 	name := getRandomUserName()
-	permissionsBitmask := domain.PermissionsBitmask(0)
+	permissionsBitmask := domain.Bitmask(0)
 	//permissionsBitmask.AddPermission(domain.UserPermissionAdmin)
 	return domain.User{
 		UserBase: domain.UserBase{

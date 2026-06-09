@@ -160,14 +160,14 @@ func (handler *UserHandler) Search(w http.ResponseWriter, r *http.Request) {
 			filter.Email = request.Filter.Email
 		}
 		if request.Filter.Permissions != nil {
-			requiredPermissionsBitmask := domain.PermissionsBitmask(0)
-			forbiddenPermissionsBitmask := domain.PermissionsBitmask(0)
+			requiredPermissionsBitmask := domain.Bitmask(0)
+			forbiddenPermissionsBitmask := domain.Bitmask(0)
 			if request.Filter.Permissions.IsSuperUser != nil {
 				if *request.Filter.Permissions.IsSuperUser {
-					requiredPermissionsBitmask.AddPermission(domain.UserPermissionAdmin)
+					requiredPermissionsBitmask.AddFlag(domain.UserPermissionAdmin)
 					filter.RequiredPermissionsBitmask = &requiredPermissionsBitmask
 				} else {
-					forbiddenPermissionsBitmask.AddPermission(domain.UserPermissionAdmin)
+					forbiddenPermissionsBitmask.AddFlag(domain.UserPermissionAdmin)
 					filter.ForbiddenPermissionsBitmask = &forbiddenPermissionsBitmask
 				}
 			}

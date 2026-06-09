@@ -18,7 +18,7 @@ func toDomain(role roleDTO) domain.Role {
 			ID:   role.ID,
 			Name: role.Name,
 		},
-		PermissionsBitmask: domain.PermissionsBitmask(role.PermissionsBitmask),
+		PermissionsBitmask: domain.Bitmask(role.PermissionsBitmask),
 	}
 }
 

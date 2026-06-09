@@ -41,7 +41,7 @@ func toDomain(user userDTO) domain.User {
 		CreatedAt:          time.UnixMilli(user.CreatedAt),
 		UpdatedAt:          utils.SQLNullInt64ToTimePtr(user.UpdatedAt),
 		DeletedAt:          utils.SQLNullInt64ToTimePtr(user.DeletedAt),
-		PermissionsBitmask: domain.PermissionsBitmask(user.PermissionsBitmask),
+		PermissionsBitmask: domain.Bitmask(user.PermissionsBitmask),
 	}
 }
 

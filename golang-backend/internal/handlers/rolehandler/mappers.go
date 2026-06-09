@@ -6,28 +6,28 @@ import (
 	"github.com/aportela/doneo/internal/handlers"
 )
 
-func requestPermissionsToDomainPermissionsBitmask(permissions permissionsFlags) domain.PermissionsBitmask {
-	bitmaskPermission := domain.PermissionsBitmask(0)
+func requestPermissionsToDomainPermissionsBitmask(permissions permissionsFlags) domain.Bitmask {
+	bitmaskPermission := domain.Bitmask(0)
 	if permissions.AllowUpdateProject {
-		bitmaskPermission.AddPermission(domain.PermissionUpdateProject)
+		bitmaskPermission.AddFlag(domain.PermissionUpdateProject)
 	}
 	if permissions.AllowDeleteProject {
-		bitmaskPermission.AddPermission(domain.PermissionDeleteProject)
+		bitmaskPermission.AddFlag(domain.PermissionDeleteProject)
 	}
 	if permissions.AllowViewProject {
-		bitmaskPermission.AddPermission(domain.PermissionViewProject)
+		bitmaskPermission.AddFlag(domain.PermissionViewProject)
 	}
 	if permissions.AllowAddTask {
-		bitmaskPermission.AddPermission(domain.PermissionAddTask)
+		bitmaskPermission.AddFlag(domain.PermissionAddTask)
 	}
 	if permissions.AllowUpdateTask {
-		bitmaskPermission.AddPermission(domain.PermissionUpdateTask)
+		bitmaskPermission.AddFlag(domain.PermissionUpdateTask)
 	}
 	if permissions.AllowDeleteTask {
-		bitmaskPermission.AddPermission(domain.PermissionDeleteTask)
+		bitmaskPermission.AddFlag(domain.PermissionDeleteTask)
 	}
 	if permissions.AllowViewTask {
-		bitmaskPermission.AddPermission(domain.PermissionViewTask)
+		bitmaskPermission.AddFlag(domain.PermissionViewTask)
 	}
 	return bitmaskPermission
 }
@@ -51,15 +51,15 @@ func updateRequestToDomain(request updateRequest) domain.Role {
 	}
 }
 
-func permissionDomainToResponsePermissionsFlags(bitmaskPermission domain.PermissionsBitmask) permissionsFlags {
+func permissionDomainToResponsePermissionsFlags(bitmaskPermission domain.Bitmask) permissionsFlags {
 	return permissionsFlags{
-		AllowUpdateProject: bitmaskPermission.HasPermission(domain.PermissionUpdateProject),
-		AllowDeleteProject: bitmaskPermission.HasPermission(domain.PermissionDeleteProject),
-		AllowViewProject:   bitmaskPermission.HasPermission(domain.PermissionViewProject),
-		AllowAddTask:       bitmaskPermission.HasPermission(domain.PermissionAddTask),
-		AllowUpdateTask:    bitmaskPermission.HasPermission(domain.PermissionUpdateTask),
-		AllowDeleteTask:    bitmaskPermission.HasPermission(domain.PermissionDeleteTask),
-		AllowViewTask:      bitmaskPermission.HasPermission(domain.PermissionViewTask),
+		AllowUpdateProject: bitmaskPermission.HasFlag(domain.PermissionUpdateProject),
+		AllowDeleteProject: bitmaskPermission.HasFlag(domain.PermissionDeleteProject),
+		AllowViewProject:   bitmaskPermission.HasFlag(domain.PermissionViewProject),
+		AllowAddTask:       bitmaskPermission.HasFlag(domain.PermissionAddTask),
+		AllowUpdateTask:    bitmaskPermission.HasFlag(domain.PermissionUpdateTask),
+		AllowDeleteTask:    bitmaskPermission.HasFlag(domain.PermissionDeleteTask),
+		AllowViewTask:      bitmaskPermission.HasFlag(domain.PermissionViewTask),
 	}
 }
 
