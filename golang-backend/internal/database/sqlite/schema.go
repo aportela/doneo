@@ -189,6 +189,7 @@ var installSchemaQueries = []string{
 			due_at INTEGER,
 			priority_id TEXT NOT NULL CHECK(length(priority_id) == 36),
 			status_id TEXT NOT NULL CHECK(length(status_id) == 36),
+			cover_attachment_id TEXT CHECK(length(cover_attachment_id) == 36),
 			PRIMARY KEY (id),
 			FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE,
 			FOREIGN KEY(priority_id) REFERENCES task_priorities(id) ON DELETE CASCADE,

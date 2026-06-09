@@ -70,9 +70,9 @@ func (repository *taskRepository) Add(ctx context.Context, projectId string, tas
 		ctx,
 		`
             INSERT INTO tasks
-				(id, project_id, task_index, summary, description, creator_id, created_at, updated_at, deleted_at, started_at, finished_at, due_at, priority_id, status_id)
+				(id, project_id, task_index, summary, description, creator_id, created_at, updated_at, deleted_at, started_at, finished_at, due_at, priority_id, status_id, cover_attachment_id)
 			VALUES
-				(?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?)
+				(?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, NULL)
         `,
 		dto.ID,
 		projectId,
