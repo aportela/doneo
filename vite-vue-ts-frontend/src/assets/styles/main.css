@@ -88,6 +88,10 @@ doneo-table tfoot th:last-of-type {
     margin-bottom: 4px;
 }
 
+.doneo-disabled-icon {
+    opacity: 0.1;
+}
+
 @media (max-width: 768px) {
     .mobile-hidden {
         display: none;

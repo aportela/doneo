@@ -164,45 +164,45 @@
                     <n-tooltip trigger="hover">
                         <template #trigger>
                             <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconEdit"
-                                :class="{ 'doneo-disabled-permission-icon': !projectPermission.role.permissions.allowUpdateProject }" />
+                                :class="{ 'doneo-disabled-icon': !projectPermission.role.permissions.allowUpdateProject }" />
                         </template>
                         {{ t(projectPermission.role.permissions.allowUpdateProject ?
                             "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.updateProjectAllowed"
                             :
-                        "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.updateProjectDenied")
+                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.updateProjectDenied")
                         }}
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
                             <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconTrash"
-                                :class="{ 'doneo-disabled-permission-icon': !projectPermission.role.permissions.allowDeleteProject }" />
+                                :class="{ 'doneo-disabled-icon': !projectPermission.role.permissions.allowDeleteProject }" />
                         </template>
                         {{ t(projectPermission.role.permissions.allowDeleteProject ?
                             "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.deleteProjectAllowed"
                             :
-                        "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.deleteProjectDenied")
+                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.deleteProjectDenied")
                         }}
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
                             <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconEyeCheck"
-                                :class="{ 'doneo-disabled-permission-icon': !projectPermission.role.permissions.allowViewProject }" />
+                                :class="{ 'doneo-disabled-icon': !projectPermission.role.permissions.allowViewProject }" />
                         </template>
                         {{ t(projectPermission.role.permissions.allowViewProject ?
                             "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.viewProjectAllowed"
                             :
-                        "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.viewProjectDenied")
+                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.viewProjectDenied")
                         }}
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
                             <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconSquarePlus"
-                                :class="{ 'doneo-disabled-permission-icon': !projectPermission.role.permissions.allowAddTask }" />
+                                :class="{ 'doneo-disabled-icon': !projectPermission.role.permissions.allowAddTask }" />
                         </template>
                         {{ t(projectPermission.role.permissions.allowAddTask ?
                             "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.addTaskAllowed"
                             :
-                        "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.addTaskDenied")
+                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.addTaskDenied")
                         }}
                     </n-tooltip>
                 </td>
@@ -210,34 +210,34 @@
                     <n-tooltip trigger="hover">
                         <template #trigger>
                             <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconEdit"
-                                :class="{ 'doneo-disabled-permission-icon': !projectPermission.role.permissions.allowUpdateTask }" />
+                                :class="{ 'doneo-disabled-icon': !projectPermission.role.permissions.allowUpdateTask }" />
                         </template>
                         {{ t(projectPermission.role.permissions.allowUpdateTask ?
                             "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.updateTaskAllowed"
                             :
-                        "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.updateTaskDenied")
+                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.updateTaskDenied")
                         }}
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
                             <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconTrash"
-                                :class="{ 'doneo-disabled-permission-icon': !projectPermission.role.permissions.allowDeleteTask }" />
+                                :class="{ 'doneo-disabled-icon': !projectPermission.role.permissions.allowDeleteTask }" />
                         </template>
                         {{ t(projectPermission.role.permissions.allowDeleteTask ?
                             "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.deleteTaskAllowed"
                             :
-                        "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.deleteTaskDenied")
+                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.deleteTaskDenied")
                         }}
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
                             <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconEyeCheck"
-                                :class="{ 'doneo-disabled-permission-icon': !projectPermission.role.permissions.allowViewTask }" />
+                                :class="{ 'doneo-disabled-icon': !projectPermission.role.permissions.allowViewTask }" />
                         </template>
                         {{ t(projectPermission.role.permissions.allowViewTask ?
                             "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.viewTaskAllowed"
                             :
-                        "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.viewTaskDenied")
+                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.viewTaskDenied")
                         }}
                     </n-tooltip>
                 </td>
@@ -257,8 +257,4 @@
     </ManageTable>
 </template>
 
-<style lang="css" scoped>
-    .doneo-disabled-permission-icon {
-        opacity: 0.1;
-    }
-</style>
+<style lang="css" scoped></style>
