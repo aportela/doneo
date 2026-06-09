@@ -21,6 +21,7 @@
     import { useMarkdown } from "../../../../shared/composables/useMarkdown.ts";
     import ToggleInput from '../../../../shared/components/ToggleInput.vue';
     import ToggleDateTimePicker from '../../../../shared/components/ToggleDateTimePicker.vue';
+    import { IDate } from '../../../../shared/types/idate.ts';
 
     interface ProjectFormProps {
         mode: FormMode;
@@ -107,7 +108,6 @@
             if (state.ajaxErrorMessage) {
                 appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
             }
-
         }
     };
 
@@ -218,6 +218,28 @@
         })
     }
 
+    const onFillEmptyStartDate = () => {
+        if (!project.value.startedAt.hasValue()) {
+            project.value.startedAt = new IDate(new Date().getTime())
+        }
+    };
+
+    const onSetStartDate = () => {
+        project.value.startedAt = new IDate(new Date().getTime())
+    };
+
+    const onFillEmptyFinishDate = () => {
+        if (!project.value.finishedAt.hasValue()) {
+            project.value.finishedAt = new IDate(new Date().getTime())
+        }
+    };
+
+    const onSetFinishDate = () => {
+        if (!project.value.finishedAt) {
+            project.value.finishedAt = new IDate(new Date().getTime())
+        }
+    };
+
     const onPaste = (e: ClipboardEvent) => {
         const clipboard = e.clipboardData
         if (!clipboard) return
@@ -295,10 +317,11 @@
                     <ProjectPrioritySelector v-model:id="project.priority.id" :disabled="props.disabled" />
                 </n-form-item>
                 <n-form-item label="Status">
-                    <ProjectStatusSelector v-model:id="project.status.id" :disabled="props.disabled" />
+                    <ProjectStatusSelector v-model:id="project.status.id" :disabled="props.disabled"
+                        @fill-empty-start-date="onFillEmptyStartDate" @set-start-date="onSetStartDate"
+                        @fill-empty-finish-date="onFillEmptyFinishDate" @set-finish-date="onSetFinishDate" />
                 </n-form-item>
             </n-flex>
-
             <n-form-item label="Summary">
                 <ToggleInput v-model:value="project.summary" show-count :max-length="MAX_SUMMARY_LENGTH"
                     :disabled="props.disabled" />
