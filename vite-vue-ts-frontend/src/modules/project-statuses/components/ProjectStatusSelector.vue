@@ -32,13 +32,18 @@
 
     const projectStatuses = ref<ProjectStatusResponse[]>([]);
 
-    const emit = defineEmits([]);
+    const emit = defineEmits(["fillEmptyStartDate", "setStartDate", "fillEmptyFinishDate", "setFinishDate"]);
 
     const props = defineProps<ProjectStatusSelectorProps>();
 
     const sort = ref<Sort>(new Sort("name", "ASC"));
 
     const options = shallowRef<SelectOption[]>([]);
+
+    const fillEmptyStartDateStatusId = ref<string | null>(null);
+    const setStartDateStatusId = ref<string | null>(null);
+    const fillEmptyFinishDateStatusId = ref<string | null>(null);
+    const setFinishDateStatusId = ref<string | null>(null);
 
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
@@ -65,6 +70,10 @@
             if (!projectStatusId.value && props.setDefaultValueOnStart) {
                 projectStatusId.value = response.projectStatuses.find((projectStatus: ProjectStatusResponse) => projectStatus.flags.defaultStatusOnCreation === true)?.id;
             }
+            fillEmptyStartDateStatusId.value = response.projectStatuses.find((projectStatus: ProjectStatusResponse) => projectStatus.flags.fillEmptyStartDate === true)?.id ?? null;
+            setStartDateStatusId.value = response.projectStatuses.find((projectStatus: ProjectStatusResponse) => projectStatus.flags.setStartDate === true)?.id ?? null;
+            fillEmptyFinishDateStatusId.value = response.projectStatuses.find((projectStatus: ProjectStatusResponse) => projectStatus.flags.fillEmptyFinishDate === true)?.id ?? null;
+            setFinishDateStatusId.value = response.projectStatuses.find((projectStatus: ProjectStatusResponse) => projectStatus.flags.setFinishDate === true)?.id ?? null;
             if (props.autoFocus) {
                 focus();
             }
@@ -96,6 +105,22 @@
 
     watch(projectStatusId, (newValue) => {
         selectedColor.value = projectStatuses.value.find((projectStatus) => projectStatus.id === newValue)?.hexColor
+        if (newValue) {
+            switch (newValue) {
+                case fillEmptyStartDateStatusId.value:
+                    emit("fillEmptyStartDate");
+                    break;
+                case setStartDateStatusId.value:
+                    emit("setStartDate");
+                    break;
+                case fillEmptyFinishDateStatusId.value:
+                    emit("fillEmptyFinishDate");
+                    break;
+                case setFinishDateStatusId.value:
+                    emit("setFinishDate");
+                    break;
+            }
+        }
     });
 
     const focus = () => {
