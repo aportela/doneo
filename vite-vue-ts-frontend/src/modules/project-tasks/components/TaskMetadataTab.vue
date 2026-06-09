@@ -20,6 +20,7 @@
     import { useMarkdown } from "../../../shared/composables/useMarkdown.ts";
     import ToggleInput from '../../../shared/components/ToggleInput.vue';
     import ToggleDateTimePicker from '../../../shared/components/ToggleDateTimePicker.vue';
+    import { IDate } from '../../../shared/types/idate.ts';
 
     interface TaskMetadataTabProps {
         mode: FormMode;
@@ -168,6 +169,28 @@
         }
     };
 
+    const onFillEmptyStartDate = () => {
+        if (!task.value.startedAt.hasValue()) {
+            task.value.startedAt = new IDate(new Date().getTime())
+        }
+    };
+
+    const onSetStartDate = () => {
+        task.value.startedAt = new IDate(new Date().getTime())
+    };
+
+    const onFillEmptyFinishDate = () => {
+        if (!task.value.finishedAt.hasValue()) {
+            task.value.finishedAt = new IDate(new Date().getTime())
+        }
+    };
+
+    const onSetFinishDate = () => {
+        if (!task.value.finishedAt) {
+            task.value.finishedAt = new IDate(new Date().getTime())
+        }
+    };
+
     const insertAtCursor = (value: string) => {
         const el = document.activeElement as HTMLTextAreaElement
         if (!el) {
@@ -251,7 +274,9 @@
                     <TaskPrioritySelector v-model:id="task.priority.id" :disabled="props.disabled" />
                 </n-form-item>
                 <n-form-item label="Status">
-                    <TaskStatusSelector v-model:id="task.status.id" :disabled="props.disabled" />
+                    <TaskStatusSelector v-model:id="task.status.id" :disabled="props.disabled"
+                        @fill-empty-start-date="onFillEmptyStartDate" @set-start-date="onSetStartDate"
+                        @fill-empty-finish-date="onFillEmptyFinishDate" @set-finish-date="onSetFinishDate" />
                 </n-form-item>
             </n-flex>
             <n-form-item label="Summary">
