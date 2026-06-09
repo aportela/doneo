@@ -44,7 +44,7 @@ var installSchemaQueries = []string{
 			name TEXT NOT NULL UNIQUE CHECK(length(name) BETWEEN 1 AND 16),
 			item_hex_color TEXT NOT NULL CHECK(length(item_hex_color) = 7),
 			item_index INTEGER NOT NULL UNIQUE,
-			flags_bitmask INTEGER NOT NULL UNIQUE DEFAULT 0,
+			flags_bitmask INTEGER NOT NULL DEFAULT 0,
 			PRIMARY KEY (id)
 		) STRICT;
 	`,
@@ -62,7 +62,7 @@ var installSchemaQueries = []string{
 			name TEXT NOT NULL UNIQUE CHECK(length(name) BETWEEN 1 AND 16),
 			item_hex_color TEXT NOT NULL CHECK(length(item_hex_color) = 7),
 			item_index INTEGER NOT NULL UNIQUE,
-			flags_bitmask INTEGER NOT NULL UNIQUE DEFAULT 0,
+			flags_bitmask INTEGER NOT NULL DEFAULT 0,
 			PRIMARY KEY (id)
 		) STRICT;
 	`,
