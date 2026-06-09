@@ -14,7 +14,7 @@
     const route = useRoute();
     const router = useRouter();
 
-    const projectId = route.params.projectId as string
+    const projectId = route.params.projectId as string ?? ""
     const taskId = route.params.id as string
 
     // TODO: set tab with type (type tab = "metadata" | "notes"....)
