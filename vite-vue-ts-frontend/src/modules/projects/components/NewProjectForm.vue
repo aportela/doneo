@@ -265,7 +265,7 @@
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.selectors.projectStatus.label')"
                 path="status.id">
-                <ProjectStatusSelector required v-model:id="project.status.id"
+                <ProjectStatusSelector required v-model:id="project.status.id" set-default-value-on-start
                     :placeholder="t('modules.project.components.NewProjectForm.selectors.projectStatus.placeholder')" />
             </n-form-item>
         </n-form>

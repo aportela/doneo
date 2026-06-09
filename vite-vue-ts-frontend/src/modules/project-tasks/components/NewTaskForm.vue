@@ -210,7 +210,7 @@
                     :placeholder="t('modules.task.components.NewTaskForm.selectors.taskPriority.placeholder')" />
             </n-form-item>
             <n-form-item :label="t('modules.task.components.NewTaskForm.selectors.taskStatus.label')" path="status.id">
-                <TaskStatusSelector required v-model:id="task.status.id"
+                <TaskStatusSelector required v-model:id="task.status.id" set-default-value-on-start
                     :placeholder="t('modules.task.components.NewTaskForm.selectors.taskStatus.placeholder')" />
             </n-form-item>
         </n-form>

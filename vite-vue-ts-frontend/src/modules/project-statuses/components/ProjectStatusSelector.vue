@@ -19,6 +19,7 @@
         size?: SelectSize;
         hidePrefix?: boolean;
         disabled?: boolean;
+        setDefaultValueOnStart?: boolean;
     }
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
@@ -30,6 +31,8 @@
     const projectStatusId = defineModel<string | null>('id');
 
     const projectStatuses = ref<ProjectStatusResponse[]>([]);
+
+    const emit = defineEmits([]);
 
     const props = defineProps<ProjectStatusSelectorProps>();
 
@@ -59,6 +62,9 @@
                 selectedColor.value = projectStatuses.value.find((projectStatus) => projectStatus.id === projectStatusId.value)?.hexColor
             }
             options.value = response.projectStatuses.map((projectStatus: ProjectStatusResponse) => ({ label: projectStatus.name, value: projectStatus.id }));
+            if (!projectStatusId.value && props.setDefaultValueOnStart) {
+                projectStatusId.value = response.projectStatuses.find((projectStatus: ProjectStatusResponse) => projectStatus.flags.defaultStatusOnCreation === true)?.id;
+            }
             if (props.autoFocus) {
                 focus();
             }
