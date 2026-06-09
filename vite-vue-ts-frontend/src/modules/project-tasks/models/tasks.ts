@@ -17,6 +17,7 @@ export class ProjectTask {
   finishedAt: IDate;
   dueAt: IDate;
   createdBy: UserBase;
+  tags: string[];
   permissionsCount: number;
   attachmentsCount: number;
   notesCount: number;
@@ -35,6 +36,7 @@ export class ProjectTask {
     this.finishedAt = new IDate(data?.finishedAt ?? null);
     this.dueAt = new IDate(data?.dueAt ?? null);
     this.createdBy = new UserBase(data?.createdBy);
+    this.tags = [];
     this.permissionsCount = data?.permissionsCount ?? 0;
     this.attachmentsCount = data?.attachmentsCount ?? 0;
     this.notesCount = data?.notesCount ?? 0;

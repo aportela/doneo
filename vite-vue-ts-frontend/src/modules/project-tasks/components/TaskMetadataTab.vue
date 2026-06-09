@@ -2,7 +2,7 @@
     import { ref, reactive, watch, computed, type CSSProperties, nextTick, onMounted } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NCard, NForm, NFormItem, NInput, NButton, NButtonGroup, NIcon, type InputInst, NFlex, NEllipsis } from 'naive-ui';
+    import { NCard, NForm, NFormItem, NInput, NButton, NButtonGroup, NIcon, type InputInst, NFlex, NEllipsis, NSelect, type SelectOption } from 'naive-ui';
 
     import { useLoadingStore } from '../../../stores/loading';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
@@ -97,7 +97,6 @@
             if (state.ajaxErrorMessage) {
                 appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
             }
-
         }
     };
 
@@ -230,6 +229,14 @@
         insertAtCursor(markdown)
     };
 
+    const onAddTag = (label: string): SelectOption => {
+        const normalized = label.trim().toLowerCase();
+        return {
+            label: normalized,
+            value: normalized
+        };
+    }
+
     onMounted(() => {
         if (props.projectId && props.taskId) {
             onGet(props.projectId, props.taskId);
@@ -282,6 +289,10 @@
             <n-form-item label="Summary">
                 <ToggleInput v-model:value="task.summary" show-count :max-length="MAX_SUMMARY_LENGTH"
                     :disabled="props.disabled" />
+            </n-form-item>
+            <n-form-item label="Tags">
+                <n-select v-model:value="task.tags" filterable multiple tag placeholder="input task tags"
+                    :show-arrow="false" :show="false" :on-create="onAddTag" />
             </n-form-item>
             <n-form-item label="description">
                 <template #label>
