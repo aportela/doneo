@@ -27,7 +27,8 @@
         formData.append('file', file.file as Blob)
 
         const xhr = new XMLHttpRequest()
-        xhr.open('POST', `/api/projects/${props.projectId}/attachments/`)
+        // TODO: allow tasks upload
+        xhr.open('POST', `/api/projects/${props.projectId}/attachments`)
 
         const headerObj = typeof headers === 'function' ? headers({ file }) : headers
         if (headerObj) {
