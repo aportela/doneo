@@ -349,7 +349,7 @@ func (repository *projectRepository) Search(ctx context.Context, pager browser.P
 	case "priority":
 		field = "PP.name COLLATE NOCASE"
 	case "status":
-		field = "PS.name COLLATE NOCASE"
+		field = "PS.item_index"
 	case "summary":
 		field = "P.summary COLLATE NOCASE"
 	case "createdAt":

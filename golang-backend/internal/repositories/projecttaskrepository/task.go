@@ -292,7 +292,7 @@ func (repository *taskRepository) Search(ctx context.Context, pager browser.Para
 	case "priority":
 		field = "TP.name COLLATE NOCASE"
 	case "status":
-		field = "TS.name COLLATE NOCASE"
+		field = "TS.item_index"
 	case "summary":
 		field = "P.summary COLLATE NOCASE"
 	case "createdAt":
