@@ -30,7 +30,7 @@
 
     const items = shallowRef<ProjectPriority[]>([]);
 
-    const sort = reactive<Sort>(new Sort("name", "ASC"));
+    const sort = reactive<Sort>(new Sort("index", "ASC"));
 
     const filters = reactive<ProjectPrioritiesTableFilters>({
         name: "",
@@ -56,6 +56,12 @@
     watch(state, (newValue: AjaxStateInterface) => {
         loadingStore.set(newValue.ajaxRunning);
     });
+
+    const onSort = (newSort: Sort) => {
+        sort.field = newSort.field;
+        sort.order = newSort.order;
+        onRefresh();
+    };
 
     const onShowAddForm = () => {
         modalFormMode.value = "add";
@@ -196,7 +202,8 @@
 
     <n-card :title="t('modules.projectPriority.components.ManageProjectPrioritiesPage.header.title')">
         <ProjectPrioritiesTable :items="filteredItems" :disabled="state.ajaxRunning" @refresh="onRefresh"
-            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" v-model:filters="filters" />
+            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" :sort="sort" @sort="onSort"
+            v-model:filters="filters" />
     </n-card>
 </template>
 

@@ -9,6 +9,7 @@ func toDTO(taskPriority domain.TaskPriority) taskPriorityDTO {
 		ID:       taskPriority.ID,
 		Name:     taskPriority.Name,
 		HexColor: taskPriority.HexColor,
+		Index:    taskPriority.Index,
 	}
 }
 
@@ -17,6 +18,7 @@ func toDomain(taskPriority taskPriorityDTO) domain.TaskPriority {
 		ID:       taskPriority.ID,
 		Name:     taskPriority.Name,
 		HexColor: taskPriority.HexColor,
+		Index:    taskPriority.Index,
 	}
 }
 

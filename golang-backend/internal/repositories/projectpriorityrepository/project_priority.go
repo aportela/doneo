@@ -35,12 +35,13 @@ func (repository *projectPriorityRepository) Add(ctx context.Context, projectPri
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
-            INSERT INTO project_priorities (id, name, item_hex_color)
-			VALUES (?, ?, ?)
+            INSERT INTO project_priorities (id, name, item_hex_color, item_index)
+			VALUES (?, ?, ?, ?)
         `,
 		dto.ID,
 		dto.Name,
 		dto.HexColor,
+		dto.Index,
 	)
 	if err != nil {
 		// TODO: remove ?
@@ -55,6 +56,8 @@ func (repository *projectPriorityRepository) Add(ctx context.Context, projectPri
 				return &domain.AlreadyExistsError{Field: "name"}
 			} else if strings.Contains(sqlErr.Error(), "project_priorities.id") {
 				return &domain.AlreadyExistsError{Field: "id"}
+			} else if strings.Contains(sqlErr.Error(), "project_priorities.item_index") {
+				return &domain.AlreadyExistsError{Field: "index"}
 			}
 			return err
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
@@ -80,11 +83,13 @@ func (repository *projectPriorityRepository) Update(ctx context.Context, project
 		`
             UPDATE project_priorities SET
 				name = ?,
-				item_hex_color = ?
+				item_hex_color = ?,
+				item_index = ?
 			WHERE id = ?
         `,
 		dto.Name,
 		dto.HexColor,
+		dto.Index,
 		dto.ID,
 	)
 	if err != nil {
@@ -100,6 +105,8 @@ func (repository *projectPriorityRepository) Update(ctx context.Context, project
 				return &domain.AlreadyExistsError{Field: "name"}
 			} else if strings.Contains(sqlErr.Error(), "project_priorities.id") {
 				return &domain.AlreadyExistsError{Field: "id"}
+			} else if strings.Contains(sqlErr.Error(), "project_priorities.item_index") {
+				return &domain.AlreadyExistsError{Field: "index"}
 			}
 			return err
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
@@ -136,11 +143,11 @@ func (repository *projectPriorityRepository) Get(ctx context.Context, id string)
 		ctx,
 		`
             SELECT
-                PP.id, PP.name, PP.item_hex_color
+                PP.id, PP.name, PP.item_hex_color, PP.item_index
             FROM project_priorities PP
             WHERE PP.id = ?
         `,
-		id).Scan(&dto.ID, &dto.Name, &dto.HexColor)
+		id).Scan(&dto.ID, &dto.Name, &dto.HexColor, &dto.Index)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.ProjectPriority{}, domain.NotFoundError
@@ -156,13 +163,15 @@ func (repository *projectPriorityRepository) Search(ctx context.Context, pager b
 	var queryArgs []any
 	sqlQuery := `
 			SELECT
-				PP.id, PP.name, PP.item_hex_color
+				PP.id, PP.name, PP.item_hex_color, PP.item_index
 			FROM project_priorities PP
     `
 	var field string
 	switch order.Field {
 	case "name":
 		field = "PP.name COLLATE NOCASE"
+	case "index":
+		field = "PP.item_index"
 	default:
 		field = "PP.name COLLATE NOCASE"
 	}
@@ -204,7 +213,7 @@ func (repository *projectPriorityRepository) Search(ctx context.Context, pager b
 	for rows.Next() {
 		var dto projectPriorityDTO
 		if err := rows.Scan(
-			&dto.ID, &dto.Name, &dto.HexColor,
+			&dto.ID, &dto.Name, &dto.HexColor, &dto.Index,
 		); err != nil {
 			return nil, browser.Result{}, err
 		}

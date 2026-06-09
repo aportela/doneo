@@ -2,7 +2,7 @@
     import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, type CSSProperties, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSpin, NCard, NInput, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
+    import { NSpin, NCard, NInput, NInputNumber, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette } from '@tabler/icons-vue';
 
     import { ProjectPriority, MAX_NAME_LENGTH } from '../models/project-priority';
@@ -54,9 +54,24 @@
             },
             trigger: ['blur'],
         },
+        index: {
+            required: true,
+            validator: (_rule: FormItemRule, _value: number) => {
+                if (state.ajaxRunning) {
+                    return true;
+                }
+                if (serverErrors.value.index) {
+                    return new Error(t(serverErrors.value.index));
+                } else {
+                    return true;
+                }
+            },
+            trigger: ['blur'],
+        },
     };
 
     watch(() => projectPriority.value.name, () => { delete serverErrors.value.name });
+    watch(() => projectPriority.value.index, () => { delete serverErrors.value.index });
 
     const serverErrors = ref<Record<string, string>>({});
 
@@ -118,13 +133,8 @@
                 });
         } finally {
             state.ajaxRunning = false;
-            if (state.ajaxErrors) {
-                if (state.ajaxErrorMessage) {
-                    appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
-                } else {
-                    await nextTick();
-                    projectPriorityFormRef.value?.validate().then(() => { }).catch(() => { });
-                }
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
             }
         }
     };
@@ -136,7 +146,8 @@
         try {
             const payload: AddRequest = {
                 name: projectPriority.value.name ?? "",
-                HexColor: projectPriority.value.hexColor ?? "",
+                hexColor: projectPriority.value.hexColor ?? "",
+                index: projectPriority.value.index ?? 0,
             };
             const addedRole: ProjectPriorityResponse = await projectPriorityService.add(payload);
             emit('add', addedRole)
@@ -152,6 +163,8 @@
                         case 409:
                             if (apiError.details?.field === "name") {
                                 serverErrors.value.name = "modules.projectPriority.components.ProjectPriorityForm.warnings.nameAlreadyExists";
+                            } else if (apiError.details?.field === "index") {
+                                serverErrors.value.index = "modules.projectPriority.components.ProjectPriorityForm.warnings.indexAlreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.addError");
                             }
@@ -186,7 +199,8 @@
             const payload: UpdateRequest = {
                 id: projectPriority.value.id ?? "",
                 name: projectPriority.value.name ?? "",
-                HexColor: projectPriority.value.hexColor ?? "",
+                hexColor: projectPriority.value.hexColor ?? "",
+                index: projectPriority.value.index ?? 0,
             };
             const updatedRole: ProjectPriorityResponse = await projectPriorityService.update(payload);
             emit('update', updatedRole)
@@ -202,6 +216,8 @@
                         case 409:
                             if (apiError.details?.field === "name") {
                                 serverErrors.value.name = "modules.projectPriority.components.ProjectPriorityForm.warnings.nameAlreadyExists";
+                            } else if (apiError.details?.field === "index") {
+                                serverErrors.value.index = "modules.projectPriority.components.ProjectPriorityForm.warnings.indexAlreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.updateError");
                             }
@@ -271,7 +287,7 @@
         <template #header-extra>
             <n-spin v-if="state.ajaxRunning" size="small" />
         </template>
-        <n-form ref="projectStatusFormRef" :model="projectPriority" :rules="projectPriorityFormRules"
+        <n-form ref="projectPriorityFormRef" :model="projectPriority" :rules="projectPriorityFormRules"
             :disabled="state.ajaxRunning">
             <n-form-item :label="t('modules.projectPriority.components.ProjectPriorityForm.inputs.name.label')"
                 path="name" show-feedback>
@@ -283,6 +299,13 @@
                         <n-icon :component="IconUser" />
                     </template>
                 </n-input>
+            </n-form-item>
+            <n-form-item :label="t('modules.projectPriority.components.ProjectPriorityForm.inputs.index.label')"
+                path="index" show-feedback>
+                <n-input-number :min="0"
+                    :placeholder="t('modules.projectPriority.components.ProjectPriorityForm.inputs.index.placeholder')"
+                    v-model:value="projectPriority.index" required>
+                </n-input-number>
             </n-form-item>
             <n-form-item :label="t('modules.projectPriority.components.ProjectPriorityForm.inputs.preview.label')">
                 <n-flex style="width: 100%" align="center" :wrap="false">
@@ -319,7 +342,6 @@
             </n-flex>
         </template>
     </n-card>
-
 </template>
 
 <style lang="css" scoped></style>

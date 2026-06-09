@@ -35,12 +35,13 @@ func (repository *taskPriorityRepository) Add(ctx context.Context, taskPriority 
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
-            INSERT INTO task_priorities (id, name, item_hex_color)
-			VALUES (?, ?, ?)
+            INSERT INTO task_priorities (id, name, item_hex_color, item_index)
+			VALUES (?, ?, ?, ?)
         `,
 		dto.ID,
 		dto.Name,
 		dto.HexColor,
+		dto.Index,
 	)
 	if err != nil {
 		// TODO: remove ?
@@ -55,6 +56,8 @@ func (repository *taskPriorityRepository) Add(ctx context.Context, taskPriority 
 				return &domain.AlreadyExistsError{Field: "name"}
 			} else if strings.Contains(sqlErr.Error(), "task_priorities.id") {
 				return &domain.AlreadyExistsError{Field: "id"}
+			} else if strings.Contains(sqlErr.Error(), "task_priorities.item_index") {
+				return &domain.AlreadyExistsError{Field: "index"}
 			}
 			return err
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
@@ -80,11 +83,13 @@ func (repository *taskPriorityRepository) Update(ctx context.Context, taskPriori
 		`
             UPDATE task_priorities SET
 				name = ?,
-				item_hex_color = ?
+				item_hex_color = ?,
+				item_index = ?
 			WHERE id = ?
         `,
 		dto.Name,
 		dto.HexColor,
+		dto.Index,
 		dto.ID,
 	)
 	if err != nil {
@@ -100,6 +105,8 @@ func (repository *taskPriorityRepository) Update(ctx context.Context, taskPriori
 				return &domain.AlreadyExistsError{Field: "name"}
 			} else if strings.Contains(sqlErr.Error(), "task_priorities.id") {
 				return &domain.AlreadyExistsError{Field: "id"}
+			} else if strings.Contains(sqlErr.Error(), "task_priorities.item_index") {
+				return &domain.AlreadyExistsError{Field: "index"}
 			}
 			return err
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
@@ -136,11 +143,11 @@ func (repository *taskPriorityRepository) Get(ctx context.Context, id string) (d
 		ctx,
 		`
             SELECT
-                TP.id, TP.name, TP.item_hex_color
+                TP.id, TP.name, TP.item_hex_color, TP.item_index
             FROM task_priorities TP
             WHERE TP.id = ?
         `,
-		id).Scan(&dto.ID, &dto.Name, &dto.HexColor)
+		id).Scan(&dto.ID, &dto.Name, &dto.HexColor, &dto.Index)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.TaskPriority{}, domain.NotFoundError
@@ -156,13 +163,15 @@ func (repository *taskPriorityRepository) Search(ctx context.Context, pager brow
 	var queryArgs []any
 	sqlQuery := `
 			SELECT
-				TP.id, TP.name, TP.item_hex_color
+				TP.id, TP.name, TP.item_hex_color, TP.item_index
 			FROM task_priorities TP
     `
 	var field string
 	switch order.Field {
 	case "name":
 		field = "TP.name COLLATE NOCASE"
+	case "index":
+		field = "TP.item_index"
 	default:
 		field = "TP.name COLLATE NOCASE"
 	}
@@ -204,7 +213,7 @@ func (repository *taskPriorityRepository) Search(ctx context.Context, pager brow
 	for rows.Next() {
 		var dto taskPriorityDTO
 		if err := rows.Scan(
-			&dto.ID, &dto.Name, &dto.HexColor,
+			&dto.ID, &dto.Name, &dto.HexColor, &dto.Index,
 		); err != nil {
 			return nil, browser.Result{}, err
 		}

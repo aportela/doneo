@@ -10,6 +10,7 @@ func addRequestToDomain(request addRequest) domain.TaskPriority {
 	return domain.TaskPriority{
 		Name:     request.Name,
 		HexColor: request.HexColor,
+		Index:    request.Index,
 	}
 }
 
@@ -17,6 +18,7 @@ func updateRequestToDomain(request updateRequest) domain.TaskPriority {
 	return domain.TaskPriority{
 		Name:     request.Name,
 		HexColor: request.HexColor,
+		Index:    request.Index,
 	}
 }
 
@@ -25,6 +27,7 @@ func DomainToResponse(taskPriority domain.TaskPriority) TaskPriorityResponse {
 		ID:       taskPriority.ID,
 		Name:     taskPriority.Name,
 		HexColor: taskPriority.HexColor,
+		Index:    taskPriority.Index,
 	}
 }
 

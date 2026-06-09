@@ -15,16 +15,18 @@
     import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
+    import type { Sort } from '../../../shared/types/models/sort.ts';
 
     interface Props {
         disabled: boolean;
         items: TaskPriority[];
+        sort?: Sort;
     }
 
     const { t } = useI18n();
     const dialog = useDialog();
 
-    const emit = defineEmits(['refresh', 'add', 'update', 'delete']);
+    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'sort']);
 
     const props = defineProps<Props>();
 
@@ -45,10 +47,21 @@
             label: t("modules.taskPriority.components.TaskPrioritiesTable.header.columns.name"),
             field: "name",
             visible: true,
-            sortable: false,
+            sortable: true,
             isFiltered: () => isFilteredByName.value,
         },
+        {
+            label: t("modules.taskPriority.components.TaskPrioritiesTable.header.columns.index"),
+            field: "index",
+            visible: true,
+            sortable: true,
+            isFiltered: () => false,
+        },
     ]);
+
+    const onSort = (sort: Sort) => {
+        emit("sort", sort);
+    };
 
     const onRefresh = () => {
         emit("refresh");
@@ -87,7 +100,7 @@
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
+    <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd">
         <template #thead>
             <tr>
                 <th>
@@ -95,6 +108,7 @@
                         :placeholder="t('modules.taskPriority.components.TaskPrioritiesTable.filters.name.placeholder')"
                         v-model:value="filters.name" />
                 </th>
+                <th></th>
                 <th class="doneo-text-center">
                     <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
                 </th>
@@ -104,8 +118,9 @@
             <tr v-for="taskPriority, index in items" :key="taskPriority.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(taskPriority.hexColor ?? '#888888')">{{ taskPriority.name
-                    }}</n-tag>
+                        }}</n-tag>
                 </td>
+                <td>{{ taskPriority.index }}</td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
                         :delete-disabled="props.disabled" :disabled="props.disabled"

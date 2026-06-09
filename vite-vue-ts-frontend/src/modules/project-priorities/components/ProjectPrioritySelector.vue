@@ -33,7 +33,7 @@
 
     const props = defineProps<ProjectPrioritySelectorProps>();
 
-    const sort = ref<Sort>(new Sort("name", "ASC"));
+    const sort = ref<Sort>(new Sort("index", "ASC"));
 
     const options = shallowRef<SelectOption[]>([]);
 

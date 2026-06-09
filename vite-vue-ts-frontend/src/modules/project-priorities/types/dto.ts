@@ -6,13 +6,15 @@ import type { Order } from "../../../shared/types/dto/order";
 
 export type AddRequest = {
   name: string;
-  HexColor: string;
+  hexColor: string;
+  index: number;
 };
 
 export type UpdateRequest = {
   id: string;
   name: string;
-  HexColor: string;
+  hexColor: string;
+  index: number;
 };
 
 type SearchRequestFilter = {
@@ -29,6 +31,7 @@ export type ProjectPriorityResponse = {
   id: string;
   name: string;
   hexColor: string;
+  index: number;
 };
 
 export type SearchResponse = {

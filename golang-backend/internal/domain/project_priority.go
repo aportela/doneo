@@ -4,6 +4,7 @@ type ProjectPriority struct {
 	ID       string
 	Name     string
 	HexColor string
+	Index    uint
 }
 
 type SearchProjectPrioritiesFilter struct {

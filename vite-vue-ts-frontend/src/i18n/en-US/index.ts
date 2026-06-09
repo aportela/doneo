@@ -523,6 +523,13 @@ export default {
             preview: {
               label: "Preview",
             },
+            index: {
+              label: "Index",
+              placeholder: "Enter project priority index",
+              errors: {
+                alreadyExists: "Index",
+              },
+            },
           },
           errors: {
             loadError:
@@ -536,6 +543,7 @@ export default {
           },
           warnings: {
             nameAlreadyExists: "Name already exists",
+            indexAlreadyExists: "Index already exists",
           },
         },
         ManageProjectPrioritiesPage: {
@@ -565,6 +573,7 @@ export default {
           header: {
             columns: {
               name: "Name",
+              index: "Index",
             },
           },
           filters: {
@@ -1186,6 +1195,13 @@ export default {
             preview: {
               label: "Preview",
             },
+            index: {
+              label: "Index",
+              placeholder: "Enter task priority index",
+              errors: {
+                alreadyExists: "Index",
+              },
+            },
           },
           errors: {
             loadError:
@@ -1198,6 +1214,7 @@ export default {
           },
           warnings: {
             nameAlreadyExists: "Name already exists",
+            indexAlreadyExists: "Index already exists",
           },
         },
         ManageTaskPrioritiesPage: {
@@ -1224,6 +1241,7 @@ export default {
           header: {
             columns: {
               name: "Name",
+              index: "Index",
             },
           },
           filters: {

@@ -2,7 +2,7 @@
     import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, type CSSProperties, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSpin, NCard, NInput, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
+    import { NSpin, NCard, NInput, NInputNumber, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette } from '@tabler/icons-vue';
 
     import { TaskPriority, MAX_NAME_LENGTH } from '../models/task-priority';
@@ -54,9 +54,24 @@
             },
             trigger: ['blur'],
         },
+        index: {
+            required: true,
+            validator: (_rule: FormItemRule, _value: number) => {
+                if (state.ajaxRunning) {
+                    return true;
+                }
+                if (serverErrors.value.index) {
+                    return new Error(t(serverErrors.value.index));
+                } else {
+                    return true;
+                }
+            },
+            trigger: ['blur'],
+        },
     };
 
     watch(() => taskPriority.value.name, () => { delete serverErrors.value.name });
+    watch(() => taskPriority.value.index, () => { delete serverErrors.value.index });
 
     const serverErrors = ref<Record<string, string>>({});
 
@@ -136,7 +151,8 @@
         try {
             const payload: AddRequest = {
                 name: taskPriority.value.name ?? "",
-                HexColor: taskPriority.value.hexColor ?? "",
+                hexColor: taskPriority.value.hexColor ?? "",
+                index: taskPriority.value.index ?? 0,
             };
             const addedRole: TaskPriorityResponse = await taskPriorityService.add(payload);
             emit('add', addedRole)
@@ -152,6 +168,8 @@
                         case 409:
                             if (apiError.details?.field === "name") {
                                 serverErrors.value.name = "modules.taskPriority.components.TaskPriorityForm.warnings.nameAlreadyExists";
+                            } else if (apiError.details?.field === "index") {
+                                serverErrors.value.index = "modules.taskPriority.components.TaskPriorityForm.warnings.indexAlreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("modules.taskPriority.components.TaskPriorityForm.errors.addError");
                             }
@@ -186,7 +204,8 @@
             const payload: UpdateRequest = {
                 id: taskPriority.value.id ?? "",
                 name: taskPriority.value.name ?? "",
-                HexColor: taskPriority.value.hexColor ?? "",
+                hexColor: taskPriority.value.hexColor ?? "",
+                index: taskPriority.value.index ?? 0,
             };
             const updatedRole: TaskPriorityResponse = await taskPriorityService.update(payload);
             emit('update', updatedRole)
@@ -202,6 +221,8 @@
                         case 409:
                             if (apiError.details?.field === "name") {
                                 serverErrors.value.name = "modules.taskPriority.components.TaskPriorityForm.warnings.nameAlreadyExists";
+                            } else if (apiError.details?.field === "index") {
+                                serverErrors.value.index = "modules.taskPriority.components.TaskPriorityForm.warnings.indexAlreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("modules.taskPriority.components.TaskPriorityForm.errors.updateError");
                             }
@@ -271,7 +292,7 @@
         <template #header-extra>
             <n-spin v-if="state.ajaxRunning" size="small" />
         </template>
-        <n-form ref="taskStatusFormRef" :model="taskPriority" :rules="taskPriorityFormRules"
+        <n-form ref="taskPriorityFormRef" :model="taskPriority" :rules="taskPriorityFormRules"
             :disabled="state.ajaxRunning">
             <n-form-item :label="t('modules.taskPriority.components.TaskPriorityForm.inputs.name.label')" path="name"
                 show-feedback>
@@ -283,6 +304,13 @@
                         <n-icon :component="IconUser" />
                     </template>
                 </n-input>
+            </n-form-item>
+            <n-form-item :label="t('modules.taskPriority.components.TaskPriorityForm.inputs.index.label')" path="index"
+                show-feedback>
+                <n-input-number :min="0"
+                    :placeholder="t('modules.taskPriority.components.TaskPriorityForm.inputs.index.placeholder')"
+                    v-model:value="taskPriority.index" required>
+                </n-input-number>
             </n-form-item>
             <n-form-item :label="t('modules.taskPriority.components.TaskPriorityForm.inputs.preview.label')">
                 <n-flex style="width: 100%" align="center" :wrap="false">

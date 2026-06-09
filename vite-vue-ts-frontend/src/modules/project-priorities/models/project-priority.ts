@@ -4,11 +4,13 @@ export class ProjectPriority {
   id: string | null;
   name: string | null;
   hexColor: string | null;
+  index: number | null;
 
   constructor(data?: ProjectPriorityDTO) {
     this.id = data?.id ?? null;
     this.name = data?.name ?? null;
     this.hexColor = data?.hexColor ?? null;
+    this.index = data?.index ?? 0;
   }
 
   toDTO(): ProjectPriorityDTO {
@@ -16,6 +18,7 @@ export class ProjectPriority {
       id: this.id ?? "",
       name: this.name ?? "",
       hexColor: this.hexColor ?? "",
+      index: this.index ?? 0,
     };
   }
 }

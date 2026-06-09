@@ -4,6 +4,7 @@ type taskPriorityDTO struct {
 	ID       string `db:"id"`
 	Name     string `db:"name"`
 	HexColor string `db:"item_hex_color"`
+	Index    uint   `db:"item_index"`
 }
 
 type searchFilterDTO struct {

@@ -15,10 +15,11 @@ func createTaskPriorities(database database.Database) []string {
 	taskPriorityNames := []string{"Low", "Medium", "High"}
 	var newTaskPriorityIds []string
 	taskPriorityService := taskpriorityservice.NewService(database, taskpriorityrepository.NewRepository(database))
-	for _, taskPriorityName := range taskPriorityNames {
+	for index, taskPriorityName := range taskPriorityNames {
 		taskPriority := domain.TaskPriority{
 			Name:     taskPriorityName,
 			HexColor: utils.RandomSoftHexColor(),
+			Index:    uint(index),
 		}
 		taskPriority, err := taskPriorityService.Add(context.Background(), taskPriority)
 		if err != nil {
