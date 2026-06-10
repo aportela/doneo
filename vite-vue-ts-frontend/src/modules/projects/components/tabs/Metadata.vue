@@ -277,7 +277,7 @@
             </n-form-item>
             <div>
                 <div>Created at: {{ project.createdAt.toLocaleString() }}</div>
-                <div>Updated at: {{ project.updatedAt?.toLocaleString() }}</div>
+                <div v-if="project.updatedAt.hasValue()">Updated at: {{ project.updatedAt?.toLocaleString() }}</div>
             </div>
         </n-flex>
         <n-flex>
