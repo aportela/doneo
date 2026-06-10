@@ -23,8 +23,8 @@
 
     const timer = ref<boolean>(false);
 
-    const color = computed<string>(() => {
-        return hasTimers.value ? "red" : "black";
+    const color = computed<string | undefined>(() => {
+        return hasTimers.value ? "red" : undefined;
     });
 
     const start = ref<number | null>(null);
