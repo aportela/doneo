@@ -24,6 +24,7 @@ import (
 	"github.com/aportela/doneo/internal/handlers/rolehandler"
 	"github.com/aportela/doneo/internal/handlers/taskpriorityhandler"
 	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
+	"github.com/aportela/doneo/internal/handlers/timerhandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/attachmentrepository"
@@ -38,6 +39,7 @@ import (
 	"github.com/aportela/doneo/internal/repositories/rolerepository"
 	"github.com/aportela/doneo/internal/repositories/taskpriorityrepository"
 	"github.com/aportela/doneo/internal/repositories/taskstatusrepository"
+	"github.com/aportela/doneo/internal/repositories/timerrepository"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"github.com/aportela/doneo/internal/services/attachmentservice"
 	"github.com/aportela/doneo/internal/services/authservice"
@@ -52,6 +54,7 @@ import (
 	"github.com/aportela/doneo/internal/services/roleservice"
 	"github.com/aportela/doneo/internal/services/taskpriorityservice"
 	"github.com/aportela/doneo/internal/services/taskstatusservice"
+	"github.com/aportela/doneo/internal/services/timerservice"
 	"github.com/aportela/doneo/internal/services/userservice"
 
 	"github.com/aportela/doneo/internal/ui"
@@ -186,6 +189,14 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		r.Delete("/{id:"+uuidPattern+"}", handler.Delete)
 	})
 
+	apiRouter.Route("/timers", func(r chi.Router) {
+		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
+		handler := timerhandler.NewHandler(timerservice.NewService(database, timerrepository.NewRepository(database)))
+		r.Post("/", handler.Start)
+		r.Put("/{id:"+uuidPattern+"}", handler.Stop)
+		r.Delete("/", handler.Clear)
+		r.Get("/", handler.Search)
+	})
 	apiRouter.Route("/projects", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
 		projectHandler := projecthandler.NewHandler(projectservice.NewService(database, projectrepository.NewRepository(database)))

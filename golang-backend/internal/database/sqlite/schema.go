@@ -207,6 +207,17 @@ var installSchemaQueries = []string{
 			FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE
 		) STRICT;
 	`,
+	`
+		CREATE TABLE IF NOT EXISTS timers (
+			id TEXT NOT NULL CHECK(length(id) == 36),
+			user_id TEXT NOT NULL CHECK(length(user_id) == 36),
+			started_at INTEGER NOT NULL,
+			finished_at INTEGER,
+			PRIMARY KEY (id),
+			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+			UNIQUE(user_id, started_at)
+		) STRICT;
+	`,
 
 	/*
 		`

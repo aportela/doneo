@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// TODO: MOVE TO handlers package ???
 func ToJSONResponse(w http.ResponseWriter, status int, data any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
@@ -12,6 +13,8 @@ func ToJSONResponse(w http.ResponseWriter, status int, data any) {
 		http.Error(w, "error encoding JSON: "+err.Error(), http.StatusInternalServerError)
 	}
 }
+
+// TODO: MOVE TO handlers package ???
 func ToJSONErrorResponse(w http.ResponseWriter, err error) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusInternalServerError)
