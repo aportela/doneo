@@ -11,6 +11,7 @@ import (
 	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/projecthistoryrepository"
 	"github.com/aportela/doneo/internal/repositories/projecttaskrepository"
+	"github.com/aportela/doneo/internal/repositories/tagrepository"
 	"github.com/aportela/doneo/internal/utils"
 )
 
@@ -58,6 +59,15 @@ func (service *taskService) Add(ctx context.Context, projectId string, task doma
 	err = service.repository.Add(ctx, projectId, task)
 	if err != nil {
 		return domain.Task{}, err
+	}
+	if len(task.Tags) > 0 {
+		tagRepository := tagrepository.NewRepository(service.database)
+		for _, tag := range task.Tags {
+			err = tagRepository.AddTaskTag(ctx, task.ID, tag)
+			if err != nil {
+				return domain.Task{}, err
+			}
+		}
 	}
 	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, task.ID, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: task.CreatedAt, OperationType: domain.EventTaskCreated})
 	if err != nil {
@@ -136,6 +146,11 @@ func (service *taskService) Get(ctx context.Context, id string) (domain.Task, er
 	if err != nil {
 		return domain.Task{}, fmt.Errorf("[TaskService] failed to get task with ID %s: %w", id, err)
 	}
+	tags, err := tagrepository.NewRepository(service.database).GetTaskTags(ctx, task.ID)
+	if err != nil {
+		return domain.Task{}, fmt.Errorf("[TaskService] failed to get task with ID %s: %w", id, err)
+	}
+	task.Tags = tags
 	return task, nil
 }
 

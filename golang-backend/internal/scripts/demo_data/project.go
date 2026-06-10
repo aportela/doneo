@@ -147,6 +147,39 @@ func getRandomProject(userIds []string, projectTypeIds []string, projectPriority
 	}
 }
 
+func getRandomTags(maxTags int) []string {
+	var availableTags = []string{
+		"planning", "design", "development", "testing",
+		"deployment", "documentation", "research", "architecture",
+		"frontend", "backend", "database", "api",
+		"bugfix", "refactoring", "optimization", "security",
+		"teamwork", "meeting", "deadline", "review",
+		"analytics", "integration", "maintenance", "cloud",
+	}
+	if maxTags <= 0 {
+		return nil
+	}
+
+	if maxTags > len(availableTags) {
+		maxTags = len(availableTags)
+	}
+
+	numTags := rand.Intn(maxTags + 1)
+
+	if numTags == 0 {
+		return nil
+	}
+
+	indices := rand.Perm(len(availableTags))
+
+	tags := make([]string, numTags)
+	for i := 0; i < numTags; i++ {
+		tags[i] = availableTags[indices[i]]
+	}
+
+	return tags
+}
+
 func getRandomTask(userIds []string, taskStatusIds []string, taskPriorityIds []string) domain.Task {
 	taskDescription := getRandomProjectDescription()
 	startOffset := rand.Int63n(48)
@@ -174,6 +207,7 @@ func getRandomTask(userIds []string, taskStatusIds []string, taskPriorityIds []s
 		DueAt:       utils.Int64PtrToTimePtr(&dtime),
 		Priority:    domain.TaskPriority{ID: taskPriorityIds[rand.Intn(len(taskPriorityIds))]},
 		Status:      domain.TaskStatus{ID: taskStatusIds[rand.Intn(len(taskStatusIds))]},
+		Tags:        getRandomTags(5),
 	}
 }
 

@@ -17,6 +17,7 @@ type Task struct {
 	DueAt                  *time.Time
 	Priority               TaskPriority
 	Status                 TaskStatus
+	Tags                   []string
 	PermissionsCount       uint
 	AttachmentsCount       uint
 	NotesCount             uint

@@ -199,6 +199,14 @@ var installSchemaQueries = []string{
 			UNIQUE(project_id, task_index)
 		) STRICT;
 	`,
+	`
+		CREATE TABLE IF NOT EXISTS task_tags (
+			task_id TEXT NOT NULL CHECK(length(task_id) == 36),
+			tag TEXT NOT NULL CHECK(length(tag) <= 64),
+			PRIMARY KEY (task_id, tag),
+			FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE
+		) STRICT;
+	`,
 
 	/*
 		`

@@ -21,6 +21,7 @@ type addRequest struct {
 	Description *string      `json:"description"`
 	Priority    taskPriority `json:"priority"`
 	Status      taskStatus   `json:"status"`
+	Tags        []string     `json:"tags"`
 }
 
 type updateRequest struct {
@@ -32,6 +33,7 @@ type updateRequest struct {
 	StartedAt   *int64       `json:"startedAt"`
 	FinishedAt  *int64       `json:"finishedAt"`
 	DueAt       *int64       `json:"dueAt"`
+	Tags        []string     `json:"tags"`
 }
 
 type filterRequest struct {
@@ -62,6 +64,7 @@ type taskResponse struct {
 	DueAt                  *int64                                   `json:"dueAt"`
 	Priority               taskpriorityhandler.TaskPriorityResponse `json:"priority"`
 	Status                 taskstatushandler.TaskStatusResponse     `json:"status"`
+	Tags                   []string                                 `json:"tags"`
 	TasksCount             uint                                     `json:"tasksCount"`
 	PermissionsCount       uint                                     `json:"permissionsCount"`
 	AttachmentsCount       uint                                     `json:"attachmentsCount"`
