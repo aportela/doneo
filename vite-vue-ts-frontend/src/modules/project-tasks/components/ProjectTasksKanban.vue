@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { onMounted, ref } from 'vue'
 
-    import { NCard, NButton, NInput, NScrollbar, NGrid, NGridItem, NIcon } from 'naive-ui'
+    import { NCard, NButton, NInput, NScrollbar, NGrid, NGridItem, NIcon, NSpace, NTag } from 'naive-ui'
 
     import draggable from 'vuedraggable'
 
@@ -12,13 +12,14 @@
     import type { SearchRequest as SearchRequestTask } from '../types/dto'
 
     import { Sort } from '../../../shared/types/models/sort'
-    import { IconPaperclip } from '@tabler/icons-vue'
+    import { IconPaperclip, IconMessages } from '@tabler/icons-vue'
 
     interface Task {
         id: string
         slug: string;
         summary: string
         attachmentCount: number;
+        tags: string[];
     }
 
 
@@ -37,7 +38,7 @@
     function addTask(columnId: string) {
         const column = columns.value.find(c => c.id === columnId)
         if (column && newTaskTitle.value.trim() !== '') {
-            column.tasks.push({ id: Date.now().toString(), slug: "00", summary: newTaskTitle.value, attachmentCount: 0 })
+            column.tasks.push({ id: Date.now().toString(), slug: "00", summary: newTaskTitle.value, attachmentCount: 0, tags: [] })
             newTaskTitle.value = ''
         }
     }
@@ -85,7 +86,7 @@
         try {
             const response = await projectTaskService.search(null, payload);
             columns.value.forEach((column) => {
-                column.tasks = response.tasks.filter((task) => task.status.id == column.id).map((task) => { return { id: task.id, slug: task.slug, summary: task.summary, attachmentCount: Math.floor(Math.random() * 3) }; });
+                column.tasks = response.tasks.filter((task) => task.status.id == column.id).map((task) => { return { id: task.id, slug: task.slug, summary: task.summary, attachmentCount: Math.floor(Math.random() * 3), tags: ['test', 'review'] }; });
             });
         } catch (e) {
             console.error(e);
@@ -106,19 +107,33 @@
     <NGrid :cols="columns.length" x-gap="16">
         <NGridItem v-for="column in columns" :key="column.id">
             <NCard :title="column.title" size="large" class="doneo-kanban-column"
-                :style="'background-color: ' + column.hexColor + ';'">
+                :style="'background-color: ' + column.hexColor + ';'" segmented>
                 <div style="flex: 1; overflow: hidden;">
                     <NScrollbar style="height: 100%;">
                         <draggable v-model="column.tasks" group="tasks" item-key="id" animation="200"
                             ghost-class="drag-ghost">
                             <template #item="{ element }">
-                                <NCard size="small" style="cursor: grab; margin-bottom: 8px;">
-                                    {{ element.slug }}
+                                <NCard size="small" style="cursor: grab; margin-bottom: 8px;" :title="element.slug"
+                                    segmented>
+                                    <template #header-extra>
+                                        <p v-if="element.attachmentCount > 0">
+                                            <n-icon :component="IconPaperclip" />
+                                            {{ element.attachmentCount }}
+                                            &nbsp;
+                                            <n-icon :component="IconMessages" />
+                                            {{ element.attachmentCount + 1 }}
+                                        </p>
+                                    </template>
                                     <p>{{ element.summary }}</p>
-                                    <img v-if="element.attachmentCount > 0"
-                                        :src="'https://loremflickr.com/320/240?random=' + element.id">
-                                    <p v-if="element.attachmentCount > 0"><n-icon :component="IconPaperclip" /> {{
-                                        element.attachmentCount }}</p>
+                                    <template #footer v-if="element.attachmentCount > 0">
+                                        <img :src="'https://loremflickr.com/320/240?random=' + element.id"
+                                            style="width: 100%;">
+                                    </template>
+                                    <template #action>
+                                        <n-space><n-tag v-for="tag in element.tags" :key="tag">{{ tag
+                                        }}</n-tag></n-space>
+                                    </template>
+
                                 </NCard>
                             </template>
                         </draggable>
