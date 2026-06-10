@@ -78,7 +78,7 @@
 
 <template>
     <n-input-group>
-        <n-space v-if="!editMode" class="doneo-tag-selector-container" @click="toggleMode">
+        <n-space v-if="!editMode" class="doneo-tag-selector-container doneo-cursor-pointer" @click="toggleMode">
             <!-- TODO: router-link filter by tag -->
             <n-tag v-for="tag in editValue" :key="tag" class="doneo-cursor-pointer">
                 {{ tag }}
@@ -118,6 +118,7 @@
 <style lang="css" scoped>
     .doneo-tag-selector-container {
         width: 100%;
+        min-height: 20px;
         border: 1px solid #e0e0e6;
         border-radius: var(--n-border-radius);
         padding: 6px;
