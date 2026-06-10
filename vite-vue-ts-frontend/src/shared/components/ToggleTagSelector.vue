@@ -7,11 +7,8 @@
 
     interface ToggleInputProps {
         startupEditMode?: boolean;
-        showCount?: boolean;
-        maxLength?: number;
         disabled?: boolean;
         readOnly?: boolean;
-        clearable?: boolean;
         placeholder?: string;
         onConfirm?: (newValue: string[]) => void;
         onCancel?: () => void;
@@ -19,10 +16,8 @@
 
     const props = withDefaults(defineProps<ToggleInputProps>(), {
         startupEditMode: false,
-        showCount: false,
         disabled: false,
         readOnly: false,
-        clearable: false,
     });
 
     const { t } = useI18n();
