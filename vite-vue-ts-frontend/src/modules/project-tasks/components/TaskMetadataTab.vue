@@ -118,6 +118,7 @@
                 startedAt: task.value.startedAt?.msTimestamp ?? null,
                 finishedAt: task.value.finishedAt?.msTimestamp ?? null,
                 dueAt: task.value.dueAt?.msTimestamp ?? null,
+                tags: task.value.tags,
             };
             const response: TaskResponse = await projectTaskService.update(props.projectId, payload);
             if (response.id === task.value.id) {

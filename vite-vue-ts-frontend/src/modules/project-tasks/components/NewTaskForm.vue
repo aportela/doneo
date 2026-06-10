@@ -122,6 +122,7 @@
                 description: task.value.description,
                 priority: { id: task.value.priority.id ?? "" },
                 status: { id: task.value.status.id ?? "" },
+                tags: task.value.tags,
             };
             const addedTask: TaskResponse = await projectTaskService.add(props.projectId, payload);
             emit('add', addedTask, openTaskAfterCreate.value)

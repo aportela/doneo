@@ -102,6 +102,19 @@ func (service *taskService) Update(ctx context.Context, task domain.Task) (domai
 	if err != nil {
 		return domain.Task{}, err
 	}
+	tagRepository := tagrepository.NewRepository(service.database)
+	err = tagRepository.DeleteTaskTags(ctx, task.ID)
+	if err != nil {
+		return domain.Task{}, err
+	}
+	if len(task.Tags) > 0 {
+		for _, tag := range task.Tags {
+			err = tagRepository.AddTaskTag(ctx, task.ID, tag)
+			if err != nil {
+				return domain.Task{}, err
+			}
+		}
+	}
 	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, task.ID, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskUpdated})
 	if err != nil {
 		return domain.Task{}, err

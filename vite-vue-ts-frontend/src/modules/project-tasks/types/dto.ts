@@ -18,6 +18,7 @@ export type AddRequest = {
   status: {
     id: string;
   };
+  tags: string[];
 };
 
 export type UpdateRequest = {
@@ -33,6 +34,7 @@ export type UpdateRequest = {
   startedAt: number | null;
   finishedAt: number | null;
   dueAt: number | null;
+  tags: string[];
 };
 
 type SearchRequestFilter = {
