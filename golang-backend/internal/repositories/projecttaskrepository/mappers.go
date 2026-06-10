@@ -10,6 +10,7 @@ import (
 func toDTO(task domain.Task) taskDTO {
 	return taskDTO{
 		ID:                     task.ID,
+		projectID:              task.ProjectID,
 		Index:                  task.Index,
 		Slug:                   task.Slug,
 		Summary:                task.Summary,
@@ -35,6 +36,7 @@ func toDTO(task domain.Task) taskDTO {
 func toDomain(task taskDTO) domain.Task {
 	return domain.Task{
 		ID:                     task.ID,
+		ProjectID:              task.projectID,
 		Index:                  task.Index,
 		Slug:                   task.Slug,
 		Summary:                task.Summary,

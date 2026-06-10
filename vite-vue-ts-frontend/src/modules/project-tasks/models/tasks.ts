@@ -6,6 +6,7 @@ import { IDate } from "../../../shared/types/idate";
 
 export class ProjectTask {
   id: string | null;
+  projectId: string | null;
   slug: string | null;
   summary: string | null;
   description: string | null;
@@ -25,6 +26,7 @@ export class ProjectTask {
 
   constructor(data?: ProjectTaskDTO) {
     this.id = data?.id ?? null;
+    this.projectId = data?.projectId ?? null;
     this.slug = data?.slug ?? null;
     this.summary = data?.summary ?? null;
     this.description = data?.description ?? null;
@@ -46,6 +48,7 @@ export class ProjectTask {
   toDTO(): ProjectTaskDTO {
     return {
       id: this.id ?? "",
+      projectId: this.projectId ?? "",
       slug: this.slug ?? "",
       summary: this.summary ?? "",
       description: this.description ?? "",

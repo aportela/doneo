@@ -47,6 +47,7 @@ func updateRequestToDomain(request updateRequest) domain.Task {
 func DomainToResponse(task domain.Task) taskResponse {
 	return taskResponse{
 		ID:                     task.ID,
+		ProjectID:              task.ProjectID,
 		Slug:                   task.Slug,
 		Summary:                task.Summary,
 		Description:            task.Description,

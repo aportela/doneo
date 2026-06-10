@@ -181,7 +181,8 @@
                         }}</n-tag></td>
                 <td><n-tag :bordered="false" :color="getNaiveUITagColorProperty(task.status.hexColor ?? '#888888')">{{
                     task.status.name }}</n-tag></td>
-                <td><router-link :to="{ name: 'taskTab', params: { id: task.id, tab: 'metadata' } }"
+                <td><router-link
+                        :to="{ name: 'taskTab', params: { id: task.id, projectId: task.projectId, tab: 'metadata' } }"
                         class="doneo-link-text-color-default">{{
                             task.summary
                         }}</router-link></td>
@@ -192,7 +193,8 @@
                 <td class="doneo-text-center">
                     <!-- TODO: use ManageTableActionButtons -->
                     <n-button-group size="small">
-                        <router-link :to="{ name: 'taskTab', params: { id: task.id, tab: 'metadata' } }">
+                        <router-link
+                            :to="{ name: 'taskTab', params: { id: task.id, projectId: task.projectId, tab: 'metadata' } }">
                             <n-button :disabled="props.disabled">
                                 {{ t("shared.buttons.Open.label") }}
                                 <template #icon>

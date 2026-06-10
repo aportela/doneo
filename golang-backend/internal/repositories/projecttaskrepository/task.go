@@ -193,6 +193,7 @@ func (repository *taskRepository) Get(ctx context.Context, id string) (domain.Ta
 		`
             SELECT
                 T.id,
+				T.project_id,
 				T.task_index,
 				P.slug || "-" || T.task_index AS task_slug,
 				T.summary,
@@ -223,6 +224,7 @@ func (repository *taskRepository) Get(ctx context.Context, id string) (domain.Ta
         `,
 		id).Scan(
 		&dto.ID,
+		&dto.projectID,
 		&dto.Index,
 		&dto.Slug,
 		&dto.Summary,
@@ -261,6 +263,7 @@ func (repository *taskRepository) Search(ctx context.Context, pager browser.Para
 	sqlQuery := `
 		SELECT
 			T.id,
+			T.project_id,
 			T.task_index,
 			P.slug || "-" || T.task_index AS task_slug,
 			T.summary,
@@ -377,6 +380,7 @@ func (repository *taskRepository) Search(ctx context.Context, pager browser.Para
 		var dto taskDTO
 		if err := rows.Scan(
 			&dto.ID,
+			&dto.projectID,
 			&dto.Index,
 			&dto.Slug,
 			&dto.Summary,

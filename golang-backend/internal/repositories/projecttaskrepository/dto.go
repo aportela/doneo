@@ -8,6 +8,7 @@ import (
 
 type taskDTO struct {
 	ID                     string         `db:"id"`
+	projectID              string         `db:"project_id"`
 	Index                  uint           `db:"task_index"`
 	Slug                   string         `db:"task_slug"`
 	Summary                string         `db:"summary"`
@@ -32,7 +33,7 @@ type taskDTO struct {
 }
 
 type searchFilterDTO struct {
-	ProjectId       *string
+	ProjectId       *string // TODO ?????
 	Summary         *string
 	PriorityId      *string
 	StatusId        *string

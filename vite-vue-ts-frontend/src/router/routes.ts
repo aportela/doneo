@@ -50,7 +50,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         name: "task",
-        path: "tasks/:id",
+        path: "projects/:projectId/tasks/:id",
         component: () => import("../modules/project-tasks/pages/TaskPage.vue"),
         children: [
           {

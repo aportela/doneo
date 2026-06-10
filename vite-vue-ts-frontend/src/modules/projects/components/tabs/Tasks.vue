@@ -159,6 +159,7 @@
                     name: "taskTab",
                     params: {
                         id: task.id,
+                        projectId: task.projectId,
                         tab: "metadata",
                     }
                 },

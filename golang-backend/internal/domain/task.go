@@ -4,6 +4,7 @@ import "time"
 
 type Task struct {
 	ID                     string
+	ProjectID              string
 	Index                  uint
 	Slug                   string
 	Summary                string
@@ -25,7 +26,7 @@ type Task struct {
 }
 
 type SearchTaskFilter struct {
-	ProjectId       *string
+	ProjectId       *string // TODO ???
 	Summary         *string
 	StatusId        *string
 	PriorityId      *string

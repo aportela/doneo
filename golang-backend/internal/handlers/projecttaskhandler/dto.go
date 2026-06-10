@@ -52,6 +52,7 @@ type searchRequest struct {
 
 type taskResponse struct {
 	ID                     string                                   `json:"id"`
+	ProjectID              string                                   `json:"projectId"`
 	Slug                   string                                   `json:"slug"`
 	Summary                string                                   `json:"summary"`
 	Description            *string                                  `json:"description"`

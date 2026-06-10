@@ -51,6 +51,7 @@ export type SearchRequest = {
 
 export type TaskResponse = {
   id: string;
+  projectId: string;
   slug: string;
   summary: string;
   description: string;
