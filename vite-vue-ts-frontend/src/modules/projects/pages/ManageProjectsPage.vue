@@ -197,7 +197,7 @@
                 {
                     name: "projectTab",
                     params: {
-                        id: project.id,
+                        projectId: project.id,
                         tab: "metadata",
                     }
                 },
