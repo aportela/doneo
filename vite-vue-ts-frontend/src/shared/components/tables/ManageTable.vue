@@ -65,7 +65,7 @@
             </p>
         </div>
     </n-modal>
-    <n-table :size="size" :striped="striped" class="doneo-table">
+    <n-table :size="size" :striped="striped" class="doneo-table" :single-line="false" :single-column="false">
         <thead>
             <tr v-if="props.columns && props.columns?.length > 0">
                 <th v-for="column in props.columns" :key="column.field" @click="onToggleSort(column)"
