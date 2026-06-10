@@ -15,6 +15,7 @@
     import { useSessionStore } from "../stores/session";
     import { useLoadingStore } from '../stores/loading';
     import { renderIcon } from '../shared/composables/naive-ui-icon';
+    import TimerButton from "../shared/components/buttons/TimerButton.vue";
 
 
     const router = useRouter();
@@ -96,6 +97,7 @@
                 <SwitchNotificationsButton :icon-size="commonIconSize" />
                 <SwitchColorSchemeButton :icon-size="commonIconSize" />
                 <SwitchNavigationModeButton :icon-size="commonIconSize" />
+                <TimerButton :icon-size="commonIconSize" />
                 <n-dropdown :options="userDropdownOptions" placement="bottom-end" trigger="hover"
                     @select="onUserDropDownSelect">
                     <n-button quaternary>

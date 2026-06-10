@@ -178,6 +178,14 @@ export default {
             toolTip: "Switch to side navigation",
           },
         },
+        timer: {
+          enable: {
+            toolTip: "Enable timer",
+          },
+          disable: {
+            toolTip: "Disable timer",
+          },
+        },
       },
     },
     buttons: {
