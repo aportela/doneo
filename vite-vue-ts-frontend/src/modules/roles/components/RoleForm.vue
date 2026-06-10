@@ -289,14 +289,14 @@
                 <n-gi>
                     <h4 class="doneo-permission-group-header">{{
                         t("modules.role.components.RoleForm.headers.projectPermissions")
-                        }}</h4>
+                    }}</h4>
                     <n-switch v-model:value="role.permissions.allowUpdateProject" class="doneo-permission-switch"
                         :disabled="state.ajaxRunning">
                         <template #checked>
                             {{ t("modules.role.components.RoleForm.permissionSwitches.updateProjectAllowed") }}
                         </template>
                         <template #unchecked>
-                            {{ t("modules.role.components.RoleForm.permissionSwitches.updateProjectAllowed") }}
+                            {{ t("modules.role.components.RoleForm.permissionSwitches.updateProjectDenied") }}
                         </template>
                     </n-switch>
                     <n-switch v-model:value="role.permissions.allowDeleteProject" class="doneo-permission-switch"
@@ -305,7 +305,7 @@
                             {{ t("modules.role.components.RoleForm.permissionSwitches.deleteProjectAllowed") }}
                         </template>
                         <template #unchecked>
-                            {{ t("modules.role.components.RoleForm.permissionSwitches.deleteProjectAllowed") }}
+                            {{ t("modules.role.components.RoleForm.permissionSwitches.deleteProjectDenied") }}
                         </template>
                     </n-switch>
                     <n-switch v-model:value="role.permissions.allowViewProject" class="doneo-permission-switch"
@@ -314,14 +314,14 @@
                             {{ t("modules.role.components.RoleForm.permissionSwitches.viewProjectAllowed") }}
                         </template>
                         <template #unchecked>
-                            {{ t("modules.role.components.RoleForm.permissionSwitches.viewProjectAllowed") }}
+                            {{ t("modules.role.components.RoleForm.permissionSwitches.viewProjectDenied") }}
                         </template>
                     </n-switch>
                 </n-gi>
                 <n-gi>
                     <h4 class="doneo-permission-group-header">{{
                         t("modules.role.components.RoleForm.headers.taskPermissions")
-                        }}
+                    }}
                     </h4>
                     <n-switch v-model:value="role.permissions.allowAddTask" class="doneo-permission-switch"
                         :disabled="state.ajaxRunning">
@@ -329,7 +329,7 @@
                             {{ t("modules.role.components.RoleForm.permissionSwitches.addTaskAllowed") }}
                         </template>
                         <template #unchecked>
-                            {{ t("modules.role.components.RoleForm.permissionSwitches.addTaskAllowed") }}
+                            {{ t("modules.role.components.RoleForm.permissionSwitches.addTaskDenied") }}
                         </template>
                     </n-switch>
                     <n-switch v-model:value="role.permissions.allowUpdateTask" class="doneo-permission-switch"
@@ -338,7 +338,7 @@
                             {{ t("modules.role.components.RoleForm.permissionSwitches.updateTaskAllowed") }}
                         </template>
                         <template #unchecked>
-                            {{ t("modules.role.components.RoleForm.permissionSwitches.updateTaskAllowed") }}
+                            {{ t("modules.role.components.RoleForm.permissionSwitches.updateTaskDenied") }}
                         </template>
                     </n-switch>
                     <n-switch v-model:value="role.permissions.allowDeleteTask" class="doneo-permission-switch"
@@ -347,7 +347,7 @@
                             {{ t("modules.role.components.RoleForm.permissionSwitches.deleteTaskAllowed") }}
                         </template>
                         <template #unchecked>
-                            {{ t("modules.role.components.RoleForm.permissionSwitches.deleteTaskAllowed") }}
+                            {{ t("modules.role.components.RoleForm.permissionSwitches.deleteTaskDenied") }}
                         </template>
                     </n-switch>
                     <n-switch v-model:value="role.permissions.allowViewTask" class="doneo-permission-switch"
@@ -356,7 +356,7 @@
                             {{ t("modules.role.components.RoleForm.permissionSwitches.viewTaskAllowed") }}
                         </template>
                         <template #unchecked>
-                            {{ t("modules.role.components.RoleForm.permissionSwitches.viewTaskAllowed") }}
+                            {{ t("modules.role.components.RoleForm.permissionSwitches.viewTaskDenied") }}
                         </template>
                     </n-switch>
                 </n-gi>
