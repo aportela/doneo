@@ -71,6 +71,7 @@ doneo-table tfoot th:last-of-type {
 }
 
 .doneo-datetime-label-readonly {
+    /* TODO: use naive-ui vars */
     border: 1px solid #e0e0e6;
     border-radius: 3px;
     padding: 6px;

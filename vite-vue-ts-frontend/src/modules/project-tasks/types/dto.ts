@@ -63,6 +63,7 @@ export type TaskResponse = {
   startedAt?: number;
   finishedAt?: number;
   dueAt?: number;
+  tags: string[];
   permissionsCount: number;
   attachmentsCount: number;
   notesCount: number;

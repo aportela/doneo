@@ -98,6 +98,16 @@ export default {
           },
           placeholder: "search by permission",
         },
+        ToggleTagSelector: {
+          buttons: {
+            confirm: {
+              toolTip: "Confirm",
+            },
+            cancel: {
+              toolTip: "Cancel",
+            },
+          },
+        },
       },
       pickers: {
         datepicker: {

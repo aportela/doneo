@@ -38,7 +38,7 @@ export class ProjectTask {
     this.finishedAt = new IDate(data?.finishedAt ?? null);
     this.dueAt = new IDate(data?.dueAt ?? null);
     this.createdBy = new UserBase(data?.createdBy);
-    this.tags = [];
+    this.tags = data?.tags ?? [];
     this.permissionsCount = data?.permissionsCount ?? 0;
     this.attachmentsCount = data?.attachmentsCount ?? 0;
     this.notesCount = data?.notesCount ?? 0;
@@ -56,6 +56,7 @@ export class ProjectTask {
       status: this.status.toDTO(),
       createdAt: this.createdAt.msTimestamp ?? 0,
       createdBy: this.createdBy.toDTO(),
+      tags: this.tags,
       permissionsCount: this.permissionsCount,
       attachmentsCount: this.attachmentsCount,
       notesCount: this.notesCount,
