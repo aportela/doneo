@@ -13,6 +13,7 @@ import (
 	"github.com/aportela/doneo/internal/data"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/router"
+	"github.com/aportela/doneo/internal/scripts"
 	demodatascripts "github.com/aportela/doneo/internal/scripts/demo_data"
 )
 
@@ -30,6 +31,12 @@ func main() {
 		log.Fatal("Error opening configuration:", err)
 	}
 
+	_, err = os.Stat(configuration.Database.Path)
+	createSchema := false
+	if err != nil {
+		createSchema = true
+	}
+
 	databaseHandler, err := database.Open(configuration.Database)
 	if err != nil {
 		log.Fatal(err)
@@ -39,6 +46,10 @@ func main() {
 		err := databaseHandler.CheckSchema()
 		if err != nil {
 			log.Fatal("Error checking database schema: ", err)
+		}
+		if createSchema {
+			scripts.CreateDefaultAdminUser(databaseHandler)
+
 		}
 		params, err := cli.HandleFlags()
 		if err != nil {
