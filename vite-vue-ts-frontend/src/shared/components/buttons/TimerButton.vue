@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick } from "vue";
+    import { ref, reactive, computed, watch, onMounted, onBeforeUnmount, nextTick } from "vue";
     //import { useI18n } from "vue-i18n";
 
     import { NInputGroup, NInput, NButton, NIcon, NPopover, NCard, type InputInst, NCollapse, NCollapseItem } from 'naive-ui';
@@ -46,6 +46,15 @@
     const hasFinishedTimers = computed(() => finishedTimers.value.length > 0);
 
     const finishedTimers = computed(() => timers.value.filter((timer) => timer.finishedAt !== null));
+
+    watch(hasTimerRunning, (running) => {
+        console.log(running);
+        if (running) {
+            onStartInterval();
+        } else {
+            onStopInterval();
+        }
+    });
 
     const formatDuration = (totalSeconds: number): string => {
         const days = Math.floor(totalSeconds / 86400);
@@ -141,15 +150,22 @@
 
     let interval: number | undefined;
 
-    onMounted(() => {
+    const onStartInterval = () => {
         interval = setInterval(() => {
             now.value = Date.now()
         }, 1000);
+    }
+
+    const onStopInterval = () => {
+        clearInterval(interval)
+    };
+
+    onMounted(() => {
         onGetTimers();
     });
 
     onBeforeUnmount(() => {
-        clearInterval(interval)
+        onStopInterval();
     })
 </script>
 
