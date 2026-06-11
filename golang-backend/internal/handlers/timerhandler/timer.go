@@ -39,9 +39,20 @@ func (handler *TimerHandler) Stop(w http.ResponseWriter, r *http.Request) {
 	utils.ToJSONResponse(w, http.StatusOK, handlers.ToEmptyResponse())
 }
 
+func (handler *TimerHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	timerId := chi.URLParam(r, "id")
+	err := handler.service.Delete(r.Context(), timerId)
+	if err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TimerHandler] failed to delete timer: %w", err))
+		return
+	}
+	utils.ToJSONResponse(w, http.StatusOK, handlers.ToEmptyResponse())
+}
+
 func (handler *TimerHandler) Clear(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	err := handler.service.DeleteUserTimers(r.Context())
+	err := handler.service.Clear(r.Context())
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TimerHandler] failed to clear timers: %w", err))
 		return
@@ -51,6 +62,6 @@ func (handler *TimerHandler) Clear(w http.ResponseWriter, r *http.Request) {
 
 func (handler *TimerHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	timers, err := handler.service.GetTimers(r.Context())
+	timers, err := handler.service.Search(r.Context())
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(timers), err)
 }

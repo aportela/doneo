@@ -194,6 +194,7 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		handler := timerhandler.NewHandler(timerservice.NewService(database, timerrepository.NewRepository(database)))
 		r.Post("/", handler.Start)
 		r.Put("/{id:"+uuidPattern+"}", handler.Stop)
+		r.Delete("/{id:"+uuidPattern+"}", handler.Delete)
 		r.Delete("/", handler.Clear)
 		r.Get("/", handler.Search)
 	})

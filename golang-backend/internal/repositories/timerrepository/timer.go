@@ -15,8 +15,9 @@ import (
 type TimerRepository interface {
 	Start(ctx context.Context, id string, userId string, startedAt int64) error
 	Stop(ctx context.Context, id string, userId string, finishedAt int64) error
-	DeleteUserTimers(ctx context.Context, userId string) error
-	GetTimers(ctx context.Context, userId string) ([]domain.Timer, error)
+	Delete(ctx context.Context, id string, userId string) error
+	Clear(ctx context.Context, userId string) error
+	Search(ctx context.Context, userId string) ([]domain.Timer, error)
 }
 
 type timerRepository struct {
@@ -105,7 +106,45 @@ func (repository *timerRepository) Stop(ctx context.Context, id string, userId s
 	return nil
 }
 
-func (repository *timerRepository) DeleteUserTimers(ctx context.Context, userId string) error {
+func (repository *timerRepository) Delete(ctx context.Context, id string, userId string) error {
+	_, err := repository.database.ExecContext(
+		ctx,
+		`
+            DELETE FROM timers
+			WHERE id = ?
+			AND user_id = ?
+        `,
+		id,
+		userId,
+	)
+	if err != nil {
+		// TODO: remove ?
+		fmt.Println(err.Error())
+		var sqlErr *sqlite.Error
+		if !errors.As(err, &sqlErr) {
+			return err
+		}
+		switch sqlErr.Code() {
+		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
+			// TODO
+			return err
+		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
+			return &domain.ValidationError{Field: "id"}
+		case sqlite3.SQLITE_CONSTRAINT_CHECK:
+			if strings.Contains(sqlErr.Error(), "length(id)") {
+				return &domain.ValidationError{Field: "id"}
+			} else if strings.Contains(sqlErr.Error(), "length(user_id)") {
+				return &domain.ValidationError{Field: "user_id"}
+			}
+			return err
+		default:
+			return err
+		}
+	}
+	return nil
+}
+
+func (repository *timerRepository) Clear(ctx context.Context, userId string) error {
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
@@ -141,7 +180,7 @@ func (repository *timerRepository) DeleteUserTimers(ctx context.Context, userId 
 	return nil
 }
 
-func (repository *timerRepository) GetTimers(ctx context.Context, userId string) ([]domain.Timer, error) {
+func (repository *timerRepository) Search(ctx context.Context, userId string) ([]domain.Timer, error) {
 	rows, err := repository.database.QueryContext(ctx,
 		`
 			SELECT

@@ -3,7 +3,7 @@
     //import { useI18n } from "vue-i18n";
 
     import { NButton, NIcon, NPopover, NCard, NList, NListItem } from 'naive-ui';
-    import { IconAlarm, IconClock, IconClockCancel, IconClockPlay, IconClockStop } from '@tabler/icons-vue';
+    import { IconAlarm, IconClock, IconClockCancel, IconClockPlay, IconClockStop, IconTrash } from '@tabler/icons-vue';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from "../../../shared/types/ajaxState";
     import { useNotify } from '../../../shared/composables/notification';
@@ -101,7 +101,7 @@
     const onGetTimers = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const response = await timerService.getTimers();
+            const response = await timerService.search();
             timers.value = response.timers;
             start.value = timers.value.find((timer) => timer.finishedAt === null)?.startedAt ?? null;
         } catch (e) {
@@ -129,6 +129,19 @@
         Object.assign(state, defaultAjaxStateRunning);
         try {
             await timerService.stop(id);
+            await onGetTimers();
+        } catch (e) {
+            // TODO:
+            console.error(e);
+        } finally {
+            state.ajaxRunning = false;
+        }
+    };
+
+    const onDeleteTimer = async (id: string) => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            await timerService.delete(id);
             await onGetTimers();
         } catch (e) {
             // TODO:
@@ -208,6 +221,9 @@
 
                             )
                         }}
+                        <n-button @click="onDeleteTimer(timer.id)" :disabled="state.ajaxRunning">
+                            <n-icon :component="IconTrash" size="commonIconSize" />
+                        </n-button>
                     </n-list-item>
                 </n-list>
             </template>

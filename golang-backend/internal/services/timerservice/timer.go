@@ -15,8 +15,9 @@ import (
 type TimerService interface {
 	Start(ctx context.Context) error
 	Stop(ctx context.Context, id string) error
-	DeleteUserTimers(ctx context.Context) error
-	GetTimers(ctx context.Context) ([]domain.Timer, error)
+	Delete(ctx context.Context, id string) error
+	Clear(ctx context.Context) error
+	Search(ctx context.Context) ([]domain.Timer, error)
 }
 
 type timerService struct {
@@ -46,21 +47,30 @@ func (service *timerService) Stop(ctx context.Context, id string) error {
 	return err
 }
 
-func (service *timerService) DeleteUserTimers(ctx context.Context) error {
+func (service *timerService) Delete(ctx context.Context, id string) error {
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
 		return fmt.Errorf("[TimerService] user ID not found in context")
 	}
-	err := service.repository.DeleteUserTimers(ctx, currentUserId)
+	err := service.repository.Delete(ctx, id, currentUserId)
 	return err
 }
 
-func (service *timerService) GetTimers(ctx context.Context) ([]domain.Timer, error) {
+func (service *timerService) Clear(ctx context.Context) error {
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return fmt.Errorf("[TimerService] user ID not found in context")
+	}
+	err := service.repository.Clear(ctx, currentUserId)
+	return err
+}
+
+func (service *timerService) Search(ctx context.Context) ([]domain.Timer, error) {
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
 		return nil, fmt.Errorf("[TimerService] user ID not found in context")
 	}
-	timers, err := service.repository.GetTimers(ctx, currentUserId)
+	timers, err := service.repository.Search(ctx, currentUserId)
 	if err != nil {
 		return nil, fmt.Errorf("[TimerService] failed to get user timers: %w", err)
 	}
