@@ -26,5 +26,6 @@
 <style lang="css" scoped>
     .doneo-avatar-username {
         margin-right: 4px;
+        flex-shrink: 0;
     }
 </style>
