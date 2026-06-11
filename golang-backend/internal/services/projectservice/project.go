@@ -46,7 +46,7 @@ func (service *projectService) Add(ctx context.Context, project domain.Project) 
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return domain.Project{}, fmt.Errorf("user ID not found in context")
+		return domain.Project{}, fmt.Errorf("[ProjectService] user ID not found in context")
 	}
 	project.ID = utils.UUID()
 	project.CreatedBy.ID = currentUserId
@@ -85,7 +85,7 @@ func (service *projectService) Update(ctx context.Context, project domain.Projec
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return domain.Project{}, fmt.Errorf("user ID not found in context")
+		return domain.Project{}, fmt.Errorf("[ProjectService] user ID not found in context")
 	}
 	project.UpdatedAt = utils.CurrentTimePtr()
 	err = service.repository.Update(ctx, project)
@@ -118,7 +118,7 @@ func (service *projectService) Delete(ctx context.Context, id string) error {
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("user ID not found in context")
+		return fmt.Errorf("[ProjectService] user ID not found in context")
 	}
 	err = service.repository.Delete(ctx, id, time.Now().UnixMilli())
 	if err != nil {

@@ -47,7 +47,7 @@ func (service *taskService) Add(ctx context.Context, projectId string, task doma
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return domain.Task{}, fmt.Errorf("user ID not found in context")
+		return domain.Task{}, fmt.Errorf("[TaskService] user ID not found in context")
 	}
 	task.ID = utils.UUID()
 	task.CreatedBy.ID = currentUserId
@@ -95,7 +95,7 @@ func (service *taskService) Update(ctx context.Context, task domain.Task) (domai
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return domain.Task{}, fmt.Errorf("user ID not found in context")
+		return domain.Task{}, fmt.Errorf("[TaskService] user ID not found in context")
 	}
 	task.UpdatedAt = utils.CurrentTimePtr()
 	err = service.repository.Update(ctx, task)
@@ -141,7 +141,7 @@ func (service *taskService) Delete(ctx context.Context, id string) error {
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("user ID not found in context")
+		return fmt.Errorf("[TaskService] user ID not found in context")
 	}
 	err = service.repository.Delete(ctx, id, time.Now().UnixMilli())
 	if err != nil {

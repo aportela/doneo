@@ -45,7 +45,7 @@ func (service *noteService) AddProjectNote(ctx context.Context, projectId string
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return domain.Note{}, fmt.Errorf("user ID not found in context")
+		return domain.Note{}, fmt.Errorf("[NoteService] user ID not found in context")
 	}
 	note.ID = utils.UUID()
 	note.User.ID = currentUserId
@@ -80,7 +80,7 @@ func (service *noteService) UpdateProjectNote(ctx context.Context, projectId str
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return domain.Note{}, fmt.Errorf("user ID not found in context")
+		return domain.Note{}, fmt.Errorf("[NoteService] user ID not found in context")
 	}
 	note.UpdatedAt = utils.CurrentTimePtr()
 	err = service.repository.UpdateProjectNote(ctx, projectId, note)
@@ -113,7 +113,7 @@ func (service *noteService) DeleteProjectNote(ctx context.Context, projectId str
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("user ID not found in context")
+		return fmt.Errorf("[NoteService] user ID not found in context")
 	}
 	err = service.repository.DeleteProjectNote(ctx, projectId, noteId)
 	if err != nil {

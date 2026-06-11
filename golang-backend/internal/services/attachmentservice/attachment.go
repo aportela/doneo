@@ -51,7 +51,7 @@ func (service *attachmentService) AddProjectAttachment(ctx context.Context, proj
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return domain.Attachment{}, fmt.Errorf("user ID not found in context")
+		return domain.Attachment{}, fmt.Errorf("[AttachmentService] user ID not found in context")
 	}
 	attachment.CreatedBy.ID = currentUserId
 	attachment.CreatedAt = time.Now()
@@ -90,7 +90,7 @@ func (service *attachmentService) DeleteProjectAttachment(ctx context.Context, p
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("user ID not found in context")
+		return fmt.Errorf("[AttachmentService] user ID not found in context")
 	}
 	err = service.repository.DeleteProjectAttachment(ctx, projectId, attachmentId)
 	if err != nil {

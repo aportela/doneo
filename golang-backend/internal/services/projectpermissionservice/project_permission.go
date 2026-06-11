@@ -44,7 +44,7 @@ func (service *projectPermissionService) Add(ctx context.Context, projectId stri
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return domain.ProjectPermission{}, fmt.Errorf("user ID not found in context")
+		return domain.ProjectPermission{}, fmt.Errorf("[ProjectPermissionService] user ID not found in context")
 	}
 	permission.ID = utils.UUID()
 	err = service.repository.Add(ctx, projectId, permission)
@@ -77,7 +77,7 @@ func (service *projectPermissionService) Delete(ctx context.Context, projectId s
 	}()
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("user ID not found in context")
+		return fmt.Errorf("[ProjectPermissionService] user ID not found in context")
 	}
 	err = service.repository.Delete(ctx, projectId, permissionId)
 	if err != nil {
