@@ -2,7 +2,7 @@
     import { ref, reactive, computed, onMounted, onBeforeUnmount } from "vue";
     //import { useI18n } from "vue-i18n";
 
-    import { NButton, NIcon, NPopover, NCard } from 'naive-ui';
+    import { NButton, NIcon, NPopover, NCard, NList, NListItem } from 'naive-ui';
     import { IconAlarm, IconClock, IconClockCancel, IconClockPlay, IconClockStop } from '@tabler/icons-vue';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from "../../../shared/types/ajaxState";
@@ -10,6 +10,7 @@
 
     import { timerService } from "../../../modules/timer/services/timer";
     import { type TimerResponse } from "../../../modules/timer/types/dto";
+    import { IDate } from "../../types/idate";
 
     interface SwitchNotificationsButtonProps {
         iconSize?: number,
@@ -178,30 +179,37 @@
                         <n-icon :component="IconClockStop" :size="commonIconSize" />
                     </template>
                     Stop current timer: {{ formatDuration(currentTimerElapsedSeconds > 0 ? currentTimerElapsedSeconds :
-                    0) }}
+                        0) }}
                 </n-button>
                 <n-button block @click="onStartTimer" v-else :disabled="state.ajaxRunning">
                     <template #icon>
                         <n-icon :component="IconClockPlay" />
                     </template>
-                    Start timer
+                    Start new timer
                 </n-button>
             </template>
             <template #footer v-if="hasFinishedTimers">
-                <p v-for="timer in finishedTimers" :key="timer.id">
-                    <n-button block :disabled="state.ajaxRunning">
-                        <template #icon>
-                            <n-icon :component="IconClock" :size="commonIconSize" />
-                        </template>
+                <n-list>
+                    <template #header>
+                        <n-icon :component="IconClock" :size="commonIconSize" /> Previous timers
+                    </template>
+                    <n-list-item v-for="timer in finishedTimers" :key="timer.id">
+                        <n-icon :component="IconClockPlay" :size="commonIconSize" /> {{ new
+                            IDate(timer.startedAt).toLocaleString() }}
+                        <br>
+                        <n-icon :component="IconClockStop" :size="commonIconSize" /> {{ new
+                            IDate(timer.finishedAt).toLocaleString() }}
+                        <br>
+                        <n-icon :component="IconClock" :size="commonIconSize" />Total timer:
                         {{
                             formatDuration(
-                                Math.trunc(
-                                    ((timer.finishedAt ?? new Date().getTime()) - timer.startedAt) / 1000
-                                )
+
+                                ((timer.finishedAt ?? new Date().getTime()) - timer.startedAt) / 1000
+
                             )
                         }}
-                    </n-button>
-                </p>
+                    </n-list-item>
+                </n-list>
             </template>
             <template #action v-if="hasTimers">
                 <n-button block @click="onClearTimers" :disabled="state.ajaxRunning">
