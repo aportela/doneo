@@ -2,7 +2,7 @@
     import { ref, reactive, computed, watch, onMounted, onBeforeUnmount, nextTick } from "vue";
     //import { useI18n } from "vue-i18n";
 
-    import { NInputGroup, NInput, NButton, NIcon, NPopover, NCard, type InputInst, NCollapse, NCollapseItem } from 'naive-ui';
+    import { NInputGroup, NInput, NButton, NIcon, NPopover, NCard, type InputInst, NCollapse, NCollapseItem, type ButtonType } from 'naive-ui';
     import { IconAlarm, IconClockCancel, IconClockPlay, IconClockStop, IconTrash } from '@tabler/icons-vue';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from "../../../shared/types/ajaxState";
@@ -22,6 +22,8 @@
     const newTimerSummary = ref<string>("");
     const newTimerSummaryRef = ref<InputInst | null>(null);
 
+    const showPopOver = ref<boolean>(false);
+
     const start = ref<number | null>(Date.now());
     const now = ref<number>(Date.now())
 
@@ -36,7 +38,19 @@
     const hasTimerRunning = computed(() => typeof currentActiveTimer.value !== "undefined");
 
     const currentButtonIconColor = computed<string | undefined>(() => {
-        return hasTimers.value ? "red" : undefined;
+        return hasTimers.value ? "primary" : undefined;
+    });
+
+    const currentButtonType = computed<ButtonType>(() => {
+        if (hasTimers.value) {
+            if (hasTimerRunning.value) {
+                return ("primary");
+            } else {
+                return ("info");
+            }
+        } else {
+            return ("default");
+        }
     });
 
     const currentTimerElapsedSeconds = computed(() => {
@@ -48,7 +62,6 @@
     const finishedTimers = computed(() => timers.value.filter((timer) => timer.finishedAt !== null));
 
     watch(hasTimerRunning, (running) => {
-        console.log(running);
         if (running) {
             onStartInterval();
         } else {
@@ -88,8 +101,10 @@
             Object.assign(state, defaultAjaxStateRunning);
             try {
                 await timerService.start(newTimerSummary.value);
+                showPopOver.value = false;
                 await onGetTimers();
                 newTimerSummary.value = "";
+
             } catch (e) {
                 // TODO:
                 console.error(e);
@@ -103,6 +118,7 @@
         Object.assign(state, defaultAjaxStateRunning);
         try {
             await timerService.stop(id);
+            showPopOver.value = false;
             await onGetTimers();
         } catch (e) {
             // TODO:
@@ -129,6 +145,7 @@
         Object.assign(state, defaultAjaxStateRunning);
         try {
             await timerService.clear();
+            showPopOver.value = false;
             await onGetTimers();
         } catch (e) {
             // TODO:
@@ -143,7 +160,7 @@
             if (!hasTimerRunning.value) {
                 nextTick().then(() => {
                     newTimerSummaryRef.value?.focus();
-                }).catch(() => { });
+                }).catch((e) => { console.error(e); });
             }
         }
     };
@@ -170,9 +187,9 @@
 </script>
 
 <template>
-    <n-popover placement="bottom" trigger="hover" @update-show="onShowPopOver">
+    <n-popover placement="bottom" trigger="hover" v-model:show="showPopOver" @update-show="onShowPopOver">
         <template #trigger>
-            <n-button quaternary :disabled="state.ajaxRunning">
+            <n-button quaternary :disabled="state.ajaxRunning" :type="currentButtonType">
                 <template #icon>
                     <n-icon :component="IconAlarm" :size="iconSize" :color="currentButtonIconColor"
                         :class="{ 'doneo-timer-animated-icon': hasTimerRunning }" />
