@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/aportela/doneo/internal/config"
 
@@ -11,7 +12,8 @@ import (
 )
 
 type Handler struct {
-	database *sql.DB
+	database       *sql.DB
+	currentVersion uint
 }
 
 func configure(db *sql.DB) error {
@@ -52,23 +54,61 @@ func (handler *Handler) Begin() (*sql.Tx, error) {
 	return handler.database.Begin()
 }
 
-func (handler *Handler) CreateSchema() error {
+func (handler *Handler) CheckSchema() error {
+	ctx := context.Background()
+	var currentVersion uint
 
-	tx, err := handler.database.Begin()
+	err := handler.database.
+		QueryRowContext(ctx, "PRAGMA user_version").
+		Scan(&currentVersion)
+
 	if err != nil {
-		return fmt.Errorf("begin transaction: %w", err)
+		return fmt.Errorf("error getting current version: %w", err)
 	}
 
-	for _, query := range installSchemaQueries {
-		if _, err := tx.Exec(query); err != nil {
-			tx.Rollback()
-			return fmt.Errorf("sqlite schema error: %w", err)
+	log.Printf("Current schema version: %d", currentVersion)
+
+	tx, err := handler.database.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin transaction error: %w", err)
+	}
+	defer tx.Rollback()
+
+	for _, m := range schemaQueries {
+		if m.Version <= currentVersion {
+			continue
 		}
+
+		log.Printf("Applying schema version %d", m.Version)
+
+		for _, q := range m.Queries {
+			if _, err := tx.ExecContext(ctx, q); err != nil {
+				return fmt.Errorf(
+					"migration %d failed: %w",
+					m.Version,
+					err,
+				)
+			}
+		}
+
+		if _, err := tx.ExecContext(
+			ctx,
+			fmt.Sprintf("PRAGMA user_version=%d", m.Version),
+		); err != nil {
+			return fmt.Errorf(
+				"setting schema version %d error: %w",
+				m.Version,
+				err,
+			)
+		}
+
+		currentVersion = m.Version
 	}
 
 	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("commit transaction: %w", err)
+		return fmt.Errorf("commit transaction error: %w", err)
 	}
+
 	return nil
 }
 
