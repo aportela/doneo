@@ -4,4 +4,5 @@ export interface StatusFlags {
   setStartDate: boolean;
   fillEmptyFinishDate: boolean;
   setFinishDate: boolean;
+  unsetFinishDateOnLeave: boolean;
 }

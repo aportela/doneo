@@ -24,4 +24,6 @@ const (
 	ProjectStatusFlagFillEmptyFinishDate
 	// project finish date will be filled with current time (ALWAYS)
 	ProjectStatusFlagSetFinishDate
+	// project finish date will be clear when status with this flag is changed
+	ProjectStatusFlagUnsetFinishDateOnLeave
 )

@@ -32,7 +32,7 @@
 
     const taskStatuses = ref<TaskStatusResponse[]>([]);
 
-    const emit = defineEmits(["fillEmptyStartDate", "setStartDate", "fillEmptyFinishDate", "setFinishDate"]);
+    const emit = defineEmits(["fillEmptyStartDate", "setStartDate", "fillEmptyFinishDate", "setFinishDate", "unsetFinishDateOnLeave"]);
 
     const props = defineProps<TaskStatusSelectorProps>();
 
@@ -44,6 +44,7 @@
     const setStartDateStatusId = ref<string | null>(null);
     const fillEmptyFinishDateStatusId = ref<string | null>(null);
     const setFinishDateStatusId = ref<string | null>(null);
+    const unsetFinishDateOnLeaveStatusId = ref<string | null>(null);
 
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
@@ -74,6 +75,7 @@
             setStartDateStatusId.value = response.taskStatuses.find((taskStatus: TaskStatusResponse) => taskStatus.flags.setStartDate === true)?.id ?? null;
             fillEmptyFinishDateStatusId.value = response.taskStatuses.find((taskStatus: TaskStatusResponse) => taskStatus.flags.fillEmptyFinishDate === true)?.id ?? null;
             setFinishDateStatusId.value = response.taskStatuses.find((taskStatus: TaskStatusResponse) => taskStatus.flags.setFinishDate === true)?.id ?? null;
+            unsetFinishDateOnLeaveStatusId.value = response.taskStatuses.find((taskStatus: TaskStatusResponse) => taskStatus.flags.unsetFinishDateOnLeave === true)?.id ?? null;
             if (props.autoFocus) {
                 focus();
             }
@@ -103,9 +105,11 @@
 
     const selectedColor = ref<string | undefined>();
 
-    watch(taskStatusId, (newValue) => {
+    watch(taskStatusId, (newValue, oldValue) => {
         selectedColor.value = taskStatuses.value.find((taskStatus) => taskStatus.id === newValue)?.hexColor
-        if (newValue) {
+        if (oldValue && oldValue === unsetFinishDateOnLeaveStatusId.value) {
+            emit("unsetFinishDateOnLeave");
+        } else if (newValue) {
             switch (newValue) {
                 case fillEmptyStartDateStatusId.value:
                     emit("fillEmptyStartDate");

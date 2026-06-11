@@ -9,19 +9,22 @@ import (
 func requestFlagsToDomainFlagsBitmask(flags statusFlags) domain.Bitmask {
 	bitmaskFlag := domain.Bitmask(0)
 	if flags.DefaultStatusOnCreation {
-		bitmaskFlag.AddFlag(domain.ProjectStatusFlagDefaultOnCreate)
+		bitmaskFlag.AddFlag(domain.TaskStatusFlagDefaultOnCreate)
 	}
 	if flags.FillEmptyStartDate {
-		bitmaskFlag.AddFlag(domain.ProjectStatusFlagFillEmptyStartDate)
+		bitmaskFlag.AddFlag(domain.TaskStatusFlagFillEmptyStartDate)
 	}
 	if flags.SetStartDate {
-		bitmaskFlag.AddFlag(domain.ProjectStatusFlagSetStartDate)
+		bitmaskFlag.AddFlag(domain.TaskStatusFlagSetStartDate)
 	}
 	if flags.FillEmptyFinishDate {
-		bitmaskFlag.AddFlag(domain.ProjectStatusFlagFillEmptyFinishDate)
+		bitmaskFlag.AddFlag(domain.TaskStatusFlagFillEmptyFinishDate)
 	}
 	if flags.SetFinishDate {
-		bitmaskFlag.AddFlag(domain.ProjectStatusFlagSetFinishDate)
+		bitmaskFlag.AddFlag(domain.TaskStatusFlagSetFinishDate)
+	}
+	if flags.UnsetFinishDateOnLeave {
+		bitmaskFlag.AddFlag(domain.TaskStatusFlagUnsetFinishDateOnLeave)
 	}
 	return bitmaskFlag
 }
@@ -48,11 +51,12 @@ func updateRequestToDomain(request updateRequest) domain.TaskStatus {
 
 func flagDomainToResponseFlags(flag domain.Bitmask) statusFlags {
 	return statusFlags{
-		DefaultStatusOnCreation: flag.HasFlag(domain.ProjectStatusFlagDefaultOnCreate),
-		FillEmptyStartDate:      flag.HasFlag(domain.ProjectStatusFlagFillEmptyStartDate),
-		SetStartDate:            flag.HasFlag(domain.ProjectStatusFlagSetStartDate),
-		FillEmptyFinishDate:     flag.HasFlag(domain.ProjectStatusFlagFillEmptyFinishDate),
-		SetFinishDate:           flag.HasFlag(domain.ProjectStatusFlagSetFinishDate),
+		DefaultStatusOnCreation: flag.HasFlag(domain.TaskStatusFlagDefaultOnCreate),
+		FillEmptyStartDate:      flag.HasFlag(domain.TaskStatusFlagFillEmptyStartDate),
+		SetStartDate:            flag.HasFlag(domain.TaskStatusFlagSetStartDate),
+		FillEmptyFinishDate:     flag.HasFlag(domain.TaskStatusFlagFillEmptyFinishDate),
+		SetFinishDate:           flag.HasFlag(domain.TaskStatusFlagSetFinishDate),
+		UnsetFinishDateOnLeave:  flag.HasFlag(domain.TaskStatusFlagUnsetFinishDateOnLeave),
 	}
 }
 

@@ -8,6 +8,7 @@ type statusFlags struct {
 	SetStartDate            bool `json:"setStartDate"`
 	FillEmptyFinishDate     bool `json:"fillEmptyFinishDate"`
 	SetFinishDate           bool `json:"setFinishDate"`
+	UnsetFinishDateOnLeave  bool `json:"unsetFinishDateOnLeave"`
 }
 
 type addRequest struct {

@@ -24,4 +24,6 @@ const (
 	TaskStatusFlagFillEmptyFinishDate
 	// task finish date will be filled with current time (ALWAYS)
 	TaskStatusFlagSetFinishDate
+	// task finish date will be clear when status with this flag is changed
+	TaskStatusFlagUnsetFinishDateOnLeave
 )

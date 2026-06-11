@@ -19,6 +19,7 @@ export class TaskStatus {
       setStartDate: false,
       fillEmptyFinishDate: false,
       setFinishDate: false,
+      unsetFinishDateOnLeave: false,
     };
   }
 
@@ -34,6 +35,7 @@ export class TaskStatus {
         setStartDate: false,
         fillEmptyFinishDate: false,
         setFinishDate: false,
+        unsetFinishDateOnLeave: false,
       },
     };
   }

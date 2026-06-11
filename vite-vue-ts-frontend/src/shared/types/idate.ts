@@ -12,6 +12,11 @@ export class IDate {
     return this.date !== null && this.msTimestamp !== null;
   }
 
+  clear() {
+    this.msTimestamp = null;
+    this.date = null;
+  }
+
   toLocaleString = () => {
     if (this.date === null && this.msTimestamp !== null) {
       this.date = new Date(this.msTimestamp);

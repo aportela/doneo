@@ -3,7 +3,7 @@
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NInput, NInputNumber, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NTooltip } from 'naive-ui';
-    import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette, IconStar, IconCalendarBolt, IconCalendarCancel } from '@tabler/icons-vue';
+    import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette, IconStar, IconCalendarBolt, IconCalendarCancel, IconCalendarMinus } from '@tabler/icons-vue';
 
     import { TaskStatus, MAX_NAME_LENGTH } from '../models/task-status';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
@@ -154,6 +154,7 @@
                     setStartDate: taskStatus.value.flags?.setStartDate ?? false,
                     fillEmptyFinishDate: taskStatus.value.flags?.fillEmptyFinishDate ?? false,
                     setFinishDate: taskStatus.value.flags?.setFinishDate ?? false,
+                    unsetFinishDateOnLeave: taskStatus.value.flags?.unsetFinishDateOnLeave ?? false,
                 }
             };
             const addedRole: TaskStatusResponse = await taskStatusService.add(payload);
@@ -214,6 +215,7 @@
                     setStartDate: taskStatus.value.flags?.setStartDate ?? false,
                     fillEmptyFinishDate: taskStatus.value.flags?.fillEmptyFinishDate ?? false,
                     setFinishDate: taskStatus.value.flags?.setFinishDate ?? false,
+                    unsetFinishDateOnLeave: taskStatus.value.flags?.unsetFinishDateOnLeave ?? false,
                 }
             };
             const updatedRole: TaskStatusResponse = await taskStatusService.update(payload);
@@ -381,6 +383,18 @@
                             "modules.taskStatus.components.TaskStatusesTable.body.columns.permissionsHints.hasSetFinishDate"
                             :
                             "modules.taskStatus.components.TaskStatusesTable.body.columns.permissionsHints.hasNotSetFinishDate")
+                        }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover">
+                        <template #trigger>
+                            <n-icon :component="IconCalendarMinus" :size="flagIconSize" class="doneo-cursor-help"
+                                :class="{ 'doneo-disabled-icon': !taskStatus.flags.unsetFinishDateOnLeave }"
+                                @click="taskStatus.flags.unsetFinishDateOnLeave = !taskStatus.flags.unsetFinishDateOnLeave" />
+                        </template>
+                        {{ t(taskStatus.flags.unsetFinishDateOnLeave ?
+                            "modules.taskStatus.components.TaskStatusesTable.body.columns.permissionsHints.hasUnsetFinishDateOnLeave"
+                            :
+                            "modules.taskStatus.components.TaskStatusesTable.body.columns.permissionsHints.hasNotUnsetFinishDateOnLeave")
                         }}
                     </n-tooltip>
                 </n-form-item>

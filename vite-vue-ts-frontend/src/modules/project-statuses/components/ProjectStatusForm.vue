@@ -3,7 +3,7 @@
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NInput, NInputNumber, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NTooltip } from 'naive-ui';
-    import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette, IconStar, IconCalendarBolt, IconCalendarCancel } from '@tabler/icons-vue';
+    import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette, IconStar, IconCalendarBolt, IconCalendarCancel, IconCalendarMinus } from '@tabler/icons-vue';
 
     import { ProjectStatus, MAX_NAME_LENGTH } from '../models/project-status';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
@@ -154,6 +154,7 @@
                     setStartDate: projectStatus.value.flags?.setStartDate ?? false,
                     fillEmptyFinishDate: projectStatus.value.flags?.fillEmptyFinishDate ?? false,
                     setFinishDate: projectStatus.value.flags?.setFinishDate ?? false,
+                    unsetFinishDateOnLeave: projectStatus.value.flags?.unsetFinishDateOnLeave ?? false,
                 }
             };
             const addedRole: ProjectStatusResponse = await projectStatusService.add(payload);
@@ -214,6 +215,7 @@
                     setStartDate: projectStatus.value.flags?.setStartDate ?? false,
                     fillEmptyFinishDate: projectStatus.value.flags?.fillEmptyFinishDate ?? false,
                     setFinishDate: projectStatus.value.flags?.setFinishDate ?? false,
+                    unsetFinishDateOnLeave: projectStatus.value.flags?.unsetFinishDateOnLeave ?? false,
                 }
             };
             const updatedRole: ProjectStatusResponse = await projectStatusService.update(payload);
@@ -382,6 +384,18 @@
                             "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasSetFinishDate"
                             :
                             "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasNotSetFinishDate")
+                        }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover">
+                        <template #trigger>
+                            <n-icon :component="IconCalendarMinus" :size="flagIconSize" class="doneo-cursor-help"
+                                :class="{ 'doneo-disabled-icon': !projectStatus.flags.unsetFinishDateOnLeave }"
+                                @click="projectStatus.flags.unsetFinishDateOnLeave = !projectStatus.flags.unsetFinishDateOnLeave" />
+                        </template>
+                        {{ t(projectStatus.flags.unsetFinishDateOnLeave ?
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasUnsetFinishDateOnLeave"
+                            :
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasNotUnsetFinishDateOnLeave")
                         }}
                     </n-tooltip>
                 </n-form-item>

@@ -718,6 +718,10 @@ export default {
                 hasSetFinishDate: "set project finish date on state change",
                 hasNotSetFinishDate:
                   "do not set project finish date on state change",
+                hasUnsetFinishDateOnLeave:
+                  "unset project finish date when leaving this status",
+                hasNotUnsetFinishDateOnLeave:
+                  "do not unset project finish date when leaving this status",
               },
             },
           },
@@ -1193,6 +1197,10 @@ export default {
                 hasSetFinishDate: "set task finish date on state change",
                 hasNotSetFinishDate:
                   "do not set task finish date on state change",
+                hasUnsetFinishDateOnLeave:
+                  "unset task finish date when leaving this status",
+                hasNotUnsetFinishDateOnLeave:
+                  "do not unset task finish date when leaving this status",
               },
             },
           },

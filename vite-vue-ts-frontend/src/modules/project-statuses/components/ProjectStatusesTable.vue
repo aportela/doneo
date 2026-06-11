@@ -3,7 +3,7 @@
     import { useI18n } from "vue-i18n";
 
     import { useDialog, NEmpty, NTag, NIcon, NTooltip } from 'naive-ui';
-    import { IconTrash, IconStar, IconCalendarBolt, IconCalendarCancel } from '@tabler/icons-vue';
+    import { IconTrash, IconStar, IconCalendarBolt, IconCalendarCancel, IconCalendarMinus } from '@tabler/icons-vue';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
     import type { Sort } from '../../../shared/types/models/sort.ts';
@@ -186,6 +186,17 @@
                             "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasSetFinishDate"
                             :
                             "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasNotSetFinishDate")
+                        }}
+                    </n-tooltip>
+                    <n-tooltip trigger="hover">
+                        <template #trigger>
+                            <n-icon :component="IconCalendarMinus" :size="flagIconSize" class="doneo-cursor-help"
+                                :class="{ 'doneo-disabled-icon': !projectStatus.flags.unsetFinishDateOnLeave }" />
+                        </template>
+                        {{ t(projectStatus.flags.unsetFinishDateOnLeave ?
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasUnsetFinishDateOnLeave"
+                            :
+                            "modules.projectStatus.components.ProjectStatusesTable.body.columns.permissionsHints.hasNotUnsetFinishDateOnLeave")
                         }}
                     </n-tooltip>
                 </td>

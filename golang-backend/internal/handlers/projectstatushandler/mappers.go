@@ -23,6 +23,9 @@ func requestFlagsToDomainFlagsBitmask(flags statusFlags) domain.Bitmask {
 	if flags.SetFinishDate {
 		bitmaskFlag.AddFlag(domain.ProjectStatusFlagSetFinishDate)
 	}
+	if flags.UnsetFinishDateOnLeave {
+		bitmaskFlag.AddFlag(domain.ProjectStatusFlagUnsetFinishDateOnLeave)
+	}
 	return bitmaskFlag
 }
 
@@ -53,6 +56,7 @@ func flagDomainToResponseFlags(flag domain.Bitmask) statusFlags {
 		SetStartDate:            flag.HasFlag(domain.ProjectStatusFlagSetStartDate),
 		FillEmptyFinishDate:     flag.HasFlag(domain.ProjectStatusFlagFillEmptyFinishDate),
 		SetFinishDate:           flag.HasFlag(domain.ProjectStatusFlagSetFinishDate),
+		UnsetFinishDateOnLeave:  flag.HasFlag(domain.ProjectStatusFlagUnsetFinishDateOnLeave),
 	}
 }
 
