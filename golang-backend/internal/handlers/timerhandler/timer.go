@@ -1,6 +1,7 @@
 package timerhandler
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -20,7 +21,12 @@ func NewHandler(service timerservice.TimerService) *TimerHandler {
 
 func (handler *TimerHandler) Start(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	err := handler.service.Start(r.Context())
+	var request startRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] invalid request payload: %w", err))
+		return
+	}
+	err := handler.service.Start(r.Context(), request.Summary)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TimerHandler] failed to start timer: %w", err))
 		return

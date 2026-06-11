@@ -13,7 +13,7 @@ import (
 )
 
 type TimerService interface {
-	Start(ctx context.Context) error
+	Start(ctx context.Context, summary string) error
 	Stop(ctx context.Context, id string) error
 	Delete(ctx context.Context, id string) error
 	Clear(ctx context.Context) error
@@ -29,12 +29,12 @@ func NewService(database database.Database, repository timerrepository.TimerRepo
 	return &timerService{database: database, repository: repository}
 }
 
-func (service *timerService) Start(ctx context.Context) error {
+func (service *timerService) Start(ctx context.Context, summary string) error {
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
 		return fmt.Errorf("[TimerService] user ID not found in context")
 	}
-	err := service.repository.Start(ctx, utils.UUID(), currentUserId, time.Now().UnixMilli())
+	err := service.repository.Start(ctx, utils.UUID(), currentUserId, summary, time.Now().UnixMilli())
 	return err
 }
 

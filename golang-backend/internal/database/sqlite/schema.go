@@ -211,6 +211,7 @@ var installSchemaQueries = []string{
 		CREATE TABLE IF NOT EXISTS timers (
 			id TEXT NOT NULL CHECK(length(id) == 36),
 			user_id TEXT NOT NULL CHECK(length(user_id) == 36),
+			summary TEXT NOT NULL CHECK(length(summary) BETWEEN 1 AND 32),
 			started_at INTEGER NOT NULL,
 			finished_at INTEGER,
 			PRIMARY KEY (id),

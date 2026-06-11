@@ -3,8 +3,14 @@ import { axiosInstance } from "../../../api/client";
 import type { EmptyResponse, SearchResponse } from "../types/dto";
 
 export const timerService = {
-  async start(): Promise<EmptyResponse> {
-    const { data } = await axiosInstance.post<EmptyResponse>("/timers/");
+  async start(summary: string): Promise<EmptyResponse> {
+    const payload = {
+      summary: summary,
+    };
+    const { data } = await axiosInstance.post<EmptyResponse>(
+      "/timers/",
+      payload,
+    );
     return data;
   },
   async stop(id: string): Promise<EmptyResponse> {

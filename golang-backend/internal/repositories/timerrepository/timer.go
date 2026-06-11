@@ -13,7 +13,7 @@ import (
 )
 
 type TimerRepository interface {
-	Start(ctx context.Context, id string, userId string, startedAt int64) error
+	Start(ctx context.Context, id string, userId string, summary string, startedAt int64) error
 	Stop(ctx context.Context, id string, userId string, finishedAt int64) error
 	Delete(ctx context.Context, id string, userId string) error
 	Clear(ctx context.Context, userId string) error
@@ -28,15 +28,16 @@ func NewRepository(database database.Database) TimerRepository {
 	return &timerRepository{database: database}
 }
 
-func (repository *timerRepository) Start(ctx context.Context, id string, userId string, startedAt int64) error {
+func (repository *timerRepository) Start(ctx context.Context, id string, userId string, summary string, startedAt int64) error {
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
-            INSERT INTO timers (id, user_id, started_at, finished_at)
-			VALUES (?, ?, ?, NULL)
+            INSERT INTO timers (id, user_id, summary, started_at, finished_at)
+			VALUES (?, ?, ?, ?, NULL)
         `,
 		id,
 		userId,
+		summary,
 		startedAt,
 	)
 	if err != nil {
@@ -57,6 +58,8 @@ func (repository *timerRepository) Start(ctx context.Context, id string, userId 
 				return &domain.ValidationError{Field: "id"}
 			} else if strings.Contains(sqlErr.Error(), "length(user_id)") {
 				return &domain.ValidationError{Field: "user_id"}
+			} else if strings.Contains(sqlErr.Error(), "length(summary)") {
+				return &domain.ValidationError{Field: "summary"}
 			}
 			return err
 		default:
@@ -184,7 +187,7 @@ func (repository *timerRepository) Search(ctx context.Context, userId string) ([
 	rows, err := repository.database.QueryContext(ctx,
 		`
 			SELECT
-				T.id, T.started_at, T.finished_at
+				T.id, T.summary, T.started_at, T.finished_at
 			FROM timers T
 			WHERE T.user_id = ?
 			ORDER BY T.started_at DESC
@@ -199,7 +202,7 @@ func (repository *timerRepository) Search(ctx context.Context, userId string) ([
 	for rows.Next() {
 		var dto timerDTO
 		if err := rows.Scan(
-			&dto.ID, &dto.StartedAt, &dto.FinishedAt,
+			&dto.ID, &dto.Summary, &dto.StartedAt, &dto.FinishedAt,
 		); err != nil {
 			return nil, err
 		}

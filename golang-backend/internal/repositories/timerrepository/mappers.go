@@ -10,6 +10,7 @@ import (
 func toDTO(timer domain.Timer) timerDTO {
 	return timerDTO{
 		ID:         timer.ID,
+		Summary:    timer.Summary,
 		StartedAt:  timer.StartedAt.UnixMilli(),
 		FinishedAt: utils.TimePtrToSQLNullInt64(timer.FinishedAt),
 	}
@@ -18,6 +19,7 @@ func toDTO(timer domain.Timer) timerDTO {
 func toDomain(timer timerDTO) domain.Timer {
 	return domain.Timer{
 		ID:         timer.ID,
+		Summary:    timer.Summary,
 		StartedAt:  time.UnixMilli(timer.StartedAt),
 		FinishedAt: utils.SQLNullInt64ToTimePtr(timer.FinishedAt),
 	}

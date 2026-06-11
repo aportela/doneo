@@ -1,62 +1,52 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, onMounted, onBeforeUnmount } from "vue";
+    import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick } from "vue";
     //import { useI18n } from "vue-i18n";
 
-    import { NButton, NIcon, NPopover, NCard, NList, NListItem } from 'naive-ui';
-    import { IconAlarm, IconClock, IconClockCancel, IconClockPlay, IconClockStop, IconTrash } from '@tabler/icons-vue';
+    import { NInputGroup, NInput, NButton, NIcon, NPopover, NCard, type InputInst, NCollapse, NCollapseItem } from 'naive-ui';
+    import { IconAlarm, IconClockCancel, IconClockPlay, IconClockStop, IconTrash } from '@tabler/icons-vue';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from "../../../shared/types/ajaxState";
-    import { useNotify } from '../../../shared/composables/notification';
 
     import { timerService } from "../../../modules/timer/services/timer";
     import { type TimerResponse } from "../../../modules/timer/types/dto";
     import { IDate } from "../../types/idate";
 
-    interface SwitchNotificationsButtonProps {
+    interface TimerButtonProps {
         iconSize?: number,
     };
 
-    withDefaults(defineProps<SwitchNotificationsButtonProps>(), {
+    withDefaults(defineProps<TimerButtonProps>(), {
         iconSize: 20
     });
 
+    const newTimerSummary = ref<string>("");
+    const newTimerSummaryRef = ref<InputInst | null>(null);
+
+    const start = ref<number | null>(Date.now());
+    const now = ref<number>(Date.now())
+
     //const { t } = useI18n();
-    const { notify } = useNotify();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    const timer = ref<boolean>(false);
-
-    const color = computed<string | undefined>(() => {
-        return hasTimers.value ? "red" : undefined;
-    });
-
-    const start = ref<number | null>(null);
-    const stop = ref<number | null>(null);
-    const now = ref(Date.now())
-
-
-    const onToggleTimer = () => {
-        if (timer.value) {
-            stop.value = new Date().getTime();
-            const totalTime = stop.value - (start.value ?? 0);
-            notify('success', "Total time: " + totalTime + " ms");
-            console.log("Total time: " + totalTime / 1000 + "sec");
-        } else {
-            start.value = new Date().getTime();
-        }
-        timer.value = !timer.value;
-    };
-
-    const commonIconSize = 22;
+    const timers = ref<TimerResponse[]>([]);
 
     const hasTimers = computed(() => timers.value.length > 0);
     const currentActiveTimer = computed<TimerResponse | undefined>(() => timers.value.find((timer) => timer.finishedAt === null));
     const hasTimerRunning = computed(() => typeof currentActiveTimer.value !== "undefined");
 
+    const currentButtonIconColor = computed<string | undefined>(() => {
+        return hasTimers.value ? "red" : undefined;
+    });
+
     const currentTimerElapsedSeconds = computed(() => {
         return Math.floor((now.value - (start.value ?? 0)) / 1000)
-    })
+    });
+
+    const hasFinishedTimers = computed(() => finishedTimers.value.length > 0);
+
+    const finishedTimers = computed(() => timers.value.filter((timer) => timer.finishedAt !== null));
+
 
     const formatDuration = (totalSeconds: number): string => {
         const days = Math.floor(totalSeconds / 86400);
@@ -70,33 +60,6 @@
         if (seconds > 0 || parts.length === 0) parts.push(`${seconds}s`);
         return parts.join(" ");
     }
-
-    const onTimerDropDownSelect = (key: string | number) => {
-        switch (key) {
-            case "pause":
-                break;
-            case "resume":
-                break;
-            case "start":
-                onStartTimer();
-                break;
-            case "stop":
-                console.log(currentActiveTimer.value);
-                onStopTimer(currentActiveTimer.value?.id ?? "");
-                break;
-            case "clear":
-                onClearTimers();
-                break;
-        }
-    };
-
-    let interval: number | undefined;
-
-    const timers = ref<TimerResponse[]>([]);
-
-    const finishedTimers = computed(() => timers.value.filter((timer) => timer.finishedAt !== null));
-
-    const hasFinishedTimers = computed(() => finishedTimers.value.length > 0);
 
     const onGetTimers = async () => {
         Object.assign(state, defaultAjaxStateRunning);
@@ -113,15 +76,18 @@
     };
 
     const onStartTimer = async () => {
-        Object.assign(state, defaultAjaxStateRunning);
-        try {
-            await timerService.start();
-            await onGetTimers();
-        } catch (e) {
-            // TODO:
-            console.error(e);
-        } finally {
-            state.ajaxRunning = false;
+        if (newTimerSummary.value) {
+            Object.assign(state, defaultAjaxStateRunning);
+            try {
+                await timerService.start(newTimerSummary.value);
+                await onGetTimers();
+                newTimerSummary.value = "";
+            } catch (e) {
+                // TODO:
+                console.error(e);
+            } finally {
+                state.ajaxRunning = false;
+            }
         }
     };
 
@@ -164,6 +130,18 @@
         }
     };
 
+    const onShowPopOver = () => {
+        if (!state.ajaxRunning) {
+            if (!hasTimerRunning.value) {
+                nextTick().then(() => {
+                    newTimerSummaryRef.value?.focus();
+                }).catch(() => { });
+            }
+        }
+    };
+
+    let interval: number | undefined;
+
     onMounted(() => {
         interval = setInterval(() => {
             now.value = Date.now()
@@ -177,60 +155,67 @@
 </script>
 
 <template>
-    <n-popover placement="bottom" trigger="hover" @select="onTimerDropDownSelect">
+    <n-popover placement="bottom" trigger="hover" @update-show="onShowPopOver">
         <template #trigger>
-            <n-button quaternary @click.prevent="onToggleTimer" @mousedown.prevent :disabled="state.ajaxRunning">
-                <n-icon :size="iconSize" :component="IconAlarm" :color="color"
-                    :class="{ 'doneo-timer-animated-icon': hasTimerRunning }" />
+            <n-button quaternary :disabled="state.ajaxRunning">
+                <template #icon>
+                    <n-icon :component="IconAlarm" :size="iconSize" :color="currentButtonIconColor"
+                        :class="{ 'doneo-timer-animated-icon': hasTimerRunning }" />
+                </template>
             </n-button>
         </template>
         <n-card size="small" segmented>
             <template #header>
-                <n-button block @click="onStopTimer(currentActiveTimer?.id ?? '')" v-if="hasTimerRunning"
+                <n-button size="small" block @click="onStopTimer(currentActiveTimer?.id ?? '')" v-if="hasTimerRunning"
                     :disabled="state.ajaxRunning">
                     <template #icon>
-                        <n-icon :component="IconClockStop" :size="commonIconSize" />
+                        <n-icon :component="IconClockStop" />
                     </template>
                     Stop current timer: {{ formatDuration(currentTimerElapsedSeconds > 0 ? currentTimerElapsedSeconds :
                         0) }}
                 </n-button>
-                <n-button block @click="onStartTimer" v-else :disabled="state.ajaxRunning">
-                    <template #icon>
-                        <n-icon :component="IconClockPlay" />
-                    </template>
-                    Start new timer
-                </n-button>
+                <n-input-group v-else>
+                    <n-input size="small" ref="newTimerSummaryRef" placeholder="type new timer summary" :minlength="1"
+                        :maxlength="32" show-count v-model:value="newTimerSummary" :disabled="state.ajaxRunning"
+                        @keydown.enter="onStartTimer" />
+                    <n-button size="small" @click="onStartTimer" :disabled="state.ajaxRunning || !newTimerSummary">
+                        <template #icon>
+                            <n-icon :component="IconClockPlay" />
+                        </template>
+                        Start new timer
+                    </n-button>
+                </n-input-group>
             </template>
             <template #footer v-if="hasFinishedTimers">
-                <n-list>
-                    <template #header>
-                        <n-icon :component="IconClock" :size="commonIconSize" /> Previous timers
-                    </template>
-                    <n-list-item v-for="timer in finishedTimers" :key="timer.id">
-                        <n-icon :component="IconClockPlay" :size="commonIconSize" /> {{ new
-                            IDate(timer.startedAt).toLocaleString() }}
-                        <br>
-                        <n-icon :component="IconClockStop" :size="commonIconSize" /> {{ new
-                            IDate(timer.finishedAt).toLocaleString() }}
-                        <br>
-                        <n-icon :component="IconClock" :size="commonIconSize" />Total timer:
-                        {{
+                <p>Previous timers</p>
+                <n-collapse display-directive="if" accordion :trigger-areas="['main', 'arrow']">
+                    <n-collapse-item v-for="timer in finishedTimers" :key="timer.id" :name="timer.id"
+                        :title="timer.summary">
+                        <template #header-extra>
+                            <n-button block size="tiny" @click="onDeleteTimer(timer.id)" :disabled="state.ajaxRunning">
+                                <template #icon>
+                                    <n-icon :component="IconTrash" />
+                                </template>
+                            </n-button>
+                        </template>
+                        <dt>
+                        <dd>Started: {{ new IDate(timer.startedAt).toLocaleString() }}</dd>
+                        <dd>Finished: {{ new IDate(timer.finishedAt).toLocaleString() }}</dd>
+                        <dd>Total elapsed time: {{
                             formatDuration(
-
-                                ((timer.finishedAt ?? new Date().getTime()) - timer.startedAt) / 1000
-
+                                Math.round(
+                                    ((timer.finishedAt ?? new Date().getTime()) - timer.startedAt) / 1000
+                                )
                             )
-                        }}
-                        <n-button @click="onDeleteTimer(timer.id)" :disabled="state.ajaxRunning">
-                            <n-icon :component="IconTrash" size="commonIconSize" />
-                        </n-button>
-                    </n-list-item>
-                </n-list>
+                        }}</dd>
+                        </dt>
+                    </n-collapse-item>
+                </n-collapse>
             </template>
             <template #action v-if="hasTimers">
-                <n-button block @click="onClearTimers" :disabled="state.ajaxRunning">
+                <n-button size="small" block @click="onClearTimers" :disabled="state.ajaxRunning">
                     <template #icon>
-                        <n-icon :component="IconClockCancel" :size="commonIconSize" />
+                        <n-icon :component="IconClockCancel" />
                     </template>
                     Clear timers
                 </n-button>
