@@ -84,8 +84,7 @@
                         <IconSearch :size="16" />
                     </template>
                 </n-input>
-                <span class="shortcut"
-                    style="padding: 4px 8px; border: 1px solid rgb(239, 239, 245); border-radius: 17px; width: 300px; cursor: pointer;">
+                <span class="shortcut">
                     <IconSearch :size="16" />
                     <kbd>Crtl</kbd>+<kbd>K</kbd> to open search
                 </span>
@@ -166,14 +165,20 @@
         align-items: center;
         gap: 6px;
         font-size: 12px;
+
+        padding: 4px 8px;
+        border: 1px solid rgb(239, 239, 245);
+        border-radius: 17px;
+        width: 300px;
+        cursor: pointer;
     }
 
     kbd {
         padding: 2px 8px;
         border-radius: 4px;
         border: 1px solid #ccc;
-        background: #f5f5f5;
         font-family: monospace;
         font-size: 12px;
+        color: var(--n-text-color);
     }
 </style>
