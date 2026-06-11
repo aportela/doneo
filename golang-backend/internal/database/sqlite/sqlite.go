@@ -20,6 +20,7 @@ func configure(db *sql.DB) error {
 	pragmas := []string{
 		"PRAGMA journal_mode = WAL;",
 		"PRAGMA foreign_keys = ON;",
+		"PRAGMA busy_timeout = 1000;",
 	}
 
 	for _, p := range pragmas {
