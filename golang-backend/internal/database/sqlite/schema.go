@@ -163,7 +163,7 @@ var schemaQueries = []schemaMigration{
 				) STRICT;
 			`,
 			`
-				CREATE TABLE IF NOT EXISTS project_history_operations (
+				CREATE TABLE IF NOT EXISTS history_operations (
 					id TEXT NOT NULL CHECK(length(id) == 36),
 					project_id TEXT NOT NULL CHECK(length(project_id) == 36),
 					task_id TEXT CHECK(length(task_id) == 36),
