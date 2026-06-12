@@ -40,4 +40,14 @@ export const noteService = {
     );
     return data;
   },
+
+  async getTaskNotes(
+    projectId: string,
+    taskId: string,
+  ): Promise<SearchResponse> {
+    const { data } = await axiosInstance.get<SearchResponse>(
+      "/projects/" + projectId + "/tasks/" + taskId + "/notes/",
+    );
+    return data;
+  },
 };
