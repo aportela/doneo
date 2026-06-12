@@ -187,7 +187,8 @@
 </script>
 
 <template>
-    <n-popover placement="bottom" trigger="hover" v-model:show="showPopOver" @update-show="onShowPopOver">
+    <n-popover placement="bottom" trigger="hover" v-model:show="showPopOver" @update-show="onShowPopOver"
+        class="doneo-disable-user-select">
         <template #trigger>
             <n-button quaternary :disabled="state.ajaxRunning" :type="currentButtonType">
                 <template #icon>
@@ -230,17 +231,15 @@
                                 </template>
                             </n-button>
                         </template>
-                        <dt>
-                        <dd>Started: {{ new IDate(timer.startedAt).toLocaleString() }}</dd>
-                        <dd>Finished: {{ new IDate(timer.finishedAt).toLocaleString() }}</dd>
-                        <dd>Total elapsed time: {{
+                        <div>Started: {{ new IDate(timer.startedAt).toLocaleString() }}</div>
+                        <div>Finished: {{ new IDate(timer.finishedAt).toLocaleString() }}</div>
+                        <div>Total elapsed time: {{
                             formatDuration(
                                 Math.round(
                                     ((timer.finishedAt ?? new Date().getTime()) - timer.startedAt) / 1000
                                 )
                             )
-                        }}</dd>
-                        </dt>
+                        }}</div>
                     </n-collapse-item>
                 </n-collapse>
             </template>
