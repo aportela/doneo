@@ -56,7 +56,7 @@ func (handler *NoteHandler) UpdateProjectNote(w http.ResponseWriter, r *http.Req
 
 	note, err := handler.service.UpdateProjectNote(r.Context(), projectId, note)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to add note: %w", err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to update note: %w", err))
 		return
 	}
 
@@ -85,5 +85,75 @@ func (handler *NoteHandler) GetProjectNotes(w http.ResponseWriter, r *http.Reque
 	w.Header().Set("Content-Type", "application/json")
 	projectId := chi.URLParam(r, "id")
 	projectPermissions, err := handler.service.GetProjectNotes(r.Context(), projectId)
+	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectPermissions), err)
+}
+
+func (handler *NoteHandler) AddTaskNote(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var request addRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] invalid request payload: %w", err))
+		return
+	}
+	note := addRequestToDomain(request)
+	taskId := chi.URLParam(r, "task_id")
+
+	note, err := handler.service.AddTaskNote(r.Context(), taskId, note)
+	if err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to add note: %w", err))
+		return
+	}
+
+	// TODO: reuse current note ???
+	note, err = handler.service.GetTaskNote(r.Context(), note.ID)
+	if err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to get new note: %w", err))
+		return
+	}
+	handlers.ToHandlerJSONResponse(w, domainToResponse(note), nil, http.StatusCreated)
+}
+
+func (handler *NoteHandler) UpdateTaskNote(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var request updateRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] invalid request payload: %w", err))
+		return
+	}
+	note := updateRequestToDomain(request)
+	note.ID = chi.URLParam(r, "note_id")
+	taskId := chi.URLParam(r, "task_id")
+
+	note, err := handler.service.UpdateTaskNote(r.Context(), taskId, note)
+	if err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to update note: %w", err))
+		return
+	}
+
+	// TODO: reuse current note ???
+	note, err = handler.service.GetTaskNote(r.Context(), note.ID)
+	if err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to get updated note: %w", err))
+		return
+	}
+	handlers.ToHandlerJSONResponse(w, domainToResponse(note), nil)
+}
+
+func (handler *NoteHandler) DeleteTaskNote(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	taskId := chi.URLParam(r, "task_id")
+	noteId := chi.URLParam(r, "note_id")
+	err := handler.service.DeleteTaskNote(r.Context(), taskId, noteId)
+	if err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to delete note: %w", err))
+		return
+	}
+	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
+}
+
+func (handler *NoteHandler) GetTaskNotes(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	taskId := chi.URLParam(r, "task_id")
+	projectPermissions, err := handler.service.GetTaskNotes(r.Context(), taskId)
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectPermissions), err)
 }
