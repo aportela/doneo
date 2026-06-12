@@ -166,11 +166,13 @@ var schemaQueries = []schemaMigration{
 				CREATE TABLE IF NOT EXISTS project_history_operations (
 					id TEXT NOT NULL CHECK(length(id) == 36),
 					project_id TEXT NOT NULL CHECK(length(project_id) == 36),
+					task_id TEXT CHECK(length(task_id) == 36),
 					operation_type INTEGER NOT NULL,
 					user_id TEXT NOT NULL CHECK(length(user_id) == 36),
 					operation_date INTEGER NOT NULL,
 					PRIMARY KEY (id),
 					FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE,
+					FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
 					FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 				) STRICT;
 			`,

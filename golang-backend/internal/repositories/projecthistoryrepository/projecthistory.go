@@ -13,7 +13,8 @@ import (
 )
 
 type ProjectHistoryRepository interface {
-	Add(ctx context.Context, projectId string, operation domain.HistoryOperation) error
+	AddProjectOperation(ctx context.Context, projectId string, operation domain.HistoryOperation) error
+	AddTaskOperation(ctx context.Context, projectId string, taskId string, operation domain.HistoryOperation) error
 	Search(ctx context.Context, projectId string) ([]domain.HistoryOperation, error)
 }
 
@@ -25,15 +26,15 @@ func NewRepository(database database.Database) ProjectHistoryRepository {
 	return &projectHistoryRepository{database: database}
 }
 
-func (repository *projectHistoryRepository) Add(ctx context.Context, projectId string, operation domain.HistoryOperation) error {
+func (repository *projectHistoryRepository) AddProjectOperation(ctx context.Context, projectId string, operation domain.HistoryOperation) error {
 	dto := toDTO(operation)
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
 			INSERT INTO project_history_operations
-				(id, project_id, operation_type, user_id, operation_date)
+				(id, project_id, task_id, operation_type, user_id, operation_date)
 			VALUES
-				(?, ?, ?, ?, ?)
+				(?, ?, NULL, ?, ?, ?)
 		`,
 		dto.ID,
 		projectId,
@@ -50,10 +51,53 @@ func (repository *projectHistoryRepository) Add(ctx context.Context, projectId s
 		}
 		switch sqlErr.Code() {
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "project_id, operation_type, user_id, operation_date"}
+			return &domain.ValidationError{Field: "id"}
 		case sqlite3.SQLITE_CONSTRAINT_CHECK:
 			if strings.Contains(sqlErr.Error(), "length(project_id)") {
 				return &domain.ValidationError{Field: "project_id"}
+			} else if strings.Contains(sqlErr.Error(), "length(user_id)") {
+				return &domain.ValidationError{Field: "user_id"}
+			}
+			return err
+		default:
+			return err
+		}
+	}
+	return nil
+}
+
+func (repository *projectHistoryRepository) AddTaskOperation(ctx context.Context, projectId string, taskId string, operation domain.HistoryOperation) error {
+	dto := toDTO(operation)
+	_, err := repository.database.ExecContext(
+		ctx,
+		`
+			INSERT INTO project_history_operations
+				(id, project_id, task_id, operation_type, user_id, operation_date)
+			VALUES
+				(?, ?, ?, ?, ?, ?)
+		`,
+		dto.ID,
+		projectId,
+		taskId,
+		dto.OperationType,
+		dto.UserId,
+		dto.CreatedAt,
+	)
+	if err != nil {
+		// TODO: remove ?
+		fmt.Println(err.Error())
+		var sqlErr *sqlite.Error
+		if !errors.As(err, &sqlErr) {
+			return err
+		}
+		switch sqlErr.Code() {
+		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
+			return &domain.ValidationError{Field: "id"}
+		case sqlite3.SQLITE_CONSTRAINT_CHECK:
+			if strings.Contains(sqlErr.Error(), "length(project_id)") {
+				return &domain.ValidationError{Field: "project_id"}
+			} else if strings.Contains(sqlErr.Error(), "length(task_id)") {
+				return &domain.ValidationError{Field: "task_id"}
 			} else if strings.Contains(sqlErr.Error(), "length(user_id)") {
 				return &domain.ValidationError{Field: "user_id"}
 			}

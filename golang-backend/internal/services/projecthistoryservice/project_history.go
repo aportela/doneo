@@ -26,7 +26,7 @@ func NewService(database database.Database, repository projecthistoryrepository.
 
 func (service *projectHistoryService) Add(ctx context.Context, projectId string, operation domain.HistoryOperation) (domain.HistoryOperation, error) {
 	operation.ID = utils.UUID()
-	err := service.repository.Add(ctx, projectId, operation)
+	err := service.repository.AddProjectOperation(ctx, projectId, operation)
 	if err != nil {
 		return domain.HistoryOperation{}, err
 	}

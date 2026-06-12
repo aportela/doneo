@@ -59,7 +59,7 @@ func (service *projectService) Add(ctx context.Context, project domain.Project) 
 	if err != nil {
 		return domain.Project{}, err
 	}
-	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, project.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: project.CreatedAt, OperationType: domain.EventProjectCreated})
+	err = projecthistoryrepository.NewRepository(service.database).AddProjectOperation(ctx, project.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: project.CreatedAt, OperationType: domain.EventProjectCreated})
 	if err != nil {
 		return domain.Project{}, err
 	}
@@ -92,7 +92,7 @@ func (service *projectService) Update(ctx context.Context, project domain.Projec
 	if err != nil {
 		return domain.Project{}, err
 	}
-	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, project.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectUpdated})
+	err = projecthistoryrepository.NewRepository(service.database).AddProjectOperation(ctx, project.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectUpdated})
 	if err != nil {
 		return domain.Project{}, err
 	}
@@ -124,7 +124,7 @@ func (service *projectService) Delete(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, id, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectDeleted})
+	err = projecthistoryrepository.NewRepository(service.database).AddProjectOperation(ctx, id, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectDeleted})
 	if err != nil {
 		return err
 	}
