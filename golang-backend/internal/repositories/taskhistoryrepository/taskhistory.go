@@ -31,7 +31,7 @@ func (repository *taskHistoryRepository) Add(ctx context.Context, taskId string,
 		ctx,
 		`
 			INSERT INTO task_history_operations
-				(id, taskId, operation_type, user_id, operation_date)
+				(id, task_id, operation_type, user_id, operation_date)
 			VALUES
 				(?, ?, ?, ?, ?)
 		`,
