@@ -33,6 +33,8 @@ func (handler *NoteHandler) AddProjectNote(w http.ResponseWriter, r *http.Reques
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to add note: %w", err))
 		return
 	}
+
+	// TODO: reuse current note ???
 	note, err = handler.service.GetProjectNote(r.Context(), note.ID)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to get new note: %w", err))
@@ -57,6 +59,8 @@ func (handler *NoteHandler) UpdateProjectNote(w http.ResponseWriter, r *http.Req
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to add note: %w", err))
 		return
 	}
+
+	// TODO: reuse current note ???
 	note, err = handler.service.GetProjectNote(r.Context(), note.ID)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to get updated note: %w", err))

@@ -5,7 +5,7 @@ import (
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 )
 
-func domainToResponse(operation domain.ProjectHistoryOperation) ProjectHistoryOperationResponse {
+func domainToResponse(operation domain.HistoryOperation) ProjectHistoryOperationResponse {
 	return ProjectHistoryOperationResponse{
 		ID:            operation.ID,
 		CreatedBy:     userhandler.BaseDomainToBaseResponse(operation.CreatedBy),
@@ -14,7 +14,7 @@ func domainToResponse(operation domain.ProjectHistoryOperation) ProjectHistoryOp
 	}
 }
 
-func domainArrayToResponseArray(attachments []domain.ProjectHistoryOperation) []ProjectHistoryOperationResponse {
+func domainArrayToResponseArray(attachments []domain.HistoryOperation) []ProjectHistoryOperationResponse {
 	operationResponse := []ProjectHistoryOperationResponse{}
 	for _, attachment := range attachments {
 		operationResponse = append(operationResponse, domainToResponse(attachment))
@@ -22,7 +22,7 @@ func domainArrayToResponseArray(attachments []domain.ProjectHistoryOperation) []
 	return operationResponse
 }
 
-func toSearchResponse(operations []domain.ProjectHistoryOperation) searchResponse {
+func toSearchResponse(operations []domain.HistoryOperation) searchResponse {
 	return searchResponse{
 		HistoryOperations: domainArrayToResponseArray(operations),
 	}

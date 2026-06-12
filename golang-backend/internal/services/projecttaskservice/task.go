@@ -69,7 +69,7 @@ func (service *taskService) Add(ctx context.Context, projectId string, task doma
 			}
 		}
 	}
-	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, task.ID, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: task.CreatedAt, OperationType: domain.EventTaskCreated})
+	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, task.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: task.CreatedAt, OperationType: domain.EventTaskCreated})
 	if err != nil {
 		return domain.Task{}, err
 	}
@@ -115,7 +115,7 @@ func (service *taskService) Update(ctx context.Context, task domain.Task) (domai
 			}
 		}
 	}
-	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, task.ID, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskUpdated})
+	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, task.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskUpdated})
 	if err != nil {
 		return domain.Task{}, err
 	}
@@ -147,7 +147,7 @@ func (service *taskService) Delete(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, id, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskDeleted})
+	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, id, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskDeleted})
 	if err != nil {
 		return err
 	}

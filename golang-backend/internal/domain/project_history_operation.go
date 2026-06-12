@@ -4,7 +4,8 @@ import (
 	"time"
 )
 
-type ProjectHistoryOperation struct {
+// TODO: rename file
+type HistoryOperation struct {
 	ID            string
 	CreatedBy     UserBase
 	CreatedAt     time.Time

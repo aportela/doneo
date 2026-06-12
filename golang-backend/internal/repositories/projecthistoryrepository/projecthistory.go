@@ -13,8 +13,8 @@ import (
 )
 
 type ProjectHistoryRepository interface {
-	Add(ctx context.Context, projectId string, operation domain.ProjectHistoryOperation) error
-	Search(ctx context.Context, projectId string) ([]domain.ProjectHistoryOperation, error)
+	Add(ctx context.Context, projectId string, operation domain.HistoryOperation) error
+	Search(ctx context.Context, projectId string) ([]domain.HistoryOperation, error)
 }
 
 type projectHistoryRepository struct {
@@ -25,7 +25,7 @@ func NewRepository(database database.Database) ProjectHistoryRepository {
 	return &projectHistoryRepository{database: database}
 }
 
-func (repository *projectHistoryRepository) Add(ctx context.Context, projectId string, operation domain.ProjectHistoryOperation) error {
+func (repository *projectHistoryRepository) Add(ctx context.Context, projectId string, operation domain.HistoryOperation) error {
 	dto := toDTO(operation)
 	_, err := repository.database.ExecContext(
 		ctx,
@@ -65,7 +65,7 @@ func (repository *projectHistoryRepository) Add(ctx context.Context, projectId s
 	return nil
 }
 
-func (repository *projectHistoryRepository) Search(ctx context.Context, projectId string) ([]domain.ProjectHistoryOperation, error) {
+func (repository *projectHistoryRepository) Search(ctx context.Context, projectId string) ([]domain.HistoryOperation, error) {
 	rows, err := repository.database.QueryContext(
 		ctx,
 		`

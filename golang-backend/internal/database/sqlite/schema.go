@@ -237,6 +237,35 @@ var schemaQueries = []schemaMigration{
 					FOREIGN KEY(related_task_id) REFERENCES tasks(id) ON DELETE CASCADE
 				) STRICT;
 			`,
+			`
+				CREATE TABLE IF NOT EXISTS task_notes (
+					id TEXT NOT NULL CHECK(length(id) == 36),
+					task_id TEXT NOT NULL CHECK(length(task_id) == 36),
+					user_id TEXT NOT NULL CHECK(length(user_id) == 36),
+					created_at INTEGER NOT NULL,
+					updated_at INTEGER,
+					body TEXT NOT NULL,
+					PRIMARY KEY (id),
+					FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+					FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+				) STRICT;
+			`,
+			`
+				CREATE INDEX IF NOT EXISTS idx_task_notes_task_id ON task_notes(task_id);
+				CREATE INDEX IF NOT EXISTS idx_task_notes_user_id ON task_notes(user_id);
+			`,
+			`
+				CREATE TABLE IF NOT EXISTS task_history_operations (
+					id TEXT NOT NULL CHECK(length(id) == 36),
+					task_id TEXT NOT NULL CHECK(length(task_id) == 36),
+					operation_type INTEGER NOT NULL,
+					user_id TEXT NOT NULL CHECK(length(user_id) == 36),
+					operation_date INTEGER NOT NULL,
+					PRIMARY KEY (id),
+					FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+					FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+				) STRICT;
+			`,
 		},
 	},
 }

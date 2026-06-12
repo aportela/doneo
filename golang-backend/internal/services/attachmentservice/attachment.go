@@ -63,7 +63,7 @@ func (service *attachmentService) AddProjectAttachment(ctx context.Context, proj
 	if err != nil {
 		return domain.Attachment{}, err
 	}
-	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: attachment.CreatedAt, OperationType: domain.EventProjectAttachmentAdded})
+	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: attachment.CreatedAt, OperationType: domain.EventProjectAttachmentAdded})
 	if err != nil {
 		return domain.Attachment{}, err
 	}
@@ -100,7 +100,7 @@ func (service *attachmentService) DeleteProjectAttachment(ctx context.Context, p
 	if err != nil {
 		return err
 	}
-	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.ProjectHistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectAttachmentDeleted})
+	err = projecthistoryrepository.NewRepository(service.database).Add(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectAttachmentDeleted})
 	if err != nil {
 		return err
 	}
