@@ -57,10 +57,21 @@
             tabsRef.value?.syncBarPosition();
         }
     );
+
+    const tabPlacement = ref<"top" | "left">("top");
+
+    const onToggleTabPlacement = () => {
+        if (tabPlacement.value == "top") {
+            tabPlacement.value = "left";
+        } else {
+            tabPlacement.value = "top";
+        }
+    };
 </script>
 
 <template>
-    <n-tabs placement="top" type="line" ref="tabsRef" animated v-model:value="tab">
+    <h1 class="doneo-cursor-pointer" @click="onToggleTabPlacement">PROJECT</h1>
+    <n-tabs :placement="tabPlacement" type="line" animated ref="tabsRef" v-model:value="tab">
         <n-tab-pane name="metadata" display-directive="show" key="metadata" :disabled="!projectId">
             <template #tab>
                 Metadata
