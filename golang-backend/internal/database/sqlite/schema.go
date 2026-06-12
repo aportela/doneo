@@ -227,6 +227,16 @@ var schemaQueries = []schemaMigration{
 					UNIQUE(user_id, started_at)
 				) STRICT;
 			`,
+			`
+				CREATE TABLE IF NOT EXISTS task_relations (
+					task_id TEXT NOT NULL CHECK(length(task_id) == 36),
+					related_task_id  TEXT NOT NULL CHECK(length(task_id) == 36),
+					relation_type INTEGER NOT NULL,
+					PRIMARY KEY (task_id, related_task_id),
+					FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+					FOREIGN KEY(related_task_id) REFERENCES tasks(id) ON DELETE CASCADE
+				) STRICT;
+			`,
 		},
 	},
 }
