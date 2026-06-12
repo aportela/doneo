@@ -1,30 +1,29 @@
 <script setup lang="ts">
     import { ref, computed, watch, nextTick } from 'vue';
+    import { useI18n } from 'vue-i18n';
     import { useRoute, useRouter } from 'vue-router';
 
     import { NTabs, NTabPane, type TabsInst } from 'naive-ui';
 
-    //import { IconAlertTriangle } from '@tabler/icons-vue';
 
     import TaskMetadataTab from '../components/TaskMetadataTab.vue';
-    //import ProjectAttachmentsTab from '../components/ProjectAttachmentsTab.vue';
-    //import ProjectNotesTab from '../components/ProjectNotesTab.vue';
-    //import ProjectHistoryOperationsTab from '../components/ProjectHistoryOperationsTab.vue';
 
+    const { t } = useI18n();
     const route = useRoute();
     const router = useRouter();
 
     const projectId = route.params.projectId as string ?? ""
-    const taskId = route.params.id as string
+    const taskId = route.params.taskId as string ?? ""
 
     // TODO: set tab with type (type tab = "metadata" | "notes"....)
     const tab = computed({
         get: () => route.params.tab as string,
         set: (value: string) => {
             router.push({
-                name: 'projectTab',
+                name: 'taskTab',
                 params: {
-                    id: route.params.id,
+                    projectId: route.params.projectId,
+                    taskId: route.params.taskId,
                     tab: value
                 }
             });
@@ -35,13 +34,11 @@
     const attachmentCount = ref<number>(0);
     const historyOperationCount = ref<number>(0);
 
-    // TODO: i18n
-    const attachmentsTabLabel = computed(() => attachmentCount.value > 0 ? `Attachments (${attachmentCount.value})` : 'Attachments')
-    const notesTabLabel = computed(() => noteCount.value > 0 ? `Notes (${noteCount.value})` : 'Notes')
-    const historyTabLabel = computed(() => historyOperationCount.value > 0 ? `History (${historyOperationCount.value})` : 'History')
+    const attachmentsTabLabel = computed(() => t("modules.task.components.TaskPage.tabs.attachments.label", attachmentCount.value));
+    const notesTabLabel = computed(() => t("modules.task.components.TaskPage.tabs.notes.label", noteCount.value));
+    const historyTabLabel = computed(() => t("modules.task.components.TaskPage.tabs.history.label", historyOperationCount.value));
 
     const tabsRef = ref<TabsInst>();
-
 
     // recalc bar position on dynamic tab labels changes
     watch(
@@ -55,7 +52,7 @@
 
 <template>
     <n-tabs placement="top" type="line" ref="tabsRef" animated v-model:value="tab">
-        <n-tab-pane name="metadata" display-directive="show" key="metadata">
+        <n-tab-pane name="metadata" display-directive="show" key="metadata" :disabled="!projectId || !taskId">
             <template #tab>
                 Metadata
             </template>
@@ -63,21 +60,17 @@
             <TaskMetadataTab mode="add" :project-id="projectId" :task-id="taskId" v-model:note-count="noteCount"
                 v-model:attachment-count="attachmentCount" v-model:history-operation-count="historyOperationCount" />
         </n-tab-pane>
-        <n-tab-pane name="notes" :tab="notesTabLabel" display-directive="show:lazy">
-            <!--
-            <ProjectNotesTab :project-id="taskId" v-model:item-count="noteCount" />
-            -->
+        <n-tab-pane name="notes" :tab="notesTabLabel" display-directive="show:lazy" key="notes"
+            :disabled="!projectId || !taskId">
+            TODO NOTES
         </n-tab-pane>
-        <n-tab-pane name="attachments" :tab="attachmentsTabLabel" display-directive="show:lazy">
-            <!--
-            <ProjectAttachmentsTab :project-id="taskId" v-model:item-count="attachmentCount" />
-            -->
+        <n-tab-pane name="attachments" :tab="attachmentsTabLabel" display-directive="show:lazy" key="attachments"
+            :disabled="!projectId || !taskId">
+            TODO ATTACHMENTS
         </n-tab-pane>
-        <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy">
-            <!--
-            <ProjectHistoryOperationsTab :project-id="taskId" v-model:item-count="historyOperationCount"
-                :key="historyOperationCount" />
-                -->
+        <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy" key="history"
+            :disabled="!projectId || !taskId">
+            TODO HISTORY
         </n-tab-pane>
     </n-tabs>
 </template>

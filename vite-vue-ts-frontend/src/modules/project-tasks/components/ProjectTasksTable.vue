@@ -25,7 +25,7 @@
         disabled: boolean;
         items: ProjectTask[];
         sort?: Sort;
-        projectId: string;
+        projectId?: string;
     }
 
     const { t } = useI18n();
@@ -182,7 +182,7 @@
                 <td><n-tag :bordered="false" :color="getNaiveUITagColorProperty(task.status.hexColor ?? '#888888')">{{
                     task.status.name }}</n-tag></td>
                 <td><router-link
-                        :to="{ name: 'taskTab', params: { id: task.id, projectId: task.projectId, tab: 'metadata' } }"
+                        :to="{ name: 'taskTab', params: { taskId: task.id, projectId: task.projectId, tab: 'metadata' } }"
                         class="doneo-link-text-color-default">{{
                             task.summary
                         }}</router-link></td>
@@ -194,7 +194,7 @@
                     <!-- TODO: use ManageTableActionButtons -->
                     <n-button-group size="small">
                         <router-link
-                            :to="{ name: 'taskTab', params: { id: task.id, projectId: task.projectId, tab: 'metadata' } }">
+                            :to="{ name: 'taskTab', params: { taskId: task.id, projectId: task.projectId, tab: 'metadata' } }">
                             <n-button :disabled="props.disabled">
                                 {{ t("shared.buttons.Open.label") }}
                                 <template #icon>

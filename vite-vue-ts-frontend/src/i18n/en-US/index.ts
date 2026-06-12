@@ -1406,6 +1406,27 @@ export default {
             noItemsFound: "No tasks found",
           },
         },
+        TaskPage: {
+          tabs: {
+            attachments: {
+              label:
+                "Attachments | Attachments ({count}) | Attachments ({count})",
+            },
+            notes: {
+              label: "Notes | Notes ({count}) | Notes ({count})",
+            },
+            history: {
+              label: "History | History ({count}) | History ({count})",
+            },
+          },
+          errors: {
+            loadError: "There was a problem while loading the project data",
+            // TODO: deduplicate
+            notFoundError: "We couldn’t find the specified project",
+            addError: "There was a problem while adding the project data",
+            updateError: "There was a problem while updating the project data",
+          },
+        },
         ProjectTasksTab: {
           pager: {
             totalItemsLabel: "Total tasks: {total}",
