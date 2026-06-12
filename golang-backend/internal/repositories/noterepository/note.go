@@ -279,7 +279,7 @@ func (repository *noteRepository) GetTaskNotes(ctx context.Context, taskId strin
 				TN.id, TN.user_id, U.name, TN.created_at, TN.updated_at, TN.body
             FROM task_notes TN
 			INNER JOIN users U ON U.id = TN.user_id
-            WHERE PN.task_id = ?
+            WHERE TN.task_id = ?
 			ORDER BY TN.created_at DESC
         `,
 		taskId)
