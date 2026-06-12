@@ -202,7 +202,7 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
 		projectHandler := projecthandler.NewHandler(projectservice.NewService(database, projectrepository.NewRepository(database)))
 		projectPermissionHandler := projectpermissionhandler.NewHandler(projectpermissionservice.NewService(database, projectpermissionrepository.NewRepository(database)))
-		projectNoteHandler := notehandler.NewHandler(noteservice.NewService(database, noterepository.NewRepository(database)))
+		noteHandler := notehandler.NewHandler(noteservice.NewService(database, noterepository.NewRepository(database)))
 		projectAttachmentHandler := attachmenthandler.NewHandler(attachmentservice.NewService(database, attachmentrepository.NewRepository(database)), cfg.Storage.AttachmentsPath)
 		projectHistoryHandler := projecthistoryhandler.NewHandler(projecthistoryservice.NewService(database, projecthistoryrepository.NewRepository(database)))
 		projectTaskHandler := projecttaskhandler.NewHandler(projecttaskservice.NewService(database, projecttaskrepository.NewRepository(database)))
@@ -216,10 +216,10 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		r.Post("/{id:"+uuidPattern+"}/permissions", projectPermissionHandler.Add)
 		r.Delete("/{id:"+uuidPattern+"}/permissions/{permission_id:"+uuidPattern+"}", projectPermissionHandler.Delete)
 
-		r.Get("/{id:"+uuidPattern+"}/notes", projectNoteHandler.GetProjectNotes)
-		r.Post("/{id:"+uuidPattern+"}/notes", projectNoteHandler.AddProjectNote)
-		r.Put("/{id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", projectNoteHandler.UpdateProjectNote)
-		r.Delete("/{id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", projectNoteHandler.DeleteProjectNote)
+		r.Get("/{id:"+uuidPattern+"}/notes", noteHandler.GetProjectNotes)
+		r.Post("/{id:"+uuidPattern+"}/notes", noteHandler.AddProjectNote)
+		r.Put("/{id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", noteHandler.UpdateProjectNote)
+		r.Delete("/{id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", noteHandler.DeleteProjectNote)
 
 		r.Get("/{id:"+uuidPattern+"}/attachments", projectAttachmentHandler.GetProjectAttachments)
 		r.Post("/{id:"+uuidPattern+"}/attachments", projectAttachmentHandler.AddProjectAttachment)
@@ -232,6 +232,11 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		r.Get("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", projectTaskHandler.Get)
 		r.Put("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", projectTaskHandler.Update)
 		r.Delete("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", projectTaskHandler.Delete)
+
+		r.Get("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/notes", noteHandler.GetTaskNotes)
+		r.Post("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/notes", noteHandler.AddTaskNote)
+		r.Put("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", noteHandler.UpdateTaskNote)
+		r.Delete("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", noteHandler.DeleteTaskNote)
 	})
 
 	apiRouter.Route("/tasks", func(r chi.Router) {

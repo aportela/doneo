@@ -119,7 +119,7 @@
                     const payload: AddRequest = {
                         body: note.body
                     };
-                    note = new Note(await noteService.addProjectNote(props.taskId, payload));
+                    note = new Note(await noteService.addTaskNote(props.projectId, props.taskId, payload));
                     items.value = [note, ...items.value.filter((note) => !!note.id)]
                     itemCount.value = items.value?.length ?? 0;
                     notify('success', t("modules.note.components.ProjectNotesTab.notifications.projectNoteAdded"));
@@ -134,7 +134,7 @@
                         updatedAt: null,
                         body: note.body
                     };
-                    note = new Note(await noteService.updateProjectNote(props.taskId, note.id, payload));
+                    note = new Note(await noteService.updateTaskote(props.projectId, props.taskId, note.id, payload));
                     items.value = items.value.map((item) => item.id === note.id ? note : item)
                     itemCount.value = items.value?.length ?? 0;
                     notify('success', t("modules.note.components.ProjectNotesTab.notifications.projectNoteUpdated"));
@@ -149,7 +149,7 @@
     const onDeleteNote = async (id: string) => {
         if (props.taskId) {
             try {
-                await noteService.deleteProjectNote(props.taskId, id);
+                await noteService.deleteTaskNote(props.projectId, props.taskId, id);
                 items.value = items.value.filter((note) => note.id != id)
                 itemCount.value = items.value?.length ?? 0;
                 notify('success', t("modules.note.components.ProjectNotesTab.notifications.projectNoteDeleted"));

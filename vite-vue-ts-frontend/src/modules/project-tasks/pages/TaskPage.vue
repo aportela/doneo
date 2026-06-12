@@ -7,6 +7,7 @@
 
 
     import TaskMetadataTab from '../components/TaskMetadataTab.vue';
+    import TaskNotesTab from '../components/tabs/Notes.vue';
 
     const { t } = useI18n();
     const route = useRoute();
@@ -62,7 +63,8 @@
         </n-tab-pane>
         <n-tab-pane name="notes" :tab="notesTabLabel" display-directive="show:lazy" key="notes"
             :disabled="!projectId || !taskId">
-            TODO NOTES
+            <TaskNotesTab v-if="projectId && taskId" :project-id="projectId" :task-id="taskId"
+                v-model:item-count="noteCount" />
         </n-tab-pane>
         <n-tab-pane name="attachments" :tab="attachmentsTabLabel" display-directive="show:lazy" key="attachments"
             :disabled="!projectId || !taskId">

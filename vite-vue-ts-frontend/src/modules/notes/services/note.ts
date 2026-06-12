@@ -40,13 +40,44 @@ export const noteService = {
     );
     return data;
   },
-
+  async addTaskNote(
+    projectId: string,
+    taskId: string,
+    payload: AddRequest,
+  ): Promise<NoteResponse> {
+    const { data } = await axiosInstance.post<NoteResponse>(
+      "/projects/" + projectId + "/tasks/" + taskId + "/notes",
+      payload,
+    );
+    return data;
+  },
+  async updateTaskote(
+    projectId: string,
+    taskId: string,
+    noteId: string,
+    payload: UpdateRequest,
+  ): Promise<NoteResponse> {
+    const { data } = await axiosInstance.put<NoteResponse>(
+      "/projects/" + projectId + "/tasks/" + taskId + "/notes/" + noteId,
+      payload,
+    );
+    return data;
+  },
+  async deleteTaskNote(
+    projectId: string,
+    taskId: string,
+    noteId: string,
+  ): Promise<void> {
+    await axiosInstance.delete<void>(
+      "/projects/" + projectId + "/tasks/" + taskId + "/notes/" + noteId,
+    );
+  },
   async getTaskNotes(
     projectId: string,
     taskId: string,
   ): Promise<SearchResponse> {
     const { data } = await axiosInstance.get<SearchResponse>(
-      "/projects/" + projectId + "/tasks/" + taskId + "/notes/",
+      "/projects/" + projectId + "/tasks/" + taskId + "/notes",
     );
     return data;
   },
