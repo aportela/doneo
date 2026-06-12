@@ -1,6 +1,6 @@
 import type { UserBaseResponse } from "../../users/types/dto";
 
-export type ProjectHistoryOperationResponse = {
+export type HistoryOperationResponse = {
   id: string;
   createdBy: UserBaseResponse;
   createdAt: number;
@@ -8,5 +8,5 @@ export type ProjectHistoryOperationResponse = {
 };
 
 export type SearchResponse = {
-  historyOperations: ProjectHistoryOperationResponse[];
+  historyOperations: HistoryOperationResponse[];
 };

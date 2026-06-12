@@ -8,6 +8,7 @@
 
     import TaskMetadataTab from '../components/TaskMetadataTab.vue';
     import TaskNotesTab from '../components/tabs/Notes.vue';
+    import TaskHistoryTab from '../components/tabs/History.vue';
 
     const { t } = useI18n();
     const route = useRoute();
@@ -72,7 +73,7 @@
         </n-tab-pane>
         <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy" key="history"
             :disabled="!projectId || !taskId">
-            TODO HISTORY
+            <TaskHistoryTab v-if="projectId && taskId" :project-id="projectId" :task-id="taskId" />
         </n-tab-pane>
     </n-tabs>
 </template>

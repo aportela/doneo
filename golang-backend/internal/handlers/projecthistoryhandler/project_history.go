@@ -19,6 +19,6 @@ func NewHandler(service projecthistoryservice.ProjectHistoryService) *ProjectHis
 func (handler *ProjectHistoryHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectId := chi.URLParam(r, "id")
-	projectAttachments, err := handler.service.Search(r.Context(), projectId)
-	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectAttachments), err)
+	historyOperations, err := handler.service.Search(r.Context(), projectId)
+	handlers.ToHandlerJSONResponse(w, toSearchResponse(historyOperations), err)
 }

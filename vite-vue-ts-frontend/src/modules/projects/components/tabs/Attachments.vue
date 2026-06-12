@@ -90,12 +90,6 @@
         loadingStore.set(newValue.ajaxRunning);
     });
 
-    watch(() => props.projectId, (newValue, oldValue) => {
-        if (!oldValue && newValue) {
-            onRefresh();
-        }
-    });
-
     watch(showUploadModal, (newValue) => {
         if (!newValue) {
             if (uploadCount.value > 0) {

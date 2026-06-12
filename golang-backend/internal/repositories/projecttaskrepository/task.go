@@ -212,14 +212,24 @@ func (repository *taskRepository) Get(ctx context.Context, id string) (domain.Ta
 				TP.item_hex_color AS priority_hex_color,
 				T.creator_id,
 				U.name AS creator_name,
-				0 AS notes_count,
+				IFNULL(TN.notes_count, 0) AS notes_count,
 				0 AS attachments_count,
-				0 AS history_operations_count
+				IFNULL(THO.history_operations_count, 0) AS history_operations_count
             FROM tasks T
 			INNER JOIN projects P on P.id = T.project_id
 			INNER JOIN task_priorities TP ON TP.id = T.priority_id
 			INNER JOIN task_statuses TS ON TS.id = T.status_id
 			INNER JOIN users U ON U.ID = T.creator_id
+			LEFT JOIN (
+    			SELECT task_id, COUNT(*) AS notes_count
+    			FROM task_notes
+    			GROUP BY task_id
+			) TN ON TN.task_id = T.id
+			LEFT JOIN (
+				SELECT task_id, COUNT(*) as history_operations_count
+				FROM task_history_operations
+				GROUP BY task_id
+			) THO ON THO.task_id = T.id
             WHERE T.id = ?
         `,
 		id).Scan(

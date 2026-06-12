@@ -83,24 +83,6 @@
         ];
     };
 
-    let stopBusReauthListener: () => void;
-
-    onMounted(() => {
-        onRefresh();
-        stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
-            if (payload.to.includes("ProjectNotes.onRefresh")) {
-                onRefresh();
-            } else if (payload.to.includes("ProjectNotes.onDelete")) {
-                // TODO: ???
-                //onDelete(selectedItem.value);
-            }
-        });
-    });
-
-    onBeforeUnmount(() => {
-        stopBusReauthListener();
-    });
-
     const onSaveNote = async (note: Note) => {
         try {
             if (!note.id) {
@@ -139,6 +121,24 @@
             notify('success', t("modules.note.components.ProjectNotesTab.notifications.projectNoteDeleted"));
         } catch { }
     }
+
+    let stopBusReauthListener: () => void;
+
+    onMounted(() => {
+        onRefresh();
+        stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
+            if (payload.to.includes("ProjectNotes.onRefresh")) {
+                onRefresh();
+            } else if (payload.to.includes("ProjectNotes.onDelete")) {
+                // TODO: ???
+                //onDelete(selectedItem.value);
+            }
+        });
+    });
+
+    onBeforeUnmount(() => {
+        stopBusReauthListener();
+    });
 </script>
 
 <template>

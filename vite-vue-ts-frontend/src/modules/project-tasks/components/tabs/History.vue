@@ -20,6 +20,7 @@
     interface ProjectHistoryOperationsTabProps {
         style?: string | CSSProperties;
         projectId: string;
+        taskId: string;
     }
 
     const props = defineProps<ProjectHistoryOperationsTabProps>();
@@ -58,7 +59,7 @@
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const results: SearchResponse = await historyOperationsService.getProjectHistoryOperations(props.projectId);
+            const results: SearchResponse = await historyOperationsService.getTaskHistoryOperations(props.projectId, props.taskId);
             items.value = results.historyOperations.map((operation) => new HistoryOperation(operation));
             itemCount.value = items.value?.length ?? 0;
         } catch (error: unknown) {
@@ -102,8 +103,8 @@
 
 <template>
     <n-card bordered :style="props.style">
-        <HistoryOperationsTable :project-id="props.projectId" :items="filteredItems" :disabled="state.ajaxRunning"
-            v-model:filters="filters" @refresh="onRefresh" />
+        <HistoryOperationsTable :project-id="props.projectId" :task-id="props.taskId" :items="filteredItems"
+            :disabled="state.ajaxRunning" v-model:filters="filters" @refresh="onRefresh" />
     </n-card>
 </template>
 

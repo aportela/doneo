@@ -1,21 +1,21 @@
-import type { ProjectHistoryOperationResponse as ProjectHistoryOperationDTO } from "../types/dto";
+import type { HistoryOperationResponse as HistoryOperationDTO } from "../types/dto";
 import { UserBase } from "../../users/models/user";
 import { IDate } from "../../../shared/types/idate";
 
-export class ProjectHistoryOperation {
+export class HistoryOperation {
   id: string;
   createdBy: UserBase;
   createdAt: IDate;
   operationType: number;
 
-  constructor(data?: ProjectHistoryOperationDTO) {
+  constructor(data?: HistoryOperationDTO) {
     ((this.id = data?.id ?? ""),
       (this.createdBy = new UserBase(data?.createdBy)));
     this.createdAt = new IDate(data?.createdAt ?? null);
     this.operationType = data?.operationType ?? 0;
   }
 
-  toDTO(): ProjectHistoryOperationDTO {
+  toDTO(): HistoryOperationDTO {
     return {
       id: this.id ?? "",
       createdBy: this.createdBy.toDTO(),
@@ -46,39 +46,24 @@ export class ProjectHistoryOperation {
         return "project permission added";
       case 10:
         return "project permission deleted";
+      case 20:
+        return "task created";
+      case 21:
+        return "task updated";
+      case 22:
+        return "task deleted";
+      case 23:
+        return "task note added";
+      case 24:
+        return "task note updated";
+      case 25:
+        return "task note deleted";
+      case 26:
+        return "task attachment added";
+      case 27:
+        return "task attachment deleted";
       default:
         return "unknown operation";
-    }
-  }
-  getNaiveUITimelineItemType():
-    | "default"
-    | "success"
-    | "info"
-    | "warning"
-    | "error" {
-    switch (this.operationType) {
-      case 1: // add project
-        return "success";
-      case 2: // update project
-        return "info";
-      case 3: // delete project
-        return "error";
-      case 4: // add note
-        return "success";
-      case 5: // update note
-        return "info";
-      case 6: // delete note
-        return "error";
-      case 7: // added attachment
-        return "success";
-      case 8: // delete attachment
-        return "error";
-      case 9: // added permission
-        return "success";
-      case 10: // delete permission
-        return "error";
-      default:
-        return "default";
     }
   }
 }

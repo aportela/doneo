@@ -4,10 +4,10 @@
 
     import { NEmpty } from 'naive-ui';
 
-    import { ProjectHistoryOperation } from '../models/project-history-operation.ts';
+    import { HistoryOperation } from '../models/history-operation.ts';
 
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
-    import type { ProjectHistoryOperationsTableFilters } from '../types/project-history-operations-table-filters.ts';
+    import type { HistoryOperationsTableFilters } from '../types/history-operations-table-filters.ts';
 
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
@@ -19,8 +19,9 @@
 
     interface Props {
         disabled: boolean;
-        items: ProjectHistoryOperation[];
+        items: HistoryOperation[];
         projectId: string;
+        taskId?: string;
         errorMessage?: string | null;
     }
 
@@ -32,7 +33,7 @@
 
     const createdAtFilterRef = ref<DateFilterSelectComponent | undefined>();
 
-    const filters = defineModel<ProjectHistoryOperationsTableFilters>("filters", {
+    const filters = defineModel<HistoryOperationsTableFilters>("filters", {
         default: () => ({
             userId: "",
             createdAt: {

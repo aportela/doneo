@@ -83,12 +83,6 @@
         loadingStore.set(newValue.ajaxRunning);
     });
 
-    watch(() => props.projectId, (newValue, oldValue) => {
-        if (!oldValue && newValue) {
-            onRefresh();
-        }
-    });
-
     const onShowAddForm = () => {
         showForm.value = true;
     };
@@ -98,40 +92,36 @@
     };
 
     const onRefresh = async () => {
-        if (props.projectId) {
-            Object.assign(state, defaultAjaxStateRunning);
-            try {
-                const results: SearchResponse = await projectPermissionService.search(props.projectId);
-                items.value = results.projectPermissions.map((permission) => new ProjectPermission(permission));
-                itemCount.value = items.value?.length ?? 0;
-            } catch (error: unknown) {
-                state.ajaxErrors = true;
-                handleAPIError(error,
-                    (apiError) => {
-                        switch (apiError.response?.status) {
-                            case 401:
-                                state.ajaxErrors = false;
-                                appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPermissions.onRefresh" } });
-                                break;
-                            default:
-                                state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.refreshError");
-                                break;
-                        }
-                    },
-                    (fatalError) => {
-                        state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.refreshError");
-                        console.error("Unhandled API error", { file: "ProjectPermissions.vue", method: "onRefresh" }, { err: fatalError });
-                    });
-            } finally {
-                state.ajaxRunning = false;
-            }
-        } else {
-            console.error("project id not set", { file: "ProjectPermissions.vue", method: "onRefresh" });
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const results: SearchResponse = await projectPermissionService.search(props.projectId);
+            items.value = results.projectPermissions.map((permission) => new ProjectPermission(permission));
+            itemCount.value = items.value?.length ?? 0;
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPermissions.onRefresh" } });
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.refreshError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.refreshError");
+                    console.error("Unhandled API error", { file: "ProjectPermissions.vue", method: "onRefresh" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
         }
     };
 
     const onDelete = async (projectPermission: ProjectPermission, _index?: number) => {
-        if (props.projectId && projectPermission.id) {
+        if (projectPermission.id) {
             Object.assign(state, defaultAjaxStateRunning);
             try {
                 await projectPermissionService.delete(props.projectId, projectPermission.id);
@@ -193,7 +183,6 @@
     onBeforeUnmount(() => {
         stopBusReauthListener();
     });
-
 </script>
 
 <template>

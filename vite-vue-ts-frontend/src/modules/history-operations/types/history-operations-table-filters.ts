@@ -1,6 +1,6 @@
 import type { TimestampRange } from "../../../shared/composables/timestamps";
 
-export interface ProjectHistoryOperationsTableFilters {
+export interface HistoryOperationsTableFilters {
   userId: string | null;
   createdAt: TimestampRange;
 }
