@@ -1091,6 +1091,25 @@ export default {
           },
         },
         ProjectPage: {
+          tabs: {
+            permissions: {
+              label:
+                "Permissions | Permissions ({count}) | Permissions ({count})",
+            },
+            attachments: {
+              label:
+                "Attachments | Attachments ({count}) | Attachments ({count})",
+            },
+            notes: {
+              label: "Notes | Notes ({count}) | Notes ({count})",
+            },
+            history: {
+              label: "History | History ({count}) | History ({count})",
+            },
+            tasks: {
+              label: "Tasks | Tasks ({count}) | Tasks ({count})",
+            },
+          },
           errors: {
             loadError: "There was a problem while loading the project data",
             // TODO: deduplicate
