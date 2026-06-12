@@ -257,7 +257,7 @@ func (repository *projectRepository) Get(ctx context.Context, id string) (domain
 			) PA ON PA.project_id = P.id
 			LEFT JOIN (
 				SELECT project_id, COUNT(*) as history_operations_count
-				FROM project_history_operations
+				FROM history_operations
 				GROUP BY project_id
 			) PHO ON PHO.project_id = P.id
 			LEFT JOIN (

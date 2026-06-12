@@ -31,7 +31,7 @@ func (repository *projectHistoryRepository) AddProjectOperation(ctx context.Cont
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
-			INSERT INTO project_history_operations
+			INSERT INTO history_operations
 				(id, project_id, task_id, operation_type, user_id, operation_date)
 			VALUES
 				(?, ?, NULL, ?, ?, ?)
@@ -71,7 +71,7 @@ func (repository *projectHistoryRepository) AddTaskOperation(ctx context.Context
 	_, err := repository.database.ExecContext(
 		ctx,
 		`
-			INSERT INTO project_history_operations
+			INSERT INTO history_operations
 				(id, project_id, task_id, operation_type, user_id, operation_date)
 			VALUES
 				(?, ?, ?, ?, ?, ?)
@@ -115,7 +115,7 @@ func (repository *projectHistoryRepository) Search(ctx context.Context, projectI
 		`
             SELECT
 				PHO.id, PHO.user_id, U.name, PHO.operation_date, PHO.operation_type
-            FROM project_history_operations PHO
+            FROM history_operations PHO
 			INNER JOIN users U ON U.id = PHO.user_id
             WHERE PHO.project_id = ?
 			ORDER BY PHO.operation_date DESC
