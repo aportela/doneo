@@ -61,7 +61,7 @@
 
 <template>
     <n-tabs placement="top" type="line" ref="tabsRef" animated v-model:value="tab">
-        <n-tab-pane name="metadata" display-directive="show" key="metadata">
+        <n-tab-pane name="metadata" display-directive="show" key="metadata" :disabled="!projectId">
             <template #tab>
                 Metadata
             </template>
@@ -69,30 +69,30 @@
                 v-model:note-count="noteCount" v-model:attachment-count="attachmentCount"
                 v-model:history-operation-count="historyOperationCount" v-model:task-count="taskCount" />
         </n-tab-pane>
-        <n-tab-pane name="permissions" display-directive="show:lazy">
+        <n-tab-pane name="permissions" display-directive="show:lazy" :disabled="!projectId">
             <template #tab>
                 {{ permissionsTabLabel }}
                 <n-icon :component="IconAlertTriangle" color="red" style="margin-left: 8px;"
                     v-if="permissionCount < 1" />
             </template>
-            <ProjectPermissionsTab :project-id="projectId" v-model:item-count="permissionCount" />
+            <ProjectPermissionsTab v-if="projectId" :project-id="projectId" v-model:item-count="permissionCount" />
         </n-tab-pane>
-        <n-tab-pane name="notes" :tab="notesTabLabel" display-directive="show:lazy">
-            <ProjectNotesTab :project-id="projectId" v-model:item-count="noteCount" />
+        <n-tab-pane name="notes" :tab="notesTabLabel" display-directive="show:lazy" :disabled="!projectId">
+            <ProjectNotesTab v-if="projectId" :project-id="projectId" v-model:item-count="noteCount" />
         </n-tab-pane>
-        <n-tab-pane name="attachments" :tab="attachmentsTabLabel" display-directive="show:lazy">
-            <ProjectAttachmentsTab :project-id="projectId" v-model:item-count="attachmentCount" />
+        <n-tab-pane name="attachments" :tab="attachmentsTabLabel" display-directive="show:lazy" :disabled="!projectId">
+            <ProjectAttachmentsTab v-if="projectId" :project-id="projectId" v-model:item-count="attachmentCount" />
         </n-tab-pane>
-        <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy">
-            <ProjectHistoryTab :project-id="projectId" v-model:item-count="historyOperationCount"
+        <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy" :disabled="!projectId">
+            <ProjectHistoryTab v-if="projectId" :project-id="projectId" v-model:item-count="historyOperationCount"
                 :key="historyOperationCount" />
         </n-tab-pane>
-        <n-tab-pane name="tasks" display-directive="show:lazy">
+        <n-tab-pane name="tasks" display-directive="show:lazy" :disabled="!projectId">
             <template #tab>
                 {{ tasksTabLabel }}
                 <n-icon :component="IconAlertTriangle" color="red" style="margin-left: 8px;" v-if="taskCount < 1" />
             </template>
-            <ProjectTasksTab :project-id="projectId" v-model:item-count="taskCount" />
+            <ProjectTasksTab v-if="projectId" :project-id="projectId" v-model:item-count="taskCount" />
         </n-tab-pane>
     </n-tabs>
 </template>
