@@ -34,12 +34,6 @@ func (handler *NoteHandler) AddProjectNote(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	// TODO: reuse current note ???
-	note, err = handler.service.GetProjectNote(r.Context(), note.ID)
-	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to get new note: %w", err))
-		return
-	}
 	handlers.ToHandlerJSONResponse(w, domainToResponse(note), nil, http.StatusCreated)
 }
 
@@ -57,13 +51,6 @@ func (handler *NoteHandler) UpdateProjectNote(w http.ResponseWriter, r *http.Req
 	note, err := handler.service.UpdateProjectNote(r.Context(), projectId, note)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to update note: %w", err))
-		return
-	}
-
-	// TODO: reuse current note ???
-	note, err = handler.service.GetProjectNote(r.Context(), note.ID)
-	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to get updated note: %w", err))
 		return
 	}
 	handlers.ToHandlerJSONResponse(w, domainToResponse(note), nil)
@@ -103,13 +90,6 @@ func (handler *NoteHandler) AddTaskNote(w http.ResponseWriter, r *http.Request) 
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to add note: %w", err))
 		return
 	}
-
-	// TODO: reuse current note ???
-	note, err = handler.service.GetTaskNote(r.Context(), note.ID)
-	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to get new note: %w", err))
-		return
-	}
 	handlers.ToHandlerJSONResponse(w, domainToResponse(note), nil, http.StatusCreated)
 }
 
@@ -127,13 +107,6 @@ func (handler *NoteHandler) UpdateTaskNote(w http.ResponseWriter, r *http.Reques
 	note, err := handler.service.UpdateTaskNote(r.Context(), taskId, note)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to update note: %w", err))
-		return
-	}
-
-	// TODO: reuse current note ???
-	note, err = handler.service.GetTaskNote(r.Context(), note.ID)
-	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to get updated note: %w", err))
 		return
 	}
 	handlers.ToHandlerJSONResponse(w, domainToResponse(note), nil)
