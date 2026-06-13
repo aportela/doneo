@@ -32,6 +32,7 @@ func createTaskStatuses(database database.Database) []string {
 			Name:     taskStatusName,
 			HexColor: utils.RandomSoftHexColor(),
 			Index:    uint(index),
+			Flags:    flags,
 		}
 		taskStatus, err := projectStatusService.Add(context.Background(), taskStatus)
 		if err != nil {
