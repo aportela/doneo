@@ -4,6 +4,7 @@ import (
 	"errors"
 )
 
+var AuthorizationError = errors.New("access denied")
 var InvalidCredentialsError = errors.New("invalid credentials")
 var NotFoundError = errors.New("entity not found")
 var DeletedError = errors.New("entity deleted")

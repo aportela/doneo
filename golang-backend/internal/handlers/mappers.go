@@ -19,6 +19,8 @@ func mapError(err error) (int, string, any) {
 		return http.StatusGone, "resource has been deleted", nil
 	} else if errors.Is(err, domain.InvalidCredentialsError) {
 		return http.StatusUnauthorized, "invalid credentials", nil
+	} else if errors.Is(err, domain.AuthorizationError) {
+		return http.StatusForbidden, "access denied", nil
 	}
 
 	var alreadyExistsError *domain.AlreadyExistsError
