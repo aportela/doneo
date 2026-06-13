@@ -112,7 +112,7 @@
                 </td>
 
                 <td class="doneo-text-center">
-                    <ManageTableActionButtons show-preview :disabled="props.disabled" />
+                    <ManageTableActionButtons show-preview :disabled="true || props.disabled" />
                 </td>
             </tr>
             <tr>
