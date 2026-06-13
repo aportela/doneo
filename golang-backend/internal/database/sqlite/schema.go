@@ -154,6 +154,9 @@ var schemaQueries = []schemaMigration{
 				) STRICT;
 			`,
 			`
+				CREATE INDEX IF NOT EXISTS idx_attachments_user_id ON attachments(user_id);
+			`,
+			`
 				CREATE TABLE IF NOT EXISTS project_attachments (
 					project_id TEXT NOT NULL CHECK(length(project_id) == 36),
 					attachment_id TEXT NOT NULL CHECK(length(attachment_id) == 36),
@@ -161,6 +164,10 @@ var schemaQueries = []schemaMigration{
 					FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE,
 					FOREIGN KEY(attachment_id) REFERENCES attachments(id) ON DELETE CASCADE
 				) STRICT;
+			`,
+			`
+				CREATE INDEX IF NOT EXISTS idx_project_attachments_project_id ON project_attachments(project_id);
+				CREATE INDEX IF NOT EXISTS idx_project_attachments_attachment_id ON project_attachments(attachment_id);
 			`,
 			`
 				CREATE TABLE IF NOT EXISTS history_operations (
@@ -188,6 +195,9 @@ var schemaQueries = []schemaMigration{
 					PRIMARY KEY (project_id),
 					FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
 				) STRICT;
+			`,
+			`
+				CREATE INDEX IF NOT EXISTS idx_project_task_counter_project_id ON project_task_counter(project_id);
 			`,
 			`
 				CREATE TABLE IF NOT EXISTS tasks (
