@@ -90,10 +90,11 @@ func (service *projectPermissionService) Delete(ctx context.Context, projectId s
 	return tx.Commit()
 }
 
+// TODO: remove ???
 func (service *projectPermissionService) Get(ctx context.Context, permissionId string) (domain.ProjectPermission, error) {
 	projectPermission, err := service.repository.Get(ctx, permissionId)
 	if err != nil {
-		return domain.ProjectPermission{}, fmt.Errorf("[ProjectTypeService] failed to get project permission: %w", err)
+		return domain.ProjectPermission{}, fmt.Errorf("[ProjectPermissionService] failed to get project permission: %w", err)
 	}
 	return projectPermission, nil
 }
@@ -101,7 +102,7 @@ func (service *projectPermissionService) Get(ctx context.Context, permissionId s
 func (service *projectPermissionService) Search(ctx context.Context, projectId string) ([]domain.ProjectPermission, error) {
 	projectPermissions, err := service.repository.Search(ctx, projectId)
 	if err != nil {
-		return nil, fmt.Errorf("[ProjectTypeService] failed to get project permissions: %w", err)
+		return nil, fmt.Errorf("[ProjectPermissionService] failed to get project permissions: %w", err)
 	}
 	return projectPermissions, nil
 }
