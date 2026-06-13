@@ -18,7 +18,7 @@ func NewHandler(service historyoperationservice.HistoryOperationService) *Histor
 
 func (handler *HistoryOperationHandler) SearchProjectHistoryOperations(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "id")
+	projectId := chi.URLParam(r, "project_id")
 	historyOperations, err := handler.service.SearchProjectHistoryOperations(r.Context(), projectId)
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(historyOperations), err)
 }

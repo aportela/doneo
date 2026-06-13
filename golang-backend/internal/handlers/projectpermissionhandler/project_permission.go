@@ -26,7 +26,7 @@ func (handler *ProjectPermissionHandler) Add(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	projectPermission := addRequestToDomain(request)
-	projectId := chi.URLParam(r, "id")
+	projectId := chi.URLParam(r, "project_id")
 
 	projectPermission, err := handler.service.Add(r.Context(), projectId, projectPermission)
 	if err != nil {
@@ -45,7 +45,7 @@ func (handler *ProjectPermissionHandler) Add(w http.ResponseWriter, r *http.Requ
 
 func (handler *ProjectPermissionHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "id")
+	projectId := chi.URLParam(r, "project_id")
 	permissionId := chi.URLParam(r, "permission_id")
 	err := handler.service.Delete(r.Context(), projectId, permissionId)
 	if err != nil {
@@ -57,7 +57,7 @@ func (handler *ProjectPermissionHandler) Delete(w http.ResponseWriter, r *http.R
 
 func (handler *ProjectPermissionHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "id")
+	projectId := chi.URLParam(r, "project_id")
 	projectPermissions, err := handler.service.Search(r.Context(), projectId)
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectPermissions), err)
 }

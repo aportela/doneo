@@ -75,7 +75,7 @@ func (handler *AttachmentHandler) AddProjectAttachment(w http.ResponseWriter, r 
 		return
 	}
 
-	projectId := chi.URLParam(r, "id")
+	projectId := chi.URLParam(r, "project_id")
 
 	attachment, err = handler.service.AddProjectAttachment(r.Context(), projectId, attachment)
 
@@ -98,7 +98,7 @@ func (handler *AttachmentHandler) AddProjectAttachment(w http.ResponseWriter, r 
 
 func (handler *AttachmentHandler) DeleteProjectAttachment(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "id")
+	projectId := chi.URLParam(r, "project_id")
 	attachmentId := chi.URLParam(r, "attachment_id")
 	err := handler.service.DeleteProjectAttachment(r.Context(), projectId, attachmentId)
 	if err != nil {
@@ -110,7 +110,7 @@ func (handler *AttachmentHandler) DeleteProjectAttachment(w http.ResponseWriter,
 
 func (handler *AttachmentHandler) DownloadProjectAttachment(w http.ResponseWriter, r *http.Request) {
 
-	//projectId := chi.URLParam(r, "id")
+	//projectId := chi.URLParam(r, "project_id")
 	attachmentId := chi.URLParam(r, "attachment_id")
 
 	attachment, err := handler.service.GetAttachment(r.Context(), attachmentId)
@@ -149,7 +149,7 @@ func (handler *AttachmentHandler) DownloadProjectAttachment(w http.ResponseWrite
 
 func (handler *AttachmentHandler) GetProjectAttachments(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "id")
+	projectId := chi.URLParam(r, "project_id")
 	projectAttachments, err := handler.service.GetProjectAttachments(r.Context(), projectId)
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectAttachments), err)
 }

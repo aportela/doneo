@@ -50,7 +50,7 @@ func (handler *ProjectHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	project := updateRequestToDomain(request)
-	project.ID = chi.URLParam(r, "id")
+	project.ID = chi.URLParam(r, "project_id")
 	project.UpdatedAt = utils.NowToTimePtr()
 	project, err := handler.service.Update(r.Context(), project)
 	if err != nil {
@@ -67,7 +67,7 @@ func (handler *ProjectHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 func (handler *ProjectHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "id")
+	projectId := chi.URLParam(r, "project_id")
 	err := handler.service.Delete(r.Context(), projectId)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to delete project with ID %s: %w", projectId, err))
@@ -78,7 +78,7 @@ func (handler *ProjectHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 func (handler *ProjectHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "id")
+	projectId := chi.URLParam(r, "project_id")
 	project, err := handler.service.Get(r.Context(), projectId)
 	if err != nil {
 		if err == domain.NotFoundError {

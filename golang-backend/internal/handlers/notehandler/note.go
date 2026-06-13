@@ -26,7 +26,7 @@ func (handler *NoteHandler) AddProjectNote(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	note := addRequestToDomain(request)
-	projectId := chi.URLParam(r, "id")
+	projectId := chi.URLParam(r, "project_id")
 
 	note, err := handler.service.AddProjectNote(r.Context(), projectId, note)
 	if err != nil {
@@ -46,7 +46,7 @@ func (handler *NoteHandler) UpdateProjectNote(w http.ResponseWriter, r *http.Req
 	}
 	note := updateRequestToDomain(request)
 	note.ID = chi.URLParam(r, "note_id")
-	projectId := chi.URLParam(r, "id")
+	projectId := chi.URLParam(r, "project_id")
 
 	note, err := handler.service.UpdateProjectNote(r.Context(), projectId, note)
 	if err != nil {
@@ -58,7 +58,7 @@ func (handler *NoteHandler) UpdateProjectNote(w http.ResponseWriter, r *http.Req
 
 func (handler *NoteHandler) DeleteProjectNote(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "id")
+	projectId := chi.URLParam(r, "project_id")
 	noteId := chi.URLParam(r, "note_id")
 	err := handler.service.DeleteProjectNote(r.Context(), projectId, noteId)
 	if err != nil {
@@ -70,7 +70,7 @@ func (handler *NoteHandler) DeleteProjectNote(w http.ResponseWriter, r *http.Req
 
 func (handler *NoteHandler) GetProjectNotes(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "id")
+	projectId := chi.URLParam(r, "project_id")
 	projectPermissions, err := handler.service.GetProjectNotes(r.Context(), projectId)
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectPermissions), err)
 }
@@ -83,7 +83,7 @@ func (handler *NoteHandler) AddTaskNote(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	note := addRequestToDomain(request)
-	projectId := chi.URLParam(r, "id")
+	projectId := chi.URLParam(r, "project_id")
 	taskId := chi.URLParam(r, "task_id")
 
 	note, err := handler.service.AddTaskNote(r.Context(), projectId, taskId, note)
@@ -102,7 +102,7 @@ func (handler *NoteHandler) UpdateTaskNote(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	note := updateRequestToDomain(request)
-	projectId := chi.URLParam(r, "id")
+	projectId := chi.URLParam(r, "project_id")
 	taskId := chi.URLParam(r, "task_id")
 	note.ID = chi.URLParam(r, "note_id")
 
@@ -116,7 +116,7 @@ func (handler *NoteHandler) UpdateTaskNote(w http.ResponseWriter, r *http.Reques
 
 func (handler *NoteHandler) DeleteTaskNote(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "id")
+	projectId := chi.URLParam(r, "project_id")
 	taskId := chi.URLParam(r, "task_id")
 	noteId := chi.URLParam(r, "note_id")
 	err := handler.service.DeleteTaskNote(r.Context(), projectId, taskId, noteId)
