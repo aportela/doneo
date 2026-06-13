@@ -203,7 +203,7 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		projectHandler := projecthandler.NewHandler(projectservice.NewService(database, projectrepository.NewRepository(database)))
 		projectPermissionHandler := projectpermissionhandler.NewHandler(projectpermissionservice.NewService(database, projectpermissionrepository.NewRepository(database)))
 		noteHandler := notehandler.NewHandler(noteservice.NewService(database, noterepository.NewRepository(database)))
-		projectAttachmentHandler := attachmenthandler.NewHandler(attachmentservice.NewService(database, attachmentrepository.NewRepository(database)), cfg.Storage.AttachmentsPath)
+		attachmentHandler := attachmenthandler.NewHandler(attachmentservice.NewService(database, attachmentrepository.NewRepository(database)), cfg.Storage.AttachmentsPath)
 		historyOperationHandler := historyoperationhandler.NewHandler(historyoperationservice.NewService(database, historyoperationrepository.NewRepository(database)))
 		projectTaskHandler := projecttaskhandler.NewHandler(projecttaskservice.NewService(database, projecttaskrepository.NewRepository(database)))
 		r.Post("/", projectHandler.Add)
@@ -221,9 +221,9 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		r.Put("/{project_id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", noteHandler.UpdateProjectNote)
 		r.Delete("/{project_id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", noteHandler.DeleteProjectNote)
 
-		r.Get("/{project_id:"+uuidPattern+"}/attachments", projectAttachmentHandler.GetProjectAttachments)
-		r.Post("/{project_id:"+uuidPattern+"}/attachments", projectAttachmentHandler.AddProjectAttachment)
-		r.Delete("/{project_id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", projectAttachmentHandler.DeleteProjectAttachment)
+		r.Get("/{project_id:"+uuidPattern+"}/attachments", attachmentHandler.GetProjectAttachments)
+		r.Post("/{project_id:"+uuidPattern+"}/attachments", attachmentHandler.AddProjectAttachment)
+		r.Delete("/{project_id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", attachmentHandler.DeleteProjectAttachment)
 
 		r.Get("/{project_id:"+uuidPattern+"}/history_operations", historyOperationHandler.SearchProjectHistoryOperations)
 
@@ -237,6 +237,10 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		r.Post("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/notes", noteHandler.AddTaskNote)
 		r.Put("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", noteHandler.UpdateTaskNote)
 		r.Delete("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", noteHandler.DeleteTaskNote)
+
+		r.Get("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/attachments", attachmentHandler.GetTaskAttachments)
+		r.Post("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/attachments", attachmentHandler.AddTaskAttachment)
+		r.Delete("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", attachmentHandler.DeleteTaskAttachment)
 
 		r.Get("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/history_operations", historyOperationHandler.SearchTaskHistoryOperations)
 	})

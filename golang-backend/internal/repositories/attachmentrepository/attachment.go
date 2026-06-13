@@ -20,6 +20,9 @@ type AttachmentRepository interface {
 	AddProjectAttachment(ctx context.Context, projectId string, attachmentId string) error
 	DeleteProjectAttachment(ctx context.Context, projectId string, attachmentId string) error
 	GetProjectAttachments(ctx context.Context, projectId string) ([]domain.Attachment, error)
+	AddTaskAttachment(ctx context.Context, taskId string, attachmentId string) error
+	DeleteTaskAttachment(ctx context.Context, taskId string, attachmentId string) error
+	GetTaskAttachments(ctx context.Context, taskId string) ([]domain.Attachment, error)
 }
 
 type attachmentRepository struct {
@@ -94,7 +97,7 @@ func (repository *attachmentRepository) GetAttachment(ctx context.Context, id st
             SELECT
 				A.id, A.user_id, U.name, A.created_at, A.original_name, A.content_type, A.size
             FROM project_attachments PA
-			INNER JOIN attachments A ON A.id = PA.attachment_id
+			INNER JOIN attachments A ON A.id = TA.attachment_id
 			INNER JOIN users U ON U.id = A.user_id
             WHERE A.id = ?
         `,
@@ -171,12 +174,101 @@ func (repository *attachmentRepository) GetProjectAttachments(ctx context.Contex
             SELECT
 				A.id, A.user_id, U.name, A.created_at, A.original_name, A.content_type, A.size
             FROM project_attachments PA
-			INNER JOIN attachments A ON A.id = PA.attachment_id
+			INNER JOIN attachments A ON A.id = TA.attachment_id
 			INNER JOIN users U ON U.id = A.user_id
-            WHERE PA.project_id = ?
+            WHERE TA.project_id = ?
 			ORDER BY A.created_at DESC
         `,
 		projectId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	dtos := make([]attachmentDTO, 0)
+	for rows.Next() {
+		var dto attachmentDTO
+		if err := rows.Scan(
+			&dto.ID, &dto.UserId, &dto.UserName, &dto.CreatedAt, &dto.OriginalName, &dto.ContentType, &dto.Size,
+		); err != nil {
+			return nil, err
+		}
+		dtos = append(dtos, dto)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return toDomainArray(dtos), nil
+}
+
+func (repository *attachmentRepository) AddTaskAttachment(ctx context.Context, taskId string, attachmentId string) error {
+	_, err := repository.database.ExecContext(
+		ctx,
+		`
+            INSERT INTO task_attachments (task_id, attachment_id)
+			VALUES (?, ?)
+        `,
+		taskId,
+		attachmentId,
+	)
+	if err != nil {
+		// TODO: remove ?
+		fmt.Println(err.Error())
+		var sqlErr *sqlite.Error
+		if !errors.As(err, &sqlErr) {
+			return err
+		}
+		switch sqlErr.Code() {
+		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
+			return &domain.ValidationError{Field: "task_id, attachment_id"}
+		case sqlite3.SQLITE_CONSTRAINT_CHECK:
+			if strings.Contains(sqlErr.Error(), "length(task_id)") {
+				return &domain.ValidationError{Field: "task_id"}
+			} else if strings.Contains(sqlErr.Error(), "length(attachment_id)") {
+				return &domain.ValidationError{Field: "attachment_id"}
+			}
+			return err
+		default:
+			return err
+		}
+	}
+	return nil
+}
+
+func (repository *attachmentRepository) DeleteTaskAttachment(ctx context.Context, taskId string, attachmentId string) error {
+	_, err := repository.database.ExecContext(
+		ctx,
+		`
+            DELETE FROM task_attachments
+			WHERE
+				task_id = ?
+			AND
+				attachment_id = ?
+        `,
+		taskId,
+		attachmentId,
+	)
+	if err != nil {
+		// TODO: remove ?
+		// TODO: check sql error
+		fmt.Println(err.Error())
+		return err
+	}
+	return nil
+}
+
+func (repository *attachmentRepository) GetTaskAttachments(ctx context.Context, taskId string) ([]domain.Attachment, error) {
+	rows, err := repository.database.QueryContext(
+		ctx,
+		`
+            SELECT
+				A.id, A.user_id, U.name, A.created_at, A.original_name, A.content_type, A.size
+            FROM task_attachments TA
+			INNER JOIN attachments A ON A.id = TA.attachment_id
+			INNER JOIN users U ON U.id = A.user_id
+            WHERE TA.task_id = ?
+			ORDER BY A.created_at DESC
+        `,
+		taskId)
 	if err != nil {
 		return nil, err
 	}
