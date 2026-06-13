@@ -177,6 +177,11 @@ var schemaQueries = []schemaMigration{
 				) STRICT;
 			`,
 			`
+				CREATE INDEX IF NOT EXISTS idx_history_operations_project_id ON history_operations(project_id);
+				CREATE INDEX IF NOT EXISTS idx_history_operations_task_id ON history_operations(task_id);
+				CREATE INDEX IF NOT EXISTS idx_history_operations_user_id ON history_operations(user_id);
+			`,
+			`
 				CREATE TABLE IF NOT EXISTS project_task_counter (
 					project_id TEXT NOT NULL CHECK(length(project_id) == 36),
 					next_task_index INTEGER NOT NULL DEFAULT 1 CHECK(next_task_index > 0),

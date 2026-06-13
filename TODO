@@ -8,3 +8,4 @@ auto session reauth with setTimeout
 add task times for spent hours
 use naive ui ellipsis on long texts
 remove exported (Uppercase) on not required structs
+check missing indexes
