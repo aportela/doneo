@@ -17,12 +17,10 @@ type NoteService interface {
 	AddProjectNote(ctx context.Context, projectId string, note domain.Note) (domain.Note, error)
 	UpdateProjectNote(ctx context.Context, projectId string, note domain.Note) (domain.Note, error)
 	DeleteProjectNote(ctx context.Context, projectId string, noteId string) error
-	GetProjectNote(ctx context.Context, noteId string) (domain.Note, error)
 	GetProjectNotes(ctx context.Context, projectId string) ([]domain.Note, error)
 	AddTaskNote(ctx context.Context, projectId string, taskId string, note domain.Note) (domain.Note, error)
 	UpdateTaskNote(ctx context.Context, projectId string, taskId string, note domain.Note) (domain.Note, error)
 	DeleteTaskNote(ctx context.Context, projectId string, taskId string, noteId string) error
-	GetTaskNote(ctx context.Context, noteId string) (domain.Note, error) // TODO DELETE
 	GetTaskNotes(ctx context.Context, taskId string) ([]domain.Note, error)
 }
 
@@ -131,14 +129,6 @@ func (service *noteService) DeleteProjectNote(ctx context.Context, projectId str
 	return tx.Commit()
 }
 
-func (service *noteService) GetProjectNote(ctx context.Context, noteId string) (domain.Note, error) {
-	note, err := service.repository.GetProjectNote(ctx, noteId)
-	if err != nil {
-		return domain.Note{}, fmt.Errorf("[NoteService] failed to get project note: %w", err)
-	}
-	return note, nil
-}
-
 func (service *noteService) GetProjectNotes(ctx context.Context, projectId string) ([]domain.Note, error) {
 	notes, err := service.repository.GetProjectNotes(ctx, projectId)
 	if err != nil {
@@ -241,14 +231,6 @@ func (service *noteService) DeleteTaskNote(ctx context.Context, projectId string
 		return err
 	}
 	return tx.Commit()
-}
-
-func (service *noteService) GetTaskNote(ctx context.Context, noteId string) (domain.Note, error) {
-	note, err := service.repository.GetTaskNote(ctx, noteId)
-	if err != nil {
-		return domain.Note{}, fmt.Errorf("[NoteService] failed to get task note: %w", err)
-	}
-	return note, nil
 }
 
 func (service *noteService) GetTaskNotes(ctx context.Context, taskId string) ([]domain.Note, error) {
