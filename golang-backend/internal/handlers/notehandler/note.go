@@ -71,8 +71,8 @@ func (handler *NoteHandler) DeleteProjectNote(w http.ResponseWriter, r *http.Req
 func (handler *NoteHandler) GetProjectNotes(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectId := chi.URLParam(r, "project_id")
-	projectPermissions, err := handler.service.GetProjectNotes(r.Context(), projectId)
-	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectPermissions), err)
+	notes, err := handler.service.GetProjectNotes(r.Context(), projectId)
+	handlers.ToHandlerJSONResponse(w, toSearchResponse(notes), err)
 }
 
 func (handler *NoteHandler) AddTaskNote(w http.ResponseWriter, r *http.Request) {
@@ -130,6 +130,6 @@ func (handler *NoteHandler) DeleteTaskNote(w http.ResponseWriter, r *http.Reques
 func (handler *NoteHandler) GetTaskNotes(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	taskId := chi.URLParam(r, "task_id")
-	projectPermissions, err := handler.service.GetTaskNotes(r.Context(), taskId)
-	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectPermissions), err)
+	notes, err := handler.service.GetTaskNotes(r.Context(), taskId)
+	handlers.ToHandlerJSONResponse(w, toSearchResponse(notes), err)
 }
