@@ -50,8 +50,9 @@ func (handler *TaskHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	task := updateRequestToDomain(request)
+	projectId := chi.URLParam(r, "id")
 	task.ID = chi.URLParam(r, "task_id")
-	task, err := handler.service.Update(r.Context(), task)
+	task, err := handler.service.Update(r.Context(), projectId, task)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to update task with ID %s: %w", task.ID, err))
 		return
@@ -67,7 +68,8 @@ func (handler *TaskHandler) Update(w http.ResponseWriter, r *http.Request) {
 func (handler *TaskHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectId := chi.URLParam(r, "id")
-	err := handler.service.Delete(r.Context(), projectId)
+	taskId := chi.URLParam(r, "task_id")
+	err := handler.service.Delete(r.Context(), projectId, taskId)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to delete project with ID %s: %w", projectId, err))
 		return

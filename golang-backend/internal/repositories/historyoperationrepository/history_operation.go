@@ -13,9 +13,10 @@ import (
 )
 
 type HistoryOperationRepository interface {
-	AddProjectOperation(ctx context.Context, projectId string, operation domain.HistoryOperation) error
+	AddProjectHistoryOperation(ctx context.Context, projectId string, operation domain.HistoryOperation) error
+	SearchProjectHistoryOperations(ctx context.Context, projectId string) ([]domain.HistoryOperation, error)
 	AddTaskOperation(ctx context.Context, projectId string, taskId string, operation domain.HistoryOperation) error
-	Search(ctx context.Context, projectId string) ([]domain.HistoryOperation, error)
+	SearchTaskHistoryOperations(ctx context.Context, taskId string) ([]domain.HistoryOperation, error)
 }
 
 type historyOperationRepository struct {
@@ -26,7 +27,7 @@ func NewRepository(database database.Database) HistoryOperationRepository {
 	return &historyOperationRepository{database: database}
 }
 
-func (repository *historyOperationRepository) AddProjectOperation(ctx context.Context, projectId string, operation domain.HistoryOperation) error {
+func (repository *historyOperationRepository) AddProjectHistoryOperation(ctx context.Context, projectId string, operation domain.HistoryOperation) error {
 	dto := toDTO(operation)
 	_, err := repository.database.ExecContext(
 		ctx,
@@ -64,6 +65,38 @@ func (repository *historyOperationRepository) AddProjectOperation(ctx context.Co
 		}
 	}
 	return nil
+}
+
+func (repository *historyOperationRepository) SearchProjectHistoryOperations(ctx context.Context, projectId string) ([]domain.HistoryOperation, error) {
+	rows, err := repository.database.QueryContext(
+		ctx,
+		`
+            SELECT
+				PHO.id, PHO.user_id, U.name, PHO.operation_date, PHO.operation_type
+            FROM history_operations PHO
+			INNER JOIN users U ON U.id = PHO.user_id
+            WHERE PHO.project_id = ?
+			ORDER BY PHO.operation_date DESC
+        `,
+		projectId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	dtos := make([]historyOperationDTO, 0)
+	for rows.Next() {
+		var dto historyOperationDTO
+		if err := rows.Scan(
+			&dto.ID, &dto.UserId, &dto.UserName, &dto.CreatedAt, &dto.OperationType,
+		); err != nil {
+			return nil, err
+		}
+		dtos = append(dtos, dto)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return toDomainArray(dtos), nil
 }
 
 func (repository *historyOperationRepository) AddTaskOperation(ctx context.Context, projectId string, taskId string, operation domain.HistoryOperation) error {
@@ -109,18 +142,18 @@ func (repository *historyOperationRepository) AddTaskOperation(ctx context.Conte
 	return nil
 }
 
-func (repository *historyOperationRepository) Search(ctx context.Context, projectId string) ([]domain.HistoryOperation, error) {
+func (repository *historyOperationRepository) SearchTaskHistoryOperations(ctx context.Context, taskId string) ([]domain.HistoryOperation, error) {
 	rows, err := repository.database.QueryContext(
 		ctx,
 		`
             SELECT
-				PHO.id, PHO.user_id, U.name, PHO.operation_date, PHO.operation_type
-            FROM history_operations PHO
-			INNER JOIN users U ON U.id = PHO.user_id
-            WHERE PHO.project_id = ?
-			ORDER BY PHO.operation_date DESC
+				THO.id, THO.user_id, U.name, THO.operation_date, THO.operation_type
+            FROM task_history_operations THO
+			INNER JOIN users U ON U.id = THO.user_id
+            WHERE THO.task_id = ?
+			ORDER BY THO.operation_date DESC
         `,
-		projectId)
+		taskId)
 	if err != nil {
 		return nil, err
 	}

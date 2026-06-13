@@ -11,8 +11,10 @@ import (
 )
 
 type HistoryOperationService interface {
-	Add(ctx context.Context, projectId string, operation domain.HistoryOperation) (domain.HistoryOperation, error)
-	Search(ctx context.Context, projectId string) ([]domain.HistoryOperation, error)
+	AddProjectHistoryOperation(ctx context.Context, projectId string, operation domain.HistoryOperation) (domain.HistoryOperation, error)
+	SearchProjectHistoryOperations(ctx context.Context, projectId string) ([]domain.HistoryOperation, error)
+	AddTaskHistoryOperation(ctx context.Context, projectId string, taskId string, operation domain.HistoryOperation) (domain.HistoryOperation, error)
+	SearchTaskHistoryOperations(ctx context.Context, taskId string) ([]domain.HistoryOperation, error)
 }
 
 type historyOperationService struct {
@@ -24,19 +26,36 @@ func NewService(database database.Database, repository historyoperationrepositor
 	return &historyOperationService{database: database, repository: repository}
 }
 
-func (service *historyOperationService) Add(ctx context.Context, projectId string, operation domain.HistoryOperation) (domain.HistoryOperation, error) {
+func (service *historyOperationService) AddProjectHistoryOperation(ctx context.Context, projectId string, operation domain.HistoryOperation) (domain.HistoryOperation, error) {
 	operation.ID = utils.UUID()
-	err := service.repository.AddProjectOperation(ctx, projectId, operation)
+	err := service.repository.AddProjectHistoryOperation(ctx, projectId, operation)
 	if err != nil {
 		return domain.HistoryOperation{}, err
 	}
 	return operation, nil
 }
 
-func (service *historyOperationService) Search(ctx context.Context, projectId string) ([]domain.HistoryOperation, error) {
-	operations, err := service.repository.Search(ctx, projectId)
+func (service *historyOperationService) SearchProjectHistoryOperations(ctx context.Context, projectId string) ([]domain.HistoryOperation, error) {
+	operations, err := service.repository.SearchProjectHistoryOperations(ctx, projectId)
 	if err != nil {
 		return nil, fmt.Errorf("[HistoryOperationService] failed to get project history operations: %w", err)
+	}
+	return operations, nil
+}
+
+func (service *historyOperationService) AddTaskHistoryOperation(ctx context.Context, projectId string, taskId string, operation domain.HistoryOperation) (domain.HistoryOperation, error) {
+	operation.ID = utils.UUID()
+	err := service.repository.AddTaskOperation(ctx, projectId, taskId, operation)
+	if err != nil {
+		return domain.HistoryOperation{}, err
+	}
+	return operation, nil
+}
+
+func (service *historyOperationService) SearchTaskHistoryOperations(ctx context.Context, taskId string) ([]domain.HistoryOperation, error) {
+	operations, err := service.repository.SearchProjectHistoryOperations(ctx, taskId)
+	if err != nil {
+		return nil, fmt.Errorf("[HistoryOperationService] failed to get task history operations: %w", err)
 	}
 	return operations, nil
 }

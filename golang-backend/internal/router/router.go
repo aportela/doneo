@@ -22,7 +22,6 @@ import (
 	"github.com/aportela/doneo/internal/handlers/projecttaskhandler"
 	"github.com/aportela/doneo/internal/handlers/projecttypehandler"
 	"github.com/aportela/doneo/internal/handlers/rolehandler"
-	"github.com/aportela/doneo/internal/handlers/taskhistoryhandler"
 	"github.com/aportela/doneo/internal/handlers/taskpriorityhandler"
 	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
 	"github.com/aportela/doneo/internal/handlers/timerhandler"
@@ -38,7 +37,6 @@ import (
 	"github.com/aportela/doneo/internal/repositories/projecttaskrepository"
 	"github.com/aportela/doneo/internal/repositories/projecttyperepository"
 	"github.com/aportela/doneo/internal/repositories/rolerepository"
-	"github.com/aportela/doneo/internal/repositories/taskhistoryrepository"
 	"github.com/aportela/doneo/internal/repositories/taskpriorityrepository"
 	"github.com/aportela/doneo/internal/repositories/taskstatusrepository"
 	"github.com/aportela/doneo/internal/repositories/timerrepository"
@@ -54,7 +52,6 @@ import (
 	"github.com/aportela/doneo/internal/services/projecttaskservice"
 	"github.com/aportela/doneo/internal/services/projecttypeservice"
 	"github.com/aportela/doneo/internal/services/roleservice"
-	"github.com/aportela/doneo/internal/services/taskhistoryservice"
 	"github.com/aportela/doneo/internal/services/taskpriorityservice"
 	"github.com/aportela/doneo/internal/services/taskstatusservice"
 	"github.com/aportela/doneo/internal/services/timerservice"
@@ -209,7 +206,6 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		projectAttachmentHandler := attachmenthandler.NewHandler(attachmentservice.NewService(database, attachmentrepository.NewRepository(database)), cfg.Storage.AttachmentsPath)
 		historyOperationHandler := historyoperationhandler.NewHandler(historyoperationservice.NewService(database, historyoperationrepository.NewRepository(database)))
 		projectTaskHandler := projecttaskhandler.NewHandler(projecttaskservice.NewService(database, projecttaskrepository.NewRepository(database)))
-		taskHistoryHandler := taskhistoryhandler.NewHandler(taskhistoryservice.NewService(database, taskhistoryrepository.NewRepository(database)))
 		r.Post("/", projectHandler.Add)
 		r.Post("/search", projectHandler.Search)
 		r.Get("/{id:"+uuidPattern+"}", projectHandler.Get)
@@ -229,7 +225,7 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		r.Post("/{id:"+uuidPattern+"}/attachments", projectAttachmentHandler.AddProjectAttachment)
 		r.Delete("/{id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", projectAttachmentHandler.DeleteProjectAttachment)
 
-		r.Get("/{id:"+uuidPattern+"}/history_operations", historyOperationHandler.Search)
+		r.Get("/{id:"+uuidPattern+"}/history_operations", historyOperationHandler.SearchProjectHistoryOperations)
 
 		r.Post("/{id:"+uuidPattern+"}/tasks/search", projectTaskHandler.Search)
 		r.Post("/{id:"+uuidPattern+"}/tasks", projectTaskHandler.Add)
@@ -242,7 +238,7 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		r.Put("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", noteHandler.UpdateTaskNote)
 		r.Delete("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", noteHandler.DeleteTaskNote)
 
-		r.Get("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/history_operations", taskHistoryHandler.Search)
+		r.Get("/{id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/history_operations", historyOperationHandler.SearchTaskHistoryOperations)
 	})
 
 	apiRouter.Route("/tasks", func(r chi.Router) {

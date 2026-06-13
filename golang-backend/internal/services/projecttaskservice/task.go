@@ -9,16 +9,16 @@ import (
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
+	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
 	"github.com/aportela/doneo/internal/repositories/projecttaskrepository"
 	"github.com/aportela/doneo/internal/repositories/tagrepository"
-	"github.com/aportela/doneo/internal/repositories/taskhistoryrepository"
 	"github.com/aportela/doneo/internal/utils"
 )
 
 type TaskService interface {
 	Add(ctx context.Context, projectId string, task domain.Task) (domain.Task, error)
-	Update(ctx context.Context, task domain.Task) (domain.Task, error)
-	Delete(ctx context.Context, id string) error
+	Update(ctx context.Context, projectId string, task domain.Task) (domain.Task, error)
+	Delete(ctx context.Context, projectId string, id string) error
 	Get(ctx context.Context, id string) (domain.Task, error)
 	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskFilter) ([]domain.Task, browser.Result, error)
 }
@@ -69,7 +69,7 @@ func (service *taskService) Add(ctx context.Context, projectId string, task doma
 			}
 		}
 	}
-	err = taskhistoryrepository.NewRepository(service.database).Add(ctx, task.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: task.CreatedAt, OperationType: domain.EventTaskCreated})
+	err = historyoperationrepository.NewRepository(service.database).AddTaskOperation(ctx, projectId, task.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: task.CreatedAt, OperationType: domain.EventTaskCreated})
 	if err != nil {
 		return domain.Task{}, err
 	}
@@ -80,7 +80,7 @@ func (service *taskService) Add(ctx context.Context, projectId string, task doma
 	return task, nil
 }
 
-func (service *taskService) Update(ctx context.Context, task domain.Task) (domain.Task, error) {
+func (service *taskService) Update(ctx context.Context, projectId string, task domain.Task) (domain.Task, error) {
 	tx, err := service.database.Begin()
 	if err != nil {
 		return domain.Task{}, err
@@ -115,7 +115,7 @@ func (service *taskService) Update(ctx context.Context, task domain.Task) (domai
 			}
 		}
 	}
-	err = taskhistoryrepository.NewRepository(service.database).Add(ctx, task.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskUpdated})
+	err = historyoperationrepository.NewRepository(service.database).AddTaskOperation(ctx, projectId, task.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskUpdated})
 	if err != nil {
 		return domain.Task{}, err
 	}
@@ -126,7 +126,7 @@ func (service *taskService) Update(ctx context.Context, task domain.Task) (domai
 	return task, nil
 }
 
-func (service *taskService) Delete(ctx context.Context, id string) error {
+func (service *taskService) Delete(ctx context.Context, projectId string, id string) error {
 	tx, err := service.database.Begin()
 	if err != nil {
 		return err
@@ -147,7 +147,7 @@ func (service *taskService) Delete(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	err = taskhistoryrepository.NewRepository(service.database).Add(ctx, id, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskDeleted})
+	err = historyoperationrepository.NewRepository(service.database).AddTaskOperation(ctx, projectId, id, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskDeleted})
 	if err != nil {
 		return err
 	}

@@ -19,7 +19,6 @@ type NoteRepository interface {
 	DeleteProjectNote(ctx context.Context, id string) error
 	GetProjectNote(ctx context.Context, noteId string) (domain.Note, error)
 	GetProjectNotes(ctx context.Context, projectId string) ([]domain.Note, error)
-
 	AddTaskNote(ctx context.Context, taskId string, note domain.Note) error
 	UpdateTaskNote(ctx context.Context, note domain.Note) error
 	DeleteTaskNote(ctx context.Context, id string) error

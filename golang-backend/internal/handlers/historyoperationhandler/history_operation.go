@@ -16,9 +16,16 @@ func NewHandler(service historyoperationservice.HistoryOperationService) *Histor
 	return &HistoryOperationHandler{service: service}
 }
 
-func (handler *HistoryOperationHandler) Search(w http.ResponseWriter, r *http.Request) {
+func (handler *HistoryOperationHandler) SearchProjectHistoryOperations(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectId := chi.URLParam(r, "id")
-	historyOperations, err := handler.service.Search(r.Context(), projectId)
+	historyOperations, err := handler.service.SearchProjectHistoryOperations(r.Context(), projectId)
+	handlers.ToHandlerJSONResponse(w, toSearchResponse(historyOperations), err)
+}
+
+func (handler *HistoryOperationHandler) SearchTaskHistoryOperations(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	taskId := chi.URLParam(r, "task_id")
+	historyOperations, err := handler.service.SearchTaskHistoryOperations(r.Context(), taskId)
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(historyOperations), err)
 }
