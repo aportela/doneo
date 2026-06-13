@@ -18,10 +18,21 @@ func createProjectStatuses(database database.Database) []string {
 	var newProjectStatusIds []string
 	service := projectstatusservice.NewService(database, projectstatusrepository.NewRepository(database))
 	for index, projectStatusName := range projectStatusNames {
+		var flags domain.Bitmask
+		switch projectStatusName {
+		case "Pending":
+			flags.AddFlag(domain.ProjectStatusFlagDefaultOnCreate)
+		case "Started":
+			flags.AddFlag(domain.ProjectStatusFlagFillEmptyStartDate)
+		case "Finished":
+			flags.AddFlag(domain.ProjectStatusFlagFillEmptyFinishDate)
+			flags.AddFlag(domain.ProjectStatusFlagUnsetFinishDateOnLeave)
+		}
 		projectStatus := domain.ProjectStatus{
 			Name:     projectStatusName,
 			HexColor: utils.RandomSoftHexColor(),
 			Index:    uint(index),
+			Flags:    flags,
 		}
 		projectStatus, err := service.Add(context.Background(), projectStatus)
 		if err != nil {

@@ -18,6 +18,16 @@ func createTaskStatuses(database database.Database) []string {
 	var newTaskStatusIds []string
 	projectStatusService := taskstatusservice.NewService(database, taskstatusrepository.NewRepository(database))
 	for index, taskStatusName := range taskStatusNames {
+		var flags domain.Bitmask
+		switch taskStatusName {
+		case "Pending":
+			flags.AddFlag(domain.TaskStatusFlagDefaultOnCreate)
+		case "Started":
+			flags.AddFlag(domain.TaskStatusFlagFillEmptyStartDate)
+		case "Finished":
+			flags.AddFlag(domain.TaskStatusFlagFillEmptyFinishDate)
+			flags.AddFlag(domain.TaskStatusFlagUnsetFinishDateOnLeave)
+		}
 		taskStatus := domain.TaskStatus{
 			Name:     taskStatusName,
 			HexColor: utils.RandomSoftHexColor(),
