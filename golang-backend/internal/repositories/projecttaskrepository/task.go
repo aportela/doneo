@@ -227,7 +227,7 @@ func (repository *taskRepository) Get(ctx context.Context, id string) (domain.Ta
 			) TN ON TN.task_id = T.id
 			LEFT JOIN (
 				SELECT task_id, COUNT(*) as history_operations_count
-				FROM task_history_operations
+				FROM history_operations
 				GROUP BY task_id
 			) THO ON THO.task_id = T.id
             WHERE T.id = ?

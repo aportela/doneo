@@ -53,7 +53,7 @@ func (service *historyOperationService) AddTaskHistoryOperation(ctx context.Cont
 }
 
 func (service *historyOperationService) SearchTaskHistoryOperations(ctx context.Context, taskId string) ([]domain.HistoryOperation, error) {
-	operations, err := service.repository.SearchProjectHistoryOperations(ctx, taskId)
+	operations, err := service.repository.SearchTaskHistoryOperations(ctx, taskId)
 	if err != nil {
 		return nil, fmt.Errorf("[HistoryOperationService] failed to get task history operations: %w", err)
 	}

@@ -72,11 +72,11 @@ func (repository *historyOperationRepository) SearchProjectHistoryOperations(ctx
 		ctx,
 		`
             SELECT
-				PHO.id, PHO.user_id, U.name, PHO.operation_date, PHO.operation_type
-            FROM history_operations PHO
-			INNER JOIN users U ON U.id = PHO.user_id
-            WHERE PHO.project_id = ?
-			ORDER BY PHO.operation_date DESC
+				HO.id, HO.user_id, U.name, HO.operation_date, HO.operation_type
+            FROM history_operations HO
+			INNER JOIN users U ON U.id = HO.user_id
+            WHERE HO.project_id = ?
+			ORDER BY HO.operation_date DESC
         `,
 		projectId)
 	if err != nil {
@@ -147,11 +147,11 @@ func (repository *historyOperationRepository) SearchTaskHistoryOperations(ctx co
 		ctx,
 		`
             SELECT
-				THO.id, THO.user_id, U.name, THO.operation_date, THO.operation_type
-            FROM task_history_operations THO
-			INNER JOIN users U ON U.id = THO.user_id
-            WHERE THO.task_id = ?
-			ORDER BY THO.operation_date DESC
+				HO.id, HO.user_id, U.name, HO.operation_date, HO.operation_type
+            FROM history_operations HO
+			INNER JOIN users U ON U.id = HO.user_id
+            WHERE HO.task_id = ?
+			ORDER BY HO.operation_date DESC
         `,
 		taskId)
 	if err != nil {
