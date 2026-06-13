@@ -1118,6 +1118,11 @@ export default {
             updateError: "There was a problem while updating the project data",
           },
         },
+        ProjectTasksTab: {
+          notifications: {
+            taskAdded: 'Task "{summary}" has been added',
+          },
+        },
       },
     },
     taskStatus: {
