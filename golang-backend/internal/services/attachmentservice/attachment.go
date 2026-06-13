@@ -9,7 +9,7 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/attachmentrepository"
-	"github.com/aportela/doneo/internal/repositories/projecthistoryrepository"
+	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
 	"github.com/aportela/doneo/internal/utils"
 )
 
@@ -63,7 +63,7 @@ func (service *attachmentService) AddProjectAttachment(ctx context.Context, proj
 	if err != nil {
 		return domain.Attachment{}, err
 	}
-	err = projecthistoryrepository.NewRepository(service.database).AddProjectOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: attachment.CreatedAt, OperationType: domain.EventProjectAttachmentAdded})
+	err = historyoperationrepository.NewRepository(service.database).AddProjectOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: attachment.CreatedAt, OperationType: domain.EventProjectAttachmentAdded})
 	if err != nil {
 		return domain.Attachment{}, err
 	}
@@ -100,7 +100,7 @@ func (service *attachmentService) DeleteProjectAttachment(ctx context.Context, p
 	if err != nil {
 		return err
 	}
-	err = projecthistoryrepository.NewRepository(service.database).AddProjectOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectAttachmentDeleted})
+	err = historyoperationrepository.NewRepository(service.database).AddProjectOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectAttachmentDeleted})
 	if err != nil {
 		return err
 	}

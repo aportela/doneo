@@ -1,4 +1,4 @@
-package projecthistoryrepository
+package historyoperationrepository
 
 import (
 	"time"
@@ -6,8 +6,8 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 )
 
-func toDTO(operation domain.HistoryOperation) projectHistoryOperationDTO {
-	return projectHistoryOperationDTO{
+func toDTO(operation domain.HistoryOperation) historyOperationDTO {
+	return historyOperationDTO{
 		ID:            operation.ID,
 		UserId:        operation.CreatedBy.ID,
 		UserName:      operation.CreatedBy.Name,
@@ -16,7 +16,7 @@ func toDTO(operation domain.HistoryOperation) projectHistoryOperationDTO {
 	}
 }
 
-func toDomain(operation projectHistoryOperationDTO) domain.HistoryOperation {
+func toDomain(operation historyOperationDTO) domain.HistoryOperation {
 	switch operation.OperationType {
 	case 1:
 		break
@@ -32,7 +32,7 @@ func toDomain(operation projectHistoryOperationDTO) domain.HistoryOperation {
 	}
 }
 
-func toDomainArray(operations []projectHistoryOperationDTO) []domain.HistoryOperation {
+func toDomainArray(operations []historyOperationDTO) []domain.HistoryOperation {
 	results := make([]domain.HistoryOperation, 0, len(operations))
 	for _, operation := range operations {
 		results = append(results, toDomain(operation))

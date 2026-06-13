@@ -1,4 +1,4 @@
-package projecthistoryrepository
+package historyoperationrepository
 
 import (
 	"context"
@@ -12,21 +12,21 @@ import (
 	sqlite3 "modernc.org/sqlite/lib"
 )
 
-type ProjectHistoryRepository interface {
+type HistoryOperationRepository interface {
 	AddProjectOperation(ctx context.Context, projectId string, operation domain.HistoryOperation) error
 	AddTaskOperation(ctx context.Context, projectId string, taskId string, operation domain.HistoryOperation) error
 	Search(ctx context.Context, projectId string) ([]domain.HistoryOperation, error)
 }
 
-type projectHistoryRepository struct {
+type historyOperationRepository struct {
 	database database.Database
 }
 
-func NewRepository(database database.Database) ProjectHistoryRepository {
-	return &projectHistoryRepository{database: database}
+func NewRepository(database database.Database) HistoryOperationRepository {
+	return &historyOperationRepository{database: database}
 }
 
-func (repository *projectHistoryRepository) AddProjectOperation(ctx context.Context, projectId string, operation domain.HistoryOperation) error {
+func (repository *historyOperationRepository) AddProjectOperation(ctx context.Context, projectId string, operation domain.HistoryOperation) error {
 	dto := toDTO(operation)
 	_, err := repository.database.ExecContext(
 		ctx,
@@ -66,7 +66,7 @@ func (repository *projectHistoryRepository) AddProjectOperation(ctx context.Cont
 	return nil
 }
 
-func (repository *projectHistoryRepository) AddTaskOperation(ctx context.Context, projectId string, taskId string, operation domain.HistoryOperation) error {
+func (repository *historyOperationRepository) AddTaskOperation(ctx context.Context, projectId string, taskId string, operation domain.HistoryOperation) error {
 	dto := toDTO(operation)
 	_, err := repository.database.ExecContext(
 		ctx,
@@ -109,7 +109,7 @@ func (repository *projectHistoryRepository) AddTaskOperation(ctx context.Context
 	return nil
 }
 
-func (repository *projectHistoryRepository) Search(ctx context.Context, projectId string) ([]domain.HistoryOperation, error) {
+func (repository *historyOperationRepository) Search(ctx context.Context, projectId string) ([]domain.HistoryOperation, error) {
 	rows, err := repository.database.QueryContext(
 		ctx,
 		`
@@ -125,9 +125,9 @@ func (repository *projectHistoryRepository) Search(ctx context.Context, projectI
 		return nil, err
 	}
 	defer rows.Close()
-	dtos := make([]projectHistoryOperationDTO, 0)
+	dtos := make([]historyOperationDTO, 0)
 	for rows.Next() {
-		var dto projectHistoryOperationDTO
+		var dto historyOperationDTO
 		if err := rows.Scan(
 			&dto.ID, &dto.UserId, &dto.UserName, &dto.CreatedAt, &dto.OperationType,
 		); err != nil {

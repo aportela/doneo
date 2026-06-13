@@ -8,7 +8,7 @@ import (
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
-	"github.com/aportela/doneo/internal/repositories/projecthistoryrepository"
+	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/utils"
 )
@@ -51,7 +51,7 @@ func (service *projectPermissionService) Add(ctx context.Context, projectId stri
 	if err != nil {
 		return domain.ProjectPermission{}, err
 	}
-	err = projecthistoryrepository.NewRepository(service.database).AddProjectOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectPermissionAdded})
+	err = historyoperationrepository.NewRepository(service.database).AddProjectOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectPermissionAdded})
 	if err != nil {
 		return domain.ProjectPermission{}, err
 	}
@@ -83,7 +83,7 @@ func (service *projectPermissionService) Delete(ctx context.Context, projectId s
 	if err != nil {
 		return err
 	}
-	err = projecthistoryrepository.NewRepository(service.database).AddProjectOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectPermissionDeleted})
+	err = historyoperationrepository.NewRepository(service.database).AddProjectOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectPermissionDeleted})
 	if err != nil {
 		return err
 	}

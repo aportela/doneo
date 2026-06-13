@@ -13,9 +13,9 @@ import (
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/handlers/attachmenthandler"
 	"github.com/aportela/doneo/internal/handlers/authhandler"
+	"github.com/aportela/doneo/internal/handlers/historyoperationhandler"
 	"github.com/aportela/doneo/internal/handlers/notehandler"
 	"github.com/aportela/doneo/internal/handlers/projecthandler"
-	"github.com/aportela/doneo/internal/handlers/projecthistoryhandler"
 	"github.com/aportela/doneo/internal/handlers/projectpermissionhandler"
 	"github.com/aportela/doneo/internal/handlers/projectpriorityhandler"
 	"github.com/aportela/doneo/internal/handlers/projectstatushandler"
@@ -29,8 +29,8 @@ import (
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/attachmentrepository"
+	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
 	"github.com/aportela/doneo/internal/repositories/noterepository"
-	projecthistoryrepository "github.com/aportela/doneo/internal/repositories/projecthistoryrepository"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/projectpriorityrepository"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
@@ -45,8 +45,8 @@ import (
 	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"github.com/aportela/doneo/internal/services/attachmentservice"
 	"github.com/aportela/doneo/internal/services/authservice"
+	"github.com/aportela/doneo/internal/services/historyoperationservice"
 	"github.com/aportela/doneo/internal/services/noteservice"
-	"github.com/aportela/doneo/internal/services/projecthistoryservice"
 	"github.com/aportela/doneo/internal/services/projectpermissionservice"
 	"github.com/aportela/doneo/internal/services/projectpriorityservice"
 	"github.com/aportela/doneo/internal/services/projectservice"
@@ -207,7 +207,7 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		projectPermissionHandler := projectpermissionhandler.NewHandler(projectpermissionservice.NewService(database, projectpermissionrepository.NewRepository(database)))
 		noteHandler := notehandler.NewHandler(noteservice.NewService(database, noterepository.NewRepository(database)))
 		projectAttachmentHandler := attachmenthandler.NewHandler(attachmentservice.NewService(database, attachmentrepository.NewRepository(database)), cfg.Storage.AttachmentsPath)
-		projectHistoryHandler := projecthistoryhandler.NewHandler(projecthistoryservice.NewService(database, projecthistoryrepository.NewRepository(database)))
+		historyOperationHandler := historyoperationhandler.NewHandler(historyoperationservice.NewService(database, historyoperationrepository.NewRepository(database)))
 		projectTaskHandler := projecttaskhandler.NewHandler(projecttaskservice.NewService(database, projecttaskrepository.NewRepository(database)))
 		taskHistoryHandler := taskhistoryhandler.NewHandler(taskhistoryservice.NewService(database, taskhistoryrepository.NewRepository(database)))
 		r.Post("/", projectHandler.Add)
@@ -229,7 +229,7 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 		r.Post("/{id:"+uuidPattern+"}/attachments", projectAttachmentHandler.AddProjectAttachment)
 		r.Delete("/{id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", projectAttachmentHandler.DeleteProjectAttachment)
 
-		r.Get("/{id:"+uuidPattern+"}/history_operations", projectHistoryHandler.Search)
+		r.Get("/{id:"+uuidPattern+"}/history_operations", historyOperationHandler.Search)
 
 		r.Post("/{id:"+uuidPattern+"}/tasks/search", projectTaskHandler.Search)
 		r.Post("/{id:"+uuidPattern+"}/tasks", projectTaskHandler.Add)

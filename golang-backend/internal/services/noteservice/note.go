@@ -8,8 +8,8 @@ import (
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
+	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
 	"github.com/aportela/doneo/internal/repositories/noterepository"
-	"github.com/aportela/doneo/internal/repositories/projecthistoryrepository"
 	"github.com/aportela/doneo/internal/repositories/taskhistoryrepository"
 	"github.com/aportela/doneo/internal/utils"
 )
@@ -61,7 +61,7 @@ func (service *noteService) AddProjectNote(ctx context.Context, projectId string
 	if err != nil {
 		return domain.Note{}, err
 	}
-	err = projecthistoryrepository.NewRepository(service.database).AddProjectOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: note.CreatedAt, OperationType: domain.EventProjectNoteAdded})
+	err = historyoperationrepository.NewRepository(service.database).AddProjectOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: note.CreatedAt, OperationType: domain.EventProjectNoteAdded})
 	if err != nil {
 		return domain.Note{}, err
 	}
@@ -94,7 +94,7 @@ func (service *noteService) UpdateProjectNote(ctx context.Context, projectId str
 	if err != nil {
 		return domain.Note{}, err
 	}
-	err = projecthistoryrepository.NewRepository(service.database).AddProjectOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectNoteUpdated})
+	err = historyoperationrepository.NewRepository(service.database).AddProjectOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectNoteUpdated})
 	if err != nil {
 		return domain.Note{}, err
 	}
@@ -126,7 +126,7 @@ func (service *noteService) DeleteProjectNote(ctx context.Context, projectId str
 	if err != nil {
 		return err
 	}
-	err = projecthistoryrepository.NewRepository(service.database).AddProjectOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectNoteDeleted})
+	err = historyoperationrepository.NewRepository(service.database).AddProjectOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectNoteDeleted})
 	if err != nil {
 		return err
 	}
