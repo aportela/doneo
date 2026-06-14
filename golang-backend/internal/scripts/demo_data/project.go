@@ -7,13 +7,17 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/aportela/doneo/internal/cache"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
+	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
 	"github.com/aportela/doneo/internal/repositories/noterepository"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
 	"github.com/aportela/doneo/internal/repositories/projecttaskrepository"
+	"github.com/aportela/doneo/internal/services/authorizationservice"
+	"github.com/aportela/doneo/internal/services/historyoperationservice"
 	"github.com/aportela/doneo/internal/services/noteservice"
 	"github.com/aportela/doneo/internal/services/projectpermissionservice"
 	"github.com/aportela/doneo/internal/services/projectservice"
@@ -224,9 +228,11 @@ func randomText(n int) string {
 }
 func createProjects(database database.Database, projectTypeIds []string, projectPriorityIds []string, projectStatusIds []string, userIds []string, roleIds []string, taskStatusIds []string, taskPriorityIds []string, count int) []string {
 	var newProjectIds []string
-	projectService := projectservice.NewService(database, projectrepository.NewRepository(database))
-	noteService := noteservice.NewService(database, noterepository.NewRepository(database))
-	projectPermissionService := projectpermissionservice.NewService(database, projectpermissionrepository.NewRepository(database))
+	historyOperationService := historyoperationservice.NewService(database, historyoperationrepository.NewRepository(database))
+	authorizationService := authorizationservice.NewService(database, cache.NewPermissionCache())
+	projectService := projectservice.NewService(database, authorizationService, historyOperationService, projectrepository.NewRepository(database))
+	noteService := noteservice.NewService(database, historyOperationService, noterepository.NewRepository(database))
+	projectPermissionService := projectpermissionservice.NewService(database, cache.NewPermissionCache(), historyOperationService, projectpermissionrepository.NewRepository(database))
 	taskService := projecttaskservice.NewService(database, projecttaskrepository.NewRepository(database))
 	for i := 1; i <= count; i++ {
 		newProject := getRandomProject(userIds, projectTypeIds, projectPriorityIds, projectStatusIds)

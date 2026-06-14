@@ -9,58 +9,13 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	"github.com/aportela/doneo/internal/config"
-	"github.com/aportela/doneo/internal/database"
-	"github.com/aportela/doneo/internal/handlers/attachmenthandler"
-	"github.com/aportela/doneo/internal/handlers/authhandler"
-	"github.com/aportela/doneo/internal/handlers/historyoperationhandler"
-	"github.com/aportela/doneo/internal/handlers/notehandler"
-	"github.com/aportela/doneo/internal/handlers/projecthandler"
-	"github.com/aportela/doneo/internal/handlers/projectpermissionhandler"
-	"github.com/aportela/doneo/internal/handlers/projectpriorityhandler"
-	"github.com/aportela/doneo/internal/handlers/projectstatushandler"
-	"github.com/aportela/doneo/internal/handlers/projecttaskhandler"
-	"github.com/aportela/doneo/internal/handlers/projecttypehandler"
-	"github.com/aportela/doneo/internal/handlers/rolehandler"
-	"github.com/aportela/doneo/internal/handlers/taskpriorityhandler"
-	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
-	"github.com/aportela/doneo/internal/handlers/timerhandler"
-	"github.com/aportela/doneo/internal/handlers/userhandler"
+	"github.com/aportela/doneo/internal/app"
 	"github.com/aportela/doneo/internal/middlewares"
-	"github.com/aportela/doneo/internal/repositories/attachmentrepository"
-	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
-	"github.com/aportela/doneo/internal/repositories/noterepository"
-	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
-	"github.com/aportela/doneo/internal/repositories/projectpriorityrepository"
-	"github.com/aportela/doneo/internal/repositories/projectrepository"
-	"github.com/aportela/doneo/internal/repositories/projectstatusrepository"
-	"github.com/aportela/doneo/internal/repositories/projecttaskrepository"
-	"github.com/aportela/doneo/internal/repositories/projecttyperepository"
-	"github.com/aportela/doneo/internal/repositories/rolerepository"
-	"github.com/aportela/doneo/internal/repositories/taskpriorityrepository"
-	"github.com/aportela/doneo/internal/repositories/taskstatusrepository"
-	"github.com/aportela/doneo/internal/repositories/timerrepository"
-	"github.com/aportela/doneo/internal/repositories/userrepository"
-	"github.com/aportela/doneo/internal/services/attachmentservice"
-	"github.com/aportela/doneo/internal/services/authservice"
-	"github.com/aportela/doneo/internal/services/historyoperationservice"
-	"github.com/aportela/doneo/internal/services/noteservice"
-	"github.com/aportela/doneo/internal/services/projectpermissionservice"
-	"github.com/aportela/doneo/internal/services/projectpriorityservice"
-	"github.com/aportela/doneo/internal/services/projectservice"
-	"github.com/aportela/doneo/internal/services/projectstatusservice"
-	"github.com/aportela/doneo/internal/services/projecttaskservice"
-	"github.com/aportela/doneo/internal/services/projecttypeservice"
-	"github.com/aportela/doneo/internal/services/roleservice"
-	"github.com/aportela/doneo/internal/services/taskpriorityservice"
-	"github.com/aportela/doneo/internal/services/taskstatusservice"
-	"github.com/aportela/doneo/internal/services/timerservice"
-	"github.com/aportela/doneo/internal/services/userservice"
 
 	"github.com/aportela/doneo/internal/ui"
 )
 
-func NewRouter(database database.Database, cfg config.Configuration) http.Handler {
+func NewRouter(app *app.App) http.Handler {
 	baseRouter := chi.NewRouter()
 
 	baseRouter.Use(middleware.Logger)
@@ -76,10 +31,9 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 	apiRouter := chi.NewRouter()
 
 	apiRouter.Route("/auth", func(r chi.Router) {
-		handler := authhandler.NewHandler(authservice.NewService(database, userrepository.NewRepository(database)), cfg.Auth.SecretKey, cfg.Auth.AccessTokenExpirationHours, cfg.Auth.RefreshTokenExpirationDays)
-		r.Post("/signin", handler.SignIn)
-		r.Post("/signout", handler.SignOut)
-		r.Post("/renew-access-token", handler.RenewAccessToken)
+		r.Post("/signin", app.AuthHandler.SignIn)
+		r.Post("/signout", app.AuthHandler.SignOut)
+		r.Post("/renew-access-token", app.AuthHandler.RenewAccessToken)
 	})
 
 	uuidPattern := "[0-9a-fA-F-]{36}"
@@ -96,159 +50,141 @@ func NewRouter(database database.Database, cfg config.Configuration) http.Handle
 	})
 
 	apiRouter.Route("/attachments", func(r chi.Router) {
-		r.Use(middlewares.RequireJWTCookieAuthentication(cfg.Auth.SecretKey))
-		// TODO: remove project, check attachment permissions on get
-		handler := attachmenthandler.NewHandler(attachmentservice.NewService(database, attachmentrepository.NewRepository(database)), cfg.Storage.AttachmentsPath)
-		r.Get("/project/{id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}", handler.DownloadProjectAttachment)
+		r.Use(middlewares.RequireJWTCookieAuthentication(app.Cfg.Auth.SecretKey))
+		r.Get("/project/{id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}", app.AttachmentHandler.DownloadProjectAttachment)
 
 	})
 
 	apiRouter.Route("/entities", func(r chi.Router) {
-		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
-		userHandler := userhandler.NewHandler(userservice.NewService(database, userrepository.NewRepository(database)))
-		roleHandler := rolehandler.NewHandler(roleservice.NewService(database, rolerepository.NewRepository(database)))
-		r.Get("/users", userHandler.SearchBase)
-		r.Get("/roles", roleHandler.SearchBase)
+		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
+		r.Get("/users", app.UserHandler.SearchBase)
+		r.Get("/roles", app.RoleHandler.SearchBase)
 	})
 
 	apiRouter.Route("/users", func(r chi.Router) {
-		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
+		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		handler := userhandler.NewHandler(userservice.NewService(database, userrepository.NewRepository(database)))
-		r.Post("/", handler.Add)
-		r.Post("/search", handler.Search)
-		r.Get("/{id:"+uuidPattern+"}", handler.Get)
-		r.Put("/{id:"+uuidPattern+"}", handler.Update)
-		r.Patch("/{id:"+uuidPattern+"}", handler.Patch)
-		r.Delete("/{id:"+uuidPattern+"}", handler.Delete)
+		r.Post("/", app.UserHandler.Add)
+		r.Post("/search", app.UserHandler.Search)
+		r.Get("/{id:"+uuidPattern+"}", app.UserHandler.Get)
+		r.Put("/{id:"+uuidPattern+"}", app.UserHandler.Update)
+		r.Patch("/{id:"+uuidPattern+"}", app.UserHandler.Patch)
+		r.Delete("/{id:"+uuidPattern+"}", app.UserHandler.Delete)
 	})
 
 	apiRouter.Route("/roles", func(r chi.Router) {
-		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
+		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		handler := rolehandler.NewHandler(roleservice.NewService(database, rolerepository.NewRepository(database)))
-		r.Post("/", handler.Add)
-		r.Post("/search", handler.Search)
-		r.Get("/{id:"+uuidPattern+"}", handler.Get)
-		r.Put("/{id:"+uuidPattern+"}", handler.Update)
-		r.Delete("/{id:"+uuidPattern+"}", handler.Delete)
+		r.Post("/", app.RoleHandler.Add)
+		r.Post("/search", app.RoleHandler.Search)
+		r.Get("/{id:"+uuidPattern+"}", app.RoleHandler.Get)
+		r.Put("/{id:"+uuidPattern+"}", app.RoleHandler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", app.RoleHandler.Delete)
 	})
 
 	apiRouter.Route("/project-types", func(r chi.Router) {
-		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
+		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		handler := projecttypehandler.NewHandler(projecttypeservice.NewService(database, projecttyperepository.NewRepository(database)))
-		r.Post("/", handler.Add)
-		r.Post("/search", handler.Search)
-		r.Get("/{id:"+uuidPattern+"}", handler.Get)
-		r.Put("/{id:"+uuidPattern+"}", handler.Update)
-		r.Delete("/{id:"+uuidPattern+"}", handler.Delete)
+		r.Post("/", app.ProjectTypeHandler.Add)
+		r.Post("/search", app.ProjectTypeHandler.Search)
+		r.Get("/{id:"+uuidPattern+"}", app.ProjectTypeHandler.Get)
+		r.Put("/{id:"+uuidPattern+"}", app.ProjectTypeHandler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", app.ProjectTypeHandler.Delete)
 	})
 
 	apiRouter.Route("/project-statuses", func(r chi.Router) {
-		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
+		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		handler := projectstatushandler.NewHandler(projectstatusservice.NewService(database, projectstatusrepository.NewRepository(database)))
-		r.Post("/", handler.Add)
-		r.Post("/search", handler.Search)
-		r.Get("/{id:"+uuidPattern+"}", handler.Get)
-		r.Put("/{id:"+uuidPattern+"}", handler.Update)
-		r.Delete("/{id:"+uuidPattern+"}", handler.Delete)
+		r.Post("/", app.ProjectStatusHandler.Add)
+		r.Post("/search", app.ProjectStatusHandler.Search)
+		r.Get("/{id:"+uuidPattern+"}", app.ProjectStatusHandler.Get)
+		r.Put("/{id:"+uuidPattern+"}", app.ProjectStatusHandler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", app.ProjectStatusHandler.Delete)
 	})
 
 	apiRouter.Route("/project-priorities", func(r chi.Router) {
-		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
+		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		handler := projectpriorityhandler.NewHandler(projectpriorityservice.NewService(database, projectpriorityrepository.NewRepository(database)))
-		r.Post("/", handler.Add)
-		r.Post("/search", handler.Search)
-		r.Get("/{id:"+uuidPattern+"}", handler.Get)
-		r.Put("/{id:"+uuidPattern+"}", handler.Update)
-		r.Delete("/{id:"+uuidPattern+"}", handler.Delete)
+		r.Post("/", app.ProjectPriorityHandler.Add)
+		r.Post("/search", app.ProjectPriorityHandler.Search)
+		r.Get("/{id:"+uuidPattern+"}", app.ProjectPriorityHandler.Get)
+		r.Put("/{id:"+uuidPattern+"}", app.ProjectPriorityHandler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", app.ProjectPriorityHandler.Delete)
 	})
 
 	apiRouter.Route("/task-statuses", func(r chi.Router) {
-		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
+		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		handler := taskstatushandler.NewHandler(taskstatusservice.NewService(database, taskstatusrepository.NewRepository(database)))
-		r.Post("/", handler.Add)
-		r.Post("/search", handler.Search)
-		r.Get("/{id:"+uuidPattern+"}", handler.Get)
-		r.Put("/{id:"+uuidPattern+"}", handler.Update)
-		r.Delete("/{id:"+uuidPattern+"}", handler.Delete)
+		r.Post("/", app.TaskStatusHandler.Add)
+		r.Post("/search", app.TaskStatusHandler.Search)
+		r.Get("/{id:"+uuidPattern+"}", app.TaskStatusHandler.Get)
+		r.Put("/{id:"+uuidPattern+"}", app.TaskStatusHandler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", app.TaskStatusHandler.Delete)
 	})
 
 	apiRouter.Route("/task-priorities", func(r chi.Router) {
-		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
+		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
 		r.Use(middlewares.RequireSuperUser)
-		handler := taskpriorityhandler.NewHandler(taskpriorityservice.NewService(database, taskpriorityrepository.NewRepository(database)))
-		r.Post("/", handler.Add)
-		r.Post("/search", handler.Search)
-		r.Get("/{id:"+uuidPattern+"}", handler.Get)
-		r.Put("/{id:"+uuidPattern+"}", handler.Update)
-		r.Delete("/{id:"+uuidPattern+"}", handler.Delete)
+		r.Post("/", app.TaskPriorityHandler.Add)
+		r.Post("/search", app.TaskPriorityHandler.Search)
+		r.Get("/{id:"+uuidPattern+"}", app.TaskPriorityHandler.Get)
+		r.Put("/{id:"+uuidPattern+"}", app.TaskPriorityHandler.Update)
+		r.Delete("/{id:"+uuidPattern+"}", app.TaskPriorityHandler.Delete)
 	})
 
 	apiRouter.Route("/timers", func(r chi.Router) {
-		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
-		handler := timerhandler.NewHandler(timerservice.NewService(database, timerrepository.NewRepository(database)))
-		r.Post("/", handler.Start)
-		r.Put("/{id:"+uuidPattern+"}", handler.Stop)
-		r.Delete("/{id:"+uuidPattern+"}", handler.Delete)
-		r.Delete("/", handler.Clear)
-		r.Get("/", handler.Search)
+		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
+		r.Post("/", app.TimerHandler.Start)
+		r.Put("/{id:"+uuidPattern+"}", app.TimerHandler.Stop)
+		r.Delete("/{id:"+uuidPattern+"}", app.TimerHandler.Delete)
+		r.Delete("/", app.TimerHandler.Clear)
+		r.Get("/", app.TimerHandler.Search)
 	})
+
 	apiRouter.Route("/projects", func(r chi.Router) {
-		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
-		projectHandler := projecthandler.NewHandler(projectservice.NewService(database, projectrepository.NewRepository(database)))
-		projectPermissionHandler := projectpermissionhandler.NewHandler(projectpermissionservice.NewService(database, projectpermissionrepository.NewRepository(database)))
-		noteHandler := notehandler.NewHandler(noteservice.NewService(database, noterepository.NewRepository(database)))
-		attachmentHandler := attachmenthandler.NewHandler(attachmentservice.NewService(database, attachmentrepository.NewRepository(database)), cfg.Storage.AttachmentsPath)
-		historyOperationHandler := historyoperationhandler.NewHandler(historyoperationservice.NewService(database, historyoperationrepository.NewRepository(database)))
-		projectTaskHandler := projecttaskhandler.NewHandler(projecttaskservice.NewService(database, projecttaskrepository.NewRepository(database)))
-		r.Post("/", projectHandler.Add)
-		r.Post("/search", projectHandler.Search)
-		r.Get("/{project_id:"+uuidPattern+"}", projectHandler.Get)
-		r.Put("/{project_id:"+uuidPattern+"}", projectHandler.Update)
-		r.Delete("/{project_id:"+uuidPattern+"}", projectHandler.Delete)
+		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
+		r.Post("/", app.ProjectHandler.Add)
+		r.Post("/search", app.ProjectHandler.Search)
+		r.Get("/{project_id:"+uuidPattern+"}", app.ProjectHandler.Get)
+		r.Put("/{project_id:"+uuidPattern+"}", app.ProjectHandler.Update)
+		r.Delete("/{project_id:"+uuidPattern+"}", app.ProjectHandler.Delete)
 
-		r.Get("/{project_id:"+uuidPattern+"}/permissions", projectPermissionHandler.Search)
-		r.Post("/{project_id:"+uuidPattern+"}/permissions", projectPermissionHandler.Add)
-		r.Delete("/{project_id:"+uuidPattern+"}/permissions/{permission_id:"+uuidPattern+"}", projectPermissionHandler.Delete)
+		r.Get("/{project_id:"+uuidPattern+"}/permissions", app.ProjectPermissionHandler.Search)
+		r.Post("/{project_id:"+uuidPattern+"}/permissions", app.ProjectPermissionHandler.Add)
+		r.Delete("/{project_id:"+uuidPattern+"}/permissions/{permission_id:"+uuidPattern+"}", app.ProjectPermissionHandler.Delete)
 
-		r.Get("/{project_id:"+uuidPattern+"}/notes", noteHandler.GetProjectNotes)
-		r.Post("/{project_id:"+uuidPattern+"}/notes", noteHandler.AddProjectNote)
-		r.Put("/{project_id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", noteHandler.UpdateProjectNote)
-		r.Delete("/{project_id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", noteHandler.DeleteProjectNote)
+		r.Get("/{project_id:"+uuidPattern+"}/notes", app.NoteHandler.GetProjectNotes)
+		r.Post("/{project_id:"+uuidPattern+"}/notes", app.NoteHandler.AddProjectNote)
+		r.Put("/{project_id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", app.NoteHandler.UpdateProjectNote)
+		r.Delete("/{project_id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", app.NoteHandler.DeleteProjectNote)
 
-		r.Get("/{project_id:"+uuidPattern+"}/attachments", attachmentHandler.GetProjectAttachments)
-		r.Post("/{project_id:"+uuidPattern+"}/attachments", attachmentHandler.AddProjectAttachment)
-		r.Delete("/{project_id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", attachmentHandler.DeleteProjectAttachment)
+		r.Get("/{project_id:"+uuidPattern+"}/attachments", app.AttachmentHandler.GetProjectAttachments)
+		r.Post("/{project_id:"+uuidPattern+"}/attachments", app.AttachmentHandler.AddProjectAttachment)
+		r.Delete("/{project_id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", app.AttachmentHandler.DeleteProjectAttachment)
 
-		r.Get("/{project_id:"+uuidPattern+"}/history_operations", historyOperationHandler.SearchProjectHistoryOperations)
+		r.Get("/{project_id:"+uuidPattern+"}/history_operations", app.HistoryOperationHandler.SearchProjectHistoryOperations)
 
-		r.Post("/{project_id:"+uuidPattern+"}/tasks/search", projectTaskHandler.Search)
-		r.Post("/{project_id:"+uuidPattern+"}/tasks", projectTaskHandler.Add)
-		r.Get("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", projectTaskHandler.Get)
-		r.Put("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", projectTaskHandler.Update)
-		r.Delete("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", projectTaskHandler.Delete)
+		r.Post("/{project_id:"+uuidPattern+"}/tasks/search", app.TaskHandler.Search)
+		r.Post("/{project_id:"+uuidPattern+"}/tasks", app.TaskHandler.Add)
+		r.Get("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", app.TaskHandler.Get)
+		r.Put("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", app.TaskHandler.Update)
+		r.Delete("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", app.TaskHandler.Delete)
 
-		r.Get("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/notes", noteHandler.GetTaskNotes)
-		r.Post("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/notes", noteHandler.AddTaskNote)
-		r.Put("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", noteHandler.UpdateTaskNote)
-		r.Delete("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", noteHandler.DeleteTaskNote)
+		r.Get("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/notes", app.NoteHandler.GetTaskNotes)
+		r.Post("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/notes", app.NoteHandler.AddTaskNote)
+		r.Put("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", app.NoteHandler.UpdateTaskNote)
+		r.Delete("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", app.NoteHandler.DeleteTaskNote)
 
-		r.Get("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/attachments", attachmentHandler.GetTaskAttachments)
-		r.Post("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/attachments", attachmentHandler.AddTaskAttachment)
-		r.Delete("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", attachmentHandler.DeleteTaskAttachment)
+		r.Get("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/attachments", app.AttachmentHandler.GetTaskAttachments)
+		r.Post("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/attachments", app.AttachmentHandler.AddTaskAttachment)
+		r.Delete("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", app.AttachmentHandler.DeleteTaskAttachment)
 
-		r.Get("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/history_operations", historyOperationHandler.SearchTaskHistoryOperations)
+		r.Get("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/history_operations", app.HistoryOperationHandler.SearchTaskHistoryOperations)
 	})
 
 	apiRouter.Route("/tasks", func(r chi.Router) {
-		r.Use(middlewares.RequireJWTAuthentication(cfg.Auth.SecretKey))
-		handler := projecttaskhandler.NewHandler(projecttaskservice.NewService(database, projecttaskrepository.NewRepository(database)))
-		r.Post("/search", handler.Search)
+		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
+		r.Post("/search", app.TaskHandler.Search)
 	})
 
 	// TODO: 404 route ?

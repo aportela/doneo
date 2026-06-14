@@ -9,7 +9,7 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/attachmentrepository"
-	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
+	"github.com/aportela/doneo/internal/services/historyoperationservice"
 	"github.com/aportela/doneo/internal/utils"
 )
 
@@ -18,18 +18,19 @@ type AttachmentService interface {
 	AddProjectAttachment(ctx context.Context, projectId string, attachment domain.Attachment) (domain.Attachment, error)
 	DeleteProjectAttachment(ctx context.Context, projectId string, attachmentId string) error
 	GetProjectAttachments(ctx context.Context, projectId string) ([]domain.Attachment, error)
-	AddTaskAttachment(ctx context.Context, taskId string, attachment domain.Attachment) (domain.Attachment, error)
-	DeleteTaskAttachment(ctx context.Context, taskId string, attachmentId string) error
+	AddTaskAttachment(ctx context.Context, projectId string, taskId string, attachment domain.Attachment) (domain.Attachment, error)
+	DeleteTaskAttachment(ctx context.Context, projectId string, taskId string, attachmentId string) error
 	GetTaskAttachments(ctx context.Context, taskId string) ([]domain.Attachment, error)
 }
 
 type attachmentService struct {
-	database   database.Database
-	repository attachmentrepository.AttachmentRepository
+	database                database.Database
+	historyOperationService historyoperationservice.HistoryOperationService
+	repository              attachmentrepository.AttachmentRepository
 }
 
-func NewService(database database.Database, repository attachmentrepository.AttachmentRepository) AttachmentService {
-	return &attachmentService{database: database, repository: repository}
+func NewService(database database.Database, historyOperationService historyoperationservice.HistoryOperationService, repository attachmentrepository.AttachmentRepository) AttachmentService {
+	return &attachmentService{database: database, historyOperationService: historyOperationService, repository: repository}
 }
 
 func (service *attachmentService) GetAttachment(ctx context.Context, id string) (domain.Attachment, error) {
@@ -67,7 +68,7 @@ func (service *attachmentService) AddProjectAttachment(ctx context.Context, proj
 	if err != nil {
 		return domain.Attachment{}, err
 	}
-	err = historyoperationrepository.NewRepository(service.database).AddProjectHistoryOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: attachment.CreatedAt, OperationType: domain.EventProjectAttachmentAdded})
+	_, err = service.historyOperationService.AddProjectHistoryOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: attachment.CreatedAt, OperationType: domain.EventProjectAttachmentAdded})
 	if err != nil {
 		return domain.Attachment{}, err
 	}
@@ -100,7 +101,7 @@ func (service *attachmentService) DeleteProjectAttachment(ctx context.Context, p
 	if err != nil {
 		return err
 	}
-	err = historyoperationrepository.NewRepository(service.database).AddProjectHistoryOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectAttachmentDeleted})
+	_, err = service.historyOperationService.AddProjectHistoryOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectAttachmentDeleted})
 	if err != nil {
 		return err
 	}
@@ -115,7 +116,7 @@ func (service *attachmentService) GetProjectAttachments(ctx context.Context, pro
 	return attachments, nil
 }
 
-func (service *attachmentService) AddTaskAttachment(ctx context.Context, taskId string, attachment domain.Attachment) (domain.Attachment, error) {
+func (service *attachmentService) AddTaskAttachment(ctx context.Context, projectId string, taskId string, attachment domain.Attachment) (domain.Attachment, error) {
 	tx, err := service.database.Begin()
 	if err != nil {
 		return domain.Attachment{}, err
@@ -142,7 +143,7 @@ func (service *attachmentService) AddTaskAttachment(ctx context.Context, taskId 
 	if err != nil {
 		return domain.Attachment{}, err
 	}
-	err = historyoperationrepository.NewRepository(service.database).AddProjectHistoryOperation(ctx, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: attachment.CreatedAt, OperationType: domain.EventTaskAttachmentAdded})
+	_, err = service.historyOperationService.AddTaskHistoryOperation(ctx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: attachment.CreatedAt, OperationType: domain.EventTaskAttachmentAdded})
 	if err != nil {
 		return domain.Attachment{}, err
 	}
@@ -153,7 +154,7 @@ func (service *attachmentService) AddTaskAttachment(ctx context.Context, taskId 
 	return attachment, nil
 }
 
-func (service *attachmentService) DeleteTaskAttachment(ctx context.Context, taskId string, attachmentId string) error {
+func (service *attachmentService) DeleteTaskAttachment(ctx context.Context, projectId string, taskId string, attachmentId string) error {
 	// TODO: remove data/attachments file from storage
 	tx, err := service.database.Begin()
 	if err != nil {
@@ -175,7 +176,7 @@ func (service *attachmentService) DeleteTaskAttachment(ctx context.Context, task
 	if err != nil {
 		return err
 	}
-	err = historyoperationrepository.NewRepository(service.database).AddProjectHistoryOperation(ctx, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskAttachmentDeleted})
+	_, err = service.historyOperationService.AddTaskHistoryOperation(ctx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskAttachmentDeleted})
 	if err != nil {
 		return err
 	}

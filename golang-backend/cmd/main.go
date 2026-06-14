@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"syscall"
 
+	"github.com/aportela/doneo/internal/app"
+	"github.com/aportela/doneo/internal/cache"
 	"github.com/aportela/doneo/internal/cli"
 	"github.com/aportela/doneo/internal/config"
 	"github.com/aportela/doneo/internal/data"
@@ -61,7 +63,11 @@ func main() {
 			demodatascripts.CreateDemoData(databaseHandler)
 		}
 
-		r := router.NewRouter(databaseHandler, *configuration)
+		permissionCache := cache.NewPermissionCache()
+
+		app := app.NewApp(databaseHandler, *configuration, permissionCache)
+
+		r := router.NewRouter(app)
 
 		sigChan := make(chan os.Signal, 1)
 		signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)

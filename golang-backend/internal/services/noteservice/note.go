@@ -8,8 +8,8 @@ import (
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
-	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
 	"github.com/aportela/doneo/internal/repositories/noterepository"
+	"github.com/aportela/doneo/internal/services/historyoperationservice"
 	"github.com/aportela/doneo/internal/utils"
 )
 
@@ -25,12 +25,13 @@ type NoteService interface {
 }
 
 type noteService struct {
-	database   database.Database
-	repository noterepository.NoteRepository
+	database                database.Database
+	historyOperationService historyoperationservice.HistoryOperationService
+	repository              noterepository.NoteRepository
 }
 
-func NewService(database database.Database, repository noterepository.NoteRepository) NoteService {
-	return &noteService{database: database, repository: repository}
+func NewService(database database.Database, historyOperationService historyoperationservice.HistoryOperationService, repository noterepository.NoteRepository) NoteService {
+	return &noteService{database: database, historyOperationService: historyOperationService, repository: repository}
 }
 
 func (service *noteService) AddProjectNote(ctx context.Context, projectId string, note domain.Note) (domain.Note, error) {
@@ -57,7 +58,7 @@ func (service *noteService) AddProjectNote(ctx context.Context, projectId string
 	if err != nil {
 		return domain.Note{}, err
 	}
-	err = historyoperationrepository.NewRepository(service.database).AddProjectHistoryOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: note.CreatedAt, OperationType: domain.EventProjectNoteAdded})
+	_, err = service.historyOperationService.AddProjectHistoryOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: note.CreatedAt, OperationType: domain.EventProjectNoteAdded})
 	if err != nil {
 		return domain.Note{}, err
 	}
@@ -90,7 +91,7 @@ func (service *noteService) UpdateProjectNote(ctx context.Context, projectId str
 	if err != nil {
 		return domain.Note{}, err
 	}
-	err = historyoperationrepository.NewRepository(service.database).AddProjectHistoryOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectNoteUpdated})
+	_, err = service.historyOperationService.AddProjectHistoryOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectNoteUpdated})
 	if err != nil {
 		return domain.Note{}, err
 	}
@@ -122,7 +123,7 @@ func (service *noteService) DeleteProjectNote(ctx context.Context, projectId str
 	if err != nil {
 		return err
 	}
-	err = historyoperationrepository.NewRepository(service.database).AddProjectHistoryOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectNoteDeleted})
+	_, err = service.historyOperationService.AddProjectHistoryOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectNoteDeleted})
 	if err != nil {
 		return err
 	}
@@ -161,7 +162,7 @@ func (service *noteService) AddTaskNote(ctx context.Context, projectId string, t
 	if err != nil {
 		return domain.Note{}, err
 	}
-	err = historyoperationrepository.NewRepository(service.database).AddTaskOperation(ctx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: note.CreatedAt, OperationType: domain.EventTaskNoteAdded})
+	_, err = service.historyOperationService.AddTaskHistoryOperation(ctx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: note.CreatedAt, OperationType: domain.EventTaskNoteAdded})
 	if err != nil {
 		return domain.Note{}, err
 	}
@@ -194,7 +195,7 @@ func (service *noteService) UpdateTaskNote(ctx context.Context, projectId string
 	if err != nil {
 		return domain.Note{}, err
 	}
-	err = historyoperationrepository.NewRepository(service.database).AddTaskOperation(ctx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskNoteUpdated})
+	_, err = service.historyOperationService.AddTaskHistoryOperation(ctx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskNoteUpdated})
 	if err != nil {
 		return domain.Note{}, err
 	}
@@ -226,7 +227,7 @@ func (service *noteService) DeleteTaskNote(ctx context.Context, projectId string
 	if err != nil {
 		return err
 	}
-	err = historyoperationrepository.NewRepository(service.database).AddTaskOperation(ctx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskNoteDeleted})
+	_, err = service.historyOperationService.AddTaskHistoryOperation(ctx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskNoteDeleted})
 	if err != nil {
 		return err
 	}

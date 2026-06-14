@@ -206,9 +206,10 @@ func (handler *AttachmentHandler) AddTaskAttachment(w http.ResponseWriter, r *ht
 		return
 	}
 
+	projectId := chi.URLParam(r, "project_id")
 	taskId := chi.URLParam(r, "task_id")
 
-	attachment, err = handler.service.AddTaskAttachment(r.Context(), taskId, attachment)
+	attachment, err = handler.service.AddTaskAttachment(r.Context(), projectId, taskId, attachment)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -229,9 +230,10 @@ func (handler *AttachmentHandler) AddTaskAttachment(w http.ResponseWriter, r *ht
 
 func (handler *AttachmentHandler) DeleteTaskAttachment(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	projectId := chi.URLParam(r, "project_id")
 	taskId := chi.URLParam(r, "task_id")
 	attachmentId := chi.URLParam(r, "attachment_id")
-	err := handler.service.DeleteTaskAttachment(r.Context(), taskId, attachmentId)
+	err := handler.service.DeleteTaskAttachment(r.Context(), projectId, taskId, attachmentId)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AttachmentHandler] failed to delete task attachment: %w", err))
 		return

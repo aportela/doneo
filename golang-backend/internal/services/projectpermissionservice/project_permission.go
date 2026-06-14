@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/aportela/doneo/internal/cache"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
-	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
+	"github.com/aportela/doneo/internal/services/historyoperationservice"
 	"github.com/aportela/doneo/internal/utils"
 )
 
@@ -21,12 +22,14 @@ type ProjectPermissionService interface {
 }
 
 type projectPermissionService struct {
-	database   database.Database
-	repository projectpermissionrepository.ProjectPermissionRepository
+	database                database.Database
+	cache                   cache.PermissionCache
+	historyOperationService historyoperationservice.HistoryOperationService
+	repository              projectpermissionrepository.ProjectPermissionRepository
 }
 
-func NewService(database database.Database, repository projectpermissionrepository.ProjectPermissionRepository) ProjectPermissionService {
-	return &projectPermissionService{database: database, repository: repository}
+func NewService(database database.Database, cache cache.PermissionCache, historyOperationService historyoperationservice.HistoryOperationService, repository projectpermissionrepository.ProjectPermissionRepository) ProjectPermissionService {
+	return &projectPermissionService{database: database, cache: cache, historyOperationService: historyOperationService, repository: repository}
 }
 
 func (service *projectPermissionService) Add(ctx context.Context, projectId string, permission domain.ProjectPermission) (domain.ProjectPermission, error) {
@@ -51,7 +54,7 @@ func (service *projectPermissionService) Add(ctx context.Context, projectId stri
 	if err != nil {
 		return domain.ProjectPermission{}, err
 	}
-	err = historyoperationrepository.NewRepository(service.database).AddProjectHistoryOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectPermissionAdded})
+	_, err = service.historyOperationService.AddProjectHistoryOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectPermissionAdded})
 	if err != nil {
 		return domain.ProjectPermission{}, err
 	}
@@ -59,7 +62,7 @@ func (service *projectPermissionService) Add(ctx context.Context, projectId stri
 	if err != nil {
 		return domain.ProjectPermission{}, err
 	}
-	//cacheservice.NewProjectPermissionCache().Set(currentUserId, projectId, permission.Role.PermissionsBitmask)
+	service.cache.SetProject(currentUserId, projectId, permission.Role.PermissionsBitmask)
 	return permission, nil
 }
 
@@ -84,7 +87,7 @@ func (service *projectPermissionService) Delete(ctx context.Context, projectId s
 	if err != nil {
 		return err
 	}
-	err = historyoperationrepository.NewRepository(service.database).AddProjectHistoryOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectPermissionDeleted})
+	_, err = service.historyOperationService.AddProjectHistoryOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectPermissionDeleted})
 	if err != nil {
 		return err
 	}
@@ -92,7 +95,7 @@ func (service *projectPermissionService) Delete(ctx context.Context, projectId s
 	if err != nil {
 		return err
 	}
-	//cacheservice.NewProjectPermissionCache().Delete(currentUserId, projectId)
+	service.cache.DeleteProject(currentUserId, projectId)
 	return nil
 }
 

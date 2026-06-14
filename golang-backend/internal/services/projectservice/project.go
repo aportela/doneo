@@ -9,31 +9,33 @@ import (
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
-	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
 	"github.com/aportela/doneo/internal/services/authorizationservice"
+	"github.com/aportela/doneo/internal/services/historyoperationservice"
 	"github.com/aportela/doneo/internal/utils"
 )
 
 type ProjectService interface {
-	Add(ctx context.Context, Project domain.Project) (domain.Project, error)
-	Update(ctx context.Context, Project domain.Project) (domain.Project, error)
+	Add(ctx context.Context, project domain.Project) (domain.Project, error)
+	Update(ctx context.Context, project domain.Project) (domain.Project, error)
 	Delete(ctx context.Context, id string) error
 	Get(ctx context.Context, id string) (domain.Project, error)
 	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.Result, error)
 }
 
 type projectService struct {
-	database   database.Database
-	repository projectrepository.ProjectRepository
+	db      database.Database
+	auth    authorizationservice.AuthorizationService
+	history historyoperationservice.HistoryOperationService
+	repo    projectrepository.ProjectRepository
 }
 
-func NewService(database database.Database, repository projectrepository.ProjectRepository) ProjectService {
-	return &projectService{database: database, repository: repository}
+func NewService(db database.Database, auth authorizationservice.AuthorizationService, history historyoperationservice.HistoryOperationService, repo projectrepository.ProjectRepository) ProjectService {
+	return &projectService{db: db, auth: auth, history: history, repo: repo}
 }
 
 func (service *projectService) Add(ctx context.Context, project domain.Project) (domain.Project, error) {
-	tx, err := service.database.Begin()
+	tx, err := service.db.Begin()
 	if err != nil {
 		return domain.Project{}, err
 	}
@@ -52,15 +54,15 @@ func (service *projectService) Add(ctx context.Context, project domain.Project) 
 	project.ID = utils.UUID()
 	project.CreatedBy.ID = currentUserId
 	project.CreatedAt = time.Now()
-	err = service.repository.Add(ctx, project)
+	err = service.repo.Add(ctx, project)
 	if err != nil {
 		return domain.Project{}, err
 	}
-	err = service.repository.AddTaskCounter(ctx, project.ID)
+	err = service.repo.AddTaskCounter(ctx, project.ID)
 	if err != nil {
 		return domain.Project{}, err
 	}
-	err = historyoperationrepository.NewRepository(service.database).AddProjectHistoryOperation(ctx, project.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: project.CreatedAt, OperationType: domain.EventProjectCreated})
+	_, err = service.history.AddProjectHistoryOperation(ctx, project.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: project.CreatedAt, OperationType: domain.EventProjectCreated})
 	if err != nil {
 		return domain.Project{}, err
 	}
@@ -76,11 +78,11 @@ func (service *projectService) Update(ctx context.Context, project domain.Projec
 	if !ok {
 		return domain.Project{}, fmt.Errorf("[ProjectService] user ID not found in context")
 	}
-	err := authorizationservice.NewService(service.database).RequireProjectUpdatePermission(ctx, currentUserId, project.ID)
+	err := service.auth.RequireProjectUpdatePermission(ctx, currentUserId, project.ID)
 	if err != nil {
 		return domain.Project{}, err
 	}
-	tx, err := service.database.Begin()
+	tx, err := service.db.Begin()
 	if err != nil {
 		return domain.Project{}, err
 	}
@@ -93,11 +95,11 @@ func (service *projectService) Update(ctx context.Context, project domain.Projec
 		}
 	}()
 	project.UpdatedAt = utils.CurrentTimePtr()
-	err = service.repository.Update(ctx, project)
+	err = service.repo.Update(ctx, project)
 	if err != nil {
 		return domain.Project{}, err
 	}
-	err = historyoperationrepository.NewRepository(service.database).AddProjectHistoryOperation(ctx, project.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectUpdated})
+	_, err = service.history.AddProjectHistoryOperation(ctx, project.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectUpdated})
 	if err != nil {
 		return domain.Project{}, err
 	}
@@ -113,11 +115,11 @@ func (service *projectService) Delete(ctx context.Context, id string) error {
 	if !ok {
 		return fmt.Errorf("[ProjectService] user ID not found in context")
 	}
-	err := authorizationservice.NewService(service.database).RequireProjectDeletePermission(ctx, currentUserId, id)
+	err := service.auth.RequireProjectDeletePermission(ctx, currentUserId, id)
 	if err != nil {
 		return err
 	}
-	tx, err := service.database.Begin()
+	tx, err := service.db.Begin()
 	if err != nil {
 		return err
 	}
@@ -129,11 +131,11 @@ func (service *projectService) Delete(ctx context.Context, id string) error {
 			_ = tx.Rollback()
 		}
 	}()
-	err = service.repository.Delete(ctx, id, time.Now().UnixMilli())
+	err = service.repo.Delete(ctx, id, time.Now().UnixMilli())
 	if err != nil {
 		return err
 	}
-	err = historyoperationrepository.NewRepository(service.database).AddProjectHistoryOperation(ctx, id, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectDeleted})
+	_, err = service.history.AddProjectHistoryOperation(ctx, id, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectDeleted})
 	if err != nil {
 		return err
 	}
@@ -145,11 +147,11 @@ func (service *projectService) Get(ctx context.Context, id string) (domain.Proje
 	if !ok {
 		return domain.Project{}, fmt.Errorf("[ProjectService] user ID not found in context")
 	}
-	err := authorizationservice.NewService(service.database).RequireProjectViewPermission(ctx, currentUserId, id)
+	err := service.auth.RequireProjectViewPermission(ctx, currentUserId, id)
 	if err != nil {
 		return domain.Project{}, err
 	}
-	project, err := service.repository.Get(ctx, id)
+	project, err := service.repo.Get(ctx, id)
 	if err != nil {
 		return domain.Project{}, fmt.Errorf("[ProjectService] failed to get project with ID %s: %w", id, err)
 	}
@@ -165,7 +167,7 @@ func (service *projectService) Search(ctx context.Context, pager browser.Params,
 		// TODO: user is not admin, search only projects with view permission for current user
 		filter.ViewByUserId = &currentUserId
 	}
-	projects, pagerResult, err := service.repository.Search(ctx, pager, order, filter)
+	projects, pagerResult, err := service.repo.Search(ctx, pager, order, filter)
 
 	if err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[ProjectService] failed to search projects: %w", err)
