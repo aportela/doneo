@@ -110,6 +110,14 @@ func (service *projectService) Update(ctx context.Context, project domain.Projec
 }
 
 func (service *projectService) Delete(ctx context.Context, id string) error {
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return fmt.Errorf("[ProjectService] user ID not found in context")
+	}
+	err := authorizationservice.NewService(service.database, projectpermissionrepository.NewRepository(service.database)).RequireProjectDeletePermission(ctx, currentUserId, id)
+	if err != nil {
+		return err
+	}
 	tx, err := service.database.Begin()
 	if err != nil {
 		return err
@@ -122,10 +130,6 @@ func (service *projectService) Delete(ctx context.Context, id string) error {
 			_ = tx.Rollback()
 		}
 	}()
-	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return fmt.Errorf("[ProjectService] user ID not found in context")
-	}
 	err = service.repository.Delete(ctx, id, time.Now().UnixMilli())
 	if err != nil {
 		return err
@@ -138,6 +142,14 @@ func (service *projectService) Delete(ctx context.Context, id string) error {
 }
 
 func (service *projectService) Get(ctx context.Context, id string) (domain.Project, error) {
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return domain.Project{}, fmt.Errorf("[ProjectService] user ID not found in context")
+	}
+	err := authorizationservice.NewService(service.database, projectpermissionrepository.NewRepository(service.database)).RequireProjectViewPermission(ctx, currentUserId, id)
+	if err != nil {
+		return domain.Project{}, err
+	}
 	project, err := service.repository.Get(ctx, id)
 	if err != nil {
 		return domain.Project{}, fmt.Errorf("[ProjectService] failed to get project with ID %s: %w", id, err)
@@ -146,7 +158,15 @@ func (service *projectService) Get(ctx context.Context, id string) (domain.Proje
 }
 
 func (service *projectService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.Result, error) {
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return nil, browser.Result{}, fmt.Errorf("[ProjectService] user ID not found in context")
+	}
+	if false {
+		filter.ViewByUserId = &currentUserId
+	}
 	projects, pagerResult, err := service.repository.Search(ctx, pager, order, filter)
+
 	if err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[ProjectService] failed to search projects: %w", err)
 	}

@@ -34,6 +34,7 @@ type SearchProjectFilter struct {
 	PriorityId      *string
 	CreatedAt       *TimestampFilter
 	CreatedByUserId *string
+	ViewByUserId    *string
 }
 
 type ProjectEventType uint
