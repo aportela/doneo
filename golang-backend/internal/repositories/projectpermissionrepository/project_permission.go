@@ -50,7 +50,7 @@ func (repository *projectPermissionRepository) Add(ctx context.Context, projectI
 		}
 		switch sqlErr.Code() {
 		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "projectId,userId,roleId"}
+			return &domain.ValidationError{Field: "id"}
 		case sqlite3.SQLITE_CONSTRAINT_CHECK:
 			if strings.Contains(sqlErr.Error(), "length(project_id)") {
 				return &domain.ValidationError{Field: "projectId"}
