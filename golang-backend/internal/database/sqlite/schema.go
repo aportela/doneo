@@ -113,7 +113,7 @@ var schemaQueries = []schemaMigration{
 					user_id TEXT NOT NULL CHECK(length(user_id) == 36),
 					role_id TEXT NOT NULL CHECK(length(role_id) == 36),
 					PRIMARY KEY (id),
-					UNIQUE(project_id,user_id,role_id),
+					UNIQUE(project_id,user_id),
 					FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE,
 					FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
 					FOREIGN KEY(role_id) REFERENCES roles(id) ON DELETE CASCADE
