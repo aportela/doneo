@@ -6,7 +6,7 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 )
 
-type CacheKey struct {
+type ProjectPermissionCacheKey struct {
 	UserID    string
 	ProjectID string
 }
@@ -20,12 +20,12 @@ type ProjectPermissionCache interface {
 
 type projectPermissionCache struct {
 	mu          sync.RWMutex
-	permissions map[CacheKey]domain.Bitmask
+	permissions map[ProjectPermissionCacheKey]domain.Bitmask
 }
 
 func NewProjectPermissionCache() ProjectPermissionCache {
 	return &projectPermissionCache{
-		permissions: make(map[CacheKey]domain.Bitmask),
+		permissions: make(map[ProjectPermissionCacheKey]domain.Bitmask),
 	}
 }
 
@@ -33,7 +33,7 @@ func (service *projectPermissionCache) Get(userID string, projectID string) (dom
 	service.mu.RLock()
 	defer service.mu.RUnlock()
 
-	permissionBitmask, ok := service.permissions[CacheKey{
+	permissionBitmask, ok := service.permissions[ProjectPermissionCacheKey{
 		UserID:    userID,
 		ProjectID: projectID,
 	}]
@@ -45,7 +45,7 @@ func (service *projectPermissionCache) Set(userID string, projectID string, perm
 	service.mu.Lock()
 	defer service.mu.Unlock()
 
-	service.permissions[CacheKey{
+	service.permissions[ProjectPermissionCacheKey{
 		UserID:    userID,
 		ProjectID: projectID,
 	}] = permissionBitmask
@@ -55,7 +55,7 @@ func (service *projectPermissionCache) Delete(userID string, projectID string) {
 	service.mu.Lock()
 	defer service.mu.Unlock()
 
-	delete(service.permissions, CacheKey{
+	delete(service.permissions, ProjectPermissionCacheKey{
 		UserID:    userID,
 		ProjectID: projectID,
 	})
@@ -65,5 +65,5 @@ func (service *projectPermissionCache) Clear() {
 	service.mu.Lock()
 	defer service.mu.Unlock()
 
-	service.permissions = make(map[CacheKey]domain.Bitmask)
+	service.permissions = make(map[ProjectPermissionCacheKey]domain.Bitmask)
 }
