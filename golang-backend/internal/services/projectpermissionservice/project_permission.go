@@ -28,8 +28,8 @@ type projectPermissionService struct {
 	repository              projectpermissionrepository.ProjectPermissionRepository
 }
 
-func NewService(database database.Database, cache cache.PermissionCache, historyOperationService historyoperationservice.HistoryOperationService, repository projectpermissionrepository.ProjectPermissionRepository) ProjectPermissionService {
-	return &projectPermissionService{database: database, cache: cache, historyOperationService: historyOperationService, repository: repository}
+func NewService(db database.Database, cache cache.PermissionCache, historyOperationService historyoperationservice.HistoryOperationService, repository projectpermissionrepository.ProjectPermissionRepository) ProjectPermissionService {
+	return &projectPermissionService{database: db, cache: cache, historyOperationService: historyOperationService, repository: repository}
 }
 
 func (service *projectPermissionService) Add(ctx context.Context, projectId string, permission domain.ProjectPermission) (domain.ProjectPermission, error) {

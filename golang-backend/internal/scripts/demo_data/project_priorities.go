@@ -11,10 +11,10 @@ import (
 	"github.com/aportela/doneo/internal/utils"
 )
 
-func createProjectPriorities(database database.Database) []string {
+func createProjectPriorities(db database.Database) []string {
 	projectPriorityNames := []string{"Low", "Medium", "High"}
 	var newProjectPriorityIds []string
-	service := projectpriorityservice.NewService(database, projectpriorityrepository.NewRepository(database))
+	service := projectpriorityservice.NewService(db, projectpriorityrepository.NewRepository(db))
 	for index, projectPriorityName := range projectPriorityNames {
 		projectPriority := domain.ProjectPriority{
 			Name:     projectPriorityName,

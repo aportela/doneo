@@ -21,16 +21,16 @@ type ProjectPermissionRepository interface {
 }
 
 type projectPermissionRepository struct {
-	database database.Database
+	db database.Database
 }
 
-func NewRepository(database database.Database) ProjectPermissionRepository {
-	return &projectPermissionRepository{database: database}
+func NewRepository(db database.Database) ProjectPermissionRepository {
+	return &projectPermissionRepository{db: db}
 }
 
 func (repository *projectPermissionRepository) Add(ctx context.Context, projectId string, permission domain.ProjectPermission) error {
 	dto := toDTO(permission)
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             INSERT INTO project_user_role (id, project_id, user_id, role_id)
@@ -68,7 +68,7 @@ func (repository *projectPermissionRepository) Add(ctx context.Context, projectI
 }
 
 func (repository *projectPermissionRepository) Delete(ctx context.Context, projectId string, permissionId string) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             DELETE FROM project_user_role
@@ -88,7 +88,7 @@ func (repository *projectPermissionRepository) Delete(ctx context.Context, proje
 
 func (repository *projectPermissionRepository) Get(ctx context.Context, permissionId string) (domain.ProjectPermission, error) {
 	var dto projectPermissionDTO
-	err := repository.database.QueryRowContext(
+	err := repository.db.QueryRowContext(
 		ctx,
 		`
             SELECT
@@ -109,7 +109,7 @@ func (repository *projectPermissionRepository) Get(ctx context.Context, permissi
 }
 
 func (repository *projectPermissionRepository) Search(ctx context.Context, projectId string) ([]domain.ProjectPermission, error) {
-	rows, err := repository.database.QueryContext(
+	rows, err := repository.db.QueryContext(
 		ctx,
 		`
             SELECT

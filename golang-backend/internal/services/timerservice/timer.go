@@ -25,8 +25,8 @@ type timerService struct {
 	repository timerrepository.TimerRepository
 }
 
-func NewService(database database.Database, repository timerrepository.TimerRepository) TimerService {
-	return &timerService{database: database, repository: repository}
+func NewService(db database.Database, repository timerrepository.TimerRepository) TimerService {
+	return &timerService{database: db, repository: repository}
 }
 
 func (service *timerService) Start(ctx context.Context, summary string) error {

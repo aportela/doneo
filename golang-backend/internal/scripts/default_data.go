@@ -11,10 +11,10 @@ import (
 	"github.com/aportela/doneo/internal/services/userservice"
 )
 
-func CreateDefaultAdminUser(database database.Database) {
+func CreateDefaultAdminUser(db database.Database) {
 	permissionsBitmask := domain.Bitmask(0)
 	permissionsBitmask.AddFlag(domain.UserPermissionAdmin)
-	service := userservice.NewService(database, userrepository.NewRepository(database))
+	service := userservice.NewService(db, userrepository.NewRepository(db))
 	_, err := service.Add(context.Background(), domain.User{
 		UserBase: domain.UserBase{
 			Name: "administrator",

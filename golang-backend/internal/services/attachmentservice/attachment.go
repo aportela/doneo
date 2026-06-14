@@ -29,8 +29,8 @@ type attachmentService struct {
 	repository              attachmentrepository.AttachmentRepository
 }
 
-func NewService(database database.Database, historyOperationService historyoperationservice.HistoryOperationService, repository attachmentrepository.AttachmentRepository) AttachmentService {
-	return &attachmentService{database: database, historyOperationService: historyOperationService, repository: repository}
+func NewService(db database.Database, historyOperationService historyoperationservice.HistoryOperationService, repository attachmentrepository.AttachmentRepository) AttachmentService {
+	return &attachmentService{database: db, historyOperationService: historyOperationService, repository: repository}
 }
 
 func (service *attachmentService) GetAttachment(ctx context.Context, id string) (domain.Attachment, error) {

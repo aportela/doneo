@@ -24,16 +24,16 @@ type NoteRepository interface {
 }
 
 type noteRepository struct {
-	database database.Database
+	db database.Database
 }
 
-func NewRepository(database database.Database) NoteRepository {
-	return &noteRepository{database: database}
+func NewRepository(db database.Database) NoteRepository {
+	return &noteRepository{db: db}
 }
 
 func (repository *noteRepository) AddProjectNote(ctx context.Context, projectId string, note domain.Note) error {
 	dto := toDTO(note)
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             INSERT INTO project_notes (id, project_id, user_id, created_at, updated_at, body)
@@ -71,7 +71,7 @@ func (repository *noteRepository) AddProjectNote(ctx context.Context, projectId 
 
 func (repository *noteRepository) UpdateProjectNote(ctx context.Context, note domain.Note) error {
 	dto := toDTO(note)
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             UPDATE project_notes SET
@@ -94,7 +94,7 @@ func (repository *noteRepository) UpdateProjectNote(ctx context.Context, note do
 }
 
 func (repository *noteRepository) DeleteProjectNote(ctx context.Context, id string) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             DELETE FROM project_notes
@@ -113,7 +113,7 @@ func (repository *noteRepository) DeleteProjectNote(ctx context.Context, id stri
 }
 
 func (repository *noteRepository) GetProjectNotes(ctx context.Context, projectId string) ([]domain.Note, error) {
-	rows, err := repository.database.QueryContext(
+	rows, err := repository.db.QueryContext(
 		ctx,
 		`
             SELECT
@@ -146,7 +146,7 @@ func (repository *noteRepository) GetProjectNotes(ctx context.Context, projectId
 
 func (repository *noteRepository) AddTaskNote(ctx context.Context, taskId string, note domain.Note) error {
 	dto := toDTO(note)
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             INSERT INTO task_notes (id, task_id, user_id, created_at, updated_at, body)
@@ -184,7 +184,7 @@ func (repository *noteRepository) AddTaskNote(ctx context.Context, taskId string
 
 func (repository *noteRepository) UpdateTaskNote(ctx context.Context, note domain.Note) error {
 	dto := toDTO(note)
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             UPDATE task_notes SET
@@ -207,7 +207,7 @@ func (repository *noteRepository) UpdateTaskNote(ctx context.Context, note domai
 }
 
 func (repository *noteRepository) DeleteTaskNote(ctx context.Context, id string) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             DELETE FROM task_notes
@@ -226,7 +226,7 @@ func (repository *noteRepository) DeleteTaskNote(ctx context.Context, id string)
 }
 
 func (repository *noteRepository) GetTaskNotes(ctx context.Context, taskId string) ([]domain.Note, error) {
-	rows, err := repository.database.QueryContext(
+	rows, err := repository.db.QueryContext(
 		ctx,
 		`
             SELECT

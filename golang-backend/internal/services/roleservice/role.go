@@ -24,8 +24,8 @@ type roleService struct {
 	repository rolerepository.RoleRepository
 }
 
-func NewService(database database.Database, role rolerepository.RoleRepository) RoleService {
-	return &roleService{database: database, repository: role}
+func NewService(db database.Database, role rolerepository.RoleRepository) RoleService {
+	return &roleService{database: db, repository: role}
 }
 
 func (service *roleService) Add(ctx context.Context, role domain.Role) (domain.Role, error) {

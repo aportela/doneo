@@ -10,9 +10,9 @@ import (
 	"github.com/aportela/doneo/internal/services/roleservice"
 )
 
-func createRoles(database database.Database) []string {
+func createRoles(db database.Database) []string {
 	var newRoleIds []string
-	roleService := roleservice.NewService(database, rolerepository.NewRepository(database))
+	roleService := roleservice.NewService(db, rolerepository.NewRepository(db))
 	permissionBitMask := domain.Bitmask(0)
 	permissionBitMask.AddFlag(domain.PermissionUpdateProject | domain.PermissionDeleteProject | domain.PermissionViewProject | domain.PermissionAddTask | domain.PermissionUpdateTask | domain.PermissionDeleteTask | domain.PermissionViewTask)
 	role := domain.Role{

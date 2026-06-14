@@ -11,10 +11,10 @@ import (
 	"github.com/aportela/doneo/internal/utils"
 )
 
-func createTaskPriorities(database database.Database) []string {
+func createTaskPriorities(db database.Database) []string {
 	taskPriorityNames := []string{"Low", "Medium", "High"}
 	var newTaskPriorityIds []string
-	taskPriorityService := taskpriorityservice.NewService(database, taskpriorityrepository.NewRepository(database))
+	taskPriorityService := taskpriorityservice.NewService(db, taskpriorityrepository.NewRepository(db))
 	for index, taskPriorityName := range taskPriorityNames {
 		taskPriority := domain.TaskPriority{
 			Name:     taskPriorityName,

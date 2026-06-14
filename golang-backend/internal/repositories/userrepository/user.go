@@ -27,11 +27,11 @@ type UserRepository interface {
 }
 
 type userRepository struct {
-	database database.Database
+	db database.Database
 }
 
-func NewRepository(database database.Database) UserRepository {
-	return &userRepository{database: database}
+func NewRepository(db database.Database) UserRepository {
+	return &userRepository{db: db}
 }
 
 func (repository *userRepository) Add(ctx context.Context, user domain.User, password string) error {
@@ -42,7 +42,7 @@ func (repository *userRepository) Add(ctx context.Context, user domain.User, pas
 	dto := toDTO(user)
 	dto.PasswordHash = string(hashedPasswordBytes)
 
-	_, err = repository.database.ExecContext(
+	_, err = repository.db.ExecContext(
 		ctx,
 		`
             INSERT INTO users (id, email, name, password_hash, created_at, updated_at, deleted_at, permissions_bitmask)
@@ -121,7 +121,7 @@ func (repository *userRepository) Update(ctx context.Context, user domain.User) 
 			WHERE id = ?`
 		args = append(args, dto.Email, dto.Name, dto.UpdatedAt, dto.PermissionsBitmask, dto.ID)
 	}
-	_, err := repository.database.ExecContext(ctx, query, args...)
+	_, err := repository.db.ExecContext(ctx, query, args...)
 	if err != nil {
 		// TODO: remove ?
 		fmt.Println(err.Error())
@@ -152,7 +152,7 @@ func (repository *userRepository) Update(ctx context.Context, user domain.User) 
 }
 
 func (repository *userRepository) Delete(ctx context.Context, id string, deletedAt int64) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             UPDATE users SET
@@ -166,7 +166,7 @@ func (repository *userRepository) Delete(ctx context.Context, id string, deleted
 }
 
 func (repository *userRepository) UnDelete(ctx context.Context, id string) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             UPDATE users SET
@@ -179,7 +179,7 @@ func (repository *userRepository) UnDelete(ctx context.Context, id string) error
 }
 
 func (repository *userRepository) Purge(ctx context.Context, id string) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             DELETE FROM users
@@ -192,7 +192,7 @@ func (repository *userRepository) Purge(ctx context.Context, id string) error {
 
 func (repository *userRepository) Get(ctx context.Context, id string) (domain.User, error) {
 	var dto userDTO
-	err := repository.database.QueryRowContext(
+	err := repository.db.QueryRowContext(
 		ctx,
 		`
             SELECT
@@ -212,7 +212,7 @@ func (repository *userRepository) Get(ctx context.Context, id string) (domain.Us
 
 func (repository *userRepository) GetByEmail(ctx context.Context, email string) (domain.User, error) {
 	var dto userDTO
-	err := repository.database.QueryRowContext(
+	err := repository.db.QueryRowContext(
 		ctx,
 		`
             SELECT
@@ -326,7 +326,7 @@ func (repository *userRepository) Search(ctx context.Context, pager browser.Para
 		sqlLimit = ""
 	}
 	sqlQuery = fmt.Sprintf("%s %s %s %s ", sqlQuery, sqlWhere, sqlOrder, sqlLimit)
-	rows, err := repository.database.QueryContext(ctx, sqlQuery, queryArgs...)
+	rows, err := repository.db.QueryContext(ctx, sqlQuery, queryArgs...)
 	if err != nil {
 		return nil, browser.Result{}, err
 	}
@@ -352,7 +352,7 @@ func (repository *userRepository) Search(ctx context.Context, pager browser.Para
 			FROM users U
 		`
 		sqlCountQuery = fmt.Sprintf("%s %s", sqlCountQuery, sqlWhere)
-		err = repository.database.QueryRowContext(
+		err = repository.db.QueryRowContext(
 			ctx,
 			sqlCountQuery,
 			filterArgs...,

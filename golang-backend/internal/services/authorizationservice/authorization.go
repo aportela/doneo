@@ -29,12 +29,12 @@ type authorizationService struct {
 	projectPermissionRepository projectpermissionrepository.ProjectPermissionRepository
 }
 
-func NewService(database database.Database, cache cache.PermissionCache) AuthorizationService {
+func NewService(db database.Database, cache cache.PermissionCache) AuthorizationService {
 	return &authorizationService{
-		database:                    database,
+		database:                    db,
 		permissionCache:             cache,
-		userRepository:              userrepository.NewRepository(database),
-		projectPermissionRepository: projectpermissionrepository.NewRepository(database),
+		userRepository:              userrepository.NewRepository(db),
+		projectPermissionRepository: projectpermissionrepository.NewRepository(db),
 	}
 }
 

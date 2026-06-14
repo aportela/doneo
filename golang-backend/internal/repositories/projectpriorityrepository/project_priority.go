@@ -23,16 +23,16 @@ type ProjectPriorityRepository interface {
 }
 
 type projectPriorityRepository struct {
-	database database.Database
+	db database.Database
 }
 
-func NewRepository(database database.Database) ProjectPriorityRepository {
-	return &projectPriorityRepository{database: database}
+func NewRepository(db database.Database) ProjectPriorityRepository {
+	return &projectPriorityRepository{db: db}
 }
 
 func (repository *projectPriorityRepository) Add(ctx context.Context, projectPriority domain.ProjectPriority) error {
 	dto := toDTO(projectPriority)
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             INSERT INTO project_priorities (id, name, item_hex_color, item_index)
@@ -78,7 +78,7 @@ func (repository *projectPriorityRepository) Add(ctx context.Context, projectPri
 
 func (repository *projectPriorityRepository) Update(ctx context.Context, projectPriority domain.ProjectPriority) error {
 	dto := toDTO(projectPriority)
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             UPDATE project_priorities SET
@@ -126,7 +126,7 @@ func (repository *projectPriorityRepository) Update(ctx context.Context, project
 }
 
 func (repository *projectPriorityRepository) Delete(ctx context.Context, id string) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             DELETE FROM project_priorities
@@ -139,7 +139,7 @@ func (repository *projectPriorityRepository) Delete(ctx context.Context, id stri
 
 func (repository *projectPriorityRepository) Get(ctx context.Context, id string) (domain.ProjectPriority, error) {
 	var dto projectPriorityDTO
-	err := repository.database.QueryRowContext(
+	err := repository.db.QueryRowContext(
 		ctx,
 		`
             SELECT
@@ -204,7 +204,7 @@ func (repository *projectPriorityRepository) Search(ctx context.Context, pager b
 		sqlLimit = ""
 	}
 	sqlQuery = fmt.Sprintf("%s %s %s %s ", sqlQuery, sqlWhere, sqlOrder, sqlLimit)
-	rows, err := repository.database.QueryContext(ctx, sqlQuery, queryArgs...)
+	rows, err := repository.db.QueryContext(ctx, sqlQuery, queryArgs...)
 	if err != nil {
 		return nil, browser.Result{}, err
 	}
@@ -232,7 +232,7 @@ func (repository *projectPriorityRepository) Search(ctx context.Context, pager b
 			FROM project_priorities PP
 		`
 		sqlCountQuery = fmt.Sprintf("%s %s", sqlCountQuery, sqlWhere)
-		err = repository.database.QueryRowContext(
+		err = repository.db.QueryRowContext(
 			ctx,
 			sqlCountQuery,
 			filterArgs...,

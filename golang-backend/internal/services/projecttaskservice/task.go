@@ -28,8 +28,8 @@ type taskService struct {
 	repository projecttaskrepository.TaskRepository
 }
 
-func NewService(database database.Database, repository projecttaskrepository.TaskRepository) TaskService {
-	return &taskService{database: database, repository: repository}
+func NewService(db database.Database, repository projecttaskrepository.TaskRepository) TaskService {
+	return &taskService{database: db, repository: repository}
 }
 
 func (service *taskService) Add(ctx context.Context, projectId string, task domain.Task) (domain.Task, error) {

@@ -18,16 +18,16 @@ type TaskRelationRepository interface {
 }
 
 type taskRelationRepository struct {
-	database database.Database
+	db database.Database
 }
 
-func NewRepository(database database.Database) TaskRelationRepository {
-	return &taskRelationRepository{database: database}
+func NewRepository(db database.Database) TaskRelationRepository {
+	return &taskRelationRepository{db: db}
 }
 
 func (repository *taskRelationRepository) AddTaskRelation(ctx context.Context, taskRelation domain.TaskRelation) error {
 	dto := toDTO(taskRelation)
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             INSERT INTO task_relations (task_id, related_task_id, relation_type )
@@ -86,7 +86,7 @@ func (repository *taskRelationRepository) DeleteTaskRelation(ctx context.Context
 		// TODO:
 		return fmt.Errorf("Invalid relation")
 	}
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		sqlQuery,
 		queryArgs,

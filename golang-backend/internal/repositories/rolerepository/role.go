@@ -23,16 +23,16 @@ type RoleRepository interface {
 }
 
 type roleRepository struct {
-	database database.Database
+	db database.Database
 }
 
-func NewRepository(database database.Database) RoleRepository {
-	return &roleRepository{database: database}
+func NewRepository(db database.Database) RoleRepository {
+	return &roleRepository{db: db}
 }
 
 func (repository *roleRepository) Add(ctx context.Context, role domain.Role) error {
 	dto := toDTO(role)
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             INSERT INTO roles (id, name, permissions_bitmask)
@@ -75,7 +75,7 @@ func (repository *roleRepository) Add(ctx context.Context, role domain.Role) err
 
 func (repository *roleRepository) Update(ctx context.Context, role domain.Role) error {
 	dto := toDTO(role)
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             UPDATE roles SET
@@ -113,7 +113,7 @@ func (repository *roleRepository) Update(ctx context.Context, role domain.Role) 
 }
 
 func (repository *roleRepository) Delete(ctx context.Context, id string) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             DELETE FROM roles
@@ -126,7 +126,7 @@ func (repository *roleRepository) Delete(ctx context.Context, id string) error {
 
 func (repository *roleRepository) Get(ctx context.Context, id string) (domain.Role, error) {
 	var dto roleDTO
-	err := repository.database.QueryRowContext(
+	err := repository.db.QueryRowContext(
 		ctx,
 		`
             SELECT
@@ -188,7 +188,7 @@ func (repository *roleRepository) Search(ctx context.Context, pager browser.Para
 		sqlLimit = ""
 	}
 	sqlQuery = fmt.Sprintf("%s %s %s %s ", sqlQuery, sqlWhere, sqlOrder, sqlLimit)
-	rows, err := repository.database.QueryContext(ctx, sqlQuery, queryArgs...)
+	rows, err := repository.db.QueryContext(ctx, sqlQuery, queryArgs...)
 	if err != nil {
 		return nil, browser.Result{}, err
 	}
@@ -214,7 +214,7 @@ func (repository *roleRepository) Search(ctx context.Context, pager browser.Para
 			FROM roles R
 		`
 		sqlCountQuery = fmt.Sprintf("%s %s", sqlCountQuery, sqlWhere)
-		err = repository.database.QueryRowContext(
+		err = repository.db.QueryRowContext(
 			ctx,
 			sqlCountQuery,
 			filterArgs...,

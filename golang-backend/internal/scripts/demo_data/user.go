@@ -56,9 +56,9 @@ func getRandomUser() domain.User {
 	}
 }
 
-func createUsers(database database.Database, count int) []string {
+func createUsers(db database.Database, count int) []string {
 	var newUserIds []string
-	service := userservice.NewService(database, userrepository.NewRepository(database))
+	service := userservice.NewService(db, userrepository.NewRepository(db))
 	for i := 1; i <= count; i++ {
 		newUser := getRandomUser()
 		newUser, err := service.Add(context.Background(), newUser, "secret")

@@ -226,14 +226,14 @@ func randomText(n int) string {
 
 	return string(b)
 }
-func createProjects(database database.Database, projectTypeIds []string, projectPriorityIds []string, projectStatusIds []string, userIds []string, roleIds []string, taskStatusIds []string, taskPriorityIds []string, count int) []string {
+func createProjects(db database.Database, projectTypeIds []string, projectPriorityIds []string, projectStatusIds []string, userIds []string, roleIds []string, taskStatusIds []string, taskPriorityIds []string, count int) []string {
 	var newProjectIds []string
-	historyOperationService := historyoperationservice.NewService(database, historyoperationrepository.NewRepository(database))
-	authorizationService := authorizationservice.NewService(database, cache.NewPermissionCache())
-	projectService := projectservice.NewService(database, authorizationService, historyOperationService, projectrepository.NewRepository(database))
-	noteService := noteservice.NewService(database, historyOperationService, noterepository.NewRepository(database))
-	projectPermissionService := projectpermissionservice.NewService(database, cache.NewPermissionCache(), historyOperationService, projectpermissionrepository.NewRepository(database))
-	taskService := projecttaskservice.NewService(database, projecttaskrepository.NewRepository(database))
+	historyOperationService := historyoperationservice.NewService(db, historyoperationrepository.NewRepository(db))
+	authorizationService := authorizationservice.NewService(db, cache.NewPermissionCache())
+	projectService := projectservice.NewService(db, authorizationService, historyOperationService, projectrepository.NewRepository(db))
+	noteService := noteservice.NewService(db, historyOperationService, noterepository.NewRepository(db))
+	projectPermissionService := projectpermissionservice.NewService(db, cache.NewPermissionCache(), historyOperationService, projectpermissionrepository.NewRepository(db))
+	taskService := projecttaskservice.NewService(db, projecttaskrepository.NewRepository(db))
 	for i := 1; i <= count; i++ {
 		newProject := getRandomProject(userIds, projectTypeIds, projectPriorityIds, projectStatusIds)
 		ctx := context.Background()

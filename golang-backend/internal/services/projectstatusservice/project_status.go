@@ -24,8 +24,8 @@ type projectStatusService struct {
 	repository projectstatusrepository.ProjectStatusRepository
 }
 
-func NewService(database database.Database, repository projectstatusrepository.ProjectStatusRepository) ProjectStatusService {
-	return &projectStatusService{database: database, repository: repository}
+func NewService(db database.Database, repository projectstatusrepository.ProjectStatusRepository) ProjectStatusService {
+	return &projectStatusService{database: db, repository: repository}
 }
 
 func (service *projectStatusService) Add(ctx context.Context, projectStatus domain.ProjectStatus) (domain.ProjectStatus, error) {

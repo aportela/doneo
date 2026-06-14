@@ -19,15 +19,15 @@ type TagRepository interface {
 }
 
 type tagRepository struct {
-	database database.Database
+	db database.Database
 }
 
-func NewRepository(database database.Database) TagRepository {
-	return &tagRepository{database: database}
+func NewRepository(db database.Database) TagRepository {
+	return &tagRepository{db: db}
 }
 
 func (repository *tagRepository) AddTaskTag(ctx context.Context, taskId string, tag string) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             INSERT INTO task_tags (task_id, tag)
@@ -59,7 +59,7 @@ func (repository *tagRepository) AddTaskTag(ctx context.Context, taskId string, 
 }
 
 func (repository *tagRepository) DeleteTaskTags(ctx context.Context, taskId string) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             DELETE FROM task_tags
@@ -78,7 +78,7 @@ func (repository *tagRepository) DeleteTaskTags(ctx context.Context, taskId stri
 }
 
 func (repository *tagRepository) GetTaskTags(ctx context.Context, taskId string) ([]string, error) {
-	rows, err := repository.database.QueryContext(
+	rows, err := repository.db.QueryContext(
 		ctx,
 		`
             SELECT

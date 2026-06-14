@@ -11,7 +11,7 @@ import (
 	"github.com/aportela/doneo/internal/utils"
 )
 
-func createProjectTypes(database database.Database) []string {
+func createProjectTypes(db database.Database) []string {
 	projectTypeNames := []string{
 		"Personal", "Business", "Work", "Educational", "Technology",
 		"Creative", "Research", "Social", "Marketing", "Sports",
@@ -19,7 +19,7 @@ func createProjectTypes(database database.Database) []string {
 		"Legal", "Logistics", "Administrative", "Strategy",
 	}
 	var newProjectTypeIds []string
-	service := projecttypeservice.NewService(database, projecttyperepository.NewRepository(database))
+	service := projecttypeservice.NewService(db, projecttyperepository.NewRepository(db))
 	for _, projectTypeName := range projectTypeNames {
 		projectType := domain.ProjectType{
 			Name:     projectTypeName,

@@ -21,15 +21,15 @@ type TimerRepository interface {
 }
 
 type timerRepository struct {
-	database database.Database
+	db database.Database
 }
 
-func NewRepository(database database.Database) TimerRepository {
-	return &timerRepository{database: database}
+func NewRepository(db database.Database) TimerRepository {
+	return &timerRepository{db: db}
 }
 
 func (repository *timerRepository) Start(ctx context.Context, id string, userId string, summary string, startedAt int64) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             INSERT INTO timers (id, user_id, summary, started_at, finished_at)
@@ -70,7 +70,7 @@ func (repository *timerRepository) Start(ctx context.Context, id string, userId 
 }
 
 func (repository *timerRepository) Stop(ctx context.Context, id string, userId string, finishedAt int64) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             UPDATE timers SET
@@ -110,7 +110,7 @@ func (repository *timerRepository) Stop(ctx context.Context, id string, userId s
 }
 
 func (repository *timerRepository) Delete(ctx context.Context, id string, userId string) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             DELETE FROM timers
@@ -148,7 +148,7 @@ func (repository *timerRepository) Delete(ctx context.Context, id string, userId
 }
 
 func (repository *timerRepository) Clear(ctx context.Context, userId string) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             DELETE FROM timers
@@ -184,7 +184,7 @@ func (repository *timerRepository) Clear(ctx context.Context, userId string) err
 }
 
 func (repository *timerRepository) Search(ctx context.Context, userId string) ([]domain.Timer, error) {
-	rows, err := repository.database.QueryContext(ctx,
+	rows, err := repository.db.QueryContext(ctx,
 		`
 			SELECT
 				T.id, T.summary, T.started_at, T.finished_at

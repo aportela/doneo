@@ -26,16 +26,16 @@ type AttachmentRepository interface {
 }
 
 type attachmentRepository struct {
-	database database.Database
+	db database.Database
 }
 
-func NewRepository(database database.Database) AttachmentRepository {
-	return &attachmentRepository{database: database}
+func NewRepository(db database.Database) AttachmentRepository {
+	return &attachmentRepository{db: db}
 }
 
 func (repository *attachmentRepository) AddAttachment(ctx context.Context, attachment domain.Attachment) error {
 	dto := toDTO(attachment)
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             INSERT INTO attachments (id, original_name, content_type, size, user_id, created_at)
@@ -71,7 +71,7 @@ func (repository *attachmentRepository) AddAttachment(ctx context.Context, attac
 }
 
 func (repository *attachmentRepository) DeleteAttachment(ctx context.Context, attachmentId string) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             DELETE FROM attachments
@@ -91,7 +91,7 @@ func (repository *attachmentRepository) DeleteAttachment(ctx context.Context, at
 
 func (repository *attachmentRepository) GetAttachment(ctx context.Context, id string) (domain.Attachment, error) {
 	var dto attachmentDTO
-	err := repository.database.QueryRowContext(
+	err := repository.db.QueryRowContext(
 		ctx,
 		`
             SELECT
@@ -112,7 +112,7 @@ func (repository *attachmentRepository) GetAttachment(ctx context.Context, id st
 }
 
 func (repository *attachmentRepository) AddProjectAttachment(ctx context.Context, projectId string, attachmentId string) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             INSERT INTO project_attachments (project_id, attachment_id)
@@ -146,7 +146,7 @@ func (repository *attachmentRepository) AddProjectAttachment(ctx context.Context
 }
 
 func (repository *attachmentRepository) DeleteProjectAttachment(ctx context.Context, projectId string, attachmentId string) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             DELETE FROM project_attachments
@@ -168,7 +168,7 @@ func (repository *attachmentRepository) DeleteProjectAttachment(ctx context.Cont
 }
 
 func (repository *attachmentRepository) GetProjectAttachments(ctx context.Context, projectId string) ([]domain.Attachment, error) {
-	rows, err := repository.database.QueryContext(
+	rows, err := repository.db.QueryContext(
 		ctx,
 		`
             SELECT
@@ -201,7 +201,7 @@ func (repository *attachmentRepository) GetProjectAttachments(ctx context.Contex
 }
 
 func (repository *attachmentRepository) AddTaskAttachment(ctx context.Context, taskId string, attachmentId string) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             INSERT INTO task_attachments (task_id, attachment_id)
@@ -235,7 +235,7 @@ func (repository *attachmentRepository) AddTaskAttachment(ctx context.Context, t
 }
 
 func (repository *attachmentRepository) DeleteTaskAttachment(ctx context.Context, taskId string, attachmentId string) error {
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
             DELETE FROM task_attachments
@@ -257,7 +257,7 @@ func (repository *attachmentRepository) DeleteTaskAttachment(ctx context.Context
 }
 
 func (repository *attachmentRepository) GetTaskAttachments(ctx context.Context, taskId string) ([]domain.Attachment, error) {
-	rows, err := repository.database.QueryContext(
+	rows, err := repository.db.QueryContext(
 		ctx,
 		`
             SELECT

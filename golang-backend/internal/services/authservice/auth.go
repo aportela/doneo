@@ -19,8 +19,8 @@ type authService struct {
 	repository userrepository.UserRepository
 }
 
-func NewService(database database.Database, repository userrepository.UserRepository) AuthService {
-	return &authService{database: database, repository: repository}
+func NewService(db database.Database, repository userrepository.UserRepository) AuthService {
+	return &authService{database: db, repository: repository}
 }
 
 func (service *authService) SignIn(ctx context.Context, email string, password string) (domain.User, error) {

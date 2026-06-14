@@ -24,8 +24,8 @@ type taskPriorityService struct {
 	repository taskpriorityrepository.TaskPriorityRepository
 }
 
-func NewService(database database.Database, repository taskpriorityrepository.TaskPriorityRepository) TaskPriorityService {
-	return &taskPriorityService{database: database, repository: repository}
+func NewService(db database.Database, repository taskpriorityrepository.TaskPriorityRepository) TaskPriorityService {
+	return &taskPriorityService{database: db, repository: repository}
 }
 
 func (service *taskPriorityService) Add(ctx context.Context, taskPriority domain.TaskPriority) (domain.TaskPriority, error) {

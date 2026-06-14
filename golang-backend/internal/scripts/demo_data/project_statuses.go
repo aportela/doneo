@@ -11,12 +11,12 @@ import (
 	"github.com/aportela/doneo/internal/utils"
 )
 
-func createProjectStatuses(database database.Database) []string {
+func createProjectStatuses(db database.Database) []string {
 	projectStatusNames := []string{
 		"Pending", "Started", "Stopped", "Finished", "Aborted",
 	}
 	var newProjectStatusIds []string
-	service := projectstatusservice.NewService(database, projectstatusrepository.NewRepository(database))
+	service := projectstatusservice.NewService(db, projectstatusrepository.NewRepository(db))
 	for index, projectStatusName := range projectStatusNames {
 		var flags domain.Bitmask
 		switch projectStatusName {

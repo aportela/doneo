@@ -30,8 +30,8 @@ type noteService struct {
 	repository              noterepository.NoteRepository
 }
 
-func NewService(database database.Database, historyOperationService historyoperationservice.HistoryOperationService, repository noterepository.NoteRepository) NoteService {
-	return &noteService{database: database, historyOperationService: historyOperationService, repository: repository}
+func NewService(db database.Database, historyOperationService historyoperationservice.HistoryOperationService, repository noterepository.NoteRepository) NoteService {
+	return &noteService{database: db, historyOperationService: historyOperationService, repository: repository}
 }
 
 func (service *noteService) AddProjectNote(ctx context.Context, projectId string, note domain.Note) (domain.Note, error) {

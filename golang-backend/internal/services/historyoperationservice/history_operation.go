@@ -22,8 +22,8 @@ type historyOperationService struct {
 	repository historyoperationrepository.HistoryOperationRepository
 }
 
-func NewService(database database.Database, repository historyoperationrepository.HistoryOperationRepository) HistoryOperationService {
-	return &historyOperationService{database: database, repository: repository}
+func NewService(db database.Database, repository historyoperationrepository.HistoryOperationRepository) HistoryOperationService {
+	return &historyOperationService{database: db, repository: repository}
 }
 
 func (service *historyOperationService) AddProjectHistoryOperation(ctx context.Context, projectId string, operation domain.HistoryOperation) (domain.HistoryOperation, error) {

@@ -20,16 +20,16 @@ type HistoryOperationRepository interface {
 }
 
 type historyOperationRepository struct {
-	database database.Database
+	db database.Database
 }
 
-func NewRepository(database database.Database) HistoryOperationRepository {
-	return &historyOperationRepository{database: database}
+func NewRepository(db database.Database) HistoryOperationRepository {
+	return &historyOperationRepository{db: db}
 }
 
 func (repository *historyOperationRepository) AddProjectHistoryOperation(ctx context.Context, projectId string, operation domain.HistoryOperation) error {
 	dto := toDTO(operation)
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
 			INSERT INTO history_operations
@@ -68,7 +68,7 @@ func (repository *historyOperationRepository) AddProjectHistoryOperation(ctx con
 }
 
 func (repository *historyOperationRepository) SearchProjectHistoryOperations(ctx context.Context, projectId string) ([]domain.HistoryOperation, error) {
-	rows, err := repository.database.QueryContext(
+	rows, err := repository.db.QueryContext(
 		ctx,
 		`
             SELECT
@@ -101,7 +101,7 @@ func (repository *historyOperationRepository) SearchProjectHistoryOperations(ctx
 
 func (repository *historyOperationRepository) AddTaskOperation(ctx context.Context, projectId string, taskId string, operation domain.HistoryOperation) error {
 	dto := toDTO(operation)
-	_, err := repository.database.ExecContext(
+	_, err := repository.db.ExecContext(
 		ctx,
 		`
 			INSERT INTO history_operations
@@ -143,7 +143,7 @@ func (repository *historyOperationRepository) AddTaskOperation(ctx context.Conte
 }
 
 func (repository *historyOperationRepository) SearchTaskHistoryOperations(ctx context.Context, taskId string) ([]domain.HistoryOperation, error) {
-	rows, err := repository.database.QueryContext(
+	rows, err := repository.db.QueryContext(
 		ctx,
 		`
             SELECT
