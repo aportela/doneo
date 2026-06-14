@@ -11,59 +11,59 @@ type CacheKey struct {
 	ProjectID string
 }
 
-type PermissionCache interface {
+type ProjectPermissionCache interface {
 	Get(userID string, projectID string) (domain.Bitmask, bool)
-	Set(userID string, projectID string, perms domain.Bitmask)
+	Set(userID string, projectID string, permissionBitmask domain.Bitmask)
 	Delete(userID string, projectID string)
 	Clear()
 }
 
-type permissionCache struct {
-	mu    sync.RWMutex
-	perms map[CacheKey]domain.Bitmask
+type projectPermissionCache struct {
+	mu          sync.RWMutex
+	permissions map[CacheKey]domain.Bitmask
 }
 
-func NewPermissionCache() PermissionCache {
-	return &permissionCache{
-		perms: make(map[CacheKey]domain.Bitmask),
+func NewProjectPermissionCache() ProjectPermissionCache {
+	return &projectPermissionCache{
+		permissions: make(map[CacheKey]domain.Bitmask),
 	}
 }
 
-func (service *permissionCache) Get(userID string, projectID string) (domain.Bitmask, bool) {
+func (service *projectPermissionCache) Get(userID string, projectID string) (domain.Bitmask, bool) {
 	service.mu.RLock()
 	defer service.mu.RUnlock()
 
-	perms, ok := service.perms[CacheKey{
+	permissionBitmask, ok := service.permissions[CacheKey{
 		UserID:    userID,
 		ProjectID: projectID,
 	}]
 
-	return perms, ok
+	return permissionBitmask, ok
 }
 
-func (service *permissionCache) Set(userID string, projectID string, perms domain.Bitmask) {
+func (service *projectPermissionCache) Set(userID string, projectID string, permissionBitmask domain.Bitmask) {
 	service.mu.Lock()
 	defer service.mu.Unlock()
 
-	service.perms[CacheKey{
+	service.permissions[CacheKey{
 		UserID:    userID,
 		ProjectID: projectID,
-	}] = perms
+	}] = permissionBitmask
 }
 
-func (service *permissionCache) Delete(userID string, projectID string) {
+func (service *projectPermissionCache) Delete(userID string, projectID string) {
 	service.mu.Lock()
 	defer service.mu.Unlock()
 
-	delete(service.perms, CacheKey{
+	delete(service.permissions, CacheKey{
 		UserID:    userID,
 		ProjectID: projectID,
 	})
 }
 
-func (service *permissionCache) Clear() {
+func (service *projectPermissionCache) Clear() {
 	service.mu.Lock()
 	defer service.mu.Unlock()
 
-	service.perms = make(map[CacheKey]domain.Bitmask)
+	service.permissions = make(map[CacheKey]domain.Bitmask)
 }

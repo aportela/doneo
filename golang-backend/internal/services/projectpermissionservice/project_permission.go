@@ -60,7 +60,7 @@ func (service *projectPermissionService) Add(ctx context.Context, projectId stri
 	if err != nil {
 		return domain.ProjectPermission{}, err
 	}
-	cacheservice.NewPermissionCache().Set(currentUserId, projectId, permission.Role.PermissionsBitmask)
+	cacheservice.NewProjectPermissionCache().Set(currentUserId, projectId, permission.Role.PermissionsBitmask)
 	return permission, nil
 }
 
@@ -93,7 +93,7 @@ func (service *projectPermissionService) Delete(ctx context.Context, projectId s
 	if err != nil {
 		return err
 	}
-	cacheservice.NewPermissionCache().Delete(currentUserId, projectId)
+	cacheservice.NewProjectPermissionCache().Delete(currentUserId, projectId)
 	return nil
 }
 

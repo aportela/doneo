@@ -23,12 +23,12 @@ type AuthorizationService interface {
 
 type authorizationService struct {
 	database   database.Database // TODO: delete ||create project permission repository with this on NewService
-	cache      cacheservice.PermissionCache
+	cache      cacheservice.ProjectPermissionCache
 	repository projectpermissionrepository.ProjectPermissionRepository
 }
 
 func NewService(database database.Database, repository projectpermissionrepository.ProjectPermissionRepository) AuthorizationService {
-	return &authorizationService{database: database, cache: cacheservice.NewPermissionCache(), repository: repository}
+	return &authorizationService{database: database, cache: cacheservice.NewProjectPermissionCache(), repository: repository}
 }
 
 func (service *authorizationService) RequireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error {
