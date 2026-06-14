@@ -10,7 +10,9 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
+	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
+	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/utils"
 )
 
@@ -71,6 +73,14 @@ func (service *projectService) Add(ctx context.Context, project domain.Project) 
 }
 
 func (service *projectService) Update(ctx context.Context, project domain.Project) (domain.Project, error) {
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return domain.Project{}, fmt.Errorf("[ProjectService] user ID not found in context")
+	}
+	err := authorizationservice.NewService(service.database, projectpermissionrepository.NewRepository(service.database)).RequireProjectUpdatePermission(ctx, currentUserId, project.ID)
+	if err != nil {
+		return domain.Project{}, err
+	}
 	tx, err := service.database.Begin()
 	if err != nil {
 		return domain.Project{}, err
@@ -83,10 +93,6 @@ func (service *projectService) Update(ctx context.Context, project domain.Projec
 			_ = tx.Rollback()
 		}
 	}()
-	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return domain.Project{}, fmt.Errorf("[ProjectService] user ID not found in context")
-	}
 	project.UpdatedAt = utils.CurrentTimePtr()
 	err = service.repository.Update(ctx, project)
 	if err != nil {
