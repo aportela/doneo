@@ -10,7 +10,6 @@ import (
 	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
-	"github.com/aportela/doneo/internal/services/cacheservice"
 	"github.com/aportela/doneo/internal/utils"
 )
 
@@ -60,7 +59,7 @@ func (service *projectPermissionService) Add(ctx context.Context, projectId stri
 	if err != nil {
 		return domain.ProjectPermission{}, err
 	}
-	cacheservice.NewProjectPermissionCache().Set(currentUserId, projectId, permission.Role.PermissionsBitmask)
+	//cacheservice.NewProjectPermissionCache().Set(currentUserId, projectId, permission.Role.PermissionsBitmask)
 	return permission, nil
 }
 
@@ -93,7 +92,7 @@ func (service *projectPermissionService) Delete(ctx context.Context, projectId s
 	if err != nil {
 		return err
 	}
-	cacheservice.NewProjectPermissionCache().Delete(currentUserId, projectId)
+	//cacheservice.NewProjectPermissionCache().Delete(currentUserId, projectId)
 	return nil
 }
 

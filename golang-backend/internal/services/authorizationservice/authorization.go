@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/aportela/doneo/internal/cache"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
-	"github.com/aportela/doneo/internal/services/cacheservice"
 )
 
 type AuthorizationService interface {
@@ -24,8 +24,7 @@ type AuthorizationService interface {
 
 type authorizationService struct {
 	database                    database.Database
-	projectPermissionCache      cacheservice.ProjectPermissionCache
-	userPermissionCache         cacheservice.UserPermissionCache
+	permissionCache             cache.PermissionCache
 	userRepository              userrepository.UserRepository
 	projectPermissionRepository projectpermissionrepository.ProjectPermissionRepository
 }
@@ -33,27 +32,26 @@ type authorizationService struct {
 func NewService(database database.Database) AuthorizationService {
 	return &authorizationService{
 		database:                    database,
-		projectPermissionCache:      cacheservice.NewProjectPermissionCache(),
-		userPermissionCache:         cacheservice.NewUserPermissionCache(),
+		permissionCache:             cache.NewPermissionCache(),
 		userRepository:              userrepository.NewRepository(database),
 		projectPermissionRepository: projectpermissionrepository.NewRepository(database),
 	}
 }
 
 func (service *authorizationService) RequireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error {
-	userPermissionsBitmask, ok := service.userPermissionCache.Get(userID)
+	userPermissionsBitmask, ok := service.permissionCache.GetUser(userID)
 	if !ok {
 		user, err := service.userRepository.Get(ctx, userID)
 		if err != nil {
 			return fmt.Errorf("[AuthorizationService] failed to get user permissions: %w", err)
 		}
 		userPermissionsBitmask = user.PermissionsBitmask
-		service.userPermissionCache.Set(userID, userPermissionsBitmask)
+		service.permissionCache.SetUser(userID, userPermissionsBitmask)
 	}
 	if userPermissionsBitmask.HasFlag(domain.UserPermissionAdmin) {
 		return nil
 	}
-	permissionsBitmask, ok := service.projectPermissionCache.Get(userID, projectID)
+	permissionsBitmask, ok := service.permissionCache.GetProject(userID, projectID)
 	if !ok {
 		found := false
 		projectPermissions, err := service.projectPermissionRepository.Search(ctx, projectID)
@@ -63,7 +61,7 @@ func (service *authorizationService) RequireProjectPermission(ctx context.Contex
 		for _, projectPermission := range projectPermissions {
 			if projectPermission.User.ID == userID {
 				permissionsBitmask = projectPermission.Role.PermissionsBitmask
-				service.projectPermissionCache.Set(userID, projectID, permissionsBitmask)
+				service.permissionCache.SetProject(userID, projectID, permissionsBitmask)
 				found = true
 			}
 		}
