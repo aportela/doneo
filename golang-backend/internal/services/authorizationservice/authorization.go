@@ -7,6 +7,7 @@ import (
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
+	"github.com/aportela/doneo/internal/services/cacheservice"
 )
 
 type AuthorizationService interface {
@@ -21,33 +22,39 @@ type AuthorizationService interface {
 }
 
 type authorizationService struct {
-	database   database.Database
+	database   database.Database // TODO: delete ||create project permission repository with this on NewService
+	cache      cacheservice.PermissionCache
 	repository projectpermissionrepository.ProjectPermissionRepository
 }
 
 func NewService(database database.Database, repository projectpermissionrepository.ProjectPermissionRepository) AuthorizationService {
-	return &authorizationService{database: database, repository: repository}
+	return &authorizationService{database: database, cache: cacheservice.NewPermissionCache(), repository: repository}
 }
 
 func (service *authorizationService) RequireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error {
-	projectPermissions, err := service.repository.Search(ctx, projectID)
-	if err != nil {
-		return fmt.Errorf("[AuthorizationService] failed to get project permissions: %w", err)
-	}
-	for _, projectPermission := range projectPermissions {
-		if projectPermission.User.ID == userID {
-			if projectPermission.Role.PermissionsBitmask.HasFlag(permission) {
-				return nil
+	permissionsBitmask, ok := service.cache.Get(userID, projectID)
+	if !ok {
+		found := false
+		projectPermissions, err := service.repository.Search(ctx, projectID)
+		if err != nil {
+			return fmt.Errorf("[AuthorizationService] failed to get project permissions: %w", err)
+		}
+		for _, projectPermission := range projectPermissions {
+			if projectPermission.User.ID == userID {
+				permissionsBitmask = projectPermission.Role.PermissionsBitmask
+				service.cache.Set(userID, projectID, permissionsBitmask)
+				found = true
 			}
 		}
+		if !found {
+			return domain.AuthorizationError
+		}
 	}
-	return domain.AuthorizationError
-	/*
-		return fmt.Errorf(
-			"[AuthorizationService] user %s lacks permission %v on project %s",
-			userID, permission, projectID,
-		)
-	*/
+	if permissionsBitmask.HasFlag(permission) {
+		return nil
+	} else {
+		return domain.AuthorizationError
+	}
 }
 
 func (service *authorizationService) RequireProjectUpdatePermission(ctx context.Context, userID string, projectID string) error {
