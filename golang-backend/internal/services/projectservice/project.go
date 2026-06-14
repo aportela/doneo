@@ -10,7 +10,6 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
-	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
 	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/utils"
@@ -77,7 +76,7 @@ func (service *projectService) Update(ctx context.Context, project domain.Projec
 	if !ok {
 		return domain.Project{}, fmt.Errorf("[ProjectService] user ID not found in context")
 	}
-	err := authorizationservice.NewService(service.database, projectpermissionrepository.NewRepository(service.database)).RequireProjectUpdatePermission(ctx, currentUserId, project.ID)
+	err := authorizationservice.NewService(service.database).RequireProjectUpdatePermission(ctx, currentUserId, project.ID)
 	if err != nil {
 		return domain.Project{}, err
 	}
@@ -114,7 +113,7 @@ func (service *projectService) Delete(ctx context.Context, id string) error {
 	if !ok {
 		return fmt.Errorf("[ProjectService] user ID not found in context")
 	}
-	err := authorizationservice.NewService(service.database, projectpermissionrepository.NewRepository(service.database)).RequireProjectDeletePermission(ctx, currentUserId, id)
+	err := authorizationservice.NewService(service.database).RequireProjectDeletePermission(ctx, currentUserId, id)
 	if err != nil {
 		return err
 	}
@@ -146,7 +145,7 @@ func (service *projectService) Get(ctx context.Context, id string) (domain.Proje
 	if !ok {
 		return domain.Project{}, fmt.Errorf("[ProjectService] user ID not found in context")
 	}
-	err := authorizationservice.NewService(service.database, projectpermissionrepository.NewRepository(service.database)).RequireProjectViewPermission(ctx, currentUserId, id)
+	err := authorizationservice.NewService(service.database).RequireProjectViewPermission(ctx, currentUserId, id)
 	if err != nil {
 		return domain.Project{}, err
 	}
@@ -163,6 +162,7 @@ func (service *projectService) Search(ctx context.Context, pager browser.Params,
 		return nil, browser.Result{}, fmt.Errorf("[ProjectService] user ID not found in context")
 	}
 	if false {
+		// TODO: user is not admin, search only projects with view permission for current user
 		filter.ViewByUserId = &currentUserId
 	}
 	projects, pagerResult, err := service.repository.Search(ctx, pager, order, filter)
