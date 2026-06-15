@@ -5,22 +5,22 @@ import (
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 )
 
-func addRequestToDomain(request addRequest) domain.TaskTimeEntry {
-	return domain.TaskTimeEntry{
+func addRequestToDomain(request addRequest) domain.TaskTimerEntry {
+	return domain.TaskTimerEntry{
 		Summary:      request.Summary,
 		TotalSeconds: request.TotalSeconds,
 	}
 }
 
-func updateRequestToDomain(request updateRequest) domain.TaskTimeEntry {
-	return domain.TaskTimeEntry{
+func updateRequestToDomain(request updateRequest) domain.TaskTimerEntry {
+	return domain.TaskTimerEntry{
 		ID:           request.Id,
 		Summary:      request.Summary,
 		TotalSeconds: request.TotalSeconds,
 	}
 }
 
-func domainToResponse(taskTimeEntry domain.TaskTimeEntry) TaskTimeEntryResponse {
+func domainToResponse(taskTimeEntry domain.TaskTimerEntry) TaskTimeEntryResponse {
 	return TaskTimeEntryResponse{
 		Id:           taskTimeEntry.ID,
 		User:         userhandler.BaseDomainToBaseResponse(taskTimeEntry.CreatedBy),
@@ -30,7 +30,7 @@ func domainToResponse(taskTimeEntry domain.TaskTimeEntry) TaskTimeEntryResponse 
 	}
 }
 
-func domainArrayToResponseArray(taskTimeEntries []domain.TaskTimeEntry) []TaskTimeEntryResponse {
+func domainArrayToResponseArray(taskTimeEntries []domain.TaskTimerEntry) []TaskTimeEntryResponse {
 	taskTimeEntriesResponse := []TaskTimeEntryResponse{}
 	for _, taskTimeEntry := range taskTimeEntries {
 		taskTimeEntriesResponse = append(taskTimeEntriesResponse, domainToResponse(taskTimeEntry))
@@ -38,7 +38,7 @@ func domainArrayToResponseArray(taskTimeEntries []domain.TaskTimeEntry) []TaskTi
 	return taskTimeEntriesResponse
 }
 
-func toSearchResponse(taskTimeEntries []domain.TaskTimeEntry) searchResponse {
+func toSearchResponse(taskTimeEntries []domain.TaskTimerEntry) searchResponse {
 	return searchResponse{
 		ProjectPermissions: domainArrayToResponseArray(taskTimeEntries),
 	}

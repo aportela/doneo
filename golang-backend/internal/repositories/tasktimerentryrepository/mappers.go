@@ -1,13 +1,17 @@
 package tasktimeentryrepository
 
 import (
+	"errors"
+	"strings"
 	"time"
 
 	"github.com/aportela/doneo/internal/domain"
+	"modernc.org/sqlite"
+	sqlite3 "modernc.org/sqlite/lib"
 )
 
-func toDTO(taskTimeEntry domain.TaskTimeEntry) taskTimeEntryDTO {
-	return taskTimeEntryDTO{
+func toDTO(taskTimeEntry domain.TaskTimerEntry) taskTimerEntryDTO {
+	return taskTimerEntryDTO{
 		ID:           taskTimeEntry.ID,
 		CreatedAt:    taskTimeEntry.CreatedAt.UnixMilli(),
 		CreatorId:    taskTimeEntry.CreatedBy.ID,
@@ -17,8 +21,8 @@ func toDTO(taskTimeEntry domain.TaskTimeEntry) taskTimeEntryDTO {
 	}
 }
 
-func toDomain(taskTimeEntry taskTimeEntryDTO) domain.TaskTimeEntry {
-	return domain.TaskTimeEntry{
+func toDomain(taskTimeEntry taskTimerEntryDTO) domain.TaskTimerEntry {
+	return domain.TaskTimerEntry{
 		ID:           taskTimeEntry.ID,
 		CreatedAt:    time.UnixMilli(taskTimeEntry.CreatedAt),
 		CreatedBy:    domain.UserBase{ID: taskTimeEntry.CreatorId, Name: taskTimeEntry.CreatorName},
@@ -27,10 +31,24 @@ func toDomain(taskTimeEntry taskTimeEntryDTO) domain.TaskTimeEntry {
 	}
 }
 
-func toDomainArray(timers []taskTimeEntryDTO) []domain.TaskTimeEntry {
-	results := make([]domain.TaskTimeEntry, 0, len(timers))
+func toDomainArray(timers []taskTimerEntryDTO) []domain.TaskTimerEntry {
+	results := make([]domain.TaskTimerEntry, 0, len(timers))
 	for _, timer := range timers {
 		results = append(results, toDomain(timer))
 	}
 	return results
+}
+
+func mapSQLiteError(err error) error {
+	var sqlErr *sqlite.Error
+	if !errors.As(err, &sqlErr) {
+		return err
+	}
+	switch sqlErr.Code() {
+	case sqlite3.SQLITE_CONSTRAINT_CHECK:
+		if strings.Contains(sqlErr.Error(), "length(summary)") {
+			return &domain.ValidationError{Field: "summary"}
+		}
+	}
+	return err
 }

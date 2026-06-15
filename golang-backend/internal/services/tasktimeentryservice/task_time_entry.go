@@ -14,11 +14,11 @@ import (
 )
 
 type TaskTimeEntryService interface {
-	Add(ctx context.Context, projectId string, taskId string, taskTimeEntry domain.TaskTimeEntry) error
-	Update(ctx context.Context, projectId string, taskId string, taskTimeEntry domain.TaskTimeEntry) error
+	Add(ctx context.Context, projectId string, taskId string, taskTimeEntry domain.TaskTimerEntry) error
+	Update(ctx context.Context, projectId string, taskId string, taskTimeEntry domain.TaskTimerEntry) error
 	Delete(ctx context.Context, projectId string, taskId string, taskTimeEntryId string) error
-	Get(ctx context.Context, id string) (domain.TaskTimeEntry, error)
-	GetTaskTimeEntries(ctx context.Context, taskId string) ([]domain.TaskTimeEntry, error)
+	Get(ctx context.Context, id string) (domain.TaskTimerEntry, error)
+	GetTaskTimeEntries(ctx context.Context, taskId string) ([]domain.TaskTimerEntry, error)
 }
 
 type taskTimeEntryService struct {
@@ -31,7 +31,7 @@ func NewService(db database.Database, history historyoperationservice.HistoryOpe
 	return &taskTimeEntryService{database: db, history: history, repository: repository}
 }
 
-func (service *taskTimeEntryService) Add(ctx context.Context, projectId string, taskId string, taskTimeEntry domain.TaskTimeEntry) error {
+func (service *taskTimeEntryService) Add(ctx context.Context, projectId string, taskId string, taskTimeEntry domain.TaskTimerEntry) error {
 	tx, err := service.database.Begin()
 	if err != nil {
 		return err
@@ -65,7 +65,7 @@ func (service *taskTimeEntryService) Add(ctx context.Context, projectId string, 
 	return nil
 }
 
-func (service *taskTimeEntryService) Update(ctx context.Context, projectId string, taskId string, taskTimeEntry domain.TaskTimeEntry) error {
+func (service *taskTimeEntryService) Update(ctx context.Context, projectId string, taskId string, taskTimeEntry domain.TaskTimerEntry) error {
 	tx, err := service.database.Begin()
 	if err != nil {
 		return err
@@ -119,15 +119,15 @@ func (service *taskTimeEntryService) Delete(ctx context.Context, projectId strin
 	return nil
 }
 
-func (service *taskTimeEntryService) Get(ctx context.Context, id string) (domain.TaskTimeEntry, error) {
+func (service *taskTimeEntryService) Get(ctx context.Context, id string) (domain.TaskTimerEntry, error) {
 	taskTimeEntry, err := service.repository.Get(ctx, id)
 	if err != nil {
-		return domain.TaskTimeEntry{}, fmt.Errorf("[TaskTimeEntryService] failed to get task time entry with ID %s: %w", id, err)
+		return domain.TaskTimerEntry{}, fmt.Errorf("[TaskTimeEntryService] failed to get task time entry with ID %s: %w", id, err)
 	}
 	return taskTimeEntry, nil
 }
 
-func (service *taskTimeEntryService) GetTaskTimeEntries(ctx context.Context, taskId string) ([]domain.TaskTimeEntry, error) {
+func (service *taskTimeEntryService) GetTaskTimeEntries(ctx context.Context, taskId string) ([]domain.TaskTimerEntry, error) {
 	taskTimeEntries, err := service.repository.GetTaskTimeEntries(ctx, taskId)
 	if err != nil {
 		return nil, fmt.Errorf("[TaskTimeEntryService] failed to get task time entries: %w", err)
