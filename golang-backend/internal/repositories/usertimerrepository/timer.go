@@ -1,4 +1,4 @@
-package timerrepository
+package usertimerrepository
 
 import (
 	"context"
