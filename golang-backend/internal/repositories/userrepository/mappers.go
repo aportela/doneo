@@ -23,6 +23,7 @@ func toDTO(user domain.User) userDTO {
 	return userDTO{
 		userBaseDTO:        toBaseDTO(user.UserBase),
 		Email:              user.Email,
+		PasswordHash:       user.PasswordHash,
 		CreatedAt:          user.CreatedAt.UnixMilli(),
 		UpdatedAt:          utils.TimePtrToSQLNullInt64(user.UpdatedAt),
 		DeletedAt:          utils.TimePtrToSQLNullInt64(user.DeletedAt),

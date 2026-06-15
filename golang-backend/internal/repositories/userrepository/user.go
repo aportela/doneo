@@ -10,11 +10,10 @@ import (
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type UserRepository interface {
-	Add(ctx context.Context, dbExecutor database.DatabaseExecutor, user domain.User, password string) error
+	Add(ctx context.Context, dbExecutor database.DatabaseExecutor, user domain.User) error
 	Update(ctx context.Context, dbExecutor database.DatabaseExecutor, user domain.User) error
 	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string, deletedAt int64) error
 	UnDelete(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) error
@@ -32,15 +31,9 @@ func NewRepository() UserRepository {
 	return &userRepository{}
 }
 
-func (repository *userRepository) Add(ctx context.Context, dbExecutor database.DatabaseExecutor, user domain.User, password string) error {
-	hashedPasswordBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return err
-	}
+func (repository *userRepository) Add(ctx context.Context, dbExecutor database.DatabaseExecutor, user domain.User) error {
 	dto := toDTO(user)
-	dto.PasswordHash = string(hashedPasswordBytes)
-
-	_, err = dbExecutor.ExecContext(
+	_, err := dbExecutor.ExecContext(
 		ctx,
 		`
             INSERT INTO users
@@ -63,14 +56,7 @@ func (repository *userRepository) Add(ctx context.Context, dbExecutor database.D
 
 func (repository *userRepository) Update(ctx context.Context, dbExecutor database.DatabaseExecutor, user domain.User) error {
 	dto := toDTO(user)
-	hasNewPassword := user.Password != ""
-	if hasNewPassword {
-		hashedPasswordBytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-		if err != nil {
-			return err
-		}
-		dto.PasswordHash = string(hashedPasswordBytes)
-	}
+	hasNewPassword := dto.PasswordHash != ""
 	var query string
 	var args []any
 	if hasNewPassword {
