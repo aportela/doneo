@@ -12,17 +12,17 @@
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../../shared/types/ajaxState';
     import type { FormMode } from "../../../../shared/types/form-mode.ts";
     import type { SearchRequest } from "../../types/dto.ts";
-    import type { SearchResponse } from "../../../project-tasks/types/dto.ts";
-    import type { TasksTableFilters } from "../../../project-tasks/types/project-tasks-table-filters.ts";
+    import type { SearchResponse } from "../../../tasks/types/dto.ts";
+    import type { TasksTableFilters } from "../../../tasks/types/project-tasks-table-filters.ts";
 
     import { Sort } from '../../../../shared/types/models/sort';
-    import { Task } from "../../../project-tasks/models/tasks.ts";
+    import { Task } from "../../../tasks/models/tasks.ts";
 
-    import { taskService } from "../../../project-tasks/services/task.ts";
+    import { taskService } from "../../../tasks/services/task.ts";
     import { handleAPIError } from '../../../../api/client/errorHandler';
 
-    import NewTaskForm from "../../../project-tasks/components/NewTaskForm.vue";
-    import ProjectTasksTable from "../../../project-tasks/components/ProjectTasksTable.vue";
+    import NewTaskForm from "../../../tasks/components/NewTaskForm.vue";
+    import ProjectTasksTable from "../../../tasks/components/ProjectTasksTable.vue";
     import Pager from '../../../../shared/components/tables/Pager.vue';
 
     interface ProjectTasksProps {

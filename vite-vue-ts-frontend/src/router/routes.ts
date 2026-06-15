@@ -45,19 +45,17 @@ const routes: RouteRecordRaw[] = [
       {
         name: "manageTasks",
         path: "tasks",
-        component: () =>
-          import("../modules/project-tasks/pages/ManageTasksPage.vue"),
+        component: () => import("../modules/tasks/pages/ManageTasksPage.vue"),
       },
       {
         name: "task",
         path: "projects/:projectId/tasks/:taskId",
-        component: () => import("../modules/project-tasks/pages/TaskPage.vue"),
+        component: () => import("../modules/tasks/pages/TaskPage.vue"),
         children: [
           {
             path: "tab/:tab",
             name: "taskTab",
-            component: () =>
-              import("../modules/project-tasks/pages/TaskPage.vue"),
+            component: () => import("../modules/tasks/pages/TaskPage.vue"),
           },
         ],
       },
@@ -91,25 +89,19 @@ const routes: RouteRecordRaw[] = [
         name: "manageProjectStatuses",
         path: "manage/project-statuses",
         component: () =>
-          import(
-            "../modules/project-statuses/pages/ManageProjectStatusesPage.vue"
-          ),
+          import("../modules/project-statuses/pages/ManageProjectStatusesPage.vue"),
       },
       {
         name: "manageProjectPriorities",
         path: "manage/project-priorities",
         component: () =>
-          import(
-            "../modules/project-priorities/pages/ManageProjectPrioritiesPage.vue"
-          ),
+          import("../modules/project-priorities/pages/ManageProjectPrioritiesPage.vue"),
       },
       {
         name: "manageTaskPriorities",
         path: "manage/task-priorities",
         component: () =>
-          import(
-            "../modules/task-priorities/pages/ManageTaskPrioritiesPage.vue"
-          ),
+          import("../modules/task-priorities/pages/ManageTaskPrioritiesPage.vue"),
       },
       {
         name: "manageTaskStatuses",
