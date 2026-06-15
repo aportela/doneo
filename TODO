@@ -11,3 +11,6 @@ remove exported (Uppercase) on not required structs
 check missing indexes
 check project permission duplicate role for same user
 set global cache && pass as depending reference to handlers/services
+review `db:xxxx" mappings
+remove "non updatable" get funcs on repo/service/handler
+move entity details to entity handler/service/repository (ex: GetProjectAttachments from attachment to project)
