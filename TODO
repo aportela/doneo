@@ -16,3 +16,5 @@ remove "non updatable" get funcs on repo/service/handler
 move entity details to entity handler/service/repository (ex: GetProjectAttachments from attachment to project)
 all add/update services return domain entity with new values
 add interface on handlers
+
+project attachment/task attachemnt same table  as project permissions (id vs not id)
