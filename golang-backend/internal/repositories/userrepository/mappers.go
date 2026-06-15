@@ -8,8 +8,8 @@ import (
 	"github.com/aportela/doneo/internal/utils"
 )
 
-func ToBaseDTO(user domain.UserBase) UserBaseDTO {
-	return UserBaseDTO{
+func toBaseDTO(user domain.UserBase) userBaseDTO {
+	return userBaseDTO{
 		ID:   user.ID,
 		Name: user.Name,
 	}
@@ -17,7 +17,7 @@ func ToBaseDTO(user domain.UserBase) UserBaseDTO {
 
 func toDTO(user domain.User) userDTO {
 	return userDTO{
-		UserBaseDTO:        ToBaseDTO(user.UserBase),
+		userBaseDTO:        toBaseDTO(user.UserBase),
 		Email:              user.Email,
 		CreatedAt:          user.CreatedAt.UnixMilli(),
 		UpdatedAt:          utils.TimePtrToSQLNullInt64(user.UpdatedAt),
@@ -26,7 +26,7 @@ func toDTO(user domain.User) userDTO {
 	}
 }
 
-func ToBaseDomain(user UserBaseDTO) domain.UserBase {
+func toBaseDomain(user userBaseDTO) domain.UserBase {
 	return domain.UserBase{
 		ID:   user.ID,
 		Name: user.Name,
@@ -35,7 +35,7 @@ func ToBaseDomain(user UserBaseDTO) domain.UserBase {
 
 func toDomain(user userDTO) domain.User {
 	return domain.User{
-		UserBase:           ToBaseDomain(user.UserBaseDTO),
+		UserBase:           toBaseDomain(user.userBaseDTO),
 		Email:              user.Email,
 		PasswordHash:       user.PasswordHash,
 		CreatedAt:          time.UnixMilli(user.CreatedAt),
