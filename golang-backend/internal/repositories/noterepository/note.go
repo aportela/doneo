@@ -2,8 +2,6 @@ package noterepository
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
@@ -13,13 +11,11 @@ type NoteRepository interface {
 	AddProjectNote(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, note domain.Note) error
 	UpdateProjectNote(ctx context.Context, dbExecutor database.DatabaseExecutor, note domain.Note) error
 	DeleteProjectNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteID string) error
-	GetProjectNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteID string) (domain.Note, error)
 	GetProjectNotes(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) ([]domain.Note, error)
 
 	AddTaskNote(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string, note domain.Note) error
 	UpdateTaskNote(ctx context.Context, dbExecutor database.DatabaseExecutor, note domain.Note) error
 	DeleteTaskNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteID string) error
-	GetTaskNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteID string) (domain.Note, error)
 	GetTaskNotes(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]domain.Note, error)
 }
 
@@ -101,30 +97,6 @@ func (repository *noteRepository) DeleteProjectNote(ctx context.Context, dbExecu
 		return domain.NotFoundError
 	}
 	return nil
-}
-
-func (repository *noteRepository) GetProjectNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteID string) (domain.Note, error) {
-	var dto noteDTO
-	err := dbExecutor.QueryRowContext(
-		ctx,
-		`
-            SELECT
-				PN.id, PN.creator_id, U.name, PN.created_at, PN.updated_at, PN.body
-            FROM project_notes PN
-			INNER JOIN users U ON U.id = PN.creator_id
-            WHERE
-				PN.id = ?
-        `,
-		noteID).Scan(
-		&dto.ID, &dto.CreatorID, &dto.CreatorName, &dto.CreatedAt, &dto.UpdatedAt, &dto.Body,
-	)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return domain.Note{}, domain.NotFoundError
-		}
-		return domain.Note{}, err
-	}
-	return toDomain(dto), err
 }
 
 func (repository *noteRepository) GetProjectNotes(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) ([]domain.Note, error) {
@@ -233,30 +205,6 @@ func (repository *noteRepository) DeleteTaskNote(ctx context.Context, dbExecutor
 		return domain.NotFoundError
 	}
 	return nil
-}
-
-func (repository *noteRepository) GetTaskNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteID string) (domain.Note, error) {
-	var dto noteDTO
-	err := dbExecutor.QueryRowContext(
-		ctx,
-		`
-            SELECT
-				TN.id, TN.creator_id, U.name, TN.created_at, TN.updated_at, TN.body
-            FROM task_notes TN
-			INNER JOIN users U ON U.id = TN.creator_id
-            WHERE
-				TN.id = ?
-        `,
-		noteID).Scan(
-		&dto.ID, &dto.CreatorID, &dto.CreatorName, &dto.CreatedAt, &dto.UpdatedAt, &dto.Body,
-	)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return domain.Note{}, domain.NotFoundError
-		}
-		return domain.Note{}, err
-	}
-	return toDomain(dto), err
 }
 
 func (repository *noteRepository) GetTaskNotes(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]domain.Note, error) {

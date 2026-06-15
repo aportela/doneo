@@ -19,13 +19,11 @@ type NoteService interface {
 	AddProjectNote(ctx context.Context, projectID string, note domain.Note) (domain.Note, error)
 	UpdateProjectNote(ctx context.Context, projectID string, note domain.Note) (domain.Note, error)
 	DeleteProjectNote(ctx context.Context, projectID string, noteID string) error
-	GetProjectNote(ctx context.Context, projectID string, noteID string) (domain.Note, error)
 	GetProjectNotes(ctx context.Context, projectID string) ([]domain.Note, error)
 
 	AddTaskNote(ctx context.Context, projectID string, taskID string, note domain.Note) (domain.Note, error)
 	UpdateTaskNote(ctx context.Context, projectID string, taskID string, note domain.Note) (domain.Note, error)
 	DeleteTaskNote(ctx context.Context, projectID string, taskID string, noteID string) error
-	GetTaskNote(ctx context.Context, projectID string, noteID string) (domain.Note, error)
 	GetTaskNotes(ctx context.Context, projectID string, taskID string) ([]domain.Note, error)
 }
 
@@ -148,21 +146,6 @@ func (service *noteService) DeleteProjectNote(ctx context.Context, projectID str
 	return err
 }
 
-func (service *noteService) GetProjectNote(ctx context.Context, projectID string, noteID string) (domain.Note, error) {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return domain.Note{}, fmt.Errorf("user not found in context")
-	}
-	if err := service.authorizationService.RequireProjectViewPermission(ctx, currentContextUserID, projectID); err != nil {
-		return domain.Note{}, err
-	}
-	note, err := service.noteRepository.GetProjectNote(ctx, service.database, noteID)
-	if err != nil {
-		return domain.Note{}, err
-	}
-	return note, nil
-}
-
 func (service *noteService) GetProjectNotes(ctx context.Context, projectID string) ([]domain.Note, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
@@ -274,21 +257,6 @@ func (service *noteService) DeleteTaskNote(ctx context.Context, projectID string
 	})
 
 	return err
-}
-
-func (service *noteService) GetTaskNote(ctx context.Context, projectID string, noteID string) (domain.Note, error) {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return domain.Note{}, fmt.Errorf("user not found in context")
-	}
-	if err := service.authorizationService.RequireProjectViewPermission(ctx, currentContextUserID, projectID); err != nil {
-		return domain.Note{}, err
-	}
-	note, err := service.noteRepository.GetTaskNote(ctx, service.database, noteID)
-	if err != nil {
-		return domain.Note{}, fmt.Errorf("[NoteService] failed to get task note: %w", err)
-	}
-	return note, nil
 }
 
 func (service *noteService) GetTaskNotes(ctx context.Context, projectID string, taskID string) ([]domain.Note, error) {
