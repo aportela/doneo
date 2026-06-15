@@ -10,12 +10,12 @@
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import type { SearchRequest, TaskResponse } from '../types/dto';
-    import type { ProjectTasksTableFilters } from '../types/project-tasks-table-filters.ts';
+    import type { TasksTableFilters } from '../types/project-tasks-table-filters.ts';
 
     import { Sort } from '../../../shared/types/models/sort';
-    import { ProjectTask } from '../models/tasks';
+    import { Task } from '../models/tasks';
 
-    import { projectTaskService } from '../services/task.ts';
+    import { taskService } from '../services/task.ts';
     import { handleAPIError } from '../../../api/client/errorHandler.ts';
 
     import ProjectTasksTable from '../components/ProjectTasksTable.vue';
@@ -30,7 +30,7 @@
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    const items = shallowRef<ProjectTask[]>([]);
+    const items = shallowRef<Task[]>([]);
 
     const sort = reactive<Sort>(new Sort("createdAt", "DESC"));
 
@@ -40,7 +40,7 @@
     const totalResults = ref(0);
     const totalPages = ref(0);
 
-    const filters = reactive<ProjectTasksTableFilters>({
+    const filters = reactive<TasksTableFilters>({
         slug: null,
         priorityId: null,
         statusId: null,
@@ -100,10 +100,10 @@
                     createdByUserId: filters.createdByUserId !== null ? filters.createdByUserId : undefined,
                 }
             };
-            const response = await projectTaskService.search(null, payload);
+            const response = await taskService.search(null, payload);
             totalPages.value = response.pager.totalPages;
             totalResults.value = response.pager.totalResults;
-            items.value = response.tasks.map((task: TaskResponse) => new ProjectTask(task))
+            items.value = response.tasks.map((task: TaskResponse) => new Task(task))
         } catch (error: unknown) {
             items.value = [];
             state.ajaxErrors = true;

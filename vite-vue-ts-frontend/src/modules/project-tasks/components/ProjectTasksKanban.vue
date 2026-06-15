@@ -8,7 +8,7 @@
     import { taskStatusService } from '../../task-statuses/services/task-status'
     import type { SearchRequest as SearchRequestStatus } from '../../task-statuses/types/dto'
 
-    import { projectTaskService } from '../services/task'
+    import { taskService } from '../services/task'
     import type { SearchRequest as SearchRequestTask } from '../types/dto'
 
     import { Sort } from '../../../shared/types/models/sort'
@@ -84,7 +84,7 @@
             }
         };
         try {
-            const response = await projectTaskService.search(null, payload);
+            const response = await taskService.search(null, payload);
             columns.value.forEach((column) => {
                 column.tasks = response.tasks.filter((task) => task.status.id == column.id).map((task) => { return { id: task.id, slug: task.slug, summary: task.summary, attachmentCount: Math.floor(Math.random() * 3), tags: ['test', 'review'] }; });
             });
@@ -131,7 +131,7 @@
                                     </template>
                                     <template #action>
                                         <n-space><n-tag v-for="tag in element.tags" :key="tag">{{ tag
-                                        }}</n-tag></n-space>
+                                                }}</n-tag></n-space>
                                     </template>
 
                                 </NCard>

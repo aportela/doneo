@@ -6,13 +6,13 @@
 
     import { useLoadingStore } from '../../../stores/loading';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
-    import { projectTaskService } from '../services/task.ts';
+    import { taskService } from '../services/task.ts';
     import { handleAPIError } from '../../../api/client/errorHandler';
     import { appBus } from '../../../shared/composables/bus';
     import type { TaskResponse, UpdateRequest } from '../types/dto';
 
     import type { FormMode } from '../../../shared/types/form-mode';
-    import { ProjectTask, MAX_SUMMARY_LENGTH } from "../models/tasks.ts";
+    import { Task, MAX_SUMMARY_LENGTH } from "../models/tasks.ts";
     import TaskPrioritySelector from '../../task-priorities/components/TaskPrioritySelector.vue';
     import TaskStatusSelector from '../../task-statuses/components/TaskStatusSelector.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
@@ -31,7 +31,7 @@
         taskId: string;
     }
 
-    const task = ref<ProjectTask>(new ProjectTask());
+    const task = ref<Task>(new Task());
 
     const props = defineProps<TaskMetadataTabProps>();
 
@@ -63,9 +63,9 @@
         serverErrors.value = {};
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const response: TaskResponse = await projectTaskService.get(projectId, taskId);
+            const response: TaskResponse = await taskService.get(projectId, taskId);
             if (response.id === taskId) {
-                task.value = new ProjectTask(response);
+                task.value = new Task(response);
                 noteCount.value = task.value.notesCount;
                 attachmentCount.value = task.value.attachmentsCount;
                 historyOperationCount.value = task.value.historyOperationsCount;
@@ -120,9 +120,9 @@
                 dueAt: task.value.dueAt?.msTimestamp ?? null,
                 tags: task.value.tags,
             };
-            const response: TaskResponse = await projectTaskService.update(props.projectId, payload);
+            const response: TaskResponse = await taskService.update(props.projectId, payload);
             if (response.id === task.value.id) {
-                task.value = new ProjectTask(response);
+                task.value = new Task(response);
                 noteCount.value = task.value.notesCount;
                 attachmentCount.value = task.value.attachmentsCount;
                 historyOperationCount.value = task.value.historyOperationsCount;

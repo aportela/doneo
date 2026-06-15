@@ -9,8 +9,8 @@
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { DateFilterSelectComponent } from '../../users/components/date-filter-select-component.ts';
 
-    import type { ProjectTasksTableFilters } from '../types/project-tasks-table-filters.ts';
-    import { ProjectTask } from '../models/tasks.ts';
+    import type { TasksTableFilters } from '../types/project-tasks-table-filters.ts';
+    import { Task } from '../models/tasks.ts';
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
     import TaskPrioritySelector from '../../task-priorities/components/TaskPrioritySelector.vue';
@@ -23,7 +23,7 @@
 
     interface Props {
         disabled: boolean;
-        items: ProjectTask[];
+        items: Task[];
         sort?: Sort;
         projectId?: string;
     }
@@ -37,7 +37,7 @@
 
     const createdAtFilterRef = ref<DateFilterSelectComponent | undefined>();
 
-    const filters = defineModel<ProjectTasksTableFilters>("filters", {
+    const filters = defineModel<TasksTableFilters>("filters", {
         default: () => ({
             slug: null,
             priorityId: null,

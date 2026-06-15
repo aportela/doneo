@@ -4,7 +4,7 @@ import { TaskStatus } from "../../task-statuses/models/task-status";
 import { UserBase } from "../../users/models/user";
 import { IDate } from "../../../shared/types/idate";
 
-export class ProjectTask {
+export class Task {
   id: string | null;
   projectId: string | null;
   slug: string | null;

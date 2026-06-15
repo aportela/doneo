@@ -8,7 +8,7 @@ import type {
   SearchResponse,
 } from "../types/dto";
 
-export const projectTaskService = {
+export const taskService = {
   async add(projectId: string, payload: AddRequest): Promise<TaskResponse> {
     const { data } = await axiosInstance.post<TaskResponse>(
       "/projects/" + projectId + "/tasks",

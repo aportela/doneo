@@ -5,9 +5,9 @@
     import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NSwitch } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconPlus } from '@tabler/icons-vue';
 
-    import { ProjectTask, MAX_SUMMARY_LENGTH } from '../models/tasks';
+    import { Task, MAX_SUMMARY_LENGTH } from '../models/tasks';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
-    import { projectTaskService } from '../services/task.ts';
+    import { taskService } from '../services/task.ts';
     import { handleAPIError } from '../../../api/client/errorHandler';
     import type { TaskResponse, AddRequest } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
@@ -27,7 +27,7 @@
 
     const openTaskAfterCreate = ref<boolean>(true);
 
-    const task = ref<ProjectTask>(new ProjectTask());
+    const task = ref<Task>(new Task());
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -124,7 +124,7 @@
                 status: { id: task.value.status.id ?? "" },
                 tags: task.value.tags,
             };
-            const addedTask: TaskResponse = await projectTaskService.add(props.projectId, payload);
+            const addedTask: TaskResponse = await taskService.add(props.projectId, payload);
             emit('add', addedTask, openTaskAfterCreate.value)
         } catch (error: unknown) {
             state.ajaxErrors = true;

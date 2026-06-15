@@ -13,12 +13,12 @@
     import type { FormMode } from "../../../../shared/types/form-mode.ts";
     import type { SearchRequest } from "../../types/dto.ts";
     import type { SearchResponse } from "../../../project-tasks/types/dto.ts";
-    import type { ProjectTasksTableFilters } from "../../../project-tasks/types/project-tasks-table-filters.ts";
+    import type { TasksTableFilters } from "../../../project-tasks/types/project-tasks-table-filters.ts";
 
     import { Sort } from '../../../../shared/types/models/sort';
-    import { ProjectTask } from "../../../project-tasks/models/tasks.ts";
+    import { Task } from "../../../project-tasks/models/tasks.ts";
 
-    import { projectTaskService } from "../../../project-tasks/services/task.ts";
+    import { taskService } from "../../../project-tasks/services/task.ts";
     import { handleAPIError } from '../../../../api/client/errorHandler';
 
     import NewTaskForm from "../../../project-tasks/components/NewTaskForm.vue";
@@ -39,7 +39,7 @@
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    const items = shallowRef<ProjectTask[]>([]);
+    const items = shallowRef<Task[]>([]);
 
     const itemCount = defineModel<number>("itemCount", { default: 0 });
     itemCount.value = 0;
@@ -52,7 +52,7 @@
     const totalResults = ref(0);
     const totalPages = ref(0);
 
-    const filters = reactive<ProjectTasksTableFilters>({
+    const filters = reactive<TasksTableFilters>({
         slug: null,
         priorityId: null,
         statusId: null,
@@ -123,8 +123,8 @@
                 filter: {
                 }
             };
-            const results: SearchResponse = await projectTaskService.search(props.projectId, payload);
-            items.value = results.tasks.map((task) => new ProjectTask(task));
+            const results: SearchResponse = await taskService.search(props.projectId, payload);
+            items.value = results.tasks.map((task) => new Task(task));
             itemCount.value = items.value?.length ?? 0;
             totalResults.value = itemCount.value;
         } catch (error: unknown) {
@@ -150,7 +150,7 @@
         }
     };
 
-    const onAdded = (task: ProjectTask, openTaskAfterCreate: boolean) => {
+    const onAdded = (task: Task, openTaskAfterCreate: boolean) => {
         showModal.value = false;
         notify('success', t("modules.project.components.ProjectTasksTab.notifications.taskAdded", { summary: task.summary }));
         if (openTaskAfterCreate) {
