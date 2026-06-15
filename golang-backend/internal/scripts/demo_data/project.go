@@ -252,7 +252,7 @@ func createProjects(db database.Database, projectTypeIds []string, projectPriori
 		newProjectIds = append(newProjectIds, newProject.ID)
 		for j := 0; j < 5; j++ {
 			note := domain.Note{
-				User: domain.UserBase{
+				CreatedBy: domain.UserBase{
 					ID: userIds[j],
 				},
 				Body:      "Note index " + strconv.Itoa(j) + ": " + randomText(rand.Intn(384)+128),

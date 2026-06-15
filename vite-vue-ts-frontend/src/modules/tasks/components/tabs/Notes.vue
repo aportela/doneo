@@ -81,7 +81,7 @@
     const onAddNote = () => {
         items.value = [new Note({
             id: "",
-            user: {
+            createdBy: {
                 id: sesionStore.sessionUserId ?? "",
                 name: sessionStorage.sessionUserName ?? "",
             },
@@ -126,12 +126,6 @@
                 } else if (note.id) {
                     const payload: UpdateRequest = {
                         id: note.id,
-                        user: {
-                            id: note.user.id ?? "",
-                            name: note.user.name ?? "",
-                        },
-                        createdAt: note.createdAt?.msTimestamp ?? 0,
-                        updatedAt: null,
                         body: note.body
                     };
                     note = new Note(await noteService.updateTaskote(props.projectId, props.taskId, note.id, payload));

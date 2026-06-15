@@ -146,7 +146,7 @@
     <n-card size="small" bordered>
         <div class="note-header">
             <div class="note-user">
-                <AvatarUserName :user-id="props.note.user.id" :user-name="props.note.user.name" />
+                <AvatarUserName :user-id="props.note.createdBy.id" :user-name="props.note.createdBy.name" />
             </div>
             <span class="note-date">
                 <div>

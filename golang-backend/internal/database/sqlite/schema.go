@@ -128,18 +128,18 @@ var schemaQueries = []schemaMigration{
 				CREATE TABLE IF NOT EXISTS project_notes (
 					id TEXT NOT NULL CHECK(length(id) == 36),
 					project_id TEXT NOT NULL CHECK(length(project_id) == 36),
-					user_id TEXT NOT NULL CHECK(length(user_id) == 36),
+					creator_id TEXT NOT NULL CHECK(length(creator_id) == 36),
 					created_at INTEGER NOT NULL,
 					updated_at INTEGER,
 					body TEXT NOT NULL,
 					PRIMARY KEY (id),
 					FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE,
-					FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE
 				) STRICT;
 			`,
 			`
 				CREATE INDEX IF NOT EXISTS idx_project_notes_project_id ON project_notes(project_id);
-				CREATE INDEX IF NOT EXISTS idx_project_notes_user_id ON project_notes(user_id);
+				CREATE INDEX IF NOT EXISTS idx_project_notes_creator_id ON project_notes(creator_id);
 			`,
 			`
 				CREATE TABLE IF NOT EXISTS attachments (
@@ -258,18 +258,18 @@ var schemaQueries = []schemaMigration{
 				CREATE TABLE IF NOT EXISTS task_notes (
 					id TEXT NOT NULL CHECK(length(id) == 36),
 					task_id TEXT NOT NULL CHECK(length(task_id) == 36),
-					user_id TEXT NOT NULL CHECK(length(user_id) == 36),
+					creator_id TEXT NOT NULL CHECK(length(creator_id) == 36),
 					created_at INTEGER NOT NULL,
 					updated_at INTEGER,
 					body TEXT NOT NULL,
 					PRIMARY KEY (id),
 					FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
-					FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE
 				) STRICT;
 			`,
 			`
 				CREATE INDEX IF NOT EXISTS idx_task_notes_task_id ON task_notes(task_id);
-				CREATE INDEX IF NOT EXISTS idx_task_notes_user_id ON task_notes(user_id);
+				CREATE INDEX IF NOT EXISTS idx_task_notes_creator_id ON task_notes(creator_id);
 			`,
 			`
 				CREATE TABLE IF NOT EXISTS task_attachments (

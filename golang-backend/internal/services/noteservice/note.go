@@ -52,7 +52,7 @@ func (service *noteService) AddProjectNote(ctx context.Context, projectId string
 		return domain.Note{}, fmt.Errorf("[NoteService] user ID not found in context")
 	}
 	note.ID = utils.UUID()
-	note.User.ID = currentUserId
+	note.CreatedBy.ID = currentUserId
 	note.CreatedAt = time.Now()
 	err = service.repository.AddProjectNote(ctx, projectId, note)
 	if err != nil {
@@ -156,7 +156,7 @@ func (service *noteService) AddTaskNote(ctx context.Context, projectId string, t
 		return domain.Note{}, fmt.Errorf("[NoteService] user ID not found in context")
 	}
 	note.ID = utils.UUID()
-	note.User.ID = currentUserId
+	note.CreatedBy.ID = currentUserId
 	note.CreatedAt = time.Now()
 	err = service.repository.AddTaskNote(ctx, taskId, note)
 	if err != nil {

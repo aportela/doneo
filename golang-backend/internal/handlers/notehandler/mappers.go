@@ -9,7 +9,6 @@ import (
 func addRequestToDomain(request addRequest) domain.Note {
 	return domain.Note{
 		Body: request.Body,
-		User: domain.UserBase{},
 	}
 }
 
@@ -17,18 +16,13 @@ func updateRequestToDomain(request updateRequest) domain.Note {
 	return domain.Note{
 		ID:   request.ID,
 		Body: request.Body,
-		User: domain.UserBase{
-			ID:   request.User.ID,
-			Name: request.User.Name,
-		},
-		CreatedAt: utils.MSTimestampToTime(request.CreatedAt),
 	}
 }
 
 func domainToResponse(note domain.Note) NoteResponse {
 	return NoteResponse{
 		ID:        note.ID,
-		User:      userhandler.BaseDomainToBaseResponse(note.User),
+		CreatedBy: userhandler.BaseDomainToBaseResponse(note.CreatedBy),
 		CreatedAt: note.CreatedAt.UnixMilli(),
 		UpdatedAt: utils.TimePtrToInt64Ptr(note.UpdatedAt),
 		Body:      note.Body,
@@ -45,6 +39,6 @@ func domainArrayToResponseArray(notes []domain.Note) []NoteResponse {
 
 func toSearchResponse(notes []domain.Note) searchResponse {
 	return searchResponse{
-		ProjectPermissions: domainArrayToResponseArray(notes),
+		Notes: domainArrayToResponseArray(notes),
 	}
 }

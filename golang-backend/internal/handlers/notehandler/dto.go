@@ -9,20 +9,18 @@ type addRequest struct {
 }
 
 type updateRequest struct {
-	ID        string                       `json:"id"`
-	User      userhandler.UserBaseResponse `json:"user"`
-	CreatedAt int64                        `json:"createdAt"`
-	Body      string                       `json:"body"`
+	ID   string `json:"id"`
+	Body string `json:"body"`
 }
 
 type NoteResponse struct {
 	ID        string                       `json:"id"`
-	User      userhandler.UserBaseResponse `json:"user"`
+	CreatedBy userhandler.UserBaseResponse `json:"createdBy"`
 	CreatedAt int64                        `json:"createdAt"`
 	UpdatedAt *int64                       `json:"updatedAt"`
 	Body      string                       `json:"body"`
 }
 
 type searchResponse struct {
-	ProjectPermissions []NoteResponse `json:"notes"`
+	Notes []NoteResponse `json:"notes"`
 }

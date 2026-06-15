@@ -36,12 +36,12 @@ func (repository *noteRepository) AddProjectNote(ctx context.Context, projectId 
 	_, err := repository.db.ExecContext(
 		ctx,
 		`
-            INSERT INTO project_notes (id, project_id, user_id, created_at, updated_at, body)
+            INSERT INTO project_notes (id, project_id, creator_id, created_at, updated_at, body)
 			VALUES (?, ?, ?, ?, NULL, ?)
         `,
 		dto.ID,
 		projectId,
-		dto.UserId,
+		dto.CreatorId,
 		dto.CreatedAt,
 		dto.Body,
 	)
@@ -58,8 +58,8 @@ func (repository *noteRepository) AddProjectNote(ctx context.Context, projectId 
 		case sqlite3.SQLITE_CONSTRAINT_CHECK:
 			if strings.Contains(sqlErr.Error(), "length(project_id)") {
 				return &domain.ValidationError{Field: "projectId"}
-			} else if strings.Contains(sqlErr.Error(), "length(user_id)") {
-				return &domain.ValidationError{Field: "userId"}
+			} else if strings.Contains(sqlErr.Error(), "length(creator_id)") {
+				return &domain.ValidationError{Field: "creator_id"}
 			}
 			return err
 		default:
@@ -117,9 +117,9 @@ func (repository *noteRepository) GetProjectNotes(ctx context.Context, projectId
 		ctx,
 		`
             SELECT
-				PN.id, PN.user_id, U.name, PN.created_at, PN.updated_at, PN.body
+				PN.id, PN.creator_id, U.name, PN.created_at, PN.updated_at, PN.body
             FROM project_notes PN
-			INNER JOIN users U ON U.id = PN.user_id
+			INNER JOIN users U ON U.id = PN.creator_id
             WHERE PN.project_id = ?
 			ORDER BY PN.created_at DESC
         `,
@@ -132,7 +132,7 @@ func (repository *noteRepository) GetProjectNotes(ctx context.Context, projectId
 	for rows.Next() {
 		var dto noteDTO
 		if err := rows.Scan(
-			&dto.ID, &dto.UserId, &dto.UserName, &dto.CreatedAt, &dto.UpdatedAt, &dto.Body,
+			&dto.ID, &dto.CreatorId, &dto.CreatorName, &dto.CreatedAt, &dto.UpdatedAt, &dto.Body,
 		); err != nil {
 			return nil, err
 		}
@@ -149,12 +149,12 @@ func (repository *noteRepository) AddTaskNote(ctx context.Context, taskId string
 	_, err := repository.db.ExecContext(
 		ctx,
 		`
-            INSERT INTO task_notes (id, task_id, user_id, created_at, updated_at, body)
+            INSERT INTO task_notes (id, task_id, creator_id, created_at, updated_at, body)
 			VALUES (?, ?, ?, ?, NULL, ?)
         `,
 		dto.ID,
 		taskId,
-		dto.UserId,
+		dto.CreatorId,
 		dto.CreatedAt,
 		dto.Body,
 	)
@@ -171,8 +171,8 @@ func (repository *noteRepository) AddTaskNote(ctx context.Context, taskId string
 		case sqlite3.SQLITE_CONSTRAINT_CHECK:
 			if strings.Contains(sqlErr.Error(), "length(task_id)") {
 				return &domain.ValidationError{Field: "task_id"}
-			} else if strings.Contains(sqlErr.Error(), "length(user_id)") {
-				return &domain.ValidationError{Field: "userId"}
+			} else if strings.Contains(sqlErr.Error(), "length(creator_id)") {
+				return &domain.ValidationError{Field: "creator_id"}
 			}
 			return err
 		default:
@@ -230,9 +230,9 @@ func (repository *noteRepository) GetTaskNotes(ctx context.Context, taskId strin
 		ctx,
 		`
             SELECT
-				TN.id, TN.user_id, U.name, TN.created_at, TN.updated_at, TN.body
+				TN.id, TN.creator_id, U.name, TN.created_at, TN.updated_at, TN.body
             FROM task_notes TN
-			INNER JOIN users U ON U.id = TN.user_id
+			INNER JOIN users U ON U.id = TN.creator_id
             WHERE TN.task_id = ?
 			ORDER BY TN.created_at DESC
         `,
@@ -245,7 +245,7 @@ func (repository *noteRepository) GetTaskNotes(ctx context.Context, taskId strin
 	for rows.Next() {
 		var dto noteDTO
 		if err := rows.Scan(
-			&dto.ID, &dto.UserId, &dto.UserName, &dto.CreatedAt, &dto.UpdatedAt, &dto.Body,
+			&dto.ID, &dto.CreatorId, &dto.CreatorName, &dto.CreatedAt, &dto.UpdatedAt, &dto.Body,
 		); err != nil {
 			return nil, err
 		}

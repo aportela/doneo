@@ -4,7 +4,7 @@ import "time"
 
 type Note struct {
 	ID        string
-	User      UserBase
+	CreatedBy UserBase
 	CreatedAt time.Time
 	UpdatedAt *time.Time
 	Body      string

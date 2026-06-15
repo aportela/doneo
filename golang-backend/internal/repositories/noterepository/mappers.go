@@ -9,21 +9,21 @@ import (
 
 func toDTO(note domain.Note) noteDTO {
 	return noteDTO{
-		ID:        note.ID,
-		UserId:    note.User.ID,
-		UserName:  note.User.Name,
-		CreatedAt: note.CreatedAt.UnixMilli(),
-		UpdatedAt: utils.TimePtrToSQLNullInt64(note.UpdatedAt),
-		Body:      note.Body,
+		ID:          note.ID,
+		CreatorId:   note.CreatedBy.ID,
+		CreatorName: note.CreatedBy.Name,
+		CreatedAt:   note.CreatedAt.UnixMilli(),
+		UpdatedAt:   utils.TimePtrToSQLNullInt64(note.UpdatedAt),
+		Body:        note.Body,
 	}
 }
 
 func toDomain(note noteDTO) domain.Note {
 	return domain.Note{
 		ID: note.ID,
-		User: domain.UserBase{
-			ID:   note.UserId,
-			Name: note.UserName,
+		CreatedBy: domain.UserBase{
+			ID:   note.CreatorId,
+			Name: note.CreatorName,
 		},
 		CreatedAt: time.UnixMilli(note.CreatedAt),
 		UpdatedAt: utils.SQLNullInt64ToTimePtr(note.UpdatedAt),

@@ -4,14 +4,14 @@ import { IDate } from "../../../shared/types/idate";
 
 export class Note {
   id: string | null;
-  user: UserBase;
+  createdBy: UserBase;
   createdAt: IDate | null;
   updatedAt: IDate | null;
   body: string;
 
   constructor(data?: NoteDTO) {
     this.id = data?.id ?? null;
-    this.user = new UserBase(data?.user);
+    this.createdBy = new UserBase(data?.createdBy);
     this.createdAt = data?.createdAt ? new IDate(data.createdAt) : null;
     this.updatedAt = data?.updatedAt ? new IDate(data.updatedAt) : null;
     this.body = data?.body ?? "";
@@ -20,7 +20,7 @@ export class Note {
   toDTO(): NoteDTO {
     return {
       id: this.id ?? "",
-      user: this.user.toDTO(),
+      createdBy: this.createdBy.toDTO(),
       createdAt: this.createdAt?.msTimestamp ?? 0,
       updatedAt: this.updatedAt?.msTimestamp ?? null,
       body: this.body ?? "",
