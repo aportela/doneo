@@ -1,7 +1,12 @@
 package taskpriorityrepository
 
 import (
+	"errors"
+	"strings"
+
 	"github.com/aportela/doneo/internal/domain"
+	"modernc.org/sqlite"
+	sqlite3 "modernc.org/sqlite/lib"
 )
 
 func toDTO(taskPriority domain.TaskPriority) taskPriorityDTO {
@@ -34,4 +39,22 @@ func toFilterDTO(filter domain.SearchTaskPrioritiesFilter) searchFilterDTO {
 	return searchFilterDTO{
 		Name: filter.Name,
 	}
+}
+
+func mapSQLiteError(err error) error {
+	var sqlErr *sqlite.Error
+	if !errors.As(err, &sqlErr) {
+		return err
+	}
+	switch sqlErr.Code() {
+	case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
+		if strings.Contains(sqlErr.Error(), "task_priorities.name") {
+			return &domain.AlreadyExistsError{Field: "name"}
+		}
+	case sqlite3.SQLITE_CONSTRAINT_CHECK:
+		if strings.Contains(sqlErr.Error(), "length(name)") {
+			return &domain.ValidationError{Field: "name"}
+		}
+	}
+	return err
 }

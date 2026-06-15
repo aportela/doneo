@@ -10,33 +10,31 @@ import (
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"modernc.org/sqlite"
-	sqlite3 "modernc.org/sqlite/lib"
 )
 
 type TaskPriorityRepository interface {
-	Add(ctx context.Context, taskPriority domain.TaskPriority) error
-	Update(ctx context.Context, taskPriority domain.TaskPriority) error
-	Get(ctx context.Context, id string) (domain.TaskPriority, error)
-	Delete(ctx context.Context, id string) error
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskPrioritiesFilter) ([]domain.TaskPriority, browser.Result, error)
+	Add(ctx context.Context, dbExecutor database.DatabaseExecutor, taskPriority domain.TaskPriority) error
+	Update(ctx context.Context, dbExecutor database.DatabaseExecutor, taskPriority domain.TaskPriority) error
+	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, taskPriorityID string) error
+	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, taskPriorityID string) (domain.TaskPriority, error)
+	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchTaskPrioritiesFilter) ([]domain.TaskPriority, browser.Result, error)
 }
 
-type taskPriorityRepository struct {
-	db database.Database
+type taskPriorityRepository struct{}
+
+func NewRepository() TaskPriorityRepository {
+	return &taskPriorityRepository{}
 }
 
-func NewRepository(db database.Database) TaskPriorityRepository {
-	return &taskPriorityRepository{db: db}
-}
-
-func (repository *taskPriorityRepository) Add(ctx context.Context, taskPriority domain.TaskPriority) error {
+func (repository *taskPriorityRepository) Add(ctx context.Context, dbExecutor database.DatabaseExecutor, taskPriority domain.TaskPriority) error {
 	dto := toDTO(taskPriority)
-	_, err := repository.db.ExecContext(
+	_, err := dbExecutor.ExecContext(
 		ctx,
 		`
-            INSERT INTO task_priorities (id, name, item_hex_color, item_index)
-			VALUES (?, ?, ?, ?)
+            INSERT INTO task_priorities
+				(id, name, item_hex_color, item_index)
+			VALUES
+				(?, ?, ?, ?)
         `,
 		dto.ID,
 		dto.Name,
@@ -44,48 +42,22 @@ func (repository *taskPriorityRepository) Add(ctx context.Context, taskPriority 
 		dto.Index,
 	)
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			if strings.Contains(sqlErr.Error(), "task_priorities.name") {
-				return &domain.AlreadyExistsError{Field: "name"}
-			} else if strings.Contains(sqlErr.Error(), "task_priorities.id") {
-				return &domain.AlreadyExistsError{Field: "id"}
-			} else if strings.Contains(sqlErr.Error(), "task_priorities.item_index") {
-				return &domain.AlreadyExistsError{Field: "index"}
-			}
-			return err
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(name)") {
-				return &domain.ValidationError{Field: "name"}
-			} else if strings.Contains(sqlErr.Error(), "length(id)") {
-				return &domain.ValidationError{Field: "id"}
-			}
-			return err
-		default:
-			return err
-		}
+		return mapSQLiteError(err)
 	}
 	return nil
 }
 
-func (repository *taskPriorityRepository) Update(ctx context.Context, taskPriority domain.TaskPriority) error {
+func (repository *taskPriorityRepository) Update(ctx context.Context, dbExecutor database.DatabaseExecutor, taskPriority domain.TaskPriority) error {
 	dto := toDTO(taskPriority)
-	_, err := repository.db.ExecContext(
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
             UPDATE task_priorities SET
 				name = ?,
 				item_hex_color = ?,
 				item_index = ?
-			WHERE id = ?
+			WHERE
+				id = ?
         `,
 		dto.Name,
 		dto.HexColor,
@@ -93,61 +65,53 @@ func (repository *taskPriorityRepository) Update(ctx context.Context, taskPriori
 		dto.ID,
 	)
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			if strings.Contains(sqlErr.Error(), "task_priorities.name") {
-				return &domain.AlreadyExistsError{Field: "name"}
-			} else if strings.Contains(sqlErr.Error(), "task_priorities.id") {
-				return &domain.AlreadyExistsError{Field: "id"}
-			} else if strings.Contains(sqlErr.Error(), "task_priorities.item_index") {
-				return &domain.AlreadyExistsError{Field: "index"}
-			}
-			return err
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(name)") {
-				return &domain.ValidationError{Field: "name"}
-			} else if strings.Contains(sqlErr.Error(), "length(id)") {
-				return &domain.ValidationError{Field: "id"}
-			}
-			return err
-		default:
-			return err
-		}
+		return mapSQLiteError(err)
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
 	}
 	return nil
 }
 
-func (repository *taskPriorityRepository) Delete(ctx context.Context, id string) error {
-	_, err := repository.db.ExecContext(
+func (repository *taskPriorityRepository) Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, taskPriorityID string) error {
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
             DELETE FROM task_priorities
-			WHERE id = ?
+			WHERE
+				id = ?
         `,
-		id,
+		taskPriorityID,
 	)
-	return err
+	if err != nil {
+		return err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
+	}
+	return nil
 }
 
-func (repository *taskPriorityRepository) Get(ctx context.Context, id string) (domain.TaskPriority, error) {
+func (repository *taskPriorityRepository) Get(ctx context.Context, dbExecutor database.DatabaseExecutor, taskPriorityID string) (domain.TaskPriority, error) {
 	var dto taskPriorityDTO
-	err := repository.db.QueryRowContext(
+	err := dbExecutor.QueryRowContext(
 		ctx,
 		`
             SELECT
                 TP.id, TP.name, TP.item_hex_color, TP.item_index
             FROM task_priorities TP
-            WHERE TP.id = ?
+            WHERE
+				TP.id = ?
         `,
-		id).Scan(&dto.ID, &dto.Name, &dto.HexColor, &dto.Index)
+		taskPriorityID).Scan(&dto.ID, &dto.Name, &dto.HexColor, &dto.Index)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.TaskPriority{}, domain.NotFoundError
@@ -157,7 +121,7 @@ func (repository *taskPriorityRepository) Get(ctx context.Context, id string) (d
 	return toDomain(dto), err
 }
 
-func (repository *taskPriorityRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskPrioritiesFilter) ([]domain.TaskPriority, browser.Result, error) {
+func (repository *taskPriorityRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchTaskPrioritiesFilter) ([]domain.TaskPriority, browser.Result, error) {
 	filterDTO := toFilterDTO(filter)
 	var filterArgs []any
 	var queryArgs []any
@@ -204,7 +168,7 @@ func (repository *taskPriorityRepository) Search(ctx context.Context, pager brow
 		sqlLimit = ""
 	}
 	sqlQuery = fmt.Sprintf("%s %s %s %s ", sqlQuery, sqlWhere, sqlOrder, sqlLimit)
-	rows, err := repository.db.QueryContext(ctx, sqlQuery, queryArgs...)
+	rows, err := dbExecutor.QueryContext(ctx, sqlQuery, queryArgs...)
 	if err != nil {
 		return nil, browser.Result{}, err
 	}
@@ -232,7 +196,7 @@ func (repository *taskPriorityRepository) Search(ctx context.Context, pager brow
 			FROM task_priorities TP
 		`
 		sqlCountQuery = fmt.Sprintf("%s %s", sqlCountQuery, sqlWhere)
-		err = repository.db.QueryRowContext(
+		err = dbExecutor.QueryRowContext(
 			ctx,
 			sqlCountQuery,
 			filterArgs...,
