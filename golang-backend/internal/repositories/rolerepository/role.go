@@ -10,131 +10,96 @@ import (
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"modernc.org/sqlite"
-	sqlite3 "modernc.org/sqlite/lib"
 )
 
 type RoleRepository interface {
-	Add(ctx context.Context, role domain.Role) error
-	Update(ctx context.Context, role domain.Role) error
-	Delete(ctx context.Context, id string) error
-	Get(ctx context.Context, id string) (domain.Role, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error)
+	Add(ctx context.Context, dbExecutor database.DatabaseExecutor, role domain.Role) error
+	Update(ctx context.Context, dbExecutor database.DatabaseExecutor, role domain.Role) error
+	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, roleID string) error
+	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, roleID string) (domain.Role, error)
+	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error)
 }
 
 type roleRepository struct {
-	db database.Database
 }
 
-func NewRepository(db database.Database) RoleRepository {
-	return &roleRepository{db: db}
+func NewRepository() RoleRepository {
+	return &roleRepository{}
 }
 
-func (repository *roleRepository) Add(ctx context.Context, role domain.Role) error {
+func (repository *roleRepository) Add(ctx context.Context, dbExecutor database.DatabaseExecutor, role domain.Role) error {
 	dto := toDTO(role)
-	_, err := repository.db.ExecContext(
+	_, err := dbExecutor.ExecContext(
 		ctx,
 		`
-            INSERT INTO roles (id, name, permissions_bitmask)
-			VALUES (?, ?, ?)
+            INSERT INTO roles
+				(id, name, permissions_bitmask)
+			VALUES
+				(?, ?, ?)
         `,
 		dto.ID,
 		dto.Name,
 		dto.PermissionsBitmask,
 	)
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			if strings.Contains(sqlErr.Error(), "roles.name") {
-				return &domain.AlreadyExistsError{Field: "name"}
-			} else if strings.Contains(sqlErr.Error(), "roles.id") {
-				return &domain.AlreadyExistsError{Field: "id"}
-			}
-			return err
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(name)") {
-				return &domain.ValidationError{Field: "name"}
-			} else if strings.Contains(sqlErr.Error(), "length(id)") {
-				return &domain.ValidationError{Field: "id"}
-			}
-			return err
-		default:
-			return err
-		}
+		return mapSQLiteError(err)
 	}
 	return nil
 }
 
-func (repository *roleRepository) Update(ctx context.Context, role domain.Role) error {
+func (repository *roleRepository) Update(ctx context.Context, dbExecutor database.DatabaseExecutor, role domain.Role) error {
 	dto := toDTO(role)
-	_, err := repository.db.ExecContext(
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
             UPDATE roles SET
 				name = ?,
 				permissions_bitmask = ?
-			WHERE id = ?
+			WHERE
+				id = ?
         `,
 		dto.Name,
 		dto.PermissionsBitmask,
 		dto.ID,
 	)
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			if strings.Contains(sqlErr.Error(), "roles.name") {
-				return &domain.AlreadyExistsError{Field: "name"}
-			}
-			return err
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(name)") {
-				return &domain.ValidationError{Field: "name"}
-			}
-			return err
-		default:
-			return err
-		}
+		return mapSQLiteError(err)
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
 	}
 	return nil
 }
 
-func (repository *roleRepository) Delete(ctx context.Context, id string) error {
-	_, err := repository.db.ExecContext(
+func (repository *roleRepository) Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, roleID string) error {
+	_, err := dbExecutor.ExecContext(
 		ctx,
 		`
             DELETE FROM roles
-			WHERE id = ?
+			WHERE
+				id = ?
         `,
-		id,
+		roleID,
 	)
 	return err
 }
 
-func (repository *roleRepository) Get(ctx context.Context, id string) (domain.Role, error) {
+func (repository *roleRepository) Get(ctx context.Context, dbExecutor database.DatabaseExecutor, roleID string) (domain.Role, error) {
 	var dto roleDTO
-	err := repository.db.QueryRowContext(
+	err := dbExecutor.QueryRowContext(
 		ctx,
 		`
             SELECT
                 R.id, R.name, R.permissions_bitmask
             FROM roles R
-            WHERE R.id = ?
+            WHERE
+				R.id = ?
         `,
-		id).Scan(&dto.ID, &dto.Name, &dto.PermissionsBitmask)
+		roleID).Scan(&dto.ID, &dto.Name, &dto.PermissionsBitmask)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.Role{}, domain.NotFoundError
@@ -144,7 +109,7 @@ func (repository *roleRepository) Get(ctx context.Context, id string) (domain.Ro
 	return toDomain(dto), err
 }
 
-func (repository *roleRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error) {
+func (repository *roleRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error) {
 	filterDTO := toFilterDTO(filter)
 	var filterArgs []any
 	var queryArgs []any
@@ -188,7 +153,7 @@ func (repository *roleRepository) Search(ctx context.Context, pager browser.Para
 		sqlLimit = ""
 	}
 	sqlQuery = fmt.Sprintf("%s %s %s %s ", sqlQuery, sqlWhere, sqlOrder, sqlLimit)
-	rows, err := repository.db.QueryContext(ctx, sqlQuery, queryArgs...)
+	rows, err := dbExecutor.QueryContext(ctx, sqlQuery, queryArgs...)
 	if err != nil {
 		return nil, browser.Result{}, err
 	}
@@ -214,7 +179,7 @@ func (repository *roleRepository) Search(ctx context.Context, pager browser.Para
 			FROM roles R
 		`
 		sqlCountQuery = fmt.Sprintf("%s %s", sqlCountQuery, sqlWhere)
-		err = repository.db.QueryRowContext(
+		err = dbExecutor.QueryRowContext(
 			ctx,
 			sqlCountQuery,
 			filterArgs...,
