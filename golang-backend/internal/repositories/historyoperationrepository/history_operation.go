@@ -2,34 +2,27 @@ package historyoperationrepository
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"strings"
 
-	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"modernc.org/sqlite"
-	sqlite3 "modernc.org/sqlite/lib"
+	"github.com/aportela/doneo/internal/repositories"
 )
 
 type HistoryOperationRepository interface {
-	AddProjectHistoryOperation(ctx context.Context, projectId string, operation domain.HistoryOperation) error
-	SearchProjectHistoryOperations(ctx context.Context, projectId string) ([]domain.HistoryOperation, error)
-	AddTaskOperation(ctx context.Context, projectId string, taskId string, operation domain.HistoryOperation) error
-	SearchTaskHistoryOperations(ctx context.Context, taskId string) ([]domain.HistoryOperation, error)
+	AddProjectHistoryOperation(ctx context.Context, dbExecutor repositories.Executor, projectId string, operation domain.HistoryOperation) error
+	SearchProjectHistoryOperations(ctx context.Context, dbExecutor repositories.Executor, projectId string) ([]domain.HistoryOperation, error)
+	AddTaskOperation(ctx context.Context, dbExecutor repositories.Executor, projectId string, taskId string, operation domain.HistoryOperation) error
+	SearchTaskHistoryOperations(ctx context.Context, dbExecutor repositories.Executor, taskId string) ([]domain.HistoryOperation, error)
 }
 
-type historyOperationRepository struct {
-	db database.Database
+type historyOperationRepository struct{}
+
+func NewRepository() HistoryOperationRepository {
+	return &historyOperationRepository{}
 }
 
-func NewRepository(db database.Database) HistoryOperationRepository {
-	return &historyOperationRepository{db: db}
-}
-
-func (repository *historyOperationRepository) AddProjectHistoryOperation(ctx context.Context, projectId string, operation domain.HistoryOperation) error {
+func (repository *historyOperationRepository) AddProjectHistoryOperation(ctx context.Context, dbExecutor repositories.Executor, projectId string, operation domain.HistoryOperation) error {
 	dto := toDTO(operation)
-	_, err := repository.db.ExecContext(
+	_, err := dbExecutor.ExecContext(
 		ctx,
 		`
 			INSERT INTO history_operations
@@ -43,32 +36,11 @@ func (repository *historyOperationRepository) AddProjectHistoryOperation(ctx con
 		dto.UserId,
 		dto.CreatedAt,
 	)
-	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(project_id)") {
-				return &domain.ValidationError{Field: "project_id"}
-			} else if strings.Contains(sqlErr.Error(), "length(user_id)") {
-				return &domain.ValidationError{Field: "user_id"}
-			}
-			return err
-		default:
-			return err
-		}
-	}
-	return nil
+	return err
 }
 
-func (repository *historyOperationRepository) SearchProjectHistoryOperations(ctx context.Context, projectId string) ([]domain.HistoryOperation, error) {
-	rows, err := repository.db.QueryContext(
+func (repository *historyOperationRepository) SearchProjectHistoryOperations(ctx context.Context, dbExecutor repositories.Executor, projectId string) ([]domain.HistoryOperation, error) {
+	rows, err := dbExecutor.QueryContext(
 		ctx,
 		`
             SELECT
@@ -99,9 +71,9 @@ func (repository *historyOperationRepository) SearchProjectHistoryOperations(ctx
 	return toDomainArray(dtos), nil
 }
 
-func (repository *historyOperationRepository) AddTaskOperation(ctx context.Context, projectId string, taskId string, operation domain.HistoryOperation) error {
+func (repository *historyOperationRepository) AddTaskOperation(ctx context.Context, dbExecutor repositories.Executor, projectId string, taskId string, operation domain.HistoryOperation) error {
 	dto := toDTO(operation)
-	_, err := repository.db.ExecContext(
+	_, err := dbExecutor.ExecContext(
 		ctx,
 		`
 			INSERT INTO history_operations
@@ -116,34 +88,11 @@ func (repository *historyOperationRepository) AddTaskOperation(ctx context.Conte
 		dto.UserId,
 		dto.CreatedAt,
 	)
-	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(project_id)") {
-				return &domain.ValidationError{Field: "project_id"}
-			} else if strings.Contains(sqlErr.Error(), "length(task_id)") {
-				return &domain.ValidationError{Field: "task_id"}
-			} else if strings.Contains(sqlErr.Error(), "length(user_id)") {
-				return &domain.ValidationError{Field: "user_id"}
-			}
-			return err
-		default:
-			return err
-		}
-	}
-	return nil
+	return err
 }
 
-func (repository *historyOperationRepository) SearchTaskHistoryOperations(ctx context.Context, taskId string) ([]domain.HistoryOperation, error) {
-	rows, err := repository.db.QueryContext(
+func (repository *historyOperationRepository) SearchTaskHistoryOperations(ctx context.Context, dbExecutor repositories.Executor, taskId string) ([]domain.HistoryOperation, error) {
+	rows, err := dbExecutor.QueryContext(
 		ctx,
 		`
             SELECT

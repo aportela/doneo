@@ -68,7 +68,7 @@ func (service *attachmentService) AddProjectAttachment(ctx context.Context, proj
 	if err != nil {
 		return domain.Attachment{}, err
 	}
-	_, err = service.historyOperationService.AddProjectHistoryOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: attachment.CreatedAt, OperationType: domain.EventProjectAttachmentAdded})
+	_, err = service.historyOperationService.AddProjectHistoryOperation(ctx, tx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: attachment.CreatedAt, OperationType: domain.EventProjectAttachmentAdded})
 	if err != nil {
 		return domain.Attachment{}, err
 	}
@@ -101,7 +101,7 @@ func (service *attachmentService) DeleteProjectAttachment(ctx context.Context, p
 	if err != nil {
 		return err
 	}
-	_, err = service.historyOperationService.AddProjectHistoryOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectAttachmentDeleted})
+	_, err = service.historyOperationService.AddProjectHistoryOperation(ctx, tx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectAttachmentDeleted})
 	if err != nil {
 		return err
 	}
@@ -143,7 +143,7 @@ func (service *attachmentService) AddTaskAttachment(ctx context.Context, project
 	if err != nil {
 		return domain.Attachment{}, err
 	}
-	_, err = service.historyOperationService.AddTaskHistoryOperation(ctx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: attachment.CreatedAt, OperationType: domain.EventTaskAttachmentAdded})
+	_, err = service.historyOperationService.AddTaskHistoryOperation(ctx, tx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: attachment.CreatedAt, OperationType: domain.EventTaskAttachmentAdded})
 	if err != nil {
 		return domain.Attachment{}, err
 	}
@@ -176,7 +176,7 @@ func (service *attachmentService) DeleteTaskAttachment(ctx context.Context, proj
 	if err != nil {
 		return err
 	}
-	_, err = service.historyOperationService.AddTaskHistoryOperation(ctx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskAttachmentDeleted})
+	_, err = service.historyOperationService.AddTaskHistoryOperation(ctx, tx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskAttachmentDeleted})
 	if err != nil {
 		return err
 	}

@@ -54,7 +54,7 @@ func (service *taskTimeEntryService) Add(ctx context.Context, projectId string, 
 	if err != nil {
 		return err
 	}
-	_, err = service.history.AddTaskHistoryOperation(ctx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: taskTimeEntry.CreatedAt, OperationType: domain.EventTaskTimeEntryAdded})
+	_, err = service.history.AddTaskHistoryOperation(ctx, tx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: taskTimeEntry.CreatedAt, OperationType: domain.EventTaskTimeEntryAdded})
 	if err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func (service *taskTimeEntryService) Update(ctx context.Context, projectId strin
 	if err := service.repository.Update(ctx, taskTimeEntry); err != nil {
 		return fmt.Errorf("[TaskTimeEntryService] failed to update task time entry with ID %s: %w", taskTimeEntry.ID, err)
 	}
-	_, err = service.history.AddTaskHistoryOperation(ctx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskTimeEntryUpdated})
+	_, err = service.history.AddTaskHistoryOperation(ctx, tx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskTimeEntryUpdated})
 	if err != nil {
 		return err
 	}
@@ -112,7 +112,7 @@ func (service *taskTimeEntryService) Delete(ctx context.Context, projectId strin
 	if err := service.repository.Delete(ctx, taskTimeEntryId); err != nil {
 		return fmt.Errorf("[TaskTimeEntryService] failed to delete task time entry with ID %s: %w", taskTimeEntryId, err)
 	}
-	_, err = service.history.AddTaskHistoryOperation(ctx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskTimeEntryDeleted})
+	_, err = service.history.AddTaskHistoryOperation(ctx, tx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskTimeEntryDeleted})
 	if err != nil {
 		return err
 	}

@@ -228,12 +228,12 @@ func randomText(n int) string {
 }
 func createProjects(db database.Database, projectTypeIds []string, projectPriorityIds []string, projectStatusIds []string, userIds []string, roleIds []string, taskStatusIds []string, taskPriorityIds []string, count int) []string {
 	var newProjectIds []string
-	historyOperationService := historyoperationservice.NewService(db, historyoperationrepository.NewRepository(db))
+	historyOperationService := historyoperationservice.NewService(historyoperationrepository.NewRepository())
 	authorizationService := authorizationservice.NewService(db, cache.NewPermissionCache())
 	projectService := projectservice.NewService(db, authorizationService, historyOperationService, projectrepository.NewRepository(db))
-	noteService := noteservice.NewService(db, historyOperationService, authorizationService, noterepository.NewRepository(db))
+	noteService := noteservice.NewService(db, historyOperationService, authorizationService, noterepository.NewRepository())
 	projectPermissionService := projectpermissionservice.NewService(db, cache.NewPermissionCache(), historyOperationService, projectpermissionrepository.NewRepository(db))
-	taskService := taskservice.NewService(db, taskrepository.NewRepository(db))
+	taskService := taskservice.NewService(db, historyOperationService, taskrepository.NewRepository(db))
 	for i := 1; i <= count; i++ {
 		newProject := getRandomProject(userIds, projectTypeIds, projectPriorityIds, projectStatusIds)
 		ctx := context.Background()

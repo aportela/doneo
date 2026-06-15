@@ -62,7 +62,7 @@ func (service *projectService) Add(ctx context.Context, project domain.Project) 
 	if err != nil {
 		return domain.Project{}, err
 	}
-	_, err = service.history.AddProjectHistoryOperation(ctx, project.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: project.CreatedAt, OperationType: domain.EventProjectCreated})
+	_, err = service.history.AddProjectHistoryOperation(ctx, tx, project.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: project.CreatedAt, OperationType: domain.EventProjectCreated})
 	if err != nil {
 		return domain.Project{}, err
 	}
@@ -99,7 +99,7 @@ func (service *projectService) Update(ctx context.Context, project domain.Projec
 	if err != nil {
 		return domain.Project{}, err
 	}
-	_, err = service.history.AddProjectHistoryOperation(ctx, project.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectUpdated})
+	_, err = service.history.AddProjectHistoryOperation(ctx, tx, project.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectUpdated})
 	if err != nil {
 		return domain.Project{}, err
 	}
@@ -135,7 +135,7 @@ func (service *projectService) Delete(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	_, err = service.history.AddProjectHistoryOperation(ctx, id, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectDeleted})
+	_, err = service.history.AddProjectHistoryOperation(ctx, tx, id, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectDeleted})
 	if err != nil {
 		return err
 	}

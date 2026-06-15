@@ -9,27 +9,28 @@ import (
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
-	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
 	"github.com/aportela/doneo/internal/repositories/tagrepository"
 	"github.com/aportela/doneo/internal/repositories/taskrepository"
+	"github.com/aportela/doneo/internal/services/historyoperationservice"
 	"github.com/aportela/doneo/internal/utils"
 )
 
 type TaskService interface {
 	Add(ctx context.Context, projectId string, task domain.Task) (domain.Task, error)
 	Update(ctx context.Context, projectId string, task domain.Task) (domain.Task, error)
-	Delete(ctx context.Context, projectId string, id string) error
-	Get(ctx context.Context, id string) (domain.Task, error)
+	Delete(ctx context.Context, projectId string, taskId string) error
+	Get(ctx context.Context, taskId string) (domain.Task, error)
 	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskFilter) ([]domain.Task, browser.Result, error)
 }
 
 type taskService struct {
 	database   database.Database
+	history    historyoperationservice.HistoryOperationService
 	repository taskrepository.TaskRepository
 }
 
-func NewService(db database.Database, repository taskrepository.TaskRepository) TaskService {
-	return &taskService{database: db, repository: repository}
+func NewService(db database.Database, history historyoperationservice.HistoryOperationService, repository taskrepository.TaskRepository) TaskService {
+	return &taskService{database: db, history: history, repository: repository}
 }
 
 func (service *taskService) Add(ctx context.Context, projectId string, task domain.Task) (domain.Task, error) {
@@ -69,7 +70,7 @@ func (service *taskService) Add(ctx context.Context, projectId string, task doma
 			}
 		}
 	}
-	err = historyoperationrepository.NewRepository(service.database).AddTaskOperation(ctx, projectId, task.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: task.CreatedAt, OperationType: domain.EventTaskCreated})
+	_, err = service.history.AddTaskHistoryOperation(ctx, tx, projectId, task.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: task.CreatedAt, OperationType: domain.EventTaskCreated})
 	if err != nil {
 		return domain.Task{}, err
 	}
@@ -115,7 +116,7 @@ func (service *taskService) Update(ctx context.Context, projectId string, task d
 			}
 		}
 	}
-	err = historyoperationrepository.NewRepository(service.database).AddTaskOperation(ctx, projectId, task.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskUpdated})
+	_, err = service.history.AddTaskHistoryOperation(ctx, tx, projectId, task.ID, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: *task.UpdatedAt, OperationType: domain.EventTaskUpdated})
 	if err != nil {
 		return domain.Task{}, err
 	}
@@ -126,7 +127,7 @@ func (service *taskService) Update(ctx context.Context, projectId string, task d
 	return task, nil
 }
 
-func (service *taskService) Delete(ctx context.Context, projectId string, id string) error {
+func (service *taskService) Delete(ctx context.Context, projectId string, taskId string) error {
 	tx, err := service.database.Begin()
 	if err != nil {
 		return err
@@ -143,25 +144,25 @@ func (service *taskService) Delete(ctx context.Context, projectId string, id str
 	if !ok {
 		return fmt.Errorf("[TaskService] user ID not found in context")
 	}
-	err = service.repository.Delete(ctx, id, time.Now().UnixMilli())
+	err = service.repository.Delete(ctx, taskId, time.Now().UnixMilli())
 	if err != nil {
 		return err
 	}
-	err = historyoperationrepository.NewRepository(service.database).AddTaskOperation(ctx, projectId, id, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskDeleted})
+	_, err = service.history.AddTaskHistoryOperation(ctx, tx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskDeleted})
 	if err != nil {
 		return err
 	}
 	return tx.Commit()
 }
 
-func (service *taskService) Get(ctx context.Context, id string) (domain.Task, error) {
-	task, err := service.repository.Get(ctx, id)
+func (service *taskService) Get(ctx context.Context, taskId string) (domain.Task, error) {
+	task, err := service.repository.Get(ctx, taskId)
 	if err != nil {
-		return domain.Task{}, fmt.Errorf("[TaskService] failed to get task with ID %s: %w", id, err)
+		return domain.Task{}, fmt.Errorf("[TaskService] failed to get task with ID %s: %w", taskId, err)
 	}
 	tags, err := tagrepository.NewRepository(service.database).GetTaskTags(ctx, task.ID)
 	if err != nil {
-		return domain.Task{}, fmt.Errorf("[TaskService] failed to get task with ID %s: %w", id, err)
+		return domain.Task{}, fmt.Errorf("[TaskService] failed to get task with ID %s: %w", taskId, err)
 	}
 	task.Tags = tags
 	return task, nil

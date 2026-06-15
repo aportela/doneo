@@ -85,8 +85,8 @@ func NewApp(
 ) *App {
 
 	attachmentRepository := attachmentrepository.NewRepository(db)
-	historyOperationRepository := historyoperationrepository.NewRepository(db)
-	noteRepository := noterepository.NewRepository(db)
+	historyOperationRepository := historyoperationrepository.NewRepository()
+	noteRepository := noterepository.NewRepository()
 	projectPermissionRepository := projectpermissionrepository.NewRepository(db)
 	projectPriorityRepository := projectpriorityrepository.NewRepository(db)
 	projectRepository := projectrepository.NewRepository(db)
@@ -103,7 +103,7 @@ func NewApp(
 	timerRepository := timerrepository.NewRepository(db)
 	userRepository := userrepository.NewRepository(db)
 
-	historyOperationService := historyoperationservice.NewService(db, historyOperationRepository)
+	historyOperationService := historyoperationservice.NewService(historyOperationRepository)
 	attachmentService := attachmentservice.NewService(db, historyOperationService, attachmentRepository)
 	authorizationService := authorizationservice.NewService(db, cache)
 	authService := authservice.NewService(db, userRepository)
@@ -112,7 +112,7 @@ func NewApp(
 	projectPriorityService := projectpriorityservice.NewService(db, projectPriorityRepository)
 	projectService := projectservice.NewService(db, authorizationService, historyOperationService, projectRepository)
 	projectStatusService := projectstatusservice.NewService(db, projectStatusRepository)
-	taskService := taskservice.NewService(db, taskRepository)
+	taskService := taskservice.NewService(db, historyOperationService, taskRepository)
 	projectTypeService := projecttypeservice.NewService(db, projectTypeRepository)
 	roleService := roleservice.NewService(db, roleRepository)
 	taskPriorityService := taskpriorityservice.NewService(db, taskPriorityRepository)
@@ -123,7 +123,7 @@ func NewApp(
 
 	attachmentHandler := attachmenthandler.NewHandler(attachmentService, cfg.Storage.AttachmentsPath)
 	authHandler := authhandler.NewHandler(authService, cfg.Auth.SecretKey, cfg.Auth.AccessTokenExpirationHours, cfg.Auth.RefreshTokenExpirationDays)
-	historyOperationHandler := historyoperationhandler.NewHandler(historyOperationService)
+	historyOperationHandler := historyoperationhandler.NewHandler(db, historyOperationService)
 	noteHandler := notehandler.NewHandler(noteService)
 	projectPermissionHandler := projectpermissionhandler.NewHandler(projectPermissionService)
 	projectPriorityHandler := projectpriorityhandler.NewHandler(projectPriorityService)

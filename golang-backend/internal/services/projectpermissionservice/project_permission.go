@@ -54,7 +54,7 @@ func (service *projectPermissionService) Add(ctx context.Context, projectId stri
 	if err != nil {
 		return domain.ProjectPermission{}, err
 	}
-	_, err = service.historyOperationService.AddProjectHistoryOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectPermissionAdded})
+	_, err = service.historyOperationService.AddProjectHistoryOperation(ctx, tx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectPermissionAdded})
 	if err != nil {
 		return domain.ProjectPermission{}, err
 	}
@@ -87,7 +87,7 @@ func (service *projectPermissionService) Delete(ctx context.Context, projectId s
 	if err != nil {
 		return err
 	}
-	_, err = service.historyOperationService.AddProjectHistoryOperation(ctx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectPermissionDeleted})
+	_, err = service.historyOperationService.AddProjectHistoryOperation(ctx, tx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectPermissionDeleted})
 	if err != nil {
 		return err
 	}
