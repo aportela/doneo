@@ -7,9 +7,9 @@ import (
 func toDTO(projectPermission domain.ProjectPermission) projectPermissionDTO {
 	return projectPermissionDTO{
 		ID:       projectPermission.ID,
-		UserId:   projectPermission.User.ID,
+		UserID:   projectPermission.User.ID,
 		UserName: projectPermission.User.Name,
-		RoleId:   projectPermission.Role.ID,
+		RoleID:   projectPermission.Role.ID,
 		RoleName: projectPermission.Role.Name,
 	}
 }
@@ -18,12 +18,12 @@ func toDomain(projectPermission projectPermissionDTO) domain.ProjectPermission {
 	return domain.ProjectPermission{
 		ID: projectPermission.ID,
 		User: domain.UserBase{
-			ID:   projectPermission.UserId,
+			ID:   projectPermission.UserID,
 			Name: projectPermission.UserName,
 		},
 		Role: domain.Role{
 			RoleBase: domain.RoleBase{
-				ID:   projectPermission.RoleId,
+				ID:   projectPermission.RoleID,
 				Name: projectPermission.RoleName,
 			},
 			PermissionsBitmask: domain.Bitmask(projectPermission.RolePermissionsBitmask),

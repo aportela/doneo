@@ -4,91 +4,68 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
-	"strings"
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"modernc.org/sqlite"
-	sqlite3 "modernc.org/sqlite/lib"
 )
 
 type ProjectPermissionRepository interface {
-	Add(ctx context.Context, projectId string, permission domain.ProjectPermission) error
-	Delete(ctx context.Context, projectId string, permissionId string) error
-	Get(ctx context.Context, permissionId string) (domain.ProjectPermission, error)
-	Search(ctx context.Context, projectId string) ([]domain.ProjectPermission, error)
+	Add(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, permission domain.ProjectPermission) error
+	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, permissionID string) error
+	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, permissionID string) (domain.ProjectPermission, error)
+	GetProjectPermissions(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) ([]domain.ProjectPermission, error)
 }
 
-type projectPermissionRepository struct {
-	db database.Database
+type projectPermissionRepository struct{}
+
+func NewRepository() ProjectPermissionRepository {
+	return &projectPermissionRepository{}
 }
 
-func NewRepository(db database.Database) ProjectPermissionRepository {
-	return &projectPermissionRepository{db: db}
-}
-
-func (repository *projectPermissionRepository) Add(ctx context.Context, projectId string, permission domain.ProjectPermission) error {
+func (repository *projectPermissionRepository) Add(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, permission domain.ProjectPermission) error {
 	dto := toDTO(permission)
-	_, err := repository.db.ExecContext(
+	_, err := dbExecutor.ExecContext(
 		ctx,
 		`
-            INSERT INTO project_user_role (id, project_id, user_id, role_id)
-			VALUES (?, ?, ?, ?)
+            INSERT INTO project_user_role
+				(id, project_id, user_id, role_id)
+			VALUES
+				(?, ?, ?, ?)
         `,
 		dto.ID,
-		projectId,
-		dto.UserId,
-		dto.RoleId,
+		projectID,
+		dto.UserID,
+		dto.RoleID,
 	)
-	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(project_id)") {
-				return &domain.ValidationError{Field: "projectId"}
-			} else if strings.Contains(sqlErr.Error(), "length(user_id)") {
-				return &domain.ValidationError{Field: "userId"}
-			} else if strings.Contains(sqlErr.Error(), "length(role_id)") {
-				return &domain.ValidationError{Field: "roleId"}
-			}
-			return err
-		default:
-			return err
-		}
-	}
-	return nil
+	return err
 }
 
-func (repository *projectPermissionRepository) Delete(ctx context.Context, projectId string, permissionId string) error {
-	_, err := repository.db.ExecContext(
+func (repository *projectPermissionRepository) Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, permissionID string) error {
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
             DELETE FROM project_user_role
 			WHERE
 				id = ?
         `,
-		permissionId,
+		permissionID,
 	)
 	if err != nil {
-		// TODO: remove ?
-		// TODO: check sql error
-		fmt.Println(err.Error())
 		return err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
 	}
 	return nil
 }
 
-func (repository *projectPermissionRepository) Get(ctx context.Context, permissionId string) (domain.ProjectPermission, error) {
+func (repository *projectPermissionRepository) Get(ctx context.Context, dbExecutor database.DatabaseExecutor, permissionID string) (domain.ProjectPermission, error) {
 	var dto projectPermissionDTO
-	err := repository.db.QueryRowContext(
+	err := dbExecutor.QueryRowContext(
 		ctx,
 		`
             SELECT
@@ -96,9 +73,10 @@ func (repository *projectPermissionRepository) Get(ctx context.Context, permissi
             FROM project_user_role PUR
 			INNER JOIN users U ON U.id = PUR.user_id
 			INNER JOIN roles R ON R.id = PUR.role_id
-            WHERE PUR.id = ?
+            WHERE
+				PUR.id = ?
         `,
-		permissionId).Scan(&dto.ID, &dto.UserId, &dto.UserName, &dto.RoleId, &dto.RoleName, &dto.RolePermissionsBitmask)
+		permissionID).Scan(&dto.ID, &dto.UserID, &dto.UserName, &dto.RoleID, &dto.RoleName, &dto.RolePermissionsBitmask)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.ProjectPermission{}, domain.NotFoundError
@@ -108,8 +86,8 @@ func (repository *projectPermissionRepository) Get(ctx context.Context, permissi
 	return toDomain(dto), err
 }
 
-func (repository *projectPermissionRepository) Search(ctx context.Context, projectId string) ([]domain.ProjectPermission, error) {
-	rows, err := repository.db.QueryContext(
+func (repository *projectPermissionRepository) GetProjectPermissions(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) ([]domain.ProjectPermission, error) {
+	rows, err := dbExecutor.QueryContext(
 		ctx,
 		`
             SELECT
@@ -117,10 +95,12 @@ func (repository *projectPermissionRepository) Search(ctx context.Context, proje
             FROM project_user_role PUR
 			INNER JOIN users U ON U.id = PUR.user_id
 			INNER JOIN roles R ON R.id = PUR.role_id
-            WHERE PUR.project_id = ?
-			ORDER BY U.name COLLATE NOCASE
+            WHERE
+				PUR.project_id = ?
+			ORDER BY
+				U.name COLLATE NOCASE
         `,
-		projectId)
+		projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +109,7 @@ func (repository *projectPermissionRepository) Search(ctx context.Context, proje
 	for rows.Next() {
 		var dto projectPermissionDTO
 		if err := rows.Scan(
-			&dto.ID, &dto.UserId, &dto.UserName, &dto.RoleId, &dto.RoleName, &dto.RolePermissionsBitmask,
+			&dto.ID, &dto.UserID, &dto.UserName, &dto.RoleID, &dto.RoleName, &dto.RolePermissionsBitmask,
 		); err != nil {
 			return nil, err
 		}

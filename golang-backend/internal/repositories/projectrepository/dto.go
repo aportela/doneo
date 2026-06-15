@@ -11,7 +11,7 @@ type projectDTO struct {
 	Slug                   string         `db:"slug"`
 	Summary                string         `db:"summary"`
 	Description            sql.NullString `db:"description"`
-	CreatorId              string         `db:"creator_id"`
+	CreatorID              string         `db:"creator_id"`
 	CreatorName            string         `db:"creator_name"`
 	CreatedAt              int64          `db:"created_at"`
 	UpdatedAt              sql.NullInt64  `db:"updated_at"`
@@ -19,13 +19,13 @@ type projectDTO struct {
 	StartedAt              sql.NullInt64  `db:"started_at"`
 	FinishedAt             sql.NullInt64  `db:"finished_at"`
 	DueAt                  sql.NullInt64  `db:"due_at"`
-	TypeId                 string         `db:"type_id"`
+	TypeID                 string         `db:"type_id"`
 	TypeName               string         `db:"type_name"`
 	TypeHexColor           string         `db:"type_hex_color"`
-	StatusId               string         `db:"status_id"`
+	StatusID               string         `db:"status_id"`
 	StatusName             string         `db:"status_name"`
 	StatusHexColor         string         `db:"status_hex_color"`
-	PriorityId             string         `db:"priority_id"`
+	PriorityID             string         `db:"priority_id"`
 	PriorityName           string         `db:"priority_name"`
 	PriorityHexColor       string         `db:"priority_hex_color"`
 	TasksCount             uint           `db:"tasks_count"`
@@ -38,9 +38,9 @@ type projectDTO struct {
 type searchFilterDTO struct {
 	Slug            *string
 	Summary         *string
-	TypeId          *string
-	PriorityId      *string
-	StatusId        *string
+	TypeID          *string
+	PriorityID      *string
+	StatusID        *string
 	CreatedAt       *repositories.TimestampFilter
 	CreatedByUserId *string
 }
