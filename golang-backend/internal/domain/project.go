@@ -59,4 +59,7 @@ const (
 	EventTaskNoteDeleted       ProjectEventType = 25
 	EventTaskAttachmentAdded   ProjectEventType = 26
 	EventTaskAttachmentDeleted ProjectEventType = 27
+	EventTaskTimeEntryAdded    ProjectEventType = 28
+	EventTaskTimeEntryUpdated  ProjectEventType = 29
+	EventTaskTimeEntryDeleted  ProjectEventType = 30
 )

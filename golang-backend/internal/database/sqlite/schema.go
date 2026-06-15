@@ -284,6 +284,19 @@ var schemaQueries = []schemaMigration{
 				CREATE INDEX IF NOT EXISTS idx_task_attachments_task_id ON task_attachments(task_id);
 				CREATE INDEX IF NOT EXISTS idx_task_attachments_attachment_id ON task_attachments(attachment_id);
 			`,
+			`
+				CREATE TABLE IF NOT EXISTS task_time_entries (
+					id TEXT NOT NULL CHECK(length(id) == 36),
+					task_id TEXT NOT NULL CHECK(length(task_id) == 36),
+					user_id TEXT NOT NULL CHECK(length(user_id) == 36),
+					created_at INTEGER NOT NULL,
+					summary TEXT NOT NULL CHECK(length(summary) BETWEEN 1 AND 128),
+					total_seconds INTEGER NOT NULL,
+					PRIMARY KEY (id),
+					FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+					FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+				) STRICT;
+			`,
 		},
 	},
 }
