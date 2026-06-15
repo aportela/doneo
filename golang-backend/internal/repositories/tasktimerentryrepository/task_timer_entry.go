@@ -14,11 +14,11 @@ import (
 )
 
 type TaskTimeEntryRepository interface {
-	Add(ctx context.Context, taskId string, taskTimeEntry domain.TaskTimeEntry) error
-	Update(ctx context.Context, taskTimeEntry domain.TaskTimeEntry) error
+	Add(ctx context.Context, taskId string, taskTimeEntry domain.TaskTimerEntry) error
+	Update(ctx context.Context, taskTimeEntry domain.TaskTimerEntry) error
 	Delete(ctx context.Context, id string) error
-	Get(ctx context.Context, id string) (domain.TaskTimeEntry, error)
-	GetTaskTimeEntries(ctx context.Context, taskId string) ([]domain.TaskTimeEntry, error)
+	Get(ctx context.Context, id string) (domain.TaskTimerEntry, error)
+	GetTaskTimeEntries(ctx context.Context, taskId string) ([]domain.TaskTimerEntry, error)
 }
 
 type taskTimeEntryRepository struct {
@@ -29,7 +29,7 @@ func NewRepository(db database.Database) TaskTimeEntryRepository {
 	return &taskTimeEntryRepository{db: db}
 }
 
-func (repository *taskTimeEntryRepository) Add(ctx context.Context, taskId string, taskTimeEntry domain.TaskTimeEntry) error {
+func (repository *taskTimeEntryRepository) Add(ctx context.Context, taskId string, taskTimeEntry domain.TaskTimerEntry) error {
 	dto := toDTO(taskTimeEntry)
 	_, err := repository.db.ExecContext(
 		ctx,
@@ -75,7 +75,7 @@ func (repository *taskTimeEntryRepository) Add(ctx context.Context, taskId strin
 	return nil
 }
 
-func (repository *taskTimeEntryRepository) Update(ctx context.Context, taskTimeEntry domain.TaskTimeEntry) error {
+func (repository *taskTimeEntryRepository) Update(ctx context.Context, taskTimeEntry domain.TaskTimerEntry) error {
 	dto := toDTO(taskTimeEntry)
 	_, err := repository.db.ExecContext(
 		ctx,
@@ -137,8 +137,8 @@ func (repository *taskTimeEntryRepository) Delete(ctx context.Context, id string
 	return nil
 }
 
-func (repository *taskTimeEntryRepository) Get(ctx context.Context, id string) (domain.TaskTimeEntry, error) {
-	var dto taskTimeEntryDTO
+func (repository *taskTimeEntryRepository) Get(ctx context.Context, id string) (domain.TaskTimerEntry, error) {
+	var dto taskTimerEntryDTO
 	err := repository.db.QueryRowContext(
 		ctx,
 		`
@@ -163,14 +163,14 @@ func (repository *taskTimeEntryRepository) Get(ctx context.Context, id string) (
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.TaskTimeEntry{}, domain.NotFoundError
+			return domain.TaskTimerEntry{}, domain.NotFoundError
 		}
-		return domain.TaskTimeEntry{}, err
+		return domain.TaskTimerEntry{}, err
 	}
 	return toDomain(dto), err
 }
 
-func (repository *taskTimeEntryRepository) GetTaskTimeEntries(ctx context.Context, taskId string) ([]domain.TaskTimeEntry, error) {
+func (repository *taskTimeEntryRepository) GetTaskTimeEntries(ctx context.Context, taskId string) ([]domain.TaskTimerEntry, error) {
 	rows, err := repository.db.QueryContext(
 		ctx,
 		`
@@ -190,9 +190,9 @@ func (repository *taskTimeEntryRepository) GetTaskTimeEntries(ctx context.Contex
 		return nil, err
 	}
 	defer rows.Close()
-	dtos := make([]taskTimeEntryDTO, 0)
+	dtos := make([]taskTimerEntryDTO, 0)
 	for rows.Next() {
-		var dto taskTimeEntryDTO
+		var dto taskTimerEntryDTO
 		if err := rows.Scan(
 			&dto.ID, &dto.CreatorId, &dto.CreatorName, &dto.CreatedAt, &dto.Summary, &dto.TotalSeconds,
 		); err != nil {
