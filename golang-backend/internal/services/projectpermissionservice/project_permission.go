@@ -2,6 +2,7 @@ package projectpermissionservice
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"time"
 
@@ -10,106 +11,105 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
+	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/services/historyoperationservice"
 	"github.com/aportela/doneo/internal/utils"
 )
 
 type ProjectPermissionService interface {
-	Add(ctx context.Context, projectId string, permission domain.ProjectPermission) (domain.ProjectPermission, error)
-	Delete(ctx context.Context, projectId string, permissionId string) error
-	Get(ctx context.Context, permissionId string) (domain.ProjectPermission, error)
-	Search(ctx context.Context, projectId string) ([]domain.ProjectPermission, error)
+	Add(ctx context.Context, projectID string, permission domain.ProjectPermission) (domain.ProjectPermission, error)
+	Delete(ctx context.Context, projectID string, permissionID string) error
+	GetProjectPermissions(ctx context.Context, projectID string) ([]domain.ProjectPermission, error)
 }
 
 type projectPermissionService struct {
-	database                database.Database
-	cache                   cache.PermissionCache
-	historyOperationService historyoperationservice.HistoryOperationService
-	repository              projectpermissionrepository.ProjectPermissionRepository
+	db                          database.Database
+	cache                       cache.PermissionCache
+	authorizationService        authorizationservice.AuthorizationService
+	historyOperationService     historyoperationservice.HistoryOperationService
+	projectPermissionRepository projectpermissionrepository.ProjectPermissionRepository
 }
 
-func NewService(db database.Database, cache cache.PermissionCache, historyOperationService historyoperationservice.HistoryOperationService, repository projectpermissionrepository.ProjectPermissionRepository) ProjectPermissionService {
-	return &projectPermissionService{database: db, cache: cache, historyOperationService: historyOperationService, repository: repository}
+func NewService(db database.Database, cache cache.PermissionCache, authorizationService authorizationservice.AuthorizationService, historyOperationService historyoperationservice.HistoryOperationService, projectPermissionRepository projectpermissionrepository.ProjectPermissionRepository) ProjectPermissionService {
+	return &projectPermissionService{db: db, cache: cache, authorizationService: authorizationService, historyOperationService: historyOperationService, projectPermissionRepository: projectPermissionRepository}
 }
 
-func (service *projectPermissionService) Add(ctx context.Context, projectId string, permission domain.ProjectPermission) (domain.ProjectPermission, error) {
-	tx, err := service.database.Begin()
-	if err != nil {
-		return domain.ProjectPermission{}, err
-	}
-	defer func() {
-		if p := recover(); p != nil {
-			_ = tx.Rollback()
-			panic(p)
-		} else if err != nil {
-			_ = tx.Rollback()
-		}
-	}()
-	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+func (service *projectPermissionService) withProjectUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
+	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return domain.ProjectPermission{}, fmt.Errorf("[ProjectPermissionService] user ID not found in context")
+		return fmt.Errorf("user not found in context")
 	}
-	permission.ID = utils.UUID()
-	err = service.repository.Add(ctx, projectId, permission)
+
+	if err := service.authorizationService.RequireProjectUpdatePermission(ctx, currentContextUserID, projectID); err != nil {
+		return err
+	}
+
+	return action(currentContextUserID)
+}
+
+func (service *projectPermissionService) Add(ctx context.Context, projectID string, permission domain.ProjectPermission) (domain.ProjectPermission, error) {
+	err := service.withProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
+		permission.ID = utils.UUID()
+		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+			if err := service.projectPermissionRepository.Add(ctx, tx, projectID, permission); err != nil {
+				return err
+			}
+			if _, err := service.historyOperationService.AddProjectHistoryOperation(
+				ctx,
+				tx,
+				projectID,
+				domain.HistoryOperation{
+					ID:            utils.UUID(),
+					CreatedBy:     domain.UserBase{ID: currentUserID},
+					CreatedAt:     time.Now(),
+					OperationType: domain.EventProjectPermissionAdded,
+				},
+			); err != nil {
+				return err
+			}
+			return nil
+		})
+	})
 	if err != nil {
 		return domain.ProjectPermission{}, err
 	}
-	_, err = service.historyOperationService.AddProjectHistoryOperation(ctx, tx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectPermissionAdded})
-	if err != nil {
-		return domain.ProjectPermission{}, err
-	}
-	err = tx.Commit()
-	if err != nil {
-		return domain.ProjectPermission{}, err
-	}
-	service.cache.SetProject(currentUserId, projectId, permission.Role.PermissionsBitmask)
 	return permission, nil
 }
 
-func (service *projectPermissionService) Delete(ctx context.Context, projectId string, permissionId string) error {
-	tx, err := service.database.Begin()
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if p := recover(); p != nil {
-			_ = tx.Rollback()
-			panic(p)
-		} else if err != nil {
-			_ = tx.Rollback()
-		}
-	}()
-	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+func (service *projectPermissionService) Delete(ctx context.Context, projectID string, permissionID string) error {
+	err := service.withProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
+		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+			if err := service.projectPermissionRepository.Delete(ctx, tx, permissionID); err != nil {
+				return err
+			}
+			if _, err := service.historyOperationService.AddProjectHistoryOperation(
+				ctx,
+				tx,
+				projectID,
+				domain.HistoryOperation{
+					ID:            utils.UUID(),
+					CreatedBy:     domain.UserBase{ID: currentUserID},
+					CreatedAt:     time.Now(),
+					OperationType: domain.EventProjectPermissionDeleted,
+				},
+			); err != nil {
+				return err
+			}
+			return nil
+		})
+	})
+	return err
+}
+
+func (service *projectPermissionService) GetProjectPermissions(ctx context.Context, projectID string) ([]domain.ProjectPermission, error) {
+	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("[ProjectPermissionService] user ID not found in context")
+		return nil, fmt.Errorf("user not found in context")
 	}
-	err = service.repository.Delete(ctx, projectId, permissionId)
-	if err != nil {
-		return err
+	if err := service.authorizationService.RequireProjectViewPermission(ctx, currentContextUserID, projectID); err != nil {
+		return nil, err
 	}
-	_, err = service.historyOperationService.AddProjectHistoryOperation(ctx, tx, projectId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventProjectPermissionDeleted})
-	if err != nil {
-		return err
-	}
-	err = tx.Commit()
-	if err != nil {
-		return err
-	}
-	service.cache.DeleteProject(currentUserId, projectId)
-	return nil
-}
-
-// TODO: remove ???
-func (service *projectPermissionService) Get(ctx context.Context, permissionId string) (domain.ProjectPermission, error) {
-	projectPermission, err := service.repository.Get(ctx, permissionId)
-	if err != nil {
-		return domain.ProjectPermission{}, fmt.Errorf("[ProjectPermissionService] failed to get project permission: %w", err)
-	}
-	return projectPermission, nil
-}
-
-func (service *projectPermissionService) Search(ctx context.Context, projectId string) ([]domain.ProjectPermission, error) {
-	projectPermissions, err := service.repository.Search(ctx, projectId)
+	projectPermissions, err := service.projectPermissionRepository.GetProjectPermissions(ctx, service.db, projectID)
 	if err != nil {
 		return nil, fmt.Errorf("[ProjectPermissionService] failed to get project permissions: %w", err)
 	}
