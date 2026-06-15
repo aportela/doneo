@@ -1369,7 +1369,7 @@ export default {
             totalItemsLabel: "Total tasks: {total}",
           },
         },
-        ProjectTasksTable: {
+        TasksTable: {
           header: {
             columns: {
               slug: "Slug",

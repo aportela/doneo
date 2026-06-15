@@ -10,7 +10,7 @@
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import type { SearchRequest, TaskResponse } from '../types/dto';
-    import type { TasksTableFilters } from '../types/project-tasks-table-filters.ts';
+    import type { TasksTableFilters } from '../types/tasks-table-filters.ts';
 
     import { Sort } from '../../../shared/types/models/sort';
     import { Task } from '../models/tasks';
@@ -18,9 +18,9 @@
     import { taskService } from '../services/task.ts';
     import { handleAPIError } from '../../../api/client/errorHandler.ts';
 
-    import ProjectTasksTable from '../components/ProjectTasksTable.vue';
-    import ProjectTasksKanban from '../components/ProjectTasksKanban.vue';
-    import ProjectTasksCalendar from '../components/ProjectTasksCalendar.vue';
+    import TasksTable from '../components/TasksTable.vue';
+    import TasksKanban from '../components/TasksKanban.vue';
+    import TasksCalendar from '../components/TasksCalendar.vue';
     import Pager from '../../../shared/components/tables/Pager.vue';
 
     const { t } = useI18n();
@@ -166,7 +166,7 @@
                             }) }}
                         </template>
                     </Pager>
-                    <ProjectTasksTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" :sort="sort"
+                    <TasksTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" :sort="sort"
                         @sort="onSort" v-model:filters="filters" :project-id="''" />
                 </n-card>
             </template>
@@ -179,7 +179,7 @@
                 Kanban
             </template>
             <template #default>
-                <ProjectTasksKanban />
+                <TasksKanban />
             </template>
         </n-tab-pane>
         <n-tab-pane name="Calendar" tab="Calendar" display-directive="show:lazy">
@@ -190,7 +190,7 @@
                 Calendar
             </template>
             <template #default>
-                <ProjectTasksCalendar />
+                <TasksCalendar />
             </template>
         </n-tab-pane>
     </n-tabs>

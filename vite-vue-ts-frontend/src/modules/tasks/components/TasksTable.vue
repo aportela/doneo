@@ -9,7 +9,7 @@
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { DateFilterSelectComponent } from '../../users/components/date-filter-select-component.ts';
 
-    import type { TasksTableFilters } from '../types/project-tasks-table-filters.ts';
+    import type { TasksTableFilters } from '../types/tasks-table-filters.ts';
     import { Task } from '../models/tasks.ts';
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
@@ -140,22 +140,22 @@
             <tr>
                 <th>
                     <TextFilterInput clearable :disabled="props.disabled" size="small"
-                        :placeholder="t('modules.task.components.ProjectTasksTable.header.filters.slug.placeholder')"
+                        :placeholder="t('modules.task.components.TasksTable.header.filters.slug.placeholder')"
                         v-model:value="filters.slug" @keydown-enter="onRefresh" />
                 </th>
                 <th>
                     <TaskPrioritySelector :disabled="props.disabled" v-model:id="filters.priorityId" :hide-prefix="true"
                         clearable
-                        :placeholder="t('modules.task.components.ProjectTasksTable.header.filters.priority.placeholder')" />
+                        :placeholder="t('modules.task.components.TasksTable.header.filters.priority.placeholder')" />
                 </th>
                 <th>
                     <TaskStatusSelector :disabled="props.disabled" v-model:id="filters.statusId" :hide-prefix="true"
                         clearable
-                        :placeholder="t('modules.task.components.ProjectTasksTable.header.filters.status.placeholder')" />
+                        :placeholder="t('modules.task.components.TasksTable.header.filters.status.placeholder')" />
                 </th>
                 <th>
                     <TextFilterInput clearable :disabled="props.disabled" size="small"
-                        :placeholder="t('modules.task.components.ProjectTasksTable.header.filters.summary.placeholder')"
+                        :placeholder="t('modules.task.components.TasksTable.header.filters.summary.placeholder')"
                         v-model:value="filters.summary" @keydown-enter="onRefresh" />
                 </th>
                 <th>
@@ -164,7 +164,7 @@
                 </th>
                 <th>
                     <UserSelector hideAvatar clearable :disabled="props.disabled" v-model:id="filters.createdByUserId"
-                        :placeholder="t('modules.task.components.ProjectTasksTable.header.filters.creator.placeholder')" />
+                        :placeholder="t('modules.task.components.TasksTable.header.filters.creator.placeholder')" />
                 </th>
                 <th class="doneo-text-center">
                     <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
@@ -207,7 +207,7 @@
             </tr>
             <tr>
                 <td :colspan="columns.length + 1" v-if="items.length < 1 && !props.disabled">
-                    <n-empty :description="t('modules.task.components.ProjectTasksTable.warnings.noItemsFound')">
+                    <n-empty :description="t('modules.task.components.TasksTable.warnings.noItemsFound')">
                     </n-empty>
                 </td>
             </tr>

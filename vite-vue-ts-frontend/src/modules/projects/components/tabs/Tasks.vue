@@ -13,7 +13,7 @@
     import type { FormMode } from "../../../../shared/types/form-mode.ts";
     import type { SearchRequest } from "../../types/dto.ts";
     import type { SearchResponse } from "../../../tasks/types/dto.ts";
-    import type { TasksTableFilters } from "../../../tasks/types/project-tasks-table-filters.ts";
+    import type { TasksTableFilters } from "../../../tasks/types/tasks-table-filters.ts";
 
     import { Sort } from '../../../../shared/types/models/sort';
     import { Task } from "../../../tasks/models/tasks.ts";
@@ -22,7 +22,7 @@
     import { handleAPIError } from '../../../../api/client/errorHandler';
 
     import NewTaskForm from "../../../tasks/components/NewTaskForm.vue";
-    import ProjectTasksTable from "../../../tasks/components/ProjectTasksTable.vue";
+    import TasksTable from "../../../tasks/components/TasksTable.vue";
     import Pager from '../../../../shared/components/tables/Pager.vue';
 
     interface ProjectTasksProps {
@@ -198,8 +198,8 @@
                 {{ t("modules.task.components.ProjectTasksTab.pager.totalItemsLabel", { total: totalResults }) }}
             </template>
         </Pager>
-        <ProjectTasksTable :items="items" :disabled="state.ajaxRunning" :project-id="props.projectId"
-            @refresh="onRefresh" @add="onShowAddForm" :sort="sort" @sort="onSort" v-model:filters="filters" />
+        <TasksTable :items="items" :disabled="state.ajaxRunning" :project-id="props.projectId" @refresh="onRefresh"
+            @add="onShowAddForm" :sort="sort" @sort="onSort" v-model:filters="filters" />
     </n-card>
 </template>
 
