@@ -102,17 +102,17 @@ func (handler *TaskHandler) Search(w http.ResponseWriter, r *http.Request) {
 	}
 	projectId := chi.URLParam(r, "project_id")
 	filter := domain.SearchTaskFilter{}
-	filter.ProjectId = &projectId
+	filter.ProjectID = &projectId
 
 	if request.Filter != nil {
 		if request.Filter.Summary != nil {
 			filter.Summary = request.Filter.Summary
 		}
 		if request.Filter.PriorityId != nil {
-			filter.PriorityId = request.Filter.PriorityId
+			filter.PriorityID = request.Filter.PriorityId
 		}
 		if request.Filter.StatusId != nil {
-			filter.StatusId = request.Filter.StatusId
+			filter.StatusID = request.Filter.StatusId
 		}
 		if request.Filter.CreatedAt != nil {
 			filter.CreatedAt = &domain.TimestampFilter{From: nil, To: nil}

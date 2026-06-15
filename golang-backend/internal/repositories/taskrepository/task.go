@@ -10,63 +10,50 @@ import (
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"modernc.org/sqlite"
-	sqlite3 "modernc.org/sqlite/lib"
 )
 
 type TaskRepository interface {
-	GetNextTaskIndex(ctx context.Context, projectId string) (uint, error)
-	Add(ctx context.Context, projectId string, task domain.Task) error
-	Update(ctx context.Context, task domain.Task) error
-	Get(ctx context.Context, id string) (domain.Task, error)
-	Delete(ctx context.Context, id string, deletedAt int64) error
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskFilter) ([]domain.Task, browser.Result, error)
+	GetNextTaskIndex(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) (uint, error)
+	Add(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, task domain.Task) error
+	Update(ctx context.Context, dbExecutor database.DatabaseExecutor, task domain.Task) error
+	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string, deletedAt int64) error
+	UnDelete(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) error
+	Purge(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) error
+	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) (domain.Task, error)
+	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchTaskFilter) ([]domain.Task, browser.Result, error)
 }
 
-type taskRepository struct {
-	db database.Database
+type taskRepository struct{}
+
+func NewRepository() TaskRepository {
+	return &taskRepository{}
 }
 
-func NewRepository(db database.Database) TaskRepository {
-	return &taskRepository{db: db}
-}
-
-func (repository *taskRepository) GetNextTaskIndex(ctx context.Context, projectId string) (uint, error) {
+func (repository *taskRepository) GetNextTaskIndex(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) (uint, error) {
 	var taskIndex uint
-	err := repository.db.QueryRowContext(
+	err := dbExecutor.QueryRowContext(
 		ctx,
 		`
 			UPDATE project_task_counter SET
 				next_task_index = next_task_index + 1
-			WHERE project_id = ?
+			WHERE
+				project_id = ?
 			RETURNING next_task_index - 1;
         `,
-		projectId,
+		projectID,
 	).Scan(&taskIndex)
-	// TODO: no rows in result set ?
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return 0, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, domain.NotFoundError
 		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(project_id)") {
-				return 0, &domain.ValidationError{Field: "project_id"}
-			}
-			return 0, err
-		default:
-			return 0, err
-		}
+		return 0, err
 	}
 	return taskIndex, nil
 }
 
-func (repository *taskRepository) Add(ctx context.Context, projectId string, task domain.Task) error {
+func (repository *taskRepository) Add(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, task domain.Task) error {
 	dto := toDTO(task)
-	_, err := repository.db.ExecContext(
+	_, err := dbExecutor.ExecContext(
 		ctx,
 		`
             INSERT INTO tasks
@@ -75,50 +62,27 @@ func (repository *taskRepository) Add(ctx context.Context, projectId string, tas
 				(?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, NULL)
         `,
 		dto.ID,
-		projectId,
+		projectID,
 		dto.Index,
 		dto.Summary,
 		dto.Description,
-		dto.CreatorId,
+		dto.CreatorID,
 		dto.CreatedAt,
 		dto.StartedAt,
 		dto.FinishedAt,
 		dto.DueAt,
-		dto.PriorityId,
-		dto.StatusId,
+		dto.PriorityID,
+		dto.StatusID,
 	)
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			// TODO: check unique
-			return err
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(id)") {
-				return &domain.ValidationError{Field: "id"}
-			} else if strings.Contains(sqlErr.Error(), "length(project_id)") {
-				return &domain.ValidationError{Field: "project_id"}
-			} else if strings.Contains(sqlErr.Error(), "length(summary)") {
-				return &domain.ValidationError{Field: "summary"}
-			}
-			return err
-		default:
-			return err
-		}
+		return mapSQLiteError(err)
 	}
 	return nil
 }
 
-func (repository *taskRepository) Update(ctx context.Context, task domain.Task) error {
+func (repository *taskRepository) Update(ctx context.Context, dbExecutor database.DatabaseExecutor, task domain.Task) error {
 	dto := toDTO(task)
-	_, err := repository.db.ExecContext(
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
             UPDATE tasks SET
@@ -130,7 +94,8 @@ func (repository *taskRepository) Update(ctx context.Context, task domain.Task) 
 				due_at = ?,
 				priority_id = ?,
 				status_id = ?
-			WHERE id = ?
+			WHERE
+				id = ?
         `,
 		dto.Summary,
 		dto.Description,
@@ -138,57 +103,98 @@ func (repository *taskRepository) Update(ctx context.Context, task domain.Task) 
 		dto.StartedAt,
 		dto.FinishedAt,
 		dto.DueAt,
-		dto.PriorityId,
-		dto.StatusId,
+		dto.PriorityID,
+		dto.StatusID,
 		dto.ID,
 	)
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(id)") {
-				return &domain.ValidationError{Field: "id"}
-			} else if strings.Contains(sqlErr.Error(), "length(summary)") {
-				return &domain.ValidationError{Field: "summary"}
-			}
-			return err
-		default:
-			return err
-		}
+		return mapSQLiteError(err)
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
 	}
 	return nil
 }
 
-func (repository *taskRepository) Delete(ctx context.Context, id string, deletedAt int64) error {
-	_, err := repository.db.ExecContext(
+func (repository *taskRepository) Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string, deletedAt int64) error {
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
             UPDATE tasks SET
 				deleted_at = ?
-			WHERE id = ?
+			WHERE
+				id = ?
         `,
 		deletedAt,
-		id,
+		taskID,
 	)
 	if err != nil {
-		// TODO: remove ?
-		// TODO: check sql error
-		fmt.Println(err.Error())
 		return err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
 	}
 	return nil
 }
 
-func (repository *taskRepository) Get(ctx context.Context, id string) (domain.Task, error) {
+func (repository *taskRepository) UnDelete(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) error {
+	result, err := dbExecutor.ExecContext(
+		ctx,
+		`
+            UPDATE tasks SET
+				deleted_at = NULL
+			WHERE
+				id = ?
+        `,
+		taskID,
+	)
+	if err != nil {
+		return err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
+	}
+	return nil
+}
+
+func (repository *taskRepository) Purge(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) error {
+	result, err := dbExecutor.ExecContext(
+		ctx,
+		`
+            DELETE FROM tasks
+			WHERE
+				id = ?
+        `,
+		taskID,
+	)
+	if err != nil {
+		return err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
+	}
+	return nil
+}
+
+func (repository *taskRepository) Get(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) (domain.Task, error) {
 	var dto taskDTO
-	err := repository.db.QueryRowContext(
+	err := dbExecutor.QueryRowContext(
 		ctx,
 		`
             SELECT
@@ -230,9 +236,10 @@ func (repository *taskRepository) Get(ctx context.Context, id string) (domain.Ta
 				FROM history_operations
 				GROUP BY task_id
 			) THO ON THO.task_id = T.id
-            WHERE T.id = ?
+            WHERE
+				T.id = ?
         `,
-		id).Scan(
+		taskID).Scan(
 		&dto.ID,
 		&dto.projectID,
 		&dto.Index,
@@ -245,13 +252,13 @@ func (repository *taskRepository) Get(ctx context.Context, id string) (domain.Ta
 		&dto.StartedAt,
 		&dto.FinishedAt,
 		&dto.DueAt,
-		&dto.StatusId,
+		&dto.StatusID,
 		&dto.StatusName,
 		&dto.StatusHexColor,
-		&dto.PriorityId,
+		&dto.PriorityID,
 		&dto.PriorityName,
 		&dto.PriorityHexColor,
-		&dto.CreatorId,
+		&dto.CreatorID,
 		&dto.CreatorName,
 		&dto.NotesCount,
 		&dto.AttachmentsCount,
@@ -266,7 +273,7 @@ func (repository *taskRepository) Get(ctx context.Context, id string) (domain.Ta
 	return toDomain(dto), err
 }
 
-func (repository *taskRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskFilter) ([]domain.Task, browser.Result, error) {
+func (repository *taskRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchTaskFilter) ([]domain.Task, browser.Result, error) {
 	filterDTO := toFilterDTO(filter)
 	var filterArgs []any
 	var queryArgs []any
@@ -337,21 +344,21 @@ func (repository *taskRepository) Search(ctx context.Context, pager browser.Para
 	sqlOrder := fmt.Sprintf(" ORDER BY %s %s ", field, sort)
 	sqlWhere := ""
 	var sqlWhereConditions []string
-	if filterDTO.ProjectId != nil && len(*filterDTO.ProjectId) > 0 {
+	if filterDTO.ProjectID != nil && len(*filterDTO.ProjectID) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "T.project_id = ?")
-		filterArgs = append(filterArgs, *filterDTO.ProjectId)
+		filterArgs = append(filterArgs, *filterDTO.ProjectID)
 	}
 	if filterDTO.Summary != nil && len(*filterDTO.Summary) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "T.summary LIKE ?")
 		filterArgs = append(filterArgs, "%"+*filterDTO.Summary+"%")
 	}
-	if filterDTO.PriorityId != nil && len(*filterDTO.PriorityId) > 0 {
+	if filterDTO.PriorityID != nil && len(*filterDTO.PriorityID) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "T.priority_id = ?")
-		filterArgs = append(filterArgs, *filterDTO.PriorityId)
+		filterArgs = append(filterArgs, *filterDTO.PriorityID)
 	}
-	if filterDTO.StatusId != nil && len(*filterDTO.StatusId) > 0 {
+	if filterDTO.StatusID != nil && len(*filterDTO.StatusID) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "T.status_id = ?")
-		filterArgs = append(filterArgs, *filterDTO.StatusId)
+		filterArgs = append(filterArgs, *filterDTO.StatusID)
 	}
 	if filterDTO.CreatedAt != nil {
 		if filterDTO.CreatedAt.From != nil && *filterDTO.CreatedAt.From > 0 {
@@ -380,7 +387,7 @@ func (repository *taskRepository) Search(ctx context.Context, pager browser.Para
 		sqlLimit = ""
 	}
 	sqlQuery = fmt.Sprintf("%s %s %s %s %s ", sqlQuery, sqlQueryInnerJoins, sqlWhere, sqlOrder, sqlLimit)
-	rows, err := repository.db.QueryContext(ctx, sqlQuery, queryArgs...)
+	rows, err := dbExecutor.QueryContext(ctx, sqlQuery, queryArgs...)
 	if err != nil {
 		return nil, browser.Result{}, err
 	}
@@ -401,13 +408,13 @@ func (repository *taskRepository) Search(ctx context.Context, pager browser.Para
 			&dto.StartedAt,
 			&dto.FinishedAt,
 			&dto.DueAt,
-			&dto.StatusId,
+			&dto.StatusID,
 			&dto.StatusName,
 			&dto.StatusHexColor,
-			&dto.PriorityId,
+			&dto.PriorityID,
 			&dto.PriorityName,
 			&dto.PriorityHexColor,
-			&dto.CreatorId,
+			&dto.CreatorID,
 			&dto.CreatorName,
 		); err != nil {
 			return nil, browser.Result{}, err
@@ -423,7 +430,7 @@ func (repository *taskRepository) Search(ctx context.Context, pager browser.Para
 			FROM tasks T
 		`
 		sqlCountQuery = fmt.Sprintf("%s %s", sqlCountQuery, sqlWhere)
-		err = repository.db.QueryRowContext(
+		err = dbExecutor.QueryRowContext(
 			ctx,
 			sqlCountQuery,
 			filterArgs...,
