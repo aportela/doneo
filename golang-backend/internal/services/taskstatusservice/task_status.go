@@ -21,10 +21,10 @@ type TaskStatusService interface {
 
 type taskStatusService struct {
 	database   database.Database
-	repository taskstatusrepository.ProjectStatusRepository
+	repository taskstatusrepository.TaskStatusRepository
 }
 
-func NewService(db database.Database, repository taskstatusrepository.ProjectStatusRepository) TaskStatusService {
+func NewService(db database.Database, repository taskstatusrepository.TaskStatusRepository) TaskStatusService {
 	return &taskStatusService{database: db, repository: repository}
 }
 
