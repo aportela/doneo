@@ -40,7 +40,7 @@ func NewService(db database.Database, authorizationService authorizationservice.
 	return &noteService{database: db, historyOperationService: historyOperationService, authorizationService: authorizationService, noteRepository: repository}
 }
 
-func (service *noteService) withProjectUpdatePermission(ctx context.Context, projectID string, action func(userID string) error) error {
+func (service *noteService) withProjectUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
 		return fmt.Errorf("user not found in context")
