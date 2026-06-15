@@ -63,7 +63,8 @@ func (repository *userRepository) Add(ctx context.Context, dbExecutor database.D
 
 func (repository *userRepository) Update(ctx context.Context, dbExecutor database.DatabaseExecutor, user domain.User) error {
 	dto := toDTO(user)
-	if len(user.Password) > 0 {
+	hasNewPassword := user.Password != ""
+	if hasNewPassword {
 		hashedPasswordBytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 		if err != nil {
 			return err
@@ -72,7 +73,7 @@ func (repository *userRepository) Update(ctx context.Context, dbExecutor databas
 	}
 	var query string
 	var args []any
-	if dto.PasswordHash != "" {
+	if hasNewPassword {
 		query = `
 			UPDATE users
 			SET
@@ -229,7 +230,7 @@ func (repository *userRepository) SearchBase(ctx context.Context, dbExecutor dat
 		ctx,
 		`
             SELECT
-			U.id, U.email, U.name, U.created_at, U.updated_at, U.deleted_at, U.permissions_bitmask
+			U.id, U.name
 			FROM users U
 			ORDER BY U.name COLLATE NOCASE
         `,
