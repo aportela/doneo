@@ -9,7 +9,7 @@ import (
 func toDTO(attachment domain.Attachment) attachmentDTO {
 	return attachmentDTO{
 		ID:           attachment.ID,
-		UserId:       attachment.CreatedBy.ID,
+		CreatorID:    attachment.CreatedBy.ID,
 		UserName:     attachment.CreatedBy.Name,
 		CreatedAt:    attachment.CreatedAt.UnixMilli(),
 		OriginalName: attachment.OriginalName,
@@ -22,7 +22,7 @@ func toDomain(attachment attachmentDTO) domain.Attachment {
 	return domain.Attachment{
 		ID: attachment.ID,
 		CreatedBy: domain.UserBase{
-			ID:   attachment.UserId,
+			ID:   attachment.CreatorID,
 			Name: attachment.UserName,
 		},
 		CreatedAt:    time.UnixMilli(attachment.CreatedAt),

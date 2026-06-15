@@ -147,14 +147,14 @@ var schemaQueries = []schemaMigration{
 					original_name TEXT NOT NULL,
 					content_type TEXT NOT NULL,
 					size INTEGER NOT NULL,
-					user_id TEXT NOT NULL CHECK(length(user_id) == 36),
+					creator_id TEXT NOT NULL CHECK(length(creator_id) == 36),
 					created_at INTEGER NOT NULL,
 					PRIMARY KEY (id),
-					FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE
 				) STRICT;
 			`,
 			`
-				CREATE INDEX IF NOT EXISTS idx_attachments_user_id ON attachments(user_id);
+				CREATE INDEX IF NOT EXISTS idx_attachments_user_id ON attachments(creator_id);
 			`,
 			`
 				CREATE TABLE IF NOT EXISTS project_attachments (

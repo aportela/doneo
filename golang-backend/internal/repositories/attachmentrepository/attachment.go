@@ -45,7 +45,7 @@ func (repository *attachmentRepository) AddAttachment(ctx context.Context, attac
 		dto.OriginalName,
 		dto.ContentType,
 		dto.Size,
-		dto.UserId,
+		dto.CreatorID,
 		dto.CreatedAt,
 	)
 	if err != nil {
@@ -101,7 +101,7 @@ func (repository *attachmentRepository) GetAttachment(ctx context.Context, id st
 			INNER JOIN users U ON U.id = A.user_id
             WHERE A.id = ?
         `,
-		id).Scan(&dto.ID, &dto.UserId, &dto.UserName, &dto.CreatedAt, &dto.OriginalName, &dto.ContentType, &dto.Size)
+		id).Scan(&dto.ID, &dto.CreatorID, &dto.UserName, &dto.CreatedAt, &dto.OriginalName, &dto.ContentType, &dto.Size)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.Attachment{}, domain.NotFoundError
@@ -188,7 +188,7 @@ func (repository *attachmentRepository) GetProjectAttachments(ctx context.Contex
 	for rows.Next() {
 		var dto attachmentDTO
 		if err := rows.Scan(
-			&dto.ID, &dto.UserId, &dto.UserName, &dto.CreatedAt, &dto.OriginalName, &dto.ContentType, &dto.Size,
+			&dto.ID, &dto.CreatorID, &dto.UserName, &dto.CreatedAt, &dto.OriginalName, &dto.ContentType, &dto.Size,
 		); err != nil {
 			return nil, err
 		}
@@ -277,7 +277,7 @@ func (repository *attachmentRepository) GetTaskAttachments(ctx context.Context, 
 	for rows.Next() {
 		var dto attachmentDTO
 		if err := rows.Scan(
-			&dto.ID, &dto.UserId, &dto.UserName, &dto.CreatedAt, &dto.OriginalName, &dto.ContentType, &dto.Size,
+			&dto.ID, &dto.CreatorID, &dto.UserName, &dto.CreatedAt, &dto.OriginalName, &dto.ContentType, &dto.Size,
 		); err != nil {
 			return nil, err
 		}
