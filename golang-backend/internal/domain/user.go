@@ -12,7 +12,6 @@ type UserBase struct {
 type User struct {
 	UserBase
 	Email              string
-	Password           string
 	PasswordHash       string
 	CreatedAt          time.Time
 	UpdatedAt          *time.Time
