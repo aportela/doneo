@@ -11,8 +11,6 @@ import (
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"golang.org/x/crypto/bcrypt"
-	"modernc.org/sqlite"
-	sqlite3 "modernc.org/sqlite/lib"
 )
 
 type UserRepository interface {
@@ -45,8 +43,10 @@ func (repository *userRepository) Add(ctx context.Context, user domain.User, pas
 	_, err = repository.db.ExecContext(
 		ctx,
 		`
-            INSERT INTO users (id, email, name, password_hash, created_at, updated_at, deleted_at, permissions_bitmask)
-			VALUES (?, ?, ?, ?, ?, NULL, NULL, ?)
+            INSERT INTO users
+				(id, email, name, password_hash, created_at, updated_at, deleted_at, permissions_bitmask)
+			VALUES
+				(?, ?, ?, ?, ?, NULL, NULL, ?)
         `,
 		dto.ID,
 		dto.Email,
@@ -56,36 +56,7 @@ func (repository *userRepository) Add(ctx context.Context, user domain.User, pas
 		dto.PermissionsBitmask,
 	)
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			if strings.Contains(sqlErr.Error(), "users.name") {
-				return &domain.AlreadyExistsError{Field: "name"}
-			} else if strings.Contains(sqlErr.Error(), "users.email") {
-				return &domain.AlreadyExistsError{Field: "email"}
-			} else if strings.Contains(sqlErr.Error(), "users.id") {
-				return &domain.AlreadyExistsError{Field: "id"}
-			}
-			return err
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(name)") {
-				return &domain.ValidationError{Field: "name"}
-			} else if strings.Contains(sqlErr.Error(), "length(email)") {
-				return &domain.ValidationError{Field: "email"}
-			} else if strings.Contains(sqlErr.Error(), "length(id)") {
-				return &domain.ValidationError{Field: "id"}
-			}
-			return err
-		default:
-			return err
-		}
+		return mapSQLiteError(err)
 	}
 	return nil
 }
@@ -103,83 +74,95 @@ func (repository *userRepository) Update(ctx context.Context, user domain.User) 
 	var args []any
 	if dto.PasswordHash != "" {
 		query = `
-			UPDATE users SET
+			UPDATE users
+			SET
 				email = ?,
 				name = ?,
 				password_hash = ?,
 				updated_at = ?,
 				permissions_bitmask = ?
-			WHERE id = ?`
+			WHERE
+				id = ?`
 		args = append(args, dto.Email, dto.Name, dto.PasswordHash, dto.UpdatedAt, dto.PermissionsBitmask, dto.ID)
 	} else {
 		query = `
-			UPDATE users SET
+			UPDATE users
+			SET
 				email = ?,
 				name = ?,
 				updated_at = ?,
 				permissions_bitmask = ?
-			WHERE id = ?`
+			WHERE
+				id = ?`
 		args = append(args, dto.Email, dto.Name, dto.UpdatedAt, dto.PermissionsBitmask, dto.ID)
 	}
-	_, err := repository.db.ExecContext(ctx, query, args...)
+	result, err := repository.db.ExecContext(ctx, query, args...)
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			if strings.Contains(sqlErr.Error(), "users.name") {
-				return &domain.AlreadyExistsError{Field: "name"}
-			} else if strings.Contains(sqlErr.Error(), "users.email") {
-				return &domain.AlreadyExistsError{Field: "email"}
-			}
-			return err
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(name)") {
-				return &domain.ValidationError{Field: "name"}
-			} else if strings.Contains(sqlErr.Error(), "length(email)") {
-				return &domain.ValidationError{Field: "email"}
-			}
-			return err
-		default:
-			return err
-		}
+		return mapSQLiteError(err)
 	}
-	return err
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
+	}
+	return nil
 }
 
 func (repository *userRepository) Delete(ctx context.Context, id string, deletedAt int64) error {
-	_, err := repository.db.ExecContext(
+	result, err := repository.db.ExecContext(
 		ctx,
 		`
-            UPDATE users SET
+            UPDATE users
+			SET
 				deleted_at = ?
-			WHERE id = ?
+			WHERE
+				id = ?
         `,
 		deletedAt,
 		id,
 	)
-	return err
+	if err != nil {
+		return err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
+	}
+	return nil
 }
 
 func (repository *userRepository) UnDelete(ctx context.Context, id string) error {
-	_, err := repository.db.ExecContext(
+	result, err := repository.db.ExecContext(
 		ctx,
 		`
-            UPDATE users SET
+            UPDATE users
+			SET
 				deleted_at = NULL
-			WHERE id = ?
+			WHERE
+				id = ?
         `,
 		id,
 	)
-	return err
+	if err != nil {
+		return err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
+	}
+	return nil
 }
 
 func (repository *userRepository) Purge(ctx context.Context, id string) error {
-	_, err := repository.db.ExecContext(
+	result, err := repository.db.ExecContext(
 		ctx,
 		`
             DELETE FROM users
@@ -187,7 +170,17 @@ func (repository *userRepository) Purge(ctx context.Context, id string) error {
         `,
 		id,
 	)
-	return err
+	if err != nil {
+		return err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
+	}
+	return nil
 }
 
 func (repository *userRepository) Get(ctx context.Context, id string) (domain.User, error) {
@@ -198,7 +191,8 @@ func (repository *userRepository) Get(ctx context.Context, id string) (domain.Us
             SELECT
                 U.id, U.email, U.name, U.password_hash, U.created_at, U.updated_at, U.deleted_at, U.permissions_bitmask
             FROM users U
-            WHERE U.id = ?
+            WHERE
+				U.id = ?
         `,
 		id).Scan(&dto.ID, &dto.Email, &dto.Name, &dto.PasswordHash, &dto.CreatedAt, &dto.UpdatedAt, &dto.DeletedAt, &dto.PermissionsBitmask)
 	if err != nil {

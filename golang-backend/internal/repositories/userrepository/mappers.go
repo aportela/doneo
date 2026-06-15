@@ -1,11 +1,15 @@
 package userrepository
 
 import (
+	"errors"
+	"strings"
 	"time"
 
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories"
 	"github.com/aportela/doneo/internal/utils"
+	"modernc.org/sqlite"
+	sqlite3 "modernc.org/sqlite/lib"
 )
 
 func toBaseDTO(user domain.UserBase) userBaseDTO {
@@ -63,4 +67,26 @@ func toFilterDTO(filter domain.SearchUsersFilter) searchFilterDTO {
 		UpdatedAt:                   repositories.TimestampFilterToDTO(filter.UpdatedAt),
 		DeletedAt:                   repositories.TimestampFilterToDTO(filter.DeletedAt),
 	}
+}
+
+func mapSQLiteError(err error) error {
+	var sqlErr *sqlite.Error
+	if !errors.As(err, &sqlErr) {
+		return err
+	}
+	switch sqlErr.Code() {
+	case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
+		if strings.Contains(sqlErr.Error(), "users.name") {
+			return &domain.AlreadyExistsError{Field: "name"}
+		} else if strings.Contains(sqlErr.Error(), "users.email") {
+			return &domain.AlreadyExistsError{Field: "email"}
+		}
+	case sqlite3.SQLITE_CONSTRAINT_CHECK:
+		if strings.Contains(sqlErr.Error(), "length(name)") {
+			return &domain.ValidationError{Field: "name"}
+		} else if strings.Contains(sqlErr.Error(), "length(email)") {
+			return &domain.ValidationError{Field: "email"}
+		}
+	}
+	return err
 }
