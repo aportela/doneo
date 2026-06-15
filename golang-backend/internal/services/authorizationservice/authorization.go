@@ -12,10 +12,14 @@ import (
 )
 
 type AuthorizationService interface {
+	RequireUserPermission(ctx context.Context, userID string, permission domain.Bitmask) error
+	RequireUserAdminPermission(ctx context.Context, userID string) error
+
 	RequireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error
 	RequireProjectUpdatePermission(ctx context.Context, userID string, projectID string) error
 	RequireProjectDeletePermission(ctx context.Context, userID string, projectID string) error
 	RequireProjectViewPermission(ctx context.Context, userID string, projectID string) error
+
 	RequireTaskAddPermission(ctx context.Context, userID string, projectID string) error
 	RequireTaskUpdatePermission(ctx context.Context, userID string, projectID string) error
 	RequireTaskDeletePermission(ctx context.Context, userID string, projectID string) error
@@ -29,19 +33,39 @@ type authorizationService struct {
 	projectPermissionRepository projectpermissionrepository.ProjectPermissionRepository
 }
 
-func NewService(db database.Database, cache cache.PermissionCache) AuthorizationService {
+func NewService(db database.Database, cache cache.PermissionCache, userRepository userrepository.UserRepository, projectPermissionRepository projectpermissionrepository.ProjectPermissionRepository) AuthorizationService {
 	return &authorizationService{
 		database:                    db,
 		permissionCache:             cache,
-		userRepository:              userrepository.NewRepository(db),
-		projectPermissionRepository: projectpermissionrepository.NewRepository(db),
+		userRepository:              userRepository,
+		projectPermissionRepository: projectPermissionRepository,
 	}
+}
+
+func (service *authorizationService) RequireUserPermission(ctx context.Context, userID string, permission domain.Bitmask) error {
+	userPermissionsBitmask, ok := service.permissionCache.GetUser(userID)
+	if !ok {
+		user, err := service.userRepository.Get(ctx, service.database, userID)
+		if err != nil {
+			return fmt.Errorf("[AuthorizationService] failed to get user permissions: %w", err)
+		}
+		userPermissionsBitmask = user.PermissionsBitmask
+		service.permissionCache.SetUser(userID, userPermissionsBitmask)
+	}
+	if userPermissionsBitmask.HasFlag(permission) {
+		return nil
+	}
+	return domain.AuthorizationError
+}
+
+func (service *authorizationService) RequireUserAdminPermission(ctx context.Context, userID string) error {
+	return service.RequireUserPermission(ctx, userID, domain.UserPermissionAdmin)
 }
 
 func (service *authorizationService) RequireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error {
 	userPermissionsBitmask, ok := service.permissionCache.GetUser(userID)
 	if !ok {
-		user, err := service.userRepository.Get(ctx, userID)
+		user, err := service.userRepository.Get(ctx, service.database, userID)
 		if err != nil {
 			return fmt.Errorf("[AuthorizationService] failed to get user permissions: %w", err)
 		}
@@ -54,7 +78,7 @@ func (service *authorizationService) RequireProjectPermission(ctx context.Contex
 	permissionsBitmask, ok := service.permissionCache.GetProject(userID, projectID)
 	if !ok {
 		found := false
-		projectPermissions, err := service.projectPermissionRepository.Search(ctx, projectID)
+		projectPermissions, err := service.projectPermissionRepository.GetProjectPermissions(ctx, service.database, projectID)
 		if err != nil {
 			return fmt.Errorf("[AuthorizationService] failed to get project permissions: %w", err)
 		}
