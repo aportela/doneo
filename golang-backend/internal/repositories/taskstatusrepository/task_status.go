@@ -10,33 +10,31 @@ import (
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"modernc.org/sqlite"
-	sqlite3 "modernc.org/sqlite/lib"
 )
 
-type ProjectStatusRepository interface {
-	Add(ctx context.Context, taskStatus domain.TaskStatus) error
-	Update(ctx context.Context, taskStatus domain.TaskStatus) error
-	Delete(ctx context.Context, id string) error
-	Get(ctx context.Context, id string) (domain.TaskStatus, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskStatusesFilter) ([]domain.TaskStatus, browser.Result, error)
+type TaskStatusRepository interface {
+	Add(ctx context.Context, dbExecutor database.DatabaseExecutor, taskStatus domain.TaskStatus) error
+	Update(ctx context.Context, dbExecutor database.DatabaseExecutor, taskStatus domain.TaskStatus) error
+	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, taskStatusID string) error
+	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, taskStatusID string) (domain.TaskStatus, error)
+	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchTaskStatusesFilter) ([]domain.TaskStatus, browser.Result, error)
 }
 
-type taskStatusRepository struct {
-	db database.Database
+type taskStatusRepository struct{}
+
+func NewRepository() TaskStatusRepository {
+	return &taskStatusRepository{}
 }
 
-func NewRepository(db database.Database) ProjectStatusRepository {
-	return &taskStatusRepository{db: db}
-}
-
-func (repository *taskStatusRepository) Add(ctx context.Context, taskStatus domain.TaskStatus) error {
+func (repository *taskStatusRepository) Add(ctx context.Context, dbExecutor database.DatabaseExecutor, taskStatus domain.TaskStatus) error {
 	dto := toDTO(taskStatus)
-	_, err := repository.db.ExecContext(
+	_, err := dbExecutor.ExecContext(
 		ctx,
 		`
-            INSERT INTO task_statuses (id, name, item_hex_color, item_index, flags_bitmask)
-			VALUES (?, ?, ?, ?, ?)
+            INSERT INTO task_statuses
+				(id, name, item_hex_color, item_index, flags_bitmask)
+			VALUES
+				(?, ?, ?, ?, ?)
         `,
 		dto.ID,
 		dto.Name,
@@ -45,43 +43,14 @@ func (repository *taskStatusRepository) Add(ctx context.Context, taskStatus doma
 		dto.FlagsBitmask,
 	)
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			if strings.Contains(sqlErr.Error(), "task_statuses.name") {
-				return &domain.AlreadyExistsError{Field: "name"}
-			} else if strings.Contains(sqlErr.Error(), "task_statuses.id") {
-				return &domain.AlreadyExistsError{Field: "id"}
-			} else if strings.Contains(sqlErr.Error(), "task_statuses.item_index") {
-				return &domain.AlreadyExistsError{Field: "index"}
-			} else if strings.Contains(sqlErr.Error(), "task_statuses.flags_bitmask") {
-				return &domain.AlreadyExistsError{Field: "flags"}
-			}
-			return err
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(name)") {
-				return &domain.ValidationError{Field: "name"}
-			} else if strings.Contains(sqlErr.Error(), "length(id)") {
-				return &domain.ValidationError{Field: "id"}
-			}
-			return err
-		default:
-			return err
-		}
+		return mapSQLiteError(err)
 	}
 	return nil
 }
 
-func (repository *taskStatusRepository) Update(ctx context.Context, taskStatus domain.TaskStatus) error {
+func (repository *taskStatusRepository) Update(ctx context.Context, dbExecutor database.DatabaseExecutor, taskStatus domain.TaskStatus) error {
 	dto := toDTO(taskStatus)
-	_, err := repository.db.ExecContext(
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
             UPDATE task_statuses SET
@@ -89,7 +58,8 @@ func (repository *taskStatusRepository) Update(ctx context.Context, taskStatus d
 				item_hex_color = ?,
 				item_index = ?,
 				flags_bitmask = ?
-			WHERE id = ?
+			WHERE
+				id = ?
         `,
 		dto.Name,
 		dto.HexColor,
@@ -98,63 +68,53 @@ func (repository *taskStatusRepository) Update(ctx context.Context, taskStatus d
 		dto.ID,
 	)
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			if strings.Contains(sqlErr.Error(), "task_statuses.name") {
-				return &domain.AlreadyExistsError{Field: "name"}
-			} else if strings.Contains(sqlErr.Error(), "task_statuses.id") {
-				return &domain.AlreadyExistsError{Field: "id"}
-			} else if strings.Contains(sqlErr.Error(), "task_statuses.item_index") {
-				return &domain.AlreadyExistsError{Field: "index"}
-			} else if strings.Contains(sqlErr.Error(), "task_statuses.flags_bitmask") {
-				return &domain.AlreadyExistsError{Field: "flags"}
-			}
-			return err
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(name)") {
-				return &domain.ValidationError{Field: "name"}
-			} else if strings.Contains(sqlErr.Error(), "length(id)") {
-				return &domain.ValidationError{Field: "id"}
-			}
-			return err
-		default:
-			return err
-		}
+		return mapSQLiteError(err)
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
 	}
 	return nil
 }
 
-func (repository *taskStatusRepository) Delete(ctx context.Context, id string) error {
-	_, err := repository.db.ExecContext(
+func (repository *taskStatusRepository) Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, taskStatusID string) error {
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
             DELETE FROM task_statuses
-			WHERE id = ?
+			WHERE
+				id = ?
         `,
-		id,
+		taskStatusID,
 	)
-	return err
+	if err != nil {
+		return err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
+	}
+	return nil
 }
 
-func (repository *taskStatusRepository) Get(ctx context.Context, id string) (domain.TaskStatus, error) {
+func (repository *taskStatusRepository) Get(ctx context.Context, dbExecutor database.DatabaseExecutor, taskStatusID string) (domain.TaskStatus, error) {
 	var dto taskStatusDTO
-	err := repository.db.QueryRowContext(
+	err := dbExecutor.QueryRowContext(
 		ctx,
 		`
             SELECT
                 TS.id, TS.name, TS.item_hex_color, TS.item_index, TS.flags_bitmask
             FROM task_statuses TS
-            WHERE TS.id = ?
+            WHERE
+				TS.id = ?
         `,
-		id).Scan(&dto.ID, &dto.Name, &dto.HexColor, &dto.Index, &dto.FlagsBitmask)
+		taskStatusID).Scan(&dto.ID, &dto.Name, &dto.HexColor, &dto.Index, &dto.FlagsBitmask)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.TaskStatus{}, domain.NotFoundError
@@ -164,7 +124,7 @@ func (repository *taskStatusRepository) Get(ctx context.Context, id string) (dom
 	return toDomain(dto), err
 }
 
-func (repository *taskStatusRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskStatusesFilter) ([]domain.TaskStatus, browser.Result, error) {
+func (repository *taskStatusRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchTaskStatusesFilter) ([]domain.TaskStatus, browser.Result, error) {
 	filterDTO := toFilterDTO(filter)
 	var filterArgs []any
 	var queryArgs []any
@@ -211,7 +171,7 @@ func (repository *taskStatusRepository) Search(ctx context.Context, pager browse
 		sqlLimit = ""
 	}
 	sqlQuery = fmt.Sprintf("%s %s %s %s ", sqlQuery, sqlWhere, sqlOrder, sqlLimit)
-	rows, err := repository.db.QueryContext(ctx, sqlQuery, queryArgs...)
+	rows, err := dbExecutor.QueryContext(ctx, sqlQuery, queryArgs...)
 	if err != nil {
 		return nil, browser.Result{}, err
 	}
@@ -239,7 +199,7 @@ func (repository *taskStatusRepository) Search(ctx context.Context, pager browse
 			FROM task_statuses TS
 		`
 		sqlCountQuery = fmt.Sprintf("%s %s", sqlCountQuery, sqlWhere)
-		err = repository.db.QueryRowContext(
+		err = dbExecutor.QueryRowContext(
 			ctx,
 			sqlCountQuery,
 			filterArgs...,
