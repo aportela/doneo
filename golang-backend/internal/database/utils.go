@@ -5,8 +5,8 @@ import (
 	"database/sql"
 )
 
-func WithTx(ctx context.Context, fn func(tx *sql.Tx) error) error {
-	tx, err := s.database.Begin()
+func WithTx(ctx context.Context, db Database, fn func(tx *sql.Tx) error) error {
+	tx, err := db.Begin()
 	if err != nil {
 		return err
 	}
