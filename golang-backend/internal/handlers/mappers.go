@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/aportela/doneo/internal/domain"
+	"modernc.org/sqlite"
 )
 
 func ToEmptyResponse() EmptyResponse {
@@ -35,6 +37,12 @@ func mapError(err error) (int, string, any) {
 		return http.StatusBadRequest, "bad request", map[string]string{
 			"field": validationError.Field,
 		}
+	}
+
+	var sqlErr *sqlite.Error
+	if !errors.As(err, &sqlErr) {
+		// print SQL to console
+		fmt.Println(err.Error())
 	}
 
 	return http.StatusInternalServerError, "internal error", nil
