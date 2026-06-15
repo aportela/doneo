@@ -34,7 +34,7 @@ func (repository *taskTimeEntryRepository) Add(ctx context.Context, taskId strin
 	_, err := repository.db.ExecContext(
 		ctx,
 		`
-            INSERT INTO task_time_entries
+            INSERT INTO task_timer_entries
 				(id, task_id, user_id, created_at, summary, total_seconds)
 			VALUES
 				(?, ?, ?, ?, ?, ?)
@@ -80,7 +80,7 @@ func (repository *taskTimeEntryRepository) Update(ctx context.Context, taskTimeE
 	_, err := repository.db.ExecContext(
 		ctx,
 		`
-            UPDATE task_time_entries SET
+            UPDATE task_timer_entries SET
 				summary = ?,
 				total_seconds = ?
 			WHERE id = ?
@@ -122,7 +122,7 @@ func (repository *taskTimeEntryRepository) Delete(ctx context.Context, id string
 	_, err := repository.db.ExecContext(
 		ctx,
 		`
-            DELETE FROM task_time_entries
+            DELETE FROM task_timer_entries
 			WHERE
 				id = ?
         `,
@@ -149,7 +149,7 @@ func (repository *taskTimeEntryRepository) Get(ctx context.Context, id string) (
 				TTE.created_at,
 				TTE.summary,
 				TTE.total_seconds
-            FROM task_time_entries TTE
+            FROM task_timer_entries TTE
 			INNER JOIN users U ON U.ID = TTE.user_id
             WHERE TTE.id = ?
         `,
@@ -181,7 +181,7 @@ func (repository *taskTimeEntryRepository) GetTaskTimeEntries(ctx context.Contex
 				TTE.created_at,
 				TTE.summary,
 				TTE.total_seconds
-            FROM task_time_entries TTE
+            FROM task_timer_entries TTE
 			INNER JOIN users U ON U.ID = TTE.user_id
             WHERE TTE.task_id = ?
         `,

@@ -288,7 +288,7 @@ var schemaQueries = []schemaMigration{
 				CREATE INDEX IF NOT EXISTS idx_task_attachments_attachment_id ON task_attachments(attachment_id);
 			`,
 			`
-				CREATE TABLE IF NOT EXISTS task_time_entries (
+				CREATE TABLE IF NOT EXISTS task_timer_entries (
 					id TEXT NOT NULL CHECK(length(id) == 36),
 					task_id TEXT NOT NULL CHECK(length(task_id) == 36),
 					user_id TEXT NOT NULL CHECK(length(user_id) == 36),
