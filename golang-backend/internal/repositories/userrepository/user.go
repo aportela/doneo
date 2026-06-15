@@ -21,6 +21,7 @@ type UserRepository interface {
 	Purge(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) error
 	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) (domain.User, error)
 	GetByEmail(ctx context.Context, dbExecutor database.DatabaseExecutor, email string) (domain.User, error)
+	SearchBase(ctx context.Context, dbExecutor database.DatabaseExecutor) ([]domain.UserBase, error)
 	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchUsersFilter) ([]domain.User, browser.Result, error)
 }
 
@@ -221,6 +222,36 @@ func (repository *userRepository) GetByEmail(ctx context.Context, dbExecutor dat
 		return domain.User{}, err
 	}
 	return toDomain(dto), err
+}
+
+func (repository *userRepository) SearchBase(ctx context.Context, dbExecutor database.DatabaseExecutor) ([]domain.UserBase, error) {
+	rows, err := dbExecutor.QueryContext(
+		ctx,
+		`
+            SELECT
+			U.id, U.email, U.name, U.created_at, U.updated_at, U.deleted_at, U.permissions_bitmask
+			FROM users U
+			ORDER BY U.name COLLATE NOCASE
+        `,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	dtos := make([]userBaseDTO, 0)
+	for rows.Next() {
+		var dto userBaseDTO
+		if err := rows.Scan(
+			&dto.ID, &dto.Name,
+		); err != nil {
+			return nil, err
+		}
+		dtos = append(dtos, dto)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return toBaseDomainArray(dtos), nil
 }
 
 func (repository *userRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchUsersFilter) ([]domain.User, browser.Result, error) {

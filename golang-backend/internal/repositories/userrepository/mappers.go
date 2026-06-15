@@ -37,6 +37,14 @@ func toBaseDomain(user userBaseDTO) domain.UserBase {
 	}
 }
 
+func toBaseDomainArray(users []userBaseDTO) []domain.UserBase {
+	results := make([]domain.UserBase, 0, len(users))
+	for _, user := range users {
+		results = append(results, toBaseDomain(user))
+	}
+	return results
+}
+
 func toDomain(user userDTO) domain.User {
 	return domain.User{
 		UserBase:           toBaseDomain(user.userBaseDTO),
