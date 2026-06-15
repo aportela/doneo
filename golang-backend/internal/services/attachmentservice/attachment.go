@@ -38,17 +38,17 @@ func NewService(db database.Database, authorizationService authorizationservice.
 	return &attachmentService{db: db, authorizationService: authorizationService, historyOperationService: historyOperationService, attachmentRepository: attachmentRepository}
 }
 
-func (service *attachmentService) withProjectUpdatePermission(ctx context.Context, projectID string, action func(userID string) error) error {
-	userID, ok := middlewares.GetUserIDFromContext(ctx)
+func (service *attachmentService) withProjectUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
+	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
 		return fmt.Errorf("user not found in context")
 	}
 
-	if err := service.authorizationService.RequireProjectUpdatePermission(ctx, userID, projectID); err != nil {
+	if err := service.authorizationService.RequireProjectUpdatePermission(ctx, currentContextUserID, projectID); err != nil {
 		return err
 	}
 
-	return action(userID)
+	return action(currentContextUserID)
 }
 
 func (service *attachmentService) GetAttachment(ctx context.Context, attachmentID string) (domain.Attachment, error) {
