@@ -16,7 +16,7 @@ import (
 type TaskTimeEntryService interface {
 	Add(ctx context.Context, projectId string, taskId string, taskTimeEntry domain.TaskTimeEntry) error
 	Update(ctx context.Context, projectId string, taskId string, taskTimeEntry domain.TaskTimeEntry) error
-	Delete(ctx context.Context, projectId string, taskId string) error
+	Delete(ctx context.Context, projectId string, taskId string, taskTimeEntryId string) error
 	Get(ctx context.Context, id string) (domain.TaskTimeEntry, error)
 	GetTaskTimeEntries(ctx context.Context, taskId string) ([]domain.TaskTimeEntry, error)
 }
@@ -92,7 +92,7 @@ func (service *taskTimeEntryService) Update(ctx context.Context, projectId strin
 	return nil
 }
 
-func (service *taskTimeEntryService) Delete(ctx context.Context, projectId string, taskId string) error {
+func (service *taskTimeEntryService) Delete(ctx context.Context, projectId string, taskId string, taskTimeEntryId string) error {
 	tx, err := service.database.Begin()
 	if err != nil {
 		return err
@@ -109,8 +109,8 @@ func (service *taskTimeEntryService) Delete(ctx context.Context, projectId strin
 	if !ok {
 		return fmt.Errorf("[TaskTimeEntryService] user ID not found in context")
 	}
-	if err := service.repository.Delete(ctx, id); err != nil {
-		return fmt.Errorf("[TaskTimeEntryService] failed to delete task time entry with ID %s: %w", id, err)
+	if err := service.repository.Delete(ctx, taskTimeEntryId); err != nil {
+		return fmt.Errorf("[TaskTimeEntryService] failed to delete task time entry with ID %s: %w", taskTimeEntryId, err)
 	}
 	_, err = service.history.AddTaskHistoryOperation(ctx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskTimeEntryDeleted})
 	if err != nil {

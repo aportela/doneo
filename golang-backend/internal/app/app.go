@@ -17,6 +17,7 @@ import (
 	"github.com/aportela/doneo/internal/handlers/taskhandler"
 	"github.com/aportela/doneo/internal/handlers/taskpriorityhandler"
 	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
+	"github.com/aportela/doneo/internal/handlers/tasktimeentryhandler"
 	"github.com/aportela/doneo/internal/handlers/timerhandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 	"github.com/aportela/doneo/internal/repositories/attachmentrepository"
@@ -31,6 +32,7 @@ import (
 	"github.com/aportela/doneo/internal/repositories/taskpriorityrepository"
 	"github.com/aportela/doneo/internal/repositories/taskrepository"
 	"github.com/aportela/doneo/internal/repositories/taskstatusrepository"
+	"github.com/aportela/doneo/internal/repositories/tasktimeentryrepository"
 	"github.com/aportela/doneo/internal/repositories/timerrepository"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"github.com/aportela/doneo/internal/services/attachmentservice"
@@ -47,6 +49,7 @@ import (
 	"github.com/aportela/doneo/internal/services/taskpriorityservice"
 	"github.com/aportela/doneo/internal/services/taskservice"
 	"github.com/aportela/doneo/internal/services/taskstatusservice"
+	"github.com/aportela/doneo/internal/services/tasktimeentryservice"
 	"github.com/aportela/doneo/internal/services/timerservice"
 	"github.com/aportela/doneo/internal/services/userservice"
 )
@@ -69,6 +72,7 @@ type App struct {
 	RoleHandler              rolehandler.RoleHandler
 	TaskPriorityHandler      taskpriorityhandler.TaskPriorityHandler
 	TaskStatusHandler        taskstatushandler.TaskStatusHandler
+	TaskTimeEntryHandler     tasktimeentryhandler.TaskTimeEntryHandler
 	TimerHandler             timerhandler.TimerHandler
 	UserHandler              userhandler.UserHandler
 }
@@ -94,6 +98,8 @@ func NewApp(
 	taskPriorityRepository := taskpriorityrepository.NewRepository(db)
 	//taskRelationRepository := taskrelationrepository.NewRepository(db)
 	taskStatusRepository := taskstatusrepository.NewRepository(db)
+	taskTimeEntryRepository := tasktimeentryrepository.NewRepository(db)
+
 	timerRepository := timerrepository.NewRepository(db)
 	userRepository := userrepository.NewRepository(db)
 
@@ -111,6 +117,7 @@ func NewApp(
 	roleService := roleservice.NewService(db, roleRepository)
 	taskPriorityService := taskpriorityservice.NewService(db, taskPriorityRepository)
 	taskStatusService := taskstatusservice.NewService(db, taskStatusRepository)
+	taskTimeEntryService := tasktimeentryservice.NewService(db, historyOperationService, taskTimeEntryRepository)
 	timerService := timerservice.NewService(db, timerRepository)
 	userService := userservice.NewService(db, userRepository)
 
@@ -127,6 +134,7 @@ func NewApp(
 	roleHandler := rolehandler.NewHandler(roleService)
 	TaskPriorityHandler := taskpriorityhandler.NewHandler(taskPriorityService)
 	TaskStatusHandler := taskstatushandler.NewHandler(taskStatusService)
+	taskTimeEntryHandler := tasktimeentryhandler.NewHandler(taskTimeEntryService)
 	TimerHandler := timerhandler.NewHandler(timerService)
 	userHandler := userhandler.NewHandler(userService)
 
@@ -148,6 +156,7 @@ func NewApp(
 		RoleHandler:              *roleHandler,
 		TaskPriorityHandler:      *TaskPriorityHandler,
 		TaskStatusHandler:        *TaskStatusHandler,
+		TaskTimeEntryHandler:     *taskTimeEntryHandler,
 		TimerHandler:             *TimerHandler,
 		UserHandler:              *userHandler,
 	}
