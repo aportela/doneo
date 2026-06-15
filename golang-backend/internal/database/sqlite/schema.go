@@ -233,7 +233,7 @@ var schemaQueries = []schemaMigration{
 				) STRICT;
 			`,
 			`
-				CREATE TABLE IF NOT EXISTS timers (
+				CREATE TABLE IF NOT EXISTS user_timers (
 					id TEXT NOT NULL CHECK(length(id) == 36),
 					user_id TEXT NOT NULL CHECK(length(user_id) == 36),
 					summary TEXT NOT NULL CHECK(length(summary) BETWEEN 1 AND 32),
@@ -243,6 +243,9 @@ var schemaQueries = []schemaMigration{
 					FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
 					UNIQUE(user_id, started_at)
 				) STRICT;
+			`,
+			`
+				CREATE INDEX IF NOT EXISTS idx_user_timers_user_id ON user_timers(user_id);
 			`,
 			`
 				CREATE TABLE IF NOT EXISTS task_relations (

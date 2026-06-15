@@ -25,7 +25,7 @@ func (repository *userTimerRepository) StartUserTimer(ctx context.Context, dbExe
 	_, err := dbExecutor.ExecContext(
 		ctx,
 		`
-            INSERT INTO timers
+            INSERT INTO user_timers
 				(id, user_id, summary, started_at, finished_at)
 			VALUES
 				(?, ?, ?, ?, NULL)
@@ -45,7 +45,7 @@ func (repository *userTimerRepository) StopUserTimer(ctx context.Context, dbExec
 	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
-            UPDATE timers
+            UPDATE user_timers
 			SET
 				finished_at = ?
 			WHERE
@@ -74,7 +74,7 @@ func (repository *userTimerRepository) DeleteUserTimer(ctx context.Context, dbEx
 	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
-            DELETE FROM timers
+            DELETE FROM user_timers
 			WHERE
 				id = ?
 			AND
@@ -100,7 +100,7 @@ func (repository *userTimerRepository) ClearUserTimers(ctx context.Context, dbEx
 	_, err := dbExecutor.ExecContext(
 		ctx,
 		`
-            DELETE FROM timers
+            DELETE FROM user_timers
 			WHERE
 				user_id = ?
         `,
@@ -113,10 +113,10 @@ func (repository *userTimerRepository) GetUserTimers(ctx context.Context, dbExec
 	rows, err := dbExecutor.QueryContext(ctx,
 		`
 			SELECT
-				T.id, T.summary, T.started_at, T.finished_at
-			FROM timers T
-			WHERE T.user_id = ?
-			ORDER BY T.started_at DESC
+				UT.id, UT.summary, UT.started_at, UT.finished_at
+			FROM user_timers UT
+			WHERE UT.user_id = ?
+			ORDER BY UT.started_at DESC
 		`,
 		userId,
 	)
