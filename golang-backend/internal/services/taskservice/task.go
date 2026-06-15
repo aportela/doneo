@@ -1,4 +1,4 @@
-package projecttaskservice
+package taskservice
 
 import (
 	"context"
@@ -10,8 +10,8 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
-	"github.com/aportela/doneo/internal/repositories/projecttaskrepository"
 	"github.com/aportela/doneo/internal/repositories/tagrepository"
+	"github.com/aportela/doneo/internal/repositories/taskrepository"
 	"github.com/aportela/doneo/internal/utils"
 )
 
@@ -25,10 +25,10 @@ type TaskService interface {
 
 type taskService struct {
 	database   database.Database
-	repository projecttaskrepository.TaskRepository
+	repository taskrepository.TaskRepository
 }
 
-func NewService(db database.Database, repository projecttaskrepository.TaskRepository) TaskService {
+func NewService(db database.Database, repository taskrepository.TaskRepository) TaskService {
 	return &taskService{database: db, repository: repository}
 }
 

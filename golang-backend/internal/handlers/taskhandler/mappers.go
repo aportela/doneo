@@ -1,4 +1,4 @@
-package projecttaskhandler
+package taskhandler
 
 import (
 	"github.com/aportela/doneo/internal/browser"

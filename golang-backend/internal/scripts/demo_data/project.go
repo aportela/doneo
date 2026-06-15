@@ -15,13 +15,13 @@ import (
 	"github.com/aportela/doneo/internal/repositories/noterepository"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
-	"github.com/aportela/doneo/internal/repositories/projecttaskrepository"
+	"github.com/aportela/doneo/internal/repositories/taskrepository"
 	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/services/historyoperationservice"
 	"github.com/aportela/doneo/internal/services/noteservice"
 	"github.com/aportela/doneo/internal/services/projectpermissionservice"
 	"github.com/aportela/doneo/internal/services/projectservice"
-	"github.com/aportela/doneo/internal/services/projecttaskservice"
+	"github.com/aportela/doneo/internal/services/taskservice"
 	"github.com/aportela/doneo/internal/utils"
 )
 
@@ -233,7 +233,7 @@ func createProjects(db database.Database, projectTypeIds []string, projectPriori
 	projectService := projectservice.NewService(db, authorizationService, historyOperationService, projectrepository.NewRepository(db))
 	noteService := noteservice.NewService(db, historyOperationService, noterepository.NewRepository(db))
 	projectPermissionService := projectpermissionservice.NewService(db, cache.NewPermissionCache(), historyOperationService, projectpermissionrepository.NewRepository(db))
-	taskService := projecttaskservice.NewService(db, projecttaskrepository.NewRepository(db))
+	taskService := taskservice.NewService(db, taskrepository.NewRepository(db))
 	for i := 1; i <= count; i++ {
 		newProject := getRandomProject(userIds, projectTypeIds, projectPriorityIds, projectStatusIds)
 		ctx := context.Background()

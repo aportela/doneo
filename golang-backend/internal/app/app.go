@@ -12,9 +12,9 @@ import (
 	"github.com/aportela/doneo/internal/handlers/projectpermissionhandler"
 	"github.com/aportela/doneo/internal/handlers/projectpriorityhandler"
 	"github.com/aportela/doneo/internal/handlers/projectstatushandler"
-	"github.com/aportela/doneo/internal/handlers/projecttaskhandler"
 	"github.com/aportela/doneo/internal/handlers/projecttypehandler"
 	"github.com/aportela/doneo/internal/handlers/rolehandler"
+	"github.com/aportela/doneo/internal/handlers/taskhandler"
 	"github.com/aportela/doneo/internal/handlers/taskpriorityhandler"
 	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
 	"github.com/aportela/doneo/internal/handlers/timerhandler"
@@ -26,10 +26,10 @@ import (
 	"github.com/aportela/doneo/internal/repositories/projectpriorityrepository"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
 	"github.com/aportela/doneo/internal/repositories/projectstatusrepository"
-	"github.com/aportela/doneo/internal/repositories/projecttaskrepository"
 	"github.com/aportela/doneo/internal/repositories/projecttyperepository"
 	"github.com/aportela/doneo/internal/repositories/rolerepository"
 	"github.com/aportela/doneo/internal/repositories/taskpriorityrepository"
+	"github.com/aportela/doneo/internal/repositories/taskrepository"
 	"github.com/aportela/doneo/internal/repositories/taskstatusrepository"
 	"github.com/aportela/doneo/internal/repositories/timerrepository"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
@@ -42,10 +42,10 @@ import (
 	"github.com/aportela/doneo/internal/services/projectpriorityservice"
 	"github.com/aportela/doneo/internal/services/projectservice"
 	"github.com/aportela/doneo/internal/services/projectstatusservice"
-	"github.com/aportela/doneo/internal/services/projecttaskservice"
 	"github.com/aportela/doneo/internal/services/projecttypeservice"
 	"github.com/aportela/doneo/internal/services/roleservice"
 	"github.com/aportela/doneo/internal/services/taskpriorityservice"
+	"github.com/aportela/doneo/internal/services/taskservice"
 	"github.com/aportela/doneo/internal/services/taskstatusservice"
 	"github.com/aportela/doneo/internal/services/timerservice"
 	"github.com/aportela/doneo/internal/services/userservice"
@@ -64,7 +64,7 @@ type App struct {
 	ProjectPriorityHandler   projectpriorityhandler.ProjectPriorityHandler
 	ProjectHandler           projecthandler.ProjectHandler
 	ProjectStatusHandler     projectstatushandler.ProjectStatusHandler
-	TaskHandler              projecttaskhandler.TaskHandler
+	TaskHandler              taskhandler.TaskHandler
 	ProjectTypeHandler       projecttypehandler.ProjectTypeHandler
 	RoleHandler              rolehandler.RoleHandler
 	TaskPriorityHandler      taskpriorityhandler.TaskPriorityHandler
@@ -87,7 +87,7 @@ func NewApp(
 	projectPriorityRepository := projectpriorityrepository.NewRepository(db)
 	projectRepository := projectrepository.NewRepository(db)
 	projectStatusRepository := projectstatusrepository.NewRepository(db)
-	projectTaskRepository := projecttaskrepository.NewRepository(db)
+	projectTaskRepository := taskrepository.NewRepository(db)
 	projectTypeRepository := projecttyperepository.NewRepository(db)
 	roleRepository := rolerepository.NewRepository(db)
 	//tagRepository := tagrepository.NewRepository(db)
@@ -106,7 +106,7 @@ func NewApp(
 	projectPriorityService := projectpriorityservice.NewService(db, projectPriorityRepository)
 	projectService := projectservice.NewService(db, authorizationService, historyOperationService, projectRepository)
 	projectStatusService := projectstatusservice.NewService(db, projectStatusRepository)
-	taskService := projecttaskservice.NewService(db, projectTaskRepository)
+	taskService := taskservice.NewService(db, projectTaskRepository)
 	projectTypeService := projecttypeservice.NewService(db, projectTypeRepository)
 	roleService := roleservice.NewService(db, roleRepository)
 	taskPriorityService := taskpriorityservice.NewService(db, taskPriorityRepository)
@@ -122,7 +122,7 @@ func NewApp(
 	projectPriorityHandler := projectpriorityhandler.NewHandler(projectPriorityService)
 	projectHandler := projecthandler.NewHandler(projectService)
 	projectStatusHandler := projectstatushandler.NewHandler(projectStatusService)
-	taskHandler := projecttaskhandler.NewHandler(taskService)
+	taskHandler := taskhandler.NewHandler(taskService)
 	ProjectTypeHandler := projecttypehandler.NewHandler(projectTypeService)
 	roleHandler := rolehandler.NewHandler(roleService)
 	TaskPriorityHandler := taskpriorityhandler.NewHandler(taskPriorityService)

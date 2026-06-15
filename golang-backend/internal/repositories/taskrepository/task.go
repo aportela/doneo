@@ -1,4 +1,4 @@
-package projecttaskrepository
+package taskrepository
 
 import (
 	"context"
