@@ -17,15 +17,15 @@ type TimerService interface {
 	Stop(ctx context.Context, id string) error
 	Delete(ctx context.Context, id string) error
 	Clear(ctx context.Context) error
-	Search(ctx context.Context) ([]domain.Timer, error)
+	Search(ctx context.Context) ([]domain.UserTimer, error)
 }
 
 type timerService struct {
 	database   database.Database
-	repository timerrepository.TimerRepository
+	repository timerrepository.UserTimerRepository
 }
 
-func NewService(db database.Database, repository timerrepository.TimerRepository) TimerService {
+func NewService(db database.Database, repository timerrepository.UserTimerRepository) TimerService {
 	return &timerService{database: db, repository: repository}
 }
 
@@ -65,7 +65,7 @@ func (service *timerService) Clear(ctx context.Context) error {
 	return err
 }
 
-func (service *timerService) Search(ctx context.Context) ([]domain.Timer, error) {
+func (service *timerService) Search(ctx context.Context) ([]domain.UserTimer, error) {
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
 		return nil, fmt.Errorf("[TimerService] user ID not found in context")
