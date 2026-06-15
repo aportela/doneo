@@ -13,9 +13,9 @@ type HistoryOperationRepository interface {
 	searchHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, scope scope, scopeID string) ([]domain.HistoryOperation, error)
 
 	AddProjectHistoryOperation(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, operation domain.HistoryOperation) error
-	SearchProjectHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) ([]domain.HistoryOperation, error)
+	GetProjectHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) ([]domain.HistoryOperation, error)
 	AddTaskHistoryOperation(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, taskID string, operation domain.HistoryOperation) error
-	SearchTaskHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]domain.HistoryOperation, error)
+	GetTaskHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]domain.HistoryOperation, error)
 }
 
 type historyOperationRepository struct{}
@@ -93,7 +93,7 @@ func (repository *historyOperationRepository) AddProjectHistoryOperation(ctx con
 	return repository.addHistoryOperation(ctx, dbExecutor, projectID, nil, operation)
 }
 
-func (repository *historyOperationRepository) SearchProjectHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) ([]domain.HistoryOperation, error) {
+func (repository *historyOperationRepository) GetProjectHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) ([]domain.HistoryOperation, error) {
 	return repository.searchHistoryOperations(ctx, dbExecutor, scopeProject, projectID)
 }
 
@@ -101,6 +101,6 @@ func (repository *historyOperationRepository) AddTaskHistoryOperation(ctx contex
 	return repository.addHistoryOperation(ctx, dbExecutor, projectID, &taskID, operation)
 }
 
-func (repository *historyOperationRepository) SearchTaskHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]domain.HistoryOperation, error) {
+func (repository *historyOperationRepository) GetTaskHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]domain.HistoryOperation, error) {
 	return repository.searchHistoryOperations(ctx, dbExecutor, scopeTask, taskID)
 }
