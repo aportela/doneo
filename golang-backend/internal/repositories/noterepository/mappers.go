@@ -1,10 +1,14 @@
 package noterepository
 
 import (
+	"errors"
+	"strings"
 	"time"
 
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/utils"
+	"modernc.org/sqlite"
+	sqlite3 "modernc.org/sqlite/lib"
 )
 
 func toDTO(note domain.Note) noteDTO {
@@ -37,4 +41,20 @@ func toDomainArray(notes []noteDTO) []domain.Note {
 		results = append(results, toDomain(note))
 	}
 	return results
+}
+
+func mapSQLiteError(err error) error {
+	var sqlErr *sqlite.Error
+	if !errors.As(err, &sqlErr) {
+		return err
+	}
+
+	switch sqlErr.Code() {
+	case sqlite3.SQLITE_CONSTRAINT_CHECK:
+		if strings.Contains(sqlErr.Error(), "length(body)") {
+			return &domain.ValidationError{Field: "body"}
+		}
+	}
+
+	return err
 }
