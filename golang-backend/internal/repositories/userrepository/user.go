@@ -14,25 +14,24 @@ import (
 )
 
 type UserRepository interface {
-	Add(ctx context.Context, user domain.User, password string) error
-	Update(ctx context.Context, user domain.User) error
-	Delete(ctx context.Context, id string, deletedAt int64) error
-	UnDelete(ctx context.Context, id string) error
-	Purge(ctx context.Context, id string) error
-	Get(ctx context.Context, id string) (domain.User, error)
-	GetByEmail(ctx context.Context, email string) (domain.User, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchUsersFilter) ([]domain.User, browser.Result, error)
+	Add(ctx context.Context, dbExecutor database.DatabaseExecutor, user domain.User, password string) error
+	Update(ctx context.Context, dbExecutor database.DatabaseExecutor, user domain.User) error
+	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string, deletedAt int64) error
+	UnDelete(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) error
+	Purge(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) error
+	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) (domain.User, error)
+	GetByEmail(ctx context.Context, dbExecutor database.DatabaseExecutor, email string) (domain.User, error)
+	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchUsersFilter) ([]domain.User, browser.Result, error)
 }
 
 type userRepository struct {
-	db database.Database
 }
 
-func NewRepository(db database.Database) UserRepository {
-	return &userRepository{db: db}
+func NewRepository() UserRepository {
+	return &userRepository{}
 }
 
-func (repository *userRepository) Add(ctx context.Context, user domain.User, password string) error {
+func (repository *userRepository) Add(ctx context.Context, dbExecutor database.DatabaseExecutor, user domain.User, password string) error {
 	hashedPasswordBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -40,7 +39,7 @@ func (repository *userRepository) Add(ctx context.Context, user domain.User, pas
 	dto := toDTO(user)
 	dto.PasswordHash = string(hashedPasswordBytes)
 
-	_, err = repository.db.ExecContext(
+	_, err = dbExecutor.ExecContext(
 		ctx,
 		`
             INSERT INTO users
@@ -61,7 +60,7 @@ func (repository *userRepository) Add(ctx context.Context, user domain.User, pas
 	return nil
 }
 
-func (repository *userRepository) Update(ctx context.Context, user domain.User) error {
+func (repository *userRepository) Update(ctx context.Context, dbExecutor database.DatabaseExecutor, user domain.User) error {
 	dto := toDTO(user)
 	if len(user.Password) > 0 {
 		hashedPasswordBytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
@@ -96,7 +95,7 @@ func (repository *userRepository) Update(ctx context.Context, user domain.User) 
 				id = ?`
 		args = append(args, dto.Email, dto.Name, dto.UpdatedAt, dto.PermissionsBitmask, dto.ID)
 	}
-	result, err := repository.db.ExecContext(ctx, query, args...)
+	result, err := dbExecutor.ExecContext(ctx, query, args...)
 	if err != nil {
 		return mapSQLiteError(err)
 	}
@@ -110,8 +109,8 @@ func (repository *userRepository) Update(ctx context.Context, user domain.User) 
 	return nil
 }
 
-func (repository *userRepository) Delete(ctx context.Context, id string, deletedAt int64) error {
-	result, err := repository.db.ExecContext(
+func (repository *userRepository) Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string, deletedAt int64) error {
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
             UPDATE users
@@ -121,7 +120,7 @@ func (repository *userRepository) Delete(ctx context.Context, id string, deleted
 				id = ?
         `,
 		deletedAt,
-		id,
+		userID,
 	)
 	if err != nil {
 		return err
@@ -136,8 +135,8 @@ func (repository *userRepository) Delete(ctx context.Context, id string, deleted
 	return nil
 }
 
-func (repository *userRepository) UnDelete(ctx context.Context, id string) error {
-	result, err := repository.db.ExecContext(
+func (repository *userRepository) UnDelete(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) error {
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
             UPDATE users
@@ -146,7 +145,7 @@ func (repository *userRepository) UnDelete(ctx context.Context, id string) error
 			WHERE
 				id = ?
         `,
-		id,
+		userID,
 	)
 	if err != nil {
 		return err
@@ -161,14 +160,14 @@ func (repository *userRepository) UnDelete(ctx context.Context, id string) error
 	return nil
 }
 
-func (repository *userRepository) Purge(ctx context.Context, id string) error {
-	result, err := repository.db.ExecContext(
+func (repository *userRepository) Purge(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) error {
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
             DELETE FROM users
 			WHERE id = ?
         `,
-		id,
+		userID,
 	)
 	if err != nil {
 		return err
@@ -183,9 +182,9 @@ func (repository *userRepository) Purge(ctx context.Context, id string) error {
 	return nil
 }
 
-func (repository *userRepository) Get(ctx context.Context, id string) (domain.User, error) {
+func (repository *userRepository) Get(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) (domain.User, error) {
 	var dto userDTO
-	err := repository.db.QueryRowContext(
+	err := dbExecutor.QueryRowContext(
 		ctx,
 		`
             SELECT
@@ -194,7 +193,7 @@ func (repository *userRepository) Get(ctx context.Context, id string) (domain.Us
             WHERE
 				U.id = ?
         `,
-		id).Scan(&dto.ID, &dto.Email, &dto.Name, &dto.PasswordHash, &dto.CreatedAt, &dto.UpdatedAt, &dto.DeletedAt, &dto.PermissionsBitmask)
+		userID).Scan(&dto.ID, &dto.Email, &dto.Name, &dto.PasswordHash, &dto.CreatedAt, &dto.UpdatedAt, &dto.DeletedAt, &dto.PermissionsBitmask)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.User{}, domain.NotFoundError
@@ -204,9 +203,9 @@ func (repository *userRepository) Get(ctx context.Context, id string) (domain.Us
 	return toDomain(dto), err
 }
 
-func (repository *userRepository) GetByEmail(ctx context.Context, email string) (domain.User, error) {
+func (repository *userRepository) GetByEmail(ctx context.Context, dbExecutor database.DatabaseExecutor, email string) (domain.User, error) {
 	var dto userDTO
-	err := repository.db.QueryRowContext(
+	err := dbExecutor.QueryRowContext(
 		ctx,
 		`
             SELECT
@@ -224,7 +223,7 @@ func (repository *userRepository) GetByEmail(ctx context.Context, email string) 
 	return toDomain(dto), err
 }
 
-func (repository *userRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchUsersFilter) ([]domain.User, browser.Result, error) {
+func (repository *userRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchUsersFilter) ([]domain.User, browser.Result, error) {
 	filterDTO := toFilterDTO(filter)
 	var filterArgs []any
 	var queryArgs []any
@@ -320,7 +319,7 @@ func (repository *userRepository) Search(ctx context.Context, pager browser.Para
 		sqlLimit = ""
 	}
 	sqlQuery = fmt.Sprintf("%s %s %s %s ", sqlQuery, sqlWhere, sqlOrder, sqlLimit)
-	rows, err := repository.db.QueryContext(ctx, sqlQuery, queryArgs...)
+	rows, err := dbExecutor.QueryContext(ctx, sqlQuery, queryArgs...)
 	if err != nil {
 		return nil, browser.Result{}, err
 	}
@@ -346,7 +345,7 @@ func (repository *userRepository) Search(ctx context.Context, pager browser.Para
 			FROM users U
 		`
 		sqlCountQuery = fmt.Sprintf("%s %s", sqlCountQuery, sqlWhere)
-		err = repository.db.QueryRowContext(
+		err = dbExecutor.QueryRowContext(
 			ctx,
 			sqlCountQuery,
 			filterArgs...,
