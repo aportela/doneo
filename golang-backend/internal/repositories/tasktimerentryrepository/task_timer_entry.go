@@ -4,122 +4,79 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
-	"strings"
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"modernc.org/sqlite"
-	sqlite3 "modernc.org/sqlite/lib"
 )
 
-type TaskTimeEntryRepository interface {
-	Add(ctx context.Context, taskId string, taskTimeEntry domain.TaskTimerEntry) error
-	Update(ctx context.Context, taskTimeEntry domain.TaskTimerEntry) error
-	Delete(ctx context.Context, id string) error
-	Get(ctx context.Context, id string) (domain.TaskTimerEntry, error)
-	GetTaskTimeEntries(ctx context.Context, taskId string) ([]domain.TaskTimerEntry, error)
+type TaskTimerEntryRepository interface {
+	Add(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string, taskTimerEntry domain.TaskTimerEntry) error
+	Update(ctx context.Context, dbExecutor database.DatabaseExecutor, taskTimerEntry domain.TaskTimerEntry) error
+	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, taskTimerEntryID string) error
+	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, taskTimerEntryID string) (domain.TaskTimerEntry, error)
+	GetTaskTimerEntries(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]domain.TaskTimerEntry, error)
 }
 
-type taskTimeEntryRepository struct {
-	db database.Database
+type taskTimerEntryRepository struct{}
+
+func NewRepository() TaskTimerEntryRepository {
+	return &taskTimerEntryRepository{}
 }
 
-func NewRepository(db database.Database) TaskTimeEntryRepository {
-	return &taskTimeEntryRepository{db: db}
-}
-
-func (repository *taskTimeEntryRepository) Add(ctx context.Context, taskId string, taskTimeEntry domain.TaskTimerEntry) error {
-	dto := toDTO(taskTimeEntry)
-	_, err := repository.db.ExecContext(
+func (repository *taskTimerEntryRepository) Add(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string, taskTimerEntry domain.TaskTimerEntry) error {
+	dto := toDTO(taskTimerEntry)
+	_, err := dbExecutor.ExecContext(
 		ctx,
 		`
             INSERT INTO task_timer_entries
-				(id, task_id, user_id, created_at, summary, total_seconds)
+				(id, task_id, creator_id, created_at, summary, total_seconds)
 			VALUES
 				(?, ?, ?, ?, ?, ?)
         `,
 		dto.ID,
-		taskId,
+		taskID,
 		dto.CreatorId,
 		dto.CreatedAt,
 		dto.Summary,
 		dto.TotalSeconds,
 	)
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			// TODO: check unique
-			return err
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(id)") {
-				return &domain.ValidationError{Field: "id"}
-			} else if strings.Contains(sqlErr.Error(), "length(task_id)") {
-				return &domain.ValidationError{Field: "task_id"}
-			} else if strings.Contains(sqlErr.Error(), "length(summary)") {
-				return &domain.ValidationError{Field: "summary"}
-			}
-			return err
-		default:
-			return err
-		}
+		return mapSQLiteError(err)
 	}
 	return nil
 }
 
-func (repository *taskTimeEntryRepository) Update(ctx context.Context, taskTimeEntry domain.TaskTimerEntry) error {
-	dto := toDTO(taskTimeEntry)
-	_, err := repository.db.ExecContext(
+func (repository *taskTimerEntryRepository) Update(ctx context.Context, dbExecutor database.DatabaseExecutor, taskTimerEntry domain.TaskTimerEntry) error {
+	dto := toDTO(taskTimerEntry)
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
-            UPDATE task_timer_entries SET
+            UPDATE task_timer_entries
+			SET
 				summary = ?,
 				total_seconds = ?
-			WHERE id = ?
+			WHERE
+				id = ?
         `,
 		dto.Summary,
 		dto.TotalSeconds,
 		dto.ID,
 	)
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			// TODO: check unique
-			return err
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(id)") {
-				return &domain.ValidationError{Field: "id"}
-			} else if strings.Contains(sqlErr.Error(), "length(task_id)") {
-				return &domain.ValidationError{Field: "task_id"}
-			} else if strings.Contains(sqlErr.Error(), "length(summary)") {
-				return &domain.ValidationError{Field: "summary"}
-			}
-			return err
-		default:
-			return err
-		}
+		return mapSQLiteError(err)
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
 	}
 	return nil
 }
 
-func (repository *taskTimeEntryRepository) Delete(ctx context.Context, id string) error {
-	_, err := repository.db.ExecContext(
+func (repository *taskTimerEntryRepository) Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, id string) error {
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
             DELETE FROM task_timer_entries
@@ -129,29 +86,34 @@ func (repository *taskTimeEntryRepository) Delete(ctx context.Context, id string
 		id,
 	)
 	if err != nil {
-		// TODO: remove ?
-		// TODO: check sql error
-		fmt.Println(err.Error())
 		return err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
 	}
 	return nil
 }
 
-func (repository *taskTimeEntryRepository) Get(ctx context.Context, id string) (domain.TaskTimerEntry, error) {
+func (repository *taskTimerEntryRepository) Get(ctx context.Context, dbExecutor database.DatabaseExecutor, id string) (domain.TaskTimerEntry, error) {
 	var dto taskTimerEntryDTO
-	err := repository.db.QueryRowContext(
+	err := dbExecutor.QueryRowContext(
 		ctx,
 		`
             SELECT
                 TTE.id,
-				TTE.user_id,
+				TTE.creator_id,
 				U.name AS creator_name,
 				TTE.created_at,
 				TTE.summary,
 				TTE.total_seconds
             FROM task_timer_entries TTE
-			INNER JOIN users U ON U.ID = TTE.user_id
-            WHERE TTE.id = ?
+			INNER JOIN users U ON U.ID = TTE.creator_id
+            WHERE
+				TTE.id = ?
         `,
 		id).Scan(
 		&dto.ID,
@@ -170,20 +132,21 @@ func (repository *taskTimeEntryRepository) Get(ctx context.Context, id string) (
 	return toDomain(dto), err
 }
 
-func (repository *taskTimeEntryRepository) GetTaskTimeEntries(ctx context.Context, taskId string) ([]domain.TaskTimerEntry, error) {
-	rows, err := repository.db.QueryContext(
+func (repository *taskTimerEntryRepository) GetTaskTimerEntries(ctx context.Context, dbExecutor database.DatabaseExecutor, taskId string) ([]domain.TaskTimerEntry, error) {
+	rows, err := dbExecutor.QueryContext(
 		ctx,
 		`
             SELECT
                 TTE.id,
-				TTE.user_id,
+				TTE.creator_id,
 				U.name AS creator_name,
 				TTE.created_at,
 				TTE.summary,
 				TTE.total_seconds
             FROM task_timer_entries TTE
-			INNER JOIN users U ON U.ID = TTE.user_id
-            WHERE TTE.task_id = ?
+			INNER JOIN users U ON U.ID = TTE.creator_id
+            WHERE
+				TTE.task_id = ?
         `,
 		taskId)
 	if err != nil {

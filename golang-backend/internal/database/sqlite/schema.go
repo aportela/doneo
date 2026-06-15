@@ -291,18 +291,18 @@ var schemaQueries = []schemaMigration{
 				CREATE TABLE IF NOT EXISTS task_timer_entries (
 					id TEXT NOT NULL CHECK(length(id) == 36),
 					task_id TEXT NOT NULL CHECK(length(task_id) == 36),
-					user_id TEXT NOT NULL CHECK(length(user_id) == 36),
+					creator_id TEXT NOT NULL CHECK(length(creator_id) == 36),
 					created_at INTEGER NOT NULL,
 					summary TEXT NOT NULL CHECK(length(summary) BETWEEN 1 AND 128),
 					total_seconds INTEGER NOT NULL,
 					PRIMARY KEY (id),
 					FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
-					FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE
 				) STRICT;
 			`,
 			`
 				CREATE INDEX IF NOT EXISTS idx_task_timer_entries_task_id ON task_timer_entries(task_id);
-				CREATE INDEX IF NOT EXISTS idx_task_timer_entries_user_id ON task_timer_entries(user_id);
+				CREATE INDEX IF NOT EXISTS idx_task_timer_entries_creator_id ON task_timer_entries(creator_id);
 			`,
 		},
 	},
