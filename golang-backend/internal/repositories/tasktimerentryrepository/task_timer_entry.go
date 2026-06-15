@@ -75,7 +75,7 @@ func (repository *taskTimerEntryRepository) Update(ctx context.Context, dbExecut
 	return nil
 }
 
-func (repository *taskTimerEntryRepository) Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, id string) error {
+func (repository *taskTimerEntryRepository) Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, taskTimerEntryID string) error {
 	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
@@ -83,7 +83,7 @@ func (repository *taskTimerEntryRepository) Delete(ctx context.Context, dbExecut
 			WHERE
 				id = ?
         `,
-		id,
+		taskTimerEntryID,
 	)
 	if err != nil {
 		return err
@@ -98,7 +98,7 @@ func (repository *taskTimerEntryRepository) Delete(ctx context.Context, dbExecut
 	return nil
 }
 
-func (repository *taskTimerEntryRepository) Get(ctx context.Context, dbExecutor database.DatabaseExecutor, id string) (domain.TaskTimerEntry, error) {
+func (repository *taskTimerEntryRepository) Get(ctx context.Context, dbExecutor database.DatabaseExecutor, taskTimerEntryID string) (domain.TaskTimerEntry, error) {
 	var dto taskTimerEntryDTO
 	err := dbExecutor.QueryRowContext(
 		ctx,
@@ -115,7 +115,7 @@ func (repository *taskTimerEntryRepository) Get(ctx context.Context, dbExecutor 
             WHERE
 				TTE.id = ?
         `,
-		id).Scan(
+		taskTimerEntryID).Scan(
 		&dto.ID,
 		&dto.CreatorId,
 		&dto.CreatorName,
@@ -132,7 +132,7 @@ func (repository *taskTimerEntryRepository) Get(ctx context.Context, dbExecutor 
 	return toDomain(dto), err
 }
 
-func (repository *taskTimerEntryRepository) GetTaskTimerEntries(ctx context.Context, dbExecutor database.DatabaseExecutor, taskId string) ([]domain.TaskTimerEntry, error) {
+func (repository *taskTimerEntryRepository) GetTaskTimerEntries(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]domain.TaskTimerEntry, error) {
 	rows, err := dbExecutor.QueryContext(
 		ctx,
 		`
@@ -148,7 +148,7 @@ func (repository *taskTimerEntryRepository) GetTaskTimerEntries(ctx context.Cont
             WHERE
 				TTE.task_id = ?
         `,
-		taskId)
+		taskID)
 	if err != nil {
 		return nil, err
 	}
