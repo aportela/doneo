@@ -4,17 +4,17 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"github.com/aportela/doneo/internal/repositories"
 	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
 	"github.com/aportela/doneo/internal/utils"
 )
 
 type HistoryOperationService interface {
-	AddProjectHistoryOperation(ctx context.Context, dbExecutor repositories.Executor, projectId string, operation domain.HistoryOperation) (domain.HistoryOperation, error)
-	SearchProjectHistoryOperations(ctx context.Context, dbExecutor repositories.Executor, projectId string) ([]domain.HistoryOperation, error)
-	AddTaskHistoryOperation(ctx context.Context, dbExecutor repositories.Executor, projectId string, taskId string, operation domain.HistoryOperation) (domain.HistoryOperation, error)
-	SearchTaskHistoryOperations(ctx context.Context, dbExecutor repositories.Executor, taskId string) ([]domain.HistoryOperation, error)
+	AddProjectHistoryOperation(ctx context.Context, dbExecutor database.DatabaseExecutor, projectId string, operation domain.HistoryOperation) (domain.HistoryOperation, error)
+	SearchProjectHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, projectId string) ([]domain.HistoryOperation, error)
+	AddTaskHistoryOperation(ctx context.Context, dbExecutor database.DatabaseExecutor, projectId string, taskId string, operation domain.HistoryOperation) (domain.HistoryOperation, error)
+	SearchTaskHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, taskId string) ([]domain.HistoryOperation, error)
 }
 
 type historyOperationService struct {
@@ -25,7 +25,7 @@ func NewService(repository historyoperationrepository.HistoryOperationRepository
 	return &historyOperationService{repository: repository}
 }
 
-func (service *historyOperationService) AddProjectHistoryOperation(ctx context.Context, dbExecutor repositories.Executor, projectId string, operation domain.HistoryOperation) (domain.HistoryOperation, error) {
+func (service *historyOperationService) AddProjectHistoryOperation(ctx context.Context, dbExecutor database.DatabaseExecutor, projectId string, operation domain.HistoryOperation) (domain.HistoryOperation, error) {
 	operation.ID = utils.UUID()
 	err := service.repository.AddProjectHistoryOperation(ctx, dbExecutor, projectId, operation)
 	if err != nil {
@@ -34,7 +34,7 @@ func (service *historyOperationService) AddProjectHistoryOperation(ctx context.C
 	return operation, nil
 }
 
-func (service *historyOperationService) SearchProjectHistoryOperations(ctx context.Context, dbExecutor repositories.Executor, projectId string) ([]domain.HistoryOperation, error) {
+func (service *historyOperationService) SearchProjectHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, projectId string) ([]domain.HistoryOperation, error) {
 	operations, err := service.repository.SearchProjectHistoryOperations(ctx, dbExecutor, projectId)
 	if err != nil {
 		return nil, fmt.Errorf("[HistoryOperationService] failed to get project history operations: %w", err)
@@ -42,7 +42,7 @@ func (service *historyOperationService) SearchProjectHistoryOperations(ctx conte
 	return operations, nil
 }
 
-func (service *historyOperationService) AddTaskHistoryOperation(ctx context.Context, dbExecutor repositories.Executor, projectId string, taskId string, operation domain.HistoryOperation) (domain.HistoryOperation, error) {
+func (service *historyOperationService) AddTaskHistoryOperation(ctx context.Context, dbExecutor database.DatabaseExecutor, projectId string, taskId string, operation domain.HistoryOperation) (domain.HistoryOperation, error) {
 	operation.ID = utils.UUID()
 	err := service.repository.AddTaskHistoryOperation(ctx, dbExecutor, projectId, taskId, operation)
 	if err != nil {
@@ -51,7 +51,7 @@ func (service *historyOperationService) AddTaskHistoryOperation(ctx context.Cont
 	return operation, nil
 }
 
-func (service *historyOperationService) SearchTaskHistoryOperations(ctx context.Context, dbExecutor repositories.Executor, taskId string) ([]domain.HistoryOperation, error) {
+func (service *historyOperationService) SearchTaskHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, taskId string) ([]domain.HistoryOperation, error) {
 	operations, err := service.repository.SearchTaskHistoryOperations(ctx, dbExecutor, taskId)
 	if err != nil {
 		return nil, fmt.Errorf("[HistoryOperationService] failed to get task history operations: %w", err)
