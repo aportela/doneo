@@ -76,7 +76,7 @@ func (repository *roleRepository) Update(ctx context.Context, dbExecutor databas
 }
 
 func (repository *roleRepository) Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, roleID string) error {
-	_, err := dbExecutor.ExecContext(
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
             DELETE FROM roles
@@ -85,7 +85,17 @@ func (repository *roleRepository) Delete(ctx context.Context, dbExecutor databas
         `,
 		roleID,
 	)
-	return err
+	if err != nil {
+		return err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
+	}
+	return nil
 }
 
 func (repository *roleRepository) Get(ctx context.Context, dbExecutor database.DatabaseExecutor, roleID string) (domain.Role, error) {
