@@ -130,6 +130,7 @@ func (handler *NoteHandler) DeleteTaskNote(w http.ResponseWriter, r *http.Reques
 func (handler *NoteHandler) GetTaskNotes(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	taskId := chi.URLParam(r, "task_id")
-	notes, err := handler.service.GetTaskNotes(r.Context(), taskId)
+	projectId := chi.URLParam(r, "project_id")
+	notes, err := handler.service.GetTaskNotes(r.Context(), projectId, taskId)
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(notes), err)
 }

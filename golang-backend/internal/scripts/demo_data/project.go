@@ -231,7 +231,7 @@ func createProjects(db database.Database, projectTypeIds []string, projectPriori
 	historyOperationService := historyoperationservice.NewService(db, historyoperationrepository.NewRepository(db))
 	authorizationService := authorizationservice.NewService(db, cache.NewPermissionCache())
 	projectService := projectservice.NewService(db, authorizationService, historyOperationService, projectrepository.NewRepository(db))
-	noteService := noteservice.NewService(db, historyOperationService, noterepository.NewRepository(db))
+	noteService := noteservice.NewService(db, historyOperationService, authorizationService, noterepository.NewRepository(db))
 	projectPermissionService := projectpermissionservice.NewService(db, cache.NewPermissionCache(), historyOperationService, projectpermissionrepository.NewRepository(db))
 	taskService := taskservice.NewService(db, taskrepository.NewRepository(db))
 	for i := 1; i <= count; i++ {

@@ -107,7 +107,7 @@ func NewApp(
 	attachmentService := attachmentservice.NewService(db, historyOperationService, attachmentRepository)
 	authorizationService := authorizationservice.NewService(db, cache)
 	authService := authservice.NewService(db, userRepository)
-	noteService := noteservice.NewService(db, historyOperationService, noteRepository)
+	noteService := noteservice.NewService(db, historyOperationService, authorizationService, noteRepository)
 	projectPermissionService := projectpermissionservice.NewService(db, cache, historyOperationService, projectPermissionRepository)
 	projectPriorityService := projectpriorityservice.NewService(db, projectPriorityRepository)
 	projectService := projectservice.NewService(db, authorizationService, historyOperationService, projectRepository)

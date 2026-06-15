@@ -9,6 +9,7 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/noterepository"
+	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/services/historyoperationservice"
 	"github.com/aportela/doneo/internal/utils"
 )
@@ -17,24 +18,36 @@ type NoteService interface {
 	AddProjectNote(ctx context.Context, projectId string, note domain.Note) (domain.Note, error)
 	UpdateProjectNote(ctx context.Context, projectId string, note domain.Note) (domain.Note, error)
 	DeleteProjectNote(ctx context.Context, projectId string, noteId string) error
+	GetProjectNote(ctx context.Context, projectId string, noteId string) (domain.Note, error)
 	GetProjectNotes(ctx context.Context, projectId string) ([]domain.Note, error)
+
 	AddTaskNote(ctx context.Context, projectId string, taskId string, note domain.Note) (domain.Note, error)
 	UpdateTaskNote(ctx context.Context, projectId string, taskId string, note domain.Note) (domain.Note, error)
 	DeleteTaskNote(ctx context.Context, projectId string, taskId string, noteId string) error
-	GetTaskNotes(ctx context.Context, taskId string) ([]domain.Note, error)
+	GetTaskNote(ctx context.Context, projectId string, noteId string) (domain.Note, error)
+	GetTaskNotes(ctx context.Context, projectId string, taskId string) ([]domain.Note, error)
 }
 
 type noteService struct {
 	database                database.Database
 	historyOperationService historyoperationservice.HistoryOperationService
+	authorizationService    authorizationservice.AuthorizationService
 	repository              noterepository.NoteRepository
 }
 
-func NewService(db database.Database, historyOperationService historyoperationservice.HistoryOperationService, repository noterepository.NoteRepository) NoteService {
-	return &noteService{database: db, historyOperationService: historyOperationService, repository: repository}
+func NewService(db database.Database, historyOperationService historyoperationservice.HistoryOperationService, authorizationService authorizationservice.AuthorizationService, repository noterepository.NoteRepository) NoteService {
+	return &noteService{database: db, historyOperationService: historyOperationService, authorizationService: authorizationService, repository: repository}
 }
 
 func (service *noteService) AddProjectNote(ctx context.Context, projectId string, note domain.Note) (domain.Note, error) {
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return domain.Note{}, fmt.Errorf("[NoteService] user ID not found in context")
+	}
+	err := service.authorizationService.RequireProjectUpdatePermission(ctx, currentUserId, projectId)
+	if err != nil {
+		return domain.Note{}, err
+	}
 	tx, err := service.database.Begin()
 	if err != nil {
 		return domain.Note{}, err
@@ -47,10 +60,6 @@ func (service *noteService) AddProjectNote(ctx context.Context, projectId string
 			_ = tx.Rollback()
 		}
 	}()
-	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return domain.Note{}, fmt.Errorf("[NoteService] user ID not found in context")
-	}
 	note.ID = utils.UUID()
 	note.CreatedBy.ID = currentUserId
 	note.CreatedAt = time.Now()
@@ -70,6 +79,14 @@ func (service *noteService) AddProjectNote(ctx context.Context, projectId string
 }
 
 func (service *noteService) UpdateProjectNote(ctx context.Context, projectId string, note domain.Note) (domain.Note, error) {
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return domain.Note{}, fmt.Errorf("[NoteService] user ID not found in context")
+	}
+	err := service.authorizationService.RequireProjectUpdatePermission(ctx, currentUserId, projectId)
+	if err != nil {
+		return domain.Note{}, err
+	}
 	tx, err := service.database.Begin()
 	if err != nil {
 		return domain.Note{}, err
@@ -82,10 +99,6 @@ func (service *noteService) UpdateProjectNote(ctx context.Context, projectId str
 			_ = tx.Rollback()
 		}
 	}()
-	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return domain.Note{}, fmt.Errorf("[NoteService] user ID not found in context")
-	}
 	note.UpdatedAt = utils.CurrentTimePtr()
 	err = service.repository.UpdateProjectNote(ctx, note)
 	if err != nil {
@@ -103,6 +116,14 @@ func (service *noteService) UpdateProjectNote(ctx context.Context, projectId str
 }
 
 func (service *noteService) DeleteProjectNote(ctx context.Context, projectId string, noteId string) error {
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return fmt.Errorf("[NoteService] user ID not found in context")
+	}
+	err := service.authorizationService.RequireProjectUpdatePermission(ctx, currentUserId, projectId)
+	if err != nil {
+		return err
+	}
 	tx, err := service.database.Begin()
 	if err != nil {
 		return err
@@ -115,10 +136,6 @@ func (service *noteService) DeleteProjectNote(ctx context.Context, projectId str
 			_ = tx.Rollback()
 		}
 	}()
-	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return fmt.Errorf("[NoteService] user ID not found in context")
-	}
 	err = service.repository.DeleteProjectNote(ctx, noteId)
 	if err != nil {
 		return err
@@ -130,7 +147,31 @@ func (service *noteService) DeleteProjectNote(ctx context.Context, projectId str
 	return tx.Commit()
 }
 
+func (service *noteService) GetProjectNote(ctx context.Context, projectId string, noteId string) (domain.Note, error) {
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return domain.Note{}, fmt.Errorf("[NoteService] user ID not found in context")
+	}
+	err := service.authorizationService.RequireProjectViewPermission(ctx, currentUserId, projectId)
+	if err != nil {
+		return domain.Note{}, err
+	}
+	note, err := service.repository.GetProjectNote(ctx, noteId)
+	if err != nil {
+		return domain.Note{}, fmt.Errorf("[NoteService] failed to get project note: %w", err)
+	}
+	return note, nil
+}
+
 func (service *noteService) GetProjectNotes(ctx context.Context, projectId string) ([]domain.Note, error) {
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("[NoteService] user ID not found in context")
+	}
+	err := service.authorizationService.RequireProjectViewPermission(ctx, currentUserId, projectId)
+	if err != nil {
+		return nil, err
+	}
 	notes, err := service.repository.GetProjectNotes(ctx, projectId)
 	if err != nil {
 		return nil, fmt.Errorf("[NoteService] failed to get project notes: %w", err)
@@ -139,6 +180,14 @@ func (service *noteService) GetProjectNotes(ctx context.Context, projectId strin
 }
 
 func (service *noteService) AddTaskNote(ctx context.Context, projectId string, taskId string, note domain.Note) (domain.Note, error) {
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return domain.Note{}, fmt.Errorf("[NoteService] user ID not found in context")
+	}
+	err := service.authorizationService.RequireTaskUpdatePermission(ctx, currentUserId, projectId)
+	if err != nil {
+		return domain.Note{}, err
+	}
 	tx, err := service.database.Begin()
 	if err != nil {
 		return domain.Note{}, err
@@ -151,10 +200,6 @@ func (service *noteService) AddTaskNote(ctx context.Context, projectId string, t
 			_ = tx.Rollback()
 		}
 	}()
-	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return domain.Note{}, fmt.Errorf("[NoteService] user ID not found in context")
-	}
 	note.ID = utils.UUID()
 	note.CreatedBy.ID = currentUserId
 	note.CreatedAt = time.Now()
@@ -174,6 +219,14 @@ func (service *noteService) AddTaskNote(ctx context.Context, projectId string, t
 }
 
 func (service *noteService) UpdateTaskNote(ctx context.Context, projectId string, taskId string, note domain.Note) (domain.Note, error) {
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return domain.Note{}, fmt.Errorf("[NoteService] user ID not found in context")
+	}
+	err := service.authorizationService.RequireTaskUpdatePermission(ctx, currentUserId, projectId)
+	if err != nil {
+		return domain.Note{}, err
+	}
 	tx, err := service.database.Begin()
 	if err != nil {
 		return domain.Note{}, err
@@ -186,10 +239,6 @@ func (service *noteService) UpdateTaskNote(ctx context.Context, projectId string
 			_ = tx.Rollback()
 		}
 	}()
-	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return domain.Note{}, fmt.Errorf("[NoteService] user ID not found in context")
-	}
 	note.UpdatedAt = utils.CurrentTimePtr()
 	err = service.repository.UpdateTaskNote(ctx, note)
 	if err != nil {
@@ -207,6 +256,14 @@ func (service *noteService) UpdateTaskNote(ctx context.Context, projectId string
 }
 
 func (service *noteService) DeleteTaskNote(ctx context.Context, projectId string, taskId string, noteId string) error {
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return fmt.Errorf("[NoteService] user ID not found in context")
+	}
+	err := service.authorizationService.RequireTaskUpdatePermission(ctx, currentUserId, projectId)
+	if err != nil {
+		return err
+	}
 	tx, err := service.database.Begin()
 	if err != nil {
 		return err
@@ -219,10 +276,6 @@ func (service *noteService) DeleteTaskNote(ctx context.Context, projectId string
 			_ = tx.Rollback()
 		}
 	}()
-	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return fmt.Errorf("[NoteService] user ID not found in context")
-	}
 	err = service.repository.DeleteTaskNote(ctx, noteId)
 	if err != nil {
 		return err
@@ -234,7 +287,31 @@ func (service *noteService) DeleteTaskNote(ctx context.Context, projectId string
 	return tx.Commit()
 }
 
-func (service *noteService) GetTaskNotes(ctx context.Context, taskId string) ([]domain.Note, error) {
+func (service *noteService) GetTaskNote(ctx context.Context, projectId string, noteId string) (domain.Note, error) {
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return domain.Note{}, fmt.Errorf("[NoteService] user ID not found in context")
+	}
+	err := service.authorizationService.RequireTaskViewPermission(ctx, currentUserId, projectId)
+	if err != nil {
+		return domain.Note{}, err
+	}
+	note, err := service.repository.GetTaskNote(ctx, noteId)
+	if err != nil {
+		return domain.Note{}, fmt.Errorf("[NoteService] failed to get task note: %w", err)
+	}
+	return note, nil
+}
+
+func (service *noteService) GetTaskNotes(ctx context.Context, projectId string, taskId string) ([]domain.Note, error) {
+	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("[NoteService] user ID not found in context")
+	}
+	err := service.authorizationService.RequireTaskViewPermission(ctx, currentUserId, projectId)
+	if err != nil {
+		return nil, err
+	}
 	notes, err := service.repository.GetTaskNotes(ctx, taskId)
 	if err != nil {
 		return nil, fmt.Errorf("[NoteService] failed to get task notes: %w", err)
