@@ -1,9 +1,13 @@
 package attachmentrepository
 
 import (
+	"errors"
+	"strings"
 	"time"
 
 	"github.com/aportela/doneo/internal/domain"
+	"modernc.org/sqlite"
+	sqlite3 "modernc.org/sqlite/lib"
 )
 
 func toDTO(attachment domain.Attachment) attachmentDTO {
@@ -38,4 +42,20 @@ func toDomainArray(attachments []attachmentDTO) []domain.Attachment {
 		results = append(results, toDomain(attachment))
 	}
 	return results
+}
+
+func mapSQLiteError(err error) error {
+	var sqlErr *sqlite.Error
+	if !errors.As(err, &sqlErr) {
+		return err
+	}
+
+	switch sqlErr.Code() {
+	case sqlite3.SQLITE_CONSTRAINT_CHECK:
+		if strings.Contains(sqlErr.Error(), "length(original_name)") {
+			return &domain.ValidationError{Field: "original_name"}
+		}
+	}
+
+	return err
 }
