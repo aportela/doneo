@@ -38,7 +38,7 @@ func (repository *historyOperationRepository) addHistoryOperation(ctx context.Co
 		projectID,
 		taskID,
 		dto.OperationType,
-		dto.UserId,
+		dto.UserID,
 		dto.CreatedAt,
 	)
 	return err
@@ -77,7 +77,7 @@ func (repository *historyOperationRepository) searchHistoryOperations(ctx contex
 	for rows.Next() {
 		var dto historyOperationDTO
 		if err := rows.Scan(
-			&dto.ID, &dto.UserId, &dto.UserName, &dto.CreatedAt, &dto.OperationType,
+			&dto.ID, &dto.UserID, &dto.UserName, &dto.CreatedAt, &dto.OperationType,
 		); err != nil {
 			return nil, err
 		}

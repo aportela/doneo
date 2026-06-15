@@ -10,17 +10,17 @@ import (
 )
 
 type NoteRepository interface {
-	AddProjectNote(ctx context.Context, dbExecutor database.DatabaseExecutor, projectId string, note domain.Note) error
+	AddProjectNote(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, note domain.Note) error
 	UpdateProjectNote(ctx context.Context, dbExecutor database.DatabaseExecutor, note domain.Note) error
-	DeleteProjectNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteId string) error
-	GetProjectNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteId string) (domain.Note, error)
-	GetProjectNotes(ctx context.Context, dbExecutor database.DatabaseExecutor, projectId string) ([]domain.Note, error)
+	DeleteProjectNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteID string) error
+	GetProjectNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteID string) (domain.Note, error)
+	GetProjectNotes(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) ([]domain.Note, error)
 
-	AddTaskNote(ctx context.Context, dbExecutor database.DatabaseExecutor, taskId string, note domain.Note) error
+	AddTaskNote(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string, note domain.Note) error
 	UpdateTaskNote(ctx context.Context, dbExecutor database.DatabaseExecutor, note domain.Note) error
-	DeleteTaskNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteId string) error
-	GetTaskNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteId string) (domain.Note, error)
-	GetTaskNotes(ctx context.Context, dbExecutor database.DatabaseExecutor, taskId string) ([]domain.Note, error)
+	DeleteTaskNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteID string) error
+	GetTaskNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteID string) (domain.Note, error)
+	GetTaskNotes(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]domain.Note, error)
 }
 
 type noteRepository struct{}
@@ -29,7 +29,7 @@ func NewRepository() NoteRepository {
 	return &noteRepository{}
 }
 
-func (repository *noteRepository) AddProjectNote(ctx context.Context, dbExecutor database.DatabaseExecutor, projectId string, note domain.Note) error {
+func (repository *noteRepository) AddProjectNote(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, note domain.Note) error {
 	dto := toDTO(note)
 	_, err := dbExecutor.ExecContext(
 		ctx,
@@ -40,7 +40,7 @@ func (repository *noteRepository) AddProjectNote(ctx context.Context, dbExecutor
 				(?, ?, ?, ?, NULL, ?)
         `,
 		dto.ID,
-		projectId,
+		projectID,
 		dto.CreatorID,
 		dto.CreatedAt,
 		dto.Body,
@@ -80,7 +80,7 @@ func (repository *noteRepository) UpdateProjectNote(ctx context.Context, dbExecu
 	return nil
 }
 
-func (repository *noteRepository) DeleteProjectNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteId string) error {
+func (repository *noteRepository) DeleteProjectNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteID string) error {
 	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
@@ -88,7 +88,7 @@ func (repository *noteRepository) DeleteProjectNote(ctx context.Context, dbExecu
 			WHERE
 				id = ?
         `,
-		noteId,
+		noteID,
 	)
 	if err != nil {
 		return err
@@ -103,7 +103,7 @@ func (repository *noteRepository) DeleteProjectNote(ctx context.Context, dbExecu
 	return nil
 }
 
-func (repository *noteRepository) GetProjectNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteId string) (domain.Note, error) {
+func (repository *noteRepository) GetProjectNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteID string) (domain.Note, error) {
 	var dto noteDTO
 	err := dbExecutor.QueryRowContext(
 		ctx,
@@ -115,7 +115,7 @@ func (repository *noteRepository) GetProjectNote(ctx context.Context, dbExecutor
             WHERE
 				PN.id = ?
         `,
-		noteId).Scan(
+		noteID).Scan(
 		&dto.ID, &dto.CreatorID, &dto.CreatorName, &dto.CreatedAt, &dto.UpdatedAt, &dto.Body,
 	)
 	if err != nil {
@@ -127,7 +127,7 @@ func (repository *noteRepository) GetProjectNote(ctx context.Context, dbExecutor
 	return toDomain(dto), err
 }
 
-func (repository *noteRepository) GetProjectNotes(ctx context.Context, dbExecutor database.DatabaseExecutor, projectId string) ([]domain.Note, error) {
+func (repository *noteRepository) GetProjectNotes(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) ([]domain.Note, error) {
 	rows, err := dbExecutor.QueryContext(
 		ctx,
 		`
@@ -140,7 +140,7 @@ func (repository *noteRepository) GetProjectNotes(ctx context.Context, dbExecuto
 			ORDER BY
 				PN.created_at DESC
         `,
-		projectId)
+		projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +161,7 @@ func (repository *noteRepository) GetProjectNotes(ctx context.Context, dbExecuto
 	return toDomainArray(dtos), nil
 }
 
-func (repository *noteRepository) AddTaskNote(ctx context.Context, dbExecutor database.DatabaseExecutor, taskId string, note domain.Note) error {
+func (repository *noteRepository) AddTaskNote(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string, note domain.Note) error {
 	dto := toDTO(note)
 	_, err := dbExecutor.ExecContext(
 		ctx,
@@ -172,7 +172,7 @@ func (repository *noteRepository) AddTaskNote(ctx context.Context, dbExecutor da
 				(?, ?, ?, ?, NULL, ?)
         `,
 		dto.ID,
-		taskId,
+		taskID,
 		dto.CreatorID,
 		dto.CreatedAt,
 		dto.Body,
@@ -212,7 +212,7 @@ func (repository *noteRepository) UpdateTaskNote(ctx context.Context, dbExecutor
 	return nil
 }
 
-func (repository *noteRepository) DeleteTaskNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteId string) error {
+func (repository *noteRepository) DeleteTaskNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteID string) error {
 	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
@@ -220,7 +220,7 @@ func (repository *noteRepository) DeleteTaskNote(ctx context.Context, dbExecutor
 			WHERE
 				id = ?
         `,
-		noteId,
+		noteID,
 	)
 	if err != nil {
 		return err
@@ -235,7 +235,7 @@ func (repository *noteRepository) DeleteTaskNote(ctx context.Context, dbExecutor
 	return nil
 }
 
-func (repository *noteRepository) GetTaskNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteId string) (domain.Note, error) {
+func (repository *noteRepository) GetTaskNote(ctx context.Context, dbExecutor database.DatabaseExecutor, noteID string) (domain.Note, error) {
 	var dto noteDTO
 	err := dbExecutor.QueryRowContext(
 		ctx,
@@ -247,7 +247,7 @@ func (repository *noteRepository) GetTaskNote(ctx context.Context, dbExecutor da
             WHERE
 				TN.id = ?
         `,
-		noteId).Scan(
+		noteID).Scan(
 		&dto.ID, &dto.CreatorID, &dto.CreatorName, &dto.CreatedAt, &dto.UpdatedAt, &dto.Body,
 	)
 	if err != nil {
@@ -259,7 +259,7 @@ func (repository *noteRepository) GetTaskNote(ctx context.Context, dbExecutor da
 	return toDomain(dto), err
 }
 
-func (repository *noteRepository) GetTaskNotes(ctx context.Context, dbExecutor database.DatabaseExecutor, taskId string) ([]domain.Note, error) {
+func (repository *noteRepository) GetTaskNotes(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]domain.Note, error) {
 	rows, err := dbExecutor.QueryContext(
 		ctx,
 		`
@@ -272,7 +272,7 @@ func (repository *noteRepository) GetTaskNotes(ctx context.Context, dbExecutor d
 			ORDER BY
 				TN.created_at DESC
         `,
-		taskId)
+		taskID)
 	if err != nil {
 		return nil, err
 	}

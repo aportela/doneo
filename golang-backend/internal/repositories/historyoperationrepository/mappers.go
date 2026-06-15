@@ -9,7 +9,7 @@ import (
 func toDTO(operation domain.HistoryOperation) historyOperationDTO {
 	return historyOperationDTO{
 		ID:            operation.ID,
-		UserId:        operation.CreatedBy.ID,
+		UserID:        operation.CreatedBy.ID,
 		UserName:      operation.CreatedBy.Name,
 		CreatedAt:     operation.CreatedAt.UnixMilli(),
 		OperationType: uint(operation.OperationType),
@@ -24,7 +24,7 @@ func toDomain(operation historyOperationDTO) domain.HistoryOperation {
 	return domain.HistoryOperation{
 		ID: operation.ID,
 		CreatedBy: domain.UserBase{
-			ID:   operation.UserId,
+			ID:   operation.UserID,
 			Name: operation.UserName,
 		},
 		CreatedAt:     time.UnixMilli(operation.CreatedAt),
