@@ -24,7 +24,7 @@ type AttachmentService interface {
 
 	AddTaskAttachment(ctx context.Context, projectID string, taskID string, attachment domain.Attachment) (domain.Attachment, error)
 	DeleteTaskAttachment(ctx context.Context, projectID string, taskID string, attachmentID string) error
-	GetTaskAttachments(ctx context.Context, taskID string) ([]domain.Attachment, error)
+	GetTaskAttachments(ctx context.Context, projectID string, taskID string) ([]domain.Attachment, error)
 }
 
 type attachmentService struct {
@@ -123,6 +123,13 @@ func (service *attachmentService) DeleteProjectAttachment(ctx context.Context, p
 }
 
 func (service *attachmentService) GetProjectAttachments(ctx context.Context, projectID string) ([]domain.Attachment, error) {
+	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("user not found in context")
+	}
+	if err := service.authorizationService.RequireProjectViewPermission(ctx, currentContextUserID, projectID); err != nil {
+		return nil, err
+	}
 	attachments, err := service.attachmentRepository.GetProjectAttachments(ctx, service.db, projectID)
 	if err != nil {
 		return nil, fmt.Errorf("[AttachmentService] failed to get project attachments: %w", err)
@@ -194,7 +201,14 @@ func (service *attachmentService) DeleteTaskAttachment(ctx context.Context, proj
 	return err
 }
 
-func (service *attachmentService) GetTaskAttachments(ctx context.Context, taskID string) ([]domain.Attachment, error) {
+func (service *attachmentService) GetTaskAttachments(ctx context.Context, projectID string, taskID string) ([]domain.Attachment, error) {
+	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("user not found in context")
+	}
+	if err := service.authorizationService.RequireProjectViewPermission(ctx, currentContextUserID, projectID); err != nil {
+		return nil, err
+	}
 	attachments, err := service.attachmentRepository.GetTaskAttachments(ctx, service.db, taskID)
 	if err != nil {
 		return nil, fmt.Errorf("[AttachmentService] failed to get task attachments: %w", err)
