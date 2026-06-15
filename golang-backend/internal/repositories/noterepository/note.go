@@ -134,8 +134,10 @@ func (repository *noteRepository) GetProjectNotes(ctx context.Context, dbExecuto
 				PN.id, PN.creator_id, U.name, PN.created_at, PN.updated_at, PN.body
             FROM project_notes PN
 			INNER JOIN users U ON U.id = PN.creator_id
-            WHERE PN.project_id = ?
-			ORDER BY PN.created_at DESC
+            WHERE
+				PN.project_id = ?
+			ORDER BY
+				PN.created_at DESC
         `,
 		projectId)
 	if err != nil {
@@ -263,8 +265,10 @@ func (repository *noteRepository) GetTaskNotes(ctx context.Context, dbExecutor r
 				TN.id, TN.creator_id, U.name, TN.created_at, TN.updated_at, TN.body
             FROM task_notes TN
 			INNER JOIN users U ON U.id = TN.creator_id
-            WHERE TN.task_id = ?
-			ORDER BY TN.created_at DESC
+            WHERE
+				TN.task_id = ?
+			ORDER BY
+				TN.created_at DESC
         `,
 		taskId)
 	if err != nil {
