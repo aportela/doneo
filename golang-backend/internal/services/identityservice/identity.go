@@ -13,20 +13,20 @@ import (
 
 type IdentityService interface {
 	SignIn(ctx context.Context, email string, password string) (domain.User, error)
-	GetCurrentUserInfo(ctx context.Context, userId string) (domain.User, error)
+	GetCurrentUserInfo(ctx context.Context) (domain.User, error)
 }
 
 type identityService struct {
-	db         database.Database
-	repository userrepository.UserRepository
+	db             database.Database
+	userRepository userrepository.UserRepository
 }
 
 func NewService(db database.Database, repository userrepository.UserRepository) IdentityService {
-	return &identityService{db: db, repository: repository}
+	return &identityService{db: db, userRepository: repository}
 }
 
 func (service *identityService) SignIn(ctx context.Context, email string, password string) (domain.User, error) {
-	user, err := service.repository.GetByEmail(ctx, service.db, email)
+	user, err := service.userRepository.GetByEmail(ctx, service.db, email)
 	if err != nil {
 		return domain.User{}, err
 	}
@@ -41,11 +41,11 @@ func (service *identityService) SignIn(ctx context.Context, email string, passwo
 }
 
 func (service *identityService) GetCurrentUserInfo(ctx context.Context) (domain.User, error) {
-	currentUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
 		return domain.User{}, fmt.Errorf("user not found in context")
 	}
-	user, err := service.repository.Get(ctx, service.db, currentUserID)
+	user, err := service.userRepository.Get(ctx, service.db, currentContextUserID)
 	if err != nil {
 		return domain.User{}, err
 	}
