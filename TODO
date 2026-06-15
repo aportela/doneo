@@ -15,3 +15,4 @@ review `db:xxxx" mappings
 remove "non updatable" get funcs on repo/service/handler
 move entity details to entity handler/service/repository (ex: GetProjectAttachments from attachment to project)
 all add/update services return domain entity with new values
+add interface on handlers
