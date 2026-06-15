@@ -250,12 +250,16 @@ var schemaQueries = []schemaMigration{
 			`
 				CREATE TABLE IF NOT EXISTS task_relations (
 					task_id TEXT NOT NULL CHECK(length(task_id) == 36),
-					related_task_id  TEXT NOT NULL CHECK(length(task_id) == 36),
+					related_task_id  TEXT NOT NULL CHECK(length(related_task_id) == 36),
 					relation_type INTEGER NOT NULL,
 					PRIMARY KEY (task_id, related_task_id),
 					FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
 					FOREIGN KEY(related_task_id) REFERENCES tasks(id) ON DELETE CASCADE
 				) STRICT;
+			`,
+			`
+				CREATE INDEX IF NOT EXISTS idx_task_relations_task_id ON task_relations(task_id);
+				CREATE INDEX IF NOT EXISTS idx_task_relations_related_task_id ON task_relations(related_task_id);
 			`,
 			`
 				CREATE TABLE IF NOT EXISTS task_notes (
