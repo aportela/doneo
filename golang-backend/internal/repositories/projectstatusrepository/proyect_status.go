@@ -10,33 +10,33 @@ import (
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"modernc.org/sqlite"
-	sqlite3 "modernc.org/sqlite/lib"
 )
 
 type ProjectStatusRepository interface {
-	Add(ctx context.Context, projectStatus domain.ProjectStatus) error
-	Update(ctx context.Context, projectStatus domain.ProjectStatus) error
-	Delete(ctx context.Context, id string) error
-	Get(ctx context.Context, id string) (domain.ProjectStatus, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.Result, error)
+	Add(ctx context.Context, dbExecutor database.DatabaseExecutor, projectStatus domain.ProjectStatus) error
+	Update(ctx context.Context, dbExecutor database.DatabaseExecutor, projectStatus domain.ProjectStatus) error
+	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, projectStatusID string) error
+	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, projectStatusID string) (domain.ProjectStatus, error)
+	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.Result, error)
 }
 
 type projectStatusRepository struct {
 	db database.Database
 }
 
-func NewRepository(db database.Database) ProjectStatusRepository {
-	return &projectStatusRepository{db: db}
+func NewRepository() ProjectStatusRepository {
+	return &projectStatusRepository{}
 }
 
-func (repository *projectStatusRepository) Add(ctx context.Context, projectStatus domain.ProjectStatus) error {
+func (repository *projectStatusRepository) Add(ctx context.Context, dbExecutor database.DatabaseExecutor, projectStatus domain.ProjectStatus) error {
 	dto := toDTO(projectStatus)
-	_, err := repository.db.ExecContext(
+	_, err := dbExecutor.ExecContext(
 		ctx,
 		`
-            INSERT INTO project_statuses (id, name, item_hex_color, item_index, flags_bitmask)
-			VALUES (?, ?, ?, ?, ?)
+            INSERT INTO
+				project_statuses (id, name, item_hex_color, item_index, flags_bitmask)
+			VALUES
+				(?, ?, ?, ?, ?)
         `,
 		dto.ID,
 		dto.Name,
@@ -45,43 +45,14 @@ func (repository *projectStatusRepository) Add(ctx context.Context, projectStatu
 		dto.FlagsBitmask,
 	)
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			if strings.Contains(sqlErr.Error(), "project_statuses.name") {
-				return &domain.AlreadyExistsError{Field: "name"}
-			} else if strings.Contains(sqlErr.Error(), "project_statuses.id") {
-				return &domain.AlreadyExistsError{Field: "id"}
-			} else if strings.Contains(sqlErr.Error(), "project_statuses.item_index") {
-				return &domain.AlreadyExistsError{Field: "index"}
-			} else if strings.Contains(sqlErr.Error(), "project_statuses.flags_bitmask") {
-				return &domain.AlreadyExistsError{Field: "flags"}
-			}
-			return err
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(name)") {
-				return &domain.ValidationError{Field: "name"}
-			} else if strings.Contains(sqlErr.Error(), "length(id)") {
-				return &domain.ValidationError{Field: "id"}
-			}
-			return err
-		default:
-			return err
-		}
+		return mapSQLiteError(err)
 	}
 	return nil
 }
 
-func (repository *projectStatusRepository) Update(ctx context.Context, projectStatus domain.ProjectStatus) error {
+func (repository *projectStatusRepository) Update(ctx context.Context, dbExecutor database.DatabaseExecutor, projectStatus domain.ProjectStatus) error {
 	dto := toDTO(projectStatus)
-	_, err := repository.db.ExecContext(
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
             UPDATE project_statuses SET
@@ -89,7 +60,8 @@ func (repository *projectStatusRepository) Update(ctx context.Context, projectSt
 				item_hex_color = ?,
 				item_index = ?,
 				flags_bitmask = ?
-			WHERE id = ?
+			WHERE
+				id = ?
         `,
 		dto.Name,
 		dto.HexColor,
@@ -98,55 +70,44 @@ func (repository *projectStatusRepository) Update(ctx context.Context, projectSt
 		dto.ID,
 	)
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			if strings.Contains(sqlErr.Error(), "project_statuses.name") {
-				return &domain.AlreadyExistsError{Field: "name"}
-			} else if strings.Contains(sqlErr.Error(), "project_statuses.id") {
-				return &domain.AlreadyExistsError{Field: "id"}
-			} else if strings.Contains(sqlErr.Error(), "project_statuses.item_index") {
-				return &domain.AlreadyExistsError{Field: "index"}
-			} else if strings.Contains(sqlErr.Error(), "project_statuses.flags_bitmask") {
-				return &domain.AlreadyExistsError{Field: "flags"}
-			}
-			return err
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(name)") {
-				return &domain.ValidationError{Field: "name"}
-			} else if strings.Contains(sqlErr.Error(), "length(id)") {
-				return &domain.ValidationError{Field: "id"}
-			}
-			return err
-		default:
-			return err
-		}
+		return mapSQLiteError(err)
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
 	}
 	return nil
 }
 
-func (repository *projectStatusRepository) Delete(ctx context.Context, id string) error {
-	_, err := repository.db.ExecContext(
+func (repository *projectStatusRepository) Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, projectStatusID string) error {
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
             DELETE FROM project_statuses
-			WHERE id = ?
+			WHERE
+				id = ?
         `,
-		id,
+		projectStatusID,
 	)
-	return err
+	if err != nil {
+		return err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
+	}
+	return nil
 }
 
-func (repository *projectStatusRepository) Get(ctx context.Context, id string) (domain.ProjectStatus, error) {
+func (repository *projectStatusRepository) Get(ctx context.Context, dbExecutor database.DatabaseExecutor, projectStatusID string) (domain.ProjectStatus, error) {
 	var dto projectStatusDTO
-	err := repository.db.QueryRowContext(
+	err := dbExecutor.QueryRowContext(
 		ctx,
 		`
             SELECT
@@ -154,7 +115,7 @@ func (repository *projectStatusRepository) Get(ctx context.Context, id string) (
             FROM project_statuses PS
             WHERE PS.id = ?
         `,
-		id).Scan(&dto.ID, &dto.Name, &dto.HexColor, &dto.Index, &dto.FlagsBitmask)
+		projectStatusID).Scan(&dto.ID, &dto.Name, &dto.HexColor, &dto.Index, &dto.FlagsBitmask)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.ProjectStatus{}, domain.NotFoundError
@@ -164,7 +125,7 @@ func (repository *projectStatusRepository) Get(ctx context.Context, id string) (
 	return toDomain(dto), err
 }
 
-func (repository *projectStatusRepository) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.Result, error) {
+func (repository *projectStatusRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.Result, error) {
 	filterDTO := toFilterDTO(filter)
 	var filterArgs []any
 	var queryArgs []any
@@ -211,7 +172,7 @@ func (repository *projectStatusRepository) Search(ctx context.Context, pager bro
 		sqlLimit = ""
 	}
 	sqlQuery = fmt.Sprintf("%s %s %s %s ", sqlQuery, sqlWhere, sqlOrder, sqlLimit)
-	rows, err := repository.db.QueryContext(ctx, sqlQuery, queryArgs...)
+	rows, err := dbExecutor.QueryContext(ctx, sqlQuery, queryArgs...)
 	if err != nil {
 		return nil, browser.Result{}, err
 	}
@@ -239,7 +200,7 @@ func (repository *projectStatusRepository) Search(ctx context.Context, pager bro
 			FROM project_statuses PT
 		`
 		sqlCountQuery = fmt.Sprintf("%s %s", sqlCountQuery, sqlWhere)
-		err = repository.db.QueryRowContext(
+		err = dbExecutor.QueryRowContext(
 			ctx,
 			sqlCountQuery,
 			filterArgs...,
