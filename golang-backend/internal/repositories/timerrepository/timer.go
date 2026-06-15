@@ -2,189 +2,115 @@ package timerrepository
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"strings"
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"modernc.org/sqlite"
-	sqlite3 "modernc.org/sqlite/lib"
 )
 
-type TimerRepository interface {
-	Start(ctx context.Context, id string, userId string, summary string, startedAt int64) error
-	Stop(ctx context.Context, id string, userId string, finishedAt int64) error
-	Delete(ctx context.Context, id string, userId string) error
-	Clear(ctx context.Context, userId string) error
-	Search(ctx context.Context, userId string) ([]domain.Timer, error)
+type UserTimerRepository interface {
+	StartUserTimer(ctx context.Context, dbExecutor database.DatabaseExecutor, timerID string, userID string, summary string, startedAt int64) error
+	StopUserTimer(ctx context.Context, dbExecutor database.DatabaseExecutor, timerID string, userID string, finishedAt int64) error
+	DeleteUserTimer(ctx context.Context, dbExecutor database.DatabaseExecutor, timerID string, userID string) error
+	ClearUserTimers(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) error
+	GetUserTimers(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) ([]domain.UserTimer, error)
 }
 
-type timerRepository struct {
-	db database.Database
+type userTimerRepository struct{}
+
+func NewRepository() UserTimerRepository {
+	return &userTimerRepository{}
 }
 
-func NewRepository(db database.Database) TimerRepository {
-	return &timerRepository{db: db}
-}
-
-func (repository *timerRepository) Start(ctx context.Context, id string, userId string, summary string, startedAt int64) error {
-	_, err := repository.db.ExecContext(
+func (repository *userTimerRepository) StartUserTimer(ctx context.Context, dbExecutor database.DatabaseExecutor, timerID string, userID string, summary string, startedAt int64) error {
+	_, err := dbExecutor.ExecContext(
 		ctx,
 		`
-            INSERT INTO timers (id, user_id, summary, started_at, finished_at)
-			VALUES (?, ?, ?, ?, NULL)
+            INSERT INTO timers
+				(id, user_id, summary, started_at, finished_at)
+			VALUES
+				(?, ?, ?, ?, NULL)
         `,
-		id,
-		userId,
+		timerID,
+		userID,
 		summary,
 		startedAt,
 	)
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			// TODO
-			return err
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(id)") {
-				return &domain.ValidationError{Field: "id"}
-			} else if strings.Contains(sqlErr.Error(), "length(user_id)") {
-				return &domain.ValidationError{Field: "user_id"}
-			} else if strings.Contains(sqlErr.Error(), "length(summary)") {
-				return &domain.ValidationError{Field: "summary"}
-			}
-			return err
-		default:
-			return err
-		}
+		return mapSQLiteError(err)
 	}
 	return nil
 }
 
-func (repository *timerRepository) Stop(ctx context.Context, id string, userId string, finishedAt int64) error {
-	_, err := repository.db.ExecContext(
+func (repository *userTimerRepository) StopUserTimer(ctx context.Context, dbExecutor database.DatabaseExecutor, timerID string, userID string, finishedAt int64) error {
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
-            UPDATE timers SET
+            UPDATE timers
+			SET
 				finished_at = ?
-			WHERE id = ?
-			AND user_id = ?
+			WHERE
+				id = ?
+			AND
+				user_id = ?
         `,
 		finishedAt,
-		id,
-		userId,
+		timerID,
+		userID,
 	)
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			// TODO
-			return err
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(id)") {
-				return &domain.ValidationError{Field: "id"}
-			} else if strings.Contains(sqlErr.Error(), "length(user_id)") {
-				return &domain.ValidationError{Field: "user_id"}
-			}
-			return err
-		default:
-			return err
-		}
+		return err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
 	}
 	return nil
 }
 
-func (repository *timerRepository) Delete(ctx context.Context, id string, userId string) error {
-	_, err := repository.db.ExecContext(
+func (repository *userTimerRepository) DeleteUserTimer(ctx context.Context, dbExecutor database.DatabaseExecutor, timerID string, userID string) error {
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
             DELETE FROM timers
-			WHERE id = ?
-			AND user_id = ?
+			WHERE
+				id = ?
+			AND
+				user_id = ?
         `,
-		id,
-		userId,
+		timerID,
+		userID,
 	)
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			// TODO
-			return err
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(id)") {
-				return &domain.ValidationError{Field: "id"}
-			} else if strings.Contains(sqlErr.Error(), "length(user_id)") {
-				return &domain.ValidationError{Field: "user_id"}
-			}
-			return err
-		default:
-			return err
-		}
+		return err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
 	}
 	return nil
 }
 
-func (repository *timerRepository) Clear(ctx context.Context, userId string) error {
-	_, err := repository.db.ExecContext(
+func (repository *userTimerRepository) ClearUserTimers(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) error {
+	_, err := dbExecutor.ExecContext(
 		ctx,
 		`
             DELETE FROM timers
-			WHERE user_id = ?
+			WHERE
+				user_id = ?
         `,
-		userId,
+		userID,
 	)
-	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-			// TODO
-			return err
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "id"}
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(id)") {
-				return &domain.ValidationError{Field: "id"}
-			} else if strings.Contains(sqlErr.Error(), "length(user_id)") {
-				return &domain.ValidationError{Field: "user_id"}
-			}
-			return err
-		default:
-			return err
-		}
-	}
-	return nil
+	return err
 }
 
-func (repository *timerRepository) Search(ctx context.Context, userId string) ([]domain.Timer, error) {
-	rows, err := repository.db.QueryContext(ctx,
+func (repository *userTimerRepository) GetUserTimers(ctx context.Context, dbExecutor database.DatabaseExecutor, userId string) ([]domain.UserTimer, error) {
+	rows, err := dbExecutor.QueryContext(ctx,
 		`
 			SELECT
 				T.id, T.summary, T.started_at, T.finished_at
@@ -198,9 +124,9 @@ func (repository *timerRepository) Search(ctx context.Context, userId string) ([
 		return nil, err
 	}
 	defer rows.Close()
-	dtos := make([]timerDTO, 0)
+	dtos := make([]userTimerDTO, 0)
 	for rows.Next() {
-		var dto timerDTO
+		var dto userTimerDTO
 		if err := rows.Scan(
 			&dto.ID, &dto.Summary, &dto.StartedAt, &dto.FinishedAt,
 		); err != nil {

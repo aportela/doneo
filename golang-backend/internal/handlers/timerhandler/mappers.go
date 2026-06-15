@@ -5,7 +5,7 @@ import (
 	"github.com/aportela/doneo/internal/utils"
 )
 
-func DomainToResponse(timer domain.Timer) timerResponse {
+func DomainToResponse(timer domain.UserTimer) timerResponse {
 	return timerResponse{
 		ID:         timer.ID,
 		Summary:    timer.Summary,
@@ -14,7 +14,7 @@ func DomainToResponse(timer domain.Timer) timerResponse {
 	}
 }
 
-func domainArrayToResponseArray(timers []domain.Timer) []timerResponse {
+func domainArrayToResponseArray(timers []domain.UserTimer) []timerResponse {
 	timerResponses := []timerResponse{}
 	for _, timer := range timers {
 		timerResponses = append(timerResponses, DomainToResponse(timer))
@@ -22,7 +22,7 @@ func domainArrayToResponseArray(timers []domain.Timer) []timerResponse {
 	return timerResponses
 }
 
-func toSearchResponse(timers []domain.Timer) searchResponse {
+func toSearchResponse(timers []domain.UserTimer) searchResponse {
 	return searchResponse{
 		Timers: domainArrayToResponseArray(timers),
 	}

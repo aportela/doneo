@@ -2,7 +2,7 @@ package domain
 
 import "time"
 
-type Timer struct {
+type UserTimer struct {
 	ID         string
 	Summary    string
 	StartedAt  time.Time
