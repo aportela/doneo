@@ -300,6 +300,10 @@ var schemaQueries = []schemaMigration{
 					FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 				) STRICT;
 			`,
+			`
+				CREATE INDEX IF NOT EXISTS idx_task_timer_entries_task_id ON task_timer_entries(task_id);
+				CREATE INDEX IF NOT EXISTS idx_task_timer_entries_user_id ON task_timer_entries(user_id);
+			`,
 		},
 	},
 }
