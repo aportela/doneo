@@ -14,7 +14,7 @@ import (
 func toDTO(note domain.Note) noteDTO {
 	return noteDTO{
 		ID:          note.ID,
-		CreatorId:   note.CreatedBy.ID,
+		CreatorID:   note.CreatedBy.ID,
 		CreatorName: note.CreatedBy.Name,
 		CreatedAt:   note.CreatedAt.UnixMilli(),
 		UpdatedAt:   utils.TimePtrToSQLNullInt64(note.UpdatedAt),
@@ -26,7 +26,7 @@ func toDomain(note noteDTO) domain.Note {
 	return domain.Note{
 		ID: note.ID,
 		CreatedBy: domain.UserBase{
-			ID:   note.CreatorId,
+			ID:   note.CreatorID,
 			Name: note.CreatorName,
 		},
 		CreatedAt: time.UnixMilli(note.CreatedAt),

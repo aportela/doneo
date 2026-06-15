@@ -41,7 +41,7 @@ func (repository *noteRepository) AddProjectNote(ctx context.Context, dbExecutor
         `,
 		dto.ID,
 		projectId,
-		dto.CreatorId,
+		dto.CreatorID,
 		dto.CreatedAt,
 		dto.Body,
 	)
@@ -112,10 +112,11 @@ func (repository *noteRepository) GetProjectNote(ctx context.Context, dbExecutor
 				PN.id, PN.creator_id, U.name, PN.created_at, PN.updated_at, PN.body
             FROM project_notes PN
 			INNER JOIN users U ON U.id = PN.creator_id
-            WHERE PN.id = ?
+            WHERE
+				PN.id = ?
         `,
 		noteId).Scan(
-		&dto.ID, &dto.CreatorId, &dto.CreatorName, &dto.CreatedAt, &dto.UpdatedAt, &dto.Body,
+		&dto.ID, &dto.CreatorID, &dto.CreatorName, &dto.CreatedAt, &dto.UpdatedAt, &dto.Body,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -148,7 +149,7 @@ func (repository *noteRepository) GetProjectNotes(ctx context.Context, dbExecuto
 	for rows.Next() {
 		var dto noteDTO
 		if err := rows.Scan(
-			&dto.ID, &dto.CreatorId, &dto.CreatorName, &dto.CreatedAt, &dto.UpdatedAt, &dto.Body,
+			&dto.ID, &dto.CreatorID, &dto.CreatorName, &dto.CreatedAt, &dto.UpdatedAt, &dto.Body,
 		); err != nil {
 			return nil, err
 		}
@@ -172,7 +173,7 @@ func (repository *noteRepository) AddTaskNote(ctx context.Context, dbExecutor da
         `,
 		dto.ID,
 		taskId,
-		dto.CreatorId,
+		dto.CreatorID,
 		dto.CreatedAt,
 		dto.Body,
 	)
@@ -243,10 +244,11 @@ func (repository *noteRepository) GetTaskNote(ctx context.Context, dbExecutor da
 				TN.id, TN.creator_id, U.name, TN.created_at, TN.updated_at, TN.body
             FROM task_notes TN
 			INNER JOIN users U ON U.id = TN.creator_id
-            WHERE TN.id = ?
+            WHERE
+				TN.id = ?
         `,
 		noteId).Scan(
-		&dto.ID, &dto.CreatorId, &dto.CreatorName, &dto.CreatedAt, &dto.UpdatedAt, &dto.Body,
+		&dto.ID, &dto.CreatorID, &dto.CreatorName, &dto.CreatedAt, &dto.UpdatedAt, &dto.Body,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -279,7 +281,7 @@ func (repository *noteRepository) GetTaskNotes(ctx context.Context, dbExecutor d
 	for rows.Next() {
 		var dto noteDTO
 		if err := rows.Scan(
-			&dto.ID, &dto.CreatorId, &dto.CreatorName, &dto.CreatedAt, &dto.UpdatedAt, &dto.Body,
+			&dto.ID, &dto.CreatorID, &dto.CreatorName, &dto.CreatedAt, &dto.UpdatedAt, &dto.Body,
 		); err != nil {
 			return nil, err
 		}
