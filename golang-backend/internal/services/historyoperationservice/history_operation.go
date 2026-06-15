@@ -44,7 +44,7 @@ func (service *historyOperationService) SearchProjectHistoryOperations(ctx conte
 
 func (service *historyOperationService) AddTaskHistoryOperation(ctx context.Context, dbExecutor repositories.Executor, projectId string, taskId string, operation domain.HistoryOperation) (domain.HistoryOperation, error) {
 	operation.ID = utils.UUID()
-	err := service.repository.AddTaskOperation(ctx, dbExecutor, projectId, taskId, operation)
+	err := service.repository.AddTaskHistoryOperation(ctx, dbExecutor, projectId, taskId, operation)
 	if err != nil {
 		return domain.HistoryOperation{}, err
 	}
