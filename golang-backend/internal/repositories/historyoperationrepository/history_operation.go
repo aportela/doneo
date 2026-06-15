@@ -26,7 +26,7 @@ func (repository *historyOperationRepository) AddProjectHistoryOperation(ctx con
 		ctx,
 		`
 			INSERT INTO history_operations
-				(id, project_id, task_id, operation_type, user_id, operation_date)
+				(id, project_id, task_id, operation_type, operation_user_id, operation_date)
 			VALUES
 				(?, ?, NULL, ?, ?, ?)
 		`,
@@ -44,9 +44,9 @@ func (repository *historyOperationRepository) SearchProjectHistoryOperations(ctx
 		ctx,
 		`
             SELECT
-				HO.id, HO.user_id, U.name, HO.operation_date, HO.operation_type
+				HO.id, HO.operation_user_id, U.name, HO.operation_date, HO.operation_type
             FROM history_operations HO
-			INNER JOIN users U ON U.id = HO.user_id
+			INNER JOIN users U ON U.id = HO.operation_user_id
             WHERE HO.project_id = ?
 			ORDER BY HO.operation_date DESC
         `,
@@ -77,7 +77,7 @@ func (repository *historyOperationRepository) AddTaskOperation(ctx context.Conte
 		ctx,
 		`
 			INSERT INTO history_operations
-				(id, project_id, task_id, operation_type, user_id, operation_date)
+				(id, project_id, task_id, operation_type, operation_user_id, operation_date)
 			VALUES
 				(?, ?, ?, ?, ?, ?)
 		`,
@@ -96,9 +96,9 @@ func (repository *historyOperationRepository) SearchTaskHistoryOperations(ctx co
 		ctx,
 		`
             SELECT
-				HO.id, HO.user_id, U.name, HO.operation_date, HO.operation_type
+				HO.id, HO.operation_user_id, U.name, HO.operation_date, HO.operation_type
             FROM history_operations HO
-			INNER JOIN users U ON U.id = HO.user_id
+			INNER JOIN users U ON U.id = HO.operation_user_id
             WHERE HO.task_id = ?
 			ORDER BY HO.operation_date DESC
         `,
