@@ -2,83 +2,67 @@ package tagrepository
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"strings"
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"modernc.org/sqlite"
-	sqlite3 "modernc.org/sqlite/lib"
 )
 
 type TagRepository interface {
-	AddTaskTag(ctx context.Context, taskId string, tag string) error
-	DeleteTaskTags(ctx context.Context, taskId string) error
-	GetTaskTags(ctx context.Context, taskId string) ([]string, error)
+	AddTaskTag(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string, tag string) error
+	DeleteTaskTags(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) error
+	GetTaskTags(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]string, error)
 }
 
 type tagRepository struct {
-	db database.Database
 }
 
-func NewRepository(db database.Database) TagRepository {
-	return &tagRepository{db: db}
+func NewRepository() TagRepository {
+	return &tagRepository{}
 }
 
-func (repository *tagRepository) AddTaskTag(ctx context.Context, taskId string, tag string) error {
-	_, err := repository.db.ExecContext(
+func (repository *tagRepository) AddTaskTag(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string, tag string) error {
+	_, err := dbExecutor.ExecContext(
 		ctx,
 		`
-            INSERT INTO task_tags (task_id, tag)
-			VALUES (?, ?)
+            INSERT INTO task_tags
+				(task_id, tag)
+			VALUES
+				(?, ?)
         `,
-		taskId,
+		taskID,
 		tag,
 	)
 	if err != nil {
-		// TODO: remove ?
-		fmt.Println(err.Error())
-		var sqlErr *sqlite.Error
-		if !errors.As(err, &sqlErr) {
-			return err
-		}
-		switch sqlErr.Code() {
-		case sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
-			return &domain.ValidationError{Field: "task_id, tag"}
-		case sqlite3.SQLITE_CONSTRAINT_CHECK:
-			if strings.Contains(sqlErr.Error(), "length(task_id)") {
-				return &domain.ValidationError{Field: "task_id"}
-			}
-			return err
-		default:
-			return err
-		}
+		return mapSQLiteError(err)
 	}
 	return nil
 }
 
-func (repository *tagRepository) DeleteTaskTags(ctx context.Context, taskId string) error {
-	_, err := repository.db.ExecContext(
+func (repository *tagRepository) DeleteTaskTags(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) error {
+	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
             DELETE FROM task_tags
 			WHERE
 				task_id = ?
         `,
-		taskId,
+		taskID,
 	)
 	if err != nil {
-		// TODO: remove ?
-		// TODO: check sql error
-		fmt.Println(err.Error())
 		return err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count < 1 {
+		return domain.NotFoundError
 	}
 	return nil
 }
 
-func (repository *tagRepository) GetTaskTags(ctx context.Context, taskId string) ([]string, error) {
-	rows, err := repository.db.QueryContext(
+func (repository *tagRepository) GetTaskTags(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]string, error) {
+	rows, err := dbExecutor.QueryContext(
 		ctx,
 		`
             SELECT
@@ -87,7 +71,7 @@ func (repository *tagRepository) GetTaskTags(ctx context.Context, taskId string)
             WHERE TT.task_id = ?
 			ORDER BY TT.tag
         `,
-		taskId)
+		taskID)
 	if err != nil {
 		return nil, err
 	}
