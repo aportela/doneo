@@ -22,3 +22,5 @@ project attachment/task attachemnt same table  as project permissions (id vs not
 use domain.DeletedError on get project/task deleted
 
 Get funcs on entitys for updating Vs use current search item
+
+fix route names (new handlers)
