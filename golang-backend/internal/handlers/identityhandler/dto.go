@@ -1,4 +1,4 @@
-package authhandler
+package identityhandler
 
 // TODO: this struct is duplicated on user handler
 type userPermissions struct {

@@ -1,4 +1,4 @@
-package authhandler
+package identityhandler
 
 import (
 	"encoding/json"
@@ -13,37 +13,39 @@ import (
 	"github.com/aportela/doneo/internal/utils"
 )
 
-type AuthHandler struct {
+type IdentityHandler struct {
 	identityService            identityservice.IdentityService
 	secretKey                  string
 	accessTokenExpirationHours int
 	refreshTokenExpirationDays int
 }
 
-func NewHandler(identityService identityservice.IdentityService, secretKey string, accessTokenExpirationHours int, refreshTokenExpirationDays int) *AuthHandler {
-	return &AuthHandler{identityService: identityService, secretKey: secretKey, accessTokenExpirationHours: accessTokenExpirationHours, refreshTokenExpirationDays: refreshTokenExpirationDays}
+// TODO: add func definitions
+
+func NewHandler(identityService identityservice.IdentityService, secretKey string, accessTokenExpirationHours int, refreshTokenExpirationDays int) *IdentityHandler {
+	return &IdentityHandler{identityService: identityService, secretKey: secretKey, accessTokenExpirationHours: accessTokenExpirationHours, refreshTokenExpirationDays: refreshTokenExpirationDays}
 }
 
-func (handler *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
+func (handler *IdentityHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	var request signInRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] invalid request payload: %w", err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[IdentityHandler] invalid request payload: %w", err))
 		return
 	}
 	user, err := handler.identityService.SignIn(r.Context(), request.Email, request.Password)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] failed to signin with email %s: %w", request.Email, err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[IdentityHandler] failed to signin with email %s: %w", request.Email, err))
 		return
 	}
 	accessToken, err := jwt.GenerateToken(user, time.Now().Add(time.Duration(handler.accessTokenExpirationHours)*time.Hour), handler.secretKey)
 	//accessToken, err := jwt.GenerateToken(user, time.Now().Add(time.Duration(10)*time.Second), h.secretKey)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] failed to generate access token: %w", err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[IdentityHandler] failed to generate access token: %w", err))
 		return
 	}
 	refreshToken, err := jwt.GenerateToken(user, time.Now().Add(time.Duration(handler.refreshTokenExpirationDays)*24*time.Hour), handler.secretKey)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] failed to generate refresh token: %w", err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[IdentityHandler] failed to generate refresh token: %w", err))
 		return
 	}
 	refreshTokenCookie := http.Cookie{
@@ -82,7 +84,7 @@ func (handler *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	)
 }
 
-func (handler *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
+func (handler *IdentityHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 	refreshTokenCookie := http.Cookie{
 		Name:     "refresh_token",
 		Value:    "",
@@ -106,7 +108,7 @@ func (handler *AuthHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 	utils.ToJSONResponse(w, http.StatusOK, handlers.ToEmptyResponse())
 }
 
-func (handler *AuthHandler) RenewAccessToken(w http.ResponseWriter, r *http.Request) {
+func (handler *IdentityHandler) RenewAccessToken(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("refresh_token")
 	// TODO: refresh token in request ?
 	if err != nil {
@@ -125,14 +127,14 @@ func (handler *AuthHandler) RenewAccessToken(w http.ResponseWriter, r *http.Requ
 	user, err := handler.identityService.GetCurrentUserInfo(r.Context(), userId)
 	if err != nil {
 		// TODO: return APIError JSON HERE !
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] failed to get user info: %w", err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[IdentityHandler] failed to get user info: %w", err))
 		return
 	}
 	accessToken, err := jwt.GenerateToken(user, time.Now().Add(time.Duration(handler.accessTokenExpirationHours)*time.Hour), handler.secretKey)
 	//accessToken, err := jwt.GenerateToken(user, time.Now().Add(time.Duration(10)*time.Second), h.secretKey)
 	if err != nil {
 		// TODO: return APIError JSON HERE !
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] failed to generate access token: %w", err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[IdentityHandler] failed to generate access token: %w", err))
 		return
 	}
 	accessTokenCookie := http.Cookie{
