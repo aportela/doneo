@@ -24,3 +24,5 @@ use domain.DeletedError on get project/task deleted
 Get funcs on entitys for updating Vs use current search item
 
 fix route names (new handlers)
+
+return entity on all add / update funcs
