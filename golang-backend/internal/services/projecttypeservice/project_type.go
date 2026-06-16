@@ -56,30 +56,27 @@ func (service *projectTypeService) Delete(ctx context.Context, projectTypeID str
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return err
 	}
-	if err := service.projectTypeRepository.Delete(ctx, service.db, projectTypeID); err != nil {
-		return err
-	}
-	return nil
+	return service.projectTypeRepository.Delete(ctx, service.db, projectTypeID)
 }
 
 func (service *projectTypeService) Get(ctx context.Context, projectTypeID string) (domain.ProjectType, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return domain.ProjectType{}, err
 	}
-	projectType, err := service.projectTypeRepository.Get(ctx, service.db, projectTypeID)
-	if err != nil {
+	if projectType, err := service.projectTypeRepository.Get(ctx, service.db, projectTypeID); err != nil {
 		return domain.ProjectType{}, fmt.Errorf("[ProjectTypeService] failed to get project type with ID %s: %w", projectTypeID, err)
+	} else {
+		return projectType, nil
 	}
-	return projectType, nil
 }
 
 func (service *projectTypeService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectTypesFilter) ([]domain.ProjectType, browser.Result, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return nil, browser.Result{}, err
 	}
-	projectTypes, pagerResult, err := service.projectTypeRepository.Search(ctx, service.db, pager, order, filter)
-	if err != nil {
+	if projectTypes, pagerResult, err := service.projectTypeRepository.Search(ctx, service.db, pager, order, filter); err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[ProjectTypeService] failed to search project types: %w", err)
+	} else {
+		return projectTypes, pagerResult, nil
 	}
-	return projectTypes, pagerResult, nil
 }

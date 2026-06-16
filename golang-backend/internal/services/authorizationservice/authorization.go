@@ -14,22 +14,18 @@ import (
 
 type AuthorizationService interface {
 	requireUserPermission(ctx context.Context, userID string, permission domain.Bitmask) error
+	requireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error
+
 	RequireUserAdminPermission(ctx context.Context) (middlewares.ContextUser, error)
 
-	requireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error
-	RequireProjectUpdatePermission(ctx context.Context, userID string, projectID string) error
-	WithProjectUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error
-	RequireProjectDeletePermission(ctx context.Context, userID string, projectID string) error
-	WithProjectDeletePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error
-	RequireProjectViewPermission(ctx context.Context, userID string, projectID string) error
+	RequireProjectUpdatePermission(ctx context.Context, projectID string) (middlewares.ContextUser, error)
+	RequireProjectDeletePermission(ctx context.Context, projectID string) (middlewares.ContextUser, error)
+	RequireProjectViewPermission(ctx context.Context, projectID string) (middlewares.ContextUser, error)
 
-	requireTaskAddPermission(ctx context.Context, userID string, projectID string) error
-	WithTaskAddPermission(ctx context.Context, projectID string, action func(currentUserID string) error) error
-	RequireTaskUpdatePermission(ctx context.Context, userID string, projectID string) error
-	WithTaskUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error
-	RequireTaskDeletePermission(ctx context.Context, userID string, projectID string) error
-	WithTaskDeletePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error
-	RequireTaskViewPermission(ctx context.Context, userID string, projectID string) error
+	RequireTaskAddPermission(ctx context.Context, projectID string) (middlewares.ContextUser, error)
+	RequireTaskUpdatePermission(ctx context.Context, projectID string) (middlewares.ContextUser, error)
+	RequireTaskDeletePermission(ctx context.Context, projectID string) (middlewares.ContextUser, error)
+	RequireTaskViewPermission(ctx context.Context, projectID string) (middlewares.ContextUser, error)
 }
 
 type authorizationService struct {
@@ -51,14 +47,51 @@ func NewService(db database.Database, cache cache.PermissionCache, userRepositor
 func (service *authorizationService) requireUserPermission(ctx context.Context, userID string, permission domain.Bitmask) error {
 	userPermissionsBitmask, ok := service.permissionCache.GetUser(userID)
 	if !ok {
-		user, err := service.userRepository.Get(ctx, service.db, userID)
-		if err != nil {
+		if user, err := service.userRepository.Get(ctx, service.db, userID); err != nil {
 			return fmt.Errorf("[AuthorizationService] failed to get user permissions: %w", err)
+		} else {
+			userPermissionsBitmask = user.PermissionsBitmask
+			service.permissionCache.SetUser(userID, userPermissionsBitmask)
 		}
-		userPermissionsBitmask = user.PermissionsBitmask
-		service.permissionCache.SetUser(userID, userPermissionsBitmask)
 	}
 	if userPermissionsBitmask.HasFlag(permission) {
+		return nil
+	}
+	return domain.AuthorizationError
+}
+
+func (service *authorizationService) requireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error {
+	userPermissionsBitmask, ok := service.permissionCache.GetUser(userID)
+	if !ok {
+		if user, err := service.userRepository.Get(ctx, service.db, userID); err != nil {
+			return fmt.Errorf("[AuthorizationService] failed to get user permissions: %w", err)
+		} else {
+			userPermissionsBitmask = user.PermissionsBitmask
+			service.permissionCache.SetUser(userID, userPermissionsBitmask)
+		}
+	}
+	if userPermissionsBitmask.HasFlag(domain.UserPermissionAdmin) {
+		return nil
+	}
+	projectPermissionsBitmask, ok := service.permissionCache.GetProject(userID, projectID)
+	if !ok {
+		projectPermissions, err := service.projectPermissionRepository.GetProjectPermissions(ctx, service.db, projectID)
+		if err != nil {
+			return fmt.Errorf("[AuthorizationService] failed to get project permissions: %w", err)
+		}
+		found := false
+		for _, projectPermission := range projectPermissions {
+			if projectPermission.User.ID == userID {
+				projectPermissionsBitmask = projectPermission.Role.PermissionsBitmask
+				service.permissionCache.SetProject(userID, projectID, projectPermissionsBitmask)
+				found = true
+			}
+		}
+		if !found {
+			return domain.AuthorizationError
+		}
+	}
+	if projectPermissionsBitmask.HasFlag(permission) {
 		return nil
 	}
 	return domain.AuthorizationError
@@ -77,132 +110,93 @@ func (service *authorizationService) RequireUserAdminPermission(ctx context.Cont
 	return contextUser, nil
 }
 
-func (service *authorizationService) requireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error {
-	userPermissionsBitmask, ok := service.permissionCache.GetUser(userID)
+func (service *authorizationService) RequireProjectUpdatePermission(ctx context.Context, projectID string) (middlewares.ContextUser, error) {
+	contextUser, ok := middlewares.GetContextUser(ctx)
 	if !ok {
-		user, err := service.userRepository.Get(ctx, service.db, userID)
-		if err != nil {
-			return fmt.Errorf("[AuthorizationService] failed to get user permissions: %w", err)
-		}
-		userPermissionsBitmask = user.PermissionsBitmask
-		service.permissionCache.SetUser(userID, userPermissionsBitmask)
+		return middlewares.ContextUser{}, fmt.Errorf("[AuthorizationService] user not found in context")
 	}
-	if userPermissionsBitmask.HasFlag(domain.UserPermissionAdmin) {
-		return nil
-	}
-	permissionsBitmask, ok := service.permissionCache.GetProject(userID, projectID)
-	if !ok {
-		found := false
-		projectPermissions, err := service.projectPermissionRepository.GetProjectPermissions(ctx, service.db, projectID)
-		if err != nil {
-			return fmt.Errorf("[AuthorizationService] failed to get project permissions: %w", err)
-		}
-		for _, projectPermission := range projectPermissions {
-			if projectPermission.User.ID == userID {
-				permissionsBitmask = projectPermission.Role.PermissionsBitmask
-				service.permissionCache.SetProject(userID, projectID, permissionsBitmask)
-				found = true
-			}
-		}
-		if !found {
-			return domain.AuthorizationError
+	if !contextUser.SkipAuthorization {
+		if err := service.requireProjectPermission(ctx, contextUser.ID, projectID, domain.PermissionUpdateProject); err != nil {
+			return middlewares.ContextUser{}, err
 		}
 	}
-	if permissionsBitmask.HasFlag(permission) {
-		return nil
-	}
-	return domain.AuthorizationError
+	return contextUser, nil
 }
 
-func (service *authorizationService) RequireProjectUpdatePermission(ctx context.Context, userID string, projectID string) error {
-	return service.requireProjectPermission(ctx, userID, projectID, domain.PermissionUpdateProject)
-}
-
-func (service *authorizationService) WithProjectUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
+func (service *authorizationService) RequireProjectDeletePermission(ctx context.Context, projectID string) (middlewares.ContextUser, error) {
 	contextUser, ok := middlewares.GetContextUser(ctx)
 	if !ok {
-		return fmt.Errorf("[AuthorizationService] user not found in context")
+		return middlewares.ContextUser{}, fmt.Errorf("[AuthorizationService] user not found in context")
 	}
-
-	if err := service.RequireProjectUpdatePermission(ctx, contextUser.ID, projectID); err != nil {
-		return err
+	if !contextUser.SkipAuthorization {
+		if err := service.requireProjectPermission(ctx, contextUser.ID, projectID, domain.PermissionDeleteProject); err != nil {
+			return middlewares.ContextUser{}, err
+		}
 	}
-
-	return action(contextUser.ID)
+	return contextUser, nil
 }
 
-func (service *authorizationService) RequireProjectDeletePermission(ctx context.Context, userID string, projectID string) error {
-	return service.requireProjectPermission(ctx, userID, projectID, domain.PermissionDeleteProject)
-}
-
-func (service *authorizationService) WithProjectDeletePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
+func (service *authorizationService) RequireProjectViewPermission(ctx context.Context, projectID string) (middlewares.ContextUser, error) {
 	contextUser, ok := middlewares.GetContextUser(ctx)
 	if !ok {
-		return fmt.Errorf("[AuthorizationService] user not found in context")
+		return middlewares.ContextUser{}, fmt.Errorf("[AuthorizationService] user not found in context")
 	}
-
-	if err := service.RequireProjectDeletePermission(ctx, contextUser.ID, projectID); err != nil {
-		return err
+	if !contextUser.SkipAuthorization {
+		if err := service.requireProjectPermission(ctx, contextUser.ID, projectID, domain.PermissionViewProject); err != nil {
+			return middlewares.ContextUser{}, err
+		}
 	}
-
-	return action(contextUser.ID)
+	return contextUser, nil
 }
 
-func (service *authorizationService) RequireProjectViewPermission(ctx context.Context, userID string, projectID string) error {
-	return service.requireProjectPermission(ctx, userID, projectID, domain.PermissionViewProject)
-}
-
-func (service *authorizationService) requireTaskAddPermission(ctx context.Context, userID string, projectID string) error {
-	return service.requireProjectPermission(ctx, userID, projectID, domain.PermissionAddTask)
-}
-
-func (service *authorizationService) WithTaskAddPermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
+func (service *authorizationService) RequireTaskAddPermission(ctx context.Context, projectID string) (middlewares.ContextUser, error) {
 	contextUser, ok := middlewares.GetContextUser(ctx)
 	if !ok {
-		return fmt.Errorf("[AuthorizationService] user not found in context")
+		return middlewares.ContextUser{}, fmt.Errorf("[AuthorizationService] user not found in context")
 	}
-
-	if err := service.requireTaskAddPermission(ctx, contextUser.ID, projectID); err != nil {
-		return err
+	if !contextUser.SkipAuthorization {
+		if err := service.requireProjectPermission(ctx, contextUser.ID, projectID, domain.PermissionAddTask); err != nil {
+			return middlewares.ContextUser{}, err
+		}
 	}
-
-	return action(contextUser.ID)
+	return contextUser, nil
 }
 
-func (service *authorizationService) RequireTaskUpdatePermission(ctx context.Context, userID string, projectID string) error {
-	return service.requireProjectPermission(ctx, userID, projectID, domain.PermissionUpdateTask)
-}
-
-func (service *authorizationService) WithTaskUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
+func (service *authorizationService) RequireTaskUpdatePermission(ctx context.Context, projectID string) (middlewares.ContextUser, error) {
 	contextUser, ok := middlewares.GetContextUser(ctx)
 	if !ok {
-		return fmt.Errorf("[AuthorizationService] user not found in context")
+		return middlewares.ContextUser{}, fmt.Errorf("[AuthorizationService] user not found in context")
 	}
-
-	if err := service.RequireTaskUpdatePermission(ctx, contextUser.ID, projectID); err != nil {
-		return err
+	if !contextUser.SkipAuthorization {
+		if err := service.requireProjectPermission(ctx, contextUser.ID, projectID, domain.PermissionUpdateTask); err != nil {
+			return middlewares.ContextUser{}, err
+		}
 	}
-
-	return action(contextUser.ID)
+	return contextUser, nil
 }
 
-func (service *authorizationService) RequireTaskDeletePermission(ctx context.Context, userID string, projectID string) error {
-	return service.requireProjectPermission(ctx, userID, projectID, domain.PermissionDeleteTask)
-}
-
-func (service *authorizationService) WithTaskDeletePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
+func (service *authorizationService) RequireTaskDeletePermission(ctx context.Context, projectID string) (middlewares.ContextUser, error) {
 	contextUser, ok := middlewares.GetContextUser(ctx)
 	if !ok {
-		return fmt.Errorf("[AuthorizationService] user not found in context")
+		return middlewares.ContextUser{}, fmt.Errorf("[AuthorizationService] user not found in context")
 	}
-
-	if err := service.RequireTaskDeletePermission(ctx, contextUser.ID, projectID); err != nil {
-		return err
+	if !contextUser.SkipAuthorization {
+		if err := service.requireProjectPermission(ctx, contextUser.ID, projectID, domain.PermissionDeleteTask); err != nil {
+			return middlewares.ContextUser{}, err
+		}
 	}
-
-	return action(contextUser.ID)
+	return contextUser, nil
 }
 
-func (service *authorizationService) RequireTaskViewPermission(ctx context.Context, userID string, projectID string) error {
-	return service.requireProjectPermission(ctx, userID, projectID, domain.PermissionViewTask)
+func (service *authorizationService) RequireTaskViewPermission(ctx context.Context, projectID string) (middlewares.ContextUser, error) {
+	contextUser, ok := middlewares.GetContextUser(ctx)
+	if !ok {
+		return middlewares.ContextUser{}, fmt.Errorf("[AuthorizationService] user not found in context")
+	}
+	if !contextUser.SkipAuthorization {
+		if err := service.requireProjectPermission(ctx, contextUser.ID, projectID, domain.PermissionViewTask); err != nil {
+			return middlewares.ContextUser{}, err
+		}
+	}
+	return contextUser, nil
 }

@@ -42,15 +42,15 @@ func (service *userService) Add(ctx context.Context, user domain.User, password 
 	}
 	user.ID = utils.UUID()
 	user.CreatedAt = time.Now()
-	hashedPasswordBytes, hashErr := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if hashErr != nil {
+	if hashedPasswordBytes, hashErr := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost); hashErr != nil {
 		return domain.User{}, hashErr
+	} else {
+		user.PasswordHash = string(hashedPasswordBytes)
+		if err := service.userRepository.Add(ctx, service.db, user); err != nil {
+			return domain.User{}, fmt.Errorf("[UserService] failed to add user with ID %s: %w", user.ID, err)
+		}
+		return user, nil
 	}
-	user.PasswordHash = string(hashedPasswordBytes)
-	if err := service.userRepository.Add(ctx, service.db, user); err != nil {
-		return domain.User{}, fmt.Errorf("[UserService] failed to add user with ID %s: %w", user.ID, err)
-	}
-	return user, nil
 }
 
 func (service *userService) Update(ctx context.Context, user domain.User, password *string) (domain.User, error) {
@@ -58,11 +58,11 @@ func (service *userService) Update(ctx context.Context, user domain.User, passwo
 		return domain.User{}, err
 	}
 	if password != nil {
-		hashedPasswordBytes, hashErr := bcrypt.GenerateFromPassword([]byte(*password), bcrypt.DefaultCost)
-		if hashErr != nil {
+		if hashedPasswordBytes, hashErr := bcrypt.GenerateFromPassword([]byte(*password), bcrypt.DefaultCost); hashErr != nil {
 			return domain.User{}, hashErr
+		} else {
+			user.PasswordHash = string(hashedPasswordBytes)
 		}
-		user.PasswordHash = string(hashedPasswordBytes)
 	}
 	user.UpdatedAt = utils.NowToTimePtr()
 	if err := service.userRepository.Update(ctx, service.db, user); err != nil {
@@ -91,58 +91,49 @@ func (service *userService) Delete(ctx context.Context, userID string) error {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return err
 	}
-	if err := service.userRepository.Delete(ctx, service.db, userID, time.Now().UnixMilli()); err != nil {
-		return fmt.Errorf("[UserService] failed to delete user with ID %s: %w", userID, err)
-	}
-	return nil
+	return service.userRepository.Delete(ctx, service.db, userID, time.Now().UnixMilli())
 }
 
 func (service *userService) UnDelete(ctx context.Context, userID string) error {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return err
 	}
-	if err := service.userRepository.UnDelete(ctx, service.db, userID); err != nil {
-		return fmt.Errorf("[UserService] failed to undelete user with ID %s: %w", userID, err)
-	}
-	return nil
+	return service.userRepository.UnDelete(ctx, service.db, userID)
 }
 
 func (service *userService) Purge(ctx context.Context, userID string) error {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return err
 	}
-	if err := service.userRepository.Purge(ctx, service.db, userID); err != nil {
-		return fmt.Errorf("[UserService] failed to purge user with ID %s: %w", userID, err)
-	}
-	return nil
+	return service.userRepository.Purge(ctx, service.db, userID)
 }
 
 func (service *userService) Get(ctx context.Context, userID string) (domain.User, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return domain.User{}, err
 	}
-	user, err := service.userRepository.Get(ctx, service.db, userID)
-	if err != nil {
+	if user, err := service.userRepository.Get(ctx, service.db, userID); err != nil {
 		return domain.User{}, fmt.Errorf("[UserService] failed to get user with ID %s: %w", userID, err)
+	} else {
+		return user, nil
 	}
-	return user, nil
 }
 
 func (service *userService) SearchBase(ctx context.Context) ([]domain.UserBase, error) {
-	users, err := service.userRepository.SearchBase(ctx, service.db)
-	if err != nil {
+	if users, err := service.userRepository.SearchBase(ctx, service.db); err != nil {
 		return nil, fmt.Errorf("[UserService] failed to search base users: %w", err)
+	} else {
+		return users, nil
 	}
-	return users, nil
 }
 
 func (service *userService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchUsersFilter) ([]domain.User, browser.Result, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return nil, browser.Result{}, err
 	}
-	users, pagerResult, err := service.userRepository.Search(ctx, service.db, pager, order, filter)
-	if err != nil {
+	if users, pagerResult, err := service.userRepository.Search(ctx, service.db, pager, order, filter); err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[UserService] failed to search users: %w", err)
+	} else {
+		return users, pagerResult, nil
 	}
-	return users, pagerResult, nil
 }

@@ -55,30 +55,27 @@ func (service *projectPriorityService) Delete(ctx context.Context, projectPriori
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return err
 	}
-	if err := service.projectPriorityRepository.Delete(ctx, service.db, projectPriorityID); err != nil {
-		return err
-	}
-	return nil
+	return service.projectPriorityRepository.Delete(ctx, service.db, projectPriorityID)
 }
 
 func (service *projectPriorityService) Get(ctx context.Context, projectPriorityID string) (domain.ProjectPriority, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return domain.ProjectPriority{}, err
 	}
-	projectPriority, err := service.projectPriorityRepository.Get(ctx, service.db, projectPriorityID)
-	if err != nil {
+	if projectPriority, err := service.projectPriorityRepository.Get(ctx, service.db, projectPriorityID); err != nil {
 		return domain.ProjectPriority{}, fmt.Errorf("[ProjectPriorityService] failed to get project priority with ID %s: %w", projectPriorityID, err)
+	} else {
+		return projectPriority, nil
 	}
-	return projectPriority, nil
 }
 
 func (service *projectPriorityService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectPrioritiesFilter) ([]domain.ProjectPriority, browser.Result, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return nil, browser.Result{}, err
 	}
-	projectPriorities, pagerResult, err := service.projectPriorityRepository.Search(ctx, service.db, pager, order, filter)
-	if err != nil {
+	if projectPriorities, pagerResult, err := service.projectPriorityRepository.Search(ctx, service.db, pager, order, filter); err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[ProjectPriorityService] failed to search project priorities: %w", err)
+	} else {
+		return projectPriorities, pagerResult, nil
 	}
-	return projectPriorities, pagerResult, nil
 }

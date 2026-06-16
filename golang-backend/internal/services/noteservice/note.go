@@ -8,7 +8,6 @@ import (
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/noterepository"
 	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/services/historyoperationservice"
@@ -39,47 +38,46 @@ func NewService(db database.Database, authorizationService authorizationservice.
 }
 
 func (service *noteService) AddProjectNote(ctx context.Context, projectID string, note domain.Note) (domain.Note, error) {
-	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
+	if contextUser, err := service.authorizationService.RequireProjectUpdatePermission(ctx, projectID); err != nil {
+		return domain.Note{}, err
+	} else {
 		note.ID = utils.UUID()
-		note.CreatedBy.ID = currentUserID
+		note.CreatedBy.ID = contextUser.ID
 		note.CreatedAt = time.Now()
-
-		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.noteRepository.AddProjectNote(ctx, tx, projectID, note); err != nil {
 				return err
 			}
-
 			if _, err := service.historyOperationService.AddProjectHistoryOperation(
 				ctx,
 				tx,
 				projectID,
 				domain.HistoryOperation{
 					ID:            utils.UUID(),
-					CreatedBy:     domain.UserBase{ID: currentUserID},
+					CreatedBy:     domain.UserBase{ID: contextUser.ID},
 					CreatedAt:     note.CreatedAt,
 					OperationType: domain.EventProjectNoteAdded,
 				},
 			); err != nil {
 				return err
 			}
-
 			return nil
-		})
-	})
-
-	return note, err
+		}); err != nil {
+			return domain.Note{}, err
+		}
+		return note, nil
+	}
 }
 
 func (service *noteService) UpdateProjectNote(ctx context.Context, projectID string, note domain.Note) (domain.Note, error) {
-	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
+	if contextUser, err := service.authorizationService.RequireProjectUpdatePermission(ctx, projectID); err != nil {
+		return domain.Note{}, err
+	} else {
 		note.UpdatedAt = utils.CurrentTimePtr()
-
-		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
-
+		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.noteRepository.UpdateProjectNote(ctx, tx, note); err != nil {
 				return err
 			}
-
 			if _, err := service.historyOperationService.AddProjectHistoryOperation(
 				ctx,
 				tx,
@@ -87,7 +85,7 @@ func (service *noteService) UpdateProjectNote(ctx context.Context, projectID str
 				domain.HistoryOperation{
 					ID: utils.UUID(),
 					CreatedBy: domain.UserBase{
-						ID: currentUserID,
+						ID: contextUser.ID,
 					},
 					CreatedAt:     *note.UpdatedAt,
 					OperationType: domain.EventProjectNoteUpdated,
@@ -95,21 +93,22 @@ func (service *noteService) UpdateProjectNote(ctx context.Context, projectID str
 			); err != nil {
 				return err
 			}
-
 			return nil
-		})
-	})
-
-	return note, err
+		}); err != nil {
+			return domain.Note{}, err
+		}
+		return note, nil
+	}
 }
 
 func (service *noteService) DeleteProjectNote(ctx context.Context, projectID string, noteID string) error {
-	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
+	if contextUser, err := service.authorizationService.RequireProjectUpdatePermission(ctx, projectID); err != nil {
+		return err
+	} else {
 		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.noteRepository.DeleteProjectNote(ctx, tx, noteID); err != nil {
 				return err
 			}
-
 			if _, err := service.historyOperationService.AddProjectHistoryOperation(
 				ctx,
 				tx,
@@ -117,7 +116,7 @@ func (service *noteService) DeleteProjectNote(ctx context.Context, projectID str
 				domain.HistoryOperation{
 					ID: utils.UUID(),
 					CreatedBy: domain.UserBase{
-						ID: currentUserID,
+						ID: contextUser.ID,
 					},
 					CreatedAt:     time.Now(),
 					OperationType: domain.EventProjectNoteDeleted,
@@ -125,40 +124,33 @@ func (service *noteService) DeleteProjectNote(ctx context.Context, projectID str
 			); err != nil {
 				return err
 			}
-
 			return nil
 		})
-	})
-
-	return err
+	}
 }
 
 func (service *noteService) GetProjectNotes(ctx context.Context, projectID string) ([]domain.Note, error) {
-	contextUser, ok := middlewares.GetContextUser(ctx)
-	if !ok {
-		return nil, fmt.Errorf("[NoteService] user not found in context")
-	}
-	if err := service.authorizationService.RequireProjectViewPermission(ctx, contextUser.ID, projectID); err != nil {
+	if _, err := service.authorizationService.RequireProjectViewPermission(ctx, projectID); err != nil {
 		return nil, err
 	}
-	notes, err := service.noteRepository.GetProjectNotes(ctx, service.db, projectID)
-	if err != nil {
+	if notes, err := service.noteRepository.GetProjectNotes(ctx, service.db, projectID); err != nil {
 		return nil, fmt.Errorf("[NoteService] failed to get project notes: %w", err)
+	} else {
+		return notes, nil
 	}
-	return notes, nil
 }
 
 func (service *noteService) AddTaskNote(ctx context.Context, projectID string, taskID string, note domain.Note) (domain.Note, error) {
-	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
+	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
+		return domain.Note{}, err
+	} else {
 		note.ID = utils.UUID()
-		note.CreatedBy.ID = currentUserID
+		note.CreatedBy.ID = contextUser.ID
 		note.CreatedAt = time.Now()
-
-		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.noteRepository.AddTaskNote(ctx, tx, taskID, note); err != nil {
 				return err
 			}
-
 			if _, err := service.historyOperationService.AddTaskHistoryOperation(
 				ctx,
 				tx,
@@ -166,31 +158,30 @@ func (service *noteService) AddTaskNote(ctx context.Context, projectID string, t
 				taskID,
 				domain.HistoryOperation{
 					ID:            utils.UUID(),
-					CreatedBy:     domain.UserBase{ID: currentUserID},
+					CreatedBy:     domain.UserBase{ID: contextUser.ID},
 					CreatedAt:     note.CreatedAt,
 					OperationType: domain.EventTaskNoteAdded,
 				},
 			); err != nil {
 				return err
 			}
-
 			return nil
-		})
-	})
-
-	return note, err
+		}); err != nil {
+			return domain.Note{}, err
+		}
+		return note, nil
+	}
 }
 
 func (service *noteService) UpdateTaskNote(ctx context.Context, projectID string, taskID string, note domain.Note) (domain.Note, error) {
-	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
+	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
+		return domain.Note{}, err
+	} else {
 		note.UpdatedAt = utils.CurrentTimePtr()
-
-		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
-
+		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.noteRepository.UpdateTaskNote(ctx, tx, note); err != nil {
 				return err
 			}
-
 			if _, err := service.historyOperationService.AddTaskHistoryOperation(
 				ctx,
 				tx,
@@ -199,7 +190,7 @@ func (service *noteService) UpdateTaskNote(ctx context.Context, projectID string
 				domain.HistoryOperation{
 					ID: utils.UUID(),
 					CreatedBy: domain.UserBase{
-						ID: currentUserID,
+						ID: contextUser.ID,
 					},
 					CreatedAt:     *note.UpdatedAt,
 					OperationType: domain.EventTaskNoteUpdated,
@@ -207,21 +198,22 @@ func (service *noteService) UpdateTaskNote(ctx context.Context, projectID string
 			); err != nil {
 				return err
 			}
-
 			return nil
-		})
-	})
-
-	return note, err
+		}); err != nil {
+			return domain.Note{}, err
+		}
+		return note, nil
+	}
 }
 
 func (service *noteService) DeleteTaskNote(ctx context.Context, projectID string, taskID string, noteID string) error {
-	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
+	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
+		return err
+	} else {
 		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.noteRepository.DeleteTaskNote(ctx, tx, noteID); err != nil {
 				return err
 			}
-
 			if _, err := service.historyOperationService.AddTaskHistoryOperation(
 				ctx,
 				tx,
@@ -230,7 +222,7 @@ func (service *noteService) DeleteTaskNote(ctx context.Context, projectID string
 				domain.HistoryOperation{
 					ID: utils.UUID(),
 					CreatedBy: domain.UserBase{
-						ID: currentUserID,
+						ID: contextUser.ID,
 					},
 					CreatedAt:     time.Now(),
 					OperationType: domain.EventTaskNoteDeleted,
@@ -238,25 +230,18 @@ func (service *noteService) DeleteTaskNote(ctx context.Context, projectID string
 			); err != nil {
 				return err
 			}
-
 			return nil
 		})
-	})
-
-	return err
+	}
 }
 
 func (service *noteService) GetTaskNotes(ctx context.Context, projectID string, taskID string) ([]domain.Note, error) {
-	contextUser, ok := middlewares.GetContextUser(ctx)
-	if !ok {
-		return nil, fmt.Errorf("[NoteService] user not found in context")
-	}
-	if err := service.authorizationService.RequireTaskViewPermission(ctx, contextUser.ID, projectID); err != nil {
+	if _, err := service.authorizationService.RequireTaskViewPermission(ctx, projectID); err != nil {
 		return nil, err
 	}
-	notes, err := service.noteRepository.GetTaskNotes(ctx, service.db, taskID)
-	if err != nil {
+	if notes, err := service.noteRepository.GetTaskNotes(ctx, service.db, taskID); err != nil {
 		return nil, fmt.Errorf("[NoteService] failed to get task notes: %w", err)
+	} else {
+		return notes, nil
 	}
-	return notes, nil
 }

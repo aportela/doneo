@@ -30,49 +30,45 @@ func NewService(db database.Database, userTimerRepository usertimerrepository.Us
 }
 
 func (service *userTimerService) StartUserTimer(ctx context.Context, summary string) error {
-	contextUser, ok := middlewares.GetContextUser(ctx)
-	if !ok {
+	if contextUser, ok := middlewares.GetContextUser(ctx); !ok {
 		return fmt.Errorf("[UserTimerService] user not found in context")
+	} else {
+		return service.userTimerRepository.StartUserTimer(ctx, service.db, utils.UUID(), contextUser.ID, summary, time.Now().UnixMilli())
 	}
-	err := service.userTimerRepository.StartUserTimer(ctx, service.db, utils.UUID(), contextUser.ID, summary, time.Now().UnixMilli())
-	return err
 }
 
 func (service *userTimerService) StopUserTimer(ctx context.Context, userTimerID string) error {
-	contextUser, ok := middlewares.GetContextUser(ctx)
-	if !ok {
+	if contextUser, ok := middlewares.GetContextUser(ctx); !ok {
 		return fmt.Errorf("[UserTimerService] user not found in context")
+	} else {
+		return service.userTimerRepository.StopUserTimer(ctx, service.db, userTimerID, contextUser.ID, time.Now().UnixMilli())
 	}
-	err := service.userTimerRepository.StopUserTimer(ctx, service.db, userTimerID, contextUser.ID, time.Now().UnixMilli())
-	return err
 }
 
 func (service *userTimerService) DeleteUserTimer(ctx context.Context, userTimerID string) error {
-	contextUser, ok := middlewares.GetContextUser(ctx)
-	if !ok {
+	if contextUser, ok := middlewares.GetContextUser(ctx); !ok {
 		return fmt.Errorf("[UserTimerService] user not found in context")
+	} else {
+		return service.userTimerRepository.DeleteUserTimer(ctx, service.db, userTimerID, contextUser.ID)
 	}
-	err := service.userTimerRepository.DeleteUserTimer(ctx, service.db, userTimerID, contextUser.ID)
-	return err
 }
 
 func (service *userTimerService) ClearUserTimers(ctx context.Context) error {
-	contextUser, ok := middlewares.GetContextUser(ctx)
-	if !ok {
+	if contextUser, ok := middlewares.GetContextUser(ctx); !ok {
 		return fmt.Errorf("[UserTimerService] user not found in context")
+	} else {
+		return service.userTimerRepository.ClearUserTimers(ctx, service.db, contextUser.ID)
 	}
-	err := service.userTimerRepository.ClearUserTimers(ctx, service.db, contextUser.ID)
-	return err
 }
 
 func (service *userTimerService) GetUserTimers(ctx context.Context) ([]domain.UserTimer, error) {
-	contextUser, ok := middlewares.GetContextUser(ctx)
-	if !ok {
+	if contextUser, ok := middlewares.GetContextUser(ctx); !ok {
 		return nil, fmt.Errorf("[UserTimerService] user not found in context")
+	} else {
+		if userTimers, err := service.userTimerRepository.GetUserTimers(ctx, service.db, contextUser.ID); err != nil {
+			return nil, fmt.Errorf("[UserTimerService] failed to get user timers: %w", err)
+		} else {
+			return userTimers, nil
+		}
 	}
-	userTimers, err := service.userTimerRepository.GetUserTimers(ctx, service.db, contextUser.ID)
-	if err != nil {
-		return nil, fmt.Errorf("[UserTimerService] failed to get user timers: %w", err)
-	}
-	return userTimers, nil
 }

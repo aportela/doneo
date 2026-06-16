@@ -38,53 +38,56 @@ func NewService(db database.Database, authorizationService authorizationservice.
 }
 
 func (service *taskService) Add(ctx context.Context, projectID string, task domain.Task) (domain.Task, error) {
-	err := service.authorizationService.WithTaskAddPermission(ctx, projectID, func(currentUserID string) error {
+	if contextUser, err := service.authorizationService.RequireTaskAddPermission(ctx, projectID); err != nil {
+		return domain.Task{}, err
+	} else {
 		task.ID = utils.UUID()
-		task.CreatedBy.ID = currentUserID
+		task.CreatedBy.ID = contextUser.ID
 		task.CreatedAt = time.Now()
-		newTaskIndex, err := service.taskRepository.GetNextTaskIndex(ctx, service.db, projectID)
-		if err != nil {
-			return err
-		}
-		task.Index = newTaskIndex
-		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
-			if err := service.taskRepository.Add(ctx, tx, projectID, task); err != nil {
+		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+			if newTaskIndex, err := service.taskRepository.GetNextTaskIndex(ctx, service.db, projectID); err != nil {
 				return err
-			}
-			if len(task.Tags) > 0 {
-				for _, taskTag := range task.Tags {
-					if err := service.tagRepository.AddTaskTag(ctx, tx, task.ID, taskTag); err != nil {
-						return err
+			} else {
+				task.Index = newTaskIndex
+				if err := service.taskRepository.Add(ctx, tx, projectID, task); err != nil {
+					return err
+				}
+				if len(task.Tags) > 0 {
+					for _, taskTag := range task.Tags {
+						if err := service.tagRepository.AddTaskTag(ctx, tx, task.ID, taskTag); err != nil {
+							return err
+						}
 					}
 				}
+				if _, err := service.historyOperationService.AddTaskHistoryOperation(
+					ctx,
+					tx,
+					projectID,
+					task.ID,
+					domain.HistoryOperation{
+						ID:            utils.UUID(),
+						CreatedBy:     domain.UserBase{ID: contextUser.ID},
+						CreatedAt:     task.CreatedAt,
+						OperationType: domain.EventTaskCreated,
+					},
+				); err != nil {
+					return err
+				}
+				return nil
 			}
-			if _, err := service.historyOperationService.AddTaskHistoryOperation(
-				ctx,
-				tx,
-				projectID,
-				task.ID,
-				domain.HistoryOperation{
-					ID:            utils.UUID(),
-					CreatedBy:     domain.UserBase{ID: currentUserID},
-					CreatedAt:     task.CreatedAt,
-					OperationType: domain.EventTaskCreated,
-				},
-			); err != nil {
-				return err
-			}
-			return nil
-		})
-	})
-	if err != nil {
-		return domain.Task{}, err
+		}); err != nil {
+			return domain.Task{}, err
+		}
+		return task, nil
 	}
-	return task, nil
 }
 
 func (service *taskService) Update(ctx context.Context, projectID string, task domain.Task) (domain.Task, error) {
-	err := service.authorizationService.WithTaskAddPermission(ctx, projectID, func(currentUserID string) error {
+	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
+		return domain.Task{}, err
+	} else {
 		task.UpdatedAt = utils.CurrentTimePtr()
-		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.taskRepository.Update(ctx, tx, task); err != nil {
 				return err
 			}
@@ -105,7 +108,7 @@ func (service *taskService) Update(ctx context.Context, projectID string, task d
 				task.ID,
 				domain.HistoryOperation{
 					ID:            utils.UUID(),
-					CreatedBy:     domain.UserBase{ID: currentUserID},
+					CreatedBy:     domain.UserBase{ID: contextUser.ID},
 					CreatedAt:     *task.UpdatedAt,
 					OperationType: domain.EventTaskUpdated,
 				},
@@ -113,16 +116,17 @@ func (service *taskService) Update(ctx context.Context, projectID string, task d
 				return err
 			}
 			return nil
-		})
-	})
-	if err != nil {
-		return domain.Task{}, err
+		}); err != nil {
+			return domain.Task{}, err
+		}
+		return task, nil
 	}
-	return task, nil
 }
 
 func (service *taskService) Delete(ctx context.Context, projectID string, taskID string) error {
-	err := service.authorizationService.WithTaskAddPermission(ctx, projectID, func(currentUserID string) error {
+	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
+		return err
+	} else {
 		deletedAt := time.Now()
 		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.taskRepository.Delete(ctx, tx, taskID, deletedAt.UnixMilli()); err != nil {
@@ -135,7 +139,7 @@ func (service *taskService) Delete(ctx context.Context, projectID string, taskID
 				taskID,
 				domain.HistoryOperation{
 					ID:            utils.UUID(),
-					CreatedBy:     domain.UserBase{ID: currentUserID},
+					CreatedBy:     domain.UserBase{ID: contextUser.ID},
 					CreatedAt:     deletedAt,
 					OperationType: domain.EventTaskUpdated,
 				},
@@ -144,28 +148,23 @@ func (service *taskService) Delete(ctx context.Context, projectID string, taskID
 			}
 			return nil
 		})
-	})
-	return err
+	}
 }
 
 func (service *taskService) Get(ctx context.Context, projectID string, taskID string) (domain.Task, error) {
-	contextUser, ok := middlewares.GetContextUser(ctx)
-	if !ok {
-		return domain.Task{}, fmt.Errorf("[TaskService] user not found in context")
-	}
-	if err := service.authorizationService.RequireTaskViewPermission(ctx, contextUser.ID, projectID); err != nil {
+	if _, err := service.authorizationService.RequireTaskViewPermission(ctx, projectID); err != nil {
 		return domain.Task{}, err
 	}
-	task, err := service.taskRepository.Get(ctx, service.db, taskID)
-	if err != nil {
+	if task, err := service.taskRepository.Get(ctx, service.db, taskID); err != nil {
 		return domain.Task{}, fmt.Errorf("[TaskService] failed to get task with ID %s: %w", taskID, err)
+	} else {
+		if taskTags, err := service.tagRepository.GetTaskTags(ctx, service.db, task.ID); err != nil {
+			return domain.Task{}, fmt.Errorf("[TaskService] failed to get task tags with ID %s: %w", taskID, err)
+		} else {
+			task.Tags = taskTags
+			return task, nil
+		}
 	}
-	taskTags, err := service.tagRepository.GetTaskTags(ctx, service.db, task.ID)
-	if err != nil {
-		return domain.Task{}, fmt.Errorf("[TaskService] failed to get task with ID %s: %w", taskID, err)
-	}
-	task.Tags = taskTags
-	return task, nil
 }
 
 func (service *taskService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskFilter) ([]domain.Task, browser.Result, error) {

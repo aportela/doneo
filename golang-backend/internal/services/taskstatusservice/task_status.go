@@ -55,30 +55,27 @@ func (service *taskStatusService) Delete(ctx context.Context, taskStatusID strin
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return err
 	}
-	if err := service.taskStatusRepository.Delete(ctx, service.db, taskStatusID); err != nil {
-		return err
-	}
-	return nil
+	return service.taskStatusRepository.Delete(ctx, service.db, taskStatusID)
 }
 
 func (service *taskStatusService) Get(ctx context.Context, taskStatusID string) (domain.TaskStatus, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return domain.TaskStatus{}, err
 	}
-	taskStatus, err := service.taskStatusRepository.Get(ctx, service.db, taskStatusID)
-	if err != nil {
+	if taskStatus, err := service.taskStatusRepository.Get(ctx, service.db, taskStatusID); err != nil {
 		return domain.TaskStatus{}, fmt.Errorf("[TaskStatusService] failed to get task status with ID %s: %w", taskStatusID, err)
+	} else {
+		return taskStatus, nil
 	}
-	return taskStatus, nil
 }
 
 func (service *taskStatusService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskStatusesFilter) ([]domain.TaskStatus, browser.Result, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return nil, browser.Result{}, err
 	}
-	taskStatuses, pagerResult, err := service.taskStatusRepository.Search(ctx, service.db, pager, order, filter)
-	if err != nil {
+	if taskStatuses, pagerResult, err := service.taskStatusRepository.Search(ctx, service.db, pager, order, filter); err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[TaskStatusService] failed to search task statuses: %w", err)
+	} else {
+		return taskStatuses, pagerResult, nil
 	}
-	return taskStatuses, pagerResult, nil
 }

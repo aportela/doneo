@@ -55,30 +55,27 @@ func (service *roleService) Delete(ctx context.Context, roleID string) error {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return err
 	}
-	if err := service.roleRepository.Delete(ctx, service.db, roleID); err != nil {
-		return err
-	}
-	return nil
+	return service.roleRepository.Delete(ctx, service.db, roleID)
 }
 
 func (service *roleService) Get(ctx context.Context, roleID string) (domain.Role, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return domain.Role{}, err
 	}
-	role, err := service.roleRepository.Get(ctx, service.db, roleID)
-	if err != nil {
+	if role, err := service.roleRepository.Get(ctx, service.db, roleID); err != nil {
 		return domain.Role{}, fmt.Errorf("[RoleService] failed to get role with ID %s: %w", roleID, err)
+	} else {
+		return role, nil
 	}
-	return role, nil
 }
 
 func (service *roleService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return nil, browser.Result{}, err
 	}
-	roles, pagerResult, err := service.roleRepository.Search(ctx, service.db, pager, order, filter)
-	if err != nil {
+	if roles, pagerResult, err := service.roleRepository.Search(ctx, service.db, pager, order, filter); err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[RoleService] failed to search roles: %w", err)
+	} else {
+		return roles, pagerResult, nil
 	}
-	return roles, pagerResult, nil
 }

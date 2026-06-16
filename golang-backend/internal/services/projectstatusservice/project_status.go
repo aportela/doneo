@@ -55,30 +55,27 @@ func (service *projectStatusService) Delete(ctx context.Context, projectStatusID
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return err
 	}
-	if err := service.projectStatusRepository.Delete(ctx, service.db, projectStatusID); err != nil {
-		return err
-	}
-	return nil
+	return service.projectStatusRepository.Delete(ctx, service.db, projectStatusID)
 }
 
 func (service *projectStatusService) Get(ctx context.Context, projectStatusID string) (domain.ProjectStatus, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return domain.ProjectStatus{}, err
 	}
-	projectStatus, err := service.projectStatusRepository.Get(ctx, service.db, projectStatusID)
-	if err != nil {
+	if projectStatus, err := service.projectStatusRepository.Get(ctx, service.db, projectStatusID); err != nil {
 		return domain.ProjectStatus{}, fmt.Errorf("[ProjectStatusService] failed to get project status with ID %s: %w", projectStatusID, err)
+	} else {
+		return projectStatus, nil
 	}
-	return projectStatus, nil
 }
 
 func (service *projectStatusService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.Result, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return nil, browser.Result{}, err
 	}
-	projectStatuses, pagerResult, err := service.projectStatusRepository.Search(ctx, service.db, pager, order, filter)
-	if err != nil {
+	if projectStatuses, pagerResult, err := service.projectStatusRepository.Search(ctx, service.db, pager, order, filter); err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[ProjectStatusService] failed to search project statuses: %w", err)
+	} else {
+		return projectStatuses, pagerResult, nil
 	}
-	return projectStatuses, pagerResult, nil
 }

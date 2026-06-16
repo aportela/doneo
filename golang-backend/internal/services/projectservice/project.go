@@ -43,8 +43,7 @@ func (service *projectService) Add(ctx context.Context, project domain.Project) 
 	project.ID = utils.UUID()
 	project.CreatedBy.ID = contextUser.ID
 	project.CreatedAt = time.Now()
-
-	err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+	if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 		if err := service.projectRepository.Add(ctx, tx, project); err != nil {
 			return err
 		}
@@ -64,20 +63,19 @@ func (service *projectService) Add(ctx context.Context, project domain.Project) 
 		); err != nil {
 			return err
 		}
-
 		return nil
-	})
-	if err != nil {
+	}); err != nil {
 		return domain.Project{}, err
 	}
 	return project, nil
 }
 
 func (service *projectService) Update(ctx context.Context, project domain.Project) (domain.Project, error) {
-	err := service.authorizationService.WithProjectUpdatePermission(ctx, project.ID, func(currentUserID string) error {
+	if contextUser, err := service.authorizationService.RequireProjectUpdatePermission(ctx, project.ID); err != nil {
+		return domain.Project{}, err
+	} else {
 		project.UpdatedAt = utils.CurrentTimePtr()
-
-		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.projectRepository.Update(ctx, tx, project); err != nil {
 				return err
 			}
@@ -87,26 +85,25 @@ func (service *projectService) Update(ctx context.Context, project domain.Projec
 				project.ID,
 				domain.HistoryOperation{
 					ID:            utils.UUID(),
-					CreatedBy:     domain.UserBase{ID: currentUserID},
+					CreatedBy:     domain.UserBase{ID: contextUser.ID},
 					CreatedAt:     *project.UpdatedAt,
 					OperationType: domain.EventProjectUpdated,
 				},
 			); err != nil {
 				return err
 			}
-
 			return nil
-		})
-	})
-	if err != nil {
-		return domain.Project{}, err
+		}); err != nil {
+			return domain.Project{}, err
+		}
+		return project, nil
 	}
-	return project, nil
 }
 
 func (service *projectService) Delete(ctx context.Context, projectID string) error {
-	err := service.authorizationService.WithProjectDeletePermission(ctx, projectID, func(currentUserID string) error {
-
+	if contextUser, err := service.authorizationService.RequireProjectDeletePermission(ctx, projectID); err != nil {
+		return err
+	} else {
 		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			deletedAt := time.Now()
 			if err := service.projectRepository.Delete(ctx, tx, projectID, deletedAt.UnixMilli()); err != nil {
@@ -118,33 +115,27 @@ func (service *projectService) Delete(ctx context.Context, projectID string) err
 				projectID,
 				domain.HistoryOperation{
 					ID:            utils.UUID(),
-					CreatedBy:     domain.UserBase{ID: currentUserID},
+					CreatedBy:     domain.UserBase{ID: contextUser.ID},
 					CreatedAt:     deletedAt,
 					OperationType: domain.EventProjectDeleted,
 				},
 			); err != nil {
 				return err
 			}
-
 			return nil
 		})
-	})
-	return err
+	}
 }
 
 func (service *projectService) Get(ctx context.Context, projectID string) (domain.Project, error) {
-	contextUser, ok := middlewares.GetContextUser(ctx)
-	if !ok {
-		return domain.Project{}, fmt.Errorf("[ProjectService] user not found in context")
-	}
-	if err := service.authorizationService.RequireProjectViewPermission(ctx, contextUser.ID, projectID); err != nil {
+	if _, err := service.authorizationService.RequireProjectViewPermission(ctx, projectID); err != nil {
 		return domain.Project{}, err
 	}
-	project, err := service.projectRepository.Get(ctx, service.db, projectID)
-	if err != nil {
+	if project, err := service.projectRepository.Get(ctx, service.db, projectID); err != nil {
 		return domain.Project{}, fmt.Errorf("[ProjectService] failed to get project with ID %s: %w", projectID, err)
+	} else {
+		return project, nil
 	}
-	return project, nil
 }
 
 func (service *projectService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.Result, error) {
@@ -157,10 +148,9 @@ func (service *projectService) Search(ctx context.Context, pager browser.Params,
 		// filter by projects visible by current user when admin flag is not set
 		filter.ViewByUserId = &contextUser.ID
 	}
-	projects, pagerResult, err := service.projectRepository.Search(ctx, service.db, pager, order, filter)
-
-	if err != nil {
+	if projects, pagerResult, err := service.projectRepository.Search(ctx, service.db, pager, order, filter); err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[ProjectService] failed to search projects: %w", err)
+	} else {
+		return projects, pagerResult, nil
 	}
-	return projects, pagerResult, nil
 }

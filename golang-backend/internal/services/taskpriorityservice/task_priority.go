@@ -65,20 +65,20 @@ func (service *taskPriorityService) Get(ctx context.Context, taskPriorityID stri
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return domain.TaskPriority{}, err
 	}
-	taskPriority, err := service.taskPriorityRepository.Get(ctx, service.db, taskPriorityID)
-	if err != nil {
+	if taskPriority, err := service.taskPriorityRepository.Get(ctx, service.db, taskPriorityID); err != nil {
 		return domain.TaskPriority{}, fmt.Errorf("[TaskPriorityService] failed to get task priority with ID %s: %w", taskPriorityID, err)
+	} else {
+		return taskPriority, nil
 	}
-	return taskPriority, nil
 }
 
 func (service *taskPriorityService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskPrioritiesFilter) ([]domain.TaskPriority, browser.Result, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return nil, browser.Result{}, err
 	}
-	taskPriorities, pagerResult, err := service.taskPriorityRepository.Search(ctx, service.db, pager, order, filter)
-	if err != nil {
+	if taskPriorities, pagerResult, err := service.taskPriorityRepository.Search(ctx, service.db, pager, order, filter); err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[TaskPriorityService] failed to search task priorities: %w", err)
+	} else {
+		return taskPriorities, pagerResult, nil
 	}
-	return taskPriorities, pagerResult, nil
 }

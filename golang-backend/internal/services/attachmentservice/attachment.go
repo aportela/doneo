@@ -8,7 +8,6 @@ import (
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/attachmentrepository"
 	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/services/historyoperationservice"
@@ -48,10 +47,12 @@ func (service *attachmentService) GetAttachment(ctx context.Context, attachmentI
 }
 
 func (service *attachmentService) AddProjectAttachment(ctx context.Context, projectID string, attachment domain.Attachment) (domain.Attachment, error) {
-	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
-		attachment.CreatedBy.ID = currentUserID
+	if contextUser, err := service.authorizationService.RequireProjectUpdatePermission(ctx, projectID); err != nil {
+		return domain.Attachment{}, err
+	} else {
+		attachment.CreatedBy.ID = contextUser.ID
 		attachment.CreatedAt = time.Now()
-		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.attachmentRepository.AddAttachment(ctx, tx, attachment); err != nil {
 				return err
 			}
@@ -64,7 +65,7 @@ func (service *attachmentService) AddProjectAttachment(ctx context.Context, proj
 				projectID,
 				domain.HistoryOperation{
 					ID:            utils.UUID(),
-					CreatedBy:     domain.UserBase{ID: currentUserID},
+					CreatedBy:     domain.UserBase{ID: contextUser.ID},
 					CreatedAt:     attachment.CreatedAt,
 					OperationType: domain.EventProjectAttachmentAdded,
 				},
@@ -72,17 +73,18 @@ func (service *attachmentService) AddProjectAttachment(ctx context.Context, proj
 				return err
 			}
 			return nil
-		})
-	})
-	if err != nil {
-		return domain.Attachment{}, err
+		}); err != nil {
+			return domain.Attachment{}, err
+		}
+		return attachment, nil
 	}
-	return attachment, nil
 }
 
 func (service *attachmentService) DeleteProjectAttachment(ctx context.Context, projectID string, attachmentID string) error {
 	// TODO: remove data/attachments file from storage
-	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
+	if contextUser, err := service.authorizationService.RequireProjectUpdatePermission(ctx, projectID); err != nil {
+		return err
+	} else {
 		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.attachmentRepository.DeleteProjectAttachment(ctx, tx, projectID, attachmentID); err != nil {
 				return err
@@ -96,7 +98,7 @@ func (service *attachmentService) DeleteProjectAttachment(ctx context.Context, p
 				projectID,
 				domain.HistoryOperation{
 					ID:            utils.UUID(),
-					CreatedBy:     domain.UserBase{ID: currentUserID},
+					CreatedBy:     domain.UserBase{ID: contextUser.ID},
 					CreatedAt:     time.Now(),
 					OperationType: domain.EventProjectAttachmentDeleted,
 				},
@@ -105,30 +107,27 @@ func (service *attachmentService) DeleteProjectAttachment(ctx context.Context, p
 			}
 			return nil
 		})
-	})
-	return err
+	}
 }
 
 func (service *attachmentService) GetProjectAttachments(ctx context.Context, projectID string) ([]domain.Attachment, error) {
-	contextUser, ok := middlewares.GetContextUser(ctx)
-	if !ok {
-		return nil, fmt.Errorf("[AttachmentService] user not found in context")
-	}
-	if err := service.authorizationService.RequireProjectViewPermission(ctx, contextUser.ID, projectID); err != nil {
+	if _, err := service.authorizationService.RequireProjectViewPermission(ctx, projectID); err != nil {
 		return nil, err
 	}
-	attachments, err := service.attachmentRepository.GetProjectAttachments(ctx, service.db, projectID)
-	if err != nil {
+	if attachments, err := service.attachmentRepository.GetProjectAttachments(ctx, service.db, projectID); err != nil {
 		return nil, fmt.Errorf("[AttachmentService] failed to get project attachments: %w", err)
+	} else {
+		return attachments, nil
 	}
-	return attachments, nil
 }
 
 func (service *attachmentService) AddTaskAttachment(ctx context.Context, projectID string, taskID string, attachment domain.Attachment) (domain.Attachment, error) {
-	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
-		attachment.CreatedBy.ID = currentUserID
+	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
+		return domain.Attachment{}, err
+	} else {
+		attachment.CreatedBy.ID = contextUser.ID
 		attachment.CreatedAt = time.Now()
-		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.attachmentRepository.AddAttachment(ctx, tx, attachment); err != nil {
 				return err
 			}
@@ -142,7 +141,7 @@ func (service *attachmentService) AddTaskAttachment(ctx context.Context, project
 				taskID,
 				domain.HistoryOperation{
 					ID:            utils.UUID(),
-					CreatedBy:     domain.UserBase{ID: currentUserID},
+					CreatedBy:     domain.UserBase{ID: contextUser.ID},
 					CreatedAt:     attachment.CreatedAt,
 					OperationType: domain.EventTaskAttachmentAdded,
 				},
@@ -150,17 +149,18 @@ func (service *attachmentService) AddTaskAttachment(ctx context.Context, project
 				return err
 			}
 			return nil
-		})
-	})
-	if err != nil {
-		return domain.Attachment{}, err
+		}); err != nil {
+			return domain.Attachment{}, err
+		}
+		return attachment, nil
 	}
-	return attachment, nil
 }
 
 func (service *attachmentService) DeleteTaskAttachment(ctx context.Context, projectID string, taskID string, attachmentID string) error {
 	// TODO: remove data/attachments file from storage
-	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
+	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
+		return err
+	} else {
 		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.attachmentRepository.DeleteTaskAttachment(ctx, tx, taskID, attachmentID); err != nil {
 				return err
@@ -175,7 +175,7 @@ func (service *attachmentService) DeleteTaskAttachment(ctx context.Context, proj
 				taskID,
 				domain.HistoryOperation{
 					ID:            utils.UUID(),
-					CreatedBy:     domain.UserBase{ID: currentUserID},
+					CreatedBy:     domain.UserBase{ID: contextUser.ID},
 					CreatedAt:     time.Now(),
 					OperationType: domain.EventTaskAttachmentDeleted,
 				},
@@ -184,21 +184,16 @@ func (service *attachmentService) DeleteTaskAttachment(ctx context.Context, proj
 			}
 			return nil
 		})
-	})
-	return err
+	}
 }
 
 func (service *attachmentService) GetTaskAttachments(ctx context.Context, projectID string, taskID string) ([]domain.Attachment, error) {
-	contextUser, ok := middlewares.GetContextUser(ctx)
-	if !ok {
-		return nil, fmt.Errorf("[AttachmentService] user not found in context")
-	}
-	if err := service.authorizationService.RequireTaskViewPermission(ctx, contextUser.ID, projectID); err != nil {
+	if _, err := service.authorizationService.RequireTaskViewPermission(ctx, projectID); err != nil {
 		return nil, err
 	}
-	attachments, err := service.attachmentRepository.GetTaskAttachments(ctx, service.db, taskID)
-	if err != nil {
+	if attachments, err := service.attachmentRepository.GetTaskAttachments(ctx, service.db, taskID); err != nil {
 		return nil, fmt.Errorf("[AttachmentService] failed to get task attachments: %w", err)
+	} else {
+		return attachments, nil
 	}
-	return attachments, nil
 }
