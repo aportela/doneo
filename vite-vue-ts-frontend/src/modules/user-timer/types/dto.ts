@@ -1,6 +1,6 @@
 export type EmptyResponse = {};
 
-export type TimerResponse = {
+export type UserTimerResponse = {
   id: string;
   summary: string;
   startedAt: number;
@@ -8,5 +8,5 @@ export type TimerResponse = {
 };
 
 export type SearchResponse = {
-  timers: TimerResponse[];
+  userTimers: UserTimerResponse[];
 };

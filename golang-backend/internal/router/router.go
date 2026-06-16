@@ -132,7 +132,7 @@ func NewRouter(app *app.App) http.Handler {
 		r.Delete("/{id:"+uuidPattern+"}", app.TaskPriorityHandler.Delete)
 	})
 
-	apiRouter.Route("/timers", func(r chi.Router) {
+	apiRouter.Route("/user-timers", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
 		r.Post("/", app.UserTimerHandler.StartUserTimer)
 		r.Put("/{id:"+uuidPattern+"}", app.UserTimerHandler.StopUserTimer)

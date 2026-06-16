@@ -7,8 +7,8 @@
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from "../../../shared/types/ajaxState";
 
-    import { timerService } from "../../../modules/timer/services/timer";
-    import { type TimerResponse } from "../../../modules/timer/types/dto";
+    import { userTimerService } from "../../../modules/user-timer/services/user-timer";
+    import { type UserTimerResponse } from "../../../modules/user-timer/types/dto";
     import { IDate } from "../../types/idate";
 
     interface TimerButtonProps {
@@ -31,10 +31,10 @@
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    const timers = ref<TimerResponse[]>([]);
+    const timers = ref<UserTimerResponse[]>([]);
 
     const hasTimers = computed(() => timers.value.length > 0);
-    const currentActiveTimer = computed<TimerResponse | undefined>(() => timers.value.find((timer) => timer.finishedAt === null));
+    const currentActiveTimer = computed<UserTimerResponse | undefined>(() => timers.value.find((timer) => timer.finishedAt === null));
     const hasTimerRunning = computed(() => typeof currentActiveTimer.value !== "undefined");
 
     const currentButtonIconColor = computed<string | undefined>(() => {
@@ -85,8 +85,8 @@
     const onGetTimers = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const response = await timerService.search();
-            timers.value = response.timers;
+            const response = await userTimerService.search();
+            timers.value = response.userTimers;
             start.value = timers.value.find((timer) => timer.finishedAt === null)?.startedAt ?? null;
         } catch (e) {
             // TODO:
@@ -100,7 +100,7 @@
         if (newTimerSummary.value) {
             Object.assign(state, defaultAjaxStateRunning);
             try {
-                await timerService.start(newTimerSummary.value);
+                await userTimerService.start(newTimerSummary.value);
                 showPopOver.value = false;
                 await onGetTimers();
                 newTimerSummary.value = "";
@@ -117,7 +117,7 @@
     const onStopTimer = async (id: string) => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            await timerService.stop(id);
+            await userTimerService.stop(id);
             showPopOver.value = false;
             await onGetTimers();
         } catch (e) {
@@ -131,7 +131,7 @@
     const onDeleteTimer = async (id: string) => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            await timerService.delete(id);
+            await userTimerService.delete(id);
             await onGetTimers();
         } catch (e) {
             // TODO:
@@ -144,7 +144,7 @@
     const onClearTimers = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            await timerService.clear();
+            await userTimerService.clear();
             showPopOver.value = false;
             await onGetTimers();
         } catch (e) {
