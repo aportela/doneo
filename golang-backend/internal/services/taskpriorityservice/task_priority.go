@@ -31,21 +31,8 @@ func NewService(db database.Database, authorizationService authorizationservice.
 	return &taskPriorityService{db: db, authorizationService: authorizationService, taskPriorityRepository: taskPriorityRepository}
 }
 
-func (service *taskPriorityService) withUserAdminPermission(ctx context.Context, action func(currentUserID string) error) error {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return fmt.Errorf("user not found in context")
-	}
-
-	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
-		return err
-	}
-
-	return action(currentContextUserID)
-}
-
 func (service *taskPriorityService) Add(ctx context.Context, taskPriority domain.TaskPriority) (domain.TaskPriority, error) {
-	err := service.withUserAdminPermission(ctx, func(currentUserID string) error {
+	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
 		taskPriority.ID = utils.UUID()
 		err := service.taskPriorityRepository.Add(ctx, service.db, taskPriority)
 		if err != nil {
@@ -60,7 +47,7 @@ func (service *taskPriorityService) Add(ctx context.Context, taskPriority domain
 }
 
 func (service *taskPriorityService) Update(ctx context.Context, taskPriority domain.TaskPriority) (domain.TaskPriority, error) {
-	err := service.withUserAdminPermission(ctx, func(currentUserID string) error {
+	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
 		err := service.taskPriorityRepository.Update(ctx, service.db, taskPriority)
 		if err != nil {
 			return err
@@ -74,7 +61,7 @@ func (service *taskPriorityService) Update(ctx context.Context, taskPriority dom
 }
 
 func (service *taskPriorityService) Delete(ctx context.Context, taskPriorityID string) error {
-	err := service.withUserAdminPermission(ctx, func(currentUserID string) error {
+	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
 		err := service.taskPriorityRepository.Delete(ctx, service.db, taskPriorityID)
 		if err != nil {
 			return err

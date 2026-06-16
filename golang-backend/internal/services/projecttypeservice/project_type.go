@@ -31,21 +31,8 @@ func NewService(db database.Database, authorizationService authorizationservice.
 	return &projectTypeService{db: db, authorizationService: authorizationService, projectTypeRepository: projectTypeRepository}
 }
 
-func (service *projectTypeService) withUserAdminPermission(ctx context.Context, action func(currentUserID string) error) error {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return fmt.Errorf("user not found in context")
-	}
-
-	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
-		return err
-	}
-
-	return action(currentContextUserID)
-}
-
 func (service *projectTypeService) Add(ctx context.Context, projectType domain.ProjectType) (domain.ProjectType, error) {
-	err := service.withUserAdminPermission(ctx, func(currentUserID string) error {
+	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
 		projectType.ID = utils.UUID()
 		err := service.projectTypeRepository.Add(ctx, service.db, projectType)
 		if err != nil {
@@ -60,7 +47,7 @@ func (service *projectTypeService) Add(ctx context.Context, projectType domain.P
 }
 
 func (service *projectTypeService) Update(ctx context.Context, projectType domain.ProjectType) (domain.ProjectType, error) {
-	err := service.withUserAdminPermission(ctx, func(currentUserID string) error {
+	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
 		err := service.projectTypeRepository.Update(ctx, service.db, projectType)
 		if err != nil {
 			return err
@@ -74,7 +61,7 @@ func (service *projectTypeService) Update(ctx context.Context, projectType domai
 }
 
 func (service *projectTypeService) Delete(ctx context.Context, projectTypeID string) error {
-	err := service.withUserAdminPermission(ctx, func(currentUserID string) error {
+	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
 		err := service.projectTypeRepository.Delete(ctx, service.db, projectTypeID)
 		if err != nil {
 			return err

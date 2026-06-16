@@ -31,21 +31,8 @@ func NewService(db database.Database, authorizationService authorizationservice.
 	return &projectStatusService{db: db, authorizationService: authorizationService, projectStatusRepository: projectStatusRepository}
 }
 
-func (service *projectStatusService) withUserAdminPermission(ctx context.Context, action func(currentUserID string) error) error {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return fmt.Errorf("user not found in context")
-	}
-
-	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
-		return err
-	}
-
-	return action(currentContextUserID)
-}
-
 func (service *projectStatusService) Add(ctx context.Context, projectStatus domain.ProjectStatus) (domain.ProjectStatus, error) {
-	err := service.withUserAdminPermission(ctx, func(currentUserID string) error {
+	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
 		projectStatus.ID = utils.UUID()
 		err := service.projectStatusRepository.Add(ctx, service.db, projectStatus)
 		if err != nil {
@@ -60,7 +47,7 @@ func (service *projectStatusService) Add(ctx context.Context, projectStatus doma
 }
 
 func (service *projectStatusService) Update(ctx context.Context, projectStatus domain.ProjectStatus) (domain.ProjectStatus, error) {
-	err := service.withUserAdminPermission(ctx, func(currentUserID string) error {
+	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
 		err := service.projectStatusRepository.Update(ctx, service.db, projectStatus)
 		if err != nil {
 			return err
@@ -74,7 +61,7 @@ func (service *projectStatusService) Update(ctx context.Context, projectStatus d
 }
 
 func (service *projectStatusService) Delete(ctx context.Context, projectStatusID string) error {
-	err := service.withUserAdminPermission(ctx, func(currentUserID string) error {
+	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
 		err := service.projectStatusRepository.Delete(ctx, service.db, projectStatusID)
 		if err != nil {
 			return err

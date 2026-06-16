@@ -31,21 +31,8 @@ func NewService(db database.Database, authorizationService authorizationservice.
 	return &projectPriorityService{db: db, authorizationService: authorizationService, projectPriorityRepository: projectPriorityRepository}
 }
 
-func (service *projectPriorityService) withUserAdminPermission(ctx context.Context, action func(currentUserID string) error) error {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return fmt.Errorf("user not found in context")
-	}
-
-	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
-		return err
-	}
-
-	return action(currentContextUserID)
-}
-
 func (service *projectPriorityService) Add(ctx context.Context, projectPriority domain.ProjectPriority) (domain.ProjectPriority, error) {
-	err := service.withUserAdminPermission(ctx, func(currentUserID string) error {
+	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
 		projectPriority.ID = utils.UUID()
 		err := service.projectPriorityRepository.Add(ctx, service.db, projectPriority)
 		if err != nil {
@@ -60,7 +47,7 @@ func (service *projectPriorityService) Add(ctx context.Context, projectPriority 
 }
 
 func (service *projectPriorityService) Update(ctx context.Context, projectPriority domain.ProjectPriority) (domain.ProjectPriority, error) {
-	err := service.withUserAdminPermission(ctx, func(currentUserID string) error {
+	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
 		err := service.projectPriorityRepository.Update(ctx, service.db, projectPriority)
 		if err != nil {
 			return err
@@ -74,7 +61,7 @@ func (service *projectPriorityService) Update(ctx context.Context, projectPriori
 }
 
 func (service *projectPriorityService) Delete(ctx context.Context, projectPriorityID string) error {
-	err := service.withUserAdminPermission(ctx, func(currentUserID string) error {
+	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
 		err := service.projectPriorityRepository.Delete(ctx, service.db, projectPriorityID)
 		if err != nil {
 			return err

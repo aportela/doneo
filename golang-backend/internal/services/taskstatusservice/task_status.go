@@ -31,21 +31,8 @@ func NewService(db database.Database, authorizationService authorizationservice.
 	return &taskStatusService{db: db, authorizationService: authorizationService, taskStatusRepository: taskStatusRepository}
 }
 
-func (service *taskStatusService) withUserAdminPermission(ctx context.Context, action func(currentUserID string) error) error {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return fmt.Errorf("user not found in context")
-	}
-
-	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
-		return err
-	}
-
-	return action(currentContextUserID)
-}
-
 func (service *taskStatusService) Add(ctx context.Context, taskStatus domain.TaskStatus) (domain.TaskStatus, error) {
-	err := service.withUserAdminPermission(ctx, func(currentUserID string) error {
+	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
 		taskStatus.ID = utils.UUID()
 		err := service.taskStatusRepository.Add(ctx, service.db, taskStatus)
 		if err != nil {
@@ -60,7 +47,7 @@ func (service *taskStatusService) Add(ctx context.Context, taskStatus domain.Tas
 }
 
 func (service *taskStatusService) Update(ctx context.Context, taskStatus domain.TaskStatus) (domain.TaskStatus, error) {
-	err := service.withUserAdminPermission(ctx, func(currentUserID string) error {
+	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
 		err := service.taskStatusRepository.Update(ctx, service.db, taskStatus)
 		if err != nil {
 			return err
@@ -74,7 +61,7 @@ func (service *taskStatusService) Update(ctx context.Context, taskStatus domain.
 }
 
 func (service *taskStatusService) Delete(ctx context.Context, taskStatusID string) error {
-	err := service.withUserAdminPermission(ctx, func(currentUserID string) error {
+	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
 		err := service.taskStatusRepository.Delete(ctx, service.db, taskStatusID)
 		if err != nil {
 			return err

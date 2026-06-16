@@ -15,6 +15,7 @@ import (
 type AuthorizationService interface {
 	RequireUserPermission(ctx context.Context, userID string, permission domain.Bitmask) error
 	RequireUserAdminPermission(ctx context.Context, userID string) error
+	WithUserAdminPermission(ctx context.Context, action func(currentUserID string) error) error
 
 	RequireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error
 	RequireProjectUpdatePermission(ctx context.Context, userID string, projectID string) error
@@ -63,6 +64,19 @@ func (service *authorizationService) RequireUserPermission(ctx context.Context, 
 
 func (service *authorizationService) RequireUserAdminPermission(ctx context.Context, userID string) error {
 	return service.RequireUserPermission(ctx, userID, domain.UserPermissionAdmin)
+}
+
+func (service *authorizationService) WithUserAdminPermission(ctx context.Context, action func(currentUserID string) error) error {
+	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return fmt.Errorf("user not found in context")
+	}
+
+	if err := service.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
+		return err
+	}
+
+	return action(currentContextUserID)
 }
 
 func (service *authorizationService) RequireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error {
