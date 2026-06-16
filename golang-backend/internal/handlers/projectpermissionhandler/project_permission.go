@@ -26,17 +26,11 @@ func (handler *ProjectPermissionHandler) Add(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	projectPermission := addRequestToDomain(request)
-	projectId := chi.URLParam(r, "project_id")
+	projectID := chi.URLParam(r, "project_id")
 
-	projectPermission, err := handler.service.Add(r.Context(), projectId, projectPermission)
+	projectPermission, err := handler.service.Add(r.Context(), projectID, projectPermission)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPermissionHandler] failed to add project permission: %w", err))
-		return
-	}
-
-	projectPermission, err = handler.service.Get(r.Context(), projectPermission.ID)
-	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPermissionHandler] failed to get new project permission: %w", err))
 		return
 	}
 
@@ -45,9 +39,9 @@ func (handler *ProjectPermissionHandler) Add(w http.ResponseWriter, r *http.Requ
 
 func (handler *ProjectPermissionHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "project_id")
-	permissionId := chi.URLParam(r, "permission_id")
-	err := handler.service.Delete(r.Context(), projectId, permissionId)
+	projectID := chi.URLParam(r, "project_id")
+	projectPermissionID := chi.URLParam(r, "permission_id")
+	err := handler.service.Delete(r.Context(), projectID, projectPermissionID)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPermissionHandler] failed to delete project permission: %w", err))
 		return
@@ -55,9 +49,9 @@ func (handler *ProjectPermissionHandler) Delete(w http.ResponseWriter, r *http.R
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
 
-func (handler *ProjectPermissionHandler) Search(w http.ResponseWriter, r *http.Request) {
+func (handler *ProjectPermissionHandler) GetProjectPermissions(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "project_id")
-	projectPermissions, err := handler.service.Search(r.Context(), projectId)
+	projectID := chi.URLParam(r, "project_id")
+	projectPermissions, err := handler.service.GetProjectPermissions(r.Context(), projectID)
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectPermissions), err)
 }
