@@ -12,65 +12,65 @@ import (
 	"github.com/aportela/doneo/internal/utils"
 )
 
-type TimerService interface {
+type UserTimerService interface {
 	Start(ctx context.Context, summary string) error
-	Stop(ctx context.Context, id string) error
-	Delete(ctx context.Context, id string) error
-	Clear(ctx context.Context) error
-	Search(ctx context.Context) ([]domain.UserTimer, error)
+	Stop(ctx context.Context, userTimerID string) error
+	Delete(ctx context.Context, userTimerID string) error
+	ClearUserTimers(ctx context.Context) error
+	GetUserTimers(ctx context.Context) ([]domain.UserTimer, error)
 }
 
-type timerService struct {
-	database   database.Database
-	repository timerrepository.UserTimerRepository
+type userTimerService struct {
+	db                  database.Database
+	userTimerRepository timerrepository.UserTimerRepository
 }
 
-func NewService(db database.Database, repository timerrepository.UserTimerRepository) TimerService {
-	return &timerService{database: db, repository: repository}
+func NewService(db database.Database, userTimerRepository timerrepository.UserTimerRepository) UserTimerService {
+	return &userTimerService{db: db, userTimerRepository: userTimerRepository}
 }
 
-func (service *timerService) Start(ctx context.Context, summary string) error {
+func (service *userTimerService) Start(ctx context.Context, summary string) error {
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
 		return fmt.Errorf("[TimerService] user ID not found in context")
 	}
-	err := service.repository.Start(ctx, utils.UUID(), currentUserId, summary, time.Now().UnixMilli())
+	err := service.userTimerRepository.Start(ctx, utils.UUID(), currentUserId, summary, time.Now().UnixMilli())
 	return err
 }
 
-func (service *timerService) Stop(ctx context.Context, id string) error {
+func (service *userTimerService) Stop(ctx context.Context, id string) error {
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
 		return fmt.Errorf("[TimerService] user ID not found in context")
 	}
-	err := service.repository.Stop(ctx, id, currentUserId, time.Now().UnixMilli())
+	err := service.userTimerRepository.Stop(ctx, id, currentUserId, time.Now().UnixMilli())
 	return err
 }
 
-func (service *timerService) Delete(ctx context.Context, id string) error {
+func (service *userTimerService) Delete(ctx context.Context, id string) error {
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
 		return fmt.Errorf("[TimerService] user ID not found in context")
 	}
-	err := service.repository.Delete(ctx, id, currentUserId)
+	err := service.userTimerRepository.Delete(ctx, id, currentUserId)
 	return err
 }
 
-func (service *timerService) Clear(ctx context.Context) error {
+func (service *userTimerService) Clear(ctx context.Context) error {
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
 		return fmt.Errorf("[TimerService] user ID not found in context")
 	}
-	err := service.repository.Clear(ctx, currentUserId)
+	err := service.userTimerRepository.Clear(ctx, currentUserId)
 	return err
 }
 
-func (service *timerService) Search(ctx context.Context) ([]domain.UserTimer, error) {
+func (service *userTimerService) Search(ctx context.Context) ([]domain.UserTimer, error) {
 	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
 		return nil, fmt.Errorf("[TimerService] user ID not found in context")
 	}
-	timers, err := service.repository.Search(ctx, currentUserId)
+	timers, err := service.userTimerRepository.Search(ctx, currentUserId)
 	if err != nil {
 		return nil, fmt.Errorf("[TimerService] failed to get user timers: %w", err)
 	}
