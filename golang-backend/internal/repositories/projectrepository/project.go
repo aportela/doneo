@@ -353,6 +353,9 @@ func (repository *projectRepository) Search(ctx context.Context, dbExecutor data
 		sqlWhereConditions = append(sqlWhereConditions, "P.creator_id = ?")
 		filterArgs = append(filterArgs, *filterDTO.CreatedByUserId)
 	}
+	if filterDTO.ViewByUserId != nil && len(*filterDTO.ViewByUserId) > 0 {
+		// TODO: onlw show projects with user view permission
+	}
 	if len(sqlWhereConditions) > 0 {
 		sqlWhere = " WHERE " + strings.Join(sqlWhereConditions, " AND ")
 	}
