@@ -28,13 +28,13 @@ func (handler *TaskHandler) Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	task := addRequestToDomain(request)
-	projectId := chi.URLParam(r, "project_id")
-	task, err := handler.service.Add(r.Context(), projectId, task)
+	projectID := chi.URLParam(r, "project_id")
+	task, err := handler.service.Add(r.Context(), projectID, task)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to add task with ID %s: %w", request.ID, err))
 		return
 	}
-	task, err = handler.service.Get(r.Context(), task.ID)
+	task, err = handler.service.Get(r.Context(), projectID, task.ID)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to get new task with ID %s: %w", task.ID, err))
 		return
@@ -50,14 +50,14 @@ func (handler *TaskHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	task := updateRequestToDomain(request)
-	projectId := chi.URLParam(r, "project_id")
+	projectID := chi.URLParam(r, "project_id")
 	task.ID = chi.URLParam(r, "task_id")
-	task, err := handler.service.Update(r.Context(), projectId, task)
+	task, err := handler.service.Update(r.Context(), projectID, task)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to update task with ID %s: %w", task.ID, err))
 		return
 	}
-	task, err = handler.service.Get(r.Context(), task.ID)
+	task, err = handler.service.Get(r.Context(), projectID, task.ID)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to get updated task with ID %s: %w", request.ID, err))
 		return
@@ -67,11 +67,11 @@ func (handler *TaskHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 func (handler *TaskHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "project_id")
-	taskId := chi.URLParam(r, "task_id")
-	err := handler.service.Delete(r.Context(), projectId, taskId)
+	projectID := chi.URLParam(r, "project_id")
+	taskID := chi.URLParam(r, "task_id")
+	err := handler.service.Delete(r.Context(), projectID, taskID)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to delete project with ID %s: %w", projectId, err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to delete project with ID %s: %w", projectID, err))
 		return
 	}
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
@@ -79,14 +79,15 @@ func (handler *TaskHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 func (handler *TaskHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	taskId := chi.URLParam(r, "task_id")
-	project, err := handler.service.Get(r.Context(), taskId)
+	projectID := chi.URLParam(r, "project_id")
+	taskID := chi.URLParam(r, "task_id")
+	project, err := handler.service.Get(r.Context(), projectID, taskID)
 	if err != nil {
 		if err == domain.NotFoundError {
-			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] not found project with ID %s: %w", taskId, err))
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] not found project with ID %s: %w", taskID, err))
 			return
 		} else {
-			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to get project with ID %s: %w", taskId, err))
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to get project with ID %s: %w", taskID, err))
 			return
 		}
 	}
@@ -100,9 +101,9 @@ func (handler *TaskHandler) Search(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] invalid request payload: %w", err))
 		return
 	}
-	projectId := chi.URLParam(r, "project_id")
+	projectID := chi.URLParam(r, "project_id")
 	filter := domain.SearchTaskFilter{}
-	filter.ProjectID = &projectId
+	filter.ProjectID = &projectID
 
 	if request.Filter != nil {
 		if request.Filter.Summary != nil {
