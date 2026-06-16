@@ -251,7 +251,7 @@ func (service *noteService) GetTaskNotes(ctx context.Context, projectID string, 
 	if !ok {
 		return nil, fmt.Errorf("user not found in context")
 	}
-	if err := service.authorizationService.RequireProjectViewPermission(ctx, currentContextUserID, projectID); err != nil {
+	if err := service.authorizationService.RequireTaskViewPermission(ctx, currentContextUserID, projectID); err != nil {
 		return nil, err
 	}
 	notes, err := service.noteRepository.GetTaskNotes(ctx, service.db, taskID)

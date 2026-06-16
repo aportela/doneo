@@ -193,7 +193,7 @@ func (service *attachmentService) GetTaskAttachments(ctx context.Context, projec
 	if !ok {
 		return nil, fmt.Errorf("user not found in context")
 	}
-	if err := service.authorizationService.RequireProjectViewPermission(ctx, currentContextUserID, projectID); err != nil {
+	if err := service.authorizationService.RequireTaskViewPermission(ctx, currentContextUserID, projectID); err != nil {
 		return nil, err
 	}
 	attachments, err := service.attachmentRepository.GetTaskAttachments(ctx, service.db, taskID)
