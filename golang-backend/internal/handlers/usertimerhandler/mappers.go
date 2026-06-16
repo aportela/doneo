@@ -1,12 +1,12 @@
-package timerhandler
+package usertimerhandler
 
 import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/utils"
 )
 
-func DomainToResponse(timer domain.UserTimer) timerResponse {
-	return timerResponse{
+func DomainToResponse(timer domain.UserTimer) userTimerResponse {
+	return userTimerResponse{
 		ID:         timer.ID,
 		Summary:    timer.Summary,
 		StartedAt:  timer.StartedAt.UnixMilli(),
@@ -14,8 +14,8 @@ func DomainToResponse(timer domain.UserTimer) timerResponse {
 	}
 }
 
-func domainArrayToResponseArray(timers []domain.UserTimer) []timerResponse {
-	timerResponses := []timerResponse{}
+func domainArrayToResponseArray(timers []domain.UserTimer) []userTimerResponse {
+	timerResponses := []userTimerResponse{}
 	for _, timer := range timers {
 		timerResponses = append(timerResponses, DomainToResponse(timer))
 	}
@@ -24,6 +24,6 @@ func domainArrayToResponseArray(timers []domain.UserTimer) []timerResponse {
 
 func toSearchResponse(timers []domain.UserTimer) searchResponse {
 	return searchResponse{
-		Timers: domainArrayToResponseArray(timers),
+		UserTimers: domainArrayToResponseArray(timers),
 	}
 }
