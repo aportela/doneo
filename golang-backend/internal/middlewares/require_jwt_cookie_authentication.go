@@ -28,7 +28,7 @@ func RequireJWTCookieAuthentication(secretKey string) func(http.Handler) http.Ha
 				return
 			}
 			//ctx := context.WithValue(r.Context(), userIDKey, userID)
-			ctx := context.WithValue(r.Context(), contextUserKey, ContextUser{UserBase: domain.UserBase{ID: userID}, IsSystem: false})
+			ctx := context.WithValue(r.Context(), contextUserKey, ContextUser{UserBase: domain.UserBase{ID: userID}, SkipAuthorization: false})
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

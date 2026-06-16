@@ -10,7 +10,7 @@ type contextKey string
 
 type ContextUser struct {
 	domain.UserBase
-	IsSystem bool
+	SkipAuthorization bool
 }
 
 const contextUserKey contextKey = "user"

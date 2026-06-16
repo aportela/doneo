@@ -69,7 +69,7 @@ func (service *authorizationService) RequireUserAdminPermission(ctx context.Cont
 	if !ok {
 		return middlewares.ContextUser{}, fmt.Errorf("[AuthorizationService] user not found in context")
 	}
-	if !contextUser.IsSystem {
+	if !contextUser.SkipAuthorization {
 		if err := service.requireUserPermission(ctx, contextUser.ID, domain.UserPermissionAdmin); err != nil {
 			return middlewares.ContextUser{}, err
 		}

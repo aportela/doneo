@@ -21,7 +21,7 @@ func CreateDefaultAdminUser(db database.Database) {
 	authorizationService := authorizationservice.NewService(db, cache.NewPermissionCache(), userrepository.NewRepository(), projectpermissionrepository.NewRepository())
 	service := userservice.NewService(db, authorizationService, userrepository.NewRepository())
 
-	ctx := middlewares.SetContextUser(context.Background(), middlewares.ContextUser{UserBase: domain.UserBase{}, IsSystem: true})
+	ctx := middlewares.SetContextUser(context.Background(), middlewares.ContextUser{UserBase: domain.UserBase{}, SkipAuthorization: true})
 
 	_, err := service.Add(ctx, domain.User{
 		UserBase: domain.UserBase{
