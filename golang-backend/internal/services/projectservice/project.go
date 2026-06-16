@@ -121,7 +121,8 @@ func (service *projectService) Delete(ctx context.Context, projectID string) err
 	err := service.withProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
 
 		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
-			if err := service.projectRepository.Delete(ctx, tx, projectID); err != nil {
+			deletedAt := time.Now()
+			if err := service.projectRepository.Delete(ctx, tx, projectID, deletedAt.UnixMilli()); err != nil {
 				return err
 			}
 			if _, err := service.historyOperationService.AddProjectHistoryOperation(
@@ -131,7 +132,7 @@ func (service *projectService) Delete(ctx context.Context, projectID string) err
 				domain.HistoryOperation{
 					ID:            utils.UUID(),
 					CreatedBy:     domain.UserBase{ID: currentUserID},
-					CreatedAt:     time.Now(),
+					CreatedAt:     deletedAt,
 					OperationType: domain.EventProjectDeleted,
 				},
 			); err != nil {
