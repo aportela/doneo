@@ -39,6 +39,7 @@ func NewRouter(app *app.App) http.Handler {
 	uuidPattern := "[0-9a-fA-F-]{36}"
 
 	apiRouter.Route("/avatars", func(r chi.Router) {
+		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
 		r.Get("/{size:[0-9]+}/user/{id:"+uuidPattern+"}", func(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(
 				w,
@@ -63,7 +64,6 @@ func NewRouter(app *app.App) http.Handler {
 
 	apiRouter.Route("/users", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
-		r.Use(middlewares.RequireSuperUser)
 		r.Post("/", app.UserHandler.Add)
 		r.Post("/search", app.UserHandler.Search)
 		r.Get("/{id:"+uuidPattern+"}", app.UserHandler.Get)
@@ -74,7 +74,6 @@ func NewRouter(app *app.App) http.Handler {
 
 	apiRouter.Route("/roles", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
-		r.Use(middlewares.RequireSuperUser)
 		r.Post("/", app.RoleHandler.Add)
 		r.Post("/search", app.RoleHandler.Search)
 		r.Get("/{id:"+uuidPattern+"}", app.RoleHandler.Get)
@@ -84,7 +83,6 @@ func NewRouter(app *app.App) http.Handler {
 
 	apiRouter.Route("/project-types", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
-		r.Use(middlewares.RequireSuperUser)
 		r.Post("/", app.ProjectTypeHandler.Add)
 		r.Post("/search", app.ProjectTypeHandler.Search)
 		r.Get("/{id:"+uuidPattern+"}", app.ProjectTypeHandler.Get)
@@ -94,7 +92,6 @@ func NewRouter(app *app.App) http.Handler {
 
 	apiRouter.Route("/project-statuses", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
-		r.Use(middlewares.RequireSuperUser)
 		r.Post("/", app.ProjectStatusHandler.Add)
 		r.Post("/search", app.ProjectStatusHandler.Search)
 		r.Get("/{id:"+uuidPattern+"}", app.ProjectStatusHandler.Get)
@@ -104,7 +101,6 @@ func NewRouter(app *app.App) http.Handler {
 
 	apiRouter.Route("/project-priorities", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
-		r.Use(middlewares.RequireSuperUser)
 		r.Post("/", app.ProjectPriorityHandler.Add)
 		r.Post("/search", app.ProjectPriorityHandler.Search)
 		r.Get("/{id:"+uuidPattern+"}", app.ProjectPriorityHandler.Get)
@@ -114,7 +110,6 @@ func NewRouter(app *app.App) http.Handler {
 
 	apiRouter.Route("/task-statuses", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
-		r.Use(middlewares.RequireSuperUser)
 		r.Post("/", app.TaskStatusHandler.Add)
 		r.Post("/search", app.TaskStatusHandler.Search)
 		r.Get("/{id:"+uuidPattern+"}", app.TaskStatusHandler.Get)
@@ -124,7 +119,6 @@ func NewRouter(app *app.App) http.Handler {
 
 	apiRouter.Route("/task-priorities", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
-		r.Use(middlewares.RequireSuperUser)
 		r.Post("/", app.TaskPriorityHandler.Add)
 		r.Post("/search", app.TaskPriorityHandler.Search)
 		r.Get("/{id:"+uuidPattern+"}", app.TaskPriorityHandler.Get)
