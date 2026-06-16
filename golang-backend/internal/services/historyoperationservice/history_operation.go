@@ -40,7 +40,7 @@ func (service *historyOperationService) AddProjectHistoryOperation(ctx context.C
 func (service *historyOperationService) GetProjectHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) ([]domain.HistoryOperation, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return nil, fmt.Errorf("user not found in context")
+		return nil, fmt.Errorf("[HistoryOperationService] user not found in context")
 	}
 	if err := service.authorizationService.RequireProjectViewPermission(ctx, currentContextUserID, projectID); err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func (service *historyOperationService) AddTaskHistoryOperation(ctx context.Cont
 func (service *historyOperationService) GetTaskHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, taskID string) ([]domain.HistoryOperation, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return nil, fmt.Errorf("user not found in context")
+		return nil, fmt.Errorf("[HistoryOperationService] user not found in context")
 	}
 	if err := service.authorizationService.RequireTaskViewPermission(ctx, currentContextUserID, projectID); err != nil {
 		return nil, err

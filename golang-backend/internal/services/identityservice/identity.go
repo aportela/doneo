@@ -43,7 +43,7 @@ func (service *identityService) SignIn(ctx context.Context, email string, passwo
 func (service *identityService) GetCurrentUserInfo(ctx context.Context) (domain.User, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return domain.User{}, fmt.Errorf("user not found in context")
+		return domain.User{}, fmt.Errorf("[IdentityService] user not found in context")
 	}
 	user, err := service.userRepository.Get(ctx, service.db, currentContextUserID)
 	if err != nil {

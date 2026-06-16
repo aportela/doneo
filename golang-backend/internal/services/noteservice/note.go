@@ -136,7 +136,7 @@ func (service *noteService) DeleteProjectNote(ctx context.Context, projectID str
 func (service *noteService) GetProjectNotes(ctx context.Context, projectID string) ([]domain.Note, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return nil, fmt.Errorf("user not found in context")
+		return nil, fmt.Errorf("[NoteService] user not found in context")
 	}
 	if err := service.authorizationService.RequireProjectViewPermission(ctx, currentContextUserID, projectID); err != nil {
 		return nil, err
@@ -249,7 +249,7 @@ func (service *noteService) DeleteTaskNote(ctx context.Context, projectID string
 func (service *noteService) GetTaskNotes(ctx context.Context, projectID string, taskID string) ([]domain.Note, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return nil, fmt.Errorf("user not found in context")
+		return nil, fmt.Errorf("[NoteService] user not found in context")
 	}
 	if err := service.authorizationService.RequireTaskViewPermission(ctx, currentContextUserID, projectID); err != nil {
 		return nil, err

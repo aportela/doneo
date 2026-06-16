@@ -74,7 +74,7 @@ func (service *taskPriorityService) Delete(ctx context.Context, taskPriorityID s
 func (service *taskPriorityService) Get(ctx context.Context, taskPriorityID string) (domain.TaskPriority, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return domain.TaskPriority{}, fmt.Errorf("user not found in context")
+		return domain.TaskPriority{}, fmt.Errorf("[TaskPriorityService] user not found in context")
 	}
 
 	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
@@ -90,7 +90,7 @@ func (service *taskPriorityService) Get(ctx context.Context, taskPriorityID stri
 func (service *taskPriorityService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskPrioritiesFilter) ([]domain.TaskPriority, browser.Result, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return nil, browser.Result{}, fmt.Errorf("user not found in context")
+		return nil, browser.Result{}, fmt.Errorf("[TaskPriorityService] user not found in context")
 	}
 
 	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {

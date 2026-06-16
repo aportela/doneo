@@ -74,7 +74,7 @@ func (service *taskStatusService) Delete(ctx context.Context, taskStatusID strin
 func (service *taskStatusService) Get(ctx context.Context, taskStatusID string) (domain.TaskStatus, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return domain.TaskStatus{}, fmt.Errorf("user not found in context")
+		return domain.TaskStatus{}, fmt.Errorf("[TaskStatusService] user not found in context")
 	}
 
 	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
@@ -90,7 +90,7 @@ func (service *taskStatusService) Get(ctx context.Context, taskStatusID string) 
 func (service *taskStatusService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskStatusesFilter) ([]domain.TaskStatus, browser.Result, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return nil, browser.Result{}, fmt.Errorf("user not found in context")
+		return nil, browser.Result{}, fmt.Errorf("[TaskStatusService] user not found in context")
 	}
 
 	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {

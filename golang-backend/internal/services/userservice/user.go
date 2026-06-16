@@ -41,7 +41,7 @@ func NewService(db database.Database, authorizationService authorizationservice.
 func (service *userService) withUserAdminPermission(ctx context.Context, action func(userID string) error) error {
 	currentUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("user not found in context")
+		return fmt.Errorf("[UserService] user not found in context")
 	}
 
 	if err := service.authorizationService.RequireUserPermission(ctx, currentUserID); err != nil {

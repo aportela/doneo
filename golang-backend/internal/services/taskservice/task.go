@@ -151,7 +151,7 @@ func (service *taskService) Delete(ctx context.Context, projectID string, taskID
 func (service *taskService) Get(ctx context.Context, projectID string, taskID string) (domain.Task, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return domain.Task{}, fmt.Errorf("user not found in context")
+		return domain.Task{}, fmt.Errorf("[TaskService] user not found in context")
 	}
 	if err := service.authorizationService.RequireTaskViewPermission(ctx, currentContextUserID, projectID); err != nil {
 		return domain.Task{}, err
@@ -171,7 +171,7 @@ func (service *taskService) Get(ctx context.Context, projectID string, taskID st
 func (service *taskService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskFilter) ([]domain.Task, browser.Result, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return nil, browser.Result{}, fmt.Errorf("user not found in context")
+		return nil, browser.Result{}, fmt.Errorf("[TaskService] user not found in context")
 	}
 	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
 		// filter by tasks visible by current user when admin flag is not set

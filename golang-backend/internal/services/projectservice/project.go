@@ -38,7 +38,7 @@ func NewService(db database.Database, authorizationService authorizationservice.
 func (service *projectService) Add(ctx context.Context, project domain.Project) (domain.Project, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return domain.Project{}, fmt.Errorf("user not found in context")
+		return domain.Project{}, fmt.Errorf("[ProjectService] user not found in context")
 	}
 	project.ID = utils.UUID()
 	project.CreatedBy.ID = currentContextUserID
@@ -135,7 +135,7 @@ func (service *projectService) Delete(ctx context.Context, projectID string) err
 func (service *projectService) Get(ctx context.Context, projectID string) (domain.Project, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return domain.Project{}, fmt.Errorf("user not found in context")
+		return domain.Project{}, fmt.Errorf("[ProjectService] user not found in context")
 	}
 	if err := service.authorizationService.RequireProjectViewPermission(ctx, currentContextUserID, projectID); err != nil {
 		return domain.Project{}, err
@@ -150,7 +150,7 @@ func (service *projectService) Get(ctx context.Context, projectID string) (domai
 func (service *projectService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.Result, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return nil, browser.Result{}, fmt.Errorf("user not found in context")
+		return nil, browser.Result{}, fmt.Errorf("[ProjectService] user not found in context")
 	}
 	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
 		// filter by projects visible by current user when admin flag is not set

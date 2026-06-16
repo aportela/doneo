@@ -35,7 +35,7 @@ func NewService(db database.Database, authorizationService authorizationservice.
 func (service *projectPermissionService) withProjectUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("user not found in context")
+		return fmt.Errorf("[ProjectPermissionService] user not found in context")
 	}
 
 	if err := service.authorizationService.RequireProjectUpdatePermission(ctx, currentContextUserID, projectID); err != nil {
@@ -102,7 +102,7 @@ func (service *projectPermissionService) Delete(ctx context.Context, projectID s
 func (service *projectPermissionService) GetProjectPermissions(ctx context.Context, projectID string) ([]domain.ProjectPermission, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return nil, fmt.Errorf("user not found in context")
+		return nil, fmt.Errorf("[ProjectPermissionService] user not found in context")
 	}
 	if err := service.authorizationService.RequireProjectViewPermission(ctx, currentContextUserID, projectID); err != nil {
 		return nil, err

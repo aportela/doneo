@@ -32,7 +32,7 @@ func NewService(db database.Database, userTimerRepository usertimerrepository.Us
 func (service *userTimerService) StartUserTimer(ctx context.Context, summary string) error {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("user not found in context")
+		return fmt.Errorf("[UserTimerService] user not found in context")
 	}
 	err := service.userTimerRepository.StartUserTimer(ctx, utils.UUID(), currentContextUserID, summary, time.Now().UnixMilli())
 	return err
@@ -41,7 +41,7 @@ func (service *userTimerService) StartUserTimer(ctx context.Context, summary str
 func (service *userTimerService) StopUserTimer(ctx context.Context, userTimerID string) error {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("user not found in context")
+		return fmt.Errorf("[UserTimerService] user not found in context")
 	}
 	err := service.userTimerRepository.StopUserTimer(ctx, userTimerID, currentContextUserID, time.Now().UnixMilli())
 	return err
@@ -50,7 +50,7 @@ func (service *userTimerService) StopUserTimer(ctx context.Context, userTimerID 
 func (service *userTimerService) DeleteUserTimer(ctx context.Context, userTimerID string) error {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("user not found in context")
+		return fmt.Errorf("[UserTimerService] user not found in context")
 	}
 	err := service.userTimerRepository.DeleteUserTimer(ctx, userTimerID, currentContextUserID)
 	return err
@@ -59,7 +59,7 @@ func (service *userTimerService) DeleteUserTimer(ctx context.Context, userTimerI
 func (service *userTimerService) ClearUserTimers(ctx context.Context) error {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("[TimerService] user not found in context")
+		return fmt.Errorf("[UserTimerService] user not found in context")
 	}
 	err := service.userTimerRepository.ClearUserTimers(ctx, service.db, currentContextUserID)
 	return err
@@ -68,11 +68,11 @@ func (service *userTimerService) ClearUserTimers(ctx context.Context) error {
 func (service *userTimerService) GetUserTimers(ctx context.Context) ([]domain.UserTimer, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return nil, fmt.Errorf("[TimerService] user not found in context")
+		return nil, fmt.Errorf("[UserTimerService] user not found in context")
 	}
 	userTimers, err := service.userTimerRepository.GetUserTimers(ctx, service.db, currentContextUserID)
 	if err != nil {
-		return nil, fmt.Errorf("[TimerService] failed to get user timers: %w", err)
+		return nil, fmt.Errorf("[UserTimerService] failed to get user timers: %w", err)
 	}
 	return userTimers, nil
 }

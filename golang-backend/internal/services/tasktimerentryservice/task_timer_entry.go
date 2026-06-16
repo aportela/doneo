@@ -122,14 +122,14 @@ func (service *taskTimerEntryService) Delete(ctx context.Context, projectID stri
 func (service *taskTimerEntryService) GetTaskTimerEntries(ctx context.Context, projectID string, taskID string) ([]domain.TaskTimerEntry, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return nil, fmt.Errorf("user not found in context")
+		return nil, fmt.Errorf("[TaskTimerEntryService] user not found in context")
 	}
 	if err := service.authorizationService.RequireTaskViewPermission(ctx, currentContextUserID, projectID); err != nil {
 		return nil, err
 	}
 	taskTimerEntries, err := service.taskTimerEntryRepository.GetTaskTimerEntries(ctx, service.db, taskID)
 	if err != nil {
-		return nil, fmt.Errorf("[TaskTimeEntryService] failed to get task timer entries: %w", err)
+		return nil, fmt.Errorf("[TaskTimerEntryService] failed to get task timer entries: %w", err)
 	}
 	return taskTimerEntries, nil
 }
