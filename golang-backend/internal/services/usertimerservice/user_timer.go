@@ -34,7 +34,7 @@ func (service *userTimerService) StartUserTimer(ctx context.Context, summary str
 	if !ok {
 		return fmt.Errorf("[UserTimerService] user not found in context")
 	}
-	err := service.userTimerRepository.StartUserTimer(ctx, utils.UUID(), currentContextUserID, summary, time.Now().UnixMilli())
+	err := service.userTimerRepository.StartUserTimer(ctx, service.db, utils.UUID(), currentContextUserID, summary, time.Now().UnixMilli())
 	return err
 }
 
@@ -43,7 +43,7 @@ func (service *userTimerService) StopUserTimer(ctx context.Context, userTimerID 
 	if !ok {
 		return fmt.Errorf("[UserTimerService] user not found in context")
 	}
-	err := service.userTimerRepository.StopUserTimer(ctx, userTimerID, currentContextUserID, time.Now().UnixMilli())
+	err := service.userTimerRepository.StopUserTimer(ctx, service.db, userTimerID, currentContextUserID, time.Now().UnixMilli())
 	return err
 }
 
@@ -52,7 +52,7 @@ func (service *userTimerService) DeleteUserTimer(ctx context.Context, userTimerI
 	if !ok {
 		return fmt.Errorf("[UserTimerService] user not found in context")
 	}
-	err := service.userTimerRepository.DeleteUserTimer(ctx, userTimerID, currentContextUserID)
+	err := service.userTimerRepository.DeleteUserTimer(ctx, service.db, userTimerID, currentContextUserID)
 	return err
 }
 
