@@ -228,6 +228,7 @@ func randomText(n int) string {
 
 	return string(b)
 }
+
 func createProjects(db database.Database, projectTypeIds []string, projectPriorityIds []string, projectStatusIds []string, userIds []string, roleIds []string, taskStatusIds []string, taskPriorityIds []string, count int) []string {
 	var newProjectIds []string
 	historyOperationService := historyoperationservice.NewService(historyoperationrepository.NewRepository())
