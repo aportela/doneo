@@ -17,7 +17,7 @@ import (
 	"github.com/aportela/doneo/internal/handlers/taskhandler"
 	"github.com/aportela/doneo/internal/handlers/taskpriorityhandler"
 	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
-	"github.com/aportela/doneo/internal/handlers/tasktimeentryhandler"
+	"github.com/aportela/doneo/internal/handlers/tasktimerentryhandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 	"github.com/aportela/doneo/internal/handlers/usertimerhandler"
 	"github.com/aportela/doneo/internal/repositories/attachmentrepository"
@@ -73,7 +73,7 @@ type App struct {
 	RoleHandler              rolehandler.RoleHandler
 	TaskPriorityHandler      taskpriorityhandler.TaskPriorityHandler
 	TaskStatusHandler        taskstatushandler.TaskStatusHandler
-	TaskTimeEntryHandler     tasktimeentryhandler.TaskTimeEntryHandler
+	TaskTimerEntryHandler    tasktimerentryhandler.TaskTimerEntryHandler
 	UserTimerHandler         usertimerhandler.UserTimerHandler
 	UserHandler              userhandler.UserHandler
 }
@@ -124,7 +124,7 @@ func NewApp(
 	userService := userservice.NewService(db, authorizationService, userRepository)
 
 	attachmentHandler := attachmenthandler.NewHandler(attachmentService, cfg.Storage.AttachmentsPath)
-	authHandler := authhandler.NewHandler(identityService, cfg.Auth.SecretKey, cfg.Auth.AccessTokenExpirationHours, cfg.Auth.RefreshTokenExpirationDays)
+	identityHandler := identityhandler.NewHandler(identityService, cfg.Auth.SecretKey, cfg.Auth.AccessTokenExpirationHours, cfg.Auth.RefreshTokenExpirationDays)
 	historyOperationHandler := historyoperationhandler.NewHandler(db, historyOperationService)
 	noteHandler := notehandler.NewHandler(noteService)
 	projectPermissionHandler := projectpermissionhandler.NewHandler(projectPermissionService)
@@ -136,7 +136,7 @@ func NewApp(
 	roleHandler := rolehandler.NewHandler(roleService)
 	taskPriorityHandler := taskpriorityhandler.NewHandler(taskPriorityService)
 	taskStatusHandler := taskstatushandler.NewHandler(taskStatusService)
-	taskTimeEntryHandler := tasktimeentryhandler.NewHandler(taskTimerEntryService)
+	taskTimerEntryHandler := tasktimerentryhandler.NewHandler(taskTimerEntryService)
 	userTimerHandler := usertimerhandler.NewHandler(userTimerService)
 	userHandler := userhandler.NewHandler(userService)
 
@@ -146,7 +146,7 @@ func NewApp(
 		Cache: cache,
 
 		AttachmentHandler:        *attachmentHandler,
-		IdentityHandler:          *authHandler,
+		IdentityHandler:          *identityHandler,
 		HistoryOperationHandler:  *historyOperationHandler,
 		NoteHandler:              *noteHandler,
 		ProjectPermissionHandler: *projectPermissionHandler,
@@ -158,7 +158,7 @@ func NewApp(
 		RoleHandler:              *roleHandler,
 		TaskPriorityHandler:      *taskPriorityHandler,
 		TaskStatusHandler:        *taskStatusHandler,
-		TaskTimeEntryHandler:     *taskTimeEntryHandler,
+		TaskTimerEntryHandler:    *taskTimerEntryHandler,
 		UserTimerHandler:         *userTimerHandler,
 		UserHandler:              *userHandler,
 	}
