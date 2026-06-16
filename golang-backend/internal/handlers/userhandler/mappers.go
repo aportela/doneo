@@ -19,7 +19,6 @@ func addRequestToDomain(request addRequest) domain.User {
 	return domain.User{
 		UserBase:           domain.UserBase{Name: request.Name},
 		Email:              request.Email,
-		Password:           request.Password,
 		PermissionsBitmask: permissionsToDomainPermissionsBitmask(request.Permissions),
 	}
 }
@@ -29,9 +28,6 @@ func updateRequestToDomain(request updateRequest) domain.User {
 		UserBase:           domain.UserBase{Name: request.Name},
 		Email:              request.Email,
 		PermissionsBitmask: permissionsToDomainPermissionsBitmask(request.Permissions),
-	}
-	if request.Password != nil {
-		user.Password = *request.Password
 	}
 	return user
 }

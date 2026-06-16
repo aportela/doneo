@@ -45,7 +45,7 @@ func (handler *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	user := updateRequestToDomain(request)
 	user.ID = chi.URLParam(r, "id")
-	user, err := handler.service.Update(r.Context(), user)
+	user, err := handler.service.Update(r.Context(), user, request.Password)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] failed to update user: %w", err))
 		return
@@ -60,9 +60,9 @@ func (handler *UserHandler) Patch(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] invalid request payload: %w", err))
 		return
 	}
-	userId := chi.URLParam(r, "id")
+	userID := chi.URLParam(r, "id")
 
-	user, err := handler.service.Get(r.Context(), userId)
+	user, err := handler.service.Get(r.Context(), userID)
 	if err != nil {
 		if err == domain.NotFoundError {
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] failed to get non existent user: %w", err))
@@ -86,9 +86,9 @@ func (handler *UserHandler) Patch(w http.ResponseWriter, r *http.Request) {
 
 func (handler *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	userId := chi.URLParam(r, "id")
+	userID := chi.URLParam(r, "id")
 	// TODO: deny delete current session user ?
-	err := handler.service.Delete(r.Context(), userId)
+	err := handler.service.Delete(r.Context(), userID)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserService] failed to delete user: %w", err))
 		return
@@ -98,8 +98,8 @@ func (handler *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 func (handler *UserHandler) Purge(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	userId := chi.URLParam(r, "id")
-	err := handler.service.Purge(r.Context(), userId)
+	userID := chi.URLParam(r, "id")
+	err := handler.service.Purge(r.Context(), userID)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserService] failed to purge user: %w", err))
 		return
@@ -109,8 +109,8 @@ func (handler *UserHandler) Purge(w http.ResponseWriter, r *http.Request) {
 
 func (handler *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	userId := chi.URLParam(r, "id")
-	user, err := handler.service.Get(r.Context(), userId)
+	userID := chi.URLParam(r, "id")
+	user, err := handler.service.Get(r.Context(), userID)
 	if err != nil {
 		if err == domain.NotFoundError {
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserService] failed to get non existent user: %w", err))
