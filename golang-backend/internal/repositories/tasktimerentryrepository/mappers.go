@@ -1,4 +1,4 @@
-package tasktimeentryrepository
+package tasktimerentryrepository
 
 import (
 	"errors"

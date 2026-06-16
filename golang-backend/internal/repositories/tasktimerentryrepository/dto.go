@@ -1,4 +1,4 @@
-package tasktimeentryrepository
+package tasktimerentryrepository
 
 type taskTimerEntryDTO struct {
 	ID           string `db:"id"`
