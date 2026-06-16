@@ -10,6 +10,7 @@ import (
 	"github.com/aportela/doneo/internal/cache"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"github.com/aportela/doneo/internal/services/authorizationservice"
@@ -64,9 +65,10 @@ func createUsers(db database.Database, count int) []string {
 	userRepository := userrepository.NewRepository()
 	authorizationService := authorizationservice.NewService(db, cache.NewPermissionCache(), userRepository, projectpermissionrepository.NewRepository())
 	service := userservice.NewService(db, authorizationService, userRepository)
+	ctx := middlewares.SetContextUser(context.Background(), middlewares.ContextUser{UserBase: domain.UserBase{}, SkipAuthorization: true})
 	for i := 1; i <= count; i++ {
 		newUser := getRandomUser()
-		newUser, err := service.Add(context.Background(), newUser, "secret")
+		newUser, err := service.Add(ctx, newUser, "secret")
 		if err != nil {
 			fmt.Printf("Error creating user %s\n", err.Error())
 		} else {

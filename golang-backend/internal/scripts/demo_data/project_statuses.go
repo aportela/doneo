@@ -7,6 +7,7 @@ import (
 	"github.com/aportela/doneo/internal/cache"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/projectstatusrepository"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
@@ -22,6 +23,7 @@ func createProjectStatuses(db database.Database) []string {
 	var newProjectStatusIds []string
 	authorizationService := authorizationservice.NewService(db, cache.NewPermissionCache(), userrepository.NewRepository(), projectpermissionrepository.NewRepository())
 	service := projectstatusservice.NewService(db, authorizationService, projectstatusrepository.NewRepository())
+	ctx := middlewares.SetContextUser(context.Background(), middlewares.ContextUser{UserBase: domain.UserBase{}, SkipAuthorization: true})
 	for index, projectStatusName := range projectStatusNames {
 		var flags domain.Bitmask
 		switch projectStatusName {
@@ -39,7 +41,7 @@ func createProjectStatuses(db database.Database) []string {
 			Index:    uint(index),
 			Flags:    flags,
 		}
-		projectStatus, err := service.Add(context.Background(), projectStatus)
+		projectStatus, err := service.Add(ctx, projectStatus)
 		if err != nil {
 			fmt.Printf("Error creating project status %s\n", err.Error())
 		}

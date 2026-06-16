@@ -240,9 +240,7 @@ func createProjects(db database.Database, projectTypeIds []string, projectPriori
 	taskService := taskservice.NewService(db, authorizationService, historyOperationService, taskrepository.NewRepository(), tagrepository.NewRepository())
 	for i := 1; i <= count; i++ {
 		newProject := getRandomProject(userIds, projectTypeIds, projectPriorityIds, projectStatusIds)
-		ctx := context.Background()
-		//ctx = middlewares.SetUserIDIntoContext(ctx, userIds[0])
-		ctx = middlewares.SetContextUser(ctx, middlewares.ContextUser{UserBase: domain.UserBase{ID: userIds[0]}, SkipAuthorization: true})
+		ctx := middlewares.SetContextUser(context.Background(), middlewares.ContextUser{UserBase: domain.UserBase{ID: userIds[0]}, SkipAuthorization: true})
 		newProject, err := projectService.Add(ctx, newProject)
 		if err != nil {
 			fmt.Printf("Error creating project %s\n", err.Error())

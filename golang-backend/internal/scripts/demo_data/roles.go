@@ -7,6 +7,7 @@ import (
 	"github.com/aportela/doneo/internal/cache"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/rolerepository"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
@@ -26,7 +27,8 @@ func createRoles(db database.Database) []string {
 		},
 		PermissionsBitmask: permissionBitMask,
 	}
-	role, err := roleService.Add(context.Background(), role)
+	ctx := middlewares.SetContextUser(context.Background(), middlewares.ContextUser{UserBase: domain.UserBase{}, SkipAuthorization: true})
+	role, err := roleService.Add(ctx, role)
 	if err != nil {
 		fmt.Printf("Error creating role %s\n", err.Error())
 	} else {
@@ -36,7 +38,7 @@ func createRoles(db database.Database) []string {
 	permissionBitMask.AddFlag(domain.PermissionViewProject | domain.PermissionViewTask)
 	role.Name = "Guest"
 	role.PermissionsBitmask = permissionBitMask
-	role, err = roleService.Add(context.Background(), role)
+	role, err = roleService.Add(ctx, role)
 	if err != nil {
 		fmt.Printf("Error creating role %s\n", err.Error())
 	} else {

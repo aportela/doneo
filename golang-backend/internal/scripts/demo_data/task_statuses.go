@@ -7,6 +7,7 @@ import (
 	"github.com/aportela/doneo/internal/cache"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/taskstatusrepository"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
@@ -22,6 +23,7 @@ func createTaskStatuses(db database.Database) []string {
 	var newTaskStatusIds []string
 	authorizationService := authorizationservice.NewService(db, cache.NewPermissionCache(), userrepository.NewRepository(), projectpermissionrepository.NewRepository())
 	taskStatusService := taskstatusservice.NewService(db, authorizationService, taskstatusrepository.NewRepository())
+	ctx := middlewares.SetContextUser(context.Background(), middlewares.ContextUser{UserBase: domain.UserBase{}, SkipAuthorization: true})
 	for index, taskStatusName := range taskStatusNames {
 		var flags domain.Bitmask
 		switch taskStatusName {
@@ -39,7 +41,7 @@ func createTaskStatuses(db database.Database) []string {
 			Index:    uint(index),
 			Flags:    flags,
 		}
-		taskStatus, err := taskStatusService.Add(context.Background(), taskStatus)
+		taskStatus, err := taskStatusService.Add(ctx, taskStatus)
 		if err != nil {
 			fmt.Printf("Error creating tas status %s\n", err.Error())
 		}
