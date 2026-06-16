@@ -11,10 +11,10 @@ import (
 )
 
 type TaskTimeEntryHandler struct {
-	service tasktimeentryservice.TaskTimeEntryService
+	service tasktimeentryservice.TaskTimerEntryService
 }
 
-func NewHandler(service tasktimeentryservice.TaskTimeEntryService) *TaskTimeEntryHandler {
+func NewHandler(service tasktimeentryservice.TaskTimerEntryService) *TaskTimeEntryHandler {
 	return &TaskTimeEntryHandler{service: service}
 }
 

@@ -2,135 +2,134 @@ package tasktimeentryservice
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"time"
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
-	"github.com/aportela/doneo/internal/repositories/tasktimeentryrepository"
+	"github.com/aportela/doneo/internal/repositories/tasktimerentryrepository"
+	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/services/historyoperationservice"
 	"github.com/aportela/doneo/internal/utils"
 )
 
-type TaskTimeEntryService interface {
-	Add(ctx context.Context, projectId string, taskId string, taskTimeEntry domain.TaskTimerEntry) error
-	Update(ctx context.Context, projectId string, taskId string, taskTimeEntry domain.TaskTimerEntry) error
-	Delete(ctx context.Context, projectId string, taskId string, taskTimeEntryId string) error
-	Get(ctx context.Context, id string) (domain.TaskTimerEntry, error)
-	GetTaskTimeEntries(ctx context.Context, taskId string) ([]domain.TaskTimerEntry, error)
+type TaskTimerEntryService interface {
+	Add(ctx context.Context, projectID string, taskID string, taskTimerEntry domain.TaskTimerEntry) error
+	Update(ctx context.Context, projectID string, taskID string, taskTimerEntry domain.TaskTimerEntry) error
+	Delete(ctx context.Context, projectID string, taskID string, taskTimeEntryID string) error
+	GetTaskTimerEntries(ctx context.Context, projectID string, taskID string) ([]domain.TaskTimerEntry, error)
 }
 
-type taskTimeEntryService struct {
-	database   database.Database
-	history    historyoperationservice.HistoryOperationService
-	repository tasktimeentryrepository.TaskTimeEntryRepository
+type taskTimerEntryService struct {
+	db                       database.Database
+	authorizationService     authorizationservice.AuthorizationService
+	historyOperationService  historyoperationservice.HistoryOperationService
+	taskTimerEntryRepository tasktimerentryrepository.TaskTimerEntryRepository
 }
 
-func NewService(db database.Database, history historyoperationservice.HistoryOperationService, repository tasktimeentryrepository.TaskTimeEntryRepository) TaskTimeEntryService {
-	return &taskTimeEntryService{database: db, history: history, repository: repository}
+func NewService(db database.Database, authorizationService authorizationservice.AuthorizationService, historyOperationService historyoperationservice.HistoryOperationService, taskTimerEntryRepository tasktimerentryrepository.TaskTimerEntryRepository) TaskTimerEntryService {
+	return &taskTimerEntryService{db: db, authorizationService: authorizationService, historyOperationService: historyOperationService, taskTimerEntryRepository: taskTimerEntryRepository}
 }
 
-func (service *taskTimeEntryService) Add(ctx context.Context, projectId string, taskId string, taskTimeEntry domain.TaskTimerEntry) error {
-	tx, err := service.database.Begin()
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if p := recover(); p != nil {
-			_ = tx.Rollback()
-			panic(p)
-		} else if err != nil {
-			_ = tx.Rollback()
-		}
-	}()
-	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
+func (service *taskTimerEntryService) Add(ctx context.Context, projectID string, taskID string, taskTimerEntry domain.TaskTimerEntry) error {
+	err := service.authorizationService.WithTaskUpdatePermission(ctx, projectID, func(currentUserID string) error {
+		taskTimerEntry.CreatedBy.ID = currentUserID
+		taskTimerEntry.CreatedAt = time.Now()
+		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+			if err := service.taskTimerEntryRepository.Add(ctx, tx, taskID, taskTimerEntry); err != nil {
+				return err
+			}
+
+			if _, err := service.historyOperationService.AddTaskHistoryOperation(
+				ctx,
+				tx,
+				projectID,
+				taskID,
+				domain.HistoryOperation{
+					ID:            utils.UUID(),
+					CreatedBy:     domain.UserBase{ID: currentUserID},
+					CreatedAt:     taskTimerEntry.CreatedAt,
+					OperationType: domain.EventTaskTimeEntryAdded,
+				},
+			); err != nil {
+				return err
+			}
+
+			return nil
+		})
+	})
+	return err
+}
+
+func (service *taskTimerEntryService) Update(ctx context.Context, projectID string, taskID string, taskTimerEntry domain.TaskTimerEntry) error {
+	err := service.authorizationService.WithTaskUpdatePermission(ctx, projectID, func(currentUserID string) error {
+		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+			if err := service.taskTimerEntryRepository.Add(ctx, tx, taskID, taskTimerEntry); err != nil {
+				return err
+			}
+
+			if _, err := service.historyOperationService.AddTaskHistoryOperation(
+				ctx,
+				tx,
+				projectID,
+				taskID,
+				domain.HistoryOperation{
+					ID:            utils.UUID(),
+					CreatedBy:     domain.UserBase{ID: currentUserID},
+					CreatedAt:     time.Now(),
+					OperationType: domain.EventTaskTimeEntryUpdated,
+				},
+			); err != nil {
+				return err
+			}
+
+			return nil
+		})
+	})
+	return err
+}
+
+func (service *taskTimerEntryService) Delete(ctx context.Context, projectID string, taskID string, taskTimeEntryID string) error {
+	err := service.authorizationService.WithTaskUpdatePermission(ctx, projectID, func(currentUserID string) error {
+		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+			if err := service.taskTimerEntryRepository.Delete(ctx, tx, taskTimeEntryID); err != nil {
+				return err
+			}
+
+			if _, err := service.historyOperationService.AddTaskHistoryOperation(
+				ctx,
+				tx,
+				projectID,
+				taskID,
+				domain.HistoryOperation{
+					ID:            utils.UUID(),
+					CreatedBy:     domain.UserBase{ID: currentUserID},
+					CreatedAt:     time.Now(),
+					OperationType: domain.EventTaskTimeEntryDeleted,
+				},
+			); err != nil {
+				return err
+			}
+
+			return nil
+		})
+	})
+	return err
+}
+
+func (service *taskTimerEntryService) GetTaskTimerEntries(ctx context.Context, projectID string, taskID string) ([]domain.TaskTimerEntry, error) {
+	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return fmt.Errorf("[TaskTimeEntryService] user ID not found in context")
+		return nil, fmt.Errorf("user not found in context")
 	}
-	taskTimeEntry.CreatedBy.ID = currentUserId
-	taskTimeEntry.CreatedAt = time.Now()
-	err = service.repository.Add(ctx, taskId, taskTimeEntry)
+	if err := service.authorizationService.RequireTaskViewPermission(ctx, currentContextUserID, projectID); err != nil {
+		return nil, err
+	}
+	taskTimerEntries, err := service.taskTimerEntryRepository.GetTaskTimerEntries(ctx, service.db, taskID)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("[TaskTimeEntryService] failed to get task timer entries: %w", err)
 	}
-	_, err = service.history.AddTaskHistoryOperation(ctx, tx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: taskTimeEntry.CreatedAt, OperationType: domain.EventTaskTimeEntryAdded})
-	if err != nil {
-		return err
-	}
-	err = tx.Commit()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (service *taskTimeEntryService) Update(ctx context.Context, projectId string, taskId string, taskTimeEntry domain.TaskTimerEntry) error {
-	tx, err := service.database.Begin()
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if p := recover(); p != nil {
-			_ = tx.Rollback()
-			panic(p)
-		} else if err != nil {
-			_ = tx.Rollback()
-		}
-	}()
-	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return fmt.Errorf("[TaskTimeEntryService] user ID not found in context")
-	}
-	if err := service.repository.Update(ctx, taskTimeEntry); err != nil {
-		return fmt.Errorf("[TaskTimeEntryService] failed to update task time entry with ID %s: %w", taskTimeEntry.ID, err)
-	}
-	_, err = service.history.AddTaskHistoryOperation(ctx, tx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskTimeEntryUpdated})
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (service *taskTimeEntryService) Delete(ctx context.Context, projectId string, taskId string, taskTimeEntryId string) error {
-	tx, err := service.database.Begin()
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if p := recover(); p != nil {
-			_ = tx.Rollback()
-			panic(p)
-		} else if err != nil {
-			_ = tx.Rollback()
-		}
-	}()
-	currentUserId, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return fmt.Errorf("[TaskTimeEntryService] user ID not found in context")
-	}
-	if err := service.repository.Delete(ctx, taskTimeEntryId); err != nil {
-		return fmt.Errorf("[TaskTimeEntryService] failed to delete task time entry with ID %s: %w", taskTimeEntryId, err)
-	}
-	_, err = service.history.AddTaskHistoryOperation(ctx, tx, projectId, taskId, domain.HistoryOperation{ID: utils.UUID(), CreatedBy: domain.UserBase{ID: currentUserId}, CreatedAt: time.Now(), OperationType: domain.EventTaskTimeEntryDeleted})
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (service *taskTimeEntryService) Get(ctx context.Context, id string) (domain.TaskTimerEntry, error) {
-	taskTimeEntry, err := service.repository.Get(ctx, id)
-	if err != nil {
-		return domain.TaskTimerEntry{}, fmt.Errorf("[TaskTimeEntryService] failed to get task time entry with ID %s: %w", id, err)
-	}
-	return taskTimeEntry, nil
-}
-
-func (service *taskTimeEntryService) GetTaskTimeEntries(ctx context.Context, taskId string) ([]domain.TaskTimerEntry, error) {
-	taskTimeEntries, err := service.repository.GetTaskTimeEntries(ctx, taskId)
-	if err != nil {
-		return nil, fmt.Errorf("[TaskTimeEntryService] failed to get task time entries: %w", err)
-	}
-	return taskTimeEntries, nil
+	return taskTimerEntries, nil
 }
