@@ -31,9 +31,9 @@ func NewRouter(app *app.App) http.Handler {
 	apiRouter := chi.NewRouter()
 
 	apiRouter.Route("/auth", func(r chi.Router) {
-		r.Post("/signin", app.AuthHandler.SignIn)
-		r.Post("/signout", app.AuthHandler.SignOut)
-		r.Post("/renew-access-token", app.AuthHandler.RenewAccessToken)
+		r.Post("/signin", app.IdentityHandler.SignIn)
+		r.Post("/signout", app.IdentityHandler.SignOut)
+		r.Post("/renew-access-token", app.IdentityHandler.RenewAccessToken)
 	})
 
 	uuidPattern := "[0-9a-fA-F-]{36}"
@@ -134,11 +134,11 @@ func NewRouter(app *app.App) http.Handler {
 
 	apiRouter.Route("/timers", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
-		r.Post("/", app.TimerHandler.Start)
-		r.Put("/{id:"+uuidPattern+"}", app.TimerHandler.Stop)
-		r.Delete("/{id:"+uuidPattern+"}", app.TimerHandler.Delete)
-		r.Delete("/", app.TimerHandler.Clear)
-		r.Get("/", app.TimerHandler.Search)
+		r.Post("/", app.UserTimerHandler.Start)
+		r.Put("/{id:"+uuidPattern+"}", app.UserTimerHandler.Stop)
+		r.Delete("/{id:"+uuidPattern+"}", app.UserTimerHandler.Delete)
+		r.Delete("/", app.UserTimerHandler.Clear)
+		r.Get("/", app.UserTimerHandler.Search)
 	})
 
 	apiRouter.Route("/projects", func(r chi.Router) {

@@ -5,8 +5,8 @@ import (
 	"github.com/aportela/doneo/internal/config"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/handlers/attachmenthandler"
-	"github.com/aportela/doneo/internal/handlers/authhandler"
 	"github.com/aportela/doneo/internal/handlers/historyoperationhandler"
+	"github.com/aportela/doneo/internal/handlers/identityhandler"
 	"github.com/aportela/doneo/internal/handlers/notehandler"
 	"github.com/aportela/doneo/internal/handlers/projecthandler"
 	"github.com/aportela/doneo/internal/handlers/projectpermissionhandler"
@@ -18,8 +18,8 @@ import (
 	"github.com/aportela/doneo/internal/handlers/taskpriorityhandler"
 	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
 	"github.com/aportela/doneo/internal/handlers/tasktimeentryhandler"
-	"github.com/aportela/doneo/internal/handlers/timerhandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
+	"github.com/aportela/doneo/internal/handlers/usertimerhandler"
 	"github.com/aportela/doneo/internal/repositories/attachmentrepository"
 	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
 	"github.com/aportela/doneo/internal/repositories/noterepository"
@@ -29,16 +29,17 @@ import (
 	"github.com/aportela/doneo/internal/repositories/projectstatusrepository"
 	"github.com/aportela/doneo/internal/repositories/projecttyperepository"
 	"github.com/aportela/doneo/internal/repositories/rolerepository"
+	"github.com/aportela/doneo/internal/repositories/tagrepository"
 	"github.com/aportela/doneo/internal/repositories/taskpriorityrepository"
 	"github.com/aportela/doneo/internal/repositories/taskrepository"
 	"github.com/aportela/doneo/internal/repositories/taskstatusrepository"
-	"github.com/aportela/doneo/internal/repositories/tasktimeentryrepository"
-	"github.com/aportela/doneo/internal/repositories/timerrepository"
+	"github.com/aportela/doneo/internal/repositories/tasktimerentryrepository"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
+	"github.com/aportela/doneo/internal/repositories/usertimerrepository"
 	"github.com/aportela/doneo/internal/services/attachmentservice"
 	"github.com/aportela/doneo/internal/services/authorizationservice"
-	"github.com/aportela/doneo/internal/services/authservice"
 	"github.com/aportela/doneo/internal/services/historyoperationservice"
+	"github.com/aportela/doneo/internal/services/identityservice"
 	"github.com/aportela/doneo/internal/services/noteservice"
 	"github.com/aportela/doneo/internal/services/projectpermissionservice"
 	"github.com/aportela/doneo/internal/services/projectpriorityservice"
@@ -49,9 +50,9 @@ import (
 	"github.com/aportela/doneo/internal/services/taskpriorityservice"
 	"github.com/aportela/doneo/internal/services/taskservice"
 	"github.com/aportela/doneo/internal/services/taskstatusservice"
-	"github.com/aportela/doneo/internal/services/tasktimeentryservice"
-	"github.com/aportela/doneo/internal/services/timerservice"
+	"github.com/aportela/doneo/internal/services/tasktimerentryservice"
 	"github.com/aportela/doneo/internal/services/userservice"
+	"github.com/aportela/doneo/internal/services/usertimerservice"
 )
 
 type App struct {
@@ -60,7 +61,7 @@ type App struct {
 	Cache cache.PermissionCache
 
 	AttachmentHandler        attachmenthandler.AttachmentHandler
-	AuthHandler              authhandler.AuthHandler
+	IdentityHandler          identityhandler.IdentityHandler
 	HistoryOperationHandler  historyoperationhandler.HistoryOperationHandler
 	NoteHandler              notehandler.NoteHandler
 	ProjectPermissionHandler projectpermissionhandler.ProjectPermissionHandler
@@ -73,7 +74,7 @@ type App struct {
 	TaskPriorityHandler      taskpriorityhandler.TaskPriorityHandler
 	TaskStatusHandler        taskstatushandler.TaskStatusHandler
 	TaskTimeEntryHandler     tasktimeentryhandler.TaskTimeEntryHandler
-	TimerHandler             timerhandler.TimerHandler
+	UserTimerHandler         usertimerhandler.UserTimerHandler
 	UserHandler              userhandler.UserHandler
 }
 
@@ -84,45 +85,46 @@ func NewApp(
 
 ) *App {
 
-	attachmentRepository := attachmentrepository.NewRepository(db)
+	attachmentRepository := attachmentrepository.NewRepository()
 	historyOperationRepository := historyoperationrepository.NewRepository()
 	noteRepository := noterepository.NewRepository()
-	projectPermissionRepository := projectpermissionrepository.NewRepository(db)
-	projectPriorityRepository := projectpriorityrepository.NewRepository(db)
-	projectRepository := projectrepository.NewRepository(db)
-	projectStatusRepository := projectstatusrepository.NewRepository(db)
-	taskRepository := taskrepository.NewRepository(db)
-	projectTypeRepository := projecttyperepository.NewRepository(db)
-	roleRepository := rolerepository.NewRepository(db)
-	//tagRepository := tagrepository.NewRepository(db)
-	taskPriorityRepository := taskpriorityrepository.NewRepository(db)
-	//taskRelationRepository := taskrelationrepository.NewRepository(db)
-	taskStatusRepository := taskstatusrepository.NewRepository(db)
-	taskTimeEntryRepository := tasktimeentryrepository.NewRepository(db)
+	projectPermissionRepository := projectpermissionrepository.NewRepository()
+	projectPriorityRepository := projectpriorityrepository.NewRepository()
+	projectRepository := projectrepository.NewRepository()
+	projectStatusRepository := projectstatusrepository.NewRepository()
+	taskRepository := taskrepository.NewRepository()
+	tagRepository := tagrepository.NewRepository()
+	projectTypeRepository := projecttyperepository.NewRepository()
+	roleRepository := rolerepository.NewRepository()
+	taskPriorityRepository := taskpriorityrepository.NewRepository()
+	//taskRelationRepository := taskrelationrepository.NewRepository()
+	taskStatusRepository := taskstatusrepository.NewRepository()
+	taskTimerEntryRepository := tasktimerentryrepository.NewRepository()
 
-	timerRepository := timerrepository.NewRepository(db)
-	userRepository := userrepository.NewRepository(db)
+	userTimerRepository := usertimerrepository.NewRepository()
+	userRepository := userrepository.NewRepository()
 
-	historyOperationService := historyoperationservice.NewService(historyOperationRepository)
-	attachmentService := attachmentservice.NewService(db, historyOperationService, attachmentRepository)
-	authorizationService := authorizationservice.NewService(db, cache)
-	authService := authservice.NewService(db, userRepository)
-	noteService := noteservice.NewService(db, historyOperationService, authorizationService, noteRepository)
-	projectPermissionService := projectpermissionservice.NewService(db, cache, historyOperationService, projectPermissionRepository)
-	projectPriorityService := projectpriorityservice.NewService(db, projectPriorityRepository)
+	authorizationService := authorizationservice.NewService(db, cache, userRepository, projectPermissionRepository)
+
+	historyOperationService := historyoperationservice.NewService(authorizationService, historyOperationRepository)
+	attachmentService := attachmentservice.NewService(db, authorizationService, historyOperationService, attachmentRepository)
+	identityService := identityservice.NewService(db, userRepository)
+	noteService := noteservice.NewService(db, authorizationService, historyOperationService, noteRepository)
+	projectPermissionService := projectpermissionservice.NewService(db, authorizationService, historyOperationService, projectPermissionRepository)
+	projectPriorityService := projectpriorityservice.NewService(db, authorizationService, projectPriorityRepository)
 	projectService := projectservice.NewService(db, authorizationService, historyOperationService, projectRepository)
-	projectStatusService := projectstatusservice.NewService(db, projectStatusRepository)
-	taskService := taskservice.NewService(db, historyOperationService, taskRepository)
-	projectTypeService := projecttypeservice.NewService(db, projectTypeRepository)
-	roleService := roleservice.NewService(db, roleRepository)
-	taskPriorityService := taskpriorityservice.NewService(db, taskPriorityRepository)
-	taskStatusService := taskstatusservice.NewService(db, taskStatusRepository)
-	taskTimeEntryService := tasktimeentryservice.NewService(db, historyOperationService, taskTimeEntryRepository)
-	timerService := timerservice.NewService(db, timerRepository)
-	userService := userservice.NewService(db, userRepository)
+	projectStatusService := projectstatusservice.NewService(db, authorizationService, projectStatusRepository)
+	taskService := taskservice.NewService(db, authorizationService, historyOperationService, taskRepository, tagRepository)
+	projectTypeService := projecttypeservice.NewService(db, authorizationService, projectTypeRepository)
+	roleService := roleservice.NewService(db, authorizationService, roleRepository)
+	taskPriorityService := taskpriorityservice.NewService(db, authorizationService, taskPriorityRepository)
+	taskStatusService := taskstatusservice.NewService(db, authorizationService, taskStatusRepository)
+	taskTimerEntryService := tasktimerentryservice.NewService(db, authorizationService, historyOperationService, taskTimerEntryRepository)
+	userTimerService := usertimerservice.NewService(db, userTimerRepository)
+	userService := userservice.NewService(db, authorizationService, userRepository)
 
 	attachmentHandler := attachmenthandler.NewHandler(attachmentService, cfg.Storage.AttachmentsPath)
-	authHandler := authhandler.NewHandler(authService, cfg.Auth.SecretKey, cfg.Auth.AccessTokenExpirationHours, cfg.Auth.RefreshTokenExpirationDays)
+	authHandler := authhandler.NewHandler(identityService, cfg.Auth.SecretKey, cfg.Auth.AccessTokenExpirationHours, cfg.Auth.RefreshTokenExpirationDays)
 	historyOperationHandler := historyoperationhandler.NewHandler(db, historyOperationService)
 	noteHandler := notehandler.NewHandler(noteService)
 	projectPermissionHandler := projectpermissionhandler.NewHandler(projectPermissionService)
@@ -130,12 +132,12 @@ func NewApp(
 	projectHandler := projecthandler.NewHandler(projectService)
 	projectStatusHandler := projectstatushandler.NewHandler(projectStatusService)
 	taskHandler := taskhandler.NewHandler(taskService)
-	ProjectTypeHandler := projecttypehandler.NewHandler(projectTypeService)
+	projectTypeHandler := projecttypehandler.NewHandler(projectTypeService)
 	roleHandler := rolehandler.NewHandler(roleService)
-	TaskPriorityHandler := taskpriorityhandler.NewHandler(taskPriorityService)
-	TaskStatusHandler := taskstatushandler.NewHandler(taskStatusService)
-	taskTimeEntryHandler := tasktimeentryhandler.NewHandler(taskTimeEntryService)
-	TimerHandler := timerhandler.NewHandler(timerService)
+	taskPriorityHandler := taskpriorityhandler.NewHandler(taskPriorityService)
+	taskStatusHandler := taskstatushandler.NewHandler(taskStatusService)
+	taskTimeEntryHandler := tasktimeentryhandler.NewHandler(taskTimerEntryService)
+	userTimerHandler := usertimerhandler.NewHandler(userTimerService)
 	userHandler := userhandler.NewHandler(userService)
 
 	return &App{
@@ -144,7 +146,7 @@ func NewApp(
 		Cache: cache,
 
 		AttachmentHandler:        *attachmentHandler,
-		AuthHandler:              *authHandler,
+		IdentityHandler:          *authHandler,
 		HistoryOperationHandler:  *historyOperationHandler,
 		NoteHandler:              *noteHandler,
 		ProjectPermissionHandler: *projectPermissionHandler,
@@ -152,12 +154,12 @@ func NewApp(
 		ProjectHandler:           *projectHandler,
 		ProjectStatusHandler:     *projectStatusHandler,
 		TaskHandler:              *taskHandler,
-		ProjectTypeHandler:       *ProjectTypeHandler,
+		ProjectTypeHandler:       *projectTypeHandler,
 		RoleHandler:              *roleHandler,
-		TaskPriorityHandler:      *TaskPriorityHandler,
-		TaskStatusHandler:        *TaskStatusHandler,
+		TaskPriorityHandler:      *taskPriorityHandler,
+		TaskStatusHandler:        *taskStatusHandler,
 		TaskTimeEntryHandler:     *taskTimeEntryHandler,
-		TimerHandler:             *TimerHandler,
+		UserTimerHandler:         *userTimerHandler,
 		UserHandler:              *userHandler,
 	}
 }
