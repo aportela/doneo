@@ -7,59 +7,93 @@ import (
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/rolerepository"
+	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/utils"
 )
 
 type RoleService interface {
 	Add(ctx context.Context, role domain.Role) (domain.Role, error)
 	Update(ctx context.Context, role domain.Role) (domain.Role, error)
-	Delete(ctx context.Context, id string) error
-	Get(ctx context.Context, id string) (domain.Role, error)
+	Delete(ctx context.Context, roleID string) error
+	Get(ctx context.Context, roleID string) (domain.Role, error)
 	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error)
 }
 
 type roleService struct {
-	database   database.Database
-	repository rolerepository.RoleRepository
+	db                   database.Database
+	authorizationService authorizationservice.AuthorizationService
+	roleRepository       rolerepository.RoleRepository
 }
 
-func NewService(db database.Database, role rolerepository.RoleRepository) RoleService {
-	return &roleService{database: db, repository: role}
+func NewService(db database.Database, authorizationService authorizationservice.AuthorizationService, roleRepository rolerepository.RoleRepository) RoleService {
+	return &roleService{db: db, authorizationService: authorizationService, roleRepository: roleRepository}
 }
 
 func (service *roleService) Add(ctx context.Context, role domain.Role) (domain.Role, error) {
-	role.ID = utils.UUID()
-	if err := service.repository.Add(ctx, role); err != nil {
-		return domain.Role{}, fmt.Errorf("[RoleService] failed to add role with ID %s\n%w", role.ID, err)
+	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
+		role.ID = utils.UUID()
+		if err := service.roleRepository.Add(ctx, service.db, role); err != nil {
+			return fmt.Errorf("[RoleService] failed to add role with ID %s\n%w", role.ID, err)
+		}
+		return nil
+	})
+	if err != nil {
+		return domain.Role{}, err
 	}
 	return role, nil
 }
 
 func (service *roleService) Update(ctx context.Context, role domain.Role) (domain.Role, error) {
-	if err := service.repository.Update(ctx, role); err != nil {
-		return domain.Role{}, fmt.Errorf("[RoleService] failed to update role with ID %s: %w", role.ID, err)
+	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
+		if err := service.roleRepository.Update(ctx, service.db, role); err != nil {
+			return fmt.Errorf("[RoleService] failed to update role with ID %s: %w", role.ID, err)
+		}
+		return nil
+	})
+	if err != nil {
+		return domain.Role{}, err
 	}
 	return role, nil
 }
 
-func (service *roleService) Delete(ctx context.Context, id string) error {
-	if err := service.repository.Delete(ctx, id); err != nil {
-		return fmt.Errorf("[RoleService] failed to delete role with ID %s: %w", id, err)
-	}
-	return nil
+func (service *roleService) Delete(ctx context.Context, roleID string) error {
+	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
+		if err := service.roleRepository.Delete(ctx, service.db, roleID); err != nil {
+			return fmt.Errorf("[RoleService] failed to delete role with ID %s: %w", roleID, err)
+		}
+		return nil
+	})
+	return err
 }
 
-func (service *roleService) Get(ctx context.Context, id string) (domain.Role, error) {
-	role, err := service.repository.Get(ctx, id)
+func (service *roleService) Get(ctx context.Context, roleID string) (domain.Role, error) {
+	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return domain.Role{}, fmt.Errorf("user not found in context")
+	}
+
+	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
+		return domain.Role{}, err
+	}
+	role, err := service.roleRepository.Get(ctx, service.db, roleID)
 	if err != nil {
-		return domain.Role{}, fmt.Errorf("[RoleService] failed to get role with ID %s: %w", id, err)
+		return domain.Role{}, fmt.Errorf("[RoleService] failed to get role with ID %s: %w", roleID, err)
 	}
 	return role, nil
 }
 
 func (service *roleService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error) {
-	roles, pagerResult, err := service.repository.Search(ctx, pager, order, filter)
+	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return nil, browser.Result{}, fmt.Errorf("user not found in context")
+	}
+
+	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
+		return nil, browser.Result{}, err
+	}
+	roles, pagerResult, err := service.roleRepository.Search(ctx, service.db, pager, order, filter)
 	if err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[RoleService] failed to search roles: %w", err)
 	}
