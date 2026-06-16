@@ -282,7 +282,8 @@ func (handler *AttachmentHandler) DownloadTaskAttachment(w http.ResponseWriter, 
 
 func (handler *AttachmentHandler) GetTaskAttachments(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	taskId := chi.URLParam(r, "task_id")
-	projectAttachments, err := handler.service.GetTaskAttachments(r.Context(), taskId)
+	projectID := chi.URLParam(r, "project_id")
+	taskID := chi.URLParam(r, "task_id")
+	projectAttachments, err := handler.service.GetTaskAttachments(r.Context(), projectID, taskID)
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectAttachments), err)
 }

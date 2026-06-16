@@ -9,19 +9,19 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
 	"github.com/aportela/doneo/internal/jwt"
-	"github.com/aportela/doneo/internal/services/authservice"
+	"github.com/aportela/doneo/internal/services/identityservice"
 	"github.com/aportela/doneo/internal/utils"
 )
 
 type AuthHandler struct {
-	service                    authservice.AuthService
+	identityService            identityservice.IdentityService
 	secretKey                  string
 	accessTokenExpirationHours int
 	refreshTokenExpirationDays int
 }
 
-func NewHandler(service authservice.AuthService, secretKey string, accessTokenExpirationHours int, refreshTokenExpirationDays int) *AuthHandler {
-	return &AuthHandler{service: service, secretKey: secretKey, accessTokenExpirationHours: accessTokenExpirationHours, refreshTokenExpirationDays: refreshTokenExpirationDays}
+func NewHandler(identityService identityservice.IdentityService, secretKey string, accessTokenExpirationHours int, refreshTokenExpirationDays int) *AuthHandler {
+	return &AuthHandler{identityService: identityService, secretKey: secretKey, accessTokenExpirationHours: accessTokenExpirationHours, refreshTokenExpirationDays: refreshTokenExpirationDays}
 }
 
 func (handler *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
@@ -30,7 +30,7 @@ func (handler *AuthHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] invalid request payload: %w", err))
 		return
 	}
-	user, err := handler.service.SignIn(r.Context(), request.Email, request.Password)
+	user, err := handler.identityService.SignIn(r.Context(), request.Email, request.Password)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] failed to signin with email %s: %w", request.Email, err))
 		return
@@ -122,7 +122,7 @@ func (handler *AuthHandler) RenewAccessToken(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "Invalid token", http.StatusUnauthorized)
 		return
 	}
-	user, err := handler.service.GetUserInfo(r.Context(), userId)
+	user, err := handler.identityService.GetCurrentUserInfo(r.Context(), userId)
 	if err != nil {
 		// TODO: return APIError JSON HERE !
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AuthHandler] failed to get user info: %w", err))
