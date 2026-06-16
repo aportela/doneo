@@ -206,6 +206,9 @@
                             state.ajaxErrors = false;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "UserForm.onAdd" } });
                             break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
+                            break;
                         case 409:
                             if (apiError.details?.field === "name") {
                                 serverErrors.value.name = "modules.user.components.UserForm.inputs.name.errors.alreadyExists";
@@ -261,6 +264,9 @@
                         case 401:
                             state.ajaxErrors = false;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "UserForm.onUpdate" } });
+                            break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {

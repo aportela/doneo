@@ -227,6 +227,8 @@ export default {
       Error: "Error",
       uncaugthException: "Uncaught exception",
       invalidAPIResponseCode: "Invalid API response code",
+      unauthorizedOperation:
+        "You are not authorized to perform this operation.",
     },
     warningMessages: {
       fieldIsRequired: "Field is required",

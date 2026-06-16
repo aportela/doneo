@@ -143,6 +143,9 @@
                             state.ajaxErrors = false;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onRefresh" } });
                             break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
+                            break;
                         default:
                             state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.refreshError");
                             break;
@@ -177,6 +180,9 @@
                                 state.ajaxErrors = false;
                                 selectedItem.value = user;
                                 appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onDelete" } });
+                                break;
+                            case 403:
+                                state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
                                 break;
                             case 404:
                                 state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.notFoundError");
@@ -217,6 +223,9 @@
                                 state.ajaxErrors = false;
                                 selectedItem.value = user;
                                 appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onUnDelete" } });
+                                break;
+                            case 403:
+                                state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
                                 break;
                             case 404:
                                 state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.notFoundError");
