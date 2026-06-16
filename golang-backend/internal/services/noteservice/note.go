@@ -28,14 +28,14 @@ type NoteService interface {
 }
 
 type noteService struct {
-	database                database.Database
+	db                      database.Database
 	authorizationService    authorizationservice.AuthorizationService
 	historyOperationService historyoperationservice.HistoryOperationService
 	noteRepository          noterepository.NoteRepository
 }
 
 func NewService(db database.Database, authorizationService authorizationservice.AuthorizationService, historyOperationService historyoperationservice.HistoryOperationService, repository noterepository.NoteRepository) NoteService {
-	return &noteService{database: db, historyOperationService: historyOperationService, authorizationService: authorizationService, noteRepository: repository}
+	return &noteService{db: db, historyOperationService: historyOperationService, authorizationService: authorizationService, noteRepository: repository}
 }
 
 func (service *noteService) AddProjectNote(ctx context.Context, projectID string, note domain.Note) (domain.Note, error) {
@@ -44,7 +44,7 @@ func (service *noteService) AddProjectNote(ctx context.Context, projectID string
 		note.CreatedBy.ID = currentUserID
 		note.CreatedAt = time.Now()
 
-		return database.WithTx(ctx, service.database, func(tx *sql.Tx) error {
+		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.noteRepository.AddProjectNote(ctx, tx, projectID, note); err != nil {
 				return err
 			}
@@ -74,7 +74,7 @@ func (service *noteService) UpdateProjectNote(ctx context.Context, projectID str
 	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
 		note.UpdatedAt = utils.CurrentTimePtr()
 
-		return database.WithTx(ctx, service.database, func(tx *sql.Tx) error {
+		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 
 			if err := service.noteRepository.UpdateProjectNote(ctx, tx, note); err != nil {
 				return err
@@ -105,7 +105,7 @@ func (service *noteService) UpdateProjectNote(ctx context.Context, projectID str
 
 func (service *noteService) DeleteProjectNote(ctx context.Context, projectID string, noteID string) error {
 	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
-		return database.WithTx(ctx, service.database, func(tx *sql.Tx) error {
+		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.noteRepository.DeleteProjectNote(ctx, tx, noteID); err != nil {
 				return err
 			}
@@ -141,7 +141,7 @@ func (service *noteService) GetProjectNotes(ctx context.Context, projectID strin
 	if err := service.authorizationService.RequireProjectViewPermission(ctx, currentContextUserID, projectID); err != nil {
 		return nil, err
 	}
-	notes, err := service.noteRepository.GetProjectNotes(ctx, service.database, projectID)
+	notes, err := service.noteRepository.GetProjectNotes(ctx, service.db, projectID)
 	if err != nil {
 		return nil, fmt.Errorf("[NoteService] failed to get project notes: %w", err)
 	}
@@ -154,7 +154,7 @@ func (service *noteService) AddTaskNote(ctx context.Context, projectID string, t
 		note.CreatedBy.ID = currentUserID
 		note.CreatedAt = time.Now()
 
-		return database.WithTx(ctx, service.database, func(tx *sql.Tx) error {
+		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.noteRepository.AddTaskNote(ctx, tx, taskID, note); err != nil {
 				return err
 			}
@@ -185,7 +185,7 @@ func (service *noteService) UpdateTaskNote(ctx context.Context, projectID string
 	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
 		note.UpdatedAt = utils.CurrentTimePtr()
 
-		return database.WithTx(ctx, service.database, func(tx *sql.Tx) error {
+		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 
 			if err := service.noteRepository.UpdateTaskNote(ctx, tx, note); err != nil {
 				return err
@@ -217,7 +217,7 @@ func (service *noteService) UpdateTaskNote(ctx context.Context, projectID string
 
 func (service *noteService) DeleteTaskNote(ctx context.Context, projectID string, taskID string, noteID string) error {
 	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
-		return database.WithTx(ctx, service.database, func(tx *sql.Tx) error {
+		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.noteRepository.DeleteTaskNote(ctx, tx, noteID); err != nil {
 				return err
 			}
@@ -254,7 +254,7 @@ func (service *noteService) GetTaskNotes(ctx context.Context, projectID string, 
 	if err := service.authorizationService.RequireProjectViewPermission(ctx, currentContextUserID, projectID); err != nil {
 		return nil, err
 	}
-	notes, err := service.noteRepository.GetTaskNotes(ctx, service.database, taskID)
+	notes, err := service.noteRepository.GetTaskNotes(ctx, service.db, taskID)
 	if err != nil {
 		return nil, fmt.Errorf("[NoteService] failed to get task notes: %w", err)
 	}
