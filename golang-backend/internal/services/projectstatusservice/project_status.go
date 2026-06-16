@@ -7,7 +7,6 @@ import (
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/projectstatusrepository"
 	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/utils"
@@ -32,52 +31,38 @@ func NewService(db database.Database, authorizationService authorizationservice.
 }
 
 func (service *projectStatusService) Add(ctx context.Context, projectStatus domain.ProjectStatus) (domain.ProjectStatus, error) {
-	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
-		projectStatus.ID = utils.UUID()
-		err := service.projectStatusRepository.Add(ctx, service.db, projectStatus)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-	if err != nil {
+	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
+		return domain.ProjectStatus{}, err
+	}
+	projectStatus.ID = utils.UUID()
+	if err := service.projectStatusRepository.Add(ctx, service.db, projectStatus); err != nil {
 		return domain.ProjectStatus{}, err
 	}
 	return projectStatus, nil
 }
 
 func (service *projectStatusService) Update(ctx context.Context, projectStatus domain.ProjectStatus) (domain.ProjectStatus, error) {
-	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
-		err := service.projectStatusRepository.Update(ctx, service.db, projectStatus)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-	if err != nil {
+	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
+		return domain.ProjectStatus{}, err
+	}
+	if err := service.projectStatusRepository.Update(ctx, service.db, projectStatus); err != nil {
 		return domain.ProjectStatus{}, err
 	}
 	return projectStatus, nil
 }
 
 func (service *projectStatusService) Delete(ctx context.Context, projectStatusID string) error {
-	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
-		err := service.projectStatusRepository.Delete(ctx, service.db, projectStatusID)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-	return err
+	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
+		return err
+	}
+	if err := service.projectStatusRepository.Delete(ctx, service.db, projectStatusID); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (service *projectStatusService) Get(ctx context.Context, projectStatusID string) (domain.ProjectStatus, error) {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return domain.ProjectStatus{}, fmt.Errorf("[ProjectStatusService] user not found in context")
-	}
-
-	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
+	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return domain.ProjectStatus{}, err
 	}
 	projectStatus, err := service.projectStatusRepository.Get(ctx, service.db, projectStatusID)
@@ -88,12 +73,7 @@ func (service *projectStatusService) Get(ctx context.Context, projectStatusID st
 }
 
 func (service *projectStatusService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.Result, error) {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return nil, browser.Result{}, fmt.Errorf("[ProjectStatusService] user not found in context")
-	}
-
-	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
+	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return nil, browser.Result{}, err
 	}
 	projectStatuses, pagerResult, err := service.projectStatusRepository.Search(ctx, service.db, pager, order, filter)

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/jwt"
 )
 
@@ -35,7 +36,8 @@ func RequireJWTAuthentication(secretKey string) func(http.Handler) http.Handler 
 					err.Error())
 				return
 			}
-			ctx := context.WithValue(r.Context(), userIDKey, userID)
+			//ctx := context.WithValue(r.Context(), userIDKey, userID)
+			ctx := context.WithValue(r.Context(), contextUserKey, ContextUser{UserBase: domain.UserBase{ID: userID}, IsSystem: false})
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

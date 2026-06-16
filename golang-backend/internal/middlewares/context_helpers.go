@@ -24,6 +24,7 @@ func SetContextUser(ctx context.Context, user ContextUser) context.Context {
 	return context.WithValue(ctx, contextUserKey, user)
 }
 
+/*
 const userIDKey contextKey = "userID"
 
 func GetUserIDFromContext(ctx context.Context) (string, bool) {
@@ -34,3 +35,5 @@ func GetUserIDFromContext(ctx context.Context) (string, bool) {
 func SetUserIDIntoContext(ctx context.Context, userID string) context.Context {
 	return context.WithValue(ctx, userIDKey, userID)
 }
+
+*/

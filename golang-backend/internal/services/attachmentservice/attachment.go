@@ -110,11 +110,11 @@ func (service *attachmentService) DeleteProjectAttachment(ctx context.Context, p
 }
 
 func (service *attachmentService) GetProjectAttachments(ctx context.Context, projectID string) ([]domain.Attachment, error) {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	contextUser, ok := middlewares.GetContextUser(ctx)
 	if !ok {
 		return nil, fmt.Errorf("[AttachmentService] user not found in context")
 	}
-	if err := service.authorizationService.RequireProjectViewPermission(ctx, currentContextUserID, projectID); err != nil {
+	if err := service.authorizationService.RequireProjectViewPermission(ctx, contextUser.ID, projectID); err != nil {
 		return nil, err
 	}
 	attachments, err := service.attachmentRepository.GetProjectAttachments(ctx, service.db, projectID)
@@ -189,11 +189,11 @@ func (service *attachmentService) DeleteTaskAttachment(ctx context.Context, proj
 }
 
 func (service *attachmentService) GetTaskAttachments(ctx context.Context, projectID string, taskID string) ([]domain.Attachment, error) {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	contextUser, ok := middlewares.GetContextUser(ctx)
 	if !ok {
 		return nil, fmt.Errorf("[AttachmentService] user not found in context")
 	}
-	if err := service.authorizationService.RequireTaskViewPermission(ctx, currentContextUserID, projectID); err != nil {
+	if err := service.authorizationService.RequireTaskViewPermission(ctx, contextUser.ID, projectID); err != nil {
 		return nil, err
 	}
 	attachments, err := service.attachmentRepository.GetTaskAttachments(ctx, service.db, taskID)

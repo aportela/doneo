@@ -7,7 +7,6 @@ import (
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/taskpriorityrepository"
 	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/utils"
@@ -32,52 +31,38 @@ func NewService(db database.Database, authorizationService authorizationservice.
 }
 
 func (service *taskPriorityService) Add(ctx context.Context, taskPriority domain.TaskPriority) (domain.TaskPriority, error) {
-	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
-		taskPriority.ID = utils.UUID()
-		err := service.taskPriorityRepository.Add(ctx, service.db, taskPriority)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-	if err != nil {
+	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
+		return domain.TaskPriority{}, err
+	}
+	taskPriority.ID = utils.UUID()
+	if err := service.taskPriorityRepository.Add(ctx, service.db, taskPriority); err != nil {
 		return domain.TaskPriority{}, err
 	}
 	return taskPriority, nil
 }
 
 func (service *taskPriorityService) Update(ctx context.Context, taskPriority domain.TaskPriority) (domain.TaskPriority, error) {
-	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
-		err := service.taskPriorityRepository.Update(ctx, service.db, taskPriority)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-	if err != nil {
+	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
+		return domain.TaskPriority{}, err
+	}
+	if err := service.taskPriorityRepository.Update(ctx, service.db, taskPriority); err != nil {
 		return domain.TaskPriority{}, err
 	}
 	return taskPriority, nil
 }
 
 func (service *taskPriorityService) Delete(ctx context.Context, taskPriorityID string) error {
-	err := service.authorizationService.WithUserAdminPermission(ctx, func(currentUserID string) error {
-		err := service.taskPriorityRepository.Delete(ctx, service.db, taskPriorityID)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-	return err
+	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
+		return err
+	}
+	if err := service.taskPriorityRepository.Delete(ctx, service.db, taskPriorityID); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (service *taskPriorityService) Get(ctx context.Context, taskPriorityID string) (domain.TaskPriority, error) {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return domain.TaskPriority{}, fmt.Errorf("[TaskPriorityService] user not found in context")
-	}
-
-	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
+	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return domain.TaskPriority{}, err
 	}
 	taskPriority, err := service.taskPriorityRepository.Get(ctx, service.db, taskPriorityID)
@@ -88,12 +73,7 @@ func (service *taskPriorityService) Get(ctx context.Context, taskPriorityID stri
 }
 
 func (service *taskPriorityService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskPrioritiesFilter) ([]domain.TaskPriority, browser.Result, error) {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return nil, browser.Result{}, fmt.Errorf("[TaskPriorityService] user not found in context")
-	}
-
-	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
+	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return nil, browser.Result{}, err
 	}
 	taskPriorities, pagerResult, err := service.taskPriorityRepository.Search(ctx, service.db, pager, order, filter)

@@ -14,8 +14,7 @@ import (
 
 type AuthorizationService interface {
 	requireUserPermission(ctx context.Context, userID string, permission domain.Bitmask) error
-	RequireUserAdminPermission(ctx context.Context, userID string) error
-	WithUserAdminPermission(ctx context.Context, action func(currentUserID string) error) error
+	RequireUserAdminPermission(ctx context.Context) (middlewares.ContextUser, error)
 
 	requireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error
 	RequireProjectUpdatePermission(ctx context.Context, userID string, projectID string) error
@@ -65,21 +64,17 @@ func (service *authorizationService) requireUserPermission(ctx context.Context, 
 	return domain.AuthorizationError
 }
 
-func (service *authorizationService) RequireUserAdminPermission(ctx context.Context, userID string) error {
-	return service.requireUserPermission(ctx, userID, domain.UserPermissionAdmin)
-}
-
-func (service *authorizationService) WithUserAdminPermission(ctx context.Context, action func(currentUserID string) error) error {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+func (service *authorizationService) RequireUserAdminPermission(ctx context.Context) (middlewares.ContextUser, error) {
+	contextUser, ok := middlewares.GetContextUser(ctx)
 	if !ok {
-		return fmt.Errorf("[AuthorizationService] user not found in context")
+		return middlewares.ContextUser{}, fmt.Errorf("[AuthorizationService] user not found in context")
 	}
-
-	if err := service.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
-		return err
+	if !contextUser.IsSystem {
+		if err := service.requireUserPermission(ctx, contextUser.ID, domain.UserPermissionAdmin); err != nil {
+			return middlewares.ContextUser{}, err
+		}
 	}
-
-	return action(currentContextUserID)
+	return contextUser, nil
 }
 
 func (service *authorizationService) requireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error {
@@ -124,16 +119,16 @@ func (service *authorizationService) RequireProjectUpdatePermission(ctx context.
 }
 
 func (service *authorizationService) WithProjectUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	contextUser, ok := middlewares.GetContextUser(ctx)
 	if !ok {
 		return fmt.Errorf("[AuthorizationService] user not found in context")
 	}
 
-	if err := service.RequireProjectUpdatePermission(ctx, currentContextUserID, projectID); err != nil {
+	if err := service.RequireProjectUpdatePermission(ctx, contextUser.ID, projectID); err != nil {
 		return err
 	}
 
-	return action(currentContextUserID)
+	return action(contextUser.ID)
 }
 
 func (service *authorizationService) RequireProjectDeletePermission(ctx context.Context, userID string, projectID string) error {
@@ -141,16 +136,16 @@ func (service *authorizationService) RequireProjectDeletePermission(ctx context.
 }
 
 func (service *authorizationService) WithProjectDeletePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	contextUser, ok := middlewares.GetContextUser(ctx)
 	if !ok {
 		return fmt.Errorf("[AuthorizationService] user not found in context")
 	}
 
-	if err := service.RequireProjectDeletePermission(ctx, currentContextUserID, projectID); err != nil {
+	if err := service.RequireProjectDeletePermission(ctx, contextUser.ID, projectID); err != nil {
 		return err
 	}
 
-	return action(currentContextUserID)
+	return action(contextUser.ID)
 }
 
 func (service *authorizationService) RequireProjectViewPermission(ctx context.Context, userID string, projectID string) error {
@@ -162,16 +157,16 @@ func (service *authorizationService) requireTaskAddPermission(ctx context.Contex
 }
 
 func (service *authorizationService) WithTaskAddPermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	contextUser, ok := middlewares.GetContextUser(ctx)
 	if !ok {
 		return fmt.Errorf("[AuthorizationService] user not found in context")
 	}
 
-	if err := service.requireTaskAddPermission(ctx, currentContextUserID, projectID); err != nil {
+	if err := service.requireTaskAddPermission(ctx, contextUser.ID, projectID); err != nil {
 		return err
 	}
 
-	return action(currentContextUserID)
+	return action(contextUser.ID)
 }
 
 func (service *authorizationService) RequireTaskUpdatePermission(ctx context.Context, userID string, projectID string) error {
@@ -179,16 +174,16 @@ func (service *authorizationService) RequireTaskUpdatePermission(ctx context.Con
 }
 
 func (service *authorizationService) WithTaskUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	contextUser, ok := middlewares.GetContextUser(ctx)
 	if !ok {
 		return fmt.Errorf("[AuthorizationService] user not found in context")
 	}
 
-	if err := service.RequireTaskUpdatePermission(ctx, currentContextUserID, projectID); err != nil {
+	if err := service.RequireTaskUpdatePermission(ctx, contextUser.ID, projectID); err != nil {
 		return err
 	}
 
-	return action(currentContextUserID)
+	return action(contextUser.ID)
 }
 
 func (service *authorizationService) RequireTaskDeletePermission(ctx context.Context, userID string, projectID string) error {
@@ -196,16 +191,16 @@ func (service *authorizationService) RequireTaskDeletePermission(ctx context.Con
 }
 
 func (service *authorizationService) WithTaskDeletePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	contextUser, ok := middlewares.GetContextUser(ctx)
 	if !ok {
 		return fmt.Errorf("[AuthorizationService] user not found in context")
 	}
 
-	if err := service.RequireTaskDeletePermission(ctx, currentContextUserID, projectID); err != nil {
+	if err := service.RequireTaskDeletePermission(ctx, contextUser.ID, projectID); err != nil {
 		return err
 	}
 
-	return action(currentContextUserID)
+	return action(contextUser.ID)
 }
 
 func (service *authorizationService) RequireTaskViewPermission(ctx context.Context, userID string, projectID string) error {

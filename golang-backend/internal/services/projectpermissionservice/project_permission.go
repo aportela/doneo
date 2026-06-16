@@ -33,16 +33,16 @@ func NewService(db database.Database, authorizationService authorizationservice.
 }
 
 func (service *projectPermissionService) withProjectUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	contextUser, ok := middlewares.GetContextUser(ctx)
 	if !ok {
 		return fmt.Errorf("[ProjectPermissionService] user not found in context")
 	}
 
-	if err := service.authorizationService.RequireProjectUpdatePermission(ctx, currentContextUserID, projectID); err != nil {
+	if err := service.authorizationService.RequireProjectUpdatePermission(ctx, contextUser.ID, projectID); err != nil {
 		return err
 	}
 
-	return action(currentContextUserID)
+	return action(contextUser.ID)
 }
 
 func (service *projectPermissionService) Add(ctx context.Context, projectID string, permission domain.ProjectPermission) (domain.ProjectPermission, error) {
@@ -100,11 +100,11 @@ func (service *projectPermissionService) Delete(ctx context.Context, projectID s
 }
 
 func (service *projectPermissionService) GetProjectPermissions(ctx context.Context, projectID string) ([]domain.ProjectPermission, error) {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	contextUser, ok := middlewares.GetContextUser(ctx)
 	if !ok {
 		return nil, fmt.Errorf("[ProjectPermissionService] user not found in context")
 	}
-	if err := service.authorizationService.RequireProjectViewPermission(ctx, currentContextUserID, projectID); err != nil {
+	if err := service.authorizationService.RequireProjectViewPermission(ctx, contextUser.ID, projectID); err != nil {
 		return nil, err
 	}
 	projectPermissions, err := service.projectPermissionRepository.GetProjectPermissions(ctx, service.db, projectID)

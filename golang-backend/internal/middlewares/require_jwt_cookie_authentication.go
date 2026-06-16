@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/jwt"
 )
 
@@ -26,7 +27,8 @@ func RequireJWTCookieAuthentication(secretKey string) func(http.Handler) http.Ha
 					err.Error())
 				return
 			}
-			ctx := context.WithValue(r.Context(), userIDKey, userID)
+			//ctx := context.WithValue(r.Context(), userIDKey, userID)
+			ctx := context.WithValue(r.Context(), contextUserKey, ContextUser{UserBase: domain.UserBase{ID: userID}, IsSystem: false})
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

@@ -125,7 +125,8 @@ func (handler *IdentityHandler) RenewAccessToken(w http.ResponseWriter, r *http.
 		http.Error(w, "Invalid token", http.StatusUnauthorized)
 		return
 	}
-	ctx := middlewares.SetUserIDIntoContext(r.Context(), userID_)
+	//ctx := middlewares.SetUserIDIntoContext(r.Context(), userID_)
+	ctx := middlewares.SetContextUser(r.Context(), middlewares.ContextUser{UserBase: domain.UserBase{ID: userID_}, IsSystem: false})
 	user, err := handler.identityService.GetCurrentUserInfo(ctx)
 	if err != nil {
 		// TODO: return APIError JSON HERE !
