@@ -9,6 +9,7 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
 	"github.com/aportela/doneo/internal/jwt"
+	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/services/identityservice"
 	"github.com/aportela/doneo/internal/utils"
 )
@@ -118,13 +119,14 @@ func (handler *IdentityHandler) RenewAccessToken(w http.ResponseWriter, r *http.
 	}
 	var refreshToken jwt.Token
 	refreshToken.Token = cookie.Value
-	userId, err := jwt.VerifyToken(refreshToken.Token, handler.secretKey)
+	userID_, err := jwt.VerifyToken(refreshToken.Token, handler.secretKey)
 	if err != nil {
 		// TODO: return APIError JSON HERE !
 		http.Error(w, "Invalid token", http.StatusUnauthorized)
 		return
 	}
-	user, err := handler.identityService.GetCurrentUserInfo(r.Context(), userId)
+	ctx := middlewares.SetUserIDIntoContext(r.Context(), userID_)
+	user, err := handler.identityService.GetCurrentUserInfo(ctx)
 	if err != nil {
 		// TODO: return APIError JSON HERE !
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[IdentityHandler] failed to get user info: %w", err))
