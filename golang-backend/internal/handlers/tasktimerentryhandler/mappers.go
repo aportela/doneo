@@ -1,4 +1,4 @@
-package tasktimeentryhandler
+package tasktimerentryhandler
 
 import (
 	"github.com/aportela/doneo/internal/domain"
