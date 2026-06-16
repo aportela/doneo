@@ -74,7 +74,7 @@ func (service *projectPriorityService) Delete(ctx context.Context, projectPriori
 func (service *projectPriorityService) Get(ctx context.Context, projectPriorityID string) (domain.ProjectPriority, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return domain.ProjectPriority{}, fmt.Errorf("user not found in context")
+		return domain.ProjectPriority{}, fmt.Errorf("[ProjectPriorityService] user not found in context")
 	}
 
 	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
@@ -90,7 +90,7 @@ func (service *projectPriorityService) Get(ctx context.Context, projectPriorityI
 func (service *projectPriorityService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectPrioritiesFilter) ([]domain.ProjectPriority, browser.Result, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
-		return nil, browser.Result{}, fmt.Errorf("user not found in context")
+		return nil, browser.Result{}, fmt.Errorf("[ProjectPriorityService] user not found in context")
 	}
 
 	if err := service.authorizationService.RequireUserAdminPermission(ctx, currentContextUserID); err != nil {
