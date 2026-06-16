@@ -134,11 +134,11 @@ func NewRouter(app *app.App) http.Handler {
 
 	apiRouter.Route("/timers", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
-		r.Post("/", app.UserTimerHandler.Start)
-		r.Put("/{id:"+uuidPattern+"}", app.UserTimerHandler.Stop)
-		r.Delete("/{id:"+uuidPattern+"}", app.UserTimerHandler.Delete)
-		r.Delete("/", app.UserTimerHandler.Clear)
-		r.Get("/", app.UserTimerHandler.Search)
+		r.Post("/", app.UserTimerHandler.StartUserTimer)
+		r.Put("/{id:"+uuidPattern+"}", app.UserTimerHandler.StopUserTimer)
+		r.Delete("/{id:"+uuidPattern+"}", app.UserTimerHandler.DeleteUserTimer)
+		r.Delete("/", app.UserTimerHandler.ClearUserTimers)
+		r.Get("/", app.UserTimerHandler.GetUserTimers)
 	})
 
 	apiRouter.Route("/projects", func(r chi.Router) {
