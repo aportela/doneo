@@ -39,4 +39,5 @@ type searchFilterDTO struct {
 	StatusID        *string
 	CreatedAt       *repositories.TimestampFilter
 	CreatedByUserId *string
+	ViewByUserId    *string
 }

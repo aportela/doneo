@@ -375,6 +375,9 @@ func (repository *taskRepository) Search(ctx context.Context, dbExecutor databas
 		sqlWhereConditions = append(sqlWhereConditions, "T.creator_id = ?")
 		filterArgs = append(filterArgs, *filterDTO.CreatedByUserId)
 	}
+	if filterDTO.ViewByUserId != nil && len(*filterDTO.ViewByUserId) > 0 {
+		// TODO: onlw show tasks with user view permission
+	}
 	if len(sqlWhereConditions) > 0 {
 		sqlWhere = " WHERE " + strings.Join(sqlWhereConditions, " AND ")
 	}
