@@ -67,10 +67,10 @@ func (handler *ProjectHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 func (handler *ProjectHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "project_id")
-	err := handler.service.Delete(r.Context(), projectId)
+	projectID := chi.URLParam(r, "project_id")
+	err := handler.service.Delete(r.Context(), projectID)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to delete project with ID %s: %w", projectId, err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to delete project with ID %s: %w", projectID, err))
 		return
 	}
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
@@ -78,14 +78,14 @@ func (handler *ProjectHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 func (handler *ProjectHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "project_id")
-	project, err := handler.service.Get(r.Context(), projectId)
+	projectID := chi.URLParam(r, "project_id")
+	project, err := handler.service.Get(r.Context(), projectID)
 	if err != nil {
 		if err == domain.NotFoundError {
-			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] not found project with ID %s: %w", projectId, err))
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] not found project with ID %s: %w", projectID, err))
 			return
 		} else {
-			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to get project with ID %s: %w", projectId, err))
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to get project with ID %s: %w", projectID, err))
 			return
 		}
 	}
