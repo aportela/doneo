@@ -34,7 +34,7 @@ type userService struct {
 }
 
 func NewService(db database.Database, authorizationService authorizationservice.AuthorizationService, userRepository userrepository.UserRepository) UserService {
-	return &userService{db: db, userRepository: userRepository}
+	return &userService{db: db, authorizationService: authorizationService, userRepository: userRepository}
 }
 
 func (service *userService) Add(ctx context.Context, user domain.User, password string) (domain.User, error) {
