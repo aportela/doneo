@@ -13,18 +13,18 @@ import (
 )
 
 type AuthorizationService interface {
-	RequireUserPermission(ctx context.Context, userID string, permission domain.Bitmask) error
+	requireUserPermission(ctx context.Context, userID string, permission domain.Bitmask) error
 	RequireUserAdminPermission(ctx context.Context, userID string) error
 	WithUserAdminPermission(ctx context.Context, action func(currentUserID string) error) error
 
-	RequireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error
+	requireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error
 	RequireProjectUpdatePermission(ctx context.Context, userID string, projectID string) error
 	WithProjectUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error
 	RequireProjectDeletePermission(ctx context.Context, userID string, projectID string) error
 	WithProjectDeletePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error
 	RequireProjectViewPermission(ctx context.Context, userID string, projectID string) error
 
-	RequireTaskAddPermission(ctx context.Context, userID string, projectID string) error
+	requireTaskAddPermission(ctx context.Context, userID string, projectID string) error
 	WithTaskAddPermission(ctx context.Context, projectID string, action func(currentUserID string) error) error
 	RequireTaskUpdatePermission(ctx context.Context, userID string, projectID string) error
 	WithTaskUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error
@@ -49,7 +49,7 @@ func NewService(db database.Database, cache cache.PermissionCache, userRepositor
 	}
 }
 
-func (service *authorizationService) RequireUserPermission(ctx context.Context, userID string, permission domain.Bitmask) error {
+func (service *authorizationService) requireUserPermission(ctx context.Context, userID string, permission domain.Bitmask) error {
 	userPermissionsBitmask, ok := service.permissionCache.GetUser(userID)
 	if !ok {
 		user, err := service.userRepository.Get(ctx, service.db, userID)
@@ -66,7 +66,7 @@ func (service *authorizationService) RequireUserPermission(ctx context.Context, 
 }
 
 func (service *authorizationService) RequireUserAdminPermission(ctx context.Context, userID string) error {
-	return service.RequireUserPermission(ctx, userID, domain.UserPermissionAdmin)
+	return service.requireUserPermission(ctx, userID, domain.UserPermissionAdmin)
 }
 
 func (service *authorizationService) WithUserAdminPermission(ctx context.Context, action func(currentUserID string) error) error {
@@ -82,7 +82,7 @@ func (service *authorizationService) WithUserAdminPermission(ctx context.Context
 	return action(currentContextUserID)
 }
 
-func (service *authorizationService) RequireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error {
+func (service *authorizationService) requireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error {
 	userPermissionsBitmask, ok := service.permissionCache.GetUser(userID)
 	if !ok {
 		user, err := service.userRepository.Get(ctx, service.db, userID)
@@ -120,7 +120,7 @@ func (service *authorizationService) RequireProjectPermission(ctx context.Contex
 }
 
 func (service *authorizationService) RequireProjectUpdatePermission(ctx context.Context, userID string, projectID string) error {
-	return service.RequireProjectPermission(ctx, userID, projectID, domain.PermissionUpdateProject)
+	return service.requireProjectPermission(ctx, userID, projectID, domain.PermissionUpdateProject)
 }
 
 func (service *authorizationService) WithProjectUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
@@ -137,7 +137,7 @@ func (service *authorizationService) WithProjectUpdatePermission(ctx context.Con
 }
 
 func (service *authorizationService) RequireProjectDeletePermission(ctx context.Context, userID string, projectID string) error {
-	return service.RequireProjectPermission(ctx, userID, projectID, domain.PermissionDeleteProject)
+	return service.requireProjectPermission(ctx, userID, projectID, domain.PermissionDeleteProject)
 }
 
 func (service *authorizationService) WithProjectDeletePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
@@ -154,11 +154,11 @@ func (service *authorizationService) WithProjectDeletePermission(ctx context.Con
 }
 
 func (service *authorizationService) RequireProjectViewPermission(ctx context.Context, userID string, projectID string) error {
-	return service.RequireProjectPermission(ctx, userID, projectID, domain.PermissionViewProject)
+	return service.requireProjectPermission(ctx, userID, projectID, domain.PermissionViewProject)
 }
 
-func (service *authorizationService) RequireTaskAddPermission(ctx context.Context, userID string, projectID string) error {
-	return service.RequireProjectPermission(ctx, userID, projectID, domain.PermissionAddTask)
+func (service *authorizationService) requireTaskAddPermission(ctx context.Context, userID string, projectID string) error {
+	return service.requireProjectPermission(ctx, userID, projectID, domain.PermissionAddTask)
 }
 
 func (service *authorizationService) WithTaskAddPermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
@@ -167,7 +167,7 @@ func (service *authorizationService) WithTaskAddPermission(ctx context.Context, 
 		return fmt.Errorf("[AuthorizationService] user not found in context")
 	}
 
-	if err := service.RequireTaskAddPermission(ctx, currentContextUserID, projectID); err != nil {
+	if err := service.requireTaskAddPermission(ctx, currentContextUserID, projectID); err != nil {
 		return err
 	}
 
@@ -175,7 +175,7 @@ func (service *authorizationService) WithTaskAddPermission(ctx context.Context, 
 }
 
 func (service *authorizationService) RequireTaskUpdatePermission(ctx context.Context, userID string, projectID string) error {
-	return service.RequireProjectPermission(ctx, userID, projectID, domain.PermissionUpdateTask)
+	return service.requireProjectPermission(ctx, userID, projectID, domain.PermissionUpdateTask)
 }
 
 func (service *authorizationService) WithTaskUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
@@ -192,7 +192,7 @@ func (service *authorizationService) WithTaskUpdatePermission(ctx context.Contex
 }
 
 func (service *authorizationService) RequireTaskDeletePermission(ctx context.Context, userID string, projectID string) error {
-	return service.RequireProjectPermission(ctx, userID, projectID, domain.PermissionDeleteTask)
+	return service.requireProjectPermission(ctx, userID, projectID, domain.PermissionDeleteTask)
 }
 
 func (service *authorizationService) WithTaskDeletePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
@@ -209,5 +209,5 @@ func (service *authorizationService) WithTaskDeletePermission(ctx context.Contex
 }
 
 func (service *authorizationService) RequireTaskViewPermission(ctx context.Context, userID string, projectID string) error {
-	return service.RequireProjectPermission(ctx, userID, projectID, domain.PermissionViewTask)
+	return service.requireProjectPermission(ctx, userID, projectID, domain.PermissionViewTask)
 }
