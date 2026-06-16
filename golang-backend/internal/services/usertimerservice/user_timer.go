@@ -1,4 +1,4 @@
-package timerservice
+package usertimerservice
 
 import (
 	"context"
