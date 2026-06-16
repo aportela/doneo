@@ -6,7 +6,9 @@ import (
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
+	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/utils"
 )
 
@@ -14,20 +16,21 @@ type HistoryOperationService interface {
 	AddProjectHistoryOperation(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, operation domain.HistoryOperation) (domain.HistoryOperation, error)
 	GetProjectHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) ([]domain.HistoryOperation, error)
 	AddTaskHistoryOperation(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, taskID string, operation domain.HistoryOperation) (domain.HistoryOperation, error)
-	GetTaskHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]domain.HistoryOperation, error)
+	GetTaskHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, taskID string) ([]domain.HistoryOperation, error)
 }
 
 type historyOperationService struct {
-	repository historyoperationrepository.HistoryOperationRepository
+	authorizationService       authorizationservice.AuthorizationService
+	historyOperationRepository historyoperationrepository.HistoryOperationRepository
 }
 
-func NewService(repository historyoperationrepository.HistoryOperationRepository) HistoryOperationService {
-	return &historyOperationService{repository: repository}
+func NewService(authorizationService authorizationservice.AuthorizationService, historyOperationRepository historyoperationrepository.HistoryOperationRepository) HistoryOperationService {
+	return &historyOperationService{authorizationService: authorizationService, historyOperationRepository: historyOperationRepository}
 }
 
 func (service *historyOperationService) AddProjectHistoryOperation(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, operation domain.HistoryOperation) (domain.HistoryOperation, error) {
 	operation.ID = utils.UUID()
-	err := service.repository.AddProjectHistoryOperation(ctx, dbExecutor, projectID, operation)
+	err := service.historyOperationRepository.AddProjectHistoryOperation(ctx, dbExecutor, projectID, operation)
 	if err != nil {
 		return domain.HistoryOperation{}, err
 	}
@@ -35,7 +38,14 @@ func (service *historyOperationService) AddProjectHistoryOperation(ctx context.C
 }
 
 func (service *historyOperationService) GetProjectHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) ([]domain.HistoryOperation, error) {
-	operations, err := service.repository.GetProjectHistoryOperations(ctx, dbExecutor, projectID)
+	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("user not found in context")
+	}
+	if err := service.authorizationService.RequireProjectViewPermission(ctx, currentContextUserID, projectID); err != nil {
+		return nil, err
+	}
+	operations, err := service.historyOperationRepository.GetProjectHistoryOperations(ctx, dbExecutor, projectID)
 	if err != nil {
 		return nil, fmt.Errorf("[HistoryOperationService] failed to get project history operations: %w", err)
 	}
@@ -44,15 +54,22 @@ func (service *historyOperationService) GetProjectHistoryOperations(ctx context.
 
 func (service *historyOperationService) AddTaskHistoryOperation(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, taskID string, operation domain.HistoryOperation) (domain.HistoryOperation, error) {
 	operation.ID = utils.UUID()
-	err := service.repository.AddTaskHistoryOperation(ctx, dbExecutor, projectID, taskID, operation)
+	err := service.historyOperationRepository.AddTaskHistoryOperation(ctx, dbExecutor, projectID, taskID, operation)
 	if err != nil {
 		return domain.HistoryOperation{}, err
 	}
 	return operation, nil
 }
 
-func (service *historyOperationService) GetTaskHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]domain.HistoryOperation, error) {
-	operations, err := service.repository.GetTaskHistoryOperations(ctx, dbExecutor, taskID)
+func (service *historyOperationService) GetTaskHistoryOperations(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, taskID string) ([]domain.HistoryOperation, error) {
+	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("user not found in context")
+	}
+	if err := service.authorizationService.RequireTaskViewPermission(ctx, currentContextUserID, projectID); err != nil {
+		return nil, err
+	}
+	operations, err := service.historyOperationRepository.GetTaskHistoryOperations(ctx, dbExecutor, taskID)
 	if err != nil {
 		return nil, fmt.Errorf("[HistoryOperationService] failed to get task history operations: %w", err)
 	}
