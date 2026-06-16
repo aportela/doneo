@@ -158,6 +158,9 @@
                             state.ajaxErrors = false;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "UserForm.onGet" } });
                             break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
+                            break;
                         case 404:
                             state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.notFoundError");
                             break;
@@ -389,7 +392,7 @@
                 </n-input>
                 <n-button v-else @click="onShowPasswordFormItem" block :disabled="state.ajaxRunning">{{
                     t("modules.user.components.UserForm.buttons.changePassword.label")
-                    }}</n-button>
+                }}</n-button>
             </n-form-item>
             <n-form-item :label="t('modules.user.components.UserForm.radios.permissions.label')">
                 <n-radio-group v-model:value="user.permissions.isSuperUser" name="radiogroup">

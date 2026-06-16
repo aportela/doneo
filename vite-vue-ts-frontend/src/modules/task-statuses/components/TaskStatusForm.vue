@@ -119,6 +119,9 @@
                             state.ajaxErrors = false;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "TaskStatusForm.onGet" } });
                             break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
+                            break;
                         case 404:
                             state.ajaxErrorMessage = t("modules.taskStatus.components.TaskStatusForm.errors.notFoundError");
                             break;
@@ -167,6 +170,9 @@
                         case 401:
                             state.ajaxErrors = false;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "TaskStatusForm.onAdd" } });
+                            break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
@@ -228,6 +234,9 @@
                         case 401:
                             state.ajaxErrors = false;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "TaskStatusForm.onUpdate" } });
+                            break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {

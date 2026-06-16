@@ -124,6 +124,9 @@
                             state.ajaxErrors = false;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageRolesPage.onRefresh" } });
                             break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
+                            break;
                         default:
                             state.ajaxErrorMessage = t("modules.role.components.ManageRolesPage.errors.refreshError");
                             break;
@@ -159,6 +162,9 @@
                                 state.ajaxErrors = false;
                                 selectedItem.value = role;
                                 appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageRolesPage.onDelete" } });
+                                break;
+                            case 403:
+                                state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
                                 break;
                             case 404:
                                 state.ajaxErrorMessage = t("modules.role.components.ManageRolesPage.errors.notFoundError");

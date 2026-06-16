@@ -119,6 +119,9 @@
                             state.ajaxErrors = false;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPriorityForm.onGet" } });
                             break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
+                            break;
                         case 404:
                             state.ajaxErrorMessage = t("modules.taskPriority.components.TaskPriorityForm.errors.notFoundError");
                             break;
@@ -164,6 +167,9 @@
                         case 401:
                             state.ajaxErrors = false;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPriorityForm.onAdd" } });
+                            break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
@@ -217,6 +223,9 @@
                         case 401:
                             state.ajaxErrors = false;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPriorityForm.onUpdate" } });
+                            break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {

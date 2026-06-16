@@ -106,6 +106,9 @@
                             state.ajaxErrors = false;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageProjectStatusesPage.onRefresh" } });
                             break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
+                            break;
                         default:
                             state.ajaxErrorMessage = t("modules.projectStatus.components.ManageProjectStatusesPage.errors.refreshError");
                             break;
@@ -140,6 +143,9 @@
                                 state.ajaxErrors = false;
                                 selectedItem.value = projectStatus;
                                 appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageProjectStatusesPage.onDelete" } });
+                                break;
+                            case 403:
+                                state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
                                 break;
                             case 404:
                                 state.ajaxErrorMessage = t("modules.projectStatus.components.ManageProjectStatusesPage.errors.notFoundError");
