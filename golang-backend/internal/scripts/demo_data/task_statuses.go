@@ -4,9 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/aportela/doneo/internal/cache"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/taskstatusrepository"
+	"github.com/aportela/doneo/internal/repositories/userrepository"
+	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/services/taskstatusservice"
 	"github.com/aportela/doneo/internal/utils"
 )
@@ -16,7 +20,8 @@ func createTaskStatuses(db database.Database) []string {
 		"Pending", "Started", "Stopped", "Finished", "Aborted",
 	}
 	var newTaskStatusIds []string
-	projectStatusService := taskstatusservice.NewService(db, taskstatusrepository.NewRepository(db))
+	authorizationService := authorizationservice.NewService(db, cache.NewPermissionCache(), userrepository.NewRepository(), projectpermissionrepository.NewRepository())
+	taskStatusService := taskstatusservice.NewService(db, authorizationService, taskstatusrepository.NewRepository())
 	for index, taskStatusName := range taskStatusNames {
 		var flags domain.Bitmask
 		switch taskStatusName {
@@ -34,7 +39,7 @@ func createTaskStatuses(db database.Database) []string {
 			Index:    uint(index),
 			Flags:    flags,
 		}
-		taskStatus, err := projectStatusService.Add(context.Background(), taskStatus)
+		taskStatus, err := taskStatusService.Add(context.Background(), taskStatus)
 		if err != nil {
 			fmt.Printf("Error creating tas status %s\n", err.Error())
 		}

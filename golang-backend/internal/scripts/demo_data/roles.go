@@ -4,15 +4,20 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/aportela/doneo/internal/cache"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/rolerepository"
+	"github.com/aportela/doneo/internal/repositories/userrepository"
+	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/services/roleservice"
 )
 
 func createRoles(db database.Database) []string {
 	var newRoleIds []string
-	roleService := roleservice.NewService(db, rolerepository.NewRepository(db))
+	authorizationService := authorizationservice.NewService(db, cache.NewPermissionCache(), userrepository.NewRepository(), projectpermissionrepository.NewRepository())
+	roleService := roleservice.NewService(db, authorizationService, rolerepository.NewRepository())
 	permissionBitMask := domain.Bitmask(0)
 	permissionBitMask.AddFlag(domain.PermissionUpdateProject | domain.PermissionDeleteProject | domain.PermissionViewProject | domain.PermissionAddTask | domain.PermissionUpdateTask | domain.PermissionDeleteTask | domain.PermissionViewTask)
 	role := domain.Role{

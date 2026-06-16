@@ -4,9 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/aportela/doneo/internal/cache"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/projecttyperepository"
+	"github.com/aportela/doneo/internal/repositories/userrepository"
+	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/services/projecttypeservice"
 	"github.com/aportela/doneo/internal/utils"
 )
@@ -19,7 +23,8 @@ func createProjectTypes(db database.Database) []string {
 		"Legal", "Logistics", "Administrative", "Strategy",
 	}
 	var newProjectTypeIds []string
-	service := projecttypeservice.NewService(db, projecttyperepository.NewRepository(db))
+	authorizationService := authorizationservice.NewService(db, cache.NewPermissionCache(), userrepository.NewRepository(), projectpermissionrepository.NewRepository())
+	service := projecttypeservice.NewService(db, authorizationService, projecttyperepository.NewRepository())
 	for _, projectTypeName := range projectTypeNames {
 		projectType := domain.ProjectType{
 			Name:     projectTypeName,

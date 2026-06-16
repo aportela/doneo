@@ -4,9 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/aportela/doneo/internal/cache"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/projectstatusrepository"
+	"github.com/aportela/doneo/internal/repositories/userrepository"
+	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/services/projectstatusservice"
 	"github.com/aportela/doneo/internal/utils"
 )
@@ -16,7 +20,8 @@ func createProjectStatuses(db database.Database) []string {
 		"Pending", "Started", "Stopped", "Finished", "Aborted",
 	}
 	var newProjectStatusIds []string
-	service := projectstatusservice.NewService(db, projectstatusrepository.NewRepository(db))
+	authorizationService := authorizationservice.NewService(db, cache.NewPermissionCache(), userrepository.NewRepository(), projectpermissionrepository.NewRepository())
+	service := projectstatusservice.NewService(db, authorizationService, projectstatusrepository.NewRepository())
 	for index, projectStatusName := range projectStatusNames {
 		var flags domain.Bitmask
 		switch projectStatusName {
