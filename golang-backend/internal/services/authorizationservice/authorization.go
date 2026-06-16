@@ -7,6 +7,7 @@ import (
 	"github.com/aportela/doneo/internal/cache"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
 )
@@ -17,7 +18,9 @@ type AuthorizationService interface {
 
 	RequireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error
 	RequireProjectUpdatePermission(ctx context.Context, userID string, projectID string) error
+	WithProjectUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error
 	RequireProjectDeletePermission(ctx context.Context, userID string, projectID string) error
+	WithProjectDeletePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error
 	RequireProjectViewPermission(ctx context.Context, userID string, projectID string) error
 
 	RequireTaskAddPermission(ctx context.Context, userID string, projectID string) error
@@ -103,8 +106,34 @@ func (service *authorizationService) RequireProjectUpdatePermission(ctx context.
 	return service.RequireProjectPermission(ctx, userID, projectID, domain.PermissionUpdateProject)
 }
 
+func (service *authorizationService) WithProjectUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
+	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return fmt.Errorf("user not found in context")
+	}
+
+	if err := service.RequireProjectUpdatePermission(ctx, currentContextUserID, projectID); err != nil {
+		return err
+	}
+
+	return action(currentContextUserID)
+}
+
 func (service *authorizationService) RequireProjectDeletePermission(ctx context.Context, userID string, projectID string) error {
 	return service.RequireProjectPermission(ctx, userID, projectID, domain.PermissionDeleteProject)
+}
+
+func (service *authorizationService) WithProjectDeletePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
+	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
+	if !ok {
+		return fmt.Errorf("user not found in context")
+	}
+
+	if err := service.RequireProjectDeletePermission(ctx, currentContextUserID, projectID); err != nil {
+		return err
+	}
+
+	return action(currentContextUserID)
 }
 
 func (service *authorizationService) RequireProjectViewPermission(ctx context.Context, userID string, projectID string) error {

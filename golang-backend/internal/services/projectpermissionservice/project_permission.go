@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/aportela/doneo/internal/cache"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
@@ -24,14 +23,13 @@ type ProjectPermissionService interface {
 
 type projectPermissionService struct {
 	db                          database.Database
-	cache                       cache.PermissionCache
 	authorizationService        authorizationservice.AuthorizationService
 	historyOperationService     historyoperationservice.HistoryOperationService
 	projectPermissionRepository projectpermissionrepository.ProjectPermissionRepository
 }
 
-func NewService(db database.Database, cache cache.PermissionCache, authorizationService authorizationservice.AuthorizationService, historyOperationService historyoperationservice.HistoryOperationService, projectPermissionRepository projectpermissionrepository.ProjectPermissionRepository) ProjectPermissionService {
-	return &projectPermissionService{db: db, cache: cache, authorizationService: authorizationService, historyOperationService: historyOperationService, projectPermissionRepository: projectPermissionRepository}
+func NewService(db database.Database, authorizationService authorizationservice.AuthorizationService, historyOperationService historyoperationservice.HistoryOperationService, projectPermissionRepository projectpermissionrepository.ProjectPermissionRepository) ProjectPermissionService {
+	return &projectPermissionService{db: db, authorizationService: authorizationService, historyOperationService: historyOperationService, projectPermissionRepository: projectPermissionRepository}
 }
 
 func (service *projectPermissionService) withProjectUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {

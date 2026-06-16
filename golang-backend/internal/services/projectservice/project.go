@@ -35,19 +35,6 @@ func NewService(db database.Database, authorizationService authorizationservice.
 	return &projectService{db: db, authorizationService: authorizationService, historyOperationService: historyOperationService, projectRepository: projectRepository}
 }
 
-func (service *projectService) withProjectUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return fmt.Errorf("user not found in context")
-	}
-
-	if err := service.authorizationService.RequireProjectUpdatePermission(ctx, currentContextUserID, projectID); err != nil {
-		return err
-	}
-
-	return action(currentContextUserID)
-}
-
 func (service *projectService) Add(ctx context.Context, project domain.Project) (domain.Project, error) {
 	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
 	if !ok {
@@ -87,7 +74,7 @@ func (service *projectService) Add(ctx context.Context, project domain.Project) 
 }
 
 func (service *projectService) Update(ctx context.Context, project domain.Project) (domain.Project, error) {
-	err := service.withProjectUpdatePermission(ctx, project.ID, func(currentUserID string) error {
+	err := service.authorizationService.WithProjectUpdatePermission(ctx, project.ID, func(currentUserID string) error {
 		project.UpdatedAt = utils.CurrentTimePtr()
 
 		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
@@ -118,7 +105,7 @@ func (service *projectService) Update(ctx context.Context, project domain.Projec
 }
 
 func (service *projectService) Delete(ctx context.Context, projectID string) error {
-	err := service.withProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
+	err := service.authorizationService.WithProjectDeletePermission(ctx, projectID, func(currentUserID string) error {
 
 		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			deletedAt := time.Now()

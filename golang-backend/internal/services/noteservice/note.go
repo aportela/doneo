@@ -38,21 +38,8 @@ func NewService(db database.Database, authorizationService authorizationservice.
 	return &noteService{database: db, historyOperationService: historyOperationService, authorizationService: authorizationService, noteRepository: repository}
 }
 
-func (service *noteService) withProjectUpdatePermission(ctx context.Context, projectID string, action func(currentUserID string) error) error {
-	currentContextUserID, ok := middlewares.GetUserIDFromContext(ctx)
-	if !ok {
-		return fmt.Errorf("user not found in context")
-	}
-
-	if err := service.authorizationService.RequireProjectUpdatePermission(ctx, currentContextUserID, projectID); err != nil {
-		return err
-	}
-
-	return action(currentContextUserID)
-}
-
 func (service *noteService) AddProjectNote(ctx context.Context, projectID string, note domain.Note) (domain.Note, error) {
-	err := service.withProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
+	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
 		note.ID = utils.UUID()
 		note.CreatedBy.ID = currentUserID
 		note.CreatedAt = time.Now()
@@ -84,7 +71,7 @@ func (service *noteService) AddProjectNote(ctx context.Context, projectID string
 }
 
 func (service *noteService) UpdateProjectNote(ctx context.Context, projectID string, note domain.Note) (domain.Note, error) {
-	err := service.withProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
+	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
 		note.UpdatedAt = utils.CurrentTimePtr()
 
 		return database.WithTx(ctx, service.database, func(tx *sql.Tx) error {
@@ -117,7 +104,7 @@ func (service *noteService) UpdateProjectNote(ctx context.Context, projectID str
 }
 
 func (service *noteService) DeleteProjectNote(ctx context.Context, projectID string, noteID string) error {
-	err := service.withProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
+	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
 		return database.WithTx(ctx, service.database, func(tx *sql.Tx) error {
 			if err := service.noteRepository.DeleteProjectNote(ctx, tx, noteID); err != nil {
 				return err
@@ -162,7 +149,7 @@ func (service *noteService) GetProjectNotes(ctx context.Context, projectID strin
 }
 
 func (service *noteService) AddTaskNote(ctx context.Context, projectID string, taskID string, note domain.Note) (domain.Note, error) {
-	err := service.withProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
+	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
 		note.ID = utils.UUID()
 		note.CreatedBy.ID = currentUserID
 		note.CreatedAt = time.Now()
@@ -195,7 +182,7 @@ func (service *noteService) AddTaskNote(ctx context.Context, projectID string, t
 }
 
 func (service *noteService) UpdateTaskNote(ctx context.Context, projectID string, taskID string, note domain.Note) (domain.Note, error) {
-	err := service.withProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
+	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
 		note.UpdatedAt = utils.CurrentTimePtr()
 
 		return database.WithTx(ctx, service.database, func(tx *sql.Tx) error {
@@ -229,7 +216,7 @@ func (service *noteService) UpdateTaskNote(ctx context.Context, projectID string
 }
 
 func (service *noteService) DeleteTaskNote(ctx context.Context, projectID string, taskID string, noteID string) error {
-	err := service.withProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
+	err := service.authorizationService.WithProjectUpdatePermission(ctx, projectID, func(currentUserID string) error {
 		return database.WithTx(ctx, service.database, func(tx *sql.Tx) error {
 			if err := service.noteRepository.DeleteTaskNote(ctx, tx, noteID); err != nil {
 				return err
