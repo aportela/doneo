@@ -20,3 +20,5 @@ add interface on handlers
 project attachment/task attachemnt same table  as project permissions (id vs not id)
 
 use domain.DeletedError on get project/task deleted
+
+Get funcs on entitys for updating Vs use current search item
