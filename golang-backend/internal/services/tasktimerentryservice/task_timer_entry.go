@@ -1,4 +1,4 @@
-package tasktimeentryservice
+package tasktimerentryservice
 
 import (
 	"context"
