@@ -80,6 +80,12 @@ func (handler *TaskStatusHandler) Get(w http.ResponseWriter, r *http.Request) {
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(taskStatus), nil)
 }
 
+func (handler *TaskStatusHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	taskStatuses, pagerResult, err := handler.service.SearchBase(r.Context())
+	handlers.ToHandlerJSONResponse(w, toSearchResponse(taskStatuses, pagerResult), err)
+}
+
 func (handler *TaskStatusHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request searchRequest

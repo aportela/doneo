@@ -32,6 +32,12 @@ export const projectStatusService = {
     );
     return data;
   },
+  async searchBase(): Promise<SearchResponse> {
+    const { data } = await axiosInstance.get<SearchResponse>(
+      "/entities/project-statuses",
+    );
+    return data;
+  },
   async search(payload: SearchRequest): Promise<SearchResponse> {
     const { data } = await axiosInstance.post<SearchResponse>(
       "/project-statuses/search",

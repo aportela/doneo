@@ -17,6 +17,7 @@ type ProjectTypeService interface {
 	Update(ctx context.Context, projectType domain.ProjectType) (domain.ProjectType, error)
 	Delete(ctx context.Context, projectTypeID string) error
 	Get(ctx context.Context, projectTypeID string) (domain.ProjectType, error)
+	SearchBase(ctx context.Context) ([]domain.ProjectType, browser.Result, error)
 	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectTypesFilter) ([]domain.ProjectType, browser.Result, error)
 }
 
@@ -67,6 +68,14 @@ func (service *projectTypeService) Get(ctx context.Context, projectTypeID string
 		return domain.ProjectType{}, fmt.Errorf("[ProjectTypeService] failed to get project type with ID %s: %w", projectTypeID, err)
 	} else {
 		return projectType, nil
+	}
+}
+
+func (service *projectTypeService) SearchBase(ctx context.Context) ([]domain.ProjectType, browser.Result, error) {
+	if projectTypes, pagerResult, err := service.projectTypeRepository.Search(ctx, service.db, browser.Params{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "name", Sort: "ASC"}, domain.SearchProjectTypesFilter{}); err != nil {
+		return nil, browser.Result{}, fmt.Errorf("[ProjectTypeService] failed to search project types: %w", err)
+	} else {
+		return projectTypes, pagerResult, nil
 	}
 }
 

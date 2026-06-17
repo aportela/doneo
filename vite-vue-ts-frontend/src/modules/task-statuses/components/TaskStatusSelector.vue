@@ -6,8 +6,7 @@
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { taskStatusService } from '../services/task-status';
-    import type { SearchRequest, TaskStatusResponse } from '../types/dto';
-    import { Sort } from '../../../shared/types/models/sort';
+    import type { TaskStatusResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
     import { handleAPIError } from '../../../api/client/errorHandler';
 
@@ -36,8 +35,6 @@
 
     const props = defineProps<TaskStatusSelectorProps>();
 
-    const sort = ref<Sort>(new Sort("index", "ASC"));
-
     const options = shallowRef<SelectOption[]>([]);
 
     const fillEmptyStartDateStatusId = ref<string | null>(null);
@@ -49,20 +46,7 @@
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: SearchRequest = {
-                pager: {
-                    currentPage: 1,
-                    resultsPage: 0,
-                },
-                order: {
-                    field: sort.value.field,
-                    sort: sort.value.order,
-                },
-                filter: {
-                    name: undefined,
-                }
-            };
-            const response = await taskStatusService.search(payload);
+            const response = await taskStatusService.searchBase();
             taskStatuses.value = response.taskStatuses;
             if (taskStatusId.value) {
                 selectedColor.value = taskStatuses.value.find((taskStatus) => taskStatus.id === taskStatusId.value)?.hexColor

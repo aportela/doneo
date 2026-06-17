@@ -60,6 +60,11 @@ func NewRouter(app *app.App) http.Handler {
 		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
 		r.Get("/users", app.UserHandler.SearchBase)
 		r.Get("/roles", app.RoleHandler.SearchBase)
+		r.Get("/project-types", app.ProjectTypeHandler.SearchBase)
+		r.Get("/project-statuses", app.ProjectStatusHandler.SearchBase)
+		r.Get("/project-priorities", app.ProjectPriorityHandler.SearchBase)
+		r.Get("/task-statuses", app.TaskStatusHandler.SearchBase)
+		r.Get("/task-priorities", app.TaskPriorityHandler.SearchBase)
 	})
 
 	apiRouter.Route("/users", func(r chi.Router) {

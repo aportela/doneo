@@ -17,6 +17,7 @@ type ProjectPriorityService interface {
 	Update(ctx context.Context, projectPriority domain.ProjectPriority) (domain.ProjectPriority, error)
 	Delete(ctx context.Context, projectPriorityID string) error
 	Get(ctx context.Context, projectPriorityID string) (domain.ProjectPriority, error)
+	SearchBase(ctx context.Context) ([]domain.ProjectPriority, browser.Result, error)
 	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectPrioritiesFilter) ([]domain.ProjectPriority, browser.Result, error)
 }
 
@@ -66,6 +67,14 @@ func (service *projectPriorityService) Get(ctx context.Context, projectPriorityI
 		return domain.ProjectPriority{}, fmt.Errorf("[ProjectPriorityService] failed to get project priority with ID %s: %w", projectPriorityID, err)
 	} else {
 		return projectPriority, nil
+	}
+}
+
+func (service *projectPriorityService) SearchBase(ctx context.Context) ([]domain.ProjectPriority, browser.Result, error) {
+	if projectPriorities, pagerResult, err := service.projectPriorityRepository.Search(ctx, service.db, browser.Params{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "name", Sort: "ASC"}, domain.SearchProjectPrioritiesFilter{}); err != nil {
+		return nil, browser.Result{}, fmt.Errorf("[ProjectPriorityService] failed to search project priorities: %w", err)
+	} else {
+		return projectPriorities, pagerResult, nil
 	}
 }
 

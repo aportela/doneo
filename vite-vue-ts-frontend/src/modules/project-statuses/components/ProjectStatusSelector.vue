@@ -6,8 +6,7 @@
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { projectStatusService } from '../services/project-status';
-    import type { SearchRequest, ProjectStatusResponse } from '../types/dto';
-    import { Sort } from '../../../shared/types/models/sort';
+    import type { ProjectStatusResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
     import { handleAPIError } from '../../../api/client/errorHandler';
 
@@ -36,8 +35,6 @@
 
     const props = defineProps<ProjectStatusSelectorProps>();
 
-    const sort = ref<Sort>(new Sort("index", "ASC"));
-
     const options = shallowRef<SelectOption[]>([]);
 
     const fillEmptyStartDateStatusId = ref<string | null>(null);
@@ -49,20 +46,7 @@
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: SearchRequest = {
-                pager: {
-                    currentPage: 1,
-                    resultsPage: 0,
-                },
-                order: {
-                    field: sort.value.field,
-                    sort: sort.value.order,
-                },
-                filter: {
-                    name: undefined,
-                }
-            };
-            const response = await projectStatusService.search(payload);
+            const response = await projectStatusService.searchBase();
             projectStatuses.value = response.projectStatuses;
             if (projectStatusId.value) {
                 selectedColor.value = projectStatuses.value.find((projectStatus) => projectStatus.id === projectStatusId.value)?.hexColor

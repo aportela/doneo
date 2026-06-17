@@ -32,6 +32,12 @@ export const taskPriorityService = {
     );
     return data;
   },
+  async searchBase(): Promise<SearchResponse> {
+    const { data } = await axiosInstance.get<SearchResponse>(
+      "/entities/task-priorities",
+    );
+    return data;
+  },
   async search(payload: SearchRequest): Promise<SearchResponse> {
     const { data } = await axiosInstance.post<SearchResponse>(
       "/task-priorities/search",

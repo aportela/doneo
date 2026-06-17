@@ -6,8 +6,7 @@
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { taskPriorityService } from '../services/task-priority';
-    import type { SearchRequest, TaskPriorityResponse } from '../types/dto';
-    import { Sort } from '../../../shared/types/models/sort';
+    import type { TaskPriorityResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
     import { handleAPIError } from '../../../api/client/errorHandler';
 
@@ -33,27 +32,12 @@
 
     const props = defineProps<TaskPrioritySelectorProps>();
 
-    const sort = ref<Sort>(new Sort("index", "ASC"));
-
     const options = shallowRef<SelectOption[]>([]);
 
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: SearchRequest = {
-                pager: {
-                    currentPage: 1,
-                    resultsPage: 0,
-                },
-                order: {
-                    field: sort.value.field,
-                    sort: sort.value.order,
-                },
-                filter: {
-                    name: undefined,
-                }
-            };
-            const response = await taskPriorityService.search(payload);
+            const response = await taskPriorityService.searchBase();
             taskPriorities.value = response.taskPriorities;
             if (taskPriorityId.value) {
                 selectedColor.value = taskPriorities.value.find((taskPriority) => taskPriority.id === taskPriorityId.value)?.hexColor

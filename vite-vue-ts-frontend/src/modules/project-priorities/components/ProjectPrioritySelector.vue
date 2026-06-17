@@ -6,8 +6,7 @@
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { projectPriorityService } from '../services/project-priority';
-    import type { SearchRequest, ProjectPriorityResponse } from '../types/dto';
-    import { Sort } from '../../../shared/types/models/sort';
+    import type { ProjectPriorityResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
     import { handleAPIError } from '../../../api/client/errorHandler';
 
@@ -33,27 +32,12 @@
 
     const props = defineProps<ProjectPrioritySelectorProps>();
 
-    const sort = ref<Sort>(new Sort("index", "ASC"));
-
     const options = shallowRef<SelectOption[]>([]);
 
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: SearchRequest = {
-                pager: {
-                    currentPage: 1,
-                    resultsPage: 0,
-                },
-                order: {
-                    field: sort.value.field,
-                    sort: sort.value.order,
-                },
-                filter: {
-                    name: undefined,
-                }
-            };
-            const response = await projectPriorityService.search(payload);
+            const response = await projectPriorityService.searchBase();
             projectPriorities.value = response.projectPriorities;
             if (projectPriorityId.value) {
                 selectedColor.value = projectPriorities.value.find((projectPriority) => projectPriority.id === projectPriorityId.value)?.hexColor

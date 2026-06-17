@@ -80,6 +80,12 @@ func (handler *ProjectTypeHandler) Get(w http.ResponseWriter, r *http.Request) {
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectType), nil)
 }
 
+func (handler *ProjectTypeHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	projectTypes, pagerResult, err := handler.service.SearchBase(r.Context())
+	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectTypes, pagerResult), err)
+}
+
 func (handler *ProjectTypeHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request searchRequest

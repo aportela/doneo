@@ -17,6 +17,7 @@ type TaskPriorityService interface {
 	Update(ctx context.Context, taskPriority domain.TaskPriority) (domain.TaskPriority, error)
 	Delete(ctx context.Context, taskPriorityID string) error
 	Get(ctx context.Context, taskPriorityID string) (domain.TaskPriority, error)
+	SearchBase(ctx context.Context) ([]domain.TaskPriority, browser.Result, error)
 	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskPrioritiesFilter) ([]domain.TaskPriority, browser.Result, error)
 }
 
@@ -69,6 +70,14 @@ func (service *taskPriorityService) Get(ctx context.Context, taskPriorityID stri
 		return domain.TaskPriority{}, fmt.Errorf("[TaskPriorityService] failed to get task priority with ID %s: %w", taskPriorityID, err)
 	} else {
 		return taskPriority, nil
+	}
+}
+
+func (service *taskPriorityService) SearchBase(ctx context.Context) ([]domain.TaskPriority, browser.Result, error) {
+	if taskPriorities, pagerResult, err := service.taskPriorityRepository.Search(ctx, service.db, browser.Params{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "name", Sort: "ASC"}, domain.SearchTaskPrioritiesFilter{}); err != nil {
+		return nil, browser.Result{}, fmt.Errorf("[TaskPriorityService] failed to search task priorities: %w", err)
+	} else {
+		return taskPriorities, pagerResult, nil
 	}
 }
 

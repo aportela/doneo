@@ -6,8 +6,7 @@
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { projectTypeService } from '../services/project-type';
-    import type { SearchRequest, ProjectTypeResponse } from '../types/dto';
-    import { Sort } from '../../../shared/types/models/sort';
+    import type { ProjectTypeResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
     import { handleAPIError } from '../../../api/client/errorHandler';
 
@@ -33,27 +32,12 @@
 
     const props = defineProps<ProjectTypeSelectorProps>();
 
-    const sort = ref<Sort>(new Sort("name", "ASC"));
-
     const options = shallowRef<SelectOption[]>([]);
 
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: SearchRequest = {
-                pager: {
-                    currentPage: 1,
-                    resultsPage: 0,
-                },
-                order: {
-                    field: sort.value.field,
-                    sort: sort.value.order,
-                },
-                filter: {
-                    name: undefined,
-                }
-            };
-            const response = await projectTypeService.search(payload);
+            const response = await projectTypeService.searchBase();
             projectTypes.value = response.projectTypes;
             if (projectTypeId.value) {
                 selectedColor.value = projectTypes.value.find((projectType) => projectType.id === projectTypeId.value)?.hexColor
