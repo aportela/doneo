@@ -36,3 +36,5 @@ deny close not found dialogs ??
 xicons
 
 task page do not check project id (not existent/not parent of taskid)
+
+customize img preview toolbar (https://www.naiveui.com/en-US/os-theme/components/image#custom.vue) (download with bgdownload)
