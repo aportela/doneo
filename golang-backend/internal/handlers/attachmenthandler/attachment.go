@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 
@@ -136,8 +137,15 @@ func (handler *AttachmentHandler) DownloadProjectAttachment(w http.ResponseWrite
 
 	if err == nil {
 
-		// TODO: allow previews
-		w.Header().Set("Content-Disposition", `attachment; filename="`+attachment.OriginalName+`"`)
+		switch chi.URLParam(r, "mode") {
+		case "download":
+			w.Header().Set("Content-Disposition", `attachment; filename="`+url.PathEscape(attachment.OriginalName)+`"`)
+
+		case "inline":
+			w.Header().Set("Content-Disposition", `inline; filename="`+url.PathEscape(attachment.OriginalName)+`"`)
+		default:
+			// TODO:
+		}
 		w.Header().Set("Content-Type", attachment.ContentType)
 
 		http.ServeFile(w, r, attachmentPath)

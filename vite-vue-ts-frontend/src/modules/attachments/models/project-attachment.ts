@@ -21,15 +21,15 @@ export class ProjectAttachment {
   }
 
   getDownloadURL = (projectId: string): string => {
-    return `/api/wc/attachments/project/${projectId}/attachment/${this.id}`;
+    return `/api/wc/attachments/project/${projectId}/attachment/${this.id}/download`;
   };
 
   getAxiosDownloadURL = (projectId: string): string => {
-    return `/wc/attachments/project/${projectId}/attachment/${this.id}`;
+    return `/wc/attachments/project/${projectId}/attachment/${this.id}/download`;
   };
 
   getPreviewURL = (projectId: string): string => {
-    return `/api/wc/attachments/project/${projectId}/attachment/${this.id}`;
+    return `/api/wc/attachments/project/${projectId}/attachment/${this.id}/inline`;
   };
 
   allowImagePreview = (): boolean => {
