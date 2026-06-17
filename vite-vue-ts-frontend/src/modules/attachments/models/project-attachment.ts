@@ -24,6 +24,10 @@ export class ProjectAttachment {
     return `/api/attachments/project/${projectId}/attachment/${this.id}`;
   };
 
+  getAxiosDownloadURL = (projectId: string): string => {
+    return `/attachments/project/${projectId}/attachment/${this.id}`;
+  };
+
   getPreviewURL = (projectId: string): string => {
     return `/api/attachments/project/${projectId}/attachment/${this.id}`;
   };
