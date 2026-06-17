@@ -22,6 +22,7 @@
     import ProjectAttachmentsTable from "../../../attachments/components/ProjectAttachmentsTable.vue";
     import type { ProjectAttachmentsTableFilters } from "../../../attachments/types/project-attachments-table-filter.ts";
     import { bgDownload } from "../../../../shared/composables/axios.ts";
+    import AudioPreview from "../../../../shared/components/AudioPreview.vue";
 
     interface ProjectAttachmentsProps {
         style?: string | CSSProperties;
@@ -84,6 +85,12 @@
     }));
 
     const currentImagePreviewIndex = ref<number>(0);
+
+    const showAudioPreviewModal = ref<boolean>(false);
+
+    const audioSources = computed<ProjectAttachment[]>(() => items.value.filter((item: ProjectAttachment) => item.allowAudioPreview()));
+
+    const currentAudioPreviewIndex = ref<number>(0);
 
     const selectedItem = ref<ProjectAttachment>(new ProjectAttachment());
 
@@ -174,9 +181,16 @@
         bgDownload(_projectAttachment.getAxiosDownloadURL(props.projectId), _projectAttachment.name)
     };
 
-    const onPreview = (_projectAttachment: ProjectAttachment, _index: number) => {
-        currentImagePreviewIndex.value = imageSourcesWithIds.value.findIndex((item) => item.id == _projectAttachment.id);
-        showImagePreviewModal.value = true;
+    const onPreview = (projectAttachment: ProjectAttachment, _index: number) => {
+        if (projectAttachment.allowImagePreview()) {
+            currentImagePreviewIndex.value = imageSourcesWithIds.value.findIndex((item) => item.id == projectAttachment.id);
+            showImagePreviewModal.value = true;
+        } else if (projectAttachment.allowAudioPreview()) {
+            currentAudioPreviewIndex.value = audioSources.value.findIndex((item) => item.id == projectAttachment.id);
+            showAudioPreviewModal.value = true;
+        } else {
+            console.error("Invalid preview");
+        }
     };
 
     let stopBusReauthListener: () => void;
@@ -200,6 +214,9 @@
 <template>
     <ImagePreview v-model:show="showImagePreviewModal" :sources="imageSources"
         :current-index="currentImagePreviewIndex" />
+    <AudioPreview v-model:show="showAudioPreviewModal" :project-id="props.projectId" :items="audioSources"
+        :current-index="currentAudioPreviewIndex" />
+
     <!-- TODO: onupload notification -->
     <UploadDialog v-if="props.projectId" v-model:show="showUploadModal" :project-id="props.projectId"
         v-model:upload-count="uploadCount" />
