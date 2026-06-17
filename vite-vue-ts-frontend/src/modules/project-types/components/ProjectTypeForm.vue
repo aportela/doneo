@@ -203,6 +203,9 @@
                         case 403:
                             state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
                             break;
+                        case 404:
+                            state.ajaxErrorMessage = t("modules.projectType.components.ProjectTypeForm.errors.notFoundError");
+                            break;
                         case 409:
                             if (apiError.details?.field === "name") {
                                 serverErrors.value.name = "modules.projectType.components.ProjectTypeForm.warnings.nameAlreadyExists";

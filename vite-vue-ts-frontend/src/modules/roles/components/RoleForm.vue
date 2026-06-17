@@ -209,6 +209,9 @@
                         case 403:
                             state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
                             break;
+                        case 404:
+                            state.ajaxErrorMessage = t("modules.role.components.RoleForm.errors.notFoundError");
+                            break;
                         case 409:
                             if (apiError.details?.field === "name") {
                                 serverErrors.value.name = "modules.role.components.RoleForm.warnings.nameAlreadyExists";
@@ -298,7 +301,7 @@
                 <n-gi>
                     <h4 class="doneo-permission-group-header">{{
                         t("modules.role.components.RoleForm.headers.projectPermissions")
-                        }}</h4>
+                    }}</h4>
                     <n-switch v-model:value="role.permissions.allowUpdateProject" class="doneo-permission-switch"
                         :disabled="state.ajaxRunning">
                         <template #checked>
@@ -330,7 +333,7 @@
                 <n-gi>
                     <h4 class="doneo-permission-group-header">{{
                         t("modules.role.components.RoleForm.headers.taskPermissions")
-                        }}
+                    }}
                     </h4>
                     <n-switch v-model:value="role.permissions.allowAddTask" class="doneo-permission-switch"
                         :disabled="state.ajaxRunning">
