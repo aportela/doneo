@@ -1,7 +1,7 @@
 import type { AttachmentResponse as AttachmentDTO } from "../types/dto";
 import { UserBase } from "../../users/models/user";
 import { IDate } from "../../../shared/types/idate";
-import { isImage } from "../../../shared/composables/fileUtils";
+import { isAudio, isImage, isPDF } from "../../../shared/composables/fileUtils";
 
 export class ProjectAttachment {
   id: string | null;
@@ -33,7 +33,22 @@ export class ProjectAttachment {
   };
 
   allowImagePreview = (): boolean => {
-    return isImage(this.name) ?? false;
+    return isImage(this.name);
+  };
+
+  allowAudioPreview = (): boolean => {
+    // TODO: with cache
+    /*
+    return (
+      isAudio(this.name) &&
+      document.createElement("audio").canPlayType(this.contentType) !== ""
+    );
+    */
+    return isAudio(this.name);
+  };
+
+  allowPDFPreview = (): boolean => {
+    return isPDF(this.name);
   };
 
   toDTO(): AttachmentDTO {
