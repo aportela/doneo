@@ -39,7 +39,8 @@ func NewRouter(app *app.App) http.Handler {
 	uuidPattern := "[0-9a-fA-F-]{36}"
 
 	apiRouter.Route("/avatars", func(r chi.Router) {
-		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
+		// TODO:
+		//r.Use(middlewares.RequireJWTCookieAuthentication(app.Cfg.Auth.SecretKey))
 		r.Get("/{size:[0-9]+}/user/{id:"+uuidPattern+"}", func(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(
 				w,
@@ -51,7 +52,8 @@ func NewRouter(app *app.App) http.Handler {
 	})
 
 	apiRouter.Route("/attachments", func(r chi.Router) {
-		r.Use(middlewares.RequireJWTCookieAuthentication(app.Cfg.Auth.SecretKey))
+		// TODO:
+		//r.Use(middlewares.RequireJWTCookieAuthentication(app.Cfg.Auth.SecretKey))
 		r.Get("/project/{id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}", app.AttachmentHandler.DownloadProjectAttachment)
 
 	})
