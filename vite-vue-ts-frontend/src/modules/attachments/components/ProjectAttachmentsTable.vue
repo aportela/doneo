@@ -198,7 +198,7 @@
                         @delete="onConfirmDelete(projectAttachment, index)"
                         @download="onDownload(projectAttachment, index)" @preview="onPreview(projectAttachment, index)"
                         :disabled="props.disabled" :delete-disabled="props.disabled" :download-disabled="props.disabled"
-                        :preview-disabled="props.disabled || !(projectAttachment.allowImagePreview() || projectAttachment.allowAudioPreview())" />
+                        :preview-disabled="props.disabled || !(projectAttachment.allowImagePreview() || projectAttachment.allowAudioPreview() || projectAttachment.allowPDFPreview())" />
                 </td>
             </tr>
             <tr>

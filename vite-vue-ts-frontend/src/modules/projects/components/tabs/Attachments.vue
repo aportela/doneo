@@ -23,6 +23,7 @@
     import type { ProjectAttachmentsTableFilters } from "../../../attachments/types/project-attachments-table-filter.ts";
     import { bgDownload } from "../../../../shared/composables/axios.ts";
     import AudioPreview from "../../../../shared/components/AudioPreview.vue";
+    import PDFPreview from "../../../../shared/components/PDFPreview.vue";
 
     interface ProjectAttachmentsProps {
         style?: string | CSSProperties;
@@ -91,6 +92,12 @@
     const audioSources = computed<ProjectAttachment[]>(() => items.value.filter((item: ProjectAttachment) => item.allowAudioPreview()));
 
     const currentAudioPreviewIndex = ref<number>(0);
+
+    const showPDFPreviewModal = ref<boolean>(false);
+
+    const pdfSources = computed<ProjectAttachment[]>(() => items.value.filter((item: ProjectAttachment) => item.allowPDFPreview()));
+
+    const currentPDFPreviewIndex = ref<number>(0);
 
     const selectedItem = ref<ProjectAttachment>(new ProjectAttachment());
 
@@ -188,6 +195,9 @@
         } else if (projectAttachment.allowAudioPreview()) {
             currentAudioPreviewIndex.value = audioSources.value.findIndex((item) => item.id == projectAttachment.id);
             showAudioPreviewModal.value = true;
+        } else if (projectAttachment.allowPDFPreview()) {
+            currentPDFPreviewIndex.value = pdfSources.value.findIndex((item) => item.id == projectAttachment.id);
+            showPDFPreviewModal.value = true;
         } else {
             console.error("Invalid preview");
         }
@@ -216,6 +226,8 @@
         :current-index="currentImagePreviewIndex" />
     <AudioPreview v-model:show="showAudioPreviewModal" :project-id="props.projectId" :items="audioSources"
         :current-index="currentAudioPreviewIndex" />
+    <PDFPreview v-model:show="showPDFPreviewModal" :project-id="props.projectId" :items="pdfSources"
+        :current-index="currentPDFPreviewIndex" />
 
     <!-- TODO: onupload notification -->
     <UploadDialog v-if="props.projectId" v-model:show="showUploadModal" :project-id="props.projectId"
