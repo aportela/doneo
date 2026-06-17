@@ -1,17 +1,25 @@
-const allowPreview = (filename: string) => {
-  return !!filename?.match(/.(jpg|jpeg|png|gif|svg|webp|mp3|pdf)$/i);
+const hasExtension = (filename: string, exts: string[]): boolean => {
+  return new RegExp(`\\.(${exts.join("|")})$`, "i").test(filename);
 };
 
-const isImage = (filename: string) => {
-  if (filename) return !!filename?.match(/.(jpg|jpeg|png|gif|svg|webp)$/i);
-};
+const allowPreview = (f: string): boolean =>
+  hasExtension(f, [
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+    "svg",
+    "webp",
+    "mp3",
+    "ogg",
+    "pdf",
+  ]);
 
-const isAudio = (filename: string) => {
-  return !!filename?.match(/.(mp3)$/i);
-};
+const isImage = (f: string): boolean =>
+  hasExtension(f, ["jpg", "jpeg", "png", "gif", "svg", "webp"]);
 
-const isPDF = (filename: string) => {
-  return !!filename?.match(/.(pdf)$/i);
-};
+const isAudio = (f: string): boolean => hasExtension(f, ["mp3", "ogg"]);
+
+const isPDF = (f: string): boolean => hasExtension(f, ["pdf"]);
 
 export { allowPreview, isImage, isAudio, isPDF };
