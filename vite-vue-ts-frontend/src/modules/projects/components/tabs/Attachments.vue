@@ -76,7 +76,7 @@
 
     const showImagePreviewModal = ref<boolean>(false);
 
-    const imageSources = computed<string[]>(() => items.value.filter((item: ProjectAttachment) => item.allowImagePreview()).map((item: ProjectAttachment) => item.getDownloadURL(props.projectId)));
+    const imageSources = computed<string[]>(() => items.value.filter((item: ProjectAttachment) => item.allowImagePreview()).map((item: ProjectAttachment) => item.getPreviewURL(props.projectId)));
 
     const imageSourcesWithIds = computed(() => items.value.filter((item: ProjectAttachment) => item.allowImagePreview()).map((item: ProjectAttachment) => {
         return ({
@@ -185,7 +185,7 @@
     };
 
     const onDownload = (_projectAttachment: ProjectAttachment, _index: number) => {
-        bgDownload(_projectAttachment.getAxiosDownloadURL(props.projectId), _projectAttachment.name)
+        bgDownload(_projectAttachment.getBgDownloadURL(props.projectId), _projectAttachment.name)
     };
 
     const onPreview = (projectAttachment: ProjectAttachment, _index: number) => {

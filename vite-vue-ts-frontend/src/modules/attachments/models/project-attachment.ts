@@ -24,12 +24,12 @@ export class ProjectAttachment {
     return `/api/wc/attachments/project/${projectId}/attachment/${this.id}/download`;
   };
 
-  getAxiosDownloadURL = (projectId: string): string => {
-    return `/wc/attachments/project/${projectId}/attachment/${this.id}/download`;
-  };
-
   getPreviewURL = (projectId: string): string => {
     return `/api/wc/attachments/project/${projectId}/attachment/${this.id}/inline`;
+  };
+
+  getBgDownloadURL = (projectId: string): string => {
+    return `/wc/attachments/project/${projectId}/attachment/${this.id}/download`;
   };
 
   allowImagePreview = (): boolean => {
