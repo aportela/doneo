@@ -43,6 +43,7 @@ func (service *taskService) Add(ctx context.Context, projectID string, task doma
 	} else {
 		task.ID = utils.UUID()
 		task.CreatedBy.ID = contextUser.ID
+		task.CreatedBy.Name = contextUser.Name
 		task.CreatedAt = time.Now()
 		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if newTaskIndex, err := service.taskRepository.GetNextTaskIndex(ctx, service.db, projectID); err != nil {

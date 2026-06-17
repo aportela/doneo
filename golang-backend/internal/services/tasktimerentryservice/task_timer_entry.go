@@ -37,6 +37,7 @@ func (service *taskTimerEntryService) Add(ctx context.Context, projectID string,
 		return err
 	} else {
 		taskTimerEntry.CreatedBy.ID = contextUser.ID
+		taskTimerEntry.CreatedBy.Name = contextUser.Name
 		taskTimerEntry.CreatedAt = time.Now()
 		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.taskTimerEntryRepository.Add(ctx, tx, taskID, taskTimerEntry); err != nil {

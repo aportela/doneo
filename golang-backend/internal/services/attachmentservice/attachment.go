@@ -42,6 +42,7 @@ func (service *attachmentService) AddProjectAttachment(ctx context.Context, proj
 		return domain.Attachment{}, err
 	} else {
 		attachment.CreatedBy.ID = contextUser.ID
+		attachment.CreatedBy.Name = contextUser.Name
 		attachment.CreatedAt = time.Now()
 		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.attachmentRepository.AddAttachment(ctx, tx, attachment); err != nil {
@@ -129,6 +130,7 @@ func (service *attachmentService) AddTaskAttachment(ctx context.Context, project
 		return domain.Attachment{}, err
 	} else {
 		attachment.CreatedBy.ID = contextUser.ID
+		attachment.CreatedBy.Name = contextUser.Name
 		attachment.CreatedAt = time.Now()
 		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.attachmentRepository.AddAttachment(ctx, tx, attachment); err != nil {

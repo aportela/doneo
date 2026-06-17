@@ -41,8 +41,10 @@ func (service *noteService) AddProjectNote(ctx context.Context, projectID string
 	if contextUser, err := service.authorizationService.RequireProjectUpdatePermission(ctx, projectID); err != nil {
 		return domain.Note{}, err
 	} else {
+
 		note.ID = utils.UUID()
 		note.CreatedBy.ID = contextUser.ID
+		note.CreatedBy.Name = contextUser.Name
 		note.CreatedAt = time.Now()
 		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.noteRepository.AddProjectNote(ctx, tx, projectID, note); err != nil {
@@ -146,6 +148,7 @@ func (service *noteService) AddTaskNote(ctx context.Context, projectID string, t
 	} else {
 		note.ID = utils.UUID()
 		note.CreatedBy.ID = contextUser.ID
+		note.CreatedBy.Name = contextUser.Name
 		note.CreatedAt = time.Now()
 		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.noteRepository.AddTaskNote(ctx, tx, taskID, note); err != nil {

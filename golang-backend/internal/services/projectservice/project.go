@@ -42,6 +42,7 @@ func (service *projectService) Add(ctx context.Context, project domain.Project) 
 	}
 	project.ID = utils.UUID()
 	project.CreatedBy.ID = contextUser.ID
+	project.CreatedBy.Name = contextUser.Name
 	project.CreatedAt = time.Now()
 	if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 		if err := service.projectRepository.Add(ctx, tx, project); err != nil {
