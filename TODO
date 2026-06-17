@@ -32,3 +32,5 @@ check missing 404 responses on frontend services
 add handler interface funcs
 
 deny close not found dialogs ??
+
+xicons
