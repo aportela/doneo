@@ -1427,11 +1427,11 @@ export default {
             },
           },
           errors: {
-            loadError: "There was a problem while loading the project data",
+            loadError: "There was a problem while loading the task data",
             // TODO: deduplicate
-            notFoundError: "We couldn’t find the specified project",
-            addError: "There was a problem while adding the project data",
-            updateError: "There was a problem while updating the project data",
+            notFoundError: "We couldn’t find the specified task",
+            addError: "There was a problem while adding the task data",
+            updateError: "There was a problem while updating the task data",
           },
         },
         ProjectTasksTab: {
