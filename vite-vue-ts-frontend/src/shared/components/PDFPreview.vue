@@ -93,11 +93,11 @@
     .doneo-pdf-preview-toolbar {
         z-index: 100;
         position: absolute;
-        border-radius: 24px;
-        height: 48px;
         bottom: 40px;
         left: 50%;
-        padding: 0 12px;
+        transform: translateX(-50%);
+        border-radius: 24px;
+        padding: 12px;
         background: rgba(0, 0, 0, .35);
         color: rgba(255, 255, 255, .9);
         transition: color .3s var(--n-bezier);
