@@ -27,12 +27,16 @@
     const onPrevious = () => {
         if (currentIndex.value > 0) {
             currentIndex.value--;
+        } else {
+            currentIndex.value = props.items.length - 1
         }
     };
 
     const onNext = () => {
         if (currentIndex.value < props.items.length - 1) {
             currentIndex.value++;
+        } else {
+            currentIndex.value = 0;
         }
     };
 
@@ -46,7 +50,7 @@
         <div style="background-color: rgba(250, 250, 252, 1); padding: 16px">
             <div v-if="currentItem" :key="currentItem.id ?? ''">
                 <p class="doneo-text-center"><strong>{{ currentItem.name }}</strong> ({{ formatBytes(currentItem.size)
-                    }})</p>
+                }})</p>
                 <audio controls autoplay>
                     <source :src="currentItem.getDownloadURL(props.projectId)" :type="currentItem.contentType">
                 </audio>
