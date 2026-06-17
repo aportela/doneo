@@ -16,6 +16,8 @@ import (
 )
 
 func NewRouter(app *app.App) http.Handler {
+	uuidPattern := "[0-9a-fA-F-]{36}"
+
 	baseRouter := chi.NewRouter()
 
 	baseRouter.Use(middleware.Logger)
@@ -30,18 +32,11 @@ func NewRouter(app *app.App) http.Handler {
 
 	apiRouter := chi.NewRouter()
 
-	apiRouter.Route("/auth", func(r chi.Router) {
-		r.Post("/signin", app.IdentityHandler.SignIn)
-		r.Post("/signout", app.IdentityHandler.SignOut)
-		r.Post("/renew-access-token", app.IdentityHandler.RenewAccessToken)
-	})
+	cookieAuthApiRouter := chi.NewRouter()
 
-	uuidPattern := "[0-9a-fA-F-]{36}"
-
-	apiRouter.Route("/avatars", func(r chi.Router) {
-		// TODO:
-		//r.Use(middlewares.RequireJWTCookieAuthentication(app.Cfg.Auth.SecretKey))
-		r.Get("/{size:[0-9]+}/user/{id:"+uuidPattern+"}", func(w http.ResponseWriter, r *http.Request) {
+	cookieAuthApiRouter.Route("/", func(r chi.Router) {
+		r.Use(middlewares.RequireJWTCookieAuthentication(app.Cfg.Auth.SecretKey))
+		r.Get("/avatars/{size:[0-9]+}/user/{id:"+uuidPattern+"}", func(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(
 				w,
 				r,
@@ -49,13 +44,15 @@ func NewRouter(app *app.App) http.Handler {
 				http.StatusTemporaryRedirect,
 			)
 		})
+		r.Get("/attachments/project/{id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}", app.AttachmentHandler.DownloadProjectAttachment)
 	})
 
-	apiRouter.Route("/attachments", func(r chi.Router) {
-		// TODO:
-		//r.Use(middlewares.RequireJWTCookieAuthentication(app.Cfg.Auth.SecretKey))
-		r.Get("/project/{id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}", app.AttachmentHandler.DownloadProjectAttachment)
+	apiRouter.Mount("/wc/", cookieAuthApiRouter)
 
+	apiRouter.Route("/auth", func(r chi.Router) {
+		r.Post("/signin", app.IdentityHandler.SignIn)
+		r.Post("/signout", app.IdentityHandler.SignOut)
+		r.Post("/renew-access-token", app.IdentityHandler.RenewAccessToken)
 	})
 
 	apiRouter.Route("/entities", func(r chi.Router) {

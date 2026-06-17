@@ -62,7 +62,7 @@ func (handler *IdentityHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	accessTokenCookie := http.Cookie{
 		Name:     "access_token",
 		Value:    accessToken.Token,
-		Path:     "/api/attachments/",
+		Path:     "/api/wc/",
 		HttpOnly: true,
 		Secure:   true,
 		SameSite: http.SameSiteStrictMode,
@@ -99,7 +99,7 @@ func (handler *IdentityHandler) SignOut(w http.ResponseWriter, r *http.Request) 
 	accessTokenCookie := http.Cookie{
 		Name:     "access_token",
 		Value:    "",
-		Path:     "/api/attachments/",
+		Path:     "/api/wc/",
 		HttpOnly: true,
 		Secure:   true,
 		SameSite: http.SameSiteStrictMode,
@@ -143,7 +143,7 @@ func (handler *IdentityHandler) RenewAccessToken(w http.ResponseWriter, r *http.
 	accessTokenCookie := http.Cookie{
 		Name:     "access_token",
 		Value:    accessToken.Token,
-		Path:     "/api/attachments/",
+		Path:     "/api/wc/",
 		HttpOnly: true,
 		Secure:   true,
 		SameSite: http.SameSiteStrictMode,

@@ -13,7 +13,7 @@
         avatarSize: 32,
     });
 
-    const avatarURL = computed(() => `/api/avatars/${props.avatarSize}/user/${props.userId}`);
+    const avatarURL = computed(() => `/api/wc/avatars/${props.avatarSize}/user/${props.userId}`);
 </script>
 
 <template>
