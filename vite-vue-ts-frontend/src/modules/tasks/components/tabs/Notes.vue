@@ -83,7 +83,7 @@
             id: "",
             createdBy: {
                 id: sesionStore.sessionUserId ?? "",
-                name: sessionStorage.sessionUserName ?? "",
+                name: sesionStore.sessionUserName ?? "",
             },
             createdAt: new Date().getTime(),
             updatedAt: null,
