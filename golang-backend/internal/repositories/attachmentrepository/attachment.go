@@ -84,7 +84,7 @@ func (repository *attachmentRepository) GetAttachment(ctx context.Context, dbExe
             SELECT
 				A.id, A.creator_id, U.name, A.created_at, A.original_name, A.content_type, A.size
             FROM project_attachments PA
-			INNER JOIN attachments A ON A.id = TA.attachment_id
+			INNER JOIN attachments A ON A.id = PA.attachment_id
 			INNER JOIN users U ON U.id = A.creator_id
             WHERE
 				A.id = ?
