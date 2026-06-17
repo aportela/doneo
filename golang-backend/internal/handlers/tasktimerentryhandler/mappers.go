@@ -14,7 +14,7 @@ func addRequestToDomain(request addRequest) domain.TaskTimerEntry {
 
 func updateRequestToDomain(request updateRequest) domain.TaskTimerEntry {
 	return domain.TaskTimerEntry{
-		ID:           request.Id,
+		ID:           request.ID,
 		Summary:      request.Summary,
 		TotalSeconds: request.TotalSeconds,
 	}
@@ -22,7 +22,7 @@ func updateRequestToDomain(request updateRequest) domain.TaskTimerEntry {
 
 func domainToResponse(taskTimeEntry domain.TaskTimerEntry) TaskTimeEntryResponse {
 	return TaskTimeEntryResponse{
-		Id:           taskTimeEntry.ID,
+		ID:           taskTimeEntry.ID,
 		User:         userhandler.BaseDomainToBaseResponse(taskTimeEntry.CreatedBy),
 		CreatedAt:    taskTimeEntry.CreatedAt.UnixMilli(),
 		Summary:      taskTimeEntry.Summary,

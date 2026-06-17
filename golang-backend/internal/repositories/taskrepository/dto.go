@@ -38,6 +38,6 @@ type searchFilterDTO struct {
 	PriorityID      *string
 	StatusID        *string
 	CreatedAt       *repositories.TimestampFilter
-	CreatedByUserId *string
-	ViewByUserId    *string
+	CreatedByUserID *string
+	ViewByUserID    *string
 }

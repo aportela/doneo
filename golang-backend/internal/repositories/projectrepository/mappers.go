@@ -77,11 +77,11 @@ func toFilterDTO(filter domain.SearchProjectFilter) searchFilterDTO {
 	return searchFilterDTO{
 		Slug:            filter.Slug,
 		Summary:         filter.Summary,
-		TypeID:          filter.TypeId,
-		PriorityID:      filter.PriorityId,
-		StatusID:        filter.StatusId,
+		TypeID:          filter.TypeID,
+		PriorityID:      filter.PriorityID,
+		StatusID:        filter.StatusID,
 		CreatedAt:       repositories.TimestampFilterToDTO(filter.CreatedAt),
-		CreatedByUserId: filter.CreatedByUserId,
+		CreatedByUserID: filter.CreatedByUserID,
 	}
 }
 

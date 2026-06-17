@@ -44,7 +44,7 @@ func addRequestToDomain(request addRequest) domain.Role {
 func updateRequestToDomain(request updateRequest) domain.Role {
 	return domain.Role{
 		RoleBase: domain.RoleBase{
-			ID:   request.Id,
+			ID:   request.ID,
 			Name: request.Name,
 		},
 		PermissionsBitmask: requestPermissionsToDomainPermissionsBitmask(request.Permissions),

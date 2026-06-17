@@ -109,7 +109,7 @@ func (repository *userTimerRepository) ClearUserTimers(ctx context.Context, dbEx
 	return err
 }
 
-func (repository *userTimerRepository) GetUserTimers(ctx context.Context, dbExecutor database.DatabaseExecutor, userId string) ([]domain.UserTimer, error) {
+func (repository *userTimerRepository) GetUserTimers(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) ([]domain.UserTimer, error) {
 	rows, err := dbExecutor.QueryContext(ctx,
 		`
 			SELECT
@@ -118,7 +118,7 @@ func (repository *userTimerRepository) GetUserTimers(ctx context.Context, dbExec
 			WHERE UT.user_id = ?
 			ORDER BY UT.started_at DESC
 		`,
-		userId,
+		userID,
 	)
 	if err != nil {
 		return nil, err

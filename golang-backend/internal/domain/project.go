@@ -29,12 +29,12 @@ type Project struct {
 type SearchProjectFilter struct {
 	Slug            *string
 	Summary         *string
-	TypeId          *string
-	StatusId        *string
-	PriorityId      *string
+	TypeID          *string
+	StatusID        *string
+	PriorityID      *string
 	CreatedAt       *TimestampFilter
-	CreatedByUserId *string
-	ViewByUserId    *string
+	CreatedByUserID *string
+	ViewByUserID    *string
 }
 
 type ProjectEventType uint

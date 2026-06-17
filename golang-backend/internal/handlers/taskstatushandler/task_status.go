@@ -55,8 +55,8 @@ func (handler *TaskStatusHandler) Update(w http.ResponseWriter, r *http.Request)
 
 func (handler *TaskStatusHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	taskStatusId := chi.URLParam(r, "id")
-	err := handler.service.Delete(r.Context(), taskStatusId)
+	taskStatusID := chi.URLParam(r, "id")
+	err := handler.service.Delete(r.Context(), taskStatusID)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskStatusHandler] failed to delete project status: %w", err))
 		return
@@ -66,8 +66,8 @@ func (handler *TaskStatusHandler) Delete(w http.ResponseWriter, r *http.Request)
 
 func (handler *TaskStatusHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	taskStatusId := chi.URLParam(r, "id")
-	taskStatus, err := handler.service.Get(r.Context(), taskStatusId)
+	taskStatusID := chi.URLParam(r, "id")
+	taskStatus, err := handler.service.Get(r.Context(), taskStatusID)
 	if err != nil {
 		if err == domain.NotFoundError {
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskStatusHandler] failed to get non existent project status: %w", err))

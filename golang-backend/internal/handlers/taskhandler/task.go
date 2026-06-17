@@ -109,11 +109,11 @@ func (handler *TaskHandler) Search(w http.ResponseWriter, r *http.Request) {
 		if request.Filter.Summary != nil {
 			filter.Summary = request.Filter.Summary
 		}
-		if request.Filter.PriorityId != nil {
-			filter.PriorityID = request.Filter.PriorityId
+		if request.Filter.PriorityID != nil {
+			filter.PriorityID = request.Filter.PriorityID
 		}
-		if request.Filter.StatusId != nil {
-			filter.StatusID = request.Filter.StatusId
+		if request.Filter.StatusID != nil {
+			filter.StatusID = request.Filter.StatusID
 		}
 		if request.Filter.CreatedAt != nil {
 			filter.CreatedAt = &domain.TimestampFilter{From: nil, To: nil}
@@ -124,8 +124,8 @@ func (handler *TaskHandler) Search(w http.ResponseWriter, r *http.Request) {
 				filter.CreatedAt.To = request.Filter.CreatedAt.To
 			}
 		}
-		if request.Filter.CreatedByUserId != nil {
-			filter.CreatedByUserId = request.Filter.CreatedByUserId
+		if request.Filter.CreatedByUserID != nil {
+			filter.CreatedByUserID = request.Filter.CreatedByUserID
 		}
 	}
 	projects, pagerResult, err := handler.service.Search(r.Context(),

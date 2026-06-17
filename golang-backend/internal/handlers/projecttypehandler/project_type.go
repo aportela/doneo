@@ -55,8 +55,8 @@ func (handler *ProjectTypeHandler) Update(w http.ResponseWriter, r *http.Request
 
 func (handler *ProjectTypeHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectTypeId := chi.URLParam(r, "id")
-	err := handler.service.Delete(r.Context(), projectTypeId)
+	projectTypeID := chi.URLParam(r, "id")
+	err := handler.service.Delete(r.Context(), projectTypeID)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeHandler] failed to delete project type: %w", err))
 		return
@@ -66,8 +66,8 @@ func (handler *ProjectTypeHandler) Delete(w http.ResponseWriter, r *http.Request
 
 func (handler *ProjectTypeHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectTypeId := chi.URLParam(r, "id")
-	projectType, err := handler.service.Get(r.Context(), projectTypeId)
+	projectTypeID := chi.URLParam(r, "id")
+	projectType, err := handler.service.Get(r.Context(), projectTypeID)
 	if err != nil {
 		if err == domain.NotFoundError {
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectTypeHandler] failed to get non existent project type: %w", err))

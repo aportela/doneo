@@ -31,6 +31,6 @@ type SearchTaskFilter struct {
 	StatusID        *string
 	PriorityID      *string
 	CreatedAt       *TimestampFilter
-	CreatedByUserId *string
-	ViewByUserId    *string
+	CreatedByUserID *string
+	ViewByUserID    *string
 }

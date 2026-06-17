@@ -146,7 +146,7 @@ func (service *projectService) Search(ctx context.Context, pager browser.Params,
 	contextUser, err := service.authorizationService.RequireUserAdminPermission(ctx)
 	if err != nil {
 		// filter by projects visible by current user when admin flag is not set
-		filter.ViewByUserId = &contextUser.ID
+		filter.ViewByUserID = &contextUser.ID
 	}
 	if projects, pagerResult, err := service.projectRepository.Search(ctx, service.db, pager, order, filter); err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[ProjectService] failed to search projects: %w", err)

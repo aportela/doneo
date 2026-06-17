@@ -175,7 +175,7 @@ func (service *taskService) Search(ctx context.Context, pager browser.Params, or
 	contextUser, err := service.authorizationService.RequireUserAdminPermission(ctx)
 	if err != nil {
 		// filter by tasks visible by current user when admin flag is not set
-		filter.ViewByUserId = &contextUser.ID
+		filter.ViewByUserID = &contextUser.ID
 	}
 	tasks, pagerResult, err := service.taskRepository.Search(ctx, service.db, pager, order, filter)
 	if err != nil {

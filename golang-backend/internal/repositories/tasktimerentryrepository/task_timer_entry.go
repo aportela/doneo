@@ -35,7 +35,7 @@ func (repository *taskTimerEntryRepository) Add(ctx context.Context, dbExecutor 
         `,
 		dto.ID,
 		taskID,
-		dto.CreatorId,
+		dto.CreatorID,
 		dto.CreatedAt,
 		dto.Summary,
 		dto.TotalSeconds,
@@ -117,7 +117,7 @@ func (repository *taskTimerEntryRepository) Get(ctx context.Context, dbExecutor 
         `,
 		taskTimerEntryID).Scan(
 		&dto.ID,
-		&dto.CreatorId,
+		&dto.CreatorID,
 		&dto.CreatorName,
 		&dto.CreatedAt,
 		&dto.Summary,
@@ -157,7 +157,7 @@ func (repository *taskTimerEntryRepository) GetTaskTimerEntries(ctx context.Cont
 	for rows.Next() {
 		var dto taskTimerEntryDTO
 		if err := rows.Scan(
-			&dto.ID, &dto.CreatorId, &dto.CreatorName, &dto.CreatedAt, &dto.Summary, &dto.TotalSeconds,
+			&dto.ID, &dto.CreatorID, &dto.CreatorName, &dto.CreatedAt, &dto.Summary, &dto.TotalSeconds,
 		); err != nil {
 			return nil, err
 		}

@@ -46,11 +46,11 @@ type updateRequest struct {
 type filterRequest struct {
 	Slug            *string                   `json:"slug"`
 	Summary         *string                   `json:"summary"`
-	TypeId          *string                   `json:"typeId"`
-	PriorityId      *string                   `json:"priorityId"`
-	StatusId        *string                   `json:"statusId"`
+	TypeID          *string                   `json:"typeId"`
+	PriorityID      *string                   `json:"priorityId"`
+	StatusID        *string                   `json:"statusId"`
 	CreatedAt       *handlers.TimestampFilter `json:"createdAt"`
-	CreatedByUserId *string                   `json:"createdByUserId"`
+	CreatedByUserID *string                   `json:"createdByUserId"`
 }
 
 type searchRequest struct {

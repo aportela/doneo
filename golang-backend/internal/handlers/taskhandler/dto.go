@@ -38,10 +38,10 @@ type updateRequest struct {
 
 type filterRequest struct {
 	Summary         *string                   `json:"summary"`
-	PriorityId      *string                   `json:"priorityId"`
-	StatusId        *string                   `json:"statusId"`
+	PriorityID      *string                   `json:"priorityId"`
+	StatusID        *string                   `json:"statusId"`
 	CreatedAt       *handlers.TimestampFilter `json:"createdAt"`
-	CreatedByUserId *string                   `json:"createdByUserId"`
+	CreatedByUserID *string                   `json:"createdByUserId"`
 }
 
 type searchRequest struct {

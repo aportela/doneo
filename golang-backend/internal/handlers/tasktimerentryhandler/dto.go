@@ -8,13 +8,13 @@ type addRequest struct {
 }
 
 type updateRequest struct {
-	Id           string `json:"id"`
+	ID           string `json:"id"`
 	Summary      string `json:"summary"`
 	TotalSeconds uint   `json:"totalSeconds"`
 }
 
 type TaskTimeEntryResponse struct {
-	Id           string                       `json:"id"`
+	ID           string                       `json:"id"`
 	User         userhandler.UserBaseResponse `json:"user"`
 	CreatedAt    int64                        `json:"createdAt"`
 	Summary      string                       `json:"summary"`

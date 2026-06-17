@@ -74,7 +74,7 @@ func toFilterDTO(filter domain.SearchTaskFilter) searchFilterDTO {
 		Summary:         filter.Summary,
 		PriorityID:      filter.PriorityID,
 		StatusID:        filter.StatusID,
-		CreatedByUserId: filter.CreatedByUserId,
+		CreatedByUserID: filter.CreatedByUserID,
 	}
 }
 

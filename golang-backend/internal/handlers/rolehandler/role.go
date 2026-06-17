@@ -55,8 +55,8 @@ func (handler *RoleHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 func (handler *RoleHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	roleId := chi.URLParam(r, "id")
-	err := handler.service.Delete(r.Context(), roleId)
+	roleID := chi.URLParam(r, "id")
+	err := handler.service.Delete(r.Context(), roleID)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[RoleHandler] failed to delete role: %w", err))
 		return
@@ -66,8 +66,8 @@ func (handler *RoleHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 func (handler *RoleHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	roleId := chi.URLParam(r, "id")
-	user, err := handler.service.Get(r.Context(), roleId)
+	roleID := chi.URLParam(r, "id")
+	user, err := handler.service.Get(r.Context(), roleID)
 	if err != nil {
 		if err == domain.NotFoundError {
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[RoleHandler] failed to get non existent role: %w", err))

@@ -55,8 +55,8 @@ func (handler *ProjectPriorityHandler) Update(w http.ResponseWriter, r *http.Req
 
 func (handler *ProjectPriorityHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectPriorityId := chi.URLParam(r, "id")
-	err := handler.service.Delete(r.Context(), projectPriorityId)
+	projectPriorityID := chi.URLParam(r, "id")
+	err := handler.service.Delete(r.Context(), projectPriorityID)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityHandler] failed to delete project priority: %w", err))
 		return
@@ -66,8 +66,8 @@ func (handler *ProjectPriorityHandler) Delete(w http.ResponseWriter, r *http.Req
 
 func (handler *ProjectPriorityHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectPriorityId := chi.URLParam(r, "id")
-	projectPriority, err := handler.service.Get(r.Context(), projectPriorityId)
+	projectPriorityID := chi.URLParam(r, "id")
+	projectPriority, err := handler.service.Get(r.Context(), projectPriorityID)
 	if err != nil {
 		if err == domain.NotFoundError {
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPriorityHandler] failed to get non existent project priority: %w", err))

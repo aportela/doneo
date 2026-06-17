@@ -349,11 +349,11 @@ func (repository *projectRepository) Search(ctx context.Context, dbExecutor data
 		}
 	}
 	// TODO: updatedat, deletedat, startedat, finishedat, dueat
-	if filterDTO.CreatedByUserId != nil && len(*filterDTO.CreatedByUserId) > 0 {
+	if filterDTO.CreatedByUserID != nil && len(*filterDTO.CreatedByUserID) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "P.creator_id = ?")
-		filterArgs = append(filterArgs, *filterDTO.CreatedByUserId)
+		filterArgs = append(filterArgs, *filterDTO.CreatedByUserID)
 	}
-	if filterDTO.ViewByUserId != nil && len(*filterDTO.ViewByUserId) > 0 {
+	if filterDTO.ViewByUserID != nil && len(*filterDTO.ViewByUserID) > 0 {
 		// TODO: onlw show projects with user view permission
 	}
 	if len(sqlWhereConditions) > 0 {

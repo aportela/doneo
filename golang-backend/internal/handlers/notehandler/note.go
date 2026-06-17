@@ -70,8 +70,8 @@ func (handler *NoteHandler) DeleteProjectNote(w http.ResponseWriter, r *http.Req
 
 func (handler *NoteHandler) GetProjectNotes(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "project_id")
-	notes, err := handler.service.GetProjectNotes(r.Context(), projectId)
+	projectID := chi.URLParam(r, "project_id")
+	notes, err := handler.service.GetProjectNotes(r.Context(), projectID)
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(notes), err)
 }
 

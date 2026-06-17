@@ -76,16 +76,16 @@ func (handler *AttachmentHandler) AddProjectAttachment(w http.ResponseWriter, r 
 		return
 	}
 
-	projectId := chi.URLParam(r, "project_id")
+	projectID := chi.URLParam(r, "project_id")
 
-	attachment, err = handler.service.AddProjectAttachment(r.Context(), projectId, attachment)
+	attachment, err = handler.service.AddProjectAttachment(r.Context(), projectID, attachment)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	attachment, err = handler.service.GetProjectAttachment(r.Context(), projectId, attachment.ID)
+	attachment, err = handler.service.GetProjectAttachment(r.Context(), projectID, attachment.ID)
 	if err != nil {
 		// TODO: works with custom errors (like notFound / 404) ?
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -99,9 +99,9 @@ func (handler *AttachmentHandler) AddProjectAttachment(w http.ResponseWriter, r 
 
 func (handler *AttachmentHandler) DeleteProjectAttachment(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "project_id")
-	attachmentId := chi.URLParam(r, "attachment_id")
-	err := handler.service.DeleteProjectAttachment(r.Context(), projectId, attachmentId)
+	projectID := chi.URLParam(r, "project_id")
+	attachmentID := chi.URLParam(r, "attachment_id")
+	err := handler.service.DeleteProjectAttachment(r.Context(), projectID, attachmentID)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AttachmentHandler] failed to delete project attachment: %w", err))
 		return
@@ -111,10 +111,10 @@ func (handler *AttachmentHandler) DeleteProjectAttachment(w http.ResponseWriter,
 
 func (handler *AttachmentHandler) DownloadProjectAttachment(w http.ResponseWriter, r *http.Request) {
 
-	projectId := chi.URLParam(r, "project_id")
-	attachmentId := chi.URLParam(r, "attachment_id")
+	projectID := chi.URLParam(r, "project_id")
+	attachmentID := chi.URLParam(r, "attachment_id")
 
-	attachment, err := handler.service.GetProjectAttachment(r.Context(), projectId, attachmentId)
+	attachment, err := handler.service.GetProjectAttachment(r.Context(), projectID, attachmentID)
 	if err != nil {
 		// TODO: works with custom errors (like notFound / 404) ?
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -157,8 +157,8 @@ func (handler *AttachmentHandler) DownloadProjectAttachment(w http.ResponseWrite
 
 func (handler *AttachmentHandler) GetProjectAttachments(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "project_id")
-	projectAttachments, err := handler.service.GetProjectAttachments(r.Context(), projectId)
+	projectID := chi.URLParam(r, "project_id")
+	projectAttachments, err := handler.service.GetProjectAttachments(r.Context(), projectID)
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectAttachments), err)
 }
 
@@ -214,17 +214,17 @@ func (handler *AttachmentHandler) AddTaskAttachment(w http.ResponseWriter, r *ht
 		return
 	}
 
-	projectId := chi.URLParam(r, "project_id")
-	taskId := chi.URLParam(r, "task_id")
+	projectID := chi.URLParam(r, "project_id")
+	taskID := chi.URLParam(r, "task_id")
 
-	attachment, err = handler.service.AddTaskAttachment(r.Context(), projectId, taskId, attachment)
+	attachment, err = handler.service.AddTaskAttachment(r.Context(), projectID, taskID, attachment)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	attachment, err = handler.service.GetProjectAttachment(r.Context(), projectId, attachment.ID)
+	attachment, err = handler.service.GetProjectAttachment(r.Context(), projectID, attachment.ID)
 	if err != nil {
 		// TODO: works with custom errors (like notFound / 404) ?
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -238,10 +238,10 @@ func (handler *AttachmentHandler) AddTaskAttachment(w http.ResponseWriter, r *ht
 
 func (handler *AttachmentHandler) DeleteTaskAttachment(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	projectId := chi.URLParam(r, "project_id")
-	taskId := chi.URLParam(r, "task_id")
-	attachmentId := chi.URLParam(r, "attachment_id")
-	err := handler.service.DeleteTaskAttachment(r.Context(), projectId, taskId, attachmentId)
+	projectID := chi.URLParam(r, "project_id")
+	taskID := chi.URLParam(r, "task_id")
+	attachmentID := chi.URLParam(r, "attachment_id")
+	err := handler.service.DeleteTaskAttachment(r.Context(), projectID, taskID, attachmentID)
 	if err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AttachmentHandler] failed to delete task attachment: %w", err))
 		return
@@ -251,11 +251,11 @@ func (handler *AttachmentHandler) DeleteTaskAttachment(w http.ResponseWriter, r 
 
 func (handler *AttachmentHandler) DownloadTaskAttachment(w http.ResponseWriter, r *http.Request) {
 
-	projectId := chi.URLParam(r, "project_id")
-	taskId := chi.URLParam(r, "task_id")
-	attachmentId := chi.URLParam(r, "attachment_id")
+	projectID := chi.URLParam(r, "project_id")
+	taskID := chi.URLParam(r, "task_id")
+	attachmentID := chi.URLParam(r, "attachment_id")
 
-	attachment, err := handler.service.GetTaskAttachment(r.Context(), projectId, taskId, attachmentId)
+	attachment, err := handler.service.GetTaskAttachment(r.Context(), projectID, taskID, attachmentID)
 	if err != nil {
 		// TODO: works with custom errors (like notFound / 404) ?
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -14,7 +14,7 @@ func toDTO(taskTimeEntry domain.TaskTimerEntry) taskTimerEntryDTO {
 	return taskTimerEntryDTO{
 		ID:           taskTimeEntry.ID,
 		CreatedAt:    taskTimeEntry.CreatedAt.UnixMilli(),
-		CreatorId:    taskTimeEntry.CreatedBy.ID,
+		CreatorID:    taskTimeEntry.CreatedBy.ID,
 		CreatorName:  taskTimeEntry.CreatedBy.Name,
 		Summary:      taskTimeEntry.Summary,
 		TotalSeconds: taskTimeEntry.TotalSeconds,
@@ -25,7 +25,7 @@ func toDomain(taskTimeEntry taskTimerEntryDTO) domain.TaskTimerEntry {
 	return domain.TaskTimerEntry{
 		ID:           taskTimeEntry.ID,
 		CreatedAt:    time.UnixMilli(taskTimeEntry.CreatedAt),
-		CreatedBy:    domain.UserBase{ID: taskTimeEntry.CreatorId, Name: taskTimeEntry.CreatorName},
+		CreatedBy:    domain.UserBase{ID: taskTimeEntry.CreatorID, Name: taskTimeEntry.CreatorName},
 		Summary:      taskTimeEntry.Summary,
 		TotalSeconds: taskTimeEntry.TotalSeconds,
 	}

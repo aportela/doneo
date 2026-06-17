@@ -18,7 +18,7 @@ type addRequest struct {
 }
 
 type updateRequest struct {
-	Id          string           `json:"id"`
+	ID          string           `json:"id"`
 	Name        string           `json:"name"`
 	Permissions permissionsFlags `json:"permissions"`
 }
