@@ -1,9 +1,9 @@
 const allowPreview = (filename: string) => {
-  return !!filename?.match(/.(jpg|jpeg|png|gif|svg|mp3|pdf)$/i);
+  return !!filename?.match(/.(jpg|jpeg|png|gif|svg|webp|mp3|pdf)$/i);
 };
 
 const isImage = (filename: string) => {
-  if (filename) return !!filename?.match(/.(jpg|jpeg|png|gif|svg)$/i);
+  if (filename) return !!filename?.match(/.(jpg|jpeg|png|gif|svg|webp)$/i);
 };
 
 const isAudio = (filename: string) => {
