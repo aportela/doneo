@@ -34,3 +34,5 @@ add handler interface funcs
 deny close not found dialogs ??
 
 xicons
+
+task page do not check project id (not existent/not parent of taskid)
