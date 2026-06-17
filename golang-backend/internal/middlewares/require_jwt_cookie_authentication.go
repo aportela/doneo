@@ -4,32 +4,30 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/jwt"
 )
 
 func RequireJWTCookieAuthentication(secretKey string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			cookie, err := r.Cookie("access_token")
-			if err != nil {
+			if cookie, err := r.Cookie("access_token"); err != nil {
 				writeJSONError(w, http.StatusUnauthorized,
 					"REQUIRE_JWT_AUTH_MIDDLEWARE_ERROR",
 					"Access token cookie missing",
 					"")
 				return
+			} else {
+				if jwtUser, err := jwt.VerifyToken(cookie.Value, secretKey); err != nil {
+					writeJSONError(w, http.StatusUnauthorized,
+						"REQUIRE_JWT_AUTH_MIDDLEWARE_ERROR",
+						"Invalid JWT",
+						err.Error())
+					return
+				} else {
+					ctx := context.WithValue(r.Context(), contextUserKey, ContextUser{UserBase: jwtUser, SkipAuthorization: false})
+					next.ServeHTTP(w, r.WithContext(ctx))
+				}
 			}
-			userID, err := jwt.VerifyToken(cookie.Value, secretKey)
-			if err != nil {
-				writeJSONError(w, http.StatusUnauthorized,
-					"REQUIRE_JWT_AUTH_MIDDLEWARE_ERROR",
-					"Invalid JWT",
-					err.Error())
-				return
-			}
-			//ctx := context.WithValue(r.Context(), userIDKey, userID)
-			ctx := context.WithValue(r.Context(), contextUserKey, ContextUser{UserBase: domain.UserBase{ID: userID}, SkipAuthorization: false})
-			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
 }

@@ -119,14 +119,13 @@ func (handler *IdentityHandler) RenewAccessToken(w http.ResponseWriter, r *http.
 	}
 	var refreshToken jwt.Token
 	refreshToken.Token = cookie.Value
-	userID_, err := jwt.VerifyToken(refreshToken.Token, handler.secretKey)
+	jwtUser, err := jwt.VerifyToken(refreshToken.Token, handler.secretKey)
 	if err != nil {
 		// TODO: return APIError JSON HERE !
 		http.Error(w, "Invalid token", http.StatusUnauthorized)
 		return
 	}
-	//ctx := middlewares.SetUserIDIntoContext(r.Context(), userID_)
-	ctx := middlewares.SetContextUser(r.Context(), middlewares.ContextUser{UserBase: domain.UserBase{ID: userID_}, SkipAuthorization: false})
+	ctx := middlewares.SetContextUser(r.Context(), middlewares.ContextUser{UserBase: jwtUser, SkipAuthorization: false})
 	user, err := handler.identityService.GetCurrentUserInfo(ctx)
 	if err != nil {
 		// TODO: return APIError JSON HERE !

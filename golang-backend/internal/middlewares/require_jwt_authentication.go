@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/jwt"
 )
 
@@ -28,17 +27,16 @@ func RequireJWTAuthentication(secretKey string) func(http.Handler) http.Handler 
 					"")
 				return
 			}
-			userID, err := jwt.VerifyToken(parts[1], secretKey)
-			if err != nil {
+			if jwtUser, err := jwt.VerifyToken(parts[1], secretKey); err != nil {
 				writeJSONError(w, http.StatusUnauthorized,
 					"REQUIRE_JWT_AUTH_MIDDLEWARE_ERROR",
 					"Invalid JWT",
 					err.Error())
 				return
+			} else {
+				ctx := context.WithValue(r.Context(), contextUserKey, ContextUser{UserBase: jwtUser, SkipAuthorization: false})
+				next.ServeHTTP(w, r.WithContext(ctx))
 			}
-			//ctx := context.WithValue(r.Context(), userIDKey, userID)
-			ctx := context.WithValue(r.Context(), contextUserKey, ContextUser{UserBase: domain.UserBase{ID: userID}, SkipAuthorization: false})
-			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
 }
