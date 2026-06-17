@@ -21,6 +21,7 @@
 
     import ProjectAttachmentsTable from "../../../attachments/components/ProjectAttachmentsTable.vue";
     import type { ProjectAttachmentsTableFilters } from "../../../attachments/types/project-attachments-table-filter.ts";
+    import { bgDownload } from "../../../../shared/composables/axios.ts";
 
     interface ProjectAttachmentsProps {
         style?: string | CSSProperties;
@@ -169,7 +170,9 @@
         }
     };
 
-    const onDownload = (_projectAttachment: ProjectAttachment, _index: number) => { };
+    const onDownload = (_projectAttachment: ProjectAttachment, _index: number) => {
+        bgDownload(_projectAttachment.getAxiosDownloadURL(props.projectId), _projectAttachment.name)
+    };
 
     const onPreview = (_projectAttachment: ProjectAttachment, _index: number) => {
         currentImagePreviewIndex.value = imageSourcesWithIds.value.findIndex((item) => item.id == _projectAttachment.id);
