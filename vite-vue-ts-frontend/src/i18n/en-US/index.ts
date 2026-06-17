@@ -41,6 +41,13 @@ export default {
         confirmation: {
           continueMessage: "Do you want to continue ?",
         },
+        RemoteAPIAlertModal: {
+          buttons: {
+            backToHome: {
+              label: "Back to Home",
+            },
+          },
+        },
       },
       inputs: {
         ToggleInput: {
