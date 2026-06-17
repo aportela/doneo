@@ -15,14 +15,14 @@ import (
 )
 
 type AttachmentService interface {
-	GetAttachment(ctx context.Context, attachmentID string) (domain.Attachment, error)
-
 	AddProjectAttachment(ctx context.Context, projectID string, attachment domain.Attachment) (domain.Attachment, error)
 	DeleteProjectAttachment(ctx context.Context, projectID string, attachmentID string) error
+	GetProjectAttachment(ctx context.Context, projectID string, attachmentID string) (domain.Attachment, error)
 	GetProjectAttachments(ctx context.Context, projectID string) ([]domain.Attachment, error)
 
 	AddTaskAttachment(ctx context.Context, projectID string, taskID string, attachment domain.Attachment) (domain.Attachment, error)
 	DeleteTaskAttachment(ctx context.Context, projectID string, taskID string, attachmentID string) error
+	GetTaskAttachment(ctx context.Context, projectID string, taskID string, attachmentID string) (domain.Attachment, error)
 	GetTaskAttachments(ctx context.Context, projectID string, taskID string) ([]domain.Attachment, error)
 }
 
@@ -35,15 +35,6 @@ type attachmentService struct {
 
 func NewService(db database.Database, authorizationService authorizationservice.AuthorizationService, historyOperationService historyoperationservice.HistoryOperationService, attachmentRepository attachmentrepository.AttachmentRepository) AttachmentService {
 	return &attachmentService{db: db, authorizationService: authorizationService, historyOperationService: historyOperationService, attachmentRepository: attachmentRepository}
-}
-
-func (service *attachmentService) GetAttachment(ctx context.Context, attachmentID string) (domain.Attachment, error) {
-	// TODO: check permissions
-	attachment, err := service.attachmentRepository.GetAttachment(ctx, service.db, attachmentID)
-	if err != nil {
-		return domain.Attachment{}, fmt.Errorf("[AttachmentService] failed to get attachment with ID %s: %w", attachmentID, err)
-	}
-	return attachment, nil
 }
 
 func (service *attachmentService) AddProjectAttachment(ctx context.Context, projectID string, attachment domain.Attachment) (domain.Attachment, error) {
@@ -107,6 +98,18 @@ func (service *attachmentService) DeleteProjectAttachment(ctx context.Context, p
 			}
 			return nil
 		})
+	}
+}
+
+func (service *attachmentService) GetProjectAttachment(ctx context.Context, projectID string, attachmentID string) (domain.Attachment, error) {
+	if _, err := service.authorizationService.RequireProjectViewPermission(ctx, projectID); err != nil {
+		return domain.Attachment{}, err
+	}
+	// TODO: attachment is owned by projectID ??
+	if attachment, err := service.attachmentRepository.GetAttachment(ctx, service.db, attachmentID); err != nil {
+		return domain.Attachment{}, fmt.Errorf("[AttachmentService] failed to get attachment with ID %s: %w", attachmentID, err)
+	} else {
+		return attachment, nil
 	}
 }
 
@@ -184,6 +187,18 @@ func (service *attachmentService) DeleteTaskAttachment(ctx context.Context, proj
 			}
 			return nil
 		})
+	}
+}
+
+func (service *attachmentService) GetTaskAttachment(ctx context.Context, projectID string, taskID string, attachmentID string) (domain.Attachment, error) {
+	if _, err := service.authorizationService.RequireTaskViewPermission(ctx, projectID); err != nil {
+		return domain.Attachment{}, err
+	}
+	// TODO: attachment is owned by taskID ??
+	if attachment, err := service.attachmentRepository.GetAttachment(ctx, service.db, attachmentID); err != nil {
+		return domain.Attachment{}, fmt.Errorf("[AttachmentService] failed to get attachment with ID %s: %w", attachmentID, err)
+	} else {
+		return attachment, nil
 	}
 }
 

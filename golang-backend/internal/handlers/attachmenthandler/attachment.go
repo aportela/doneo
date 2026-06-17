@@ -85,7 +85,7 @@ func (handler *AttachmentHandler) AddProjectAttachment(w http.ResponseWriter, r 
 		return
 	}
 
-	attachment, err = handler.service.GetAttachment(r.Context(), attachment.ID)
+	attachment, err = handler.service.GetProjectAttachment(r.Context(), projectId, attachment.ID)
 	if err != nil {
 		// TODO: works with custom errors (like notFound / 404) ?
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -111,10 +111,10 @@ func (handler *AttachmentHandler) DeleteProjectAttachment(w http.ResponseWriter,
 
 func (handler *AttachmentHandler) DownloadProjectAttachment(w http.ResponseWriter, r *http.Request) {
 
-	//projectId := chi.URLParam(r, "project_id")
+	projectId := chi.URLParam(r, "project_id")
 	attachmentId := chi.URLParam(r, "attachment_id")
 
-	attachment, err := handler.service.GetAttachment(r.Context(), attachmentId)
+	attachment, err := handler.service.GetProjectAttachment(r.Context(), projectId, attachmentId)
 	if err != nil {
 		// TODO: works with custom errors (like notFound / 404) ?
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -224,7 +224,7 @@ func (handler *AttachmentHandler) AddTaskAttachment(w http.ResponseWriter, r *ht
 		return
 	}
 
-	attachment, err = handler.service.GetAttachment(r.Context(), attachment.ID)
+	attachment, err = handler.service.GetProjectAttachment(r.Context(), projectId, attachment.ID)
 	if err != nil {
 		// TODO: works with custom errors (like notFound / 404) ?
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -251,10 +251,11 @@ func (handler *AttachmentHandler) DeleteTaskAttachment(w http.ResponseWriter, r 
 
 func (handler *AttachmentHandler) DownloadTaskAttachment(w http.ResponseWriter, r *http.Request) {
 
-	//projectId := chi.URLParam(r, "project_id")
+	projectId := chi.URLParam(r, "project_id")
+	taskId := chi.URLParam(r, "task_id")
 	attachmentId := chi.URLParam(r, "attachment_id")
 
-	attachment, err := handler.service.GetAttachment(r.Context(), attachmentId)
+	attachment, err := handler.service.GetTaskAttachment(r.Context(), projectId, taskId, attachmentId)
 	if err != nil {
 		// TODO: works with custom errors (like notFound / 404) ?
 		http.Error(w, err.Error(), http.StatusInternalServerError)
