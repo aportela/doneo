@@ -194,10 +194,11 @@
                         :user-name="projectAttachment.createdBy?.name ?? ''" />
                 </td>
                 <td class="doneo-text-center">
-                    <ManageTableActionButtons show-delete show-download
+                    <ManageTableActionButtons show-delete show-download show-preview
                         @delete="onConfirmDelete(projectAttachment, index)"
                         @download="onDownload(projectAttachment, index)" @preview="onPreview(projectAttachment, index)"
-                        :disabled="props.disabled" />
+                        :disabled="props.disabled" :delete-disabled="props.disabled" :download-disabled="props.disabled"
+                        :preview-disabled="props.disabled || !projectAttachment.allowImagePreview()" />
                 </td>
             </tr>
             <tr>
