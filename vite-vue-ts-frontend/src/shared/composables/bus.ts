@@ -4,7 +4,7 @@ type AppBusEvents = {
   reauthRequired: { emitter: string };
   reauthValidNotify: { to: string[] };
   // TODO: add more debug, http status code, http body response...
-  remoteAPIError: { errorMessage: string };
+  remoteAPIError: { errorMessage: string; denyCloseDialog?: boolean };
 };
 
 type BusEventMap = {

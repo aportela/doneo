@@ -11,6 +11,8 @@
 
     const show = defineModel('show', { default: false });
 
+    const closable = ref<boolean>(true);
+
     const bodyStyle = {
         width: '600px'
     };
@@ -22,6 +24,9 @@
     onMounted(async () => {
         busListener = appBus.on("remoteAPIError", (payload) => {
             errorMessage.value = payload.errorMessage
+            if (payload.denyCloseDialog) {
+                closable.value = false;
+            }
             show.value = true;
         });
     });
@@ -32,7 +37,8 @@
 </script>
 
 <template>
-    <n-modal v-model:show="show" :closable="true" preset="card" size="medium" :bordered="true" :style="bodyStyle">
+    <n-modal v-model:show="show" :closable="closable" :close-on-esc="closable" :mask-closable="closable" preset="card"
+        size="medium" :bordered="true" :style="bodyStyle">
         <template #header>
         </template>
         <RemoteAPIAlert type="error" :title="t('shared.errorMessages.Error')" :message="errorMessage" />

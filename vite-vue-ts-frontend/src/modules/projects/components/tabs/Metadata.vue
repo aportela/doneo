@@ -69,6 +69,7 @@
 
     const onGet = async (id: string) => {
         serverErrors.value = {};
+        let notFoundError = false;
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const response: ProjectResponse = await projectService.get(id);
@@ -93,6 +94,7 @@
                             break;
                         case 404:
                             state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.notFoundError");
+                            notFoundError = true;
                             break;
                         default:
                             state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.loadError");
@@ -106,7 +108,7 @@
         } finally {
             state.ajaxRunning = false;
             if (state.ajaxErrorMessage) {
-                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage, denyCloseDialog: notFoundError } });
             }
         }
     };

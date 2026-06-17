@@ -61,6 +61,7 @@
 
     const onGet = async (projectId: string, taskId: string) => {
         serverErrors.value = {};
+        let notFoundError = false;
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const response: TaskResponse = await taskService.get(projectId, taskId);
@@ -83,6 +84,7 @@
                             break;
                         case 404:
                             state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.notFoundError");
+                            notFoundError = true;
                             break;
                         default:
                             state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.loadError");
@@ -96,7 +98,7 @@
         } finally {
             state.ajaxRunning = false;
             if (state.ajaxErrorMessage) {
-                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage, denyCloseDialog: notFoundError } });
             }
         }
     };
