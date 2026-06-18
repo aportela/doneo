@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"path/filepath"
 
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
@@ -83,14 +82,7 @@ func (handler *AttachmentHandler) DownloadProjectAttachment(w http.ResponseWrite
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	} else {
-		ext := filepath.Ext(attachment.OriginalName)
-		filename := attachment.ID + ext
-		dir := filepath.Join(
-			handler.basePath,
-			string(attachment.ID[len(attachment.ID)-2]),
-			string(attachment.ID[len(attachment.ID)-1]),
-		)
-		attachmentPath := filepath.Join(dir, filename)
+		attachmentPath := handler.service.GetAttachmentFullPath(attachment.ID, attachment.OriginalName)
 		if _, err = os.Stat(attachmentPath); err == nil {
 			switch chi.URLParam(r, "mode") {
 			case "download":
@@ -181,14 +173,7 @@ func (handler *AttachmentHandler) DownloadTaskAttachment(w http.ResponseWriter, 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	} else {
-		ext := filepath.Ext(attachment.OriginalName)
-		filename := attachment.ID + ext
-		dir := filepath.Join(
-			handler.basePath,
-			string(attachment.ID[len(attachment.ID)-2]),
-			string(attachment.ID[len(attachment.ID)-1]),
-		)
-		attachmentPath := filepath.Join(dir, filename)
+		attachmentPath := handler.service.GetAttachmentFullPath(attachment.ID, attachment.OriginalName)
 		if _, err = os.Stat(attachmentPath); err == nil {
 			switch chi.URLParam(r, "mode") {
 			case "download":

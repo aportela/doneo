@@ -19,6 +19,8 @@ import (
 
 type AttachmentService interface {
 	getAttachmentPath(attachmentID string) string
+	getAttachmentFilename(attachmentID string, attachmentOriginalFilename string) string
+	GetAttachmentFullPath(attachmentID string, attachmentFilename string) string
 	SaveUploadedFile(sourceFile io.Reader, sourceFilename string) (string, error)
 	DeleteAttachment(attachment domain.Attachment) error
 
@@ -53,13 +55,21 @@ func (service *attachmentService) getAttachmentPath(attachmentID string) string 
 	)
 }
 
+func (service *attachmentService) getAttachmentFilename(attachmentID string, attachmentOriginalFilename string) string {
+	return attachmentID + filepath.Ext(attachmentOriginalFilename)
+}
+
+func (service *attachmentService) GetAttachmentFullPath(attachmentID string, attachmentFilename string) string {
+	return filepath.Join(service.getAttachmentPath(attachmentID), service.getAttachmentFilename(attachmentID, attachmentFilename))
+}
+
 func (service *attachmentService) SaveUploadedFile(sourceFile io.Reader, sourceFilename string) (string, error) {
 	attachmentID := utils.UUID()
 	attachmentPath := service.getAttachmentPath(attachmentID)
 	if err := os.MkdirAll(attachmentPath, 0755); err != nil {
 		return "", err
 	}
-	attachmentFilename := attachmentID + filepath.Ext(sourceFilename)
+	attachmentFilename := service.getAttachmentFilename(attachmentID, sourceFilename)
 	fullPath := filepath.Join(attachmentPath, attachmentFilename)
 	if destinationFile, err := os.Create(fullPath); err != nil {
 		return "", err
