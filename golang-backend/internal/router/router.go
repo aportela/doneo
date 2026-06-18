@@ -44,7 +44,7 @@ func NewRouter(app *app.App) http.Handler {
 				http.StatusTemporaryRedirect,
 			)
 		})
-		r.Get("/attachments/project/{id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}/{mode}", app.AttachmentHandler.DownloadProjectAttachment)
+		r.Get("/attachments/project/{project_id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}/{mode}", app.AttachmentHandler.DownloadProjectAttachment)
 	})
 
 	apiRouter.Mount("/wc/", cookieAuthApiRouter)
