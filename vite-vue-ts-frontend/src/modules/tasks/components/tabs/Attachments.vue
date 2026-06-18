@@ -77,12 +77,12 @@
 
     const showImagePreviewModal = ref<boolean>(false);
 
-    const imageSources = computed<string[]>(() => items.value.filter((item: Attachment) => item.allowImagePreview()).map((item: Attachment) => item.getPreviewURL(props.projectId)));
+    const imageSources = computed<string[]>(() => items.value.filter((item: Attachment) => item.allowImagePreview()).map((item: Attachment) => item.getPreviewURL(props.projectId, props.taskId)));
 
     const imageSourcesWithIds = computed(() => items.value.filter((item: Attachment) => item.allowImagePreview()).map((item: Attachment) => {
         return ({
             id: item.id,
-            url: item.getDownloadURL(props.projectId),
+            url: item.getDownloadURL(props.projectId, props.taskId),
         });
     }));
 
@@ -186,7 +186,7 @@
     };
 
     const onDownload = (attachment: Attachment, _index: number) => {
-        bgDownload(attachment.getBgDownloadURL(props.projectId), attachment.name)
+        bgDownload(attachment.getBgDownloadURL(props.projectId, props.taskId), attachment.name)
     };
 
     const onPreview = (attachment: Attachment, _index: number) => {
@@ -225,10 +225,10 @@
 <template>
     <ImagePreview v-model:show="showImagePreviewModal" :sources="imageSources"
         :current-index="currentImagePreviewIndex" />
-    <AudioPreview v-model:show="showAudioPreviewModal" :project-id="props.projectId" :items="audioSources"
-        :current-index="currentAudioPreviewIndex" />
-    <PDFPreview v-model:show="showPDFPreviewModal" :project-id="props.projectId" :items="pdfSources"
-        :current-index="currentPDFPreviewIndex" />
+    <AudioPreview v-model:show="showAudioPreviewModal" :project-id="props.projectId" :task-id="props.taskId"
+        :items="audioSources" :current-index="currentAudioPreviewIndex" />
+    <PDFPreview v-model:show="showPDFPreviewModal" :project-id="props.projectId" :task-id="props.taskId"
+        :items="pdfSources" :current-index="currentPDFPreviewIndex" />
 
     <!-- TODO: onupload notification -->
     <UploadDialog v-if="props.projectId && props.taskId" v-model:show="showUploadModal" :project-id="props.projectId"

@@ -8,6 +8,7 @@
 
     interface AudioPreviewProps {
         projectId: string;
+        taskId?: string;
         items: Attachment[];
     };
 
@@ -50,9 +51,10 @@
         <div style="background-color: rgba(250, 250, 252, 1); padding: 16px">
             <div v-if="currentItem" :key="currentItem.id ?? ''">
                 <p class="doneo-text-center"><strong>{{ currentItem.name }}</strong> ({{ formatBytes(currentItem.size)
-                }})</p>
+                    }})</p>
                 <audio controls autoplay>
-                    <source :src="currentItem.getPreviewURL(props.projectId)" :type="currentItem.contentType">
+                    <source :src="currentItem.getPreviewURL(props.projectId, props.taskId)"
+                        :type="currentItem.contentType">
                 </audio>
             </div>
             <div class="doneo-audio-preview-toolbar">

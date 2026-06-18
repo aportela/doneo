@@ -20,16 +20,28 @@ export class Attachment {
     this.size = data?.size ?? 0;
   }
 
-  getDownloadURL = (projectId: string): string => {
-    return `/api/wc/attachments/project/${projectId}/attachment/${this.id}/download`;
+  getDownloadURL = (projectId: string, taskId?: string): string => {
+    if (taskId) {
+      return `/api/wc/attachments/project/${projectId}/tasks/${taskId}/attachment/${this.id}/download`;
+    } else {
+      return `/api/wc/attachments/project/${projectId}/attachment/${this.id}/download`;
+    }
   };
 
-  getPreviewURL = (projectId: string): string => {
-    return `/api/wc/attachments/project/${projectId}/attachment/${this.id}/inline`;
+  getPreviewURL = (projectId: string, taskId?: string): string => {
+    if (taskId) {
+      return `/api/wc/attachments/project/${projectId}/tasks/${taskId}/attachment/${this.id}/inline`;
+    } else {
+      return `/api/wc/attachments/project/${projectId}/attachment/${this.id}/inline`;
+    }
   };
 
-  getBgDownloadURL = (projectId: string): string => {
-    return `/wc/attachments/project/${projectId}/attachment/${this.id}/download`;
+  getBgDownloadURL = (projectId: string, taskId?: string): string => {
+    if (taskId) {
+      return `/wc/attachments/project/${projectId}/tasks/${taskId}/attachment/${this.id}/download`;
+    } else {
+      return `/wc/attachments/project/${projectId}/attachment/${this.id}/download`;
+    }
   };
 
   allowImagePreview = (): boolean => {

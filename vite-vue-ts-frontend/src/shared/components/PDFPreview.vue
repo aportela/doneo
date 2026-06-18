@@ -9,6 +9,7 @@
 
     interface PDFPreviewProps {
         projectId: string;
+        taskId?: string;
         items: Attachment[];
     };
 
@@ -49,7 +50,7 @@
             <div v-if="currentItem" :key="currentItem.id ?? 0">
                 <p class="doneo-text-center"><strong>{{ currentItem.name }}</strong> ({{ formatBytes(currentItem.size)
                 }})</p>
-                <PDFWrapper :url="currentItem.getPreviewURL(props.projectId)"
+                <PDFWrapper :url="currentItem.getPreviewURL(props.projectId, props.taskId)"
                     inner-content-class="doneo-pdf-wrapper-inner-class" />
                 <div class="doneo-pdf-preview-toolbar">
                     <svg @click="onPrevious" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
