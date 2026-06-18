@@ -76,6 +76,6 @@ func (handler *TaskTimeTrackingHandler) Search(w http.ResponseWriter, r *http.Re
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")
-	notes, err := handler.service.GetTaskTimerEntries(r.Context(), projectID, taskID)
+	notes, err := handler.service.GetTaskTimeTrackings(r.Context(), projectID, taskID)
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(notes), err)
 }
