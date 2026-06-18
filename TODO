@@ -29,8 +29,6 @@ return entity on all add / update funcs
 
 check missing 404 responses on frontend services
 
-add handler interface funcs
-
 xicons
 
 task page do not check project id (not existent/not parent of taskid)
