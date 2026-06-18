@@ -128,7 +128,7 @@
                         id: note.id,
                         body: note.body
                     };
-                    note = new Note(await noteService.updateTaskote(props.projectId, props.taskId, note.id, payload));
+                    note = new Note(await noteService.updateTaskNote(props.projectId, props.taskId, note.id, payload));
                     items.value = items.value.map((item) => item.id === note.id ? note : item)
                     itemCount.value = items.value?.length ?? 0;
                     notify('success', t("modules.note.components.ProjectNotesTab.notifications.projectNoteUpdated"));

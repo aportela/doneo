@@ -51,7 +51,7 @@ export const noteService = {
     );
     return data;
   },
-  async updateTaskote(
+  async updateTaskNote(
     projectId: string,
     taskId: string,
     noteId: string,
