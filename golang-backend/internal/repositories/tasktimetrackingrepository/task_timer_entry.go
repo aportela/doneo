@@ -1,4 +1,4 @@
-package tasktimerentryrepository
+package tasktimetrackingrepository
 
 import (
 	"context"
@@ -9,21 +9,21 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 )
 
-type TaskTimerEntryRepository interface {
-	Add(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string, taskTimerEntry domain.TaskTimerEntry) error
-	Update(ctx context.Context, dbExecutor database.DatabaseExecutor, taskTimerEntry domain.TaskTimerEntry) error
+type TaskTimeTrackingRepository interface {
+	Add(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string, taskTimerEntry domain.TaskTimeTracking) error
+	Update(ctx context.Context, dbExecutor database.DatabaseExecutor, taskTimerEntry domain.TaskTimeTracking) error
 	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, taskTimerEntryID string) error
-	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, taskTimerEntryID string) (domain.TaskTimerEntry, error)
-	GetTaskTimerEntries(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]domain.TaskTimerEntry, error)
+	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, taskTimerEntryID string) (domain.TaskTimeTracking, error)
+	GetTaskTimerEntries(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]domain.TaskTimeTracking, error)
 }
 
-type taskTimerEntryRepository struct{}
+type taskTimeTrackingRepository struct{}
 
-func NewRepository() TaskTimerEntryRepository {
-	return &taskTimerEntryRepository{}
+func NewRepository() TaskTimeTrackingRepository {
+	return &taskTimeTrackingRepository{}
 }
 
-func (repository *taskTimerEntryRepository) Add(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string, taskTimerEntry domain.TaskTimerEntry) error {
+func (repository *taskTimeTrackingRepository) Add(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string, taskTimerEntry domain.TaskTimeTracking) error {
 	dto := toDTO(taskTimerEntry)
 	_, err := dbExecutor.ExecContext(
 		ctx,
@@ -46,7 +46,7 @@ func (repository *taskTimerEntryRepository) Add(ctx context.Context, dbExecutor 
 	return nil
 }
 
-func (repository *taskTimerEntryRepository) Update(ctx context.Context, dbExecutor database.DatabaseExecutor, taskTimerEntry domain.TaskTimerEntry) error {
+func (repository *taskTimeTrackingRepository) Update(ctx context.Context, dbExecutor database.DatabaseExecutor, taskTimerEntry domain.TaskTimeTracking) error {
 	dto := toDTO(taskTimerEntry)
 	result, err := dbExecutor.ExecContext(
 		ctx,
@@ -75,7 +75,7 @@ func (repository *taskTimerEntryRepository) Update(ctx context.Context, dbExecut
 	return nil
 }
 
-func (repository *taskTimerEntryRepository) Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, taskTimerEntryID string) error {
+func (repository *taskTimeTrackingRepository) Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, taskTimerEntryID string) error {
 	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
@@ -98,8 +98,8 @@ func (repository *taskTimerEntryRepository) Delete(ctx context.Context, dbExecut
 	return nil
 }
 
-func (repository *taskTimerEntryRepository) Get(ctx context.Context, dbExecutor database.DatabaseExecutor, taskTimerEntryID string) (domain.TaskTimerEntry, error) {
-	var dto taskTimerEntryDTO
+func (repository *taskTimeTrackingRepository) Get(ctx context.Context, dbExecutor database.DatabaseExecutor, taskTimerEntryID string) (domain.TaskTimeTracking, error) {
+	var dto taskTimeTrackingDTO
 	err := dbExecutor.QueryRowContext(
 		ctx,
 		`
@@ -125,14 +125,14 @@ func (repository *taskTimerEntryRepository) Get(ctx context.Context, dbExecutor 
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.TaskTimerEntry{}, domain.NotFoundError
+			return domain.TaskTimeTracking{}, domain.NotFoundError
 		}
-		return domain.TaskTimerEntry{}, err
+		return domain.TaskTimeTracking{}, err
 	}
 	return toDomain(dto), err
 }
 
-func (repository *taskTimerEntryRepository) GetTaskTimerEntries(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]domain.TaskTimerEntry, error) {
+func (repository *taskTimeTrackingRepository) GetTaskTimerEntries(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]domain.TaskTimeTracking, error) {
 	rows, err := dbExecutor.QueryContext(
 		ctx,
 		`
@@ -153,9 +153,9 @@ func (repository *taskTimerEntryRepository) GetTaskTimerEntries(ctx context.Cont
 		return nil, err
 	}
 	defer rows.Close()
-	dtos := make([]taskTimerEntryDTO, 0)
+	dtos := make([]taskTimeTrackingDTO, 0)
 	for rows.Next() {
-		var dto taskTimerEntryDTO
+		var dto taskTimeTrackingDTO
 		if err := rows.Scan(
 			&dto.ID, &dto.CreatorID, &dto.CreatorName, &dto.CreatedAt, &dto.Summary, &dto.TotalSeconds,
 		); err != nil {

@@ -1,4 +1,4 @@
-package tasktimerentryservice
+package tasktimetrackingservice
 
 import (
 	"context"
@@ -8,31 +8,31 @@ import (
 
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
-	"github.com/aportela/doneo/internal/repositories/tasktimerentryrepository"
+	"github.com/aportela/doneo/internal/repositories/tasktimetrackingrepository"
 	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/services/historyoperationservice"
 	"github.com/aportela/doneo/internal/utils"
 )
 
-type TaskTimerEntryService interface {
-	Add(ctx context.Context, projectID string, taskID string, taskTimerEntry domain.TaskTimerEntry) error
-	Update(ctx context.Context, projectID string, taskID string, taskTimerEntry domain.TaskTimerEntry) error
+type TaskTimeTrackingService interface {
+	Add(ctx context.Context, projectID string, taskID string, taskTimerEntry domain.TaskTimeTracking) error
+	Update(ctx context.Context, projectID string, taskID string, taskTimerEntry domain.TaskTimeTracking) error
 	Delete(ctx context.Context, projectID string, taskID string, taskTimeEntryID string) error
-	GetTaskTimerEntries(ctx context.Context, projectID string, taskID string) ([]domain.TaskTimerEntry, error)
+	GetTaskTimerEntries(ctx context.Context, projectID string, taskID string) ([]domain.TaskTimeTracking, error)
 }
 
-type taskTimerEntryService struct {
-	db                       database.Database
-	authorizationService     authorizationservice.AuthorizationService
-	historyOperationService  historyoperationservice.HistoryOperationService
-	taskTimerEntryRepository tasktimerentryrepository.TaskTimerEntryRepository
+type taskTimeTrackingService struct {
+	db                         database.Database
+	authorizationService       authorizationservice.AuthorizationService
+	historyOperationService    historyoperationservice.HistoryOperationService
+	taskTimeTrackingRepository tasktimetrackingrepository.TaskTimeTrackingRepository
 }
 
-func NewService(db database.Database, authorizationService authorizationservice.AuthorizationService, historyOperationService historyoperationservice.HistoryOperationService, taskTimerEntryRepository tasktimerentryrepository.TaskTimerEntryRepository) TaskTimerEntryService {
-	return &taskTimerEntryService{db: db, authorizationService: authorizationService, historyOperationService: historyOperationService, taskTimerEntryRepository: taskTimerEntryRepository}
+func NewService(db database.Database, authorizationService authorizationservice.AuthorizationService, historyOperationService historyoperationservice.HistoryOperationService, taskTimeTrackingRepository tasktimetrackingrepository.TaskTimeTrackingRepository) TaskTimeTrackingService {
+	return &taskTimeTrackingService{db: db, authorizationService: authorizationService, historyOperationService: historyOperationService, taskTimeTrackingRepository: taskTimeTrackingRepository}
 }
 
-func (service *taskTimerEntryService) Add(ctx context.Context, projectID string, taskID string, taskTimerEntry domain.TaskTimerEntry) error {
+func (service *taskTimeTrackingService) Add(ctx context.Context, projectID string, taskID string, taskTimerEntry domain.TaskTimeTracking) error {
 	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
 		return err
 	} else {
@@ -40,7 +40,7 @@ func (service *taskTimerEntryService) Add(ctx context.Context, projectID string,
 		taskTimerEntry.CreatedBy.Name = contextUser.Name
 		taskTimerEntry.CreatedAt = time.Now()
 		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
-			if err := service.taskTimerEntryRepository.Add(ctx, tx, taskID, taskTimerEntry); err != nil {
+			if err := service.taskTimeTrackingRepository.Add(ctx, tx, taskID, taskTimerEntry); err != nil {
 				return err
 			}
 			if _, err := service.historyOperationService.AddTaskHistoryOperation(
@@ -62,12 +62,12 @@ func (service *taskTimerEntryService) Add(ctx context.Context, projectID string,
 	}
 }
 
-func (service *taskTimerEntryService) Update(ctx context.Context, projectID string, taskID string, taskTimerEntry domain.TaskTimerEntry) error {
+func (service *taskTimeTrackingService) Update(ctx context.Context, projectID string, taskID string, taskTimerEntry domain.TaskTimeTracking) error {
 	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
 		return err
 	} else {
 		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
-			if err := service.taskTimerEntryRepository.Update(ctx, tx, taskTimerEntry); err != nil {
+			if err := service.taskTimeTrackingRepository.Update(ctx, tx, taskTimerEntry); err != nil {
 				return err
 			}
 			if _, err := service.historyOperationService.AddTaskHistoryOperation(
@@ -89,12 +89,12 @@ func (service *taskTimerEntryService) Update(ctx context.Context, projectID stri
 	}
 }
 
-func (service *taskTimerEntryService) Delete(ctx context.Context, projectID string, taskID string, taskTimeEntryID string) error {
+func (service *taskTimeTrackingService) Delete(ctx context.Context, projectID string, taskID string, taskTimeEntryID string) error {
 	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
 		return err
 	} else {
 		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
-			if err := service.taskTimerEntryRepository.Delete(ctx, tx, taskTimeEntryID); err != nil {
+			if err := service.taskTimeTrackingRepository.Delete(ctx, tx, taskTimeEntryID); err != nil {
 				return err
 			}
 			if _, err := service.historyOperationService.AddTaskHistoryOperation(
@@ -116,12 +116,12 @@ func (service *taskTimerEntryService) Delete(ctx context.Context, projectID stri
 	}
 }
 
-func (service *taskTimerEntryService) GetTaskTimerEntries(ctx context.Context, projectID string, taskID string) ([]domain.TaskTimerEntry, error) {
+func (service *taskTimeTrackingService) GetTaskTimerEntries(ctx context.Context, projectID string, taskID string) ([]domain.TaskTimeTracking, error) {
 	if _, err := service.authorizationService.RequireTaskViewPermission(ctx, projectID); err != nil {
 		return nil, err
 	}
-	if taskTimerEntries, err := service.taskTimerEntryRepository.GetTaskTimerEntries(ctx, service.db, taskID); err != nil {
-		return nil, fmt.Errorf("[TaskTimerEntryService] failed to get task timer entries: %w", err)
+	if taskTimerEntries, err := service.taskTimeTrackingRepository.GetTaskTimerEntries(ctx, service.db, taskID); err != nil {
+		return nil, fmt.Errorf("[TaskTimeTrackingService] failed to get task time tracking entries: %w", err)
 	} else {
 		return taskTimerEntries, nil
 	}

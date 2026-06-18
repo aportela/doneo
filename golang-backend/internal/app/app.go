@@ -17,7 +17,7 @@ import (
 	"github.com/aportela/doneo/internal/handlers/taskhandler"
 	"github.com/aportela/doneo/internal/handlers/taskpriorityhandler"
 	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
-	"github.com/aportela/doneo/internal/handlers/tasktimerentryhandler"
+	"github.com/aportela/doneo/internal/handlers/tasktimetrackinghandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 	"github.com/aportela/doneo/internal/handlers/usertimerhandler"
 	"github.com/aportela/doneo/internal/repositories/attachmentrepository"
@@ -33,7 +33,7 @@ import (
 	"github.com/aportela/doneo/internal/repositories/taskpriorityrepository"
 	"github.com/aportela/doneo/internal/repositories/taskrepository"
 	"github.com/aportela/doneo/internal/repositories/taskstatusrepository"
-	"github.com/aportela/doneo/internal/repositories/tasktimerentryrepository"
+	"github.com/aportela/doneo/internal/repositories/tasktimetrackingrepository"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"github.com/aportela/doneo/internal/repositories/usertimerrepository"
 	"github.com/aportela/doneo/internal/services/attachmentservice"
@@ -50,7 +50,7 @@ import (
 	"github.com/aportela/doneo/internal/services/taskpriorityservice"
 	"github.com/aportela/doneo/internal/services/taskservice"
 	"github.com/aportela/doneo/internal/services/taskstatusservice"
-	"github.com/aportela/doneo/internal/services/tasktimerentryservice"
+	"github.com/aportela/doneo/internal/services/tasktimetrackingservice"
 	"github.com/aportela/doneo/internal/services/userservice"
 	"github.com/aportela/doneo/internal/services/usertimerservice"
 )
@@ -73,7 +73,7 @@ type App struct {
 	RoleHandler              rolehandler.RoleHandler
 	TaskPriorityHandler      taskpriorityhandler.TaskPriorityHandler
 	TaskStatusHandler        taskstatushandler.TaskStatusHandler
-	TaskTimerEntryHandler    tasktimerentryhandler.TaskTimerEntryHandler
+	TaskTimeTrackingHandler  tasktimetrackinghandler.TaskTimeTrackingHandler
 	UserTimerHandler         usertimerhandler.UserTimerHandler
 	UserHandler              userhandler.UserHandler
 }
@@ -99,7 +99,7 @@ func NewApp(
 	taskPriorityRepository := taskpriorityrepository.NewRepository()
 	//taskRelationRepository := taskrelationrepository.NewRepository()
 	taskStatusRepository := taskstatusrepository.NewRepository()
-	taskTimerEntryRepository := tasktimerentryrepository.NewRepository()
+	taskTimeTrackingRepository := tasktimetrackingrepository.NewRepository()
 
 	userTimerRepository := usertimerrepository.NewRepository()
 	userRepository := userrepository.NewRepository()
@@ -119,7 +119,7 @@ func NewApp(
 	roleService := roleservice.NewService(db, authorizationService, roleRepository)
 	taskPriorityService := taskpriorityservice.NewService(db, authorizationService, taskPriorityRepository)
 	taskStatusService := taskstatusservice.NewService(db, authorizationService, taskStatusRepository)
-	taskTimerEntryService := tasktimerentryservice.NewService(db, authorizationService, historyOperationService, taskTimerEntryRepository)
+	taskTimeTrackingService := tasktimetrackingservice.NewService(db, authorizationService, historyOperationService, taskTimeTrackingRepository)
 	userTimerService := usertimerservice.NewService(db, userTimerRepository)
 	userService := userservice.NewService(db, cache, authorizationService, userRepository)
 
@@ -136,7 +136,7 @@ func NewApp(
 	roleHandler := rolehandler.NewHandler(roleService)
 	taskPriorityHandler := taskpriorityhandler.NewHandler(taskPriorityService)
 	taskStatusHandler := taskstatushandler.NewHandler(taskStatusService)
-	taskTimerEntryHandler := tasktimerentryhandler.NewHandler(taskTimerEntryService)
+	taskTimeTrackingHandler := tasktimetrackinghandler.NewHandler(taskTimeTrackingService)
 	userTimerHandler := usertimerhandler.NewHandler(userTimerService)
 	userHandler := userhandler.NewHandler(userService)
 
@@ -158,7 +158,7 @@ func NewApp(
 		RoleHandler:              *roleHandler,
 		TaskPriorityHandler:      *taskPriorityHandler,
 		TaskStatusHandler:        *taskStatusHandler,
-		TaskTimerEntryHandler:    *taskTimerEntryHandler,
+		TaskTimeTrackingHandler:  *taskTimeTrackingHandler,
 		UserTimerHandler:         *userTimerHandler,
 		UserHandler:              *userHandler,
 	}

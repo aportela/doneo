@@ -1,6 +1,6 @@
-package tasktimerentryrepository
+package tasktimetrackingrepository
 
-type taskTimerEntryDTO struct {
+type taskTimeTrackingDTO struct {
 	ID           string `db:"id"`
 	CreatorID    string `db:"creator_id"`
 	CreatorName  string `db:"creator_name"`

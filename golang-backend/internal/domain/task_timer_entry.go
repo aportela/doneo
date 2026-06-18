@@ -2,7 +2,7 @@ package domain
 
 import "time"
 
-type TaskTimerEntry struct {
+type TaskTimeTracking struct {
 	ID           string
 	Summary      string
 	CreatedBy    UserBase

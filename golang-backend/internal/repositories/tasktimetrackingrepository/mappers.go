@@ -1,4 +1,4 @@
-package tasktimerentryrepository
+package tasktimetrackingrepository
 
 import (
 	"errors"
@@ -10,8 +10,8 @@ import (
 	sqlite3 "modernc.org/sqlite/lib"
 )
 
-func toDTO(taskTimeEntry domain.TaskTimerEntry) taskTimerEntryDTO {
-	return taskTimerEntryDTO{
+func toDTO(taskTimeEntry domain.TaskTimeTracking) taskTimeTrackingDTO {
+	return taskTimeTrackingDTO{
 		ID:           taskTimeEntry.ID,
 		CreatedAt:    taskTimeEntry.CreatedAt.UnixMilli(),
 		CreatorID:    taskTimeEntry.CreatedBy.ID,
@@ -21,8 +21,8 @@ func toDTO(taskTimeEntry domain.TaskTimerEntry) taskTimerEntryDTO {
 	}
 }
 
-func toDomain(taskTimeEntry taskTimerEntryDTO) domain.TaskTimerEntry {
-	return domain.TaskTimerEntry{
+func toDomain(taskTimeEntry taskTimeTrackingDTO) domain.TaskTimeTracking {
+	return domain.TaskTimeTracking{
 		ID:           taskTimeEntry.ID,
 		CreatedAt:    time.UnixMilli(taskTimeEntry.CreatedAt),
 		CreatedBy:    domain.UserBase{ID: taskTimeEntry.CreatorID, Name: taskTimeEntry.CreatorName},
@@ -31,8 +31,8 @@ func toDomain(taskTimeEntry taskTimerEntryDTO) domain.TaskTimerEntry {
 	}
 }
 
-func toDomainArray(timers []taskTimerEntryDTO) []domain.TaskTimerEntry {
-	results := make([]domain.TaskTimerEntry, 0, len(timers))
+func toDomainArray(timers []taskTimeTrackingDTO) []domain.TaskTimeTracking {
+	results := make([]domain.TaskTimeTracking, 0, len(timers))
 	for _, timer := range timers {
 		results = append(results, toDomain(timer))
 	}

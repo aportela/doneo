@@ -1,4 +1,4 @@
-package tasktimerentryhandler
+package tasktimetrackinghandler
 
 import (
 	"encoding/json"
@@ -6,19 +6,19 @@ import (
 	"net/http"
 
 	"github.com/aportela/doneo/internal/handlers"
-	"github.com/aportela/doneo/internal/services/tasktimerentryservice"
+	"github.com/aportela/doneo/internal/services/tasktimetrackingservice"
 	"github.com/go-chi/chi/v5"
 )
 
-type TaskTimerEntryHandler struct {
-	service tasktimerentryservice.TaskTimerEntryService
+type TaskTimeTrackingHandler struct {
+	service tasktimetrackingservice.TaskTimeTrackingService
 }
 
-func NewHandler(service tasktimerentryservice.TaskTimerEntryService) *TaskTimerEntryHandler {
-	return &TaskTimerEntryHandler{service: service}
+func NewHandler(service tasktimetrackingservice.TaskTimeTrackingService) *TaskTimeTrackingHandler {
+	return &TaskTimeTrackingHandler{service: service}
 }
 
-func (handler *TaskTimerEntryHandler) Add(w http.ResponseWriter, r *http.Request) {
+func (handler *TaskTimeTrackingHandler) Add(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request addRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -39,7 +39,7 @@ func (handler *TaskTimerEntryHandler) Add(w http.ResponseWriter, r *http.Request
 	handlers.ToHandlerJSONResponse(w, domainToResponse(taskTimeEntry), nil, http.StatusCreated)
 }
 
-func (handler *TaskTimerEntryHandler) Update(w http.ResponseWriter, r *http.Request) {
+func (handler *TaskTimeTrackingHandler) Update(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request updateRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -59,7 +59,7 @@ func (handler *TaskTimerEntryHandler) Update(w http.ResponseWriter, r *http.Requ
 	handlers.ToHandlerJSONResponse(w, domainToResponse(taskTimeEntry), nil)
 }
 
-func (handler *TaskTimerEntryHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (handler *TaskTimeTrackingHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")
@@ -72,7 +72,7 @@ func (handler *TaskTimerEntryHandler) Delete(w http.ResponseWriter, r *http.Requ
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
 
-func (handler *TaskTimerEntryHandler) Search(w http.ResponseWriter, r *http.Request) {
+func (handler *TaskTimeTrackingHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")

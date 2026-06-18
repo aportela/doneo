@@ -1,4 +1,4 @@
-package tasktimerentryhandler
+package tasktimetrackinghandler
 
 import "github.com/aportela/doneo/internal/handlers/userhandler"
 
@@ -13,7 +13,7 @@ type updateRequest struct {
 	TotalSeconds uint   `json:"totalSeconds"`
 }
 
-type TaskTimeEntryResponse struct {
+type TaskTimeTrakingResponse struct {
 	ID           string                       `json:"id"`
 	User         userhandler.UserBaseResponse `json:"user"`
 	CreatedAt    int64                        `json:"createdAt"`
@@ -22,5 +22,5 @@ type TaskTimeEntryResponse struct {
 }
 
 type searchResponse struct {
-	ProjectPermissions []TaskTimeEntryResponse `json:"timeEntries"`
+	TimeTrackings []TaskTimeTrakingResponse `json:"timeTrackings"`
 }

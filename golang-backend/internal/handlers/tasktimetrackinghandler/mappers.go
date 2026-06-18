@@ -1,27 +1,27 @@
-package tasktimerentryhandler
+package tasktimetrackinghandler
 
 import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
 )
 
-func addRequestToDomain(request addRequest) domain.TaskTimerEntry {
-	return domain.TaskTimerEntry{
+func addRequestToDomain(request addRequest) domain.TaskTimeTracking {
+	return domain.TaskTimeTracking{
 		Summary:      request.Summary,
 		TotalSeconds: request.TotalSeconds,
 	}
 }
 
-func updateRequestToDomain(request updateRequest) domain.TaskTimerEntry {
-	return domain.TaskTimerEntry{
+func updateRequestToDomain(request updateRequest) domain.TaskTimeTracking {
+	return domain.TaskTimeTracking{
 		ID:           request.ID,
 		Summary:      request.Summary,
 		TotalSeconds: request.TotalSeconds,
 	}
 }
 
-func domainToResponse(taskTimeEntry domain.TaskTimerEntry) TaskTimeEntryResponse {
-	return TaskTimeEntryResponse{
+func domainToResponse(taskTimeEntry domain.TaskTimeTracking) TaskTimeTrakingResponse {
+	return TaskTimeTrakingResponse{
 		ID:           taskTimeEntry.ID,
 		User:         userhandler.BaseDomainToBaseResponse(taskTimeEntry.CreatedBy),
 		CreatedAt:    taskTimeEntry.CreatedAt.UnixMilli(),
@@ -30,16 +30,16 @@ func domainToResponse(taskTimeEntry domain.TaskTimerEntry) TaskTimeEntryResponse
 	}
 }
 
-func domainArrayToResponseArray(taskTimeEntries []domain.TaskTimerEntry) []TaskTimeEntryResponse {
-	taskTimeEntriesResponse := []TaskTimeEntryResponse{}
+func domainArrayToResponseArray(taskTimeEntries []domain.TaskTimeTracking) []TaskTimeTrakingResponse {
+	taskTimeEntriesResponse := []TaskTimeTrakingResponse{}
 	for _, taskTimeEntry := range taskTimeEntries {
 		taskTimeEntriesResponse = append(taskTimeEntriesResponse, domainToResponse(taskTimeEntry))
 	}
 	return taskTimeEntriesResponse
 }
 
-func toSearchResponse(taskTimeEntries []domain.TaskTimerEntry) searchResponse {
+func toSearchResponse(taskTimeEntries []domain.TaskTimeTracking) searchResponse {
 	return searchResponse{
-		ProjectPermissions: domainArrayToResponseArray(taskTimeEntries),
+		TimeTrackings: domainArrayToResponseArray(taskTimeEntries),
 	}
 }
