@@ -1,18 +1,28 @@
 <script setup lang="ts">
-    import { computed, ref } from 'vue';
+    import { computed, ref, watch } from 'vue';
 
     import dayjs from 'dayjs'
 
+
     import { NTabs, NTabPane, NCard, NAvatar, NFlex, NInputGroup, NInput, NButton, NButtonGroup, NPopover, NIcon, NGrid, NGridItem } from 'naive-ui';
     import { IconFileUpload, IconTrash, IconSun, IconMoon, IconInfoCircle } from '@tabler/icons-vue';
+
+    import { createStorageEntry } from "../shared/composables/localStorage";
 
     import { useColorSchemeStore } from '../stores/colorScheme';
 
     const colorSchemeStore = useColorSchemeStore();
 
+    const localStorageDatetimeFormatMask = createStorageEntry<string | null>("datetimeFormatMask", "YYYY-MM-DD HH:MM:SS");
+
     const currentTab = ref<string>("mySettings");
 
-    const currentDatetimeMask = ref<string>("YYYY-MM-DD HH:MM:SS");
+    const currentDatetimeMask = ref<string | null>(localStorageDatetimeFormatMask.get());
+
+    watch(() => currentDatetimeMask.value, (newValue) => {
+
+        localStorageDatetimeFormatMask.set(newValue || "YYYY-MM-DD HH:MM:SS")
+    });
 
     const currentDatetimeMaskPreview = computed<string | null>({
         get() {
