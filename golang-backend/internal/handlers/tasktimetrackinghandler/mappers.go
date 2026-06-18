@@ -20,20 +20,20 @@ func updateRequestToDomain(request updateRequest) domain.TaskTimeTracking {
 	}
 }
 
-func domainToResponse(taskTimeEntry domain.TaskTimeTracking) TaskTimeTrakingResponse {
+func domainToResponse(taskTimeTracking domain.TaskTimeTracking) TaskTimeTrakingResponse {
 	return TaskTimeTrakingResponse{
-		ID:           taskTimeEntry.ID,
-		User:         userhandler.BaseDomainToBaseResponse(taskTimeEntry.CreatedBy),
-		CreatedAt:    taskTimeEntry.CreatedAt.UnixMilli(),
-		Summary:      taskTimeEntry.Summary,
-		TotalSeconds: taskTimeEntry.TotalSeconds,
+		ID:           taskTimeTracking.ID,
+		User:         userhandler.BaseDomainToBaseResponse(taskTimeTracking.CreatedBy),
+		CreatedAt:    taskTimeTracking.CreatedAt.UnixMilli(),
+		Summary:      taskTimeTracking.Summary,
+		TotalSeconds: taskTimeTracking.TotalSeconds,
 	}
 }
 
 func domainArrayToResponseArray(taskTimeEntries []domain.TaskTimeTracking) []TaskTimeTrakingResponse {
 	taskTimeEntriesResponse := []TaskTimeTrakingResponse{}
-	for _, taskTimeEntry := range taskTimeEntries {
-		taskTimeEntriesResponse = append(taskTimeEntriesResponse, domainToResponse(taskTimeEntry))
+	for _, taskTimeTracking := range taskTimeEntries {
+		taskTimeEntriesResponse = append(taskTimeEntriesResponse, domainToResponse(taskTimeTracking))
 	}
 	return taskTimeEntriesResponse
 }

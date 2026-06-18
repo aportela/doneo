@@ -22,51 +22,51 @@ func (handler *TaskTimeTrackingHandler) Add(w http.ResponseWriter, r *http.Reque
 	w.Header().Set("Content-Type", "application/json")
 	var request addRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] invalid request payload: %w", err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskTimeTrackingHandler] invalid request payload: %w", err))
 		return
 	}
-	taskTimeEntry := addRequestToDomain(request)
+	taskTimeTracking := addRequestToDomain(request)
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")
 
-	// TODO: return taskTimeEntry with new id & createdAt
-	err := handler.service.Add(r.Context(), projectID, taskID, taskTimeEntry)
+	// TODO: return taskTimeTracking with new id & createdAt
+	err := handler.service.Add(r.Context(), projectID, taskID, taskTimeTracking)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to add task time entry: %w", err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskTimeTrackingHandler] failed to add task time tracking: %w", err))
 		return
 	}
 
-	handlers.ToHandlerJSONResponse(w, domainToResponse(taskTimeEntry), nil, http.StatusCreated)
+	handlers.ToHandlerJSONResponse(w, domainToResponse(taskTimeTracking), nil, http.StatusCreated)
 }
 
 func (handler *TaskTimeTrackingHandler) Update(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request updateRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] invalid request payload: %w", err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskTimeTrackingHandler] invalid request payload: %w", err))
 		return
 	}
-	taskTimeEntry := updateRequestToDomain(request)
-	taskTimeEntry.ID = chi.URLParam(r, "task_time_entry_id")
+	taskTimeTracking := updateRequestToDomain(request)
+	taskTimeTracking.ID = chi.URLParam(r, "task_time_tracking_id")
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")
 
-	err := handler.service.Update(r.Context(), projectID, taskID, taskTimeEntry)
+	err := handler.service.Update(r.Context(), projectID, taskID, taskTimeTracking)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to update task time entry: %w", err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskTimeTrackingHandler] failed to update task time tracking: %w", err))
 		return
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(taskTimeEntry), nil)
+	handlers.ToHandlerJSONResponse(w, domainToResponse(taskTimeTracking), nil)
 }
 
 func (handler *TaskTimeTrackingHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")
-	taskTimeEntryID := chi.URLParam(r, "task_time_entry_id")
-	err := handler.service.Delete(r.Context(), projectID, taskID, taskTimeEntryID)
+	taskTimeTrackingID := chi.URLParam(r, "task_time_tracking_id")
+	err := handler.service.Delete(r.Context(), projectID, taskID, taskTimeTrackingID)
 	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[NoteHandler] failed to delete task time entry: %w", err))
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskTimeTrackingHandler] failed to delete task time tracking: %w", err))
 		return
 	}
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)

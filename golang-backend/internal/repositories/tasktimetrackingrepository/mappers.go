@@ -10,30 +10,30 @@ import (
 	sqlite3 "modernc.org/sqlite/lib"
 )
 
-func toDTO(taskTimeEntry domain.TaskTimeTracking) taskTimeTrackingDTO {
+func toDTO(taskTimeTracking domain.TaskTimeTracking) taskTimeTrackingDTO {
 	return taskTimeTrackingDTO{
-		ID:           taskTimeEntry.ID,
-		CreatedAt:    taskTimeEntry.CreatedAt.UnixMilli(),
-		CreatorID:    taskTimeEntry.CreatedBy.ID,
-		CreatorName:  taskTimeEntry.CreatedBy.Name,
-		Summary:      taskTimeEntry.Summary,
-		TotalSeconds: taskTimeEntry.TotalSeconds,
+		ID:           taskTimeTracking.ID,
+		CreatedAt:    taskTimeTracking.CreatedAt.UnixMilli(),
+		CreatorID:    taskTimeTracking.CreatedBy.ID,
+		CreatorName:  taskTimeTracking.CreatedBy.Name,
+		Summary:      taskTimeTracking.Summary,
+		TotalSeconds: taskTimeTracking.TotalSeconds,
 	}
 }
 
-func toDomain(taskTimeEntry taskTimeTrackingDTO) domain.TaskTimeTracking {
+func toDomain(taskTimeTracking taskTimeTrackingDTO) domain.TaskTimeTracking {
 	return domain.TaskTimeTracking{
-		ID:           taskTimeEntry.ID,
-		CreatedAt:    time.UnixMilli(taskTimeEntry.CreatedAt),
-		CreatedBy:    domain.UserBase{ID: taskTimeEntry.CreatorID, Name: taskTimeEntry.CreatorName},
-		Summary:      taskTimeEntry.Summary,
-		TotalSeconds: taskTimeEntry.TotalSeconds,
+		ID:           taskTimeTracking.ID,
+		CreatedAt:    time.UnixMilli(taskTimeTracking.CreatedAt),
+		CreatedBy:    domain.UserBase{ID: taskTimeTracking.CreatorID, Name: taskTimeTracking.CreatorName},
+		Summary:      taskTimeTracking.Summary,
+		TotalSeconds: taskTimeTracking.TotalSeconds,
 	}
 }
 
-func toDomainArray(timers []taskTimeTrackingDTO) []domain.TaskTimeTracking {
-	results := make([]domain.TaskTimeTracking, 0, len(timers))
-	for _, timer := range timers {
+func toDomainArray(taskTimeTrackings []taskTimeTrackingDTO) []domain.TaskTimeTracking {
+	results := make([]domain.TaskTimeTracking, 0, len(taskTimeTrackings))
+	for _, timer := range taskTimeTrackings {
 		results = append(results, toDomain(timer))
 	}
 	return results
