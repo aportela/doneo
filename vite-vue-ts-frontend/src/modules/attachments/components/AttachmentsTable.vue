@@ -7,8 +7,8 @@
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
-    import type { ProjectAttachmentsTableFilters } from '../types/project-attachments-table-filter.ts';
-    import { ProjectAttachment } from '../models/project-attachment.ts';
+    import type { AttachmentsTableFilters } from '../types/attachments-table-filter.ts';
+    import { Attachment } from '../models/attachment.ts';
 
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
@@ -23,7 +23,7 @@
 
     interface Props {
         disabled: boolean;
-        items: ProjectAttachment[];
+        items: Attachment[];
         projectId: string;
         errorMessage?: string | null;
     }
@@ -37,7 +37,7 @@
 
     const createdAtFilterRef = ref<DateFilterSelectComponent | undefined>();
 
-    const filters = defineModel<ProjectAttachmentsTableFilters>("filters", {
+    const filters = defineModel<AttachmentsTableFilters>("filters", {
         default: () => ({
             name: "",
             createdByUserId: null,
@@ -57,9 +57,9 @@
 
     const contentTypeOptions = ref<SelectOption[]>([]);
 
-    watch(() => props.items, (newValue: ProjectAttachment[], oldValue: ProjectAttachment[]) => {
+    watch(() => props.items, (newValue: Attachment[], oldValue: Attachment[]) => {
         if (oldValue.length === 0) {
-            contentTypeOptions.value = [...new Set(newValue.map((item: ProjectAttachment) => { return (item.contentType) }))].map((contentType) => { return ({ label: contentType, value: contentType }); });
+            contentTypeOptions.value = [...new Set(newValue.map((item: Attachment) => { return (item.contentType) }))].map((contentType) => { return ({ label: contentType, value: contentType }); });
         }
     });
 
@@ -118,13 +118,13 @@
         emit("add");
     };
 
-    const onConfirmDelete = (projectAttachment: ProjectAttachment, index: number) => {
+    const onConfirmDelete = (attachment: Attachment, index: number) => {
         dialog.warning({
             title: t("modules.projectAttachment.components.projectAttachmentsTable.dialogs.deleteConfirmation.title"),
             icon: renderIcon(IconTrash)(24),
             content: () =>
                 h('div', [
-                    t("modules.projectAttachment.components.projectAttachmentsTable.dialogs.deleteConfirmation.message", { name: projectAttachment.name, size: formatBytes(projectAttachment.size) }),
+                    t("modules.projectAttachment.components.projectAttachmentsTable.dialogs.deleteConfirmation.message", { name: attachment.name, size: formatBytes(attachment.size) }),
                     h('br'),
                     h('br'),
                     t("shared.components.dialogs.confirmation.continueMessage"),
@@ -132,17 +132,17 @@
             positiveText: t("shared.buttons.Delete.label"),
             negativeText: t("shared.buttons.Cancel.label"),
             onPositiveClick: () => {
-                emit("delete", projectAttachment, index)
+                emit("delete", attachment, index)
             },
         });
     };
 
-    const onDownload = (projectAttachment: ProjectAttachment, index: number) => {
-        emit("download", projectAttachment, index)
+    const onDownload = (attachment: Attachment, index: number) => {
+        emit("download", attachment, index)
     };
 
-    const onPreview = (projectAttachment: ProjectAttachment, index: number) => {
-        emit("preview", projectAttachment, index)
+    const onPreview = (attachment: Attachment, index: number) => {
+        emit("preview", attachment, index)
     };
 
     const onClearFilters = () => {
@@ -184,21 +184,21 @@
             </tr>
         </template>
         <template #tbody v-if="!props.errorMessage">
-            <tr v-for="projectAttachment, index in items" :key="projectAttachment.id ?? index">
-                <td>{{ projectAttachment.name }}</td>
-                <td>{{ formatBytes(projectAttachment.size) }}</td>
-                <td>{{ projectAttachment.contentType }}</td>
-                <td>{{ projectAttachment.createdAt.toLocaleString() }}</td>
+            <tr v-for="attachment, index in items" :key="attachment.id ?? index">
+                <td>{{ attachment.name }}</td>
+                <td>{{ formatBytes(attachment.size) }}</td>
+                <td>{{ attachment.contentType }}</td>
+                <td>{{ attachment.createdAt.toLocaleString() }}</td>
                 <td>
-                    <AvatarUserName :user-id="projectAttachment.createdBy?.id ?? ''"
-                        :user-name="projectAttachment.createdBy?.name ?? ''" />
+                    <AvatarUserName :user-id="attachment.createdBy?.id ?? ''"
+                        :user-name="attachment.createdBy?.name ?? ''" />
                 </td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-delete show-download show-preview
-                        @delete="onConfirmDelete(projectAttachment, index)"
-                        @download="onDownload(projectAttachment, index)" @preview="onPreview(projectAttachment, index)"
-                        :disabled="props.disabled" :delete-disabled="props.disabled" :download-disabled="props.disabled"
-                        :preview-disabled="props.disabled || !(projectAttachment.allowImagePreview() || projectAttachment.allowAudioPreview() || projectAttachment.allowPDFPreview())" />
+                        @delete="onConfirmDelete(attachment, index)" @download="onDownload(attachment, index)"
+                        @preview="onPreview(attachment, index)" :disabled="props.disabled"
+                        :delete-disabled="props.disabled" :download-disabled="props.disabled"
+                        :preview-disabled="props.disabled || !(attachment.allowImagePreview() || attachment.allowAudioPreview() || attachment.allowPDFPreview())" />
                 </td>
             </tr>
             <tr>

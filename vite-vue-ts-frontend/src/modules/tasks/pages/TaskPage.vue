@@ -5,8 +5,9 @@
 
     import { NTabs, NTabPane, type TabsInst } from 'naive-ui';
 
-
+    // TODO: move to tabs
     import TaskMetadataTab from '../components/TaskMetadataTab.vue';
+    import TaskAttachmentsTab from '../components/tabs/Attachments.vue';
     import TaskNotesTab from '../components/tabs/Notes.vue';
     import TaskHistoryTab from '../components/tabs/History.vue';
 
@@ -69,7 +70,8 @@
         </n-tab-pane>
         <n-tab-pane name="attachments" :tab="attachmentsTabLabel" display-directive="show:lazy" key="attachments"
             :disabled="!projectId || !taskId">
-            TODO ATTACHMENTS
+            <TaskAttachmentsTab v-if="projectId && taskId" :project-id="projectId" :task-id="taskId"
+                v-model:item-count="attachmentCount" />
         </n-tab-pane>
         <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy" key="history"
             :disabled="!projectId || !taskId">

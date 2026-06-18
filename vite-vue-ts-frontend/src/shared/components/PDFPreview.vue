@@ -3,13 +3,13 @@
 
     import { NModal } from 'naive-ui';
 
-    import { ProjectAttachment } from '../../modules/attachments/models/project-attachment';
+    import { Attachment } from '../../modules/attachments/models/attachment.ts';
     import { formatBytes } from '../composables/format';
     import PDFWrapper from './PDFWrapper.vue';
 
     interface PDFPreviewProps {
         projectId: string;
-        items: ProjectAttachment[];
+        items: Attachment[];
     };
 
     const props = defineProps<PDFPreviewProps>();
@@ -18,7 +18,7 @@
 
     const currentIndex = defineModel<number>("currentIndex", { default: 0 });
 
-    const currentItem = computed<ProjectAttachment | undefined>(() =>
+    const currentItem = computed<Attachment | undefined>(() =>
         props.items[currentIndex.value] ?? undefined
     );
 

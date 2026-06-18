@@ -28,6 +28,7 @@
     interface ProjectAttachmentsProps {
         style?: string | CSSProperties;
         projectId: string;
+        taskId: string;
     }
 
     const { t } = useI18n();
@@ -121,7 +122,7 @@
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const results: SearchResponse = await attachmentService.getProjectAttachments(props.projectId);
+            const results: SearchResponse = await attachmentService.getTaskAttachments(props.projectId, props.taskId);
             items.value = results.attachments.map((attachment) => new Attachment(attachment));
             itemCount.value = items.value?.length ?? 0;
         } catch (error: unknown) {
@@ -131,28 +132,28 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectAttachmentsTab.onRefresh" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TaskAttachmentsTab.onRefresh" } });
                             break;
                         default:
-                            state.ajaxErrorMessage = t("modules.projectAttachment.components.ProjectAttachmentsTab.errors.refreshError");
+                            state.ajaxErrorMessage = t("modules.projectAttachment.components.TaskAttachmentsTab.errors.refreshError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("modules.projectAttachment.components.ProjectAttachmentsTab.errors.refreshError");
-                    console.error("Unhandled API error", { file: "ProjectAttachmentsTab.vue", method: "onRefresh" }, { err: fatalError });
+                    state.ajaxErrorMessage = t("modules.projectAttachment.components.TaskAttachmentsTab.errors.refreshError");
+                    console.error("Unhandled API error", { file: "TaskAttachmentsTab.vue", method: "onRefresh" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
         }
     };
 
-    const onDelete = async (attachment: Attachment, _index?: number) => {
-        if (attachment.id) {
+    const onDelete = async (projectAttachment: Attachment, _index?: number) => {
+        if (projectAttachment.id) {
             Object.assign(state, defaultAjaxStateRunning);
             try {
-                await attachmentService.deleteProjectAttachment(props.projectId, attachment.id);
-                notify('success', t("modules.projectAttachment.components.ProjectAttachmentsTab.notifications.projectAttachmentDeleted", { name: attachment.name }));
+                await attachmentService.deleteTaskAttachment(props.projectId, props.taskId, projectAttachment.id);
+                notify('success', t("modules.projectAttachment.components.TaskAttachmentsTab.notifications.projectAttachmentDeleted", { name: projectAttachment.name }));
                 onRefresh();
             } catch (error: unknown) {
                 state.ajaxErrors = true;
@@ -161,26 +162,26 @@
                         switch (apiError.response?.status) {
                             case 401:
                                 state.ajaxErrors = false;
-                                selectedItem.value = attachment;
-                                appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectAttachmentsTab.onDelete" } });
+                                selectedItem.value = projectAttachment;
+                                appBus.emit({ type: "reauthRequired", payload: { emitter: "TaskAttachmentsTab.onDelete" } });
                                 break;
                             case 404:
-                                state.ajaxErrorMessage = t("modules.projectAttachment.components.ProjectAttachmentsTab.errors.notFoundError");
+                                state.ajaxErrorMessage = t("modules.projectAttachment.components.TaskAttachmentsTab.errors.notFoundError");
                                 break;
                             default:
-                                state.ajaxErrorMessage = t("modules.projectAttachment.components.ProjectAttachmentsTab.errors.deleteError");
+                                state.ajaxErrorMessage = t("modules.projectAttachment.components.TaskAttachmentsTab.errors.deleteError");
                                 break;
                         }
                     },
                     (fatalError) => {
-                        state.ajaxErrorMessage = t("modules.projectAttachment.components.ProjectAttachmentsTab.errors.deleteError");
-                        console.error("Unhandled API error", { file: "ProjectAttachmentsTab.vue", method: "onRefresh" }, { err: fatalError });
+                        state.ajaxErrorMessage = t("modules.projectAttachment.components.TaskAttachmentsTab.errors.deleteError");
+                        console.error("Unhandled API error", { file: "TaskAttachmentsTab.vue", method: "onRefresh" }, { err: fatalError });
                     });
             } finally {
                 state.ajaxRunning = false;
             }
         } else {
-            console.error("project attachment id not set", { file: "ProjectAttachmentsTab.vue", method: "onDelete" });
+            console.error("project attachment id not set", { file: "TaskAttachmentsTab.vue", method: "onDelete" });
         }
     };
 
@@ -208,9 +209,9 @@
     onMounted(() => {
         onRefresh();
         stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
-            if (payload.to.includes("ProjectAttachmentsTab.onRefresh")) {
+            if (payload.to.includes("TaskAttachmentsTab.onRefresh")) {
                 onRefresh();
-            } else if (payload.to.includes("ProjectAttachmentsTab.onDelete")) {
+            } else if (payload.to.includes("TaskAttachmentsTab.onDelete")) {
                 onDelete(selectedItem.value);
             }
         });
@@ -230,8 +231,8 @@
         :current-index="currentPDFPreviewIndex" />
 
     <!-- TODO: onupload notification -->
-    <UploadDialog v-if="props.projectId" v-model:show="showUploadModal" :project-id="props.projectId"
-        v-model:upload-count="uploadCount" />
+    <UploadDialog v-if="props.projectId && props.taskId" v-model:show="showUploadModal" :project-id="props.projectId"
+        :task-id="props.taskId" v-model:upload-count="uploadCount" />
     <n-card bordered :style="props.style">
         <AttachmentsTable :project-id="props.projectId" :items="filteredItems" :disabled="state.ajaxRunning"
             v-model:filters="filters" @refresh="onRefresh" @add="onShowUploadModal" @delete="onDelete"

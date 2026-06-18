@@ -224,8 +224,9 @@ func (handler *AttachmentHandler) AddTaskAttachment(w http.ResponseWriter, r *ht
 		return
 	}
 
-	attachment, err = handler.service.GetProjectAttachment(r.Context(), projectID, attachment.ID)
+	attachment, err = handler.service.GetTaskAttachment(r.Context(), projectID, taskID, attachment.ID)
 	if err != nil {
+		fmt.Println(err)
 		// TODO: works with custom errors (like notFound / 404) ?
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

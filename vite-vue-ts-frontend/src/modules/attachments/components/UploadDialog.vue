@@ -6,6 +6,7 @@
 
     interface UploadDialogProps {
         projectId: string;
+        taskId?: string;
     };
 
     const props = defineProps<UploadDialogProps>();
@@ -28,7 +29,11 @@
 
         const xhr = new XMLHttpRequest()
         // TODO: allow tasks upload
-        xhr.open('POST', `/api/projects/${props.projectId}/attachments`)
+        if (props.taskId) {
+            xhr.open('POST', `/api/projects/${props.projectId}/tasks/${props.taskId}/attachments`)
+        } else {
+            xhr.open('POST', `/api/projects/${props.projectId}/attachments`)
+        }
 
         const headerObj = typeof headers === 'function' ? headers({ file }) : headers
         if (headerObj) {

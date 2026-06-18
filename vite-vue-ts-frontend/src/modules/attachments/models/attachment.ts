@@ -3,7 +3,7 @@ import { UserBase } from "../../users/models/user";
 import { IDate } from "../../../shared/types/idate";
 import { isAudio, isImage, isPDF } from "../../../shared/composables/fileUtils";
 
-export class ProjectAttachment {
+export class Attachment {
   id: string | null;
   createdBy: UserBase;
   createdAt: IDate;
