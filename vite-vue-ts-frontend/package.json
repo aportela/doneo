@@ -13,6 +13,7 @@
     "@tabler/icons-vue": "^3.41.1",
     "@vueuse/core": "^14.3.0",
     "axios": "^1.15.2",
+    "dayjs": "^1.11.21",
     "dompurify": "^3.4.7",
     "highlight.js": "^11.11.1",
     "markdown-it": "^14.2.0",
