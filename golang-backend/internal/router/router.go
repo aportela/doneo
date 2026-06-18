@@ -45,6 +45,7 @@ func NewRouter(app *app.App) http.Handler {
 			)
 		})
 		r.Get("/attachments/project/{project_id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}/{mode}", app.AttachmentHandler.DownloadProjectAttachment)
+		r.Get("/attachments/project/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}/{mode}", app.AttachmentHandler.DownloadTaskAttachment)
 	})
 
 	apiRouter.Mount("/wc/", cookieAuthApiRouter)
