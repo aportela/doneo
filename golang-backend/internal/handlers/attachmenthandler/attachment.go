@@ -2,7 +2,6 @@ package attachmenthandler
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -11,7 +10,6 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
 	"github.com/aportela/doneo/internal/services/attachmentservice"
-	"github.com/aportela/doneo/internal/utils"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -35,48 +33,23 @@ func (handler *AttachmentHandler) AddProjectAttachment(w http.ResponseWriter, r 
 		return
 	} else {
 		defer file.Close()
-		attachment := domain.Attachment{
-			ID:           utils.UUID(),
-			OriginalName: header.Filename,
-			ContentType:  header.Header.Get("Content-Type"),
-			Size:         uint32(header.Size),
-		}
-		ext := filepath.Ext(header.Filename)
-		// TODO: move to service ???
-		filename := attachment.ID + ext
-		dir := filepath.Join(
-			handler.basePath,
-			string(attachment.ID[len(attachment.ID)-2]),
-			string(attachment.ID[len(attachment.ID)-1]),
-		)
-		if err := os.MkdirAll(dir, 0755); err != nil {
+		if attachmentID, err := handler.service.SaveUploadedFile(r.Context(), file, header.Filename); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		fullPath := filepath.Join(dir, filename)
-		if dst, err := os.Create(fullPath); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
 		} else {
-			defer dst.Close()
-			if _, err := io.Copy(dst, file); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
+			attachment := domain.Attachment{
+				ID:           attachmentID,
+				OriginalName: header.Filename,
+				ContentType:  header.Header.Get("Content-Type"),
+				Size:         uint32(header.Size),
 			}
 			projectID := chi.URLParam(r, "project_id")
 			if attachment, err := handler.service.AddProjectAttachment(r.Context(), projectID, attachment); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			} else {
-				if attachment, err := handler.service.GetProjectAttachment(r.Context(), projectID, attachment.ID); err != nil {
-					// TODO: works with custom errors (like notFound / 404) ?
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
-				} else {
-					w.Header().Set("Content-Type", "application/json")
-					w.WriteHeader(http.StatusCreated)
-					handlers.ToHandlerJSONResponse(w, domainToResponse(attachment), nil)
-				}
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusCreated)
+				handlers.ToHandlerJSONResponse(w, domainToResponse(attachment), nil)
 			}
 		}
 	}
@@ -159,39 +132,19 @@ func (handler *AttachmentHandler) AddTaskAttachment(w http.ResponseWriter, r *ht
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
 	if file, header, err := r.FormFile("file"); err != nil {
 		http.Error(w, "file is required", http.StatusBadRequest)
 		return
 	} else {
 		defer file.Close()
-		attachment := domain.Attachment{
-			ID:           utils.UUID(),
-			OriginalName: header.Filename,
-			ContentType:  header.Header.Get("Content-Type"),
-			Size:         uint32(header.Size),
-		}
-		ext := filepath.Ext(header.Filename)
-		// TODO: move to service ???
-		filename := attachment.ID + ext
-		dir := filepath.Join(
-			handler.basePath,
-			string(attachment.ID[len(attachment.ID)-2]),
-			string(attachment.ID[len(attachment.ID)-1]),
-		)
-		if err = os.MkdirAll(dir, 0755); err != nil {
+		if attachmentID, err := handler.service.SaveUploadedFile(r.Context(), file, header.Filename); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		fullPath := filepath.Join(dir, filename)
-		if dst, err := os.Create(fullPath); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
 		} else {
-			defer dst.Close()
-			if _, err := io.Copy(dst, file); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
+			attachment := domain.Attachment{
+				ID:           attachmentID,
+				OriginalName: header.Filename,
+				ContentType:  header.Header.Get("Content-Type"),
+				Size:         uint32(header.Size),
 			}
 			projectID := chi.URLParam(r, "project_id")
 			taskID := chi.URLParam(r, "task_id")
@@ -199,17 +152,11 @@ func (handler *AttachmentHandler) AddTaskAttachment(w http.ResponseWriter, r *ht
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			} else {
-				if attachment, err := handler.service.GetTaskAttachment(r.Context(), projectID, taskID, attachment.ID); err != nil {
-					fmt.Println(err)
-					// TODO: works with custom errors (like notFound / 404) ?
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
-				} else {
-					w.Header().Set("Content-Type", "application/json")
-					w.WriteHeader(http.StatusCreated)
-					handlers.ToHandlerJSONResponse(w, domainToResponse(attachment), nil)
-				}
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusCreated)
+				handlers.ToHandlerJSONResponse(w, domainToResponse(attachment), nil)
 			}
+
 		}
 	}
 }

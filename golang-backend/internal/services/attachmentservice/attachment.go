@@ -4,6 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"io"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/aportela/doneo/internal/database"
@@ -15,6 +18,9 @@ import (
 )
 
 type AttachmentService interface {
+	getAttachmentPath(attachmentID string) string
+	SaveUploadedFile(ctx context.Context, sourceFile io.Reader, sourceFilename string) (string, error)
+
 	AddProjectAttachment(ctx context.Context, projectID string, attachment domain.Attachment) (domain.Attachment, error)
 	DeleteProjectAttachment(ctx context.Context, projectID string, attachmentID string) error
 	GetProjectAttachment(ctx context.Context, projectID string, attachmentID string) (domain.Attachment, error)
@@ -28,13 +34,41 @@ type AttachmentService interface {
 
 type attachmentService struct {
 	db                      database.Database
+	basePath                string
 	authorizationService    authorizationservice.AuthorizationService
 	historyOperationService historyoperationservice.HistoryOperationService
 	attachmentRepository    attachmentrepository.AttachmentRepository
 }
 
-func NewService(db database.Database, authorizationService authorizationservice.AuthorizationService, historyOperationService historyoperationservice.HistoryOperationService, attachmentRepository attachmentrepository.AttachmentRepository) AttachmentService {
-	return &attachmentService{db: db, authorizationService: authorizationService, historyOperationService: historyOperationService, attachmentRepository: attachmentRepository}
+func NewService(db database.Database, basePath string, authorizationService authorizationservice.AuthorizationService, historyOperationService historyoperationservice.HistoryOperationService, attachmentRepository attachmentrepository.AttachmentRepository) AttachmentService {
+	return &attachmentService{db: db, basePath: basePath, authorizationService: authorizationService, historyOperationService: historyOperationService, attachmentRepository: attachmentRepository}
+}
+
+func (service *attachmentService) getAttachmentPath(attachmentID string) string {
+	return filepath.Join(
+		service.basePath,
+		string(attachmentID[len(attachmentID)-2]),
+		string(attachmentID[len(attachmentID)-1]),
+	)
+}
+
+func (service *attachmentService) SaveUploadedFile(ctx context.Context, sourceFile io.Reader, sourceFilename string) (string, error) {
+	attachmentID := utils.UUID()
+	attachmentPath := service.getAttachmentPath(attachmentID)
+	if err := os.MkdirAll(attachmentPath, 0755); err != nil {
+		return "", err
+	}
+	attachmentFilename := attachmentID + filepath.Ext(sourceFilename)
+	fullPath := filepath.Join(attachmentPath, attachmentFilename)
+	if destinationFile, err := os.Create(fullPath); err != nil {
+		return "", err
+	} else {
+		defer destinationFile.Close()
+		if _, err := io.Copy(destinationFile, sourceFile); err != nil {
+			return "", err
+		}
+	}
+	return attachmentID, nil
 }
 
 func (service *attachmentService) AddProjectAttachment(ctx context.Context, projectID string, attachment domain.Attachment) (domain.Attachment, error) {
