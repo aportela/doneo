@@ -178,6 +178,10 @@ func NewRouter(app *app.App) http.Handler {
 		r.Post("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/attachments", app.AttachmentHandler.AddTaskAttachment)
 		r.Delete("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", app.AttachmentHandler.DeleteTaskAttachment)
 
+		r.Get("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/time_trackings", app.TaskTimeTrackingHandler.Search)
+		r.Post("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/time_trackings", app.TaskTimeTrackingHandler.Add)
+		r.Delete("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/time_trackings/{task_time_tracking_id:"+uuidPattern+"}", app.TaskTimeTrackingHandler.Update)
+
 		r.Get("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/history_operations", app.HistoryOperationHandler.SearchTaskHistoryOperations)
 	})
 
