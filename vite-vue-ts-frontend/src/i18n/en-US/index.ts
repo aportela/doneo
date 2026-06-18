@@ -1429,6 +1429,10 @@ export default {
             notes: {
               label: "Notes | Notes ({count}) | Notes ({count})",
             },
+            timeTrackings: {
+              label:
+                "Time trackings | Time trackings ({count}) | Time trackings ({count})",
+            },
             history: {
               label: "History | History ({count}) | History ({count})",
             },

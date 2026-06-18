@@ -9,6 +9,7 @@
     import TaskMetadataTab from '../components/TaskMetadataTab.vue';
     import TaskAttachmentsTab from '../components/tabs/Attachments.vue';
     import TaskNotesTab from '../components/tabs/Notes.vue';
+    import TaskTimeTrackingsTab from '../components/tabs/TimeTrackings.vue';
     import TaskHistoryTab from '../components/tabs/History.vue';
 
     const { t } = useI18n();
@@ -35,10 +36,12 @@
 
     const noteCount = ref<number>(0);
     const attachmentCount = ref<number>(0);
+    const timeTrackingsCount = ref<number>(0)
     const historyOperationCount = ref<number>(0);
 
     const attachmentsTabLabel = computed(() => t("modules.task.components.TaskPage.tabs.attachments.label", attachmentCount.value));
     const notesTabLabel = computed(() => t("modules.task.components.TaskPage.tabs.notes.label", noteCount.value));
+    const timeTrackingsTabLabel = computed(() => t("modules.task.components.TaskPage.tabs.timeTrackings.label", timeTrackingsCount.value));
     const historyTabLabel = computed(() => t("modules.task.components.TaskPage.tabs.history.label", historyOperationCount.value));
 
     const tabsRef = ref<TabsInst>();
@@ -72,6 +75,11 @@
             :disabled="!projectId || !taskId">
             <TaskAttachmentsTab v-if="projectId && taskId" :project-id="projectId" :task-id="taskId"
                 v-model:item-count="attachmentCount" />
+        </n-tab-pane>
+        <n-tab-pane name="timetrackings" :tab="timeTrackingsTabLabel" display-directive="show:lazy" key="timetrackings"
+            :disabled="!projectId || !taskId">
+            <TaskTimeTrackingsTab v-if="projectId && taskId" :project-id="projectId" :task-id="taskId"
+                v-model:item-count="timeTrackingsCount" />
         </n-tab-pane>
         <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy" key="history"
             :disabled="!projectId || !taskId">
