@@ -12,3 +12,5 @@ type Attachment struct {
 	ContentType  string
 	Size         uint32
 }
+
+const MaxUploadSize = 32 << 20 // 32 MiB

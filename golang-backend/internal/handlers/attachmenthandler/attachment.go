@@ -23,7 +23,7 @@ func NewHandler(service attachmentservice.AttachmentService, basePath string) *A
 
 func (handler *AttachmentHandler) AddProjectAttachment(w http.ResponseWriter, r *http.Request) {
 	// 32 MB
-	if err := r.ParseMultipartForm(32 << 20); err != nil {
+	if err := r.ParseMultipartForm(domain.MaxUploadSize); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -110,7 +110,7 @@ func (handler *AttachmentHandler) GetProjectAttachments(w http.ResponseWriter, r
 
 func (handler *AttachmentHandler) AddTaskAttachment(w http.ResponseWriter, r *http.Request) {
 	// 32 MB
-	if err := r.ParseMultipartForm(32 << 20); err != nil {
+	if err := r.ParseMultipartForm(domain.MaxUploadSize); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
