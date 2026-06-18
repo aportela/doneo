@@ -292,7 +292,7 @@ var schemaQueries = []schemaMigration{
 				CREATE INDEX IF NOT EXISTS idx_task_attachments_attachment_id ON task_attachments(attachment_id);
 			`,
 			`
-				CREATE TABLE IF NOT EXISTS task_timer_entries (
+				CREATE TABLE IF NOT EXISTS task_time_trackings (
 					id TEXT NOT NULL CHECK(length(id) == 36),
 					task_id TEXT NOT NULL CHECK(length(task_id) == 36),
 					creator_id TEXT NOT NULL CHECK(length(creator_id) == 36),
@@ -305,8 +305,8 @@ var schemaQueries = []schemaMigration{
 				) STRICT;
 			`,
 			`
-				CREATE INDEX IF NOT EXISTS idx_task_timer_entries_task_id ON task_timer_entries(task_id);
-				CREATE INDEX IF NOT EXISTS idx_task_timer_entries_creator_id ON task_timer_entries(creator_id);
+				CREATE INDEX IF NOT EXISTS idx_task_time_trackings_task_id ON task_time_trackings(task_id);
+				CREATE INDEX IF NOT EXISTS idx_task_time_trackings_creator_id ON task_time_trackings(creator_id);
 			`,
 		},
 	},

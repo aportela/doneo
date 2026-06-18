@@ -28,7 +28,7 @@ func (repository *taskTimerEntryRepository) Add(ctx context.Context, dbExecutor 
 	_, err := dbExecutor.ExecContext(
 		ctx,
 		`
-            INSERT INTO task_timer_entries
+            INSERT INTO task_time_trackings
 				(id, task_id, creator_id, created_at, summary, total_seconds)
 			VALUES
 				(?, ?, ?, ?, ?, ?)
@@ -51,7 +51,7 @@ func (repository *taskTimerEntryRepository) Update(ctx context.Context, dbExecut
 	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
-            UPDATE task_timer_entries
+            UPDATE task_time_trackings
 			SET
 				summary = ?,
 				total_seconds = ?
@@ -79,7 +79,7 @@ func (repository *taskTimerEntryRepository) Delete(ctx context.Context, dbExecut
 	result, err := dbExecutor.ExecContext(
 		ctx,
 		`
-            DELETE FROM task_timer_entries
+            DELETE FROM task_time_trackings
 			WHERE
 				id = ?
         `,
@@ -104,16 +104,16 @@ func (repository *taskTimerEntryRepository) Get(ctx context.Context, dbExecutor 
 		ctx,
 		`
             SELECT
-                TTE.id,
-				TTE.creator_id,
+                TTT.id,
+				TTT.creator_id,
 				U.name AS creator_name,
-				TTE.created_at,
-				TTE.summary,
-				TTE.total_seconds
-            FROM task_timer_entries TTE
-			INNER JOIN users U ON U.ID = TTE.creator_id
+				TTT.created_at,
+				TTT.summary,
+				TTT.total_seconds
+            FROM task_time_trackings TTT
+			INNER JOIN users U ON U.ID = TTT.creator_id
             WHERE
-				TTE.id = ?
+				TTT.id = ?
         `,
 		taskTimerEntryID).Scan(
 		&dto.ID,
@@ -137,16 +137,16 @@ func (repository *taskTimerEntryRepository) GetTaskTimerEntries(ctx context.Cont
 		ctx,
 		`
             SELECT
-                TTE.id,
-				TTE.creator_id,
+                TTT.id,
+				TTT.creator_id,
 				U.name AS creator_name,
-				TTE.created_at,
-				TTE.summary,
-				TTE.total_seconds
-            FROM task_timer_entries TTE
-			INNER JOIN users U ON U.ID = TTE.creator_id
+				TTT.created_at,
+				TTT.summary,
+				TTT.total_seconds
+            FROM task_time_trackings TTT
+			INNER JOIN users U ON U.ID = TTT.creator_id
             WHERE
-				TTE.task_id = ?
+				TTT.task_id = ?
         `,
 		taskID)
 	if err != nil {
