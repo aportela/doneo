@@ -1,16 +1,5 @@
 import dayjs from "dayjs";
 
-import { createStorageEntry } from "../composables/localStorage";
-
-const localStorageDatetimeFormatMask = createStorageEntry<string | null>(
-  "datetimeFormatMask",
-  "YYYY-MM-DD HH:MM:SS",
-);
-
-// TODO: use store for real time changes without refresh page ???
-const currentDatetimeMask =
-  localStorageDatetimeFormatMask.get() ?? "YYYY-MM-DD HH:MM:SS";
-
 export class IDate {
   // TODO: readonly msTimestamp ?, remove nulls
   msTimestamp: number | null;
@@ -37,10 +26,10 @@ export class IDate {
     return this.date?.toLocaleString();
   };
 
-  toCustomMaskString = () => {
+  toCustomMaskString = (mask: string) => {
     if (this.date === null && this.msTimestamp !== null) {
       this.date = new Date(this.msTimestamp);
     }
-    return dayjs(this.date).format(currentDatetimeMask);
+    return dayjs(this.date).format(mask);
   };
 }
