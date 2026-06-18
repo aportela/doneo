@@ -9,15 +9,22 @@ const localStorageUserSettingsNavigationMode =
 const localStorageUserSettingsDisableNotifications =
   createStorageEntry<boolean>("userSettings.disableNotifications", false);
 
+const localStorageUserSettingsDatetimeMask = createStorageEntry<string>(
+  "userSettings.datetimeMask",
+  "YYYY-MM-DD HH:MM:ss",
+);
+
 interface State {
   navigationMode: navigationMode;
   disableNotifications: boolean;
+  datetimeMask: string;
 }
 
 export const useUserSettingsStore = defineStore("userSettings", {
   state: (): State => ({
     navigationMode: localStorageUserSettingsNavigationMode.get(),
     disableNotifications: localStorageUserSettingsDisableNotifications.get(),
+    datetimeMask: localStorageUserSettingsDatetimeMask.get(),
   }),
   getters: {
     currentNavigationMode: (state): navigationMode => state.navigationMode,
@@ -25,6 +32,7 @@ export const useUserSettingsStore = defineStore("userSettings", {
     sideNavigationMode: (state): boolean => state.navigationMode === "side",
     hasNotificationsEnabled: (state): boolean =>
       state.disableNotifications !== true,
+    currentDatetimeMask: (state): string => state.datetimeMask,
   },
   actions: {
     setNavigationMode(mode: navigationMode): void {
@@ -42,6 +50,10 @@ export const useUserSettingsStore = defineStore("userSettings", {
     },
     toggleNotifications(): void {
       this.setNotifications(!this.hasNotificationsEnabled);
+    },
+    setDatetimeMask(mask: string): void {
+      this.datetimeMask = mask;
+      localStorageUserSettingsDatetimeMask.set(this.datetimeMask);
     },
   },
 });
