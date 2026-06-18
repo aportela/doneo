@@ -13,17 +13,17 @@ import (
 )
 
 type AttachmentHandler struct {
-	service  attachmentservice.AttachmentService
-	basePath string
+	service           attachmentservice.AttachmentService
+	maxUploadFilesize int64
 }
 
-func NewHandler(service attachmentservice.AttachmentService, basePath string) *AttachmentHandler {
-	return &AttachmentHandler{service: service, basePath: basePath}
+func NewHandler(service attachmentservice.AttachmentService, maxUploadFilesize int64) *AttachmentHandler {
+	return &AttachmentHandler{service: service, maxUploadFilesize: maxUploadFilesize}
 }
 
 func (handler *AttachmentHandler) AddProjectAttachment(w http.ResponseWriter, r *http.Request) {
 	// 32 MB
-	if err := r.ParseMultipartForm(domain.MaxUploadSize); err != nil {
+	if err := r.ParseMultipartForm(handler.maxUploadFilesize); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -110,7 +110,7 @@ func (handler *AttachmentHandler) GetProjectAttachments(w http.ResponseWriter, r
 
 func (handler *AttachmentHandler) AddTaskAttachment(w http.ResponseWriter, r *http.Request) {
 	// 32 MB
-	if err := r.ParseMultipartForm(domain.MaxUploadSize); err != nil {
+	if err := r.ParseMultipartForm(handler.maxUploadFilesize); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
