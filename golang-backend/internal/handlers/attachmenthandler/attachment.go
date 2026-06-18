@@ -33,7 +33,7 @@ func (handler *AttachmentHandler) AddProjectAttachment(w http.ResponseWriter, r 
 		return
 	} else {
 		defer file.Close()
-		if attachmentID, err := handler.service.SaveUploadedFile(r.Context(), file, header.Filename); err != nil {
+		if attachmentID, err := handler.service.SaveUploadedFile(file, header.Filename); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		} else {
 			attachment := domain.Attachment{
@@ -67,19 +67,9 @@ func (handler *AttachmentHandler) DeleteProjectAttachment(w http.ResponseWriter,
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AttachmentHandler] failed to delete project attachment: %w", err))
 			return
 		}
-		ext := filepath.Ext(attachment.OriginalName)
-		filename := attachment.ID + ext
-		dir := filepath.Join(
-			handler.basePath,
-			string(attachment.ID[len(attachment.ID)-2]),
-			string(attachment.ID[len(attachment.ID)-1]),
-		)
-		attachmentPath := filepath.Join(dir, filename)
-		if _, err = os.Stat(attachmentPath); err != nil {
-			handlers.ToHandlerJSONResponse(w, nil, err)
-		}
-		if err := os.Remove(attachmentPath); err != nil {
-			handlers.ToHandlerJSONResponse(w, nil, err)
+		if err := handler.service.DeleteAttachment(attachment); err != nil {
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AttachmentHandler] failed to delete project attachment storage file: %w", err))
+			return
 		}
 		handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 	}
@@ -137,7 +127,7 @@ func (handler *AttachmentHandler) AddTaskAttachment(w http.ResponseWriter, r *ht
 		return
 	} else {
 		defer file.Close()
-		if attachmentID, err := handler.service.SaveUploadedFile(r.Context(), file, header.Filename); err != nil {
+		if attachmentID, err := handler.service.SaveUploadedFile(file, header.Filename); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		} else {
 			attachment := domain.Attachment{
@@ -174,19 +164,9 @@ func (handler *AttachmentHandler) DeleteTaskAttachment(w http.ResponseWriter, r 
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AttachmentHandler] failed to delete task attachment: %w", err))
 			return
 		}
-		ext := filepath.Ext(attachment.OriginalName)
-		filename := attachment.ID + ext
-		dir := filepath.Join(
-			handler.basePath,
-			string(attachment.ID[len(attachment.ID)-2]),
-			string(attachment.ID[len(attachment.ID)-1]),
-		)
-		attachmentPath := filepath.Join(dir, filename)
-		if _, err = os.Stat(attachmentPath); err != nil {
-			handlers.ToHandlerJSONResponse(w, nil, err)
-		}
-		if err := os.Remove(attachmentPath); err != nil {
-			handlers.ToHandlerJSONResponse(w, nil, err)
+		if err := handler.service.DeleteAttachment(attachment); err != nil {
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AttachmentHandler] failed to delete task attachment storage file: %w", err))
+			return
 		}
 		handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 	}

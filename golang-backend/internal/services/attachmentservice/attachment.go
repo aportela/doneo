@@ -19,7 +19,8 @@ import (
 
 type AttachmentService interface {
 	getAttachmentPath(attachmentID string) string
-	SaveUploadedFile(ctx context.Context, sourceFile io.Reader, sourceFilename string) (string, error)
+	SaveUploadedFile(sourceFile io.Reader, sourceFilename string) (string, error)
+	DeleteAttachment(attachment domain.Attachment) error
 
 	AddProjectAttachment(ctx context.Context, projectID string, attachment domain.Attachment) (domain.Attachment, error)
 	DeleteProjectAttachment(ctx context.Context, projectID string, attachmentID string) error
@@ -52,7 +53,7 @@ func (service *attachmentService) getAttachmentPath(attachmentID string) string 
 	)
 }
 
-func (service *attachmentService) SaveUploadedFile(ctx context.Context, sourceFile io.Reader, sourceFilename string) (string, error) {
+func (service *attachmentService) SaveUploadedFile(sourceFile io.Reader, sourceFilename string) (string, error) {
 	attachmentID := utils.UUID()
 	attachmentPath := service.getAttachmentPath(attachmentID)
 	if err := os.MkdirAll(attachmentPath, 0755); err != nil {
@@ -69,6 +70,19 @@ func (service *attachmentService) SaveUploadedFile(ctx context.Context, sourceFi
 		}
 	}
 	return attachmentID, nil
+}
+
+func (service *attachmentService) DeleteAttachment(attachment domain.Attachment) error {
+	attachmentPath := service.getAttachmentPath(attachment.ID)
+	attachmentFilename := attachment.ID + filepath.Ext(attachment.OriginalName)
+	fullPath := filepath.Join(attachmentPath, attachmentFilename)
+	if err := os.Remove(fullPath); err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	return nil
 }
 
 func (service *attachmentService) AddProjectAttachment(ctx context.Context, projectID string, attachment domain.Attachment) (domain.Attachment, error) {
