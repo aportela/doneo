@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/aportela/doneo/internal/cache"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
@@ -22,13 +23,14 @@ type ProjectPermissionService interface {
 
 type projectPermissionService struct {
 	db                          database.Database
+	permissionCache             cache.PermissionCache
 	authorizationService        authorizationservice.AuthorizationService
 	historyOperationService     historyoperationservice.HistoryOperationService
 	projectPermissionRepository projectpermissionrepository.ProjectPermissionRepository
 }
 
-func NewService(db database.Database, authorizationService authorizationservice.AuthorizationService, historyOperationService historyoperationservice.HistoryOperationService, projectPermissionRepository projectpermissionrepository.ProjectPermissionRepository) ProjectPermissionService {
-	return &projectPermissionService{db: db, authorizationService: authorizationService, historyOperationService: historyOperationService, projectPermissionRepository: projectPermissionRepository}
+func NewService(db database.Database, cache cache.PermissionCache, authorizationService authorizationservice.AuthorizationService, historyOperationService historyoperationservice.HistoryOperationService, projectPermissionRepository projectpermissionrepository.ProjectPermissionRepository) ProjectPermissionService {
+	return &projectPermissionService{db: db, permissionCache: cache, authorizationService: authorizationService, historyOperationService: historyOperationService, projectPermissionRepository: projectPermissionRepository}
 }
 
 func (service *projectPermissionService) Add(ctx context.Context, projectID string, projectPermission domain.ProjectPermission) (domain.ProjectPermission, error) {
@@ -82,6 +84,7 @@ func (service *projectPermissionService) Delete(ctx context.Context, projectID s
 			); err != nil {
 				return err
 			}
+			service.permissionCache.DeleteProject(contextUser.ID, projectID)
 			return nil
 		})
 	}

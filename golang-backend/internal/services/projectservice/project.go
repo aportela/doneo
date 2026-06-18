@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/aportela/doneo/internal/browser"
+	"github.com/aportela/doneo/internal/cache"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
@@ -26,13 +27,14 @@ type ProjectService interface {
 
 type projectService struct {
 	db                      database.Database
+	permissionCache         cache.PermissionCache
 	authorizationService    authorizationservice.AuthorizationService
 	historyOperationService historyoperationservice.HistoryOperationService
 	projectRepository       projectrepository.ProjectRepository
 }
 
-func NewService(db database.Database, authorizationService authorizationservice.AuthorizationService, historyOperationService historyoperationservice.HistoryOperationService, projectRepository projectrepository.ProjectRepository) ProjectService {
-	return &projectService{db: db, authorizationService: authorizationService, historyOperationService: historyOperationService, projectRepository: projectRepository}
+func NewService(db database.Database, cache cache.PermissionCache, authorizationService authorizationservice.AuthorizationService, historyOperationService historyoperationservice.HistoryOperationService, projectRepository projectrepository.ProjectRepository) ProjectService {
+	return &projectService{db: db, permissionCache: cache, authorizationService: authorizationService, historyOperationService: historyOperationService, projectRepository: projectRepository}
 }
 
 func (service *projectService) Add(ctx context.Context, project domain.Project) (domain.Project, error) {
@@ -123,6 +125,7 @@ func (service *projectService) Delete(ctx context.Context, projectID string) err
 			); err != nil {
 				return err
 			}
+			service.permissionCache.DeleteProject(contextUser.ID, projectID)
 			return nil
 		})
 	}
