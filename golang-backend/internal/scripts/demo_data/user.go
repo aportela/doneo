@@ -63,8 +63,9 @@ func getRandomUser() domain.User {
 func createUsers(db database.Database, count int) []string {
 	var newUserIds []string
 	userRepository := userrepository.NewRepository()
-	authorizationService := authorizationservice.NewService(db, cache.NewPermissionCache(), userRepository, projectpermissionrepository.NewRepository())
-	service := userservice.NewService(db, authorizationService, userRepository)
+	permissionCache := cache.NewPermissionCache()
+	authorizationService := authorizationservice.NewService(db, permissionCache, userRepository, projectpermissionrepository.NewRepository())
+	service := userservice.NewService(db, permissionCache, authorizationService, userRepository)
 	ctx := middlewares.SetContextUser(context.Background(), middlewares.ContextUser{UserBase: domain.UserBase{}, SkipAuthorization: true})
 	for i := 1; i <= count; i++ {
 		newUser := getRandomUser()

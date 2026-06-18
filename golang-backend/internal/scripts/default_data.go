@@ -18,8 +18,9 @@ import (
 func CreateDefaultAdminUser(db database.Database) {
 	permissionsBitmask := domain.Bitmask(0)
 	permissionsBitmask.AddFlag(domain.UserPermissionAdmin)
-	authorizationService := authorizationservice.NewService(db, cache.NewPermissionCache(), userrepository.NewRepository(), projectpermissionrepository.NewRepository())
-	service := userservice.NewService(db, authorizationService, userrepository.NewRepository())
+	permissionCache := cache.NewPermissionCache()
+	authorizationService := authorizationservice.NewService(db, permissionCache, userrepository.NewRepository(), projectpermissionrepository.NewRepository())
+	service := userservice.NewService(db, permissionCache, authorizationService, userrepository.NewRepository())
 
 	ctx := middlewares.SetContextUser(context.Background(), middlewares.ContextUser{UserBase: domain.UserBase{}, SkipAuthorization: true})
 

@@ -121,7 +121,7 @@ func NewApp(
 	taskStatusService := taskstatusservice.NewService(db, authorizationService, taskStatusRepository)
 	taskTimerEntryService := tasktimerentryservice.NewService(db, authorizationService, historyOperationService, taskTimerEntryRepository)
 	userTimerService := usertimerservice.NewService(db, userTimerRepository)
-	userService := userservice.NewService(db, authorizationService, userRepository)
+	userService := userservice.NewService(db, cache, authorizationService, userRepository)
 
 	attachmentHandler := attachmenthandler.NewHandler(attachmentService, cfg.Storage.AttachmentsPath)
 	identityHandler := identityhandler.NewHandler(identityService, cfg.Auth.SecretKey, cfg.Auth.AccessTokenExpirationHours, cfg.Auth.RefreshTokenExpirationDays)

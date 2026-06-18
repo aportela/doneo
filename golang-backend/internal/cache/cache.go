@@ -6,7 +6,7 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 )
 
-type UserPermissions struct {
+type userPermissions struct {
 	GlobalPermissions  domain.Bitmask
 	ProjectPermissions map[string]domain.Bitmask
 }
@@ -27,12 +27,12 @@ type PermissionCache interface {
 type permissionCache struct {
 	mu sync.RWMutex
 
-	permissions map[string]*UserPermissions
+	permissions map[string]*userPermissions
 }
 
 func NewPermissionCache() PermissionCache {
 	return &permissionCache{
-		permissions: make(map[string]*UserPermissions),
+		permissions: make(map[string]*userPermissions),
 	}
 }
 
@@ -54,7 +54,7 @@ func (c *permissionCache) SetUser(userID string, permissions domain.Bitmask) {
 
 	userPerms, ok := c.permissions[userID]
 	if !ok {
-		userPerms = &UserPermissions{
+		userPerms = &userPermissions{
 			ProjectPermissions: make(map[string]domain.Bitmask),
 		}
 		c.permissions[userID] = userPerms
@@ -86,7 +86,7 @@ func (c *permissionCache) SetProject(userID, projectID string, permissions domai
 
 	userPerms, ok := c.permissions[userID]
 	if !ok {
-		userPerms = &UserPermissions{
+		userPerms = &userPermissions{
 			ProjectPermissions: make(map[string]domain.Bitmask),
 		}
 		c.permissions[userID] = userPerms
@@ -118,5 +118,5 @@ func (c *permissionCache) Clear() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	c.permissions = make(map[string]*UserPermissions)
+	c.permissions = make(map[string]*userPermissions)
 }

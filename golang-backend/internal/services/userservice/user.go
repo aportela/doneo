@@ -29,13 +29,13 @@ type UserService interface {
 
 type userService struct {
 	db                   database.Database
-	cache                cache.PermissionCache
+	permissionCache      cache.PermissionCache
 	authorizationService authorizationservice.AuthorizationService
 	userRepository       userrepository.UserRepository
 }
 
-func NewService(db database.Database, authorizationService authorizationservice.AuthorizationService, userRepository userrepository.UserRepository) UserService {
-	return &userService{db: db, authorizationService: authorizationService, userRepository: userRepository}
+func NewService(db database.Database, cache cache.PermissionCache, authorizationService authorizationservice.AuthorizationService, userRepository userrepository.UserRepository) UserService {
+	return &userService{db: db, permissionCache: cache, authorizationService: authorizationService, userRepository: userRepository}
 }
 
 func (service *userService) Add(ctx context.Context, user domain.User, password string) (domain.User, error) {
