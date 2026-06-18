@@ -224,9 +224,15 @@ func (handler *AttachmentHandler) DownloadTaskAttachment(w http.ResponseWriter, 
 			string(attachment.ID[len(attachment.ID)-1]),
 		)
 		attachmentPath := filepath.Join(dir, filename)
-		if _, err := os.Stat(attachmentPath); err == nil {
-			// TODO: allow previews
-			w.Header().Set("Content-Disposition", `attachment; filename="`+attachment.OriginalName+`"`)
+		if _, err = os.Stat(attachmentPath); err == nil {
+			switch chi.URLParam(r, "mode") {
+			case "download":
+				w.Header().Set("Content-Disposition", `attachment; filename="`+url.PathEscape(attachment.OriginalName)+`"`)
+			case "inline":
+				w.Header().Set("Content-Disposition", `inline; filename="`+url.PathEscape(attachment.OriginalName)+`"`)
+			default:
+				// TODO:
+			}
 			w.Header().Set("Content-Type", attachment.ContentType)
 			http.ServeFile(w, r, attachmentPath)
 		} else {
