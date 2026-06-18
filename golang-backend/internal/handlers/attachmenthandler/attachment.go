@@ -86,11 +86,30 @@ func (handler *AttachmentHandler) DeleteProjectAttachment(w http.ResponseWriter,
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	attachmentID := chi.URLParam(r, "attachment_id")
-	if err := handler.service.DeleteProjectAttachment(r.Context(), projectID, attachmentID); err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AttachmentHandler] failed to delete project attachment: %w", err))
+	if attachment, err := handler.service.GetProjectAttachment(r.Context(), projectID, attachmentID); err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AttachmentHandler] failed to get project attachment: %w", err))
 		return
+	} else {
+		if err := handler.service.DeleteProjectAttachment(r.Context(), projectID, attachmentID); err != nil {
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AttachmentHandler] failed to delete project attachment: %w", err))
+			return
+		}
+		ext := filepath.Ext(attachment.OriginalName)
+		filename := attachment.ID + ext
+		dir := filepath.Join(
+			handler.basePath,
+			string(attachment.ID[len(attachment.ID)-2]),
+			string(attachment.ID[len(attachment.ID)-1]),
+		)
+		attachmentPath := filepath.Join(dir, filename)
+		if _, err = os.Stat(attachmentPath); err != nil {
+			handlers.ToHandlerJSONResponse(w, nil, err)
+		}
+		if err := os.Remove(attachmentPath); err != nil {
+			handlers.ToHandlerJSONResponse(w, nil, err)
+		}
+		handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 	}
-	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
 
 func (handler *AttachmentHandler) DownloadProjectAttachment(w http.ResponseWriter, r *http.Request) {
@@ -200,11 +219,30 @@ func (handler *AttachmentHandler) DeleteTaskAttachment(w http.ResponseWriter, r 
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")
 	attachmentID := chi.URLParam(r, "attachment_id")
-	if err := handler.service.DeleteTaskAttachment(r.Context(), projectID, taskID, attachmentID); err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AttachmentHandler] failed to delete task attachment: %w", err))
+	if attachment, err := handler.service.GetTaskAttachment(r.Context(), projectID, taskID, attachmentID); err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AttachmentHandler] failed to get task attachment: %w", err))
 		return
+	} else {
+		if err := handler.service.DeleteTaskAttachment(r.Context(), projectID, taskID, attachmentID); err != nil {
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[AttachmentHandler] failed to delete task attachment: %w", err))
+			return
+		}
+		ext := filepath.Ext(attachment.OriginalName)
+		filename := attachment.ID + ext
+		dir := filepath.Join(
+			handler.basePath,
+			string(attachment.ID[len(attachment.ID)-2]),
+			string(attachment.ID[len(attachment.ID)-1]),
+		)
+		attachmentPath := filepath.Join(dir, filename)
+		if _, err = os.Stat(attachmentPath); err != nil {
+			handlers.ToHandlerJSONResponse(w, nil, err)
+		}
+		if err := os.Remove(attachmentPath); err != nil {
+			handlers.ToHandlerJSONResponse(w, nil, err)
+		}
+		handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 	}
-	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
 
 func (handler *AttachmentHandler) DownloadTaskAttachment(w http.ResponseWriter, r *http.Request) {

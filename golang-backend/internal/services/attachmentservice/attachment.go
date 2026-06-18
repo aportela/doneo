@@ -73,7 +73,6 @@ func (service *attachmentService) AddProjectAttachment(ctx context.Context, proj
 }
 
 func (service *attachmentService) DeleteProjectAttachment(ctx context.Context, projectID string, attachmentID string) error {
-	// TODO: remove data/attachments file from storage
 	if contextUser, err := service.authorizationService.RequireProjectUpdatePermission(ctx, projectID); err != nil {
 		return err
 	} else {
@@ -161,7 +160,6 @@ func (service *attachmentService) AddTaskAttachment(ctx context.Context, project
 }
 
 func (service *attachmentService) DeleteTaskAttachment(ctx context.Context, projectID string, taskID string, attachmentID string) error {
-	// TODO: remove data/attachments file from storage
 	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
 		return err
 	} else {
