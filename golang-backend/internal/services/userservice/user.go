@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/aportela/doneo/internal/browser"
+	"github.com/aportela/doneo/internal/cache"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
@@ -28,6 +29,7 @@ type UserService interface {
 
 type userService struct {
 	db                   database.Database
+	cache                cache.PermissionCache
 	authorizationService authorizationservice.AuthorizationService
 	userRepository       userrepository.UserRepository
 }
@@ -68,6 +70,7 @@ func (service *userService) Update(ctx context.Context, user domain.User, passwo
 	if err := service.userRepository.Update(ctx, service.db, user); err != nil {
 		return domain.User{}, fmt.Errorf("[UserService] failed to update user with ID %s: %w", user.ID, err)
 	}
+	cache.NewPermissionCache().DeleteUser(user.ID)
 	return user, nil
 }
 
@@ -84,6 +87,7 @@ func (service *userService) Patch(ctx context.Context, user domain.User) error {
 			return fmt.Errorf("[UserService] failed to patch user with ID %s: %w", user.ID, err)
 		}
 	}
+	cache.NewPermissionCache().DeleteUser(user.ID)
 	return nil
 }
 
@@ -91,21 +95,33 @@ func (service *userService) Delete(ctx context.Context, userID string) error {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return err
 	}
-	return service.userRepository.Delete(ctx, service.db, userID, time.Now().UnixMilli())
+	if err := service.userRepository.Delete(ctx, service.db, userID, time.Now().UnixMilli()); err != nil {
+		return err
+	}
+	cache.NewPermissionCache().DeleteUser(userID)
+	return nil
 }
 
 func (service *userService) UnDelete(ctx context.Context, userID string) error {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return err
 	}
-	return service.userRepository.UnDelete(ctx, service.db, userID)
+	if err := service.userRepository.UnDelete(ctx, service.db, userID); err != nil {
+		return err
+	}
+	cache.NewPermissionCache().DeleteUser(userID)
+	return nil
 }
 
 func (service *userService) Purge(ctx context.Context, userID string) error {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return err
 	}
-	return service.userRepository.Purge(ctx, service.db, userID)
+	if err := service.userRepository.Purge(ctx, service.db, userID); err != nil {
+		return err
+	}
+	cache.NewPermissionCache().DeleteUser(userID)
+	return nil
 }
 
 func (service *userService) Get(ctx context.Context, userID string) (domain.User, error) {
