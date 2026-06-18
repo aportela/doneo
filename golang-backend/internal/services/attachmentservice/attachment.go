@@ -106,8 +106,7 @@ func (service *attachmentService) GetProjectAttachment(ctx context.Context, proj
 	if _, err := service.authorizationService.RequireProjectViewPermission(ctx, projectID); err != nil {
 		return domain.Attachment{}, err
 	}
-	// TODO: attachment is owned by projectID ??
-	if attachment, err := service.attachmentRepository.GetAttachment(ctx, service.db, attachmentID); err != nil {
+	if attachment, err := service.attachmentRepository.GetProjectAttachment(ctx, service.db, projectID, attachmentID); err != nil {
 		return domain.Attachment{}, fmt.Errorf("[AttachmentService] failed to get attachment with ID %s: %w", attachmentID, err)
 	} else {
 		return attachment, nil
@@ -196,8 +195,7 @@ func (service *attachmentService) GetTaskAttachment(ctx context.Context, project
 	if _, err := service.authorizationService.RequireTaskViewPermission(ctx, projectID); err != nil {
 		return domain.Attachment{}, err
 	}
-	// TODO: attachment is owned by taskID ??
-	if attachment, err := service.attachmentRepository.GetAttachment(ctx, service.db, attachmentID); err != nil {
+	if attachment, err := service.attachmentRepository.GetTaskAttachment(ctx, service.db, taskID, attachmentID); err != nil {
 		return domain.Attachment{}, fmt.Errorf("[AttachmentService] failed to get attachment with ID %s: %w", attachmentID, err)
 	} else {
 		return attachment, nil
