@@ -26,47 +26,47 @@ export class HistoryOperation {
 
   getOperationTypeLabel(): string {
     switch (this.operationType) {
-      case 1:
+      case 100:
         return "project created";
-      case 2:
+      case 101:
         return "project updated";
-      case 3:
+      case 102:
         return "project deleleted";
-      case 4:
+      case 110:
         return "project note added";
-      case 5:
+      case 111:
         return "project note updated";
-      case 6:
+      case 112:
         return "project note deleted";
-      case 7:
+      case 120:
         return "project attachment added";
-      case 8:
+      case 122:
         return "project attachment deleted";
-      case 9:
+      case 130:
         return "project permission added";
-      case 10:
+      case 132:
         return "project permission deleted";
-      case 20:
+      case 200:
         return "task created";
-      case 21:
+      case 201:
         return "task updated";
-      case 22:
+      case 202:
         return "task deleted";
-      case 23:
+      case 210:
         return "task note added";
-      case 24:
+      case 211:
         return "task note updated";
-      case 25:
+      case 212:
         return "task note deleted";
-      case 26:
+      case 220:
         return "task attachment added";
-      case 27:
+      case 222:
         return "task attachment deleted";
-      case 28:
+      case 230:
         return "task time entry added";
-      case 29:
+      case 231:
         return "task time entry updated";
-      case 30:
+      case 232:
         return "task time entry deleted";
       default:
         return "unknown operation";

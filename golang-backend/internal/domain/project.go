@@ -40,26 +40,32 @@ type SearchProjectFilter struct {
 type ProjectEventType uint
 
 const (
-	EventProjectCreated           ProjectEventType = 1
-	EventProjectUpdated           ProjectEventType = 2
-	EventProjectDeleted           ProjectEventType = 3
-	EventProjectNoteAdded         ProjectEventType = 4
-	EventProjectNoteUpdated       ProjectEventType = 5
-	EventProjectNoteDeleted       ProjectEventType = 6
-	EventProjectAttachmentAdded   ProjectEventType = 7
-	EventProjectAttachmentDeleted ProjectEventType = 8
-	EventProjectPermissionAdded   ProjectEventType = 9
-	EventProjectPermissionDeleted ProjectEventType = 10
+	EventProjectCreated ProjectEventType = 100
+	EventProjectUpdated ProjectEventType = 101
+	EventProjectDeleted ProjectEventType = 102
 
-	EventTaskCreated           ProjectEventType = 20
-	EventTaskUpdated           ProjectEventType = 21
-	EventTaskDeleted           ProjectEventType = 22
-	EventTaskNoteAdded         ProjectEventType = 23
-	EventTaskNoteUpdated       ProjectEventType = 24
-	EventTaskNoteDeleted       ProjectEventType = 25
-	EventTaskAttachmentAdded   ProjectEventType = 26
-	EventTaskAttachmentDeleted ProjectEventType = 27
-	EventTaskTimeEntryAdded    ProjectEventType = 28
-	EventTaskTimeEntryUpdated  ProjectEventType = 29
-	EventTaskTimeEntryDeleted  ProjectEventType = 30
+	EventProjectNoteAdded   ProjectEventType = 110
+	EventProjectNoteUpdated ProjectEventType = 111
+	EventProjectNoteDeleted ProjectEventType = 112
+
+	EventProjectAttachmentAdded   ProjectEventType = 120
+	EventProjectAttachmentDeleted ProjectEventType = 122
+
+	EventProjectPermissionAdded   ProjectEventType = 130
+	EventProjectPermissionDeleted ProjectEventType = 132
+
+	EventTaskCreated ProjectEventType = 200
+	EventTaskUpdated ProjectEventType = 201
+	EventTaskDeleted ProjectEventType = 202
+
+	EventTaskNoteAdded   ProjectEventType = 210
+	EventTaskNoteUpdated ProjectEventType = 211
+	EventTaskNoteDeleted ProjectEventType = 212
+
+	EventTaskAttachmentAdded   ProjectEventType = 220
+	EventTaskAttachmentDeleted ProjectEventType = 222
+
+	EventTaskTimeEntryAdded   ProjectEventType = 230
+	EventTaskTimeEntryUpdated ProjectEventType = 231
+	EventTaskTimeEntryDeleted ProjectEventType = 232
 )
