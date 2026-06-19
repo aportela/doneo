@@ -34,6 +34,7 @@ func toDTO(task domain.Task) taskDTO {
 		AttachmentsCount:       task.AttachmentsCount,
 		NotesCount:             task.NotesCount,
 		HistoryOperationsCount: task.HistoryOperationsCount,
+		TimeTrackingsCount:     task.TimeTrackingsCount,
 	}
 }
 
@@ -57,6 +58,7 @@ func toDomain(task taskDTO) domain.Task {
 		AttachmentsCount:       task.AttachmentsCount,
 		NotesCount:             task.NotesCount,
 		HistoryOperationsCount: task.HistoryOperationsCount,
+		TimeTrackingsCount:     task.TimeTrackingsCount,
 	}
 }
 

@@ -52,6 +52,7 @@
     const noteCount = defineModel<number>("noteCount", { default: 0 });
     const attachmentCount = defineModel<number>("attachmentCount", { default: 0 });
     const historyOperationCount = defineModel<number>("historyOperationCount", { default: 0 });
+    const timeTrackingCount = defineModel<number>("timeTrackingCount", { default: 0 });
 
     const descriptionEditMode = ref<boolean>(false);
 
@@ -70,6 +71,7 @@
                 noteCount.value = task.value.notesCount;
                 attachmentCount.value = task.value.attachmentsCount;
                 historyOperationCount.value = task.value.historyOperationsCount;
+                timeTrackingCount.value = task.value.timeTrackingsCount;
             } else {
                 state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.loadError");
             }

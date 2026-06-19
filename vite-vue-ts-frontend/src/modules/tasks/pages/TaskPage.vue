@@ -36,12 +36,12 @@
 
     const noteCount = ref<number>(0);
     const attachmentCount = ref<number>(0);
-    const timeTrackingsCount = ref<number>(0)
+    const timeTrackingCount = ref<number>(0)
     const historyOperationCount = ref<number>(0);
 
     const attachmentsTabLabel = computed(() => t("modules.task.components.TaskPage.tabs.attachments.label", attachmentCount.value));
     const notesTabLabel = computed(() => t("modules.task.components.TaskPage.tabs.notes.label", noteCount.value));
-    const timeTrackingsTabLabel = computed(() => t("modules.task.components.TaskPage.tabs.timeTrackings.label", timeTrackingsCount.value));
+    const timeTrackingsTabLabel = computed(() => t("modules.task.components.TaskPage.tabs.timeTrackings.label", timeTrackingCount.value));
     const historyTabLabel = computed(() => t("modules.task.components.TaskPage.tabs.history.label", historyOperationCount.value));
 
     const tabsRef = ref<TabsInst>();
@@ -64,7 +64,8 @@
             </template>
             <!-- TODO: mode ???-->
             <TaskMetadataTab mode="add" :project-id="projectId" :task-id="taskId" v-model:note-count="noteCount"
-                v-model:attachment-count="attachmentCount" v-model:history-operation-count="historyOperationCount" />
+                v-model:attachment-count="attachmentCount" v-model:history-operation-count="historyOperationCount"
+                v-model:time-tracking-count="timeTrackingCount" />
         </n-tab-pane>
         <n-tab-pane name="notes" :tab="notesTabLabel" display-directive="show:lazy" key="notes"
             :disabled="!projectId || !taskId">
@@ -79,7 +80,7 @@
         <n-tab-pane name="timetrackings" :tab="timeTrackingsTabLabel" display-directive="show:lazy" key="timetrackings"
             :disabled="!projectId || !taskId">
             <TaskTimeTrackingsTab v-if="projectId && taskId" :project-id="projectId" :task-id="taskId"
-                v-model:item-count="timeTrackingsCount" />
+                v-model:item-count="timeTrackingCount" />
         </n-tab-pane>
         <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy" key="history"
             :disabled="!projectId || !taskId">

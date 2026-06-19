@@ -23,6 +23,7 @@ type Task struct {
 	AttachmentsCount       uint
 	NotesCount             uint
 	HistoryOperationsCount uint
+	TimeTrackingsCount     uint
 }
 
 type SearchTaskFilter struct {

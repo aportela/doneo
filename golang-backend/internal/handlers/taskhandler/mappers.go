@@ -65,6 +65,7 @@ func DomainToResponse(task domain.Task) taskResponse {
 		AttachmentsCount:       task.AttachmentsCount,
 		NotesCount:             task.NotesCount,
 		HistoryOperationsCount: task.HistoryOperationsCount,
+		TimeTrackingsCount:     task.TimeTrackingsCount,
 	}
 }
 

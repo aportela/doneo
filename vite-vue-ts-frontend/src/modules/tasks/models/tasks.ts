@@ -23,6 +23,7 @@ export class Task {
   attachmentsCount: number;
   notesCount: number;
   historyOperationsCount: number;
+  timeTrackingsCount: number;
 
   constructor(data?: ProjectTaskDTO) {
     this.id = data?.id ?? null;
@@ -43,6 +44,7 @@ export class Task {
     this.attachmentsCount = data?.attachmentsCount ?? 0;
     this.notesCount = data?.notesCount ?? 0;
     this.historyOperationsCount = data?.historyOperationsCount ?? 0;
+    this.timeTrackingsCount = data?.timeTrackingsCount ?? 0;
   }
 
   toDTO(): ProjectTaskDTO {
@@ -61,6 +63,7 @@ export class Task {
       attachmentsCount: this.attachmentsCount,
       notesCount: this.notesCount,
       historyOperationsCount: this.historyOperationsCount,
+      timeTrackingsCount: this.timeTrackingsCount,
     };
   }
 }

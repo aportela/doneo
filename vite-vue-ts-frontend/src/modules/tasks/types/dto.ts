@@ -70,6 +70,7 @@ export type TaskResponse = {
   attachmentsCount: number;
   notesCount: number;
   historyOperationsCount: number;
+  timeTrackingsCount: number;
 };
 
 export type SearchResponse = {

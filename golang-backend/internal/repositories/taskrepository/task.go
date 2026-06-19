@@ -219,18 +219,29 @@ func (repository *taskRepository) Get(ctx context.Context, dbExecutor database.D
 				T.creator_id,
 				U.name AS creator_name,
 				IFNULL(TN.notes_count, 0) AS notes_count,
-				0 AS attachments_count,
-				IFNULL(THO.history_operations_count, 0) AS history_operations_count
+				IFNULL(TA.attachments_count, 0) AS attachments_count,
+				IFNULL(THO.history_operations_count, 0) AS history_operations_count,
+				IFNULL(TTT.time_trackings_count, 0) AS time_trackings_count
             FROM tasks T
 			INNER JOIN projects P on P.id = T.project_id
 			INNER JOIN task_priorities TP ON TP.id = T.priority_id
 			INNER JOIN task_statuses TS ON TS.id = T.status_id
 			INNER JOIN users U ON U.ID = T.creator_id
 			LEFT JOIN (
+				SELECT task_id, COUNT(*) AS time_trackings_count
+				FROM task_time_trackings
+				GROUP BY task_id
+			) TTT ON TTT.task_id = T.id
+			LEFT JOIN (
     			SELECT task_id, COUNT(*) AS notes_count
     			FROM task_notes
     			GROUP BY task_id
 			) TN ON TN.task_id = T.id
+			LEFT JOIN (
+				SELECT task_id, COUNT(*) AS attachments_count
+				FROM task_attachments
+				GROUP BY task_id
+			) TA ON TA.task_id = T.id
 			LEFT JOIN (
 				SELECT task_id, COUNT(*) as history_operations_count
 				FROM history_operations
@@ -263,6 +274,7 @@ func (repository *taskRepository) Get(ctx context.Context, dbExecutor database.D
 		&dto.NotesCount,
 		&dto.AttachmentsCount,
 		&dto.HistoryOperationsCount,
+		&dto.TimeTrackingsCount,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

@@ -71,6 +71,7 @@ type taskResponse struct {
 	AttachmentsCount       uint                                     `json:"attachmentsCount"`
 	NotesCount             uint                                     `json:"notesCount"`
 	HistoryOperationsCount uint                                     `json:"historyOperationsCount"`
+	TimeTrackingsCount     uint                                     `json:"timeTrackingsCount"`
 }
 
 type searchTasksResponse struct {

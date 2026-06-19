@@ -30,6 +30,7 @@ type taskDTO struct {
 	AttachmentsCount       uint           `db:"attachments_count"`
 	NotesCount             uint           `db:"notes_count"`
 	HistoryOperationsCount uint           `db:"history_operations_count"`
+	TimeTrackingsCount     uint           `db:"time_trackings_count"`
 }
 
 type searchFilterDTO struct {
