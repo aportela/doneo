@@ -144,6 +144,9 @@
                 });
         } finally {
             state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
         }
     };
 
@@ -178,6 +181,9 @@
                     });
             } finally {
                 state.ajaxRunning = false;
+                if (state.ajaxErrorMessage) {
+                    appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+                }
             }
         } else {
             console.error("project attachment id not set", { file: "ProjectAttachmentsTab.vue", method: "onDelete" });

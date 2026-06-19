@@ -65,6 +65,9 @@
                 });
         } finally {
             state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
         }
     };
 

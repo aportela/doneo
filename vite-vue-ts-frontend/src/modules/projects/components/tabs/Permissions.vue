@@ -117,6 +117,9 @@
                 });
         } finally {
             state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
         }
     };
 
@@ -152,6 +155,9 @@
                     });
             } finally {
                 state.ajaxRunning = false;
+                if (state.ajaxErrorMessage) {
+                    appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+                }
             }
         } else {
             console.error("(project permission id || project id) not set", { file: "ProjectPermissions.vue", method: "onDelete" });

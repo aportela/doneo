@@ -89,10 +89,14 @@
                 });
         } finally {
             state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
         }
     };
 
     const onDelete = async (timeTracking: TimeTracking, _index?: number) => {
+        console.log(timeTracking);
         if (timeTracking.id) {
             Object.assign(state, defaultAjaxStateRunning);
             try {
@@ -124,11 +128,15 @@
                     });
             } finally {
                 state.ajaxRunning = false;
+                if (state.ajaxErrorMessage) {
+                    appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+                }
             }
         } else {
             console.error("(project permission id || project id) not set", { file: "TimeTrackings.vue", method: "onDelete" });
         }
     };
+
     const onAdded = (timeTracking: TimeTracking) => {
         showForm.value = false;
         items.value = [timeTracking, ...items.value]
