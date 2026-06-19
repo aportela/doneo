@@ -1450,10 +1450,46 @@ export default {
             totalItemsLabel: "Total tasks: {total}",
           },
         },
+        TimeTrackingsTab: {
+          notifications: {
+            timeTrackingAdded: 'Time tracking "{summary}" has been added',
+            timeTrackingDeleted: 'Time tracking "{summary}"  has been deleted',
+          },
+          errors: {
+            refreshError:
+              "There was a problem while refreshing the time tracking list",
+            deleteError: "There was a problem while deleting the time tracking",
+          },
+        },
       },
     },
     timeTracking: {
       components: {
+        TimeTrackingForm: {
+          headers: {
+            addTimeTracking: "Add time tracking",
+          },
+          inputs: {
+            summary: {
+              label: "Summary",
+              placeholder: "type summary",
+            },
+            totalHours: {
+              label: "Total hours",
+              placeholder: "type total hours",
+            },
+            totalMinutes: {
+              label: "Total minutes",
+              placeholder: "type total minutes",
+            },
+            totalTime: {
+              label: "Total time",
+              warnings: {
+                noTimeSet: "No time set",
+              },
+            },
+          },
+        },
         TimeTrackingsTable: {
           header: {
             columns: {

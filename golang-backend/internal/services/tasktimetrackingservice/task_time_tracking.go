@@ -36,6 +36,7 @@ func (service *taskTimeTrackingService) Add(ctx context.Context, projectID strin
 	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
 		return err
 	} else {
+		taskTimeTracking.ID = utils.UUID()
 		taskTimeTracking.CreatedBy.ID = contextUser.ID
 		taskTimeTracking.CreatedBy.Name = contextUser.Name
 		taskTimeTracking.CreatedAt = time.Now()

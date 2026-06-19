@@ -24,6 +24,7 @@
         disabled: boolean;
         items: TimeTracking[];
         projectId: string;
+        taskId: string; // TODO: required ?
         errorMessage?: string | null;
     }
 
