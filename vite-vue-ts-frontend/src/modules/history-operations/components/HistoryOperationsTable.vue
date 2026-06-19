@@ -17,7 +17,7 @@
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import type { DateFilterSelectComponent } from '../../users/components/date-filter-select-component.ts';
 
-    interface Props {
+    interface HistoryOperationsTableProps {
         disabled: boolean;
         items: HistoryOperation[];
         projectId: string;
@@ -29,7 +29,7 @@
 
     const emit = defineEmits(['refresh']);
 
-    const props = defineProps<Props>();
+    const props = defineProps<HistoryOperationsTableProps>();
 
     const createdAtFilterRef = ref<DateFilterSelectComponent | undefined>();
 
