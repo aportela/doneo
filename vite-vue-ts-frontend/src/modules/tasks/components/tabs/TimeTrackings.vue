@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount, type CSSProperties } from "vue";
+    import { reactive, shallowRef, watch, onMounted, onBeforeUnmount, type CSSProperties } from "vue";
     import { useI18n } from "vue-i18n";
 
     import { NCard } from "naive-ui";
@@ -8,22 +8,22 @@
     import { appBus } from '../../../../shared/composables/bus';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../../shared/types/ajaxState';
-    import type { SearchResponse } from "../../../history-operations/types/dto";
-    import type { HistoryOperationsTableFilters } from "../../../history-operations/types/history-operations-table-filters.ts";
+    import type { SearchResponse } from "../../../time-trackings/types/dto.ts";
+    import type { TimeTrackingsTableFilters } from "../../../time-trackings/types/time-trackings-table-filters.ts";
 
-    import { historyOperationsService } from "../../../history-operations/services/history-operations";
+    import { timeTrackingService } from "../../../time-trackings/services/time-tracking.ts";
     import { handleAPIError } from '../../../../api/client/errorHandler';
 
-    import { HistoryOperation } from "../../../history-operations/models/history-operation";
-    import HistoryOperationsTable from "../../../history-operations/components/HistoryOperationsTable.vue";
+    import { TimeTracking } from "../../../time-trackings/models/time-tracking.ts"
+    import TimeTrackingsTable from "../../../time-trackings/components/TimeTrackingsTable.vue";
 
-    interface ProjectHistoryOperationsTabProps {
+    interface TimeTrackingsTabProps {
         style?: string | CSSProperties;
         projectId: string;
         taskId: string;
     }
 
-    const props = defineProps<ProjectHistoryOperationsTabProps>();
+    const props = defineProps<TimeTrackingsTabProps>();
 
     const { t } = useI18n();
 
@@ -31,25 +31,17 @@
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    const items = shallowRef<HistoryOperation[]>([]);
+    const items = shallowRef<TimeTracking[]>([]);
 
     const itemCount = defineModel<number>("itemCount", { default: 0 });
 
-    const filters = reactive<HistoryOperationsTableFilters>({
-        userId: null,
+    const filters = reactive<TimeTrackingsTableFilters>({
+        createdByUserId: null,
         createdAt: {
             from: null,
             to: null,
         },
-    });
-
-    const filteredItems = computed(() => {
-        return items.value.filter((operation: HistoryOperation) => {
-            return (
-                (filters.userId === null || filters.userId == operation.createdBy.id) &&
-                ((filters.createdAt.from === null && filters.createdAt.to === null) || (operation.createdAt.msTimestamp != null && filters.createdAt.from != null && filters.createdAt.from <= operation.createdAt.msTimestamp && filters.createdAt.to != null && filters.createdAt.to >= operation.createdAt.msTimestamp))
-            );
-        });
+        summary: "",
     });
 
     watch(state, (newValue: AjaxStateInterface) => {
@@ -59,8 +51,8 @@
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const results: SearchResponse = await historyOperationsService.getTaskHistoryOperations(props.projectId, props.taskId);
-            items.value = results.historyOperations.map((operation) => new HistoryOperation(operation));
+            const results: SearchResponse = await timeTrackingService.getTaskTimeTrackings(props.projectId, props.taskId);
+            items.value = results.timeTrackings.map((timeTracking) => new TimeTracking(timeTracking));
             itemCount.value = items.value?.length ?? 0;
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -69,7 +61,7 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectAttachmentsTab.onRefresh" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TrackTimeTrackingsTab.onRefresh" } });
                             break;
                         default:
                             state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
@@ -78,7 +70,7 @@
                 },
                 (fatalError) => {
                     state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
-                    console.error("Unhandled API error", { file: "ProjectAttachmentsTab.vue", method: "onRefresh" }, { err: fatalError });
+                    console.error("Unhandled API error", { file: "TrackTimeTrackingsTab.vue", method: "onRefresh" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
@@ -90,7 +82,7 @@
     onMounted(() => {
         onRefresh();
         stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
-            if (payload.to.includes("ProjectHistoryOperationsTab.onRefresh")) {
+            if (payload.to.includes("TrackTimeTrackingsTab.onRefresh")) {
                 onRefresh();
             }
         });
@@ -103,7 +95,7 @@
 
 <template>
     <n-card bordered :style="props.style">
-        <HistoryOperationsTable :project-id="props.projectId" :task-id="props.taskId" :items="filteredItems"
+        <TimeTrackingsTable :project-id="props.projectId" :task-id="props.taskId" :items="items"
             :disabled="state.ajaxRunning" v-model:filters="filters" @refresh="onRefresh" />
     </n-card>
 </template>

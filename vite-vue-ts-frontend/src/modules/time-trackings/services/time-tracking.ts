@@ -7,7 +7,7 @@ import type {
   SearchResponse,
 } from "../types/dto";
 
-export const noteService = {
+export const timeTrackingService = {
   async addTaskTimeTracking(
     projectId: string,
     taskId: string,

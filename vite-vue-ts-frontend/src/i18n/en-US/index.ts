@@ -1452,6 +1452,41 @@ export default {
         },
       },
     },
+    timeTracking: {
+      components: {
+        TimeTrackingsTable: {
+          header: {
+            columns: {
+              summary: "Summary",
+              totalTime: "Total time",
+              createdAt: "Created at",
+              createdBy: "Created by",
+            },
+          },
+          filters: {
+            summary: {
+              placeholder: "search by summary",
+            },
+            user: {
+              placeholder: "search by user",
+            },
+            contentType: {
+              placeholder: "search by content type",
+            },
+          },
+          dialogs: {
+            deleteConfirmation: {
+              title: "Delete time tracking",
+              message:
+                "You are about to delete the time tracking {summary} from the system.",
+            },
+          },
+          warnings: {
+            noItemsFound: "No time trackings found",
+          },
+        },
+      },
+    },
   },
 
   // common actions/operations
