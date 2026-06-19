@@ -143,7 +143,7 @@
         showForm.value = false;
         items.value = [timeTracking, ...items.value]
         itemCount.value = items.value?.length ?? 0;
-        notify('success', t("modules.timeTracking.components.taskTimeTrackingsTab.notifications.taskTimeTrackingAdded", { summary: timeTracking.summary }));
+        notify('success', t("modules.timeTracking.components.taskTimeTrackingsTab.notifications.timeTrackingAdded", { summary: timeTracking.summary }));
     };
 
     let stopBusReauthListener: () => void;
