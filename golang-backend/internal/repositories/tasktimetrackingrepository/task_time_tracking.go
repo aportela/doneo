@@ -147,6 +147,8 @@ func (repository *taskTimeTrackingRepository) GetTaskTimeTrackings(ctx context.C
 			INNER JOIN users U ON U.ID = TTT.creator_id
             WHERE
 				TTT.task_id = ?
+			ORDER BY
+				TTT.created_at DESC
         `,
 		taskID)
 	if err != nil {
