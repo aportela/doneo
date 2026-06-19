@@ -109,25 +109,15 @@
                         switch (apiError.response?.status) {
                             case 401:
                                 state.ajaxErrors = false;
-                                appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPermissionForm.onAdd" } });
-                                break;
-                            case 409:
-                                // TODO
-                                if (apiError.details?.field === "userId") {
-                                    serverErrors.value.name = "modules.projectPermission.components.ProjectPermissionForm.warnings.userAlreadyExists";
-                                } else if (apiError.details?.field === "roleId") {
-                                    serverErrors.value.name = "modules.projectPermission.components.ProjectPermissionForm.warnings.roleAlreadyExists";
-                                } else {
-                                    state.ajaxErrorMessage = t("modules.projectPermission.components.ProjectPermissionForm.errors.addError");
-                                }
+                                appBus.emit({ type: "reauthRequired", payload: { emitter: "TimeTrackingForm.onAdd" } });
                                 break;
                             default:
-                                state.ajaxErrorMessage = t("modules.projectPermission.components.ProjectPermissionForm.errors.addError");
+                                state.ajaxErrorMessage = t("modules.projectPermission.components.TimeTrackingForm.errors.addError");
                                 break;
                         }
                     },
                     (fatalError) => {
-                        state.ajaxErrorMessage = t("modules.projectPermission.components.ProjectPermissionForm.errors.addError");
+                        state.ajaxErrorMessage = t("modules.projectPermission.components.TimeTrackingForm.errors.addError");
                         console.error("Unhandled API error", { file: "TimeTrackingForm.vue", method: "onAdd" }, { err: fatalError });
                     });
             } finally {
@@ -149,7 +139,7 @@
 
     onMounted(() => {
         stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
-            if (payload.to.includes("ProjectPermissionForm.onAdd")) {
+            if (payload.to.includes("TimeTrackingForm.onAdd")) {
                 onAdd();
             }
         });

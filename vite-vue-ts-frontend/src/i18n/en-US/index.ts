@@ -1495,6 +1495,16 @@ export default {
                 noTimeSet: "No time set",
               },
             },
+            errors: {
+              loadError:
+                "There was a problem while loading the time tracking data",
+              // TODO: deduplicate
+              notFoundError: "We couldn’t find the specified time tracking",
+              addError:
+                "There was a problem while adding the time tracking data",
+              updateError:
+                "There was a problem while updating the time tracking data",
+            },
           },
         },
         TimeTrackingsTable: {
@@ -1526,6 +1536,21 @@ export default {
           },
           warnings: {
             noItemsFound: "No time trackings found",
+          },
+        },
+        taskTimeTrackingsTab: {
+          errors: {
+            refreshError:
+              "There was a problem while refreshing the task time tracking list",
+            deleteError:
+              "There was a problem while deleting the task time tracking",
+            // TODO: deduplicate
+            notFoundError: "We couldn’t find the specified task time tracking",
+          },
+          notifications: {
+            timeTrackingAdded: 'Time tracking "{summary}" has been added',
+            timeTrackingUpdated: 'Time tracking "{summary}" has been updated',
+            timeTrackingDeleted: 'Time tracking "{summary}" has been deleted',
           },
         },
       },
