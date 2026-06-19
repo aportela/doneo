@@ -23,7 +23,7 @@ func updateRequestToDomain(request updateRequest) domain.TaskTimeTracking {
 func domainToResponse(taskTimeTracking domain.TaskTimeTracking) TaskTimeTrakingResponse {
 	return TaskTimeTrakingResponse{
 		ID:           taskTimeTracking.ID,
-		User:         userhandler.BaseDomainToBaseResponse(taskTimeTracking.CreatedBy),
+		CreatedBy:    userhandler.BaseDomainToBaseResponse(taskTimeTracking.CreatedBy),
 		CreatedAt:    taskTimeTracking.CreatedAt.UnixMilli(),
 		Summary:      taskTimeTracking.Summary,
 		TotalSeconds: taskTimeTracking.TotalSeconds,

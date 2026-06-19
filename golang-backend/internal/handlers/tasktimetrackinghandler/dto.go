@@ -15,7 +15,7 @@ type updateRequest struct {
 
 type TaskTimeTrakingResponse struct {
 	ID           string                       `json:"id"`
-	User         userhandler.UserBaseResponse `json:"user"`
+	CreatedBy    userhandler.UserBaseResponse `json:"createdBy"`
 	CreatedAt    int64                        `json:"createdAt"`
 	Summary      string                       `json:"summary"`
 	TotalSeconds uint                         `json:"totalSeconds"`
