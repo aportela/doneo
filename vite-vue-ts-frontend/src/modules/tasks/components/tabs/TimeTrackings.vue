@@ -63,6 +63,8 @@
         showForm.value = false;
     };
 
+    // TODO: allow updates
+
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {

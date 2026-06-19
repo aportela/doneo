@@ -73,6 +73,7 @@
         return !timeTracking.value.summary || totalSeconds.value <= 0;
     });
 
+    // TODO: allow updates
     const onSave = async () => {
         serverErrors.value = {};
         timeTrackingFormRef.value?.restoreValidation();
