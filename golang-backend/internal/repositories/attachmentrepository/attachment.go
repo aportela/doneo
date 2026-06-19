@@ -150,8 +150,10 @@ func (repository *attachmentRepository) GetProjectAttachments(ctx context.Contex
             FROM project_attachments PA
 			INNER JOIN attachments A ON A.id = PA.attachment_id
 			INNER JOIN users U ON U.id = A.creator_id
-            WHERE PA.project_id = ?
-			ORDER BY A.created_at DESC
+            WHERE
+				PA.project_id = ?
+			ORDER BY
+				A.created_at DESC
         `,
 		projectID)
 	if err != nil {
@@ -247,8 +249,10 @@ func (repository *attachmentRepository) GetTaskAttachments(ctx context.Context, 
             FROM task_attachments TA
 			INNER JOIN attachments A ON A.id = TA.attachment_id
 			INNER JOIN users U ON U.id = A.creator_id
-            WHERE TA.task_id = ?
-			ORDER BY A.created_at DESC
+            WHERE
+				TA.task_id = ?
+			ORDER BY
+				A.created_at DESC
         `,
 		taskID)
 	if err != nil {
