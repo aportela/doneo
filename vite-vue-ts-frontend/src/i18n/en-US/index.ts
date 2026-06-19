@@ -243,6 +243,13 @@ export default {
       fieldExceedsMaxLength: "Field exceeds max length",
       fieldIsBelowMinimumLength: "Field is below minimum length",
     },
+    labels: {
+      time: {
+        hour: "hour | hours",
+        minute: "minute | minutes",
+        second: "second | seconds",
+      },
+    },
   },
   modules: {
     // auth module

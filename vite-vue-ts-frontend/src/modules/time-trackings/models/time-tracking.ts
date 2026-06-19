@@ -26,4 +26,16 @@ export class TimeTracking {
       totalSeconds: this.totalSeconds ?? 0,
     };
   }
+
+  geti18nTimeParts() {
+    const hours = Math.floor(this.totalSeconds / 3600);
+    const minutes = Math.floor((this.totalSeconds % 3600) / 60);
+    const seconds = this.totalSeconds % 60;
+
+    return [
+      { key: "shared.labels.time.hour", count: hours },
+      { key: "shared.labels.time.minute", count: minutes },
+      { key: "shared.labels.time.second", count: seconds },
+    ].filter(({ count }) => count > 0);
+  }
 }
