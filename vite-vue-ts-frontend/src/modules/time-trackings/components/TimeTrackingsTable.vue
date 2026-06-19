@@ -154,7 +154,13 @@
         <template #tbody v-if="!props.errorMessage">
             <tr v-for="timeTracking, index in items" :key="timeTracking.id ?? index">
                 <td>{{ timeTracking.summary }}</td>
-                <td>{{ timeTracking.totalSeconds }}</td>
+                <td>
+                    {{
+                        timeTracking.geti18nTimeParts()
+                            .map(({ key, count }) => `${count} ${t(key, count)}`)
+                            .join(", ")
+                    }}
+                </td>
                 <td>{{ timeTracking.createdAt?.toLocaleString() }}</td>
                 <td>
                     <AvatarUserName :user-id="timeTracking.createdBy?.id ?? ''"
