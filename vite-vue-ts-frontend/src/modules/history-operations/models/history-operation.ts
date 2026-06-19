@@ -62,6 +62,12 @@ export class HistoryOperation {
         return "task attachment added";
       case 27:
         return "task attachment deleted";
+      case 28:
+        return "task time entry added";
+      case 29:
+        return "task time entry updated";
+      case 30:
+        return "task time entry deleted";
       default:
         return "unknown operation";
     }
