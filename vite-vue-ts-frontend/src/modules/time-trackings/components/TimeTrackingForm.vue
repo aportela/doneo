@@ -98,7 +98,7 @@
             try {
                 const payload: AddRequest = {
                     summary: timeTracking.value.summary,
-                    totalSeconds: totalMinutes.value + (totalHours.value * 3600),
+                    totalSeconds: (totalMinutes.value * 60) + (totalHours.value * 3600),
                 };
                 const addedTimeTracking: TimeTrackingResponse = await timeTrackingService.addTaskTimeTracking(props.projectId, props.taskId, payload);
                 emit('add', new TimeTracking(addedTimeTracking));
