@@ -55,6 +55,7 @@
     const totalHours = ref<number>(0);
     const totalMinutes = ref<number>(0);
 
+    // TODO: i18n labels
     const totalTime = computed<string>(() => {
         let str = "";
         if (totalHours.value > 0) {
@@ -66,8 +67,10 @@
         return str;
     });
 
+    const totalSeconds = computed<number>(() => (totalHours.value * 3600) + (totalMinutes.value * 60))
+
     const isSaveDisabled = computed<boolean>(() => {
-        return !timeTracking.value.summary;
+        return !timeTracking.value.summary || totalSeconds.value <= 0;
     });
 
     const onSave = async () => {
@@ -98,7 +101,7 @@
             try {
                 const payload: AddRequest = {
                     summary: timeTracking.value.summary,
-                    totalSeconds: (totalMinutes.value * 60) + (totalHours.value * 3600),
+                    totalSeconds: totalSeconds.value,
                 };
                 const addedTimeTracking: TimeTrackingResponse = await timeTrackingService.addTaskTimeTracking(props.projectId, props.taskId, payload);
                 emit('add', new TimeTracking(addedTimeTracking));
