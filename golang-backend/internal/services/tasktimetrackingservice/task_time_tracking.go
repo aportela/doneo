@@ -15,8 +15,8 @@ import (
 )
 
 type TaskTimeTrackingService interface {
-	Add(ctx context.Context, projectID string, taskID string, taskTimeTracking domain.TaskTimeTracking) error
-	Update(ctx context.Context, projectID string, taskID string, taskTimeTracking domain.TaskTimeTracking) error
+	Add(ctx context.Context, projectID string, taskID string, taskTimeTracking domain.TaskTimeTracking) (domain.TaskTimeTracking, error)
+	Update(ctx context.Context, projectID string, taskID string, taskTimeTracking domain.TaskTimeTracking) (domain.TaskTimeTracking, error)
 	Delete(ctx context.Context, projectID string, taskID string, taskTimeTrackingID string) error
 	GetTaskTimeTrackings(ctx context.Context, projectID string, taskID string) ([]domain.TaskTimeTracking, error)
 }
@@ -32,15 +32,15 @@ func NewService(db database.Database, authorizationService authorizationservice.
 	return &taskTimeTrackingService{db: db, authorizationService: authorizationService, historyOperationService: historyOperationService, taskTimeTrackingRepository: taskTimeTrackingRepository}
 }
 
-func (service *taskTimeTrackingService) Add(ctx context.Context, projectID string, taskID string, taskTimeTracking domain.TaskTimeTracking) error {
+func (service *taskTimeTrackingService) Add(ctx context.Context, projectID string, taskID string, taskTimeTracking domain.TaskTimeTracking) (domain.TaskTimeTracking, error) {
 	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
-		return err
+		return domain.TaskTimeTracking{}, err
 	} else {
 		taskTimeTracking.ID = utils.UUID()
 		taskTimeTracking.CreatedBy.ID = contextUser.ID
 		taskTimeTracking.CreatedBy.Name = contextUser.Name
 		taskTimeTracking.CreatedAt = time.Now()
-		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.taskTimeTrackingRepository.Add(ctx, tx, taskID, taskTimeTracking); err != nil {
 				return err
 			}
@@ -59,15 +59,18 @@ func (service *taskTimeTrackingService) Add(ctx context.Context, projectID strin
 				return err
 			}
 			return nil
-		})
+		}); err != nil {
+			return domain.TaskTimeTracking{}, err
+		}
+		return taskTimeTracking, nil
 	}
 }
 
-func (service *taskTimeTrackingService) Update(ctx context.Context, projectID string, taskID string, taskTimeTracking domain.TaskTimeTracking) error {
+func (service *taskTimeTrackingService) Update(ctx context.Context, projectID string, taskID string, taskTimeTracking domain.TaskTimeTracking) (domain.TaskTimeTracking, error) {
 	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
-		return err
+		return domain.TaskTimeTracking{}, err
 	} else {
-		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.taskTimeTrackingRepository.Update(ctx, tx, taskTimeTracking); err != nil {
 				return err
 			}
@@ -86,7 +89,10 @@ func (service *taskTimeTrackingService) Update(ctx context.Context, projectID st
 				return err
 			}
 			return nil
-		})
+		}); err != nil {
+			return domain.TaskTimeTracking{}, err
+		}
+		return taskTimeTracking, nil
 	}
 }
 

@@ -28,15 +28,12 @@ func (handler *TaskTimeTrackingHandler) Add(w http.ResponseWriter, r *http.Reque
 	taskTimeTracking := addRequestToDomain(request)
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")
-
-	// TODO: return taskTimeTracking with new id & createdAt
-	err := handler.service.Add(r.Context(), projectID, taskID, taskTimeTracking)
-	if err != nil {
+	if taskTimeTracking, err := handler.service.Add(r.Context(), projectID, taskID, taskTimeTracking); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskTimeTrackingHandler] failed to add task time tracking: %w", err))
 		return
+	} else {
+		handlers.ToHandlerJSONResponse(w, domainToResponse(taskTimeTracking), nil, http.StatusCreated)
 	}
-
-	handlers.ToHandlerJSONResponse(w, domainToResponse(taskTimeTracking), nil, http.StatusCreated)
 }
 
 func (handler *TaskTimeTrackingHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -51,12 +48,12 @@ func (handler *TaskTimeTrackingHandler) Update(w http.ResponseWriter, r *http.Re
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")
 
-	err := handler.service.Update(r.Context(), projectID, taskID, taskTimeTracking)
-	if err != nil {
+	if taskTimeTracking, err := handler.service.Update(r.Context(), projectID, taskID, taskTimeTracking); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskTimeTrackingHandler] failed to update task time tracking: %w", err))
 		return
+	} else {
+		handlers.ToHandlerJSONResponse(w, domainToResponse(taskTimeTracking), nil)
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(taskTimeTracking), nil)
 }
 
 func (handler *TaskTimeTrackingHandler) Delete(w http.ResponseWriter, r *http.Request) {
