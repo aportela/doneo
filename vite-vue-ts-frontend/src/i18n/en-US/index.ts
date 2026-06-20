@@ -543,7 +543,13 @@ export default {
             projectNoteUpdated: "Note has been updated",
             projectNoteDeleted: "Note has been deleted",
           },
+          errors: {
+            refreshError:
+              "There was a problem while refreshing the project note list",
+            deleteError: "There was a problem while deleting the project note",
+          },
         },
+        // TODO: task notes tab
       },
     },
     projectPriority: {

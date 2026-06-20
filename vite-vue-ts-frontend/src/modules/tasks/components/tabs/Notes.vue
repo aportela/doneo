@@ -62,12 +62,12 @@
                                 appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectNotes.onRefresh" } });
                                 break;
                             default:
-                                state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
+                                state.ajaxErrorMessage = t("modules.note.components.ProjectNotesTab.errors.refreshError");
                                 break;
                         }
                     },
                     (fatalError) => {
-                        state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
+                        state.ajaxErrorMessage = t("modules.note.components.ProjectNotesTab.errors.refreshError");
                         console.error("Unhandled API error", { file: "ProjectNotes.vue", method: "onRefresh" }, { err: fatalError });
                     });
             } finally {
@@ -137,7 +137,9 @@
                     notify('success', t("modules.note.components.ProjectNotesTab.notifications.projectNoteUpdated"));
                     // TODO: this will remove pending notes, do not allow add more than 1 one without saving
                 }
-            } catch { }
+            } catch {
+                // TODO:
+            }
         } else {
             console.error("project id not set", { file: "ProjectNotes.vue", method: "onSaveNote" });
         }
@@ -150,7 +152,9 @@
                 items.value = items.value.filter((note) => note.id != id)
                 itemCount.value = items.value?.length ?? 0;
                 notify('success', t("modules.note.components.ProjectNotesTab.notifications.projectNoteDeleted"));
-            } catch { }
+            } catch {
+                // TODO:
+            }
         } else {
             console.error("project id not set", { file: "ProjectNotes.vue", method: "onDeleteNote" });
         }
