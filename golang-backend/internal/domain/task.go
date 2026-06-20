@@ -19,11 +19,11 @@ type Task struct {
 	Priority               TaskPriority
 	Status                 TaskStatus
 	Tags                   []string
-	PermissionsCount       uint
-	AttachmentsCount       uint
-	NotesCount             uint
-	HistoryOperationsCount uint
-	TimeTrackingsCount     uint
+	PermissionsCount       uint16
+	AttachmentsCount       uint16
+	NotesCount             uint16
+	HistoryOperationsCount uint16
+	TimeTrackingsCount     uint16
 }
 
 type SearchTaskFilter struct {

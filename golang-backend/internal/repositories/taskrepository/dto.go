@@ -27,10 +27,10 @@ type taskDTO struct {
 	PriorityID             string         `db:"priority_id"`
 	PriorityName           string         `db:"priority_name"`
 	PriorityHexColor       string         `db:"priority_hex_color"`
-	AttachmentsCount       uint           `db:"attachments_count"`
-	NotesCount             uint           `db:"notes_count"`
-	HistoryOperationsCount uint           `db:"history_operations_count"`
-	TimeTrackingsCount     uint           `db:"time_trackings_count"`
+	AttachmentsCount       uint16         `db:"attachments_count"`
+	NotesCount             uint16         `db:"notes_count"`
+	HistoryOperationsCount uint16         `db:"history_operations_count"`
+	TimeTrackingsCount     uint16         `db:"time_trackings_count"`
 }
 
 type searchFilterDTO struct {

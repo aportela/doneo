@@ -66,12 +66,12 @@ type taskResponse struct {
 	Priority               taskpriorityhandler.TaskPriorityResponse `json:"priority"`
 	Status                 taskstatushandler.TaskStatusResponse     `json:"status"`
 	Tags                   []string                                 `json:"tags"`
-	TasksCount             uint                                     `json:"tasksCount"`
-	PermissionsCount       uint                                     `json:"permissionsCount"`
-	AttachmentsCount       uint                                     `json:"attachmentsCount"`
-	NotesCount             uint                                     `json:"notesCount"`
-	HistoryOperationsCount uint                                     `json:"historyOperationsCount"`
-	TimeTrackingsCount     uint                                     `json:"timeTrackingsCount"`
+	TasksCount             uint16                                   `json:"tasksCount"`
+	PermissionsCount       uint16                                   `json:"permissionsCount"`
+	AttachmentsCount       uint16                                   `json:"attachmentsCount"`
+	NotesCount             uint16                                   `json:"notesCount"`
+	HistoryOperationsCount uint16                                   `json:"historyOperationsCount"`
+	TimeTrackingsCount     uint16                                   `json:"timeTrackingsCount"`
 }
 
 type searchTasksResponse struct {
