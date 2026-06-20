@@ -12,16 +12,28 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type AttachmentHandler struct {
+type AttachmentHandler interface {
+	AddProjectAttachment(w http.ResponseWriter, r *http.Request)
+	DeleteProjectAttachment(w http.ResponseWriter, r *http.Request)
+	DownloadProjectAttachment(w http.ResponseWriter, r *http.Request)
+	GetProjectAttachments(w http.ResponseWriter, r *http.Request)
+
+	AddTaskAttachment(w http.ResponseWriter, r *http.Request)
+	DeleteTaskAttachment(w http.ResponseWriter, r *http.Request)
+	DownloadTaskAttachment(w http.ResponseWriter, r *http.Request)
+	GetTaskAttachments(w http.ResponseWriter, r *http.Request)
+}
+
+type attachmentHandler struct {
 	service           attachmentservice.AttachmentService
 	maxUploadFilesize int64
 }
 
-func NewHandler(service attachmentservice.AttachmentService, maxUploadFilesize int64) *AttachmentHandler {
-	return &AttachmentHandler{service: service, maxUploadFilesize: maxUploadFilesize}
+func NewHandler(service attachmentservice.AttachmentService, maxUploadFilesize int64) AttachmentHandler {
+	return &attachmentHandler{service: service, maxUploadFilesize: maxUploadFilesize}
 }
 
-func (handler *AttachmentHandler) AddProjectAttachment(w http.ResponseWriter, r *http.Request) {
+func (handler *attachmentHandler) AddProjectAttachment(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseMultipartForm(handler.maxUploadFilesize); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -54,7 +66,7 @@ func (handler *AttachmentHandler) AddProjectAttachment(w http.ResponseWriter, r 
 	}
 }
 
-func (handler *AttachmentHandler) DeleteProjectAttachment(w http.ResponseWriter, r *http.Request) {
+func (handler *attachmentHandler) DeleteProjectAttachment(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	attachmentID := chi.URLParam(r, "attachment_id")
@@ -74,7 +86,7 @@ func (handler *AttachmentHandler) DeleteProjectAttachment(w http.ResponseWriter,
 	}
 }
 
-func (handler *AttachmentHandler) DownloadProjectAttachment(w http.ResponseWriter, r *http.Request) {
+func (handler *attachmentHandler) DownloadProjectAttachment(w http.ResponseWriter, r *http.Request) {
 	projectID := chi.URLParam(r, "project_id")
 	attachmentID := chi.URLParam(r, "attachment_id")
 	if attachment, err := handler.service.GetProjectAttachment(r.Context(), projectID, attachmentID); err != nil {
@@ -101,14 +113,14 @@ func (handler *AttachmentHandler) DownloadProjectAttachment(w http.ResponseWrite
 	}
 }
 
-func (handler *AttachmentHandler) GetProjectAttachments(w http.ResponseWriter, r *http.Request) {
+func (handler *attachmentHandler) GetProjectAttachments(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	projectAttachments, err := handler.service.GetProjectAttachments(r.Context(), projectID)
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectAttachments), err)
 }
 
-func (handler *AttachmentHandler) AddTaskAttachment(w http.ResponseWriter, r *http.Request) {
+func (handler *attachmentHandler) AddTaskAttachment(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseMultipartForm(handler.maxUploadFilesize); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -143,7 +155,7 @@ func (handler *AttachmentHandler) AddTaskAttachment(w http.ResponseWriter, r *ht
 	}
 }
 
-func (handler *AttachmentHandler) DeleteTaskAttachment(w http.ResponseWriter, r *http.Request) {
+func (handler *attachmentHandler) DeleteTaskAttachment(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")
@@ -164,7 +176,7 @@ func (handler *AttachmentHandler) DeleteTaskAttachment(w http.ResponseWriter, r 
 	}
 }
 
-func (handler *AttachmentHandler) DownloadTaskAttachment(w http.ResponseWriter, r *http.Request) {
+func (handler *attachmentHandler) DownloadTaskAttachment(w http.ResponseWriter, r *http.Request) {
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")
 	attachmentID := chi.URLParam(r, "attachment_id")
@@ -192,7 +204,7 @@ func (handler *AttachmentHandler) DownloadTaskAttachment(w http.ResponseWriter, 
 	}
 }
 
-func (handler *AttachmentHandler) GetTaskAttachments(w http.ResponseWriter, r *http.Request) {
+func (handler *attachmentHandler) GetTaskAttachments(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")

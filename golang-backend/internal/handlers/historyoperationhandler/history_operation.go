@@ -9,23 +9,28 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type HistoryOperationHandler struct {
+type HistoryOperationHandler interface {
+	SearchProjectHistoryOperations(w http.ResponseWriter, r *http.Request)
+	SearchTaskHistoryOperations(w http.ResponseWriter, r *http.Request)
+}
+
+type historyOperationHandler struct {
 	db      database.Database
 	service historyoperationservice.HistoryOperationService
 }
 
-func NewHandler(db database.Database, service historyoperationservice.HistoryOperationService) *HistoryOperationHandler {
-	return &HistoryOperationHandler{db: db, service: service}
+func NewHandler(db database.Database, service historyoperationservice.HistoryOperationService) HistoryOperationHandler {
+	return &historyOperationHandler{db: db, service: service}
 }
 
-func (handler *HistoryOperationHandler) SearchProjectHistoryOperations(w http.ResponseWriter, r *http.Request) {
+func (handler *historyOperationHandler) SearchProjectHistoryOperations(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	historyOperations, err := handler.service.GetProjectHistoryOperations(r.Context(), handler.db, projectID)
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(historyOperations), err)
 }
 
-func (handler *HistoryOperationHandler) SearchTaskHistoryOperations(w http.ResponseWriter, r *http.Request) {
+func (handler *historyOperationHandler) SearchTaskHistoryOperations(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")

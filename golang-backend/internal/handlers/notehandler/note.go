@@ -10,15 +10,26 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type NoteHandler struct {
+type NoteHandler interface {
+	AddProjectNote(w http.ResponseWriter, r *http.Request)
+	UpdateProjectNote(w http.ResponseWriter, r *http.Request)
+	DeleteProjectNote(w http.ResponseWriter, r *http.Request)
+	GetProjectNotes(w http.ResponseWriter, r *http.Request)
+	AddTaskNote(w http.ResponseWriter, r *http.Request)
+	UpdateTaskNote(w http.ResponseWriter, r *http.Request)
+	DeleteTaskNote(w http.ResponseWriter, r *http.Request)
+	GetTaskNotes(w http.ResponseWriter, r *http.Request)
+}
+
+type noteHandler struct {
 	service noteservice.NoteService
 }
 
-func NewHandler(service noteservice.NoteService) *NoteHandler {
-	return &NoteHandler{service: service}
+func NewHandler(service noteservice.NoteService) NoteHandler {
+	return &noteHandler{service: service}
 }
 
-func (handler *NoteHandler) AddProjectNote(w http.ResponseWriter, r *http.Request) {
+func (handler *noteHandler) AddProjectNote(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request addRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -37,7 +48,7 @@ func (handler *NoteHandler) AddProjectNote(w http.ResponseWriter, r *http.Reques
 	handlers.ToHandlerJSONResponse(w, domainToResponse(note), nil, http.StatusCreated)
 }
 
-func (handler *NoteHandler) UpdateProjectNote(w http.ResponseWriter, r *http.Request) {
+func (handler *noteHandler) UpdateProjectNote(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request updateRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -56,7 +67,7 @@ func (handler *NoteHandler) UpdateProjectNote(w http.ResponseWriter, r *http.Req
 	handlers.ToHandlerJSONResponse(w, domainToResponse(note), nil)
 }
 
-func (handler *NoteHandler) DeleteProjectNote(w http.ResponseWriter, r *http.Request) {
+func (handler *noteHandler) DeleteProjectNote(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	noteID := chi.URLParam(r, "note_id")
@@ -68,14 +79,14 @@ func (handler *NoteHandler) DeleteProjectNote(w http.ResponseWriter, r *http.Req
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
 
-func (handler *NoteHandler) GetProjectNotes(w http.ResponseWriter, r *http.Request) {
+func (handler *noteHandler) GetProjectNotes(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	notes, err := handler.service.GetProjectNotes(r.Context(), projectID)
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(notes), err)
 }
 
-func (handler *NoteHandler) AddTaskNote(w http.ResponseWriter, r *http.Request) {
+func (handler *noteHandler) AddTaskNote(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request addRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -94,7 +105,7 @@ func (handler *NoteHandler) AddTaskNote(w http.ResponseWriter, r *http.Request) 
 	handlers.ToHandlerJSONResponse(w, domainToResponse(note), nil, http.StatusCreated)
 }
 
-func (handler *NoteHandler) UpdateTaskNote(w http.ResponseWriter, r *http.Request) {
+func (handler *noteHandler) UpdateTaskNote(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request updateRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -114,7 +125,7 @@ func (handler *NoteHandler) UpdateTaskNote(w http.ResponseWriter, r *http.Reques
 	handlers.ToHandlerJSONResponse(w, domainToResponse(note), nil)
 }
 
-func (handler *NoteHandler) DeleteTaskNote(w http.ResponseWriter, r *http.Request) {
+func (handler *noteHandler) DeleteTaskNote(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")
@@ -127,7 +138,7 @@ func (handler *NoteHandler) DeleteTaskNote(w http.ResponseWriter, r *http.Reques
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
 
-func (handler *NoteHandler) GetTaskNotes(w http.ResponseWriter, r *http.Request) {
+func (handler *noteHandler) GetTaskNotes(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")

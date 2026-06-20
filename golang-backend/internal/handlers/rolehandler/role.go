@@ -12,15 +12,24 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type RoleHandler struct {
+type RoleHandler interface {
+	Add(w http.ResponseWriter, r *http.Request)
+	Update(w http.ResponseWriter, r *http.Request)
+	Delete(w http.ResponseWriter, r *http.Request)
+	Get(w http.ResponseWriter, r *http.Request)
+	SearchBase(w http.ResponseWriter, r *http.Request)
+	Search(w http.ResponseWriter, r *http.Request)
+}
+
+type roleHandler struct {
 	service roleservice.RoleService
 }
 
-func NewHandler(service roleservice.RoleService) *RoleHandler {
-	return &RoleHandler{service: service}
+func NewHandler(service roleservice.RoleService) RoleHandler {
+	return &roleHandler{service: service}
 }
 
-func (handler *RoleHandler) Add(w http.ResponseWriter, r *http.Request) {
+func (handler *roleHandler) Add(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request addRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -36,7 +45,7 @@ func (handler *RoleHandler) Add(w http.ResponseWriter, r *http.Request) {
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(role), nil, http.StatusCreated)
 }
 
-func (handler *RoleHandler) Update(w http.ResponseWriter, r *http.Request) {
+func (handler *roleHandler) Update(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request updateRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -53,7 +62,7 @@ func (handler *RoleHandler) Update(w http.ResponseWriter, r *http.Request) {
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(role), nil)
 }
 
-func (handler *RoleHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (handler *roleHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	roleID := chi.URLParam(r, "id")
 	err := handler.service.Delete(r.Context(), roleID)
@@ -64,7 +73,7 @@ func (handler *RoleHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
 
-func (handler *RoleHandler) Get(w http.ResponseWriter, r *http.Request) {
+func (handler *roleHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	roleID := chi.URLParam(r, "id")
 	user, err := handler.service.Get(r.Context(), roleID)
@@ -80,7 +89,7 @@ func (handler *RoleHandler) Get(w http.ResponseWriter, r *http.Request) {
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(user), nil)
 }
 
-func (handler *RoleHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
+func (handler *roleHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	roles, _, err := handler.service.Search(r.Context(),
@@ -97,7 +106,7 @@ func (handler *RoleHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
 	handlers.ToHandlerJSONResponse(w, toSearchBaseResponse(roles), err)
 }
 
-func (handler *RoleHandler) Search(w http.ResponseWriter, r *http.Request) {
+func (handler *roleHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request searchRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {

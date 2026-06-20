@@ -12,15 +12,24 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type ProjectPriorityHandler struct {
+type ProjectPriorityHandler interface {
+	Add(w http.ResponseWriter, r *http.Request)
+	Update(w http.ResponseWriter, r *http.Request)
+	Delete(w http.ResponseWriter, r *http.Request)
+	Get(w http.ResponseWriter, r *http.Request)
+	SearchBase(w http.ResponseWriter, r *http.Request)
+	Search(w http.ResponseWriter, r *http.Request)
+}
+
+type projectPriorityHandler struct {
 	service projectpriorityservice.ProjectPriorityService
 }
 
-func NewHandler(service projectpriorityservice.ProjectPriorityService) *ProjectPriorityHandler {
-	return &ProjectPriorityHandler{service: service}
+func NewHandler(service projectpriorityservice.ProjectPriorityService) ProjectPriorityHandler {
+	return &projectPriorityHandler{service: service}
 }
 
-func (handler *ProjectPriorityHandler) Add(w http.ResponseWriter, r *http.Request) {
+func (handler *projectPriorityHandler) Add(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request addRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -36,7 +45,7 @@ func (handler *ProjectPriorityHandler) Add(w http.ResponseWriter, r *http.Reques
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectPriority), nil, http.StatusCreated)
 }
 
-func (handler *ProjectPriorityHandler) Update(w http.ResponseWriter, r *http.Request) {
+func (handler *projectPriorityHandler) Update(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request updateRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -53,7 +62,7 @@ func (handler *ProjectPriorityHandler) Update(w http.ResponseWriter, r *http.Req
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectPriority), nil)
 }
 
-func (handler *ProjectPriorityHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (handler *projectPriorityHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectPriorityID := chi.URLParam(r, "id")
 	err := handler.service.Delete(r.Context(), projectPriorityID)
@@ -64,7 +73,7 @@ func (handler *ProjectPriorityHandler) Delete(w http.ResponseWriter, r *http.Req
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
 
-func (handler *ProjectPriorityHandler) Get(w http.ResponseWriter, r *http.Request) {
+func (handler *projectPriorityHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectPriorityID := chi.URLParam(r, "id")
 	projectPriority, err := handler.service.Get(r.Context(), projectPriorityID)
@@ -80,13 +89,13 @@ func (handler *ProjectPriorityHandler) Get(w http.ResponseWriter, r *http.Reques
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectPriority), nil)
 }
 
-func (handler *ProjectPriorityHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
+func (handler *projectPriorityHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectPriorities, pagerResult, err := handler.service.SearchBase(r.Context())
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectPriorities, pagerResult), err)
 }
 
-func (handler *ProjectPriorityHandler) Search(w http.ResponseWriter, r *http.Request) {
+func (handler *projectPriorityHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request searchRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {

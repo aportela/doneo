@@ -12,15 +12,26 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type UserHandler struct {
+type UserHandler interface {
+	Add(w http.ResponseWriter, r *http.Request)
+	Update(w http.ResponseWriter, r *http.Request)
+	Patch(w http.ResponseWriter, r *http.Request)
+	Delete(w http.ResponseWriter, r *http.Request)
+	Purge(w http.ResponseWriter, r *http.Request)
+	Get(w http.ResponseWriter, r *http.Request)
+	SearchBase(w http.ResponseWriter, r *http.Request)
+	Search(w http.ResponseWriter, r *http.Request)
+}
+
+type userHandler struct {
 	service userservice.UserService
 }
 
-func NewHandler(service userservice.UserService) *UserHandler {
-	return &UserHandler{service: service}
+func NewHandler(service userservice.UserService) UserHandler {
+	return &userHandler{service: service}
 }
 
-func (handler *UserHandler) Add(w http.ResponseWriter, r *http.Request) {
+func (handler *userHandler) Add(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request addRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -36,7 +47,7 @@ func (handler *UserHandler) Add(w http.ResponseWriter, r *http.Request) {
 	handlers.ToHandlerJSONResponse(w, domainToResponse(user), nil, http.StatusCreated)
 }
 
-func (handler *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
+func (handler *userHandler) Update(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request updateRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -53,7 +64,7 @@ func (handler *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 	handlers.ToHandlerJSONResponse(w, domainToResponse(user), nil)
 }
 
-func (handler *UserHandler) Patch(w http.ResponseWriter, r *http.Request) {
+func (handler *userHandler) Patch(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request patchRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -84,7 +95,7 @@ func (handler *UserHandler) Patch(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (handler *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (handler *userHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	userID := chi.URLParam(r, "id")
 	// TODO: deny delete current session user ?
@@ -96,7 +107,7 @@ func (handler *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
 
-func (handler *UserHandler) Purge(w http.ResponseWriter, r *http.Request) {
+func (handler *userHandler) Purge(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	userID := chi.URLParam(r, "id")
 	err := handler.service.Purge(r.Context(), userID)
@@ -107,7 +118,7 @@ func (handler *UserHandler) Purge(w http.ResponseWriter, r *http.Request) {
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
 
-func (handler *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
+func (handler *userHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	userID := chi.URLParam(r, "id")
 	user, err := handler.service.Get(r.Context(), userID)
@@ -123,7 +134,7 @@ func (handler *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
 	handlers.ToHandlerJSONResponse(w, domainToResponse(user), nil)
 }
 
-func (handler *UserHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
+func (handler *userHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	users, _, err := handler.service.Search(r.Context(),
 		browser.Params{
@@ -139,7 +150,7 @@ func (handler *UserHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
 	handlers.ToHandlerJSONResponse(w, toSearchBaseResponse(users), err)
 }
 
-func (handler *UserHandler) Search(w http.ResponseWriter, r *http.Request) {
+func (handler *userHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request searchRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {

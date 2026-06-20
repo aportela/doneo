@@ -10,15 +10,21 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type ProjectPermissionHandler struct {
+type ProjectPermissionHandler interface {
+	Add(w http.ResponseWriter, r *http.Request)
+	Delete(w http.ResponseWriter, r *http.Request)
+	GetProjectPermissions(w http.ResponseWriter, r *http.Request)
+}
+
+type projectPermissionHandler struct {
 	service projectpermissionservice.ProjectPermissionService
 }
 
-func NewHandler(service projectpermissionservice.ProjectPermissionService) *ProjectPermissionHandler {
-	return &ProjectPermissionHandler{service: service}
+func NewHandler(service projectpermissionservice.ProjectPermissionService) ProjectPermissionHandler {
+	return &projectPermissionHandler{service: service}
 }
 
-func (handler *ProjectPermissionHandler) Add(w http.ResponseWriter, r *http.Request) {
+func (handler *projectPermissionHandler) Add(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request addRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -37,7 +43,7 @@ func (handler *ProjectPermissionHandler) Add(w http.ResponseWriter, r *http.Requ
 	handlers.ToHandlerJSONResponse(w, domainToResponse(projectPermission), nil, http.StatusCreated)
 }
 
-func (handler *ProjectPermissionHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (handler *projectPermissionHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	projectPermissionID := chi.URLParam(r, "permission_id")
@@ -49,7 +55,7 @@ func (handler *ProjectPermissionHandler) Delete(w http.ResponseWriter, r *http.R
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
 
-func (handler *ProjectPermissionHandler) GetProjectPermissions(w http.ResponseWriter, r *http.Request) {
+func (handler *projectPermissionHandler) GetProjectPermissions(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	projectPermissions, err := handler.service.GetProjectPermissions(r.Context(), projectID)

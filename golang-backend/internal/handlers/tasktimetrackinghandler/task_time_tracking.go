@@ -10,15 +10,22 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type TaskTimeTrackingHandler struct {
+type TaskTimeTrackingHandler interface {
+	Add(w http.ResponseWriter, r *http.Request)
+	Update(w http.ResponseWriter, r *http.Request)
+	Delete(w http.ResponseWriter, r *http.Request)
+	Search(w http.ResponseWriter, r *http.Request)
+}
+
+type taskTimeTrackingHandler struct {
 	service tasktimetrackingservice.TaskTimeTrackingService
 }
 
-func NewHandler(service tasktimetrackingservice.TaskTimeTrackingService) *TaskTimeTrackingHandler {
-	return &TaskTimeTrackingHandler{service: service}
+func NewHandler(service tasktimetrackingservice.TaskTimeTrackingService) TaskTimeTrackingHandler {
+	return &taskTimeTrackingHandler{service: service}
 }
 
-func (handler *TaskTimeTrackingHandler) Add(w http.ResponseWriter, r *http.Request) {
+func (handler *taskTimeTrackingHandler) Add(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request addRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -36,7 +43,7 @@ func (handler *TaskTimeTrackingHandler) Add(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-func (handler *TaskTimeTrackingHandler) Update(w http.ResponseWriter, r *http.Request) {
+func (handler *taskTimeTrackingHandler) Update(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request updateRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -56,7 +63,7 @@ func (handler *TaskTimeTrackingHandler) Update(w http.ResponseWriter, r *http.Re
 	}
 }
 
-func (handler *TaskTimeTrackingHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (handler *taskTimeTrackingHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")
@@ -69,7 +76,7 @@ func (handler *TaskTimeTrackingHandler) Delete(w http.ResponseWriter, r *http.Re
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
 
-func (handler *TaskTimeTrackingHandler) Search(w http.ResponseWriter, r *http.Request) {
+func (handler *taskTimeTrackingHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")

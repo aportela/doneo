@@ -12,15 +12,24 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type ProjectTypeHandler struct {
+type ProjectTypeHandler interface {
+	Add(w http.ResponseWriter, r *http.Request)
+	Update(w http.ResponseWriter, r *http.Request)
+	Delete(w http.ResponseWriter, r *http.Request)
+	Get(w http.ResponseWriter, r *http.Request)
+	SearchBase(w http.ResponseWriter, r *http.Request)
+	Search(w http.ResponseWriter, r *http.Request)
+}
+
+type projectTypeHandler struct {
 	service projecttypeservice.ProjectTypeService
 }
 
-func NewHandler(service projecttypeservice.ProjectTypeService) *ProjectTypeHandler {
-	return &ProjectTypeHandler{service: service}
+func NewHandler(service projecttypeservice.ProjectTypeService) ProjectTypeHandler {
+	return &projectTypeHandler{service: service}
 }
 
-func (handler *ProjectTypeHandler) Add(w http.ResponseWriter, r *http.Request) {
+func (handler *projectTypeHandler) Add(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request addRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -36,7 +45,7 @@ func (handler *ProjectTypeHandler) Add(w http.ResponseWriter, r *http.Request) {
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectType), nil, http.StatusCreated)
 }
 
-func (handler *ProjectTypeHandler) Update(w http.ResponseWriter, r *http.Request) {
+func (handler *projectTypeHandler) Update(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request updateRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -53,7 +62,7 @@ func (handler *ProjectTypeHandler) Update(w http.ResponseWriter, r *http.Request
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectType), nil)
 }
 
-func (handler *ProjectTypeHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (handler *projectTypeHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectTypeID := chi.URLParam(r, "id")
 	err := handler.service.Delete(r.Context(), projectTypeID)
@@ -64,7 +73,7 @@ func (handler *ProjectTypeHandler) Delete(w http.ResponseWriter, r *http.Request
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
 
-func (handler *ProjectTypeHandler) Get(w http.ResponseWriter, r *http.Request) {
+func (handler *projectTypeHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectTypeID := chi.URLParam(r, "id")
 	projectType, err := handler.service.Get(r.Context(), projectTypeID)
@@ -80,13 +89,13 @@ func (handler *ProjectTypeHandler) Get(w http.ResponseWriter, r *http.Request) {
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectType), nil)
 }
 
-func (handler *ProjectTypeHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
+func (handler *projectTypeHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectTypes, pagerResult, err := handler.service.SearchBase(r.Context())
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(projectTypes, pagerResult), err)
 }
 
-func (handler *ProjectTypeHandler) Search(w http.ResponseWriter, r *http.Request) {
+func (handler *projectTypeHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request searchRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {

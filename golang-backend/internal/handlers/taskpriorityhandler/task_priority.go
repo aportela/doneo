@@ -12,15 +12,24 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type TaskPriorityHandler struct {
+type TaskPriorityHandler interface {
+	Add(w http.ResponseWriter, r *http.Request)
+	Update(w http.ResponseWriter, r *http.Request)
+	Delete(w http.ResponseWriter, r *http.Request)
+	Get(w http.ResponseWriter, r *http.Request)
+	SearchBase(w http.ResponseWriter, r *http.Request)
+	Search(w http.ResponseWriter, r *http.Request)
+}
+
+type taskPriorityHandler struct {
 	service taskpriorityservice.TaskPriorityService
 }
 
-func NewHandler(service taskpriorityservice.TaskPriorityService) *TaskPriorityHandler {
-	return &TaskPriorityHandler{service: service}
+func NewHandler(service taskpriorityservice.TaskPriorityService) TaskPriorityHandler {
+	return &taskPriorityHandler{service: service}
 }
 
-func (handler *TaskPriorityHandler) Add(w http.ResponseWriter, r *http.Request) {
+func (handler *taskPriorityHandler) Add(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request addRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -36,7 +45,7 @@ func (handler *TaskPriorityHandler) Add(w http.ResponseWriter, r *http.Request) 
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(taskPriority), nil, http.StatusCreated)
 }
 
-func (handler *TaskPriorityHandler) Update(w http.ResponseWriter, r *http.Request) {
+func (handler *taskPriorityHandler) Update(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request updateRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -53,7 +62,7 @@ func (handler *TaskPriorityHandler) Update(w http.ResponseWriter, r *http.Reques
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(taskPriority), nil)
 }
 
-func (handler *TaskPriorityHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (handler *taskPriorityHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	taskPriorityID := chi.URLParam(r, "id")
 	err := handler.service.Delete(r.Context(), taskPriorityID)
@@ -64,7 +73,7 @@ func (handler *TaskPriorityHandler) Delete(w http.ResponseWriter, r *http.Reques
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
 
-func (handler *TaskPriorityHandler) Get(w http.ResponseWriter, r *http.Request) {
+func (handler *taskPriorityHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	taskPriorityID := chi.URLParam(r, "id")
 	taskPriority, err := handler.service.Get(r.Context(), taskPriorityID)
@@ -80,13 +89,13 @@ func (handler *TaskPriorityHandler) Get(w http.ResponseWriter, r *http.Request) 
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(taskPriority), nil)
 }
 
-func (handler *TaskPriorityHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
+func (handler *taskPriorityHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	taskPriorities, pagerResult, err := handler.service.SearchBase(r.Context())
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(taskPriorities, pagerResult), err)
 }
 
-func (handler *TaskPriorityHandler) Search(w http.ResponseWriter, r *http.Request) {
+func (handler *taskPriorityHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request searchRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {

@@ -14,20 +14,24 @@ import (
 	"github.com/aportela/doneo/internal/utils"
 )
 
-type IdentityHandler struct {
+type IdentityHandler interface {
+	SignIn(w http.ResponseWriter, r *http.Request)
+	SignOut(w http.ResponseWriter, r *http.Request)
+	RenewAccessToken(w http.ResponseWriter, r *http.Request)
+}
+
+type identityHandler struct {
 	identityService            identityservice.IdentityService
 	secretKey                  string
 	accessTokenExpirationHours int
 	refreshTokenExpirationDays int
 }
 
-// TODO: add func definitions
-
-func NewHandler(identityService identityservice.IdentityService, secretKey string, accessTokenExpirationHours int, refreshTokenExpirationDays int) *IdentityHandler {
-	return &IdentityHandler{identityService: identityService, secretKey: secretKey, accessTokenExpirationHours: accessTokenExpirationHours, refreshTokenExpirationDays: refreshTokenExpirationDays}
+func NewHandler(identityService identityservice.IdentityService, secretKey string, accessTokenExpirationHours int, refreshTokenExpirationDays int) IdentityHandler {
+	return &identityHandler{identityService: identityService, secretKey: secretKey, accessTokenExpirationHours: accessTokenExpirationHours, refreshTokenExpirationDays: refreshTokenExpirationDays}
 }
 
-func (handler *IdentityHandler) SignIn(w http.ResponseWriter, r *http.Request) {
+func (handler *identityHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	var request signInRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[IdentityHandler] invalid request payload: %w", err))
@@ -85,7 +89,7 @@ func (handler *IdentityHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	)
 }
 
-func (handler *IdentityHandler) SignOut(w http.ResponseWriter, r *http.Request) {
+func (handler *identityHandler) SignOut(w http.ResponseWriter, r *http.Request) {
 	refreshTokenCookie := http.Cookie{
 		Name:     "refresh_token",
 		Value:    "",
@@ -109,7 +113,7 @@ func (handler *IdentityHandler) SignOut(w http.ResponseWriter, r *http.Request) 
 	utils.ToJSONResponse(w, http.StatusOK, handlers.ToEmptyResponse())
 }
 
-func (handler *IdentityHandler) RenewAccessToken(w http.ResponseWriter, r *http.Request) {
+func (handler *identityHandler) RenewAccessToken(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("refresh_token")
 	// TODO: refresh token in request ?
 	if err != nil {

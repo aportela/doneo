@@ -12,15 +12,24 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type TaskStatusHandler struct {
+type TaskStatusHandler interface {
+	Add(w http.ResponseWriter, r *http.Request)
+	Update(w http.ResponseWriter, r *http.Request)
+	Delete(w http.ResponseWriter, r *http.Request)
+	Get(w http.ResponseWriter, r *http.Request)
+	SearchBase(w http.ResponseWriter, r *http.Request)
+	Search(w http.ResponseWriter, r *http.Request)
+}
+
+type taskStatusHandler struct {
 	service taskstatusservice.TaskStatusService
 }
 
-func NewHandler(service taskstatusservice.TaskStatusService) *TaskStatusHandler {
-	return &TaskStatusHandler{service: service}
+func NewHandler(service taskstatusservice.TaskStatusService) TaskStatusHandler {
+	return &taskStatusHandler{service: service}
 }
 
-func (handler *TaskStatusHandler) Add(w http.ResponseWriter, r *http.Request) {
+func (handler *taskStatusHandler) Add(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request addRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -36,7 +45,7 @@ func (handler *TaskStatusHandler) Add(w http.ResponseWriter, r *http.Request) {
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(taskStatus), nil, http.StatusCreated)
 }
 
-func (handler *TaskStatusHandler) Update(w http.ResponseWriter, r *http.Request) {
+func (handler *taskStatusHandler) Update(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request updateRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -53,7 +62,7 @@ func (handler *TaskStatusHandler) Update(w http.ResponseWriter, r *http.Request)
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(taskStatus), nil)
 }
 
-func (handler *TaskStatusHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (handler *taskStatusHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	taskStatusID := chi.URLParam(r, "id")
 	err := handler.service.Delete(r.Context(), taskStatusID)
@@ -64,7 +73,7 @@ func (handler *TaskStatusHandler) Delete(w http.ResponseWriter, r *http.Request)
 	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
 
-func (handler *TaskStatusHandler) Get(w http.ResponseWriter, r *http.Request) {
+func (handler *taskStatusHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	taskStatusID := chi.URLParam(r, "id")
 	taskStatus, err := handler.service.Get(r.Context(), taskStatusID)
@@ -80,13 +89,13 @@ func (handler *TaskStatusHandler) Get(w http.ResponseWriter, r *http.Request) {
 	handlers.ToHandlerJSONResponse(w, DomainToResponse(taskStatus), nil)
 }
 
-func (handler *TaskStatusHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
+func (handler *taskStatusHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	taskStatuses, pagerResult, err := handler.service.SearchBase(r.Context())
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(taskStatuses, pagerResult), err)
 }
 
-func (handler *TaskStatusHandler) Search(w http.ResponseWriter, r *http.Request) {
+func (handler *taskStatusHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var request searchRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
