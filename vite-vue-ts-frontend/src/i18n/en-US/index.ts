@@ -1168,6 +1168,7 @@ export default {
             loadError: "There was a problem while loading the project data",
             // TODO: deduplicate
             notFoundError: "We couldn’t find the specified project",
+            deletedError: "The specified project has been deleted",
             addError: "There was a problem while adding the project data",
             updateError: "There was a problem while updating the project data",
           },
@@ -1491,6 +1492,7 @@ export default {
             loadError: "There was a problem while loading the task data",
             // TODO: deduplicate
             notFoundError: "We couldn’t find the specified task",
+            deletedError: "The specified task has been deleted",
             addError: "There was a problem while adding the task data",
             updateError: "There was a problem while updating the task data",
           },

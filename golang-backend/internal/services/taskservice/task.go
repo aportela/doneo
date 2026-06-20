@@ -160,6 +160,9 @@ func (service *taskService) Get(ctx context.Context, projectID string, taskID st
 	if task, err := service.taskRepository.Get(ctx, service.db, taskID); err != nil {
 		return domain.Task{}, fmt.Errorf("[TaskService] failed to get task with ID %s: %w", taskID, err)
 	} else {
+		if task.DeletedAt != nil {
+			return domain.Task{}, domain.DeletedError
+		}
 		if taskTags, err := service.tagRepository.GetTaskTags(ctx, service.db, task.ID); err != nil {
 			return domain.Task{}, fmt.Errorf("[TaskService] failed to get task tags with ID %s: %w", taskID, err)
 		} else {

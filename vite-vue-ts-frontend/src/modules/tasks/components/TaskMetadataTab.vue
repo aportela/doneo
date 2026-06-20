@@ -64,6 +64,7 @@
     const onGet = async (projectId: string, taskId: string) => {
         serverErrors.value = {};
         let notFoundError = false;
+        let deletedError = false;
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const response: TaskResponse = await taskService.get(projectId, taskId);
@@ -89,6 +90,10 @@
                             state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.notFoundError");
                             notFoundError = true;
                             break;
+                        case 410:
+                            state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.deletedError");
+                            deletedError = true;
+                            break;
                         default:
                             state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.loadError");
                             break;
@@ -101,7 +106,7 @@
         } finally {
             state.ajaxRunning = false;
             if (state.ajaxErrorMessage) {
-                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage, denyCloseDialog: notFoundError } });
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage, denyCloseDialog: notFoundError || deletedError } });
             }
         }
     };

@@ -138,6 +138,9 @@ func (service *projectService) Get(ctx context.Context, projectID string) (domai
 	if project, err := service.projectRepository.Get(ctx, service.db, projectID); err != nil {
 		return domain.Project{}, fmt.Errorf("[ProjectService] failed to get project with ID %s: %w", projectID, err)
 	} else {
+		if project.DeletedAt != nil {
+			return domain.Project{}, domain.DeletedError
+		}
 		return project, nil
 	}
 }
