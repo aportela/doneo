@@ -4,7 +4,6 @@ import (
 	"time"
 )
 
-// TODO: rename file
 type HistoryOperation struct {
 	ID            string
 	CreatedBy     UserBase
