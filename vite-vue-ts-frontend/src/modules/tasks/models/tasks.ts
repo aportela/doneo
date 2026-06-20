@@ -17,6 +17,7 @@ export class Task {
   startedAt: IDate;
   finishedAt: IDate;
   dueAt: IDate;
+  estimatedTime: number;
   createdBy: UserBase;
   tags: string[];
   permissionsCount: number;
@@ -38,6 +39,7 @@ export class Task {
     this.startedAt = new IDate(data?.startedAt ?? null);
     this.finishedAt = new IDate(data?.finishedAt ?? null);
     this.dueAt = new IDate(data?.dueAt ?? null);
+    this.estimatedTime = data?.estimatedTime ?? 0;
     this.createdBy = new UserBase(data?.createdBy);
     this.tags = data?.tags ?? [];
     this.permissionsCount = data?.permissionsCount ?? 0;
@@ -58,6 +60,7 @@ export class Task {
       status: this.status.toDTO(),
       createdAt: this.createdAt.msTimestamp ?? 0,
       createdBy: this.createdBy.toDTO(),
+      estimatedTime: this.estimatedTime ?? 0,
       tags: this.tags,
       permissionsCount: this.permissionsCount,
       attachmentsCount: this.attachmentsCount,

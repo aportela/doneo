@@ -2,7 +2,7 @@
     import { ref, reactive, computed, onMounted, onBeforeUnmount, type CSSProperties, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NSwitch } from 'naive-ui';
+    import { NSpin, NCard, NInput, NInputNumber, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NSwitch, NGrid, NGridItem } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconPlus } from '@tabler/icons-vue';
 
     import { Task, MAX_SUMMARY_LENGTH } from '../models/tasks';
@@ -28,6 +28,10 @@
     const openTaskAfterCreate = ref<boolean>(true);
 
     const task = ref<Task>(new Task());
+
+    const estimatedDays = ref<number>(0);
+    const estimatedHours = ref<number>(0);
+    const estimatedMinutes = ref<number>(0);
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -205,15 +209,45 @@
                     v-model:value="task.description" clearable>
                 </n-input>
             </n-form-item>
-            <n-form-item :label="t('modules.task.components.NewTaskForm.selectors.taskPriority.label')"
-                path="priority.id">
-                <TaskPrioritySelector required v-model:id="task.priority.id"
-                    :placeholder="t('modules.task.components.NewTaskForm.selectors.taskPriority.placeholder')" />
-            </n-form-item>
-            <n-form-item :label="t('modules.task.components.NewTaskForm.selectors.taskStatus.label')" path="status.id">
-                <TaskStatusSelector required v-model:id="task.status.id" set-default-value-on-start
-                    :placeholder="t('modules.task.components.NewTaskForm.selectors.taskStatus.placeholder')" />
-            </n-form-item>
+            <n-grid :cols="2" x-gap="16">
+                <n-grid-item>
+                    <n-form-item :label="t('modules.task.components.NewTaskForm.selectors.taskPriority.label')"
+                        path="priority.id">
+                        <TaskPrioritySelector required v-model:id="task.priority.id"
+                            :placeholder="t('modules.task.components.NewTaskForm.selectors.taskPriority.placeholder')" />
+                    </n-form-item>
+                </n-grid-item>
+                <n-grid-item>
+                    <n-form-item :label="t('modules.task.components.NewTaskForm.selectors.taskStatus.label')"
+                        path="status.id">
+                        <TaskStatusSelector required v-model:id="task.status.id" set-default-value-on-start
+                            :placeholder="t('modules.task.components.NewTaskForm.selectors.taskStatus.placeholder')" />
+                    </n-form-item>
+                </n-grid-item>
+            </n-grid>
+            <n-flex>
+                <n-form-item :label="t('modules.task.components.NewTaskForm.inputs.estimatedDays.label')"
+                    path="estimatedTime" show-feedback>
+                    <n-input-number :min="0"
+                        :placeholder="t('modules.task.components.NewTaskForm.inputs.estimatedDays.placeholder')"
+                        v-model:value="estimatedDays" clearable>
+                    </n-input-number>
+                </n-form-item>
+                <n-form-item :label="t('modules.task.components.NewTaskForm.inputs.estimatedHours.label')"
+                    path="estimatedTime" show-feedback>
+                    <n-input-number :min="0" :max="59"
+                        :placeholder="t('modules.task.components.NewTaskForm.inputs.estimatedHours.placeholder')"
+                        v-model:value="estimatedHours" clearable>
+                    </n-input-number>
+                </n-form-item>
+                <n-form-item :label="t('modules.task.components.NewTaskForm.inputs.estimatedMinutes.label')"
+                    path="estimatedTime" show-feedback>
+                    <n-input-number :min="0" :max="59"
+                        :placeholder="t('modules.task.components.NewTaskForm.inputs.estimatedMinutes.placeholder')"
+                        v-model:value="estimatedMinutes" clearable>
+                    </n-input-number>
+                </n-form-item>
+            </n-flex>
         </n-form>
         <template #action>
             <n-flex>

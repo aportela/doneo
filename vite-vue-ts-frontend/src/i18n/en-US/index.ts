@@ -1363,6 +1363,18 @@ export default {
               label: "Description",
               placeholder: "Enter task description",
             },
+            estimatedDays: {
+              label: "Estimated days",
+              placeholder: "Enter estimated time (in days)",
+            },
+            estimatedHours: {
+              label: "Estimated hours",
+              placeholder: "Enter estimated time (in hours)",
+            },
+            estimatedMinutes: {
+              label: "Estimated minutes",
+              placeholder: "Enter estimated time (in minutes)",
+            },
           },
           selectors: {
             taskPriority: {
