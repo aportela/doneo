@@ -28,14 +28,14 @@ export class TimeTracking {
   }
 
   geti18nTimeParts() {
-    const hours = Math.floor(this.totalSeconds / 3600);
+    const days = Math.floor(this.totalSeconds / 86400);
+    const hours = Math.floor((this.totalSeconds % 86400) / 3600);
     const minutes = Math.floor((this.totalSeconds % 3600) / 60);
-    const seconds = this.totalSeconds % 60;
 
     return [
+      { key: "shared.labels.time.day", count: days },
       { key: "shared.labels.time.hour", count: hours },
       { key: "shared.labels.time.minute", count: minutes },
-      { key: "shared.labels.time.second", count: seconds },
     ].filter(({ count }) => count > 0);
   }
 }

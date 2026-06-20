@@ -277,6 +277,7 @@ export default {
     },
     labels: {
       time: {
+        day: "day | days",
         hour: "hour | hours",
         minute: "minute | minutes",
         second: "second | seconds",
