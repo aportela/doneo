@@ -37,7 +37,10 @@ func (repository *projectPermissionRepository) Add(ctx context.Context, dbExecut
 		dto.UserID,
 		dto.RoleID,
 	)
-	return err
+	if err != nil {
+		return mapSQLiteError(err)
+	}
+	return nil
 }
 
 func (repository *projectPermissionRepository) Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, permissionID string) error {

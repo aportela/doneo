@@ -897,7 +897,6 @@ export default {
           },
           warnings: {
             userAlreadyExists: "User already exists",
-            roleAlreadyExists: "Role already exists",
           },
         },
         projectPermissionsTable: {

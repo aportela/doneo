@@ -45,6 +45,8 @@
                     }
                     if (!value?.trim()) {
                         return new Error(t("shared.warningMessages.fieldIsRequired"));
+                    } else if (serverErrors.value.userId) {
+                        return new Error(t(serverErrors.value.userId));
                     } else {
                         return true;
                     }
@@ -73,7 +75,7 @@
     const serverErrors = ref<Record<string, string>>({});
 
     const isSaveDisabled = computed<boolean>(() => {
-        return !projectPermission.value.user.id || !projectPermission.value.role.id;
+        return !projectPermission.value.user.id || !projectPermission.value.role.id || state.ajaxRunning;
     });
 
     const onSave = async () => {
@@ -125,11 +127,9 @@
                                 appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPermissionForm.onAdd" } });
                                 break;
                             case 409:
-                                // TODO
                                 if (apiError.details?.field === "userId") {
-                                    serverErrors.value.name = "modules.projectPermission.components.ProjectPermissionForm.warnings.userAlreadyExists";
-                                } else if (apiError.details?.field === "roleId") {
-                                    serverErrors.value.name = "modules.projectPermission.components.ProjectPermissionForm.warnings.roleAlreadyExists";
+                                    // TODO:
+                                    serverErrors.value.userId = "modules.projectPermission.components.ProjectPermissionForm.warnings.userAlreadyExists";
                                 } else {
                                     state.ajaxErrorMessage = t("modules.projectPermission.components.ProjectPermissionForm.errors.addError");
                                 }
@@ -194,12 +194,14 @@
             <n-form-item :label="t('modules.projectPermission.components.ProjectPermissionForm.inputs.user.label')"
                 path="user.id">
                 <UserSelector auto-focus required v-model:id="projectPermission.user.id"
-                    :placeholder="t('modules.projectPermission.components.ProjectPermissionForm.inputs.user.placeholder')" />
+                    :placeholder="t('modules.projectPermission.components.ProjectPermissionForm.inputs.user.placeholder')"
+                    :disabled="state.ajaxRunning" />
             </n-form-item>
             <n-form-item :label="t('modules.projectPermission.components.ProjectPermissionForm.inputs.role.label')"
                 path="role.id">
                 <RoleSelector required v-model:id="projectPermission.role.id"
-                    :placeholder="t('modules.projectPermission.components.ProjectPermissionForm.inputs.role.placeholder')" />
+                    :placeholder="t('modules.projectPermission.components.ProjectPermissionForm.inputs.role.placeholder')"
+                    :disabled="state.ajaxRunning" />
             </n-form-item>
         </n-form>
         <template #action>

@@ -3,10 +3,8 @@ add into markdown code language && copy
 custom datetime masks on datepickers ?
 review tables on small screens (hide columns ?)
 auto session reauth with setTimeout
-use naive ui ellipsis on long texts
-remove exported (Uppercase) on not required structs
-check missing indexes
-check project permission duplicate role for same user
+use naive ui ellipsis on long texts (conflict on click to expand with click to edit, ex: notes)
+check missing database indexes
 review `db:xxxx" mappings
 remove "non updatable" get funcs on repo/service/handler
 move entity details to entity handler/service/repository (ex: GetProjectAttachments from attachment to project)
