@@ -47,4 +47,4 @@ return updated entity on all services for using on handler return
 
 filter notes by creator
 
-uint to uintxxx
+toggle details as list / table (ex: notes as current or table)
