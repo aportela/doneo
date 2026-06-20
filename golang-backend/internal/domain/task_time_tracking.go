@@ -7,5 +7,5 @@ type TaskTimeTracking struct {
 	Summary      string
 	CreatedBy    UserBase
 	CreatedAt    time.Time
-	TotalSeconds uint
+	TotalSeconds uint64
 }

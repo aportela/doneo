@@ -6,5 +6,5 @@ type taskTimeTrackingDTO struct {
 	CreatorName  string `db:"creator_name"`
 	CreatedAt    int64  `db:"created_at"`
 	Summary      string `db:"summary"`
-	TotalSeconds uint   `db:"total_seconds"`
+	TotalSeconds uint64 `db:"total_seconds"`
 }
