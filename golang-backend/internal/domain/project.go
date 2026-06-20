@@ -17,11 +17,11 @@ type Project struct {
 	Type                   ProjectType
 	Priority               ProjectPriority
 	Status                 ProjectStatus
-	TasksCount             uint
-	PermissionsCount       uint
-	AttachmentsCount       uint
-	NotesCount             uint
-	HistoryOperationsCount uint
+	TasksCount             uint16
+	PermissionsCount       uint16
+	AttachmentsCount       uint16
+	NotesCount             uint16
+	HistoryOperationsCount uint16
 
 	//lead, asignee
 }

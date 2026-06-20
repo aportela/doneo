@@ -74,11 +74,11 @@ type projectResponse struct {
 	Type                   projecttypehandler.ProjectTypeResponse         `json:"type"`
 	Priority               projectpriorityhandler.ProjectPriorityResponse `json:"priority"`
 	Status                 projectstatushandler.ProjectStatusResponse     `json:"status"`
-	TasksCount             uint                                           `json:"tasksCount"`
-	PermissionsCount       uint                                           `json:"permissionsCount"`
-	AttachmentsCount       uint                                           `json:"attachmentsCount"`
-	NotesCount             uint                                           `json:"notesCount"`
-	HistoryOperationsCount uint                                           `json:"historyOperationsCount"`
+	TasksCount             uint16                                         `json:"tasksCount"`
+	PermissionsCount       uint16                                         `json:"permissionsCount"`
+	AttachmentsCount       uint16                                         `json:"attachmentsCount"`
+	NotesCount             uint16                                         `json:"notesCount"`
+	HistoryOperationsCount uint16                                         `json:"historyOperationsCount"`
 }
 
 type searchProjectsResponse struct {

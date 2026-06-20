@@ -28,11 +28,11 @@ type projectDTO struct {
 	PriorityID             string         `db:"priority_id"`
 	PriorityName           string         `db:"priority_name"`
 	PriorityHexColor       string         `db:"priority_hex_color"`
-	TasksCount             uint           `db:"tasks_count"`
-	PermissionsCount       uint           `db:"permissions_count"`
-	AttachmentsCount       uint           `db:"attachments_count"`
-	NotesCount             uint           `db:"notes_count"`
-	HistoryOperationsCount uint           `db:"history_operations_count"`
+	TasksCount             uint16         `db:"tasks_count"`
+	PermissionsCount       uint16         `db:"permissions_count"`
+	AttachmentsCount       uint16         `db:"attachments_count"`
+	NotesCount             uint16         `db:"notes_count"`
+	HistoryOperationsCount uint16         `db:"history_operations_count"`
 }
 
 type searchFilterDTO struct {
