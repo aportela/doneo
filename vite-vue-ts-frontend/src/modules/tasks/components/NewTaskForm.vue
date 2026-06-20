@@ -13,7 +13,7 @@
     import { appBus } from '../../../shared/composables/bus';
     import TaskPrioritySelector from '../../task-priorities/components/TaskPrioritySelector.vue';
     import TaskStatusSelector from '../../task-statuses/components/TaskStatusSelector.vue';
-    import TimePartsInput from '../../../shared/components/forms/TimePartsInput.vue';
+    import EstimatedTimeInput from '../../../shared/components/forms/EstimatedTimeInput.vue';
 
     interface NewTaskFormProps {
         style?: string | CSSProperties;
@@ -227,7 +227,7 @@
                 <n-collapse-item
                     :title="t('modules.task.components.NewTaskForm.collapse.estimatedTimeCollapseItem.label')"
                     name="estimatedTime">
-                    <TimePartsInput v-model:seconds="task.estimatedTime" />
+                    <EstimatedTimeInput v-model:seconds="task.estimatedTime" />
                 </n-collapse-item>
             </n-collapse>
         </n-form>

@@ -60,7 +60,7 @@ export default {
             },
           },
         },
-        TimePartsInput: {
+        EstimatedTimeInput: {
           inputs: {
             estimatedDays: {
               label: "Estimated days",
