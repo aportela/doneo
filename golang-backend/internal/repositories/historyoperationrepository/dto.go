@@ -5,7 +5,7 @@ type historyOperationDTO struct {
 	UserID        string `db:"operation_user_id"`
 	UserName      string `db:"user_name"`
 	CreatedAt     int64  `db:"operation_date"`
-	OperationType uint   `db:"operation_type "`
+	OperationType uint16 `db:"operation_type "`
 }
 
 type scope string

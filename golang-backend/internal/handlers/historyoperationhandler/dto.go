@@ -6,7 +6,7 @@ type HistoryOperationResponse struct {
 	ID            string                       `json:"id"`
 	CreatedBy     userhandler.UserBaseResponse `json:"createdBy"`
 	CreatedAt     int64                        `json:"createdAt"`
-	OperationType uint                         `json:"operationType"`
+	OperationType uint16                       `json:"operationType"`
 }
 
 type searchResponse struct {

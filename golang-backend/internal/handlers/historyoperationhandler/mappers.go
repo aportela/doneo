@@ -10,7 +10,7 @@ func domainToResponse(operation domain.HistoryOperation) HistoryOperationRespons
 		ID:            operation.ID,
 		CreatedBy:     userhandler.BaseDomainToBaseResponse(operation.CreatedBy),
 		CreatedAt:     operation.CreatedAt.UnixMilli(),
-		OperationType: uint(operation.OperationType),
+		OperationType: uint16(operation.OperationType),
 	}
 }
 
