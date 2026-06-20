@@ -1,6 +1,6 @@
 package repositories
 
 type TimestampFilter struct {
-	From *int
-	To   *int
+	From *uint64
+	To   *uint64
 }
