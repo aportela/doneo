@@ -22,6 +22,7 @@
     import ToggleDateTimePicker from '../../../shared/components/ToggleDateTimePicker.vue';
     import { IDate } from '../../../shared/types/idate.ts';
     import ToggleTagSelector from '../../../shared/components/ToggleTagSelector.vue';
+    import EstimatedTimeInput from '../../../shared/components/forms/EstimatedTimeInput.vue';
 
     interface TaskMetadataTabProps {
         mode: FormMode;
@@ -289,9 +290,6 @@
                 <ToggleInput v-model:value="task.summary" show-count :max-length="MAX_SUMMARY_LENGTH"
                     :disabled="props.disabled" />
             </n-form-item>
-            <n-form-item label="Tags">
-                <ToggleTagSelector v-model:value="task.tags" />
-            </n-form-item>
             <n-form-item label="description">
                 <template #label>
                     <n-flex align="center">
@@ -325,6 +323,10 @@
                     v-html="htmlMarkDownDescriptionPreview">
                 </n-ellipsis>
             </n-form-item>
+            <n-form-item label="Tags">
+                <ToggleTagSelector v-model:value="task.tags" />
+            </n-form-item>
+            <EstimatedTimeInput v-model:seconds="task.estimatedTime" />
         </n-form>
         <n-button @click="onUpdate" :disabled="props.disabled">
             <template #icon>
