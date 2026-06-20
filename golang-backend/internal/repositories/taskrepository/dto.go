@@ -9,7 +9,7 @@ import (
 type taskDTO struct {
 	ID                     string         `db:"id"`
 	projectID              string         `db:"project_id"`
-	Index                  uint           `db:"task_index"`
+	Index                  uint16         `db:"task_index"`
 	Slug                   string         `db:"task_slug"` // TODO: projectSlug (without Index ???)
 	Summary                string         `db:"summary"`
 	Description            sql.NullString `db:"description"`

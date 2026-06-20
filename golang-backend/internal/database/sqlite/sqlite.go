@@ -13,7 +13,7 @@ import (
 
 type Handler struct {
 	database       *sql.DB
-	currentVersion uint
+	currentVersion uint16
 }
 
 func configure(db *sql.DB) error {
@@ -57,7 +57,7 @@ func (handler *Handler) Begin() (*sql.Tx, error) {
 
 func (handler *Handler) CheckSchema() error {
 	ctx := context.Background()
-	var currentVersion uint
+	var currentVersion uint16
 
 	err := handler.database.
 		QueryRowContext(ctx, "PRAGMA user_version").

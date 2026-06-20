@@ -1,7 +1,7 @@
 package sqlite
 
 type schemaMigration struct {
-	Version uint
+	Version uint16
 	Queries []string
 }
 

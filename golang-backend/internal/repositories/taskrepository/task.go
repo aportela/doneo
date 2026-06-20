@@ -13,7 +13,7 @@ import (
 )
 
 type TaskRepository interface {
-	GetNextTaskIndex(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) (uint, error)
+	GetNextTaskIndex(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) (uint16, error)
 	Add(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, task domain.Task) error
 	Update(ctx context.Context, dbExecutor database.DatabaseExecutor, task domain.Task) error
 	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string, deletedAt int64) error
@@ -29,8 +29,8 @@ func NewRepository() TaskRepository {
 	return &taskRepository{}
 }
 
-func (repository *taskRepository) GetNextTaskIndex(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) (uint, error) {
-	var taskIndex uint
+func (repository *taskRepository) GetNextTaskIndex(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) (uint16, error) {
+	var taskIndex uint16
 	err := dbExecutor.QueryRowContext(
 		ctx,
 		`
