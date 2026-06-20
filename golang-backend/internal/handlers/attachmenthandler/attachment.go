@@ -42,7 +42,7 @@ func (handler *AttachmentHandler) AddProjectAttachment(w http.ResponseWriter, r 
 			}
 			projectID := chi.URLParam(r, "project_id")
 			if attachment, err := handler.service.AddProjectAttachment(r.Context(), projectID, attachment); err != nil {
-				// TODO: delete uploaded file
+				handler.service.DeleteAttachment(attachment)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			} else {
@@ -130,7 +130,7 @@ func (handler *AttachmentHandler) AddTaskAttachment(w http.ResponseWriter, r *ht
 			projectID := chi.URLParam(r, "project_id")
 			taskID := chi.URLParam(r, "task_id")
 			if attachment, err := handler.service.AddTaskAttachment(r.Context(), projectID, taskID, attachment); err != nil {
-				// TODO: delete uploaded file
+				handler.service.DeleteAttachment(attachment)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			} else {
