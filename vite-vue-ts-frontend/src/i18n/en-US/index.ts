@@ -76,6 +76,22 @@ export default {
             },
           },
         },
+        TimeSpentInput: {
+          inputs: {
+            daysSpent: {
+              label: "Days spent",
+              placeholder: "Enter time spent (in days)",
+            },
+            hoursSpent: {
+              label: "Hours spent",
+              placeholder: "Enter time time (in hours)",
+            },
+            minutesSpent: {
+              label: "Minutes spent",
+              placeholder: "Enter time spent (in minutes)",
+            },
+          },
+        },
       },
       selectors: {
         dateFilter: {
@@ -1507,20 +1523,6 @@ export default {
             summary: {
               label: "Summary",
               placeholder: "type summary",
-            },
-            totalHours: {
-              label: "Total hours",
-              placeholder: "type total hours",
-            },
-            totalMinutes: {
-              label: "Total minutes",
-              placeholder: "type total minutes",
-            },
-            timeSpent: {
-              label: "Time spent",
-              warnings: {
-                noTimeSet: "No time set",
-              },
             },
             errors: {
               loadError:

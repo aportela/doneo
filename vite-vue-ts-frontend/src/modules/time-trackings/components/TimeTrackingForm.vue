@@ -2,7 +2,7 @@
     import { ref, reactive, computed, onMounted, onBeforeUnmount, type CSSProperties, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSpin, NCard, NFlex, NButton, NForm, type FormItemRule, type FormInst, type FormRules, NIcon, NFormItem, NInput, NInputNumber } from 'naive-ui';
+    import { NSpin, NCard, NFlex, NButton, NForm, type FormItemRule, type FormInst, type FormRules, NIcon, NFormItem, NInput } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconEdit, IconPlus } from '@tabler/icons-vue';
 
     import { TimeTracking } from '../models/time-tracking.ts';
@@ -12,6 +12,7 @@
     import type { TimeTrackingResponse, AddRequest, } from '../types/dto';
     import type { FormMode } from '../../../shared/types/form-mode';
     import { appBus } from '../../../shared/composables/bus';
+    import TimeSpentInput from '../../../shared/components/forms/TimeSpentInput.vue';
 
     interface TimeTrackingFormProps {
         mode: FormMode;
@@ -52,25 +53,8 @@
 
     const serverErrors = ref<Record<string, string>>({});
 
-    const totalHours = ref<number>(0);
-    const totalMinutes = ref<number>(0);
-
-    // TODO: i18n labels
-    const totalTime = computed<string>(() => {
-        let str = "";
-        if (totalHours.value > 0) {
-            str += totalHours.value + (totalHours.value > 1 ? " hours" : " hour") + (totalMinutes.value > 0 ? ", " : "")
-        }
-        if (totalMinutes.value > 0) {
-            str += totalMinutes.value + (totalMinutes.value > 1 ? " minutes" : " minute")
-        }
-        return str;
-    });
-
-    const totalSeconds = computed<number>(() => (totalHours.value * 3600) + (totalMinutes.value * 60))
-
     const isSaveDisabled = computed<boolean>(() => {
-        return !timeTracking.value.summary || totalSeconds.value <= 0;
+        return !timeTracking.value.summary || timeTracking.value.totalSeconds <= 0;
     });
 
     // TODO: allow updates
@@ -102,7 +86,7 @@
             try {
                 const payload: AddRequest = {
                     summary: timeTracking.value.summary,
-                    totalSeconds: totalSeconds.value,
+                    totalSeconds: timeTracking.value.totalSeconds,
                 };
                 const addedTimeTracking: TimeTrackingResponse = await timeTrackingService.addTaskTimeTracking(props.projectId, props.taskId, payload);
                 emit('add', new TimeTracking(addedTimeTracking));
@@ -176,23 +160,7 @@
                     :placeholder="t('modules.timeTracking.components.TimeTrackingForm.inputs.summary.placeholder')"
                     v-model:value="timeTracking.summary" />
             </n-form-item>
-
-            <n-flex>
-                <n-form-item :label="t('modules.timeTracking.components.TimeTrackingForm.inputs.totalHours.label')">
-                    <n-input-number
-                        :placeholder="t('modules.timeTracking.components.TimeTrackingForm.inputs.totalHours.placeholder')"
-                        :min="0" v-model:value="totalHours" />
-                </n-form-item>
-                <n-form-item :label="t('modules.timeTracking.components.TimeTrackingForm.inputs.totalMinutes.label')">
-                    <n-input-number
-                        :placeholder="t('modules.timeTracking.components.TimeTrackingForm.inputs.totalMinutes.placeholder')"
-                        :min="0" :max="59" v-model:value="totalMinutes" />
-                </n-form-item>
-                <n-form-item :label="t('modules.timeTracking.components.TimeTrackingForm.inputs.timeSpent.label')">
-                    {{ totalTime ||
-                        t('modules.timeTracking.components.TimeTrackingForm.inputs.timeSpent.warnings.noTimeSet') }}
-                </n-form-item>
-            </n-flex>
+            <TimeSpentInput v-model:seconds="timeTracking.totalSeconds" />
         </n-form>
         <template #action>
             <n-flex>
