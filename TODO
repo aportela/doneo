@@ -6,6 +6,8 @@ auto session reauth with setTimeout
 use naive ui ellipsis on long texts (conflict on click to expand with click to edit, ex: notes)
 check missing database indexes
 review `db:xxxx" mappings
+
+add project permission missing return user name
 remove "non updatable" get funcs on repo/service/handler
 move entity details to entity handler/service/repository (ex: GetProjectAttachments from attachment to project)
 all add/update services return domain entity with new values
