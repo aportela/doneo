@@ -4,6 +4,10 @@ import (
 	"time"
 )
 
+const (
+	UserPermissionAdmin Bitmask = 1 << iota
+)
+
 type UserBase struct {
 	ID   string
 	Name string

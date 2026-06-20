@@ -1,5 +1,15 @@
 package domain
 
+const (
+	PermissionUpdateProject Bitmask = 1 << iota
+	PermissionDeleteProject
+	PermissionViewProject
+	PermissionAddTask
+	PermissionUpdateTask
+	PermissionDeleteTask
+	PermissionViewTask
+)
+
 type RoleBase struct {
 	ID   string
 	Name string
