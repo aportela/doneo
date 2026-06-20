@@ -28,7 +28,7 @@
 
     const userId = defineModel<string | null>('id');
 
-    const avatarURL = computed(() => userId.value ? `/api/avatars/32/user/${userId.value}` : null);
+    const avatarURL = computed(() => userId.value ? `/api/wc/avatars/32/user/${userId.value}` : null);
 
     const props = defineProps<UserSelectorProps>();
 

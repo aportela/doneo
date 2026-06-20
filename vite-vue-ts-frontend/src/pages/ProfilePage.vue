@@ -36,7 +36,7 @@
                 <h1>My account</h1>
                 <h2>Profile details</h2>
                 <n-flex style="align-items:center;">
-                    <n-avatar :size="128" src="/api/avatars/128/user/019dfcaa-aa06-755b-aca0-bb05e4ea44a7" />
+                    <n-avatar :size="128" src="/api/wc/avatars/128/user/019dfcaa-aa06-755b-aca0-bb05e4ea44a7" />
                     <n-button>
                         <template #icon>
                             <n-icon>
