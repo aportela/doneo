@@ -4,7 +4,6 @@ add into markdown code language && copy
 standarize date formats
 review tables on small screens (hide columns ?)
 auto session reauth with setTimeout
-add task times for spent hours
 use naive ui ellipsis on long texts
 remove exported (Uppercase) on not required structs
 check missing indexes
