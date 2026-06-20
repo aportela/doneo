@@ -88,6 +88,8 @@ func (repository *projectRepository) Update(ctx context.Context, dbExecutor data
 				type_id = ?
 			WHERE
 				id = ?
+			AND
+				deleted_at IS NOT NULL
         `,
 		dto.Slug,
 		dto.Summary,
