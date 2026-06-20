@@ -5,6 +5,7 @@
     import { useDialog, NSelect, NEmpty, type SelectOption } from 'naive-ui';
     import { IconTrash } from '@tabler/icons-vue';
 
+    import { useUserSettingsStore } from '../../../stores/userSettings.ts';
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { AttachmentsTableFilters } from '../types/attachments-table-filter.ts';
@@ -21,6 +22,8 @@
     import { formatBytes } from '../../../shared/composables/format.ts';
     import type { DateFilterSelectComponent } from '../../users/components/date-filter-select-component.ts';
 
+
+
     interface Props {
         disabled: boolean;
         items: Attachment[];
@@ -30,6 +33,7 @@
 
     const { t } = useI18n();
     const dialog = useDialog();
+    const userSettingsStore = useUserSettingsStore();
 
     const emit = defineEmits(['refresh', 'add', 'delete', 'download', 'preview']);
 
@@ -188,7 +192,7 @@
                 <td>{{ attachment.name }}</td>
                 <td>{{ formatBytes(attachment.size) }}</td>
                 <td>{{ attachment.contentType }}</td>
-                <td>{{ attachment.createdAt.toLocaleString() }}</td>
+                <td>{{ attachment.createdAt.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</td>
                 <td>
                     <AvatarUserName :user-id="attachment.createdBy?.id ?? ''"
                         :user-name="attachment.createdBy?.name ?? ''" />

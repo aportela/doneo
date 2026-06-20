@@ -4,6 +4,7 @@
 
     import { NEmpty } from 'naive-ui';
 
+    import { useUserSettingsStore } from '../../../stores/userSettings.ts';
     import { HistoryOperation } from '../models/history-operation.ts';
 
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
@@ -26,6 +27,7 @@
     }
 
     const { t } = useI18n();
+    const userSettingsStore = useUserSettingsStore();
 
     const emit = defineEmits(['refresh']);
 
@@ -104,7 +106,8 @@
         </template>
         <template #tbody v-if="!props.errorMessage">
             <tr v-for="projectHistoryOperation, index in items" :key="projectHistoryOperation.id ?? index">
-                <td>{{ projectHistoryOperation.createdAt.toLocaleString() }}</td>
+                <td>{{ projectHistoryOperation.createdAt.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}
+                </td>
                 <td>{{ projectHistoryOperation.getOperationTypeLabel() }}</td>
                 <td>
                     <AvatarUserName :user-id="projectHistoryOperation.createdBy?.id ?? ''"

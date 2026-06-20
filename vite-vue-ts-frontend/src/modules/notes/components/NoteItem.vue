@@ -5,6 +5,7 @@
     import { NCard, NFlex, NButtonGroup, NButton, NIcon, NFormItem, NInput, useDialog, type InputInst } from 'naive-ui';
     import { IconDeviceFloppy, IconCancel, IconEdit, IconTrash } from '@tabler/icons-vue';
 
+    import { useUserSettingsStore } from '../../../stores/userSettings.ts';
     import { renderIcon } from "../../../shared/composables/naive-ui-icon.ts";
     import { Note } from '../models/note';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
@@ -24,6 +25,7 @@
     const { t } = useI18n();
     const dialog = useDialog();
     const { render, toMarkdown } = useMarkdown();
+    const userSettingsStore = useUserSettingsStore();
 
     const currentMode = ref<NoteItemMode>(!!props.note.id ? "view" : "add");
 
@@ -150,10 +152,10 @@
             </div>
             <span class="note-date">
                 <div>
-                    Created at: {{ props.note.createdAt?.toLocaleString() }}
+                    Created at: {{ props.note.createdAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}
                 </div>
                 <div v-if="props.note.updatedAt">
-                    Updated at: {{ props.note.updatedAt?.toLocaleString() }}
+                    Updated at: {{ props.note.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}
                 </div>
             </span>
         </div>

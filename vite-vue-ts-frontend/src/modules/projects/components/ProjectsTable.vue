@@ -5,6 +5,7 @@
     import { NEmpty, NTag, NButtonGroup, NButton, NIcon } from 'naive-ui';
     import { IconFilePencil } from '@tabler/icons-vue';
 
+    import { useUserSettingsStore } from '../../../stores/userSettings.ts';
     import type { Sort } from '../../../shared/types/models/sort.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { ProjectsTableFilters } from '../types/projects-table-filters.ts';
@@ -29,6 +30,7 @@
     }
 
     const { t } = useI18n();
+    const userSettingsStore = useUserSettingsStore();
     // TODO: dialog for delete ?
 
     const emit = defineEmits(['refresh', 'add', 'sort']);
@@ -207,7 +209,7 @@
                         class="doneo-link-text-color-default">{{
                             project.summary
                         }}</router-link></td>
-                <td>{{ project.createdAt.toLocaleString() }}</td>
+                <td>{{ project.createdAt.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</td>
                 <td>
                     <AvatarUserName :user-id="project.createdBy.id" :user-name="project.createdBy.name" />
                 </td>

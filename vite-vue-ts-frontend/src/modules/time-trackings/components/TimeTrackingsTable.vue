@@ -5,6 +5,7 @@
     import { useDialog, NEmpty } from 'naive-ui';
     import { IconTrash } from '@tabler/icons-vue';
 
+    import { useUserSettingsStore } from '../../../stores/userSettings.ts';
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { TimeTrackingsTableFilters } from '../types/time-trackings-table-filters.ts';
@@ -30,6 +31,7 @@
 
     const { t } = useI18n();
     const dialog = useDialog();
+    const userSettingsStore = useUserSettingsStore();
 
     const emit = defineEmits(['refresh', 'add', 'delete', 'download', 'preview']);
 
@@ -161,7 +163,7 @@
                             .join(", ")
                     }}
                 </td>
-                <td>{{ timeTracking.createdAt?.toLocaleString() }}</td>
+                <td>{{ timeTracking.createdAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</td>
                 <td>
                     <AvatarUserName :user-id="timeTracking.createdBy?.id ?? ''"
                         :user-name="timeTracking.createdBy?.name ?? ''" />

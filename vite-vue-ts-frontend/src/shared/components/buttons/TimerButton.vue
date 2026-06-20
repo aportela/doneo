@@ -7,6 +7,7 @@
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from "../../../shared/types/ajaxState";
 
+    import { useUserSettingsStore } from '../../../stores/userSettings.ts';
     import { userTimerService } from "../../../modules/user-timer/services/user-timer";
     import { type UserTimerResponse } from "../../../modules/user-timer/types/dto";
     import { IDate } from "../../types/idate";
@@ -28,6 +29,7 @@
     const now = ref<number>(Date.now())
 
     //const { t } = useI18n();
+    const userSettingsStore = useUserSettingsStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -231,8 +233,10 @@
                                 </template>
                             </n-button>
                         </template>
-                        <div>Started: {{ new IDate(timer.startedAt).toLocaleString() }}</div>
-                        <div>Finished: {{ new IDate(timer.finishedAt).toLocaleString() }}</div>
+                        <div>Started: {{ new
+                            IDate(timer.startedAt).toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</div>
+                        <div>Finished: {{ new
+                            IDate(timer.finishedAt).toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</div>
                         <div>Total elapsed time: {{
                             formatDuration(
                                 Math.round(

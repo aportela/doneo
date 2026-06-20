@@ -6,6 +6,7 @@
     import { IconUserKey, IconUser, IconTrash, IconTrashOff } from '@tabler/icons-vue';
 
     import { useSessionStore } from '../../../stores/session';
+    import { useUserSettingsStore } from '../../../stores/userSettings.ts';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
     import type { Sort } from '../../../shared/types/models/sort.ts';
@@ -32,6 +33,7 @@
     const { t } = useI18n();
     const sessionStore = useSessionStore();
     const dialog = useDialog();
+    const userSettingsStore = useUserSettingsStore();
 
     const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'undelete', 'sort']);
 
@@ -238,9 +240,9 @@
                     <AvatarUserName :user-id="user.id" :user-name="user.name" />
                 </td>
                 <td><a :href="'mailto:' + user.email">{{ user.email }}</a></td>
-                <td>{{ user.createdAt?.toLocaleString() }}</td>
-                <td>{{ user.updatedAt?.toLocaleString() }}</td>
-                <td>{{ user.deletedAt?.toLocaleString() }}</td>
+                <td>{{ user.createdAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</td>
+                <td>{{ user.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</td>
+                <td>{{ user.deletedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete show-restore
                         :update-disabled="props.disabled || !!user.deletedAt?.msTimestamp"
