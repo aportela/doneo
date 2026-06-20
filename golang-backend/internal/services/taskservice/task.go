@@ -41,12 +41,13 @@ func (service *taskService) Add(ctx context.Context, projectID string, task doma
 	if contextUser, err := service.authorizationService.RequireTaskAddPermission(ctx, projectID); err != nil {
 		return domain.Task{}, err
 	} else {
+
 		task.ID = utils.UUID()
 		task.CreatedBy.ID = contextUser.ID
 		task.CreatedBy.Name = contextUser.Name
 		task.CreatedAt = time.Now()
 		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
-			if newTaskIndex, err := service.taskRepository.GetNextTaskIndex(ctx, service.db, projectID); err != nil {
+			if newTaskIndex, err := service.taskRepository.GetNextTaskIndex(ctx, tx, projectID); err != nil {
 				return err
 			} else {
 				task.Index = newTaskIndex
