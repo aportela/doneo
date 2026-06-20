@@ -1489,8 +1489,8 @@ export default {
               label: "Total minutes",
               placeholder: "type total minutes",
             },
-            totalTime: {
-              label: "Total time",
+            timeSpent: {
+              label: "Time spent",
               warnings: {
                 noTimeSet: "No time set",
               },

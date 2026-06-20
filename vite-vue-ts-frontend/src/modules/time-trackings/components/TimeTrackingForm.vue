@@ -176,6 +176,7 @@
                     :placeholder="t('modules.timeTracking.components.TimeTrackingForm.inputs.summary.placeholder')"
                     v-model:value="timeTracking.summary" />
             </n-form-item>
+
             <n-flex>
                 <n-form-item :label="t('modules.timeTracking.components.TimeTrackingForm.inputs.totalHours.label')">
                     <n-input-number
@@ -187,9 +188,9 @@
                         :placeholder="t('modules.timeTracking.components.TimeTrackingForm.inputs.totalMinutes.placeholder')"
                         :min="0" :max="59" v-model:value="totalMinutes" />
                 </n-form-item>
-                <n-form-item :label="t('modules.timeTracking.components.TimeTrackingForm.inputs.totalTime.label')">
+                <n-form-item :label="t('modules.timeTracking.components.TimeTrackingForm.inputs.timeSpent.label')">
                     {{ totalTime ||
-                        t('modules.timeTracking.components.TimeTrackingForm.inputs.totalTime.warnings.noTimeSet') }}
+                        t('modules.timeTracking.components.TimeTrackingForm.inputs.timeSpent.warnings.noTimeSet') }}
                 </n-form-item>
             </n-flex>
         </n-form>
