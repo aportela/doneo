@@ -2,7 +2,6 @@ move api services on client from subcomponents to parent manager component (ex: 
 use https://github.com/imzbf/md-editor-v3 for markdown ?
 add into markdown code language && copy
 standarize date formats
-upload concurrency : database is locked (5) (SQLITE_BUSY)
 review tables on small screens (hide columns ?)
 auto session reauth with setTimeout
 add task times for spent hours
