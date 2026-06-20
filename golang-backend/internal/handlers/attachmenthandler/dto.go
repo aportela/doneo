@@ -12,5 +12,5 @@ type AttachmentResponse struct {
 }
 
 type searchResponse struct {
-	ProjectAttachments []AttachmentResponse `json:"attachments"`
+	Attachments []AttachmentResponse `json:"attachments"`
 }

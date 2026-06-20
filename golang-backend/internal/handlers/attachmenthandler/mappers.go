@@ -26,6 +26,6 @@ func domainArrayToResponseArray(attachments []domain.Attachment) []AttachmentRes
 
 func toSearchResponse(attachments []domain.Attachment) searchResponse {
 	return searchResponse{
-		ProjectAttachments: domainArrayToResponseArray(attachments),
+		Attachments: domainArrayToResponseArray(attachments),
 	}
 }
