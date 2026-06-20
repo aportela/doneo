@@ -22,7 +22,6 @@ func configure(db *sql.DB) error {
 		"PRAGMA foreign_keys = ON;",
 		"PRAGMA busy_timeout = 1000;",
 	}
-
 	for _, p := range pragmas {
 		if _, err := db.Exec(p); err != nil {
 			return fmt.Errorf("sqlite pragma error (%s): %w", p, err)
@@ -47,6 +46,7 @@ func (handler *Handler) Open(databaseConfiguration config.DatabaseConfiguration)
 		return fmt.Errorf("sqlite ping error: %w", err)
 	}
 
+	database.SetMaxOpenConns(1)
 	handler.database = database
 	return nil
 }
