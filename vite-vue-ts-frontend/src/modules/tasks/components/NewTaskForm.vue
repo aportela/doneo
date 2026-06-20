@@ -2,7 +2,7 @@
     import { ref, reactive, computed, onMounted, onBeforeUnmount, type CSSProperties, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSpin, NCard, NInput, NInputNumber, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NSwitch, NGrid, NGridItem } from 'naive-ui';
+    import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NSwitch, NGrid, NGridItem, NCollapse, NCollapseItem } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconPlus } from '@tabler/icons-vue';
 
     import { Task, MAX_SUMMARY_LENGTH } from '../models/tasks';
@@ -13,6 +13,7 @@
     import { appBus } from '../../../shared/composables/bus';
     import TaskPrioritySelector from '../../task-priorities/components/TaskPrioritySelector.vue';
     import TaskStatusSelector from '../../task-statuses/components/TaskStatusSelector.vue';
+    import TimePartsInput from '../../../shared/components/forms/TimePartsInput.vue';
 
     interface NewTaskFormProps {
         style?: string | CSSProperties;
@@ -29,9 +30,6 @@
 
     const task = ref<Task>(new Task());
 
-    const estimatedDays = ref<number>(0);
-    const estimatedHours = ref<number>(0);
-    const estimatedMinutes = ref<number>(0);
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -115,7 +113,6 @@
         emit('cancel')
     }
 
-
     const onAdd = async () => {
         serverErrors.value = {};
         newTaskFormRef.value?.restoreValidation();
@@ -126,6 +123,7 @@
                 description: task.value.description,
                 priority: { id: task.value.priority.id ?? "" },
                 status: { id: task.value.status.id ?? "" },
+                estimatedTime: task.value.estimatedTime ?? 0,
                 tags: task.value.tags,
             };
             const addedTask: TaskResponse = await taskService.add(props.projectId, payload);
@@ -225,29 +223,13 @@
                     </n-form-item>
                 </n-grid-item>
             </n-grid>
-            <n-flex>
-                <n-form-item :label="t('modules.task.components.NewTaskForm.inputs.estimatedDays.label')"
-                    path="estimatedTime" show-feedback>
-                    <n-input-number :min="0"
-                        :placeholder="t('modules.task.components.NewTaskForm.inputs.estimatedDays.placeholder')"
-                        v-model:value="estimatedDays" clearable>
-                    </n-input-number>
-                </n-form-item>
-                <n-form-item :label="t('modules.task.components.NewTaskForm.inputs.estimatedHours.label')"
-                    path="estimatedTime" show-feedback>
-                    <n-input-number :min="0" :max="59"
-                        :placeholder="t('modules.task.components.NewTaskForm.inputs.estimatedHours.placeholder')"
-                        v-model:value="estimatedHours" clearable>
-                    </n-input-number>
-                </n-form-item>
-                <n-form-item :label="t('modules.task.components.NewTaskForm.inputs.estimatedMinutes.label')"
-                    path="estimatedTime" show-feedback>
-                    <n-input-number :min="0" :max="59"
-                        :placeholder="t('modules.task.components.NewTaskForm.inputs.estimatedMinutes.placeholder')"
-                        v-model:value="estimatedMinutes" clearable>
-                    </n-input-number>
-                </n-form-item>
-            </n-flex>
+            <n-collapse>
+                <n-collapse-item
+                    :title="t('modules.task.components.NewTaskForm.collapse.estimatedTimeCollapseItem.label')"
+                    name="estimatedTime">
+                    <TimePartsInput v-model:seconds="task.estimatedTime" />
+                </n-collapse-item>
+            </n-collapse>
         </n-form>
         <template #action>
             <n-flex>

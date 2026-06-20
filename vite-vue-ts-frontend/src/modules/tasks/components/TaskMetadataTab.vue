@@ -122,6 +122,7 @@
                 startedAt: task.value.startedAt?.msTimestamp ?? null,
                 finishedAt: task.value.finishedAt?.msTimestamp ?? null,
                 dueAt: task.value.dueAt?.msTimestamp ?? null,
+                estimatedTime: task.value.estimatedTime ?? 0,
                 tags: task.value.tags,
             };
             const response: TaskResponse = await taskService.update(props.projectId, payload);

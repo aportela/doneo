@@ -18,6 +18,7 @@ export type AddRequest = {
   status: {
     id: string;
   };
+  estimatedTime: number;
   tags: string[];
 };
 
@@ -34,6 +35,7 @@ export type UpdateRequest = {
   startedAt: number | null;
   finishedAt: number | null;
   dueAt: number | null;
+  estimatedTime: number;
   tags: string[];
 };
 
