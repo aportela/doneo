@@ -26,7 +26,7 @@ func createProjectPriorities(db database.Database) []string {
 		projectPriority := domain.ProjectPriority{
 			Name:     projectPriorityName,
 			HexColor: utils.RandomSoftHexColor(),
-			Index:    uint(index),
+			Index:    uint8(index),
 		}
 		projectPriority, err := service.Add(ctx, projectPriority)
 		if err != nil {

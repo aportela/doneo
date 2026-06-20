@@ -5,13 +5,13 @@ import "github.com/aportela/doneo/internal/handlers"
 type addRequest struct {
 	Name     string `json:"name"`
 	HexColor string `json:"hexColor"`
-	Index    uint   `json:"index"`
+	Index    uint8  `json:"index"`
 }
 
 type updateRequest struct {
 	Name     string `json:"name"`
 	HexColor string `json:"hexColor"`
-	Index    uint   `json:"index"`
+	Index    uint8  `json:"index"`
 }
 
 type filterRequest struct {
@@ -28,7 +28,7 @@ type TaskPriorityResponse struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	HexColor string `json:"hexColor"`
-	Index    uint   `json:"index"`
+	Index    uint8  `json:"index"`
 }
 
 type searchResponse struct {

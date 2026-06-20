@@ -15,7 +15,7 @@ type addRequest struct {
 	ID       string      `json:"id"`
 	Name     string      `json:"name"`
 	HexColor string      `json:"hexColor"`
-	Index    uint        `json:"index"`
+	Index    uint8       `json:"index"`
 	Flags    statusFlags `json:"flags"`
 }
 
@@ -23,7 +23,7 @@ type updateRequest struct {
 	ID       string      `json:"id"`
 	Name     string      `json:"name"`
 	HexColor string      `json:"hexColor"`
-	Index    uint        `json:"index"`
+	Index    uint8       `json:"index"`
 	Flags    statusFlags `json:"flags"`
 }
 
@@ -41,7 +41,7 @@ type ProjectStatusResponse struct {
 	ID       string      `json:"id"`
 	Name     string      `json:"name"`
 	HexColor string      `json:"hexColor"`
-	Index    uint        `json:"index"`
+	Index    uint8       `json:"index"`
 	Flags    statusFlags `json:"flags"`
 }
 

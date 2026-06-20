@@ -38,7 +38,7 @@ func createTaskStatuses(db database.Database) []string {
 		taskStatus := domain.TaskStatus{
 			Name:     taskStatusName,
 			HexColor: utils.RandomSoftHexColor(),
-			Index:    uint(index),
+			Index:    uint8(index),
 			Flags:    flags,
 		}
 		taskStatus, err := taskStatusService.Add(ctx, taskStatus)

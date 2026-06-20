@@ -26,7 +26,7 @@ func createTaskPriorities(db database.Database) []string {
 		taskPriority := domain.TaskPriority{
 			Name:     taskPriorityName,
 			HexColor: utils.RandomSoftHexColor(),
-			Index:    uint(index),
+			Index:    uint8(index),
 		}
 		taskPriority, err := taskPriorityService.Add(ctx, taskPriority)
 		if err != nil {

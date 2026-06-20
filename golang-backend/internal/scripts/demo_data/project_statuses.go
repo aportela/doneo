@@ -38,7 +38,7 @@ func createProjectStatuses(db database.Database) []string {
 		projectStatus := domain.ProjectStatus{
 			Name:     projectStatusName,
 			HexColor: utils.RandomSoftHexColor(),
-			Index:    uint(index),
+			Index:    uint8(index),
 			Flags:    flags,
 		}
 		projectStatus, err := service.Add(ctx, projectStatus)

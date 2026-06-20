@@ -4,7 +4,7 @@ type TaskStatus struct {
 	ID       string
 	Name     string
 	HexColor string
-	Index    uint
+	Index    uint8
 	Flags    Bitmask
 }
 
