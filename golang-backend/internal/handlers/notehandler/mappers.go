@@ -19,8 +19,8 @@ func updateRequestToDomain(request updateRequest) domain.Note {
 	}
 }
 
-func domainToResponse(note domain.Note) NoteResponse {
-	return NoteResponse{
+func domainToResponse(note domain.Note) noteResponse {
+	return noteResponse{
 		ID:        note.ID,
 		CreatedBy: userhandler.BaseDomainToBaseResponse(note.CreatedBy),
 		CreatedAt: note.CreatedAt.UnixMilli(),
@@ -29,8 +29,8 @@ func domainToResponse(note domain.Note) NoteResponse {
 	}
 }
 
-func domainArrayToResponseArray(notes []domain.Note) []NoteResponse {
-	notesResponse := []NoteResponse{}
+func domainArrayToResponseArray(notes []domain.Note) []noteResponse {
+	notesResponse := []noteResponse{}
 	for _, note := range notes {
 		notesResponse = append(notesResponse, domainToResponse(note))
 	}

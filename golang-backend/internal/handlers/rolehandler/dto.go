@@ -33,18 +33,18 @@ type searchRequest struct {
 	Filter *filterRequest        `json:"filter"`
 }
 
-type RoleBaseResponse struct {
+type roleBaseResponse struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
 type RoleResponse struct {
-	RoleBaseResponse
+	roleBaseResponse
 	Permissions permissionsFlags `json:"permissions"`
 }
 
 type searchBaseResponse struct {
-	Roles []RoleBaseResponse `json:"roles"`
+	Roles []roleBaseResponse `json:"roles"`
 }
 
 type searchResponse struct {

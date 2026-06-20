@@ -22,12 +22,12 @@ type addRequest struct {
 	Role roleBase `json:"role"`
 }
 
-type ProjectPermissionResponse struct {
+type projectPermissionResponse struct {
 	ID   string                       `json:"id"`
 	User userhandler.UserBaseResponse `json:"user"`
 	Role rolehandler.RoleResponse     `json:"role"`
 }
 
 type searchResponse struct {
-	ProjectPermissions []ProjectPermissionResponse `json:"projectPermissions"`
+	ProjectPermissions []projectPermissionResponse `json:"projectPermissions"`
 }

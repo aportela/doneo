@@ -13,7 +13,7 @@ type updateRequest struct {
 	TotalSeconds uint64 `json:"totalSeconds"`
 }
 
-type TaskTimeTrakingResponse struct {
+type taskTimeTrakingResponse struct {
 	ID           string                       `json:"id"`
 	CreatedBy    userhandler.UserBaseResponse `json:"createdBy"`
 	CreatedAt    int64                        `json:"createdAt"`
@@ -22,5 +22,5 @@ type TaskTimeTrakingResponse struct {
 }
 
 type searchResponse struct {
-	TimeTrackings []TaskTimeTrakingResponse `json:"timeTrackings"`
+	TimeTrackings []taskTimeTrakingResponse `json:"timeTrackings"`
 }

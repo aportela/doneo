@@ -2,7 +2,7 @@ package attachmenthandler
 
 import "github.com/aportela/doneo/internal/handlers/userhandler"
 
-type AttachmentResponse struct {
+type attachmentResponse struct {
 	ID          string                       `json:"id"`
 	CreatedBy   userhandler.UserBaseResponse `json:"createdBy"`
 	CreatedAt   int64                        `json:"createdAt"`
@@ -12,5 +12,5 @@ type AttachmentResponse struct {
 }
 
 type searchResponse struct {
-	Attachments []AttachmentResponse `json:"attachments"`
+	Attachments []attachmentResponse `json:"attachments"`
 }

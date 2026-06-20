@@ -2,7 +2,7 @@ package historyoperationhandler
 
 import "github.com/aportela/doneo/internal/handlers/userhandler"
 
-type HistoryOperationResponse struct {
+type historyOperationResponse struct {
 	ID            string                       `json:"id"`
 	CreatedBy     userhandler.UserBaseResponse `json:"createdBy"`
 	CreatedAt     int64                        `json:"createdAt"`
@@ -10,5 +10,5 @@ type HistoryOperationResponse struct {
 }
 
 type searchResponse struct {
-	HistoryOperations []HistoryOperationResponse `json:"historyOperations"`
+	HistoryOperations []historyOperationResponse `json:"historyOperations"`
 }

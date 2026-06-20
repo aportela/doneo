@@ -74,9 +74,9 @@ func (handler *identityHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, &accessTokenCookie)
 	utils.ToJSONResponse(w, http.StatusOK,
-		SignInResponse{
-			AccessToken:  TokenResponse{Token: accessToken.Token, ExpiresAt: accessToken.ExpiresAt.UnixMilli()},
-			RefreshToken: TokenResponse{Token: refreshToken.Token, ExpiresAt: refreshToken.ExpiresAt.UnixMilli()},
+		signInResponse{
+			AccessToken:  tokenResponse{Token: accessToken.Token, ExpiresAt: accessToken.ExpiresAt.UnixMilli()},
+			RefreshToken: tokenResponse{Token: refreshToken.Token, ExpiresAt: refreshToken.ExpiresAt.UnixMilli()},
 			User: userResponse{
 				ID:    user.ID,
 				Name:  user.Name,
@@ -154,7 +154,7 @@ func (handler *identityHandler) RenewAccessToken(w http.ResponseWriter, r *http.
 	}
 	http.SetCookie(w, &accessTokenCookie)
 	utils.ToJSONResponse(w, http.StatusOK,
-		RenewAccessTokenResponse{
+		renewAccessTokenResponse{
 			User: userResponse{
 				ID:    user.ID,
 				Name:  user.Name,
@@ -163,7 +163,7 @@ func (handler *identityHandler) RenewAccessToken(w http.ResponseWriter, r *http.
 					IsSuperUser: user.PermissionsBitmask.HasFlag(domain.UserPermissionAdmin),
 				},
 			},
-			AccessToken: TokenResponse{Token: accessToken.Token, ExpiresAt: accessToken.ExpiresAt.UnixMilli()},
+			AccessToken: tokenResponse{Token: accessToken.Token, ExpiresAt: accessToken.ExpiresAt.UnixMilli()},
 		},
 	)
 }

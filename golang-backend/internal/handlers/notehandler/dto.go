@@ -13,7 +13,7 @@ type updateRequest struct {
 	Body string `json:"body"`
 }
 
-type NoteResponse struct {
+type noteResponse struct {
 	ID        string                       `json:"id"`
 	CreatedBy userhandler.UserBaseResponse `json:"createdBy"`
 	CreatedAt int64                        `json:"createdAt"`
@@ -22,5 +22,5 @@ type NoteResponse struct {
 }
 
 type searchResponse struct {
-	Notes []NoteResponse `json:"notes"`
+	Notes []noteResponse `json:"notes"`
 }

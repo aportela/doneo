@@ -20,18 +20,18 @@ type signInRequest struct {
 	Password string `json:"password"`
 }
 
-type TokenResponse struct {
+type tokenResponse struct {
 	Token     string `json:"token"`
 	ExpiresAt int64  `json:"expiresAt"`
 }
 
-type SignInResponse struct {
-	AccessToken  TokenResponse `json:"accessToken"`
-	RefreshToken TokenResponse `json:"refreshToken"`
+type signInResponse struct {
+	AccessToken  tokenResponse `json:"accessToken"`
+	RefreshToken tokenResponse `json:"refreshToken"`
 	User         userResponse  `json:"user"`
 }
 
-type RenewAccessTokenResponse struct {
-	AccessToken TokenResponse `json:"accessToken"`
+type renewAccessTokenResponse struct {
+	AccessToken tokenResponse `json:"accessToken"`
 	User        userResponse  `json:"user"`
 }

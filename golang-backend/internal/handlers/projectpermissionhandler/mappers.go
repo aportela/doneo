@@ -19,16 +19,16 @@ func addRequestToDomain(request addRequest) domain.ProjectPermission {
 	}
 }
 
-func domainToResponse(projectPermission domain.ProjectPermission) ProjectPermissionResponse {
-	return ProjectPermissionResponse{
+func domainToResponse(projectPermission domain.ProjectPermission) projectPermissionResponse {
+	return projectPermissionResponse{
 		ID:   projectPermission.ID,
 		User: userhandler.BaseDomainToBaseResponse(projectPermission.User),
 		Role: rolehandler.DomainToResponse(projectPermission.Role),
 	}
 }
 
-func domainArrayToResponseArray(projectPermissions []domain.ProjectPermission) []ProjectPermissionResponse {
-	projectPermissionsResponse := []ProjectPermissionResponse{}
+func domainArrayToResponseArray(projectPermissions []domain.ProjectPermission) []projectPermissionResponse {
+	projectPermissionsResponse := []projectPermissionResponse{}
 	for _, projectPermission := range projectPermissions {
 		projectPermissionsResponse = append(projectPermissionsResponse, domainToResponse(projectPermission))
 	}
