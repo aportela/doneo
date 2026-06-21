@@ -71,7 +71,7 @@ export type UserResponse = {
 };
 
 export type SearchBaseResponse = {
-  users: UserResponse[];
+  users: UserBaseResponse[];
 };
 
 export type SearchResponse = {
