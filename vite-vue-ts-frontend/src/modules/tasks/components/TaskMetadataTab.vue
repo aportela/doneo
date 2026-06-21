@@ -2,7 +2,7 @@
     import { ref, reactive, watch, computed, type CSSProperties, nextTick, onMounted } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NCard, NForm, NFormItem, NInput, NButton, NButtonGroup, NIcon, type InputInst, NFlex, NEllipsis } from 'naive-ui';
+    import { NCard, NForm, NFormItem, NInput, NButton, NButtonGroup, NIcon, type InputInst, NFlex, NEllipsis, NGrid, NGridItem, NProgress } from 'naive-ui';
 
     import { useLoadingStore } from '../../../stores/loading';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
@@ -331,7 +331,16 @@
             <n-form-item label="Tags">
                 <ToggleTagSelector v-model:value="task.tags" />
             </n-form-item>
-            <EstimatedTimeInput v-model:seconds="task.estimatedTime" />
+            <n-grid :cols="2" :x-gap="8">
+                <n-grid-item>
+                    <EstimatedTimeInput v-model:seconds="task.estimatedTime" />
+                </n-grid-item>
+                <n-grid-item>
+                    <n-form-item label="Spent / Estimated time">
+                        <n-progress type="line" :percentage="84" />
+                    </n-form-item>
+                </n-grid-item>
+            </n-grid>
         </n-form>
         <n-button @click="onUpdate" :disabled="props.disabled">
             <template #icon>
