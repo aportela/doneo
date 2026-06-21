@@ -167,7 +167,7 @@
                         </template>
                     </Pager>
                     <TasksTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" :sort="sort"
-                        @sort="onSort" v-model:filters="filters" :project-id="''" />
+                        @sort="onSort" v-model:filters="filters" :project-id="''" hide-add />
                 </n-card>
             </template>
         </n-tab-pane>

@@ -27,6 +27,7 @@
         items: Task[];
         sort?: Sort;
         projectId?: string;
+        hideAdd?: boolean;
     }
 
     const { t } = useI18n();
@@ -138,7 +139,8 @@
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd">
+    <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd"
+        :hideAdd="props.hideAdd">
         <template #thead>
             <tr>
                 <th>
