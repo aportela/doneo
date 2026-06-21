@@ -6,7 +6,7 @@
     import { NTabs, NTabPane, type TabsInst } from 'naive-ui';
 
     // TODO: move to tabs
-    import TaskMetadataTab from '../components/TaskMetadataTab.vue';
+    import TaskMetadataTab from '../components/tabs/Metadata.vue';
     import TaskAttachmentsTab from '../components/tabs/Attachments.vue';
     import TaskNotesTab from '../components/tabs/Notes.vue';
     import TaskTimeTrackingsTab from '../components/tabs/TimeTrackings.vue';

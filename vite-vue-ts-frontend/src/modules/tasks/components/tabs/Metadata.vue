@@ -4,25 +4,25 @@
 
     import { NCard, NForm, NFormItem, NInput, NButton, NButtonGroup, NIcon, type InputInst, NFlex, NEllipsis, NGrid, NGridItem, NProgress } from 'naive-ui';
 
-    import { useLoadingStore } from '../../../stores/loading';
-    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
-    import { taskService } from '../services/task.ts';
-    import { handleAPIError } from '../../../api/client/errorHandler';
-    import { appBus } from '../../../shared/composables/bus';
-    import type { TaskResponse, UpdateRequest } from '../types/dto';
+    import { useLoadingStore } from '../../../../stores/loading';
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../../shared/types/ajaxState';
+    import { taskService } from '../../services/task.ts';
+    import { handleAPIError } from '../../../../api/client/errorHandler';
+    import { appBus } from '../../../../shared/composables/bus';
+    import type { TaskResponse, UpdateRequest } from '../../types/dto';
 
-    import type { FormMode } from '../../../shared/types/form-mode';
-    import { Task, MAX_SUMMARY_LENGTH } from "../models/tasks.ts";
-    import TaskPrioritySelector from '../../task-priorities/components/TaskPrioritySelector.vue';
-    import TaskStatusSelector from '../../task-statuses/components/TaskStatusSelector.vue';
-    import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
+    import type { FormMode } from '../../../../shared/types/form-mode';
+    import { Task, MAX_SUMMARY_LENGTH } from "../../models/tasks.ts";
+    import TaskPrioritySelector from '../../../task-priorities/components/TaskPrioritySelector.vue';
+    import TaskStatusSelector from '../../../task-statuses/components/TaskStatusSelector.vue';
+    import AvatarUserName from '../../../../shared/components/AvatarUserName.vue';
     import { IconX, IconCheck, IconDeviceFloppy } from '@tabler/icons-vue';
-    import { useMarkdown } from "../../../shared/composables/useMarkdown.ts";
-    import ToggleInput from '../../../shared/components/ToggleInput.vue';
-    import ToggleDateTimePicker from '../../../shared/components/ToggleDateTimePicker.vue';
-    import { IDate } from '../../../shared/types/idate.ts';
-    import ToggleTagSelector from '../../../shared/components/ToggleTagSelector.vue';
-    import EstimatedTimeInput from '../../../shared/components/forms/EstimatedTimeInput.vue';
+    import { useMarkdown } from "../../../../shared/composables/useMarkdown.ts";
+    import ToggleInput from '../../../../shared/components/ToggleInput.vue';
+    import ToggleDateTimePicker from '../../../../shared/components/ToggleDateTimePicker.vue';
+    import { IDate } from '../../../../shared/types/idate.ts';
+    import ToggleTagSelector from '../../../../shared/components/ToggleTagSelector.vue';
+    import EstimatedTimeInput from '../../../../shared/components/forms/EstimatedTimeInput.vue';
 
     interface TaskMetadataTabProps {
         mode: FormMode;
