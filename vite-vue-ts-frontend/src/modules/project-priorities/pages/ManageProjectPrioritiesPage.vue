@@ -5,6 +5,7 @@
     import { NModal, NCard } from 'naive-ui';
 
     import { useLoadingStore } from '../../../stores/loading';
+    import { useCacheStore } from '../../../stores/cache.ts';
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
 
@@ -25,6 +26,7 @@
     const { t } = useI18n();
     const { notify } = useNotify();
     const loadingStore = useLoadingStore();
+    const cacheStore = useCacheStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -132,6 +134,7 @@
             Object.assign(state, defaultAjaxStateRunning);
             try {
                 await projectPriorityService.delete(projectPriority.id);
+                cacheStore.clearProjectPrioritiesCache();
                 notify('success', t("modules.projectPriority.components.ManageProjectPrioritiesPage.notifications.projectPriorityDeleted", { name: projectPriority.name }));
                 onRefresh();
             } catch (error: unknown) {
@@ -172,12 +175,14 @@
 
     const onAdded = (projectPriority: ProjectPriority) => {
         showModal.value = false;
+        cacheStore.clearProjectPrioritiesCache();
         notify('success', t("modules.projectPriority.components.ManageProjectPrioritiesPage.notifications.projectPriorityAdded", { name: projectPriority.name }));
         onRefresh();
     };
 
     const onUpdated = (projectPriority: ProjectPriority) => {
         showModal.value = false;
+        cacheStore.clearProjectPrioritiesCache();
         notify('success', t("modules.projectPriority.components.ManageProjectPrioritiesPage.notifications.projectPriorityUpdated", { name: projectPriority.name }));
         onRefresh();
     };

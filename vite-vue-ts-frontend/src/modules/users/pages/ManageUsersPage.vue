@@ -5,6 +5,7 @@
     import { NModal, NCard } from 'naive-ui';
 
     import { useLoadingStore } from '../../../stores/loading';
+    import { useCacheStore } from '../../../stores/cache.ts';
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
 
@@ -27,6 +28,7 @@
     const { t } = useI18n();
     const { notify } = useNotify();
     const loadingStore = useLoadingStore();
+    const cacheStore = useCacheStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -169,6 +171,7 @@
             Object.assign(state, defaultAjaxStateRunning);
             try {
                 await userService.delete(user.id);
+                cacheStore.clearUsersCache();
                 notify('success', t("modules.user.components.ManageUsersPage.notifications.userDeleted", { name: user.name }));
                 onRefresh();
             } catch (error: unknown) {
@@ -212,6 +215,7 @@
             Object.assign(state, defaultAjaxStateRunning);
             try {
                 await userService.unDelete(user.id);
+                cacheStore.clearUsersCache();
                 notify('success', t("modules.user.components.ManageUsersPage.notifications.userRestored", { name: user.name }));
                 onRefresh();
             } catch (error: unknown) {
@@ -252,12 +256,14 @@
 
     const onAdded = (user: User) => {
         showModal.value = false;
+        cacheStore.clearUsersCache();
         notify('success', t("modules.user.components.ManageUsersPage.notifications.userAdded", { name: user.name }));
         onRefresh();
     };
 
     const onUpdated = (user: User) => {
         showModal.value = false;
+        cacheStore.clearUsersCache();
         notify('success', t("modules.user.components.ManageUsersPage.notifications.userUpdated", { name: user.name }));
         onRefresh();
     };

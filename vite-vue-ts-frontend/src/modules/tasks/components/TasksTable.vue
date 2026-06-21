@@ -21,6 +21,7 @@
     import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
+    import ChangeTaskStatusDropdown from '../../../shared/components/dropdowns/ChangeTaskStatusDropdown.vue';
 
     interface Props {
         disabled: boolean;
@@ -135,7 +136,6 @@
         createdAtFilterRef.value?.reset();
         filters.value.createdByUserId = null;
     };
-
 </script>
 
 <template>
@@ -207,6 +207,7 @@
                                 </template>
                             </n-button>
                         </router-link>
+                        <ChangeTaskStatusDropdown :available-statuses="[]" :current-status="task.status" />
                     </n-button-group>
                 </td>
             </tr>

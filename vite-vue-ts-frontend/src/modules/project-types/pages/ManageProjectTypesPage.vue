@@ -5,6 +5,7 @@
     import { NModal, NCard } from 'naive-ui';
 
     import { useLoadingStore } from '../../../stores/loading';
+    import { useCacheStore } from '../../../stores/cache.ts';
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
 
@@ -25,6 +26,7 @@
     const { t } = useI18n();
     const { notify } = useNotify();
     const loadingStore = useLoadingStore();
+    const cacheStore = useCacheStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -126,6 +128,7 @@
             Object.assign(state, defaultAjaxStateRunning);
             try {
                 await projectTypeService.delete(projectType.id);
+                cacheStore.clearProjectTypesCache();
                 notify('success', t("modules.projectType.components.ManageProjectTypesPage.notifications.projectTypeDeleted", { name: projectType.name }));
                 onRefresh();
             } catch (error: unknown) {
@@ -166,12 +169,14 @@
 
     const onAdded = (projectType: ProjectType) => {
         showModal.value = false;
+        cacheStore.clearProjectTypesCache();
         notify('success', t("modules.projectType.components.ManageProjectTypesPage.notifications.projectTypeAdded", { name: projectType.name }));
         onRefresh();
     };
 
     const onUpdated = (projectType: ProjectType) => {
         showModal.value = false;
+        cacheStore.clearProjectTypesCache();
         notify('success', t("modules.projectType.components.ManageProjectTypesPage.notifications.projectTypeUpdated", { name: projectType.name }));
         onRefresh();
     };

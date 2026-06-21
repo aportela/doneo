@@ -4,6 +4,7 @@
     import { NInputGroup, NButton, NSelect, NIcon, type SelectOption, type SelectSize, type SelectInst } from 'naive-ui';
     import { IconSquare, IconSquareFilled, IconAlertCircle } from '@tabler/icons-vue';
 
+    import { useCacheStore } from '../../../stores/cache';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { projectTypeService } from '../services/project-type';
     import type { ProjectTypeResponse } from '../types/dto';
@@ -19,6 +20,8 @@
         hidePrefix?: boolean;
         disabled?: boolean;
     }
+
+    const cacheStore = useCacheStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -37,12 +40,17 @@
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const response = await projectTypeService.searchBase();
-            projectTypes.value = response.projectTypes;
+            if (cacheStore.projectTypes.length > 0) {
+                projectTypes.value = cacheStore.projectTypes;
+            } else {
+                const response = await projectTypeService.searchBase();
+                projectTypes.value = response.projectTypes;
+                cacheStore.setProjectTypesCache(projectTypes.value);
+            }
             if (projectTypeId.value) {
                 selectedColor.value = projectTypes.value.find((projectType) => projectType.id === projectTypeId.value)?.hexColor
             }
-            options.value = response.projectTypes.map((projectType: ProjectTypeResponse) => ({ label: projectType.name, value: projectType.id }));
+            options.value = projectTypes.value.map((projectType: ProjectTypeResponse) => ({ label: projectType.name, value: projectType.id }));
             if (props.autoFocus) {
                 focus();
             }

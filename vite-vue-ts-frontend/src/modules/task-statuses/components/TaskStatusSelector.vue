@@ -4,6 +4,7 @@
     import { NInputGroup, NButton, NSelect, NIcon, type SelectOption, type SelectSize, type SelectInst } from 'naive-ui';
     import { IconSquare, IconSquareFilled, IconAlertCircle } from '@tabler/icons-vue';
 
+    import { useCacheStore } from '../../../stores/cache';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { taskStatusService } from '../services/task-status';
     import type { TaskStatusResponse } from '../types/dto';
@@ -20,6 +21,8 @@
         disabled?: boolean;
         setDefaultValueOnStart?: boolean;
     }
+
+    const cacheStore = useCacheStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -46,20 +49,26 @@
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const response = await taskStatusService.searchBase();
-            taskStatuses.value = response.taskStatuses;
+
+            if (cacheStore.taskStatuses.length > 0) {
+                taskStatuses.value = cacheStore.taskStatuses;
+            } else {
+                const response = await taskStatusService.searchBase();
+                taskStatuses.value = response.taskStatuses;
+                cacheStore.setTaskStatusesCache(taskStatuses.value);
+            }
             if (taskStatusId.value) {
                 selectedColor.value = taskStatuses.value.find((taskStatus) => taskStatus.id === taskStatusId.value)?.hexColor
             }
-            options.value = response.taskStatuses.map((taskStatus: TaskStatusResponse) => ({ label: taskStatus.name, value: taskStatus.id }));
+            options.value = taskStatuses.value.map((taskStatus: TaskStatusResponse) => ({ label: taskStatus.name, value: taskStatus.id }));
             if (!taskStatusId.value && props.setDefaultValueOnStart) {
-                taskStatusId.value = response.taskStatuses.find((taskStatus: TaskStatusResponse) => taskStatus.flags.defaultStatusOnCreation === true)?.id;
+                taskStatusId.value = taskStatuses.value.find((taskStatus: TaskStatusResponse) => taskStatus.flags.defaultStatusOnCreation === true)?.id;
             }
-            fillEmptyStartDateStatusId.value = response.taskStatuses.find((taskStatus: TaskStatusResponse) => taskStatus.flags.fillEmptyStartDate === true)?.id ?? null;
-            setStartDateStatusId.value = response.taskStatuses.find((taskStatus: TaskStatusResponse) => taskStatus.flags.setStartDate === true)?.id ?? null;
-            fillEmptyFinishDateStatusId.value = response.taskStatuses.find((taskStatus: TaskStatusResponse) => taskStatus.flags.fillEmptyFinishDate === true)?.id ?? null;
-            setFinishDateStatusId.value = response.taskStatuses.find((taskStatus: TaskStatusResponse) => taskStatus.flags.setFinishDate === true)?.id ?? null;
-            unsetFinishDateOnLeaveStatusId.value = response.taskStatuses.find((taskStatus: TaskStatusResponse) => taskStatus.flags.unsetFinishDateOnLeave === true)?.id ?? null;
+            fillEmptyStartDateStatusId.value = taskStatuses.value.find((taskStatus: TaskStatusResponse) => taskStatus.flags.fillEmptyStartDate === true)?.id ?? null;
+            setStartDateStatusId.value = taskStatuses.value.find((taskStatus: TaskStatusResponse) => taskStatus.flags.setStartDate === true)?.id ?? null;
+            fillEmptyFinishDateStatusId.value = taskStatuses.value.find((taskStatus: TaskStatusResponse) => taskStatus.flags.fillEmptyFinishDate === true)?.id ?? null;
+            setFinishDateStatusId.value = taskStatuses.value.find((taskStatus: TaskStatusResponse) => taskStatus.flags.setFinishDate === true)?.id ?? null;
+            unsetFinishDateOnLeaveStatusId.value = taskStatuses.value.find((taskStatus: TaskStatusResponse) => taskStatus.flags.unsetFinishDateOnLeave === true)?.id ?? null;
             if (props.autoFocus) {
                 focus();
             }

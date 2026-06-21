@@ -4,6 +4,7 @@
     import { NInputGroup, NButton, NSelect, NIcon, type SelectOption, type SelectSize, type SelectInst } from 'naive-ui';
     import { IconSquare, IconSquareFilled, IconAlertCircle } from '@tabler/icons-vue';
 
+    import { useCacheStore } from '../../../stores/cache';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { taskPriorityService } from '../services/task-priority';
     import type { TaskPriorityResponse } from '../types/dto';
@@ -19,6 +20,8 @@
         hidePrefix?: boolean;
         disabled?: boolean;
     }
+
+    const cacheStore = useCacheStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -37,12 +40,17 @@
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const response = await taskPriorityService.searchBase();
-            taskPriorities.value = response.taskPriorities;
+            if (cacheStore.taskPriorities.length > 0) {
+                taskPriorities.value = cacheStore.taskPriorities;
+            } else {
+                const response = await taskPriorityService.searchBase();
+                taskPriorities.value = response.taskPriorities;
+                cacheStore.setTaskPrioritiesCache(taskPriorities.value);
+            }
             if (taskPriorityId.value) {
                 selectedColor.value = taskPriorities.value.find((taskPriority) => taskPriority.id === taskPriorityId.value)?.hexColor
             }
-            options.value = response.taskPriorities.map((taskPriority: TaskPriorityResponse) => ({ label: taskPriority.name, value: taskPriority.id }));
+            options.value = taskPriorities.value.map((taskPriority: TaskPriorityResponse) => ({ label: taskPriority.name, value: taskPriority.id }));
             if (props.autoFocus) {
                 focus();
             }

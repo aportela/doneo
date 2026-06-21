@@ -4,9 +4,10 @@
     import { NInputGroup, NButton, NSelect, NIcon, NAvatar, type SelectOption, type SelectSize, type SelectInst } from 'naive-ui';
     import { IconAlertCircle, IconUserCircle } from '@tabler/icons-vue';
 
+    import { useCacheStore } from '../../../stores/cache';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { userService } from '../services/user';
-    import type { UserResponse } from '../types/dto';
+    import type { UserBaseResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
     import { handleAPIError } from '../../../api/client/errorHandler';
 
@@ -19,6 +20,8 @@
         hideAvatar?: boolean;
         disabled?: boolean;
     }
+
+    const cacheStore = useCacheStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -37,8 +40,13 @@
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const response = await userService.searchBase();
-            options.value = response.users.map((user: UserResponse) => ({ label: user.name, value: user.id }));
+            if (cacheStore.users.length > 0) {
+                options.value = cacheStore.users.map((user: UserBaseResponse) => ({ label: user.name, value: user.id }));
+            } else {
+                const response = await userService.searchBase();
+                options.value = response.users.map((user: UserBaseResponse) => ({ label: user.name, value: user.id }));
+                cacheStore.setUsersCache(response.users)
+            }
             if (props.autoFocus) {
                 focus();
             }

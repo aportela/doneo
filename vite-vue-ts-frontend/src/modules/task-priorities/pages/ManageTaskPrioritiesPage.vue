@@ -5,6 +5,7 @@
     import { NModal, NCard } from 'naive-ui';
 
     import { useLoadingStore } from '../../../stores/loading';
+    import { useCacheStore } from '../../../stores/cache.ts';
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
 
@@ -25,6 +26,7 @@
     const { t } = useI18n();
     const { notify } = useNotify();
     const loadingStore = useLoadingStore();
+    const cacheStore = useCacheStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -132,6 +134,7 @@
             Object.assign(state, defaultAjaxStateRunning);
             try {
                 await taskPriorityService.delete(taskPriority.id);
+                cacheStore.clearTaskPrioritiesCache();
                 notify('success', t("modules.taskPriority.components.ManageTaskPrioritiesPage.notifications.taskPriorityDeleted", { name: taskPriority.name }));
                 onRefresh();
             } catch (error: unknown) {
@@ -172,12 +175,14 @@
 
     const onAdd = (taskPriority: TaskPriority) => {
         showModal.value = false;
+        cacheStore.clearTaskPrioritiesCache();
         notify('success', t("modules.taskPriority.components.ManageTaskPrioritiesPage.notifications.taskPriorityAdded", { name: taskPriority.name }));
         onRefresh();
     };
 
     const onUpdate = (taskPriority: TaskPriority) => {
         showModal.value = false;
+        cacheStore.clearTaskPrioritiesCache();
         notify('success', t("modules.taskPriority.components.ManageTaskPrioritiesPage.notifications.taskPriorityUpdated", { name: taskPriority.name }));
         onRefresh();
     };

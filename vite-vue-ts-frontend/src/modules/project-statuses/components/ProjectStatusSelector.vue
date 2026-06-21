@@ -4,6 +4,7 @@
     import { NInputGroup, NButton, NSelect, NIcon, type SelectOption, type SelectSize, type SelectInst } from 'naive-ui';
     import { IconSquare, IconSquareFilled, IconAlertCircle } from '@tabler/icons-vue';
 
+    import { useCacheStore } from '../../../stores/cache';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { projectStatusService } from '../services/project-status';
     import type { ProjectStatusResponse } from '../types/dto';
@@ -20,6 +21,8 @@
         disabled?: boolean;
         setDefaultValueOnStart?: boolean;
     }
+
+    const cacheStore = useCacheStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -46,20 +49,25 @@
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const response = await projectStatusService.searchBase();
-            projectStatuses.value = response.projectStatuses;
+            if (cacheStore.projectStatuses.length > 0) {
+                projectStatuses.value = cacheStore.projectStatuses;
+            } else {
+                const response = await projectStatusService.searchBase();
+                projectStatuses.value = response.projectStatuses;
+                cacheStore.setProjectStatusesCache(projectStatuses.value);
+            }
             if (projectStatusId.value) {
                 selectedColor.value = projectStatuses.value.find((projectStatus) => projectStatus.id === projectStatusId.value)?.hexColor
             }
-            options.value = response.projectStatuses.map((projectStatus: ProjectStatusResponse) => ({ label: projectStatus.name, value: projectStatus.id }));
+            options.value = projectStatuses.value.map((projectStatus: ProjectStatusResponse) => ({ label: projectStatus.name, value: projectStatus.id }));
             if (!projectStatusId.value && props.setDefaultValueOnStart) {
-                projectStatusId.value = response.projectStatuses.find((projectStatus: ProjectStatusResponse) => projectStatus.flags.defaultStatusOnCreation === true)?.id;
+                projectStatusId.value = projectStatuses.value.find((projectStatus: ProjectStatusResponse) => projectStatus.flags.defaultStatusOnCreation === true)?.id;
             }
-            fillEmptyStartDateStatusId.value = response.projectStatuses.find((projectStatus: ProjectStatusResponse) => projectStatus.flags.fillEmptyStartDate === true)?.id ?? null;
-            setStartDateStatusId.value = response.projectStatuses.find((projectStatus: ProjectStatusResponse) => projectStatus.flags.setStartDate === true)?.id ?? null;
-            fillEmptyFinishDateStatusId.value = response.projectStatuses.find((projectStatus: ProjectStatusResponse) => projectStatus.flags.fillEmptyFinishDate === true)?.id ?? null;
-            setFinishDateStatusId.value = response.projectStatuses.find((projectStatus: ProjectStatusResponse) => projectStatus.flags.setFinishDate === true)?.id ?? null;
-            unsetFinishDateOnLeaveStatusId.value = response.projectStatuses.find((projectStatus: ProjectStatusResponse) => projectStatus.flags.unsetFinishDateOnLeave === true)?.id ?? null;
+            fillEmptyStartDateStatusId.value = projectStatuses.value.find((projectStatus: ProjectStatusResponse) => projectStatus.flags.fillEmptyStartDate === true)?.id ?? null;
+            setStartDateStatusId.value = projectStatuses.value.find((projectStatus: ProjectStatusResponse) => projectStatus.flags.setStartDate === true)?.id ?? null;
+            fillEmptyFinishDateStatusId.value = projectStatuses.value.find((projectStatus: ProjectStatusResponse) => projectStatus.flags.fillEmptyFinishDate === true)?.id ?? null;
+            setFinishDateStatusId.value = projectStatuses.value.find((projectStatus: ProjectStatusResponse) => projectStatus.flags.setFinishDate === true)?.id ?? null;
+            unsetFinishDateOnLeaveStatusId.value = projectStatuses.value.find((projectStatus: ProjectStatusResponse) => projectStatus.flags.unsetFinishDateOnLeave === true)?.id ?? null;
             if (props.autoFocus) {
                 focus();
             }

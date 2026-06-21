@@ -4,6 +4,7 @@
     import { NInputGroup, NButton, NSelect, NIcon, type SelectOption, type SelectSize, type SelectInst } from 'naive-ui';
     import { IconSquare, IconSquareFilled, IconAlertCircle } from '@tabler/icons-vue';
 
+    import { useCacheStore } from '../../../stores/cache';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { projectPriorityService } from '../services/project-priority';
     import type { ProjectPriorityResponse } from '../types/dto';
@@ -19,6 +20,8 @@
         hidePrefix?: boolean;
         disabled?: boolean;
     }
+
+    const cacheStore = useCacheStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -37,12 +40,17 @@
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const response = await projectPriorityService.searchBase();
-            projectPriorities.value = response.projectPriorities;
+            if (cacheStore.projectPriorities.length > 0) {
+                projectPriorities.value = cacheStore.projectPriorities;
+            } else {
+                const response = await projectPriorityService.searchBase();
+                projectPriorities.value = response.projectPriorities;
+                cacheStore.setProjectPrioritiesCache(projectPriorities.value);
+            }
             if (projectPriorityId.value) {
                 selectedColor.value = projectPriorities.value.find((projectPriority) => projectPriority.id === projectPriorityId.value)?.hexColor
             }
-            options.value = response.projectPriorities.map((projectPriority: ProjectPriorityResponse) => ({ label: projectPriority.name, value: projectPriority.id }));
+            options.value = projectPriorities.value.map((projectPriority: ProjectPriorityResponse) => ({ label: projectPriority.name, value: projectPriority.id }));
             if (props.autoFocus) {
                 focus();
             }

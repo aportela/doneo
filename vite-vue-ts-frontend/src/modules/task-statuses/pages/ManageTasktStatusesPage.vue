@@ -5,6 +5,7 @@
     import { NModal, NCard } from 'naive-ui';
 
     import { useLoadingStore } from '../../../stores/loading';
+    import { useCacheStore } from '../../../stores/cache.ts';
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
 
@@ -25,6 +26,7 @@
     const { t } = useI18n();
     const { notify } = useNotify();
     const loadingStore = useLoadingStore();
+    const cacheStore = useCacheStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -132,6 +134,7 @@
             Object.assign(state, defaultAjaxStateRunning);
             try {
                 await taskStatusService.delete(taskStatus.id);
+                cacheStore.clearTaskStatusesCache();
                 notify('success', t("modules.taskStatus.components.ManageTaskStatusesPage.notifications.taskStatusUpdated", { name: taskStatus.name }));
                 onRefresh();
             } catch (error: unknown) {
@@ -172,12 +175,14 @@
 
     const onAdded = (taskStatus: TaskStatus) => {
         showModal.value = false;
+        cacheStore.clearTaskStatusesCache();
         notify('success', t("modules.taskStatus.components.ManageTaskStatusesPage.notifications.taskStatusAdded", { name: taskStatus.name }));
         onRefresh();
     };
 
     const onUpdated = (taskStatus: TaskStatus) => {
         showModal.value = false;
+        cacheStore.clearTaskStatusesCache();
         notify('success', t("modules.taskStatus.components.ManageTaskStatusesPage.notifications.taskStatusUpdated", { name: taskStatus.name }));
         onRefresh();
     };
