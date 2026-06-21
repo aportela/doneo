@@ -65,7 +65,7 @@ func permissionDomainToResponsePermissionsFlags(bitmaskPermission domain.Bitmask
 
 func DomainToResponse(role domain.Role) RoleResponse {
 	return RoleResponse{
-		roleBaseResponse: roleBaseResponse{
+		RoleBaseResponse: RoleBaseResponse{
 			ID:   role.ID,
 			Name: role.Name,
 		},
@@ -73,15 +73,15 @@ func DomainToResponse(role domain.Role) RoleResponse {
 	}
 }
 
-func baseDomainToBaseResponse(role domain.RoleBase) roleBaseResponse {
-	return roleBaseResponse{
+func DomainToBaseResponse(role domain.Role) RoleBaseResponse {
+	return RoleBaseResponse{
 		ID:   role.ID,
 		Name: role.Name,
 	}
 }
 
-func domainToBaseResponse(role domain.Role) roleBaseResponse {
-	return roleBaseResponse{
+func domainToBaseResponse(role domain.Role) RoleBaseResponse {
+	return RoleBaseResponse{
 		ID:   role.ID,
 		Name: role.Name,
 	}
@@ -95,8 +95,8 @@ func domainArrayToResponseArray(roles []domain.Role) []RoleResponse {
 	return roleResponses
 }
 
-func domainArrayToBaseResponseArray(roles []domain.Role) []roleBaseResponse {
-	roleResponses := []roleBaseResponse{}
+func domainArrayToBaseResponseArray(roles []domain.Role) []RoleBaseResponse {
+	roleResponses := []RoleBaseResponse{}
 	for _, role := range roles {
 		roleResponses = append(roleResponses, domainToBaseResponse(role))
 	}

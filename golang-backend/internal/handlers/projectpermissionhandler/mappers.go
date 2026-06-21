@@ -23,7 +23,7 @@ func domainToResponse(projectPermission domain.ProjectPermission) projectPermiss
 	return projectPermissionResponse{
 		ID:   projectPermission.ID,
 		User: userhandler.BaseDomainToBaseResponse(projectPermission.User),
-		Role: rolehandler.DomainToResponse(projectPermission.Role),
+		Role: rolehandler.DomainToBaseResponse(projectPermission.Role),
 	}
 }
 
