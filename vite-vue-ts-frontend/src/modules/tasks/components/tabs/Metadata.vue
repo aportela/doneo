@@ -2,7 +2,7 @@
     import { ref, reactive, watch, computed, type CSSProperties, nextTick, onMounted } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NCard, NForm, NFormItem, NInput, NButton, NButtonGroup, NIcon, type InputInst, NFlex, NEllipsis, NGrid, NGridItem, NProgress } from 'naive-ui';
+    import { NCard, NForm, NFormItem, NInput, NButton, NButtonGroup, NIcon, type InputInst, NFlex, NEllipsis, NGrid, NGridItem } from 'naive-ui';
 
     import { useLoadingStore } from '../../../../stores/loading';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../../shared/types/ajaxState';
@@ -23,6 +23,7 @@
     import { IDate } from '../../../../shared/types/idate.ts';
     import ToggleTagSelector from '../../../../shared/components/ToggleTagSelector.vue';
     import EstimatedTimeInput from '../../../../shared/components/forms/EstimatedTimeInput.vue';
+    import TaskSpentEstimatedPercent from '../../../../shared/components/progress/TaskSpentEstimatedPercent.vue';
 
     interface TaskMetadataTabProps {
         mode: FormMode;
@@ -60,8 +61,6 @@
     const descriptionExpanded = ref<boolean>(true);
 
     const htmlMarkDownDescriptionPreview = computed(() => render(task.value.description ?? ""));
-
-    const spentVsEstimatedPercent = computed<number>(() => task.value.totalSpentTime / task.value.estimatedTime * 100);
 
     const onGet = async (projectId: string, taskId: string) => {
         serverErrors.value = {};
@@ -333,15 +332,15 @@
             <n-form-item label="Tags">
                 <ToggleTagSelector v-model:value="task.tags" />
             </n-form-item>
-            <n-grid :cols="2" :x-gap="8">
+            <n-grid :cols="2" :x-gap="1">
+                <n-grid-item>
+                    <TaskSpentEstimatedPercent type="line" :estimated="task.estimatedTime" :spent="task.totalSpentTime"
+                        :height="24" />
+                </n-grid-item>
                 <n-grid-item>
                     <EstimatedTimeInput v-model:seconds="task.estimatedTime" />
                 </n-grid-item>
-                <n-grid-item>
-                    <n-form-item label="Spent / Estimated time">
-                        <n-progress type="line" :percentage="spentVsEstimatedPercent" />
-                    </n-form-item>
-                </n-grid-item>
+
             </n-grid>
         </n-form>
         <n-button @click="onUpdate" :disabled="props.disabled">
