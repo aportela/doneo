@@ -13,7 +13,7 @@ type addRequest struct {
 type projectPermissionResponse struct {
 	ID   string                       `json:"id"`
 	User userhandler.UserBaseResponse `json:"user"`
-	Role rolehandler.RoleBaseResponse `json:"role"`
+	Role rolehandler.RoleResponse     `json:"role"`
 }
 
 type searchResponse struct {

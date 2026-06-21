@@ -59,7 +59,11 @@ func (service *projectPermissionService) Add(ctx context.Context, projectID stri
 		}); err != nil {
 			return domain.ProjectPermission{}, err
 		}
-		return projectPermission, nil
+		if projectPermission, err := service.projectPermissionRepository.Get(ctx, service.db, projectPermission.ID); err != nil {
+			return domain.ProjectPermission{}, err
+		} else {
+			return projectPermission, nil
+		}
 	}
 }
 
