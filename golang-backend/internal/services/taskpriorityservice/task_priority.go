@@ -74,7 +74,7 @@ func (service *taskPriorityService) Get(ctx context.Context, taskPriorityID stri
 }
 
 func (service *taskPriorityService) SearchBase(ctx context.Context) ([]domain.TaskPriority, browser.Result, error) {
-	if taskPriorities, pagerResult, err := service.taskPriorityRepository.Search(ctx, service.db, browser.Params{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "name", Sort: "ASC"}, domain.SearchTaskPrioritiesFilter{}); err != nil {
+	if taskPriorities, pagerResult, err := service.taskPriorityRepository.Search(ctx, service.db, browser.Params{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "index", Sort: "ASC"}, domain.SearchTaskPrioritiesFilter{}); err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[TaskPriorityService] failed to search task priorities: %w", err)
 	} else {
 		return taskPriorities, pagerResult, nil

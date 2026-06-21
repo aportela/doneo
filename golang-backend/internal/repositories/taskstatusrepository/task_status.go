@@ -151,6 +151,8 @@ func (repository *taskStatusRepository) Search(ctx context.Context, dbExecutor d
 	default:
 		sort = "ASC"
 	}
+	fmt.Println(field)
+	fmt.Println(sort)
 	sqlOrder := fmt.Sprintf(" ORDER BY %s %s ", field, sort)
 	sqlWhere := ""
 	var sqlWhereConditions []string

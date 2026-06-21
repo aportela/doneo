@@ -72,7 +72,7 @@ func (service *projectTypeService) Get(ctx context.Context, projectTypeID string
 }
 
 func (service *projectTypeService) SearchBase(ctx context.Context) ([]domain.ProjectType, browser.Result, error) {
-	if projectTypes, pagerResult, err := service.projectTypeRepository.Search(ctx, service.db, browser.Params{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "name", Sort: "ASC"}, domain.SearchProjectTypesFilter{}); err != nil {
+	if projectTypes, pagerResult, err := service.projectTypeRepository.Search(ctx, service.db, browser.Params{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "index", Sort: "ASC"}, domain.SearchProjectTypesFilter{}); err != nil {
 		return nil, browser.Result{}, fmt.Errorf("[ProjectTypeService] failed to search project types: %w", err)
 	} else {
 		return projectTypes, pagerResult, nil
