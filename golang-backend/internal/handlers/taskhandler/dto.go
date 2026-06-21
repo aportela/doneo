@@ -16,24 +16,26 @@ type taskStatus struct {
 }
 
 type addRequest struct {
-	ID          string       `json:"id"`
-	Summary     string       `json:"summary"`
-	Description *string      `json:"description"`
-	Priority    taskPriority `json:"priority"`
-	Status      taskStatus   `json:"status"`
-	Tags        []string     `json:"tags"`
+	ID            string       `json:"id"`
+	Summary       string       `json:"summary"`
+	Description   *string      `json:"description"`
+	EstimatedTime *uint64      `json:"estimatedTime"`
+	Priority      taskPriority `json:"priority"`
+	Status        taskStatus   `json:"status"`
+	Tags          []string     `json:"tags"`
 }
 
 type updateRequest struct {
-	ID          string       `json:"id"`
-	Summary     string       `json:"summary"`
-	Description *string      `json:"description"`
-	Priority    taskPriority `json:"priority"`
-	Status      taskStatus   `json:"status"`
-	StartedAt   *int64       `json:"startedAt"`
-	FinishedAt  *int64       `json:"finishedAt"`
-	DueAt       *int64       `json:"dueAt"`
-	Tags        []string     `json:"tags"`
+	ID            string       `json:"id"`
+	Summary       string       `json:"summary"`
+	Description   *string      `json:"description"`
+	Priority      taskPriority `json:"priority"`
+	Status        taskStatus   `json:"status"`
+	StartedAt     *int64       `json:"startedAt"`
+	FinishedAt    *int64       `json:"finishedAt"`
+	DueAt         *int64       `json:"dueAt"`
+	EstimatedTime *uint64      `json:"estimatedTime"`
+	Tags          []string     `json:"tags"`
 }
 
 type filterRequest struct {
@@ -63,6 +65,8 @@ type taskResponse struct {
 	StartedAt              *int64                                   `json:"startedAt"`
 	FinishedAt             *int64                                   `json:"finishedAt"`
 	DueAt                  *int64                                   `json:"dueAt"`
+	EstimatedTime          uint64                                   `json:"estimatedTime"`
+	TotalSpentTime         uint64                                   `json:"totalSpentTime"`
 	Priority               taskpriorityhandler.TaskPriorityResponse `json:"priority"`
 	Status                 taskstatushandler.TaskStatusResponse     `json:"status"`
 	Tags                   []string                                 `json:"tags"`

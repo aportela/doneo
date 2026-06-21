@@ -262,11 +262,15 @@ func createProjects(db database.Database, projectTypeIds []string, projectPriori
 				Body:      "Note index " + strconv.Itoa(j) + ": " + randomText(rand.Intn(384)+128),
 				CreatedAt: time.Now().Add(time.Duration(j*5) * time.Minute),
 			}
-			noteService.AddProjectNote(ctx, newProject.ID, note)
+			if _, err := noteService.AddProjectNote(ctx, newProject.ID, note); err != nil {
+				fmt.Printf("Error creating project note: %s\n", err.Error())
+			}
 		}
 		for j := 0; j < 5; j++ {
 			newTask := getRandomTask(userIds, taskStatusIds, taskPriorityIds)
-			taskService.Add(ctx, newProject.ID, newTask)
+			if _, err := taskService.Add(ctx, newProject.ID, newTask); err != nil {
+				fmt.Printf("Error creating task: %s\n", err.Error())
+			}
 		}
 	}
 	return newProjectIds

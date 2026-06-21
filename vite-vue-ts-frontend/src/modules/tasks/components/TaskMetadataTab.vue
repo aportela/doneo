@@ -61,6 +61,8 @@
 
     const htmlMarkDownDescriptionPreview = computed(() => render(task.value.description ?? ""));
 
+    const spentVsEstimatedPercent = computed<number>(() => task.value.totalSpentTime / task.value.estimatedTime * 100);
+
     const onGet = async (projectId: string, taskId: string) => {
         serverErrors.value = {};
         let notFoundError = false;
@@ -337,7 +339,7 @@
                 </n-grid-item>
                 <n-grid-item>
                     <n-form-item label="Spent / Estimated time">
-                        <n-progress type="line" :percentage="84" />
+                        <n-progress type="line" :percentage="spentVsEstimatedPercent" />
                     </n-form-item>
                 </n-grid-item>
             </n-grid>

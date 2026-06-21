@@ -53,6 +53,8 @@ func toDomain(task taskDTO) domain.Task {
 		StartedAt:              utils.SQLNullInt64ToTimePtr(task.StartedAt),
 		FinishedAt:             utils.SQLNullInt64ToTimePtr(task.FinishedAt),
 		DueAt:                  utils.SQLNullInt64ToTimePtr(task.DueAt),
+		EstimatedTime:          task.EstimatedTime,
+		TotalSpentTime:         task.TotalSpentTime,
 		Priority:               domain.TaskPriority{ID: task.PriorityID, Name: task.PriorityName, HexColor: task.PriorityHexColor},
 		Status:                 domain.TaskStatus{ID: task.StatusID, Name: task.StatusName, HexColor: task.StatusHexColor},
 		AttachmentsCount:       task.AttachmentsCount,

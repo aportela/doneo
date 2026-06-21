@@ -21,6 +21,8 @@ type taskDTO struct {
 	StartedAt              sql.NullInt64  `db:"started_at"`
 	FinishedAt             sql.NullInt64  `db:"finished_at"`
 	DueAt                  sql.NullInt64  `db:"due_at"`
+	EstimatedTime          uint64         `db:"estimated_time"`
+	TotalSpentTime         uint64         `db:"total_spent_time"`
 	StatusID               string         `db:"status_id"`
 	StatusName             string         `db:"status_name"`
 	StatusHexColor         string         `db:"status_hex_color"`

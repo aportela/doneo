@@ -16,6 +16,8 @@ type Task struct {
 	StartedAt              *time.Time
 	FinishedAt             *time.Time
 	DueAt                  *time.Time
+	EstimatedTime          uint64
+	TotalSpentTime         uint64
 	Priority               TaskPriority
 	Status                 TaskStatus
 	Tags                   []string

@@ -68,6 +68,7 @@ export type TaskResponse = {
   finishedAt?: number;
   dueAt?: number;
   estimatedTime?: number;
+  totalSpentTime: number;
   tags: string[];
   permissionsCount: number;
   attachmentsCount: number;

@@ -57,9 +57,9 @@ func (repository *taskRepository) Add(ctx context.Context, dbExecutor database.D
 		ctx,
 		`
             INSERT INTO tasks
-				(id, project_id, task_index, summary, description, creator_id, created_at, updated_at, deleted_at, started_at, finished_at, due_at, priority_id, status_id, cover_attachment_id)
+				(id, project_id, task_index, summary, description, creator_id, created_at, updated_at, deleted_at, started_at, finished_at, due_at, estimated_time, priority_id, status_id, cover_attachment_id)
 			VALUES
-				(?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, NULL)
+				(?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, ?, NULL)
         `,
 		dto.ID,
 		projectID,
@@ -71,6 +71,7 @@ func (repository *taskRepository) Add(ctx context.Context, dbExecutor database.D
 		dto.StartedAt,
 		dto.FinishedAt,
 		dto.DueAt,
+		dto.EstimatedTime,
 		dto.PriorityID,
 		dto.StatusID,
 	)
@@ -92,6 +93,7 @@ func (repository *taskRepository) Update(ctx context.Context, dbExecutor databas
 				started_at = ?,
 				finished_at = ?,
 				due_at = ?,
+				estimated_time = ?,
 				priority_id = ?,
 				status_id = ?
 			WHERE
@@ -105,6 +107,7 @@ func (repository *taskRepository) Update(ctx context.Context, dbExecutor databas
 		dto.StartedAt,
 		dto.FinishedAt,
 		dto.DueAt,
+		dto.EstimatedTime,
 		dto.PriorityID,
 		dto.StatusID,
 		dto.ID,
@@ -212,6 +215,7 @@ func (repository *taskRepository) Get(ctx context.Context, dbExecutor database.D
 				T.started_at,
 				T.finished_at,
 				T.due_at,
+				T.estimated_time,
 				T.status_id,
 				TS.name AS status_name,
 				TS.item_hex_color AS status_hex_color,
@@ -223,7 +227,8 @@ func (repository *taskRepository) Get(ctx context.Context, dbExecutor database.D
 				IFNULL(TN.notes_count, 0) AS notes_count,
 				IFNULL(TA.attachments_count, 0) AS attachments_count,
 				IFNULL(THO.history_operations_count, 0) AS history_operations_count,
-				IFNULL(TTT.time_trackings_count, 0) AS time_trackings_count
+				IFNULL(TTT.time_trackings_count, 0) AS time_trackings_count,
+				IFNULL(TTT_SUM.total_spent_time, 0) AS total_spent_time
             FROM tasks T
 			INNER JOIN projects P on P.id = T.project_id
 			INNER JOIN task_priorities TP ON TP.id = T.priority_id
@@ -249,6 +254,11 @@ func (repository *taskRepository) Get(ctx context.Context, dbExecutor database.D
 				FROM history_operations
 				GROUP BY task_id
 			) THO ON THO.task_id = T.id
+			LEFT JOIN (
+				SELECT task_id, SUM(spent_time) as total_spent_time
+				FROM task_time_trackings
+				GROUP BY task_id
+			) TTT_SUM ON TTT_SUM.task_id = T.id
             WHERE
 				T.id = ?
         `,
@@ -265,6 +275,7 @@ func (repository *taskRepository) Get(ctx context.Context, dbExecutor database.D
 		&dto.StartedAt,
 		&dto.FinishedAt,
 		&dto.DueAt,
+		&dto.EstimatedTime,
 		&dto.StatusID,
 		&dto.StatusName,
 		&dto.StatusHexColor,
@@ -277,6 +288,7 @@ func (repository *taskRepository) Get(ctx context.Context, dbExecutor database.D
 		&dto.AttachmentsCount,
 		&dto.HistoryOperationsCount,
 		&dto.TimeTrackingsCount,
+		&dto.TotalSpentTime,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -305,6 +317,7 @@ func (repository *taskRepository) Search(ctx context.Context, dbExecutor databas
 			T.started_at,
 			T.finished_at,
 			T.due_at,
+			T.estimated_time,
 			T.status_id,
 			TS.name AS status_name,
 			TS.item_hex_color AS status_hex_color,
@@ -425,6 +438,7 @@ func (repository *taskRepository) Search(ctx context.Context, dbExecutor databas
 			&dto.StartedAt,
 			&dto.FinishedAt,
 			&dto.DueAt,
+			&dto.EstimatedTime,
 			&dto.StatusID,
 			&dto.StatusName,
 			&dto.StatusHexColor,
