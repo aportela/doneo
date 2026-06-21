@@ -19,7 +19,7 @@ type addRequest struct {
 	ID            string       `json:"id"`
 	Summary       string       `json:"summary"`
 	Description   *string      `json:"description"`
-	EstimatedTime *uint64      `json:"estimatedTime"`
+	EstimatedTime uint64       `json:"estimatedTime"`
 	Priority      taskPriority `json:"priority"`
 	Status        taskStatus   `json:"status"`
 	Tags          []string     `json:"tags"`
@@ -34,7 +34,7 @@ type updateRequest struct {
 	StartedAt     *int64       `json:"startedAt"`
 	FinishedAt    *int64       `json:"finishedAt"`
 	DueAt         *int64       `json:"dueAt"`
-	EstimatedTime *uint64      `json:"estimatedTime"`
+	EstimatedTime uint64       `json:"estimatedTime"`
 	Tags          []string     `json:"tags"`
 }
 

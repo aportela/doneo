@@ -214,7 +214,7 @@ var schemaQueries = []schemaMigration{
 					started_at INTEGER,
 					finished_at INTEGER,
 					due_at INTEGER,
-					estimated_time INTEGER,
+					estimated_time INTEGER NOT NULL DEFAULT 0,
 					priority_id TEXT NOT NULL CHECK(length(priority_id) == 36),
 					status_id TEXT NOT NULL CHECK(length(status_id) == 36),
 					cover_attachment_id TEXT CHECK(length(cover_attachment_id) == 36),

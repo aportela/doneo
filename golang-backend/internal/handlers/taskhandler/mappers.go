@@ -22,7 +22,7 @@ func addRequestToDomain(request addRequest) domain.Task {
 		Status: domain.TaskStatus{
 			ID: request.Status.ID,
 		},
-		EstimatedTime: *request.EstimatedTime,
+		EstimatedTime: request.EstimatedTime,
 		Tags:          request.Tags,
 	}
 }
@@ -41,7 +41,7 @@ func updateRequestToDomain(request updateRequest) domain.Task {
 		StartedAt:     utils.Int64PtrToTimePtr(request.StartedAt),
 		FinishedAt:    utils.Int64PtrToTimePtr(request.FinishedAt),
 		DueAt:         utils.Int64PtrToTimePtr(request.DueAt),
-		EstimatedTime: *request.EstimatedTime,
+		EstimatedTime: request.EstimatedTime,
 		Tags:          request.Tags,
 	}
 }
