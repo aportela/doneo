@@ -226,6 +226,15 @@ export default {
           },
         },
       },
+      progress: {
+        TaskSpentEstimatedPercent: {
+          labels: {
+            spent: "Spent:",
+            estimated: "Estimated:",
+            overrun: "Overrun:",
+          },
+        },
+      },
     },
     buttons: {
       Save: {
