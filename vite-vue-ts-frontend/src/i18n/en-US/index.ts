@@ -229,6 +229,7 @@ export default {
       progress: {
         TaskSpentEstimatedPercent: {
           labels: {
+            taskProgress: "Task progress",
             spent: "Spent:",
             estimated: "Estimated:",
             overrun: "Overrun:",
