@@ -12,22 +12,22 @@ import (
 
 func toDTO(taskTimeTracking domain.TaskTimeTracking) taskTimeTrackingDTO {
 	return taskTimeTrackingDTO{
-		ID:           taskTimeTracking.ID,
-		CreatedAt:    taskTimeTracking.CreatedAt.UnixMilli(),
-		CreatorID:    taskTimeTracking.CreatedBy.ID,
-		CreatorName:  taskTimeTracking.CreatedBy.Name,
-		Summary:      taskTimeTracking.Summary,
-		TotalSeconds: taskTimeTracking.TotalSeconds,
+		ID:          taskTimeTracking.ID,
+		CreatedAt:   taskTimeTracking.CreatedAt.UnixMilli(),
+		CreatorID:   taskTimeTracking.CreatedBy.ID,
+		CreatorName: taskTimeTracking.CreatedBy.Name,
+		Summary:     taskTimeTracking.Summary,
+		SpentTime:   taskTimeTracking.SpentTime,
 	}
 }
 
 func toDomain(taskTimeTracking taskTimeTrackingDTO) domain.TaskTimeTracking {
 	return domain.TaskTimeTracking{
-		ID:           taskTimeTracking.ID,
-		CreatedAt:    time.UnixMilli(taskTimeTracking.CreatedAt),
-		CreatedBy:    domain.UserBase{ID: taskTimeTracking.CreatorID, Name: taskTimeTracking.CreatorName},
-		Summary:      taskTimeTracking.Summary,
-		TotalSeconds: taskTimeTracking.TotalSeconds,
+		ID:        taskTimeTracking.ID,
+		CreatedAt: time.UnixMilli(taskTimeTracking.CreatedAt),
+		CreatedBy: domain.UserBase{ID: taskTimeTracking.CreatorID, Name: taskTimeTracking.CreatorName},
+		Summary:   taskTimeTracking.Summary,
+		SpentTime: taskTimeTracking.SpentTime,
 	}
 }
 

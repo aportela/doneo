@@ -2,13 +2,13 @@ import type { UserBaseResponse } from "../../users/types/dto";
 
 export type AddRequest = {
   summary: string;
-  totalSeconds: number;
+  spentTime: number;
 };
 
 export type UpdateRequest = {
   id: string;
   summary: string;
-  totalSeconds: number;
+  spentTime: number;
 };
 
 export type TimeTrackingResponse = {
@@ -16,7 +16,7 @@ export type TimeTrackingResponse = {
   createdBy: UserBaseResponse;
   createdAt: number;
   summary: string;
-  totalSeconds: number;
+  spentTime: number;
 };
 
 export type SearchResponse = {

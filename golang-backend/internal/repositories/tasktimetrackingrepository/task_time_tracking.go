@@ -29,7 +29,7 @@ func (repository *taskTimeTrackingRepository) Add(ctx context.Context, dbExecuto
 		ctx,
 		`
             INSERT INTO task_time_trackings
-				(id, task_id, creator_id, created_at, summary, total_seconds)
+				(id, task_id, creator_id, created_at, summary, spent_time)
 			VALUES
 				(?, ?, ?, ?, ?, ?)
         `,
@@ -38,7 +38,7 @@ func (repository *taskTimeTrackingRepository) Add(ctx context.Context, dbExecuto
 		dto.CreatorID,
 		dto.CreatedAt,
 		dto.Summary,
-		dto.TotalSeconds,
+		dto.SpentTime,
 	)
 	if err != nil {
 		return mapSQLiteError(err)
@@ -54,12 +54,12 @@ func (repository *taskTimeTrackingRepository) Update(ctx context.Context, dbExec
             UPDATE task_time_trackings
 			SET
 				summary = ?,
-				total_seconds = ?
+				spent_time = ?
 			WHERE
 				id = ?
         `,
 		dto.Summary,
-		dto.TotalSeconds,
+		dto.SpentTime,
 		dto.ID,
 	)
 	if err != nil {
@@ -109,7 +109,7 @@ func (repository *taskTimeTrackingRepository) Get(ctx context.Context, dbExecuto
 				U.name AS creator_name,
 				TTT.created_at,
 				TTT.summary,
-				TTT.total_seconds
+				TTT.spent_time
             FROM task_time_trackings TTT
 			INNER JOIN users U ON U.ID = TTT.creator_id
             WHERE
@@ -121,7 +121,7 @@ func (repository *taskTimeTrackingRepository) Get(ctx context.Context, dbExecuto
 		&dto.CreatorName,
 		&dto.CreatedAt,
 		&dto.Summary,
-		&dto.TotalSeconds,
+		&dto.SpentTime,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -142,7 +142,7 @@ func (repository *taskTimeTrackingRepository) GetTaskTimeTrackings(ctx context.C
 				U.name AS creator_name,
 				TTT.created_at,
 				TTT.summary,
-				TTT.total_seconds
+				TTT.spent_time
             FROM task_time_trackings TTT
 			INNER JOIN users U ON U.ID = TTT.creator_id
             WHERE
@@ -159,7 +159,7 @@ func (repository *taskTimeTrackingRepository) GetTaskTimeTrackings(ctx context.C
 	for rows.Next() {
 		var dto taskTimeTrackingDTO
 		if err := rows.Scan(
-			&dto.ID, &dto.CreatorID, &dto.CreatorName, &dto.CreatedAt, &dto.Summary, &dto.TotalSeconds,
+			&dto.ID, &dto.CreatorID, &dto.CreatorName, &dto.CreatedAt, &dto.Summary, &dto.SpentTime,
 		); err != nil {
 			return nil, err
 		}

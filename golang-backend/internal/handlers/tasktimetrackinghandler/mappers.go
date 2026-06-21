@@ -7,26 +7,26 @@ import (
 
 func addRequestToDomain(request addRequest) domain.TaskTimeTracking {
 	return domain.TaskTimeTracking{
-		Summary:      request.Summary,
-		TotalSeconds: request.TotalSeconds,
+		Summary:   request.Summary,
+		SpentTime: request.SpentTime,
 	}
 }
 
 func updateRequestToDomain(request updateRequest) domain.TaskTimeTracking {
 	return domain.TaskTimeTracking{
-		ID:           request.ID,
-		Summary:      request.Summary,
-		TotalSeconds: request.TotalSeconds,
+		ID:        request.ID,
+		Summary:   request.Summary,
+		SpentTime: request.SpentTime,
 	}
 }
 
 func domainToResponse(taskTimeTracking domain.TaskTimeTracking) taskTimeTrakingResponse {
 	return taskTimeTrakingResponse{
-		ID:           taskTimeTracking.ID,
-		CreatedBy:    userhandler.BaseDomainToBaseResponse(taskTimeTracking.CreatedBy),
-		CreatedAt:    taskTimeTracking.CreatedAt.UnixMilli(),
-		Summary:      taskTimeTracking.Summary,
-		TotalSeconds: taskTimeTracking.TotalSeconds,
+		ID:        taskTimeTracking.ID,
+		CreatedBy: userhandler.BaseDomainToBaseResponse(taskTimeTracking.CreatedBy),
+		CreatedAt: taskTimeTracking.CreatedAt.UnixMilli(),
+		Summary:   taskTimeTracking.Summary,
+		SpentTime: taskTimeTracking.SpentTime,
 	}
 }
 

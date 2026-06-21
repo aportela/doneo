@@ -54,7 +54,7 @@
     const serverErrors = ref<Record<string, string>>({});
 
     const isSaveDisabled = computed<boolean>(() => {
-        return !timeTracking.value.summary || timeTracking.value.totalSeconds <= 0;
+        return !timeTracking.value.summary || timeTracking.value.spentTime <= 0;
     });
 
     // TODO: allow updates
@@ -86,7 +86,7 @@
             try {
                 const payload: AddRequest = {
                     summary: timeTracking.value.summary,
-                    totalSeconds: timeTracking.value.totalSeconds,
+                    spentTime: timeTracking.value.spentTime,
                 };
                 const addedTimeTracking: TimeTrackingResponse = await timeTrackingService.addTaskTimeTracking(props.projectId, props.taskId, payload);
                 emit('add', new TimeTracking(addedTimeTracking));
@@ -160,7 +160,7 @@
                     :placeholder="t('modules.timeTracking.components.TimeTrackingForm.inputs.summary.placeholder')"
                     v-model:value="timeTracking.summary" />
             </n-form-item>
-            <TimeSpentInput v-model:seconds="timeTracking.totalSeconds" />
+            <TimeSpentInput v-model:seconds="timeTracking.spentTime" />
         </n-form>
         <template #action>
             <n-flex>

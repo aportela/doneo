@@ -299,7 +299,7 @@ var schemaQueries = []schemaMigration{
 					creator_id TEXT NOT NULL CHECK(length(creator_id) == 36),
 					created_at INTEGER NOT NULL,
 					summary TEXT NOT NULL CHECK(length(summary) BETWEEN 1 AND 128),
-					total_seconds INTEGER NOT NULL,
+					spent_time INTEGER NOT NULL,
 					PRIMARY KEY (id),
 					FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
 					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE

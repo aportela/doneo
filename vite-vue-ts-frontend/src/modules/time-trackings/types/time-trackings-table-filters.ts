@@ -4,5 +4,5 @@ export interface TimeTrackingsTableFilters {
   createdByUserId: string | null;
   createdAt: TimestampRange;
   summary: string;
-  // TODO: totalSeconds
+  // TODO: spentTime
 }

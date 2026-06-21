@@ -7,14 +7,14 @@ export class TimeTracking {
   createdBy: UserBase;
   createdAt: IDate | null;
   summary: string;
-  totalSeconds: number;
+  spentTime: number;
 
   constructor(data?: TimeTrackingDTO) {
     this.id = data?.id ?? null;
     this.createdBy = new UserBase(data?.createdBy);
     this.createdAt = data?.createdAt ? new IDate(data.createdAt) : null;
     this.summary = data?.summary ?? "";
-    this.totalSeconds = data?.totalSeconds ?? 0;
+    this.spentTime = data?.spentTime ?? 0;
   }
 
   toDTO(): TimeTrackingDTO {
@@ -23,14 +23,14 @@ export class TimeTracking {
       createdBy: this.createdBy.toDTO(),
       createdAt: this.createdAt?.msTimestamp ?? 0,
       summary: this.summary ?? "",
-      totalSeconds: this.totalSeconds ?? 0,
+      spentTime: this.spentTime ?? 0,
     };
   }
 
   geti18nTimeParts() {
-    const days = Math.floor(this.totalSeconds / 86400);
-    const hours = Math.floor((this.totalSeconds % 86400) / 3600);
-    const minutes = Math.floor((this.totalSeconds % 3600) / 60);
+    const days = Math.floor(this.spentTime / 86400);
+    const hours = Math.floor((this.spentTime % 86400) / 3600);
+    const minutes = Math.floor((this.spentTime % 3600) / 60);
 
     return [
       { key: "shared.labels.time.day", count: days },
