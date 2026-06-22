@@ -9,6 +9,7 @@ import (
 	"github.com/aportela/doneo/internal/cache"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/userrepository"
 	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/utils"
@@ -77,6 +78,13 @@ func (service *userService) Update(ctx context.Context, user domain.User, passwo
 func (service *userService) Patch(ctx context.Context, user domain.User) error {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return err
+	}
+	contextUser, ok := middlewares.GetContextUser(ctx)
+	if !ok {
+		return fmt.Errorf("[UserService] user not found in context")
+	}
+	if user.ID == contextUser.ID {
+		return fmt.Errorf("[UserService] a user cannot delete themselves")
 	}
 	if user.DeletedAt == nil {
 		if err := service.userRepository.UnDelete(ctx, service.db, user.ID); err != nil {
