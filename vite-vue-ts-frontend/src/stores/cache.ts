@@ -35,6 +35,14 @@ export const useCacheStore = defineStore("cacheStore", {
   },
 
   actions: {
+    clearAllCaches() {
+      this.clearUsersCache;
+      this.clearProjectStatusesCache();
+      this.clearProjectPrioritiesCache();
+      this.clearProjectTypesCache();
+      this.clearTaskStatusesCache();
+      this.clearTaskPrioritiesCache();
+    },
     setUsersCache(users: UserBaseResponse[]) {
       this.usersCache = users;
     },
