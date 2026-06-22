@@ -50,19 +50,21 @@
 
 <template>
     <n-flex>
-        <n-form-item :label="t('shared.components.inputs.TimeSpentInput.inputs.daysSpent.label')">
-            <n-input-number :min="0"
+        <n-form-item :label="t('shared.components.inputs.TimeSpentInput.inputs.daysSpent.label')" style="">
+            <n-input-number class="doneo-n-form-item-auto-size" :min="0"
                 :placeholder="t('shared.components.inputs.TimeSpentInput.inputs.daysSpent.placeholder')"
                 :value="parts.days" @update:value="val => updatePart('days', val)" clearable>
             </n-input-number>
         </n-form-item>
-        <n-form-item :label="t('shared.components.inputs.TimeSpentInput.inputs.hoursSpent.label')">
+        <n-form-item class="doneo-n-form-item-auto-size"
+            :label="t('shared.components.inputs.TimeSpentInput.inputs.hoursSpent.label')">
             <n-input-number :min="0"
                 :placeholder="t('shared.components.inputs.TimeSpentInput.inputs.hoursSpent.placeholder')"
                 :value="parts.hours" @update:value="val => updatePart('hours', val)" clearable>
             </n-input-number>
         </n-form-item>
-        <n-form-item :label="t('shared.components.inputs.TimeSpentInput.inputs.minutesSpent.label')">
+        <n-form-item class="doneo-n-form-item-auto-size"
+            :label="t('shared.components.inputs.TimeSpentInput.inputs.minutesSpent.label')">
             <n-input-number :min="0"
                 :placeholder="t('shared.components.inputs.TimeSpentInput.inputs.minutesSpent.placeholder')"
                 :value="parts.minutes" @update:value="val => updatePart('minutes', val)" clearable>
@@ -71,4 +73,9 @@
     </n-flex>
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+    .doneo-n-form-item-auto-size {
+        flex: 1;
+        min-width: 0;
+    }
+</style>
