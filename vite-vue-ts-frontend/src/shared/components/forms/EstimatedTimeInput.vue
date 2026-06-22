@@ -49,7 +49,7 @@
 </script>
 
 <template>
-    <n-flex>
+    <n-flex justify="space-between">
         <n-form-item :label="t('shared.components.inputs.EstimatedTimeInput.inputs.estimatedDays.label')">
             <n-input-number :min="0"
                 :placeholder="t('shared.components.inputs.EstimatedTimeInput.inputs.estimatedDays.placeholder')"
