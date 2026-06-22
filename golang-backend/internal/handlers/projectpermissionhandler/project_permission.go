@@ -33,22 +33,19 @@ func (handler *projectPermissionHandler) Add(w http.ResponseWriter, r *http.Requ
 	}
 	projectPermission := addRequestToDomain(request)
 	projectID := chi.URLParam(r, "project_id")
-
-	projectPermission, err := handler.service.Add(r.Context(), projectID, projectPermission)
-	if err != nil {
+	if projectPermission, err := handler.service.Add(r.Context(), projectID, projectPermission); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPermissionHandler] failed to add project permission: %w", err))
 		return
+	} else {
+		handlers.ToHandlerJSONResponse(w, domainToResponse(projectPermission), nil, http.StatusCreated)
 	}
-
-	handlers.ToHandlerJSONResponse(w, domainToResponse(projectPermission), nil, http.StatusCreated)
 }
 
 func (handler *projectPermissionHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	projectPermissionID := chi.URLParam(r, "permission_id")
-	err := handler.service.Delete(r.Context(), projectID, projectPermissionID)
-	if err != nil {
+	if err := handler.service.Delete(r.Context(), projectID, projectPermissionID); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectPermissionHandler] failed to delete project permission: %w", err))
 		return
 	}

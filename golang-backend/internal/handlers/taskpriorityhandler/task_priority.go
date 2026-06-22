@@ -37,12 +37,12 @@ func (handler *taskPriorityHandler) Add(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	taskPriority := addRequestToDomain(request)
-	taskPriority, err := handler.service.Add(r.Context(), taskPriority)
-	if err != nil {
+	if taskPriority, err := handler.service.Add(r.Context(), taskPriority); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskPriorityHandler] failed to add task priority: %w", err))
 		return
+	} else {
+		handlers.ToHandlerJSONResponse(w, DomainToResponse(taskPriority), nil, http.StatusCreated)
 	}
-	handlers.ToHandlerJSONResponse(w, DomainToResponse(taskPriority), nil, http.StatusCreated)
 }
 
 func (handler *taskPriorityHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -54,30 +54,29 @@ func (handler *taskPriorityHandler) Update(w http.ResponseWriter, r *http.Reques
 	}
 	taskPriority := updateRequestToDomain(request)
 	taskPriority.ID = chi.URLParam(r, "id")
-	taskPriority, err := handler.service.Update(r.Context(), taskPriority)
-	if err != nil {
+	if taskPriority, err := handler.service.Update(r.Context(), taskPriority); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskPriorityHandler] failed to update task priority: %w", err))
 		return
+	} else {
+		handlers.ToHandlerJSONResponse(w, DomainToResponse(taskPriority), nil)
 	}
-	handlers.ToHandlerJSONResponse(w, DomainToResponse(taskPriority), nil)
 }
 
 func (handler *taskPriorityHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	taskPriorityID := chi.URLParam(r, "id")
-	err := handler.service.Delete(r.Context(), taskPriorityID)
-	if err != nil {
+	if err := handler.service.Delete(r.Context(), taskPriorityID); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskPriorityHandler] failed to delete task priority: %w", err))
 		return
+	} else {
+		handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 	}
-	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
 
 func (handler *taskPriorityHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	taskPriorityID := chi.URLParam(r, "id")
-	taskPriority, err := handler.service.Get(r.Context(), taskPriorityID)
-	if err != nil {
+	if taskPriority, err := handler.service.Get(r.Context(), taskPriorityID); err != nil {
 		if err == domain.NotFoundError {
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskPriorityHandler] failed to get non existent task priority: %w", err))
 			return
@@ -85,8 +84,9 @@ func (handler *taskPriorityHandler) Get(w http.ResponseWriter, r *http.Request) 
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskPriorityHandler] failed to get task priority: %w", err))
 			return
 		}
+	} else {
+		handlers.ToHandlerJSONResponse(w, DomainToResponse(taskPriority), nil)
 	}
-	handlers.ToHandlerJSONResponse(w, DomainToResponse(taskPriority), nil)
 }
 
 func (handler *taskPriorityHandler) SearchBase(w http.ResponseWriter, r *http.Request) {

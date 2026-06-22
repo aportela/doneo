@@ -37,17 +37,17 @@ func (handler *taskHandler) Add(w http.ResponseWriter, r *http.Request) {
 	}
 	task := addRequestToDomain(request)
 	projectID := chi.URLParam(r, "project_id")
-	task, err := handler.service.Add(r.Context(), projectID, task)
-	if err != nil {
+	if task, err := handler.service.Add(r.Context(), projectID, task); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to add task with ID %s: %w", request.ID, err))
 		return
+	} else {
+		if task, err := handler.service.Get(r.Context(), projectID, task.ID); err != nil {
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to get new task with ID %s: %w", task.ID, err))
+			return
+		} else {
+			handlers.ToHandlerJSONResponse(w, DomainToResponse(task), nil, http.StatusCreated)
+		}
 	}
-	task, err = handler.service.Get(r.Context(), projectID, task.ID)
-	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to get new task with ID %s: %w", task.ID, err))
-		return
-	}
-	handlers.ToHandlerJSONResponse(w, DomainToResponse(task), nil, http.StatusCreated)
 }
 
 func (handler *taskHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -60,25 +60,24 @@ func (handler *taskHandler) Update(w http.ResponseWriter, r *http.Request) {
 	task := updateRequestToDomain(request)
 	projectID := chi.URLParam(r, "project_id")
 	task.ID = chi.URLParam(r, "task_id")
-	task, err := handler.service.Update(r.Context(), projectID, task)
-	if err != nil {
+	if task, err := handler.service.Update(r.Context(), projectID, task); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to update task with ID %s: %w", task.ID, err))
 		return
+	} else {
+		if task, err := handler.service.Get(r.Context(), projectID, task.ID); err != nil {
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to get updated task with ID %s: %w", request.ID, err))
+			return
+		} else {
+			handlers.ToHandlerJSONResponse(w, DomainToResponse(task), nil)
+		}
 	}
-	task, err = handler.service.Get(r.Context(), projectID, task.ID)
-	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to get updated task with ID %s: %w", request.ID, err))
-		return
-	}
-	handlers.ToHandlerJSONResponse(w, DomainToResponse(task), nil)
 }
 
 func (handler *taskHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")
-	err := handler.service.Delete(r.Context(), projectID, taskID)
-	if err != nil {
+	if err := handler.service.Delete(r.Context(), projectID, taskID); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to delete project with ID %s: %w", projectID, err))
 		return
 	}
@@ -89,8 +88,7 @@ func (handler *taskHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")
-	project, err := handler.service.Get(r.Context(), projectID, taskID)
-	if err != nil {
+	if project, err := handler.service.Get(r.Context(), projectID, taskID); err != nil {
 		if err == domain.NotFoundError {
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] not found project with ID %s: %w", taskID, err))
 			return
@@ -98,8 +96,9 @@ func (handler *taskHandler) Get(w http.ResponseWriter, r *http.Request) {
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to get project with ID %s: %w", taskID, err))
 			return
 		}
+	} else {
+		handlers.ToHandlerJSONResponse(w, DomainToResponse(project), nil)
 	}
-	handlers.ToHandlerJSONResponse(w, DomainToResponse(project), nil)
 }
 
 func (handler *taskHandler) Search(w http.ResponseWriter, r *http.Request) {
@@ -112,7 +111,6 @@ func (handler *taskHandler) Search(w http.ResponseWriter, r *http.Request) {
 	projectID := chi.URLParam(r, "project_id")
 	filter := domain.SearchTaskFilter{}
 	filter.ProjectID = &projectID
-
 	if request.Filter != nil {
 		if request.Filter.Summary != nil {
 			filter.Summary = request.Filter.Summary

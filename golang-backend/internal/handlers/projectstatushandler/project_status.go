@@ -37,12 +37,12 @@ func (handler *projectStatusHandler) Add(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	projectStatus := addRequestToDomain(request)
-	projectStatus, err := handler.service.Add(r.Context(), projectStatus)
-	if err != nil {
+	if projectStatus, err := handler.service.Add(r.Context(), projectStatus); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectStatusHandler] failed to add project status: %w", err))
 		return
+	} else {
+		handlers.ToHandlerJSONResponse(w, DomainToResponse(projectStatus), nil, http.StatusCreated)
 	}
-	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectStatus), nil, http.StatusCreated)
 }
 
 func (handler *projectStatusHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -54,19 +54,18 @@ func (handler *projectStatusHandler) Update(w http.ResponseWriter, r *http.Reque
 	}
 	projectStatus := updateRequestToDomain(request)
 	projectStatus.ID = chi.URLParam(r, "id")
-	projectStatus, err := handler.service.Update(r.Context(), projectStatus)
-	if err != nil {
+	if projectStatus, err := handler.service.Update(r.Context(), projectStatus); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectStatusHandler] failed to update project status: %w", err))
 		return
+	} else {
+		handlers.ToHandlerJSONResponse(w, DomainToResponse(projectStatus), nil)
 	}
-	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectStatus), nil)
 }
 
 func (handler *projectStatusHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectStatusID := chi.URLParam(r, "id")
-	err := handler.service.Delete(r.Context(), projectStatusID)
-	if err != nil {
+	if err := handler.service.Delete(r.Context(), projectStatusID); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectStatusHandler] failed to delete project status: %w", err))
 		return
 	}
@@ -76,8 +75,7 @@ func (handler *projectStatusHandler) Delete(w http.ResponseWriter, r *http.Reque
 func (handler *projectStatusHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectStatusID := chi.URLParam(r, "id")
-	projectStatus, err := handler.service.Get(r.Context(), projectStatusID)
-	if err != nil {
+	if projectStatus, err := handler.service.Get(r.Context(), projectStatusID); err != nil {
 		if err == domain.NotFoundError {
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectStatusHandler] failed to get non existent project status: %w", err))
 			return
@@ -85,8 +83,9 @@ func (handler *projectStatusHandler) Get(w http.ResponseWriter, r *http.Request)
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectStatusHandler] failed to get projectStatus: %w", err))
 			return
 		}
+	} else {
+		handlers.ToHandlerJSONResponse(w, DomainToResponse(projectStatus), nil)
 	}
-	handlers.ToHandlerJSONResponse(w, DomainToResponse(projectStatus), nil)
 }
 
 func (handler *projectStatusHandler) SearchBase(w http.ResponseWriter, r *http.Request) {

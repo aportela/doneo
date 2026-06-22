@@ -37,17 +37,17 @@ func (handler *projectHandler) Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	project := addRequestToDomain(request)
-	project, err := handler.service.Add(r.Context(), project)
-	if err != nil {
+	if project, err := handler.service.Add(r.Context(), project); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to add project with ID %s: %w", request.ID, err))
 		return
+	} else {
+		if project, err := handler.service.Get(r.Context(), project.ID); err != nil {
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to get new project with ID %s: %w", project.ID, err))
+			return
+		} else {
+			handlers.ToHandlerJSONResponse(w, DomainToResponse(project), nil, http.StatusCreated)
+		}
 	}
-	project, err = handler.service.Get(r.Context(), project.ID)
-	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to get new project with ID %s: %w", project.ID, err))
-		return
-	}
-	handlers.ToHandlerJSONResponse(w, DomainToResponse(project), nil, http.StatusCreated)
 }
 
 func (handler *projectHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -60,35 +60,34 @@ func (handler *projectHandler) Update(w http.ResponseWriter, r *http.Request) {
 	project := updateRequestToDomain(request)
 	project.ID = chi.URLParam(r, "project_id")
 	project.UpdatedAt = utils.NowToTimePtr()
-	project, err := handler.service.Update(r.Context(), project)
-	if err != nil {
+	if project, err := handler.service.Update(r.Context(), project); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to update project with ID %s: %w", project.ID, err))
 		return
+	} else {
+		if project, err := handler.service.Get(r.Context(), project.ID); err != nil {
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to get updated project with ID %s: %w", request.ID, err))
+			return
+		} else {
+			handlers.ToHandlerJSONResponse(w, DomainToResponse(project), nil)
+		}
 	}
-	project, err = handler.service.Get(r.Context(), project.ID)
-	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to get updated project with ID %s: %w", request.ID, err))
-		return
-	}
-	handlers.ToHandlerJSONResponse(w, DomainToResponse(project), nil)
 }
 
 func (handler *projectHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
-	err := handler.service.Delete(r.Context(), projectID)
-	if err != nil {
+	if err := handler.service.Delete(r.Context(), projectID); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to delete project with ID %s: %w", projectID, err))
 		return
+	} else {
+		handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 	}
-	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
 
 func (handler *projectHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
-	project, err := handler.service.Get(r.Context(), projectID)
-	if err != nil {
+	if project, err := handler.service.Get(r.Context(), projectID); err != nil {
 		if err == domain.NotFoundError {
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] not found project with ID %s: %w", projectID, err))
 			return
@@ -96,8 +95,9 @@ func (handler *projectHandler) Get(w http.ResponseWriter, r *http.Request) {
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to get project with ID %s: %w", projectID, err))
 			return
 		}
+	} else {
+		handlers.ToHandlerJSONResponse(w, DomainToResponse(project), nil)
 	}
-	handlers.ToHandlerJSONResponse(w, DomainToResponse(project), nil)
 }
 
 func (handler *projectHandler) Search(w http.ResponseWriter, r *http.Request) {

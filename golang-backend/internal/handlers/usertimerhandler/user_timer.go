@@ -34,8 +34,7 @@ func (handler *userTimerHandler) StartUserTimer(w http.ResponseWriter, r *http.R
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserTimerHandler] invalid request payload: %w", err))
 		return
 	}
-	err := handler.userTimerService.StartUserTimer(r.Context(), request.Summary)
-	if err != nil {
+	if err := handler.userTimerService.StartUserTimer(r.Context(), request.Summary); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserTimerHandler] failed to start user timer: %w", err))
 		return
 	}
@@ -45,8 +44,7 @@ func (handler *userTimerHandler) StartUserTimer(w http.ResponseWriter, r *http.R
 func (handler *userTimerHandler) StopUserTimer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	userTimerID := chi.URLParam(r, "id")
-	err := handler.userTimerService.StopUserTimer(r.Context(), userTimerID)
-	if err != nil {
+	if err := handler.userTimerService.StopUserTimer(r.Context(), userTimerID); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserTimerHandler] failed to stop user timer: %w", err))
 		return
 	}
@@ -56,8 +54,7 @@ func (handler *userTimerHandler) StopUserTimer(w http.ResponseWriter, r *http.Re
 func (handler *userTimerHandler) DeleteUserTimer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	userTimerID := chi.URLParam(r, "id")
-	err := handler.userTimerService.DeleteUserTimer(r.Context(), userTimerID)
-	if err != nil {
+	if err := handler.userTimerService.DeleteUserTimer(r.Context(), userTimerID); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserTimerHandler] failed to delete user timer: %w", err))
 		return
 	}
@@ -66,8 +63,7 @@ func (handler *userTimerHandler) DeleteUserTimer(w http.ResponseWriter, r *http.
 
 func (handler *userTimerHandler) ClearUserTimers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	err := handler.userTimerService.ClearUserTimers(r.Context())
-	if err != nil {
+	if err := handler.userTimerService.ClearUserTimers(r.Context()); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserTimerHandler] failed to clear user timers: %w", err))
 		return
 	}

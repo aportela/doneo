@@ -54,7 +54,6 @@ func (handler *taskTimeTrackingHandler) Update(w http.ResponseWriter, r *http.Re
 	taskTimeTracking.ID = chi.URLParam(r, "task_time_tracking_id")
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")
-
 	if taskTimeTracking, err := handler.service.Update(r.Context(), projectID, taskID, taskTimeTracking); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskTimeTrackingHandler] failed to update task time tracking: %w", err))
 		return
@@ -68,8 +67,7 @@ func (handler *taskTimeTrackingHandler) Delete(w http.ResponseWriter, r *http.Re
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")
 	taskTimeTrackingID := chi.URLParam(r, "task_time_tracking_id")
-	err := handler.service.Delete(r.Context(), projectID, taskID, taskTimeTrackingID)
-	if err != nil {
+	if err := handler.service.Delete(r.Context(), projectID, taskID, taskTimeTrackingID); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskTimeTrackingHandler] failed to delete task time tracking: %w", err))
 		return
 	}
