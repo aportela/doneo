@@ -39,12 +39,12 @@ func (handler *userHandler) Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := addRequestToDomain(request)
-	user, err := handler.service.Add(r.Context(), user, request.Password)
-	if err != nil {
+	if user, err := handler.service.Add(r.Context(), user, request.Password); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] failed to add user: %w", err))
 		return
+	} else {
+		handlers.ToHandlerJSONResponse(w, domainToResponse(user), nil, http.StatusCreated)
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(user), nil, http.StatusCreated)
 }
 
 func (handler *userHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -56,12 +56,12 @@ func (handler *userHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	user := updateRequestToDomain(request)
 	user.ID = chi.URLParam(r, "id")
-	user, err := handler.service.Update(r.Context(), user, request.Password)
-	if err != nil {
+	if user, err := handler.service.Update(r.Context(), user, request.Password); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] failed to update user: %w", err))
 		return
+	} else {
+		handlers.ToHandlerJSONResponse(w, domainToResponse(user), nil)
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(user), nil)
 }
 
 func (handler *userHandler) Patch(w http.ResponseWriter, r *http.Request) {
@@ -72,9 +72,7 @@ func (handler *userHandler) Patch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userID := chi.URLParam(r, "id")
-
-	user, err := handler.service.Get(r.Context(), userID)
-	if err != nil {
+	if user, err := handler.service.Get(r.Context(), userID); err != nil {
 		if err == domain.NotFoundError {
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] failed to get non existent user: %w", err))
 			return
@@ -82,25 +80,22 @@ func (handler *userHandler) Patch(w http.ResponseWriter, r *http.Request) {
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] failed to get user: %w", err))
 			return
 		}
+	} else {
+		if request.DeletedAt == nil {
+			user.DeletedAt = nil
+		}
+		if err := handler.service.Patch(r.Context(), user); err != nil {
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] failed to patch user: %w", err))
+			return
+		}
+		handlers.ToHandlerJSONResponse(w, domainToResponse(user), nil)
 	}
-	if request.DeletedAt == nil {
-		user.DeletedAt = nil
-	}
-	err = handler.service.Patch(r.Context(), user)
-	if err != nil {
-		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserHandler] failed to patch user: %w", err))
-		return
-	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(user), nil)
-
 }
 
 func (handler *userHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	userID := chi.URLParam(r, "id")
-	// TODO: deny delete current session user ?
-	err := handler.service.Delete(r.Context(), userID)
-	if err != nil {
+	if err := handler.service.Delete(r.Context(), userID); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserService] failed to delete user: %w", err))
 		return
 	}
@@ -110,8 +105,7 @@ func (handler *userHandler) Delete(w http.ResponseWriter, r *http.Request) {
 func (handler *userHandler) Purge(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	userID := chi.URLParam(r, "id")
-	err := handler.service.Purge(r.Context(), userID)
-	if err != nil {
+	if err := handler.service.Purge(r.Context(), userID); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserService] failed to purge user: %w", err))
 		return
 	}
@@ -121,8 +115,7 @@ func (handler *userHandler) Purge(w http.ResponseWriter, r *http.Request) {
 func (handler *userHandler) Get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	userID := chi.URLParam(r, "id")
-	user, err := handler.service.Get(r.Context(), userID)
-	if err != nil {
+	if user, err := handler.service.Get(r.Context(), userID); err != nil {
 		if err == domain.NotFoundError {
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserService] failed to get non existent user: %w", err))
 			return
@@ -130,8 +123,9 @@ func (handler *userHandler) Get(w http.ResponseWriter, r *http.Request) {
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[UserService] failed to get user: %w", err))
 			return
 		}
+	} else {
+		handlers.ToHandlerJSONResponse(w, domainToResponse(user), nil)
 	}
-	handlers.ToHandlerJSONResponse(w, domainToResponse(user), nil)
 }
 
 func (handler *userHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
