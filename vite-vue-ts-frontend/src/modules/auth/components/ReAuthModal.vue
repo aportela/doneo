@@ -5,12 +5,14 @@
     import { NModal } from 'naive-ui';
 
     import { useSessionStore } from '../../../stores/session';
+    import { useCacheStore } from '../../../stores/cache.ts';
     import { appBus } from '../../../shared/composables/bus';
     import { TokenManager } from '../services/tokenManager';
     import LoginForm from './LoginForm.vue';
 
     const { t } = useI18n();
     const sessionStore = useSessionStore();
+    const cacheStore = useCacheStore();
 
     let stopBusReauthListener: () => void;
 
@@ -20,6 +22,7 @@
 
     const onSuccessReauth = () => {
         show.value = false;
+        cacheStore.clearAllCaches();
         appBus.emit({ type: "reauthValidNotify", payload: { to: reAuthEmitters } });
         reAuthEmitters.length = 0;
     };
