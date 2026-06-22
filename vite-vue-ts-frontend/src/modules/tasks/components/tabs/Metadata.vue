@@ -332,7 +332,7 @@
             <n-form-item label="Tags">
                 <ToggleTagSelector v-model:value="task.tags" />
             </n-form-item>
-            <n-grid :cols="2" :x-gap="1">
+            <n-grid :cols="2" :x-gap="8">
                 <n-grid-item>
                     <TaskSpentEstimatedPercent type="line" :estimated="task.estimatedTime" :spent="task.totalSpentTime"
                         :height="24" />
