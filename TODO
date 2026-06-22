@@ -44,3 +44,5 @@ return updated entity on all services for using on handler return
 filter notes by creator
 
 toggle details as list / table (ex: notes as current or table)
+
+share change status dropdown component beween projects/tasks
