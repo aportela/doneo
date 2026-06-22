@@ -99,7 +99,7 @@ func (repository *taskRepository) Update(ctx context.Context, dbExecutor databas
 			WHERE
 				id = ?
 			AND
-				deleted_at IS NOT NULL
+				deleted_at IS NULL
         `,
 		dto.Summary,
 		dto.Description,

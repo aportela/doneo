@@ -89,7 +89,7 @@ func (repository *projectRepository) Update(ctx context.Context, dbExecutor data
 			WHERE
 				id = ?
 			AND
-				deleted_at IS NOT NULL
+				deleted_at IS NULL
         `,
 		dto.Slug,
 		dto.Summary,
