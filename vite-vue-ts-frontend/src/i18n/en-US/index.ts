@@ -1552,7 +1552,7 @@ export default {
           header: {
             columns: {
               summary: "Summary",
-              totalTime: "Total time",
+              spentTime: "Spent time",
               createdAt: "Created at",
               createdBy: "Created by",
             },

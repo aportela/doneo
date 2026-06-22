@@ -72,8 +72,8 @@
             isFiltered: () => isFilteredBySummary.value,
         },
         {
-            label: t("modules.timeTracking.components.TimeTrackingsTable.header.columns.totalTime"),
-            field: "totalTime",
+            label: t("modules.timeTracking.components.TimeTrackingsTable.header.columns.spentTime"),
+            field: "spentTime",
             visible: true,
             sortable: false,
             isFiltered: () => false,
