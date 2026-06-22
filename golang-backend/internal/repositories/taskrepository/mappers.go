@@ -27,6 +27,7 @@ func toDTO(task domain.Task) taskDTO {
 		StartedAt:              utils.TimePtrToSQLNullInt64(task.StartedAt),
 		FinishedAt:             utils.TimePtrToSQLNullInt64(task.FinishedAt),
 		DueAt:                  utils.TimePtrToSQLNullInt64(task.DueAt),
+		EstimatedTime:          task.EstimatedTime,
 		PriorityID:             task.Priority.ID,
 		PriorityName:           task.Priority.Name,
 		StatusID:               task.Status.ID,
