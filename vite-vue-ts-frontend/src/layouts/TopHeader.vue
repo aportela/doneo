@@ -14,14 +14,16 @@
     import { api } from '../shared/composables/api';
     import { useSessionStore } from "../stores/session";
     import { useLoadingStore } from '../stores/loading';
+    import { useCacheStore } from "../stores/cache.ts";
     import { renderIcon } from '../shared/composables/naive-ui-icon';
     import TimerButton from "../shared/components/buttons/TimerButton.vue";
 
 
     const router = useRouter();
-    const sessionStore = useSessionStore();
 
+    const sessionStore = useSessionStore();
     const loadingStore = useLoadingStore();
+    const cacheStore = useCacheStore();
 
     const commonIconSize = 18;
 
@@ -52,6 +54,7 @@
         loadingStore.set(true);
         api.auth.signOut().then(() => {
             sessionStore.removeAccessToken();
+            cacheStore.clearAllCaches();
             router.push(
                 { name: "login" }
             ).catch((e) => {
