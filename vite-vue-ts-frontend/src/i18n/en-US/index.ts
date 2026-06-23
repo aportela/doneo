@@ -1443,6 +1443,10 @@ export default {
           notifications: {
             taskStatusUpdated: 'Task "{summary}" changed status to {status}',
           },
+          errors: {
+            notFoundError: "We couldn’t find the specified task",
+            taskStatusUpdateError: 'Error updating status for task "{summary}"',
+          },
         },
         TasksTable: {
           header: {

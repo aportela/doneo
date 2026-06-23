@@ -39,6 +39,13 @@ export type UpdateRequest = {
   tags: string[];
 };
 
+export type PatchRequest = {
+  id: string;
+  status: {
+    id: string;
+  };
+};
+
 type SearchRequestFilter = {
   summary?: string;
   priorityId?: string;

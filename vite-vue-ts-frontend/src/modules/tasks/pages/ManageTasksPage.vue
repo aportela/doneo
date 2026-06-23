@@ -10,7 +10,7 @@
     import { appBus } from '../../../shared/composables/bus';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
-    import type { SearchRequest, TaskResponse } from '../types/dto';
+    import type { PatchRequest, SearchRequest, TaskResponse } from '../types/dto';
     import type { TasksTableFilters } from '../types/tasks-table-filters.ts';
 
     import { Sort } from '../../../shared/types/models/sort';
@@ -135,8 +135,55 @@
         }
     };
 
-    const onStatusChanged = (task: Task, status: TaskStatus) => {
-        notify('success', t("modules.task.components.ManageTasksPage.notifications.taskStatusUpdated", { summary: task.summary, status: status.name }));
+
+    let updatedStatusTask: Task;
+    let updatedStatus: TaskStatus;
+
+    const onStatusChanged = async (updatedTask: Task, status: TaskStatus) => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const payload: PatchRequest = {
+                id: updatedTask.id ?? "",
+                status: {
+                    id: status.id ?? ""
+                },
+            };
+            const response: TaskResponse = await taskService.patch(updatedTask.projectId ?? '', payload);
+            if (response.id === updatedTask.id) {
+                onRefresh();
+                notify('success', t("modules.task.components.ManageTasksPage.notifications.taskStatusUpdated", { summary: updatedTask.summary, status: status.name }));
+            } else {
+                state.ajaxErrorMessage = t("modules.task.components.ManageTasksPage.errors.taskStatusUpdateError", { summary: updatedTask.summary });
+            }
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            updatedStatusTask = updatedTask;
+                            updatedStatus = status;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageTasksPage.onStatusChanged" } });
+                            break;
+                        case 404:
+                            state.ajaxErrorMessage = t("modules.task.components.ManageTasksPage.errors.notFoundError");
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.task.components.ManageTasksPage.errors.taskStatusUpdateError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.task.components.ManageTasksPage.errors.taskStatusUpdateError");
+                    console.error("Unhandled API error", { file: "ManageTasksPage.vue", method: "onStatusChanged" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
+        }
     };
 
     onMounted(() => {
@@ -144,6 +191,8 @@
         stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
             if (payload.to.includes("ManageTasksPage.onRefresh")) {
                 onRefresh();
+            } else if (payload.to.includes("ManageTasksPage.onStatusChanged")) {
+                onStatusChanged(updatedStatusTask, updatedStatus);
             }
         });
     });
