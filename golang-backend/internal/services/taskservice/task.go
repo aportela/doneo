@@ -90,40 +90,65 @@ func (service *taskService) Update(ctx context.Context, projectID string, task d
 	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
 		return domain.Task{}, err
 	} else {
-		task.UpdatedAt = utils.CurrentTimePtr()
-		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
-			if err := service.taskRepository.Update(ctx, tx, task); err != nil {
-				return err
-			}
-			if err := service.tagRepository.DeleteTaskTags(ctx, tx, task.ID); err != nil {
-				return err
-			}
-			if len(task.Tags) > 0 {
-				for _, taskTag := range task.Tags {
-					if err := service.tagRepository.AddTaskTag(ctx, tx, task.ID, taskTag); err != nil {
-						return err
+		if existentTask, err := service.taskRepository.Get(ctx, service.db, task.ID); err != nil {
+			return domain.Task{}, err
+		} else {
+			if existentTask.Status.ID != task.Status.ID {
+				// check old status flags
+				if status, err := taskstatusrepository.NewRepository().Get(ctx, service.db, existentTask.Status.ID); err != nil {
+					return domain.Task{}, err
+				} else {
+					if status.Flags.HasFlag(domain.TaskStatusFlagUnsetFinishDateOnLeave) {
+						task.FinishedAt = nil
+					}
+				}
+				// check new status flags
+				if status, err := taskstatusrepository.NewRepository().Get(ctx, service.db, task.Status.ID); err != nil {
+					return domain.Task{}, err
+				} else {
+					if (status.Flags.HasFlag(domain.TaskStatusFlagFillEmptyStartDate) && existentTask.StartedAt == nil) || status.Flags.HasFlag(domain.TaskStatusFlagSetStartDate) {
+						task.StartedAt = utils.CurrentTimePtr()
+					}
+					if (status.Flags.HasFlag(domain.TaskStatusFlagFillEmptyFinishDate) && existentTask.FinishedAt == nil) || status.Flags.HasFlag(domain.TaskStatusFlagSetFinishDate) {
+						task.FinishedAt = utils.CurrentTimePtr()
 					}
 				}
 			}
-			if _, err := service.historyOperationService.AddTaskHistoryOperation(
-				ctx,
-				tx,
-				projectID,
-				task.ID,
-				domain.HistoryOperation{
-					ID:            utils.UUID(),
-					CreatedBy:     domain.UserBase{ID: contextUser.ID},
-					CreatedAt:     *task.UpdatedAt,
-					OperationType: domain.EventTaskUpdated,
-				},
-			); err != nil {
-				return err
+			task.UpdatedAt = utils.CurrentTimePtr()
+			if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+				if err := service.taskRepository.Update(ctx, tx, task); err != nil {
+					return err
+				}
+				if err := service.tagRepository.DeleteTaskTags(ctx, tx, task.ID); err != nil {
+					return err
+				}
+				if len(task.Tags) > 0 {
+					for _, taskTag := range task.Tags {
+						if err := service.tagRepository.AddTaskTag(ctx, tx, task.ID, taskTag); err != nil {
+							return err
+						}
+					}
+				}
+				if _, err := service.historyOperationService.AddTaskHistoryOperation(
+					ctx,
+					tx,
+					projectID,
+					task.ID,
+					domain.HistoryOperation{
+						ID:            utils.UUID(),
+						CreatedBy:     domain.UserBase{ID: contextUser.ID},
+						CreatedAt:     *task.UpdatedAt,
+						OperationType: domain.EventTaskUpdated,
+					},
+				); err != nil {
+					return err
+				}
+				return nil
+			}); err != nil {
+				return domain.Task{}, err
 			}
-			return nil
-		}); err != nil {
-			return domain.Task{}, err
+			return task, nil
 		}
-		return task, nil
 	}
 }
 
@@ -161,18 +186,6 @@ func (service *taskService) Patch(ctx context.Context, projectID string, task do
 				if err := service.taskRepository.Update(ctx, tx, existentTask); err != nil {
 					return err
 				}
-				/*
-					if err := service.tagRepository.DeleteTaskTags(ctx, tx, task.ID); err != nil {
-						return err
-					}
-					if len(task.Tags) > 0 {
-						for _, taskTag := range task.Tags {
-							if err := service.tagRepository.AddTaskTag(ctx, tx, task.ID, taskTag); err != nil {
-								return err
-							}
-						}
-					}
-				*/
 				if _, err := service.historyOperationService.AddTaskHistoryOperation(
 					ctx,
 					tx,
