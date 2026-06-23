@@ -139,7 +139,7 @@ func (service *taskService) Patch(ctx context.Context, projectID string, task do
 				if status, err := taskstatusrepository.NewRepository().Get(ctx, service.db, existentTask.Status.ID); err != nil {
 					return domain.Task{}, err
 				} else {
-					if status.Flags.HasAny(domain.TaskStatusFlagUnsetFinishDateOnLeave) {
+					if status.Flags.HasFlag(domain.TaskStatusFlagUnsetFinishDateOnLeave) {
 						existentTask.FinishedAt = nil
 					}
 				}
@@ -147,17 +147,18 @@ func (service *taskService) Patch(ctx context.Context, projectID string, task do
 				if status, err := taskstatusrepository.NewRepository().Get(ctx, service.db, task.Status.ID); err != nil {
 					return domain.Task{}, err
 				} else {
-					if (status.Flags.HasAny(domain.TaskStatusFlagFillEmptyStartDate) && existentTask.StartedAt == nil) || status.Flags.HasAny(domain.TaskStatusFlagSetStartDate) {
+					if (status.Flags.HasFlag(domain.TaskStatusFlagFillEmptyStartDate) && existentTask.StartedAt == nil) || status.Flags.HasFlag(domain.TaskStatusFlagSetStartDate) {
 						existentTask.StartedAt = utils.CurrentTimePtr()
 					}
-					if (status.Flags.HasAny(domain.TaskStatusFlagFillEmptyFinishDate) && existentTask.FinishedAt == nil) || status.Flags.HasAny(domain.TaskStatusFlagSetFinishDate) {
+					if (status.Flags.HasFlag(domain.TaskStatusFlagFillEmptyFinishDate) && existentTask.FinishedAt == nil) || status.Flags.HasFlag(domain.TaskStatusFlagSetFinishDate) {
 						existentTask.FinishedAt = utils.CurrentTimePtr()
 					}
 				}
+				existentTask.Status.ID = task.Status.ID
 			}
-			task.UpdatedAt = utils.CurrentTimePtr()
+			existentTask.UpdatedAt = utils.CurrentTimePtr()
 			if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
-				if err := service.taskRepository.Update(ctx, tx, task); err != nil {
+				if err := service.taskRepository.Update(ctx, tx, existentTask); err != nil {
 					return err
 				}
 				/*
@@ -180,7 +181,7 @@ func (service *taskService) Patch(ctx context.Context, projectID string, task do
 					domain.HistoryOperation{
 						ID:            utils.UUID(),
 						CreatedBy:     domain.UserBase{ID: contextUser.ID},
-						CreatedAt:     *task.UpdatedAt,
+						CreatedAt:     *existentTask.UpdatedAt,
 						OperationType: domain.EventTaskUpdated,
 					},
 				); err != nil {
@@ -190,7 +191,7 @@ func (service *taskService) Patch(ctx context.Context, projectID string, task do
 			}); err != nil {
 				return domain.Task{}, err
 			}
-			return task, nil
+			return existentTask, nil
 		}
 	}
 }
