@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/aportela/doneo/internal/database"
-	"github.com/aportela/doneo/internal/domain"
 )
 
 type TagRepository interface {
@@ -39,7 +38,7 @@ func (repository *tagRepository) AddTaskTag(ctx context.Context, dbExecutor data
 }
 
 func (repository *tagRepository) DeleteTaskTags(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) error {
-	result, err := dbExecutor.ExecContext(
+	_, err := dbExecutor.ExecContext(
 		ctx,
 		`
             DELETE FROM task_tags
@@ -48,17 +47,7 @@ func (repository *tagRepository) DeleteTaskTags(ctx context.Context, dbExecutor 
         `,
 		taskID,
 	)
-	if err != nil {
-		return err
-	}
-	count, err := result.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if count < 1 {
-		return domain.NotFoundError
-	}
-	return nil
+	return err
 }
 
 func (repository *tagRepository) GetTaskTags(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) ([]string, error) {
