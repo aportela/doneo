@@ -204,6 +204,12 @@
         }
     };
 
+    const onUnsetFinishDateOnLeave = () => {
+        if (task.value.finishedAt.hasValue()) {
+            task.value.finishedAt.clear();
+        }
+    };
+
     const insertAtCursor = (value: string) => {
         const el = document.activeElement as HTMLTextAreaElement
         if (!el) {
@@ -289,7 +295,8 @@
                 <n-form-item label="Status">
                     <TaskStatusSelector v-model:id="task.status.id" :disabled="props.disabled"
                         @fill-empty-start-date="onFillEmptyStartDate" @set-start-date="onSetStartDate"
-                        @fill-empty-finish-date="onFillEmptyFinishDate" @set-finish-date="onSetFinishDate" />
+                        @fill-empty-finish-date="onFillEmptyFinishDate" @set-finish-date="onSetFinishDate"
+                        @unset-finish-date-on-leave="onUnsetFinishDateOnLeave" />
                 </n-form-item>
             </n-flex>
             <n-form-item label="Summary">
