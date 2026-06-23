@@ -8,7 +8,7 @@
     import { useUserSettingsStore } from '../stores/userSettings';
     import { useLoadingStore } from '../stores/loading';
     import { useSessionStore } from '../stores/session';
-    import TopHeader from './TopHeader.vue';
+    import TopHeaderNew from './TopHeaderNew.vue';
     import TopMenu from './TopMenu.vue';
     import SearchModal from '../shared/components/modals/SearchModal.vue';
     import SidebarMenu from './SidebarMenu.vue';
@@ -90,8 +90,8 @@
                 </n-drawer>
                 <SearchModal v-model:show="showSearchModal" />
                 <n-layout-header bordered>
-                    <TopHeader />
-                    <TopMenu v-if="userSettingsStore.topNavigationMode" />
+                    <TopHeaderNew />
+                    <TopMenu v-if="false && userSettingsStore.topNavigationMode" />
                     <n-button v-if="isMobile" quaternary circle @click="mobileMenuOpen = true">☰</n-button>
                 </n-layout-header>
                 <n-layout :has-sider="true" v-if="userSettingsStore.sideNavigationMode">
