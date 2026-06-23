@@ -3,7 +3,7 @@
     import { useRoute, useRouter } from "vue-router";
 
     import { NButton, NDropdown, NMenu } from 'naive-ui'
-    import { NFlex, NInput } from 'naive-ui'
+    import { NFlex, NInput, NDivider } from 'naive-ui'
     import { IconUserCircle, IconDatabaseStar, IconId, IconLogout, IconSearch } from '@tabler/icons-vue';
 
     import SwitchNotificationsButton from '../shared/components/buttons/SwitchNotificationsButton.vue';
@@ -22,6 +22,8 @@
 
     import { useColorSchemeStore } from '../stores/colorScheme';
     import { useUserSettingsStore } from '../stores/userSettings';
+
+    import BreadCrumb from './BreadCrumb.vue';
 
     const route = useRoute();
     const router = useRouter();
@@ -144,6 +146,8 @@
                 <IconDatabaseStar :size="commonIconSize" />
                 <span class="brand-name">Doneo</span>
             </div>
+            <n-divider vertical />
+            <BreadCrumb v-if="userSettingsStore.sideNavigationMode" />
             <div class="search-container">
                 <n-input placeholder="Search..." style="min-width: 50%;" round v-if="false">
                     <template #prefix>
@@ -158,6 +162,8 @@
             <n-menu :collapsed-width="64" :collapsed-icon-size="menuOptionIconSize" :options="menuOptions"
                 :value="route.name as string" mode="horizontal" @update:value="handleMenuSelect"
                 v-if="userSettingsStore.topNavigationMode" />
+
+
             <n-flex v-if="false">
                 <SwitchLocaleButton :icon-size="commonIconSize" />
                 <SwitchNavigationModeButton :icon-size="commonIconSize" />
@@ -209,6 +215,7 @@
     .brand-container {
         display: flex;
         align-items: center;
+        margin-left: 23px;
     }
 
 
