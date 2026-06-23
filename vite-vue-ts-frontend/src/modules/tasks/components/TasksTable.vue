@@ -207,7 +207,7 @@
                                 </template>
                             </n-button>
                         </router-link>
-                        <ChangeTaskStatusDropdown :available-statuses="[]" :current-status="task.status" />
+                        <ChangeTaskStatusDropdown :current-status="task.status" />
                     </n-button-group>
                 </td>
             </tr>

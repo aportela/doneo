@@ -225,7 +225,7 @@
                                 </template>
                             </n-button>
                         </router-link>
-                        <ChangeProjectStatusDropdown :available-statuses="[]" :current-status="project.status" />
+                        <ChangeProjectStatusDropdown :current-status="project.status" />
                     </n-button-group>
                 </td>
             </tr>
