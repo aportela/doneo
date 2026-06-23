@@ -13,6 +13,8 @@
 
     const props = defineProps<ChangeProjectStatusDropdownProps>();
 
+    const emit = defineEmits(['change']);
+
     const options = computed<DropdownOption[]>(() =>
         cacheStore.projectStatuses.map(item => ({
             label: item.name ?? '',
@@ -25,7 +27,7 @@
         const status = cacheStore.projectStatuses.find(
             item => item.id === key
         );
-        console.log(status);
+        emit("change", status);
     }
 </script>
 

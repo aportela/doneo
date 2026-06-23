@@ -1098,6 +1098,8 @@ export default {
             projectAdded: 'Project "{summary}" has been added',
             projectUpdated: 'Project "{summary}" has been updated',
             projectDeleted: 'Project "{summary}" has been deleted',
+            projectStatusUpdated:
+              'Project "{summary}" changed status to {status}',
           },
           errors: {
             refreshError:
@@ -1437,6 +1439,9 @@ export default {
           },
           pager: {
             totalItemsLabel: "Total tasks: {total}",
+          },
+          notifications: {
+            taskStatusUpdated: 'Task "{summary}" changed status to {status}',
           },
         },
         TasksTable: {

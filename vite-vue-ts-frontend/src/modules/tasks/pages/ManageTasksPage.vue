@@ -6,6 +6,7 @@
     import { IconList, IconLayoutKanban, IconCalendarWeek } from '@tabler/icons-vue';
 
     import { useLoadingStore } from '../../../stores/loading';
+    import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
@@ -22,8 +23,10 @@
     import TasksKanban from '../components/TasksKanban.vue';
     import TasksCalendar from '../components/TasksCalendar.vue';
     import Pager from '../../../shared/components/tables/Pager.vue';
+    import type { TaskStatus } from '../../task-statuses/models/task-status.ts';
 
     const { t } = useI18n();
+    const { notify } = useNotify();
     const loadingStore = useLoadingStore();
 
     const tab = ref<string>("Kanban");
@@ -132,6 +135,10 @@
         }
     };
 
+    const onStatusChanged = (task: Task, status: TaskStatus) => {
+        notify('success', t("modules.task.components.ManageTasksPage.notifications.taskStatusUpdated", { summary: task.summary, status: status.name }));
+    };
+
     onMounted(() => {
         onRefresh();
         stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
@@ -167,7 +174,8 @@
                         </template>
                     </Pager>
                     <TasksTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" :sort="sort"
-                        @sort="onSort" v-model:filters="filters" :project-id="''" hide-add />
+                        @sort="onSort" v-model:filters="filters" @status-changed="onStatusChanged" :project-id="''"
+                        hide-add />
                 </n-card>
             </template>
         </n-tab-pane>

@@ -23,6 +23,7 @@
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import ChangeProjectStatusDropdown from '../../../shared/components/dropdowns/ChangeProjectStatusDropdown.vue';
+    import type { ProjectStatus } from '../../project-statuses/models/project-status.ts';
 
     interface Props {
         disabled: boolean;
@@ -34,7 +35,7 @@
     const userSettingsStore = useUserSettingsStore();
     // TODO: dialog for delete ?
 
-    const emit = defineEmits(['refresh', 'add', 'sort']);
+    const emit = defineEmits(['refresh', 'add', 'sort', 'statusChanged']);
 
     const props = defineProps<Props>();
 
@@ -137,6 +138,10 @@
         emit("add");
     };
 
+    const onStatusChange = (project: Project, status: ProjectStatus) => {
+        emit("statusChanged", project, status);
+    }
+
     const onClearFilters = () => {
         filters.value.slug = "";
         filters.value.typeId = null;
@@ -225,7 +230,8 @@
                                 </template>
                             </n-button>
                         </router-link>
-                        <ChangeProjectStatusDropdown :current-status="project.status" />
+                        <ChangeProjectStatusDropdown :current-status="project.status"
+                            @change="(status: ProjectStatus) => onStatusChange(project, status)" />
                     </n-button-group>
                 </td>
             </tr>

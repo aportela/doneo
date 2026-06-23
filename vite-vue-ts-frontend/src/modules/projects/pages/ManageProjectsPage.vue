@@ -23,6 +23,7 @@
     import NewProjectForm from '../components/NewProjectForm.vue';
     import ProjectsTable from '../components/ProjectsTable.vue';
     import Pager from '../../../shared/components/tables/Pager.vue';
+    import type { ProjectStatus } from '../../project-statuses/models/project-status.ts';
 
     const router = useRouter();
     const { t } = useI18n();
@@ -209,6 +210,10 @@
         }
     };
 
+    const onStatusChanged = (project: Project, status: ProjectStatus) => {
+        notify('success', t("modules.project.components.ManageProjectsPage.notifications.projectStatusUpdated", { summary: project.summary, status: status.name }));
+    };
+
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -240,7 +245,7 @@
             </template>
         </Pager>
         <ProjectsTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
-            :sort="sort" @sort="onSort" v-model:filters="filters" />
+            :sort="sort" @sort="onSort" @status-changed="onStatusChanged" v-model:filters="filters" />
     </n-card>
 </template>
 

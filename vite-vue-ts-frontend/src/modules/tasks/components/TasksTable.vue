@@ -22,6 +22,7 @@
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import ChangeTaskStatusDropdown from '../../../shared/components/dropdowns/ChangeTaskStatusDropdown.vue';
+    import type { TaskStatus } from '../../task-statuses/models/task-status.ts';
 
     interface Props {
         disabled: boolean;
@@ -36,7 +37,7 @@
 
     // TODO: dialog for delete ?
 
-    const emit = defineEmits(['refresh', 'add', 'sort']);
+    const emit = defineEmits(['refresh', 'add', 'sort', 'statusChanged']);
 
     const props = defineProps<Props>();
 
@@ -129,6 +130,10 @@
         emit("add");
     };
 
+    const onStatusChange = (task: Task, status: TaskStatus) => {
+        emit("statusChanged", task, status);
+    }
+
     const onClearFilters = () => {
         filters.value.priorityId = null;
         filters.value.statusId = null;
@@ -207,7 +212,8 @@
                                 </template>
                             </n-button>
                         </router-link>
-                        <ChangeTaskStatusDropdown :current-status="task.status" />
+                        <ChangeTaskStatusDropdown :current-status="task.status"
+                            @change="(status: TaskStatus) => onStatusChange(task, status)" />
                     </n-button-group>
                 </td>
             </tr>
