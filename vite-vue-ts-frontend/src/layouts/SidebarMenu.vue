@@ -4,6 +4,7 @@
     import { NDivider, NMenu } from 'naive-ui';
     import { IconDatabaseStar } from '@tabler/icons-vue';
     import { useRoute } from 'vue-router'
+
     import { menuOptionIconSize, useMenu } from '../shared/types/menu';
 
     import { useColorSchemeStore } from '../stores/colorScheme';
@@ -20,7 +21,7 @@
     const showBrand = false;
 
 
-    const { menuOptions, lightTheme, darkTheme, notificationsDisabled, notificationsEnabled } = useMenu();
+    const { menuOptions, lightTheme, darkTheme, notificationsDisabled, notificationsEnabled, topNavigation, sideNavigation } = useMenu();
 
     const handleMenuSelect = (menuOptionKey: string) => {
         switch (menuOptionKey) {
@@ -40,6 +41,14 @@
                     darkTheme.value = colorSchemeStore.dark;
                 });
                 break;
+            case "topNavigation":
+            case "sideNavigation":
+                userSettingsStore.toggleNavigationMode();
+                nextTick(() => {
+                    topNavigation.value = userSettingsStore.topNavigationMode;
+                    sideNavigation.value = userSettingsStore.sideNavigationMode;
+                });
+                break;
         }
     }
 
@@ -48,6 +57,8 @@
         notificationsDisabled.value = !userSettingsStore.hasNotificationsEnabled;
         lightTheme.value = colorSchemeStore.light;
         darkTheme.value = colorSchemeStore.dark;
+        topNavigation.value = userSettingsStore.topNavigationMode;
+        sideNavigation.value = userSettingsStore.sideNavigationMode;
     });
 
 </script>
