@@ -22,7 +22,7 @@
     );
 
     const onChange = (key: string | number) => {
-        const status = cacheStore.taskStatuses.find(
+        const status = cacheStore.projectStatuses.find(
             item => item.id === key
         );
         console.log(status);
