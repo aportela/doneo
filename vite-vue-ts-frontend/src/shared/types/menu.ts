@@ -25,6 +25,8 @@ import {
   IconBellOff,
   IconMoon,
   IconSun,
+  IconLayoutSidebarLeftExpand,
+  IconLayoutNavbarExpand,
 } from "@tabler/icons-vue";
 
 const menuOptionIconSize = 20;
@@ -35,10 +37,13 @@ export { menuOptionIconSize };
 export function useMenu() {
   const { t } = useI18n();
 
-  const lightTheme = ref(true);
-  const darkTheme = ref(false);
-  const notificationsDisabled = ref(true);
-  const notificationsEnabled = ref(true);
+  const lightTheme = ref<boolean>(true);
+  const darkTheme = ref<boolean>(false);
+  const notificationsDisabled = ref<boolean>(false);
+  const notificationsEnabled = ref<boolean>(true);
+  const topNavigation = ref<boolean>(true);
+  const sideNavigation = ref<boolean>(false);
+
   const menuOptions = computed(() => {
     return [
       {
@@ -279,6 +284,18 @@ export function useMenu() {
         icon: renderIcon(IconUserCircle)(menuOptionIconSize),
         children: [
           {
+            label: "Side navigation",
+            key: "sideNavigation",
+            show: topNavigation.value,
+            icon: renderIcon(IconLayoutSidebarLeftExpand)(menuOptionIconSize),
+          },
+          {
+            label: "Top navigation",
+            key: "topNavigation",
+            show: sideNavigation.value,
+            icon: renderIcon(IconLayoutNavbarExpand)(menuOptionIconSize),
+          },
+          {
             label: t("layouts.sidebarMenu.options.disableNotifications"),
             key: "disableNotifications",
             show: notificationsDisabled.value,
@@ -326,11 +343,14 @@ export function useMenu() {
       },
     ] as MenuOption[];
   });
+
   return {
     menuOptions,
     lightTheme,
     darkTheme,
     notificationsDisabled,
     notificationsEnabled,
+    topNavigation,
+    sideNavigation,
   };
 }
