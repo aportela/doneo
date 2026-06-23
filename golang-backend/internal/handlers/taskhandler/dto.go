@@ -38,6 +38,11 @@ type updateRequest struct {
 	Tags          []string     `json:"tags"`
 }
 
+type patchRequest struct {
+	ID     string     `json:"id"`
+	Status taskStatus `json:"status"`
+}
+
 type filterRequest struct {
 	Summary         *string                   `json:"summary"`
 	PriorityID      *string                   `json:"priorityId"`

@@ -167,6 +167,7 @@ func NewRouter(app *app.App) http.Handler {
 		r.Post("/{project_id:"+uuidPattern+"}/tasks", app.TaskHandler.Add)
 		r.Get("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", app.TaskHandler.Get)
 		r.Put("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", app.TaskHandler.Update)
+		r.Patch("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", app.TaskHandler.Patch)
 		r.Delete("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}", app.TaskHandler.Delete)
 
 		r.Get("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/notes", app.NoteHandler.GetTaskNotes)

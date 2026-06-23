@@ -15,6 +15,7 @@ import (
 type TaskHandler interface {
 	Add(w http.ResponseWriter, r *http.Request)
 	Update(w http.ResponseWriter, r *http.Request)
+	Patch(w http.ResponseWriter, r *http.Request)
 	Delete(w http.ResponseWriter, r *http.Request)
 	Get(w http.ResponseWriter, r *http.Request)
 	Search(w http.ResponseWriter, r *http.Request)
@@ -66,6 +67,29 @@ func (handler *taskHandler) Update(w http.ResponseWriter, r *http.Request) {
 	} else {
 		if task, err := handler.service.Get(r.Context(), projectID, task.ID); err != nil {
 			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to get updated task with ID %s: %w", request.ID, err))
+			return
+		} else {
+			handlers.ToHandlerJSONResponse(w, DomainToResponse(task), nil)
+		}
+	}
+}
+
+func (handler *taskHandler) Patch(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var request patchRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] invalid request payload: %w", err))
+		return
+	}
+	task := patchRequestToDomain(request)
+	projectID := chi.URLParam(r, "project_id")
+	task.ID = chi.URLParam(r, "task_id")
+	if task, err := handler.service.Patch(r.Context(), projectID, task); err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to patch task with ID %s: %w", task.ID, err))
+		return
+	} else {
+		if task, err := handler.service.Get(r.Context(), projectID, task.ID); err != nil {
+			handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskHandler] failed to get patched task with ID %s: %w", request.ID, err))
 			return
 		} else {
 			handlers.ToHandlerJSONResponse(w, DomainToResponse(task), nil)
