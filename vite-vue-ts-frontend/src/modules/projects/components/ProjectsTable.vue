@@ -22,6 +22,7 @@
     import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
+    import ChangeProjectStatusDropdown from '../../../shared/components/dropdowns/ChangeProjectStatusDropdown.vue';
 
     interface Props {
         disabled: boolean;
@@ -224,6 +225,7 @@
                                 </template>
                             </n-button>
                         </router-link>
+                        <ChangeProjectStatusDropdown :available-statuses="[]" :current-status="project.status" />
                     </n-button-group>
                 </td>
             </tr>
