@@ -95,7 +95,7 @@ func (service *projectPermissionService) Delete(ctx context.Context, projectID s
 }
 
 func (service *projectPermissionService) GetProjectPermissions(ctx context.Context, projectID string) ([]domain.ProjectPermission, error) {
-	if _, err := service.authorizationService.RequireProjectUpdatePermission(ctx, projectID); err != nil {
+	if _, err := service.authorizationService.RequireProjectViewPermission(ctx, projectID); err != nil {
 		return nil, err
 	} else {
 		if projectPermissions, err := service.projectPermissionRepository.GetProjectPermissions(ctx, service.db, projectID); err != nil {
