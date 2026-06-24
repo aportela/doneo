@@ -16,6 +16,8 @@ type AuthorizationService interface {
 	requireUserPermission(ctx context.Context, userID string, permission domain.Bitmask) error
 	requireProjectPermission(ctx context.Context, userID string, projectID string, permission domain.Bitmask) error
 
+	GetCurrentUserProjectPermissionBitmask(ctx context.Context, projectID string) (domain.Bitmask, error)
+
 	RequireUserAdminPermission(ctx context.Context) (middlewares.ContextUser, error)
 
 	RequireProjectUpdatePermission(ctx context.Context, projectID string) (middlewares.ContextUser, error)
@@ -95,6 +97,53 @@ func (service *authorizationService) requireProjectPermission(ctx context.Contex
 		return nil
 	}
 	return domain.AuthorizationError
+}
+
+func (service *authorizationService) GetCurrentUserProjectPermissionBitmask(ctx context.Context, projectID string) (domain.Bitmask, error) {
+	contextUser, ok := middlewares.GetContextUser(ctx)
+	if !ok {
+		return domain.Bitmask(0), fmt.Errorf("[AuthorizationService] user not found in context")
+	} else {
+		userPermissionsBitmask, ok := service.permissionCache.GetUser(contextUser.ID)
+		if !ok {
+			if user, err := service.userRepository.Get(ctx, service.db, contextUser.ID); err != nil {
+				return domain.Bitmask(0), fmt.Errorf("[AuthorizationService] failed to get user permissions: %w", err)
+			} else {
+				userPermissionsBitmask = user.PermissionsBitmask
+				service.permissionCache.SetUser(contextUser.ID, userPermissionsBitmask)
+			}
+		}
+		if userPermissionsBitmask.HasFlag(domain.UserPermissionAdmin) {
+			bitmask := domain.Bitmask(0)
+			bitmask.AddFlag(domain.PermissionUpdateProject)
+			bitmask.AddFlag(domain.PermissionDeleteProject)
+			bitmask.AddFlag(domain.PermissionViewProject)
+			bitmask.AddFlag(domain.PermissionAddTask)
+			bitmask.AddFlag(domain.PermissionUpdateTask)
+			bitmask.AddFlag(domain.PermissionDeleteTask)
+			bitmask.AddFlag(domain.PermissionViewTask)
+			return bitmask, nil
+		}
+		projectPermissionsBitmask, ok := service.permissionCache.GetProject(contextUser.ID, projectID)
+		if !ok {
+			projectPermissions, err := service.projectPermissionRepository.GetProjectPermissions(ctx, service.db, projectID)
+			if err != nil {
+				return domain.Bitmask(0), fmt.Errorf("[AuthorizationService] failed to get project permissions: %w", err)
+			}
+			found := false
+			for _, projectPermission := range projectPermissions {
+				if projectPermission.User.ID == contextUser.ID {
+					projectPermissionsBitmask = projectPermission.Role.PermissionsBitmask
+					service.permissionCache.SetProject(contextUser.ID, projectID, projectPermissionsBitmask)
+					found = true
+				}
+			}
+			if !found {
+				return domain.Bitmask(0), nil
+			}
+		}
+		return projectPermissionsBitmask, nil
+	}
 }
 
 func (service *authorizationService) RequireUserAdminPermission(ctx context.Context) (middlewares.ContextUser, error) {
