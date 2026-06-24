@@ -81,6 +81,8 @@ func DomainToResponse(project domain.Project) projectResponse {
 		AttachmentsCount:       project.AttachmentsCount,
 		NotesCount:             project.NotesCount,
 		HistoryOperationsCount: project.HistoryOperationsCount,
+		// TODO:
+		AllowedOperations: projectAllowedOperationsResponse{AllowViewProject: true, AllowUpdateProject: true, AllowDeleteProject: true},
 	}
 }
 

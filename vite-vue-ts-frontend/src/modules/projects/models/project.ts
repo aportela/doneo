@@ -5,6 +5,12 @@ import { ProjectStatus } from "../../project-statuses/models/project-status";
 import { UserBase } from "../../users/models/user";
 import { IDate } from "../../../shared/types/idate";
 
+type allowedProjectOperations = {
+  viewProject: boolean;
+  updateProject: boolean;
+  deleteProject: boolean;
+};
+
 export class Project {
   id: string | null;
   slug: string | null;
@@ -24,6 +30,7 @@ export class Project {
   attachmentsCount: number;
   notesCount: number;
   historyOperationsCount: number;
+  allowedOperations: allowedProjectOperations;
 
   constructor(data?: ProjectDTO) {
     this.id = data?.id ?? null;
@@ -44,6 +51,11 @@ export class Project {
     this.attachmentsCount = data?.attachmentsCount ?? 0;
     this.notesCount = data?.notesCount ?? 0;
     this.historyOperationsCount = data?.historyOperationsCount ?? 0;
+    this.allowedOperations = data?.allowedOperations ?? {
+      viewProject: false,
+      updateProject: false,
+      deleteProject: false,
+    };
   }
 
   toDTO(): ProjectDTO {
@@ -62,6 +74,7 @@ export class Project {
       attachmentsCount: this.attachmentsCount,
       notesCount: this.notesCount,
       historyOperationsCount: this.historyOperationsCount,
+      allowedOperations: this.allowedOperations,
     };
   }
 }

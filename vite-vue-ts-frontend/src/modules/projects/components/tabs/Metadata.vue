@@ -67,6 +67,8 @@
 
     const htmlMarkDownDescriptionPreview = computed(() => render(project.value.description ?? ""));
 
+    const projectUpdateDisabled = computed<boolean>(() => !project.value.allowedOperations.updateProject);
+
     const onGet = async (id: string) => {
         serverErrors.value = {};
         let notFoundError = false;
@@ -204,11 +206,13 @@
     };
 
     const onToggleDescriptionMode = () => {
-        descriptionEditMode.value = !descriptionEditMode.value;
-        if (descriptionEditMode.value) {
-            nextTick(() => {
-                descriptionRef.value?.focus();
-            });
+        if (!projectUpdateDisabled.value) {
+            descriptionEditMode.value = !descriptionEditMode.value;
+            if (descriptionEditMode.value) {
+                nextTick(() => {
+                    descriptionRef.value?.focus();
+                });
+            }
         }
     };
 
@@ -313,40 +317,52 @@
                 </span>
             </n-form-item>
             <n-form-item label="Started at">
-                <ToggleDateTimePicker clearable v-model:value="project.startedAt.msTimestamp"
-                    :disabled="props.disabled" />
+                <ToggleDateTimePicker clearable v-model:value="project.startedAt.msTimestamp" :disabled="props.disabled"
+                    v-if="!projectUpdateDisabled" />
+                <span class="doneo-datetime-label-readonly" v-else>
+                    {{ project.startedAt?.toLocaleString() }}
+                </span>
             </n-form-item>
             <n-form-item label="Finished at">
                 <ToggleDateTimePicker clearable v-model:value="project.finishedAt.msTimestamp"
-                    :disabled="props.disabled" />
+                    :disabled="props.disabled" v-if="!projectUpdateDisabled" />
+                <span class="doneo-datetime-label-readonly" v-else>
+                    {{ project.finishedAt?.toLocaleString() }}
+                </span>
             </n-form-item>
             <n-form-item label="Due at">
-                <ToggleDateTimePicker clearable v-model:value="project.dueAt.msTimestamp" :disabled="props.disabled" />
+                <ToggleDateTimePicker clearable v-model:value="project.dueAt.msTimestamp" :disabled="props.disabled"
+                    v-if="!projectUpdateDisabled" />
+                <span class="doneo-datetime-label-readonly" v-else>
+                    {{ project.dueAt?.toLocaleString() }}
+                </span>
             </n-form-item>
         </n-flex>
         <n-form>
             <n-flex>
                 <n-form-item label="Slug">
                     <ToggleInput v-model:value="project.slug" show-count :max-length="MAX_SLUG_LENGTH"
-                        :disabled="props.disabled" v-on:confirm="onConfirmNewSlugValue"
-                        v-on:cancel="onCancelNewSlugValue" ref="slugRef" />
+                        :disabled="props.disabled" :read-only="projectUpdateDisabled"
+                        v-on:confirm="onConfirmNewSlugValue" v-on:cancel="onCancelNewSlugValue" ref="slugRef" />
                 </n-form-item>
                 <n-form-item label="Type">
-                    <ProjectTypeSelector v-model:id="project.type.id" :disabled="props.disabled" />
+                    <ProjectTypeSelector v-model:id="project.type.id" :disabled="props.disabled"
+                        :readonly="projectUpdateDisabled" :read-only="projectUpdateDisabled" />
                 </n-form-item>
                 <n-form-item label="Priority">
-                    <ProjectPrioritySelector v-model:id="project.priority.id" :disabled="props.disabled" />
+                    <ProjectPrioritySelector v-model:id="project.priority.id" :disabled="props.disabled"
+                        :readonly="projectUpdateDisabled" />
                 </n-form-item>
                 <n-form-item label="Status">
                     <ProjectStatusSelector v-model:id="project.status.id" :disabled="props.disabled"
-                        @fill-empty-start-date="onFillEmptyStartDate" @set-start-date="onSetStartDate"
-                        @fill-empty-finish-date="onFillEmptyFinishDate" @set-finish-date="onSetFinishDate"
-                        @unset-finish-date-on-leave="onUnsetFinishDateOnLeave" />
+                        :readonly="projectUpdateDisabled" @fill-empty-start-date="onFillEmptyStartDate"
+                        @set-start-date="onSetStartDate" @fill-empty-finish-date="onFillEmptyFinishDate"
+                        @set-finish-date="onSetFinishDate" @unset-finish-date-on-leave="onUnsetFinishDateOnLeave" />
                 </n-form-item>
             </n-flex>
             <n-form-item label="Summary">
                 <ToggleInput v-model:value="project.summary" show-count :max-length="MAX_SUMMARY_LENGTH"
-                    :disabled="props.disabled" />
+                    :disabled="props.disabled" :read-only="projectUpdateDisabled" />
             </n-form-item>
             <n-form-item label="description">
                 <template #label>
@@ -372,9 +388,8 @@
                         </n-button-group>
                     </n-flex>
                 </div>
-                <div v-else v-html="htmlMarkDownDescriptionPreview"
-                    class="doneo-project-description-markdown-preview doneo-cursor-pointer"
-                    :class="{ 'doneo-project-description-markdown-preview-expanded': descriptionExpanded }"
+                <div v-else v-html="htmlMarkDownDescriptionPreview" class="doneo-project-description-markdown-preview"
+                    :class="{ 'doneo-project-description-markdown-preview-expanded': descriptionExpanded, 'doneo-cursor-pointer': !projectUpdateDisabled }"
                     @click="onToggleDescriptionMode" />
                 <!-- TODO: test alternatives -->
                 <n-ellipsis v-if="false" expand-trigger="click" line-clamp="4" :tooltip="false" class="ellipsis"
@@ -382,7 +397,7 @@
                 </n-ellipsis>
             </n-form-item>
         </n-form>
-        <n-button @click="onUpdate" :disabled="props.disabled">
+        <n-button @click="onUpdate" :disabled="props.disabled" v-if="!projectUpdateDisabled">
             <template #icon>
                 <n-icon :component="IconDeviceFloppy" color="red"></n-icon>
             </template>

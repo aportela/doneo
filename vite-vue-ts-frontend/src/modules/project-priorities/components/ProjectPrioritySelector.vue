@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { ref, shallowRef, reactive, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 
-    import { NInputGroup, NButton, NSelect, NIcon, type SelectOption, type SelectSize, type SelectInst } from 'naive-ui';
+    import { NInputGroup, NInput, NButton, NSelect, NIcon, type SelectOption, type SelectSize, type SelectInst } from 'naive-ui';
     import { IconSquare, IconSquareFilled, IconAlertCircle } from '@tabler/icons-vue';
 
     import { useCacheStore } from '../../../stores/cache';
@@ -19,6 +19,7 @@
         size?: SelectSize;
         hidePrefix?: boolean;
         disabled?: boolean;
+        readonly?: boolean;
     }
 
     const cacheStore = useCacheStore();
@@ -84,6 +85,14 @@
         selectedColor.value = projectPriorities.value.find((projectPriority) => projectPriority.id === newValue)?.hexColor
     });
 
+    const readOnlyLabel = computed({
+        get() {
+            return projectPriorities.value.find((item) => item.id == projectPriorityId.value)?.name;
+        },
+        set(_value) {
+        }
+    });
+
     const focus = () => {
         nextTick(() => {
             selectInstRef.value?.focus();
@@ -123,7 +132,8 @@
         </n-button>
         <n-select filterable ref="selectInstRef" :required="props.required" :clearable="props.clearable"
             v-model:value="projectPriorityId" :options="options" :placeholder="props.placeholder" :size="props.size"
-            :disabled="isDisabled" />
+            :disabled="isDisabled" v-if="!props.readonly" />
+        <n-input v-else placeholder="" v-model:value="readOnlyLabel" readonly />
         <n-button secondary :disabled="true" class="doneo-cursor-default doneo-disable-opacity" v-if="state.ajaxErrors">
             <template #icon>
                 <n-icon color="red" :component="IconAlertCircle">
