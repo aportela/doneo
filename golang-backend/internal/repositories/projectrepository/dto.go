@@ -33,7 +33,6 @@ type projectDTO struct {
 	AttachmentsCount       uint16         `db:"attachments_count"`
 	NotesCount             uint16         `db:"notes_count"`
 	HistoryOperationsCount uint16         `db:"history_operations_count"`
-	PermissionsBitmask     uint64         `db:"permissions_bitmask"`
 }
 
 type searchFilterDTO struct {

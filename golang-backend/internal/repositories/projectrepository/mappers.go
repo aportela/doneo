@@ -62,7 +62,6 @@ func toDomain(project projectDTO) domain.Project {
 		AttachmentsCount:       project.AttachmentsCount,
 		NotesCount:             project.NotesCount,
 		HistoryOperationsCount: project.HistoryOperationsCount,
-		PermissionsBitMask:     domain.Bitmask(project.PermissionsBitmask),
 	}
 }
 
@@ -83,6 +82,7 @@ func toFilterDTO(filter domain.SearchProjectFilter) searchFilterDTO {
 		StatusID:        filter.StatusID,
 		CreatedAt:       repositories.TimestampFilterToDTO(filter.CreatedAt),
 		CreatedByUserID: filter.CreatedByUserID,
+		ViewByUserID:    filter.ViewByUserID,
 	}
 }
 
