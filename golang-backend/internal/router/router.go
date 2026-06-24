@@ -146,6 +146,7 @@ func NewRouter(app *app.App) http.Handler {
 		r.Post("/search", app.ProjectHandler.Search)
 		r.Get("/{project_id:"+uuidPattern+"}", app.ProjectHandler.Get)
 		r.Put("/{project_id:"+uuidPattern+"}", app.ProjectHandler.Update)
+		r.Patch("/{project_id:"+uuidPattern+"}", app.ProjectHandler.Patch)
 		r.Delete("/{project_id:"+uuidPattern+"}", app.ProjectHandler.Delete)
 
 		r.Get("/{project_id:"+uuidPattern+"}/permissions", app.ProjectPermissionHandler.GetProjectPermissions)

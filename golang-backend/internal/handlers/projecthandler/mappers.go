@@ -51,6 +51,15 @@ func updateRequestToDomain(request updateRequest) domain.Project {
 	}
 }
 
+func patchRequestToDomain(request patchRequest) domain.Project {
+	return domain.Project{
+		ID: request.ID,
+		Status: domain.ProjectStatus{
+			ID: request.Status.ID,
+		},
+	}
+}
+
 func DomainToResponse(project domain.Project) projectResponse {
 	return projectResponse{
 		ID:                     project.ID,

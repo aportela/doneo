@@ -11,7 +11,7 @@
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import type { FormMode } from '../../../shared/types/form-mode';
-    import type { SearchRequest, ProjectResponse } from '../types/dto';
+    import type { SearchRequest, ProjectResponse, PatchRequest } from '../types/dto';
     import type { ProjectsTableFilters } from '../types/projects-table-filters.ts';
 
     import { Sort } from '../../../shared/types/models/sort';
@@ -210,8 +210,54 @@
         }
     };
 
-    const onStatusChanged = (project: Project, status: ProjectStatus) => {
-        notify('success', t("modules.project.components.ManageProjectsPage.notifications.projectStatusUpdated", { summary: project.summary, status: status.name }));
+    let updatedStatusProject: Project;
+    let updatedStatus: ProjectStatus;
+
+    const onStatusChanged = async (updatedProject: Project, status: ProjectStatus) => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const payload: PatchRequest = {
+                id: updatedProject.id ?? "",
+                status: {
+                    id: status.id ?? ""
+                },
+            };
+            const response: ProjectResponse = await projectService.patch(payload);
+            if (response.id === updatedProject.id) {
+                onRefresh();
+                notify('success', t("modules.project.components.ManageProjectsPage.notifications.projectStatusUpdated", { summary: updatedProject.summary, status: status.name }));
+            } else {
+                state.ajaxErrorMessage = t("modules.project.components.ManageProjectsPage.errors.statusUpdateError", { summary: updatedProject.summary });
+            }
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            updatedStatusProject = updatedProject;
+                            updatedStatus = status;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageProjectsPage.onStatusChanged" } });
+                            break;
+                        case 404:
+                            state.ajaxErrorMessage = t("modules.project.components.ManageProjectsPage.errors.notFoundError");
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.project.components.ManageProjectsPage.errors.statusUpdateError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.project.components.ManageProjectsPage.errors.statusUpdateError");
+                    console.error("Unhandled API error", { file: "ManageProjectsPage.vue", method: "onStatusChanged" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
+        }
     };
 
     let stopBusReauthListener: () => void;
@@ -223,6 +269,8 @@
                 onRefresh();
             } else if (payload.to.includes("ManageProjectsPage.onDelete")) {
                 onDelete(selectedItem.value);
+            } else if (payload.to.includes("ManageProjectsPage.onStatusChanged")) {
+                onStatusChanged(updatedStatusProject, updatedStatus);
             }
         });
     });

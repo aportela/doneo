@@ -12,6 +12,7 @@ import (
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
+	"github.com/aportela/doneo/internal/repositories/projectstatusrepository"
 	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/services/historyoperationservice"
 	"github.com/aportela/doneo/internal/utils"
@@ -20,6 +21,7 @@ import (
 type ProjectService interface {
 	Add(ctx context.Context, project domain.Project) (domain.Project, error)
 	Update(ctx context.Context, project domain.Project) (domain.Project, error)
+	Patch(ctx context.Context, project domain.Project) (domain.Project, error)
 	Delete(ctx context.Context, projectID string) error
 	Get(ctx context.Context, projectID string) (domain.Project, error)
 	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.Result, error)
@@ -77,29 +79,110 @@ func (service *projectService) Update(ctx context.Context, project domain.Projec
 	if contextUser, err := service.authorizationService.RequireProjectUpdatePermission(ctx, project.ID); err != nil {
 		return domain.Project{}, err
 	} else {
-		project.UpdatedAt = utils.CurrentTimePtr()
-		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
-			if err := service.projectRepository.Update(ctx, tx, project); err != nil {
-				return err
-			}
-			if _, err := service.historyOperationService.AddProjectHistoryOperation(
-				ctx,
-				tx,
-				project.ID,
-				domain.HistoryOperation{
-					ID:            utils.UUID(),
-					CreatedBy:     domain.UserBase{ID: contextUser.ID},
-					CreatedAt:     *project.UpdatedAt,
-					OperationType: domain.EventProjectUpdated,
-				},
-			); err != nil {
-				return err
-			}
-			return nil
-		}); err != nil {
+		if existentProject, err := service.projectRepository.Get(ctx, service.db, project.ID); err != nil {
 			return domain.Project{}, err
+		} else {
+			if existentProject.Status.ID != project.Status.ID {
+				// check old status flags
+				if status, err := projectstatusrepository.NewRepository().Get(ctx, service.db, existentProject.Status.ID); err != nil {
+					return domain.Project{}, err
+				} else {
+					if status.Flags.HasFlag(domain.ProjectStatusFlagUnsetFinishDateOnLeave) {
+						project.FinishedAt = nil
+					}
+				}
+				// check new status flags
+				if status, err := projectstatusrepository.NewRepository().Get(ctx, service.db, project.Status.ID); err != nil {
+					return domain.Project{}, err
+				} else {
+					if (status.Flags.HasFlag(domain.ProjectStatusFlagFillEmptyStartDate) && existentProject.StartedAt == nil) || status.Flags.HasFlag(domain.ProjectStatusFlagSetStartDate) {
+						project.StartedAt = utils.CurrentTimePtr()
+					}
+					if (status.Flags.HasFlag(domain.ProjectStatusFlagFillEmptyFinishDate) && existentProject.FinishedAt == nil) || status.Flags.HasFlag(domain.ProjectStatusFlagSetFinishDate) {
+						project.FinishedAt = utils.CurrentTimePtr()
+					}
+				}
+			}
+			project.UpdatedAt = utils.CurrentTimePtr()
+			if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+				if err := service.projectRepository.Update(ctx, tx, project); err != nil {
+					return err
+				}
+				if _, err := service.historyOperationService.AddProjectHistoryOperation(
+					ctx,
+					tx,
+					project.ID,
+					domain.HistoryOperation{
+						ID:            utils.UUID(),
+						CreatedBy:     domain.UserBase{ID: contextUser.ID},
+						CreatedAt:     *project.UpdatedAt,
+						OperationType: domain.EventProjectUpdated,
+					},
+				); err != nil {
+					return err
+				}
+				return nil
+			}); err != nil {
+				return domain.Project{}, err
+			}
+			return project, nil
 		}
-		return project, nil
+	}
+}
+
+func (service *projectService) Patch(ctx context.Context, project domain.Project) (domain.Project, error) {
+	if contextUser, err := service.authorizationService.RequireProjectUpdatePermission(ctx, project.ID); err != nil {
+		return domain.Project{}, err
+	} else {
+		if existentProject, err := service.projectRepository.Get(ctx, service.db, project.ID); err != nil {
+			return domain.Project{}, err
+		} else {
+			if existentProject.Status.ID != project.Status.ID {
+				// check old status flags
+				if status, err := projectstatusrepository.NewRepository().Get(ctx, service.db, existentProject.Status.ID); err != nil {
+					return domain.Project{}, err
+				} else {
+					if status.Flags.HasFlag(domain.ProjectStatusFlagUnsetFinishDateOnLeave) {
+						existentProject.FinishedAt = nil
+					}
+				}
+				// check new status flags
+				if status, err := projectstatusrepository.NewRepository().Get(ctx, service.db, project.Status.ID); err != nil {
+					return domain.Project{}, err
+				} else {
+					if (status.Flags.HasFlag(domain.ProjectStatusFlagFillEmptyStartDate) && existentProject.StartedAt == nil) || status.Flags.HasFlag(domain.ProjectStatusFlagSetStartDate) {
+						existentProject.StartedAt = utils.CurrentTimePtr()
+					}
+					if (status.Flags.HasFlag(domain.ProjectStatusFlagFillEmptyFinishDate) && existentProject.FinishedAt == nil) || status.Flags.HasFlag(domain.ProjectStatusFlagSetFinishDate) {
+						existentProject.FinishedAt = utils.CurrentTimePtr()
+					}
+				}
+				existentProject.Status.ID = project.Status.ID
+			}
+			existentProject.UpdatedAt = utils.CurrentTimePtr()
+			if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+				if err := service.projectRepository.Update(ctx, tx, existentProject); err != nil {
+					return err
+				}
+				if _, err := service.historyOperationService.AddProjectHistoryOperation(
+					ctx,
+					tx,
+					project.ID,
+					domain.HistoryOperation{
+						ID:            utils.UUID(),
+						CreatedBy:     domain.UserBase{ID: contextUser.ID},
+						CreatedAt:     *project.UpdatedAt,
+						OperationType: domain.EventProjectUpdated,
+					},
+				); err != nil {
+					return err
+				}
+				return nil
+			}); err != nil {
+				return domain.Project{}, err
+			}
+			return project, nil
+		}
 	}
 }
 

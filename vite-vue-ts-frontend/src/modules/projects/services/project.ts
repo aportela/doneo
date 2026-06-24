@@ -6,6 +6,7 @@ import type {
   SearchRequest,
   ProjectResponse,
   SearchResponse,
+  PatchRequest,
 } from "../types/dto";
 
 export const projectService = {
@@ -18,6 +19,13 @@ export const projectService = {
   },
   async update(payload: UpdateRequest): Promise<ProjectResponse> {
     const { data } = await axiosInstance.put<ProjectResponse>(
+      "/projects/" + payload.id,
+      payload,
+    );
+    return data;
+  },
+  async patch(payload: PatchRequest): Promise<ProjectResponse> {
+    const { data } = await axiosInstance.patch<ProjectResponse>(
       "/projects/" + payload.id,
       payload,
     );

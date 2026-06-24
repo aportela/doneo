@@ -43,6 +43,11 @@ type updateRequest struct {
 	DueAt       *int64          `json:"dueAt"`
 }
 
+type patchRequest struct {
+	ID     string        `json:"id"`
+	Status projectStatus `json:"status"`
+}
+
 type filterRequest struct {
 	Slug            *string                   `json:"slug"`
 	Summary         *string                   `json:"summary"`

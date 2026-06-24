@@ -153,7 +153,7 @@
                 onRefresh();
                 notify('success', t("modules.task.components.ManageTasksPage.notifications.taskStatusUpdated", { summary: updatedTask.summary, status: status.name }));
             } else {
-                state.ajaxErrorMessage = t("modules.task.components.ManageTasksPage.errors.taskStatusUpdateError", { summary: updatedTask.summary });
+                state.ajaxErrorMessage = t("modules.task.components.ManageTasksPage.errors.statusUpdateError", { summary: updatedTask.summary });
             }
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -170,12 +170,12 @@
                             state.ajaxErrorMessage = t("modules.task.components.ManageTasksPage.errors.notFoundError");
                             break;
                         default:
-                            state.ajaxErrorMessage = t("modules.task.components.ManageTasksPage.errors.taskStatusUpdateError");
+                            state.ajaxErrorMessage = t("modules.task.components.ManageTasksPage.errors.statusUpdateError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("modules.task.components.ManageTasksPage.errors.taskStatusUpdateError");
+                    state.ajaxErrorMessage = t("modules.task.components.ManageTasksPage.errors.statusUpdateError");
                     console.error("Unhandled API error", { file: "ManageTasksPage.vue", method: "onStatusChanged" }, { err: fatalError });
                 });
         } finally {

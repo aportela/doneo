@@ -44,6 +44,13 @@ export type UpdateRequest = {
   dueAt: number | null;
 };
 
+export type PatchRequest = {
+  id: string;
+  status: {
+    id: string;
+  };
+};
+
 type SearchRequestFilter = {
   slug?: string;
   summary?: string;

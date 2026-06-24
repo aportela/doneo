@@ -1108,6 +1108,7 @@ export default {
             restoreError: "There was a problem while restoring the project",
             // TODO: deduplicate
             notFoundError: "We couldn’t find the specified project",
+            statusUpdateError: 'Error updating status for project "{summary}"',
           },
         },
         ProjectsTable: {
@@ -1445,7 +1446,7 @@ export default {
           },
           errors: {
             notFoundError: "We couldn’t find the specified task",
-            taskStatusUpdateError: 'Error updating status for task "{summary}"',
+            statusUpdateError: 'Error updating status for task "{summary}"',
           },
         },
         TasksTable: {
