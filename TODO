@@ -46,3 +46,5 @@ filter notes by creator
 toggle details as list / table (ex: notes as current or table)
 
 share change status dropdown component beween projects/tasks
+
+add 403 forbidden check on service api calls
