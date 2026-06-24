@@ -64,10 +64,14 @@ type searchRequest struct {
 	Filter *filterRequest        `json:"filter"`
 }
 
-type projectAllowedOperationsResponse struct {
+type ProjectAllowedOperationsResponse struct {
 	AllowViewProject   bool `json:"viewProject"`
 	AllowUpdateProject bool `json:"updateProject"`
 	AllowDeleteProject bool `json:"deleteProject"`
+	AllowAddTask       bool `json:"addTask"`
+	AllowUpdateTask    bool `json:"updateTask"`
+	AllowDeleteTask    bool `json:"deleteTask"`
+	AllowViewTask      bool `json:"viewTask"`
 }
 
 type projectResponse struct {
@@ -90,7 +94,7 @@ type projectResponse struct {
 	AttachmentsCount       uint16                                         `json:"attachmentsCount"`
 	NotesCount             uint16                                         `json:"notesCount"`
 	HistoryOperationsCount uint16                                         `json:"historyOperationsCount"`
-	AllowedOperations      projectAllowedOperationsResponse               `json:"allowedOperations"`
+	AllowedOperations      ProjectAllowedOperationsResponse               `json:"allowedOperations"`
 }
 
 type searchProjectsResponse struct {
