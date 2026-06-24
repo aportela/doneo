@@ -66,6 +66,7 @@
         serverErrors.value = {};
         let notFoundError = false;
         let deletedError = false;
+        let accessDeniedError = false;
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const response: TaskResponse = await taskService.get(projectId, taskId);
@@ -87,6 +88,10 @@
                             state.ajaxErrors = false;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPage.onGet" } });
                             break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
+                            accessDeniedError = true;
+                            break;
                         case 404:
                             state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.notFoundError");
                             notFoundError = true;
@@ -107,7 +112,7 @@
         } finally {
             state.ajaxRunning = false;
             if (state.ajaxErrorMessage) {
-                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage, denyCloseDialog: notFoundError || deletedError } });
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage, denyCloseDialog: notFoundError || deletedError || accessDeniedError } });
             }
         }
     };
@@ -149,6 +154,9 @@
                         case 401:
                             state.ajaxErrors = false;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPage.onUpdate" } });
+                            break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
                             break;
                         case 404:
                             state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.notFoundError");
