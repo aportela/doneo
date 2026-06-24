@@ -424,7 +424,7 @@ func (repository *projectRepository) Search(ctx context.Context, dbExecutor data
 				COUNT(*) AS total_projects
 			FROM projects P
 		`
-		sqlCountQuery = fmt.Sprintf("%s %s", sqlCountQuery, sqlWhere)
+		sqlCountQuery = fmt.Sprintf("%s %s %s", sqlCountQuery, sqlQueryVisibilityInnerJoins, sqlWhere)
 		err = dbExecutor.QueryRowContext(
 			ctx,
 			sqlCountQuery,
