@@ -81,8 +81,11 @@ func DomainToResponse(project domain.Project) projectResponse {
 		AttachmentsCount:       project.AttachmentsCount,
 		NotesCount:             project.NotesCount,
 		HistoryOperationsCount: project.HistoryOperationsCount,
-		// TODO:
-		AllowedOperations: projectAllowedOperationsResponse{AllowViewProject: true, AllowUpdateProject: true, AllowDeleteProject: true},
+		AllowedOperations: projectAllowedOperationsResponse{
+			AllowViewProject:   project.PermissionsBitMask.HasFlag(domain.PermissionViewProject),
+			AllowUpdateProject: project.PermissionsBitMask.HasFlag(domain.PermissionUpdateProject),
+			AllowDeleteProject: project.PermissionsBitMask.HasFlag(domain.PermissionDeleteProject),
+		},
 	}
 }
 

@@ -10,6 +10,7 @@ import (
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/middlewares"
 )
 
 type ProjectRepository interface {
@@ -141,10 +142,14 @@ func (repository *projectRepository) Delete(ctx context.Context, dbExecutor data
 }
 
 func (repository *projectRepository) Get(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) (domain.Project, error) {
-	var dto projectDTO
-	err := dbExecutor.QueryRowContext(
-		ctx,
-		`
+	contextUser, ok := middlewares.GetContextUser(ctx)
+	if !ok {
+		return domain.Project{}, fmt.Errorf("[ProjectService] user not found in context")
+	} else {
+		var dto projectDTO
+		err := dbExecutor.QueryRowContext(
+			ctx,
+			`
             SELECT
                 P.id,
 				P.slug,
@@ -171,12 +176,15 @@ func (repository *projectRepository) Get(ctx context.Context, dbExecutor databas
 				IFNULL(PN.notes_count, 0) AS notes_count,
 				IFNULL(PA.attachments_count, 0) AS attachments_count,
 				IFNULL(PHO.history_operations_count, 0) AS history_operations_count,
-				IFNULL(PT.tasks_count, 0) AS tasks_count
+				IFNULL(PT.tasks_count, 0) AS tasks_count,
+				IFNULL(R.permissions_bitmask, 0) AS permissions_bitmask
             FROM projects P
 			INNER JOIN project_priorities PP ON PP.id = P.priority_id
 			INNER JOIN project_statuses PS ON PS.id = P.status_id
 			INNER JOIN project_types PT ON PT.id = P.type_id
 			INNER JOIN users U ON U.ID = P.creator_id
+			LEFT JOIN project_user_role PUR2 ON (PUR2.project_id = P.id AND PUR2.user_id = ?)
+			LEFT JOIN roles R ON R.id = PUR2.role_id
 			LEFT JOIN (
     			SELECT project_id, COUNT(*) AS permissions_count
     			FROM project_user_role
@@ -207,41 +215,45 @@ func (repository *projectRepository) Get(ctx context.Context, dbExecutor databas
 			GROUP
 				BY P.id
         `,
-		projectID).Scan(
-		&dto.ID,
-		&dto.Slug,
-		&dto.Summary,
-		&dto.Description,
-		&dto.CreatedAt,
-		&dto.UpdatedAt,
-		&dto.DeletedAt,
-		&dto.StartedAt,
-		&dto.FinishedAt,
-		&dto.DueAt,
-		&dto.StatusID,
-		&dto.StatusName,
-		&dto.StatusHexColor,
-		&dto.PriorityID,
-		&dto.PriorityName,
-		&dto.PriorityHexColor,
-		&dto.TypeID,
-		&dto.TypeName,
-		&dto.TypeHexColor,
-		&dto.CreatorID,
-		&dto.CreatorName,
-		&dto.PermissionsCount,
-		&dto.NotesCount,
-		&dto.AttachmentsCount,
-		&dto.HistoryOperationsCount,
-		&dto.TasksCount,
-	)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return domain.Project{}, domain.NotFoundError
+			contextUser.ID,
+			projectID,
+		).Scan(
+			&dto.ID,
+			&dto.Slug,
+			&dto.Summary,
+			&dto.Description,
+			&dto.CreatedAt,
+			&dto.UpdatedAt,
+			&dto.DeletedAt,
+			&dto.StartedAt,
+			&dto.FinishedAt,
+			&dto.DueAt,
+			&dto.StatusID,
+			&dto.StatusName,
+			&dto.StatusHexColor,
+			&dto.PriorityID,
+			&dto.PriorityName,
+			&dto.PriorityHexColor,
+			&dto.TypeID,
+			&dto.TypeName,
+			&dto.TypeHexColor,
+			&dto.CreatorID,
+			&dto.CreatorName,
+			&dto.PermissionsCount,
+			&dto.NotesCount,
+			&dto.AttachmentsCount,
+			&dto.HistoryOperationsCount,
+			&dto.TasksCount,
+			&dto.PermissionsBitmask,
+		)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return domain.Project{}, domain.NotFoundError
+			}
+			return domain.Project{}, err
 		}
-		return domain.Project{}, err
+		return toDomain(dto), err
 	}
-	return toDomain(dto), err
 }
 
 func (repository *projectRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.Result, error) {
