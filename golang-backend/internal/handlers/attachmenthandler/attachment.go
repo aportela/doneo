@@ -1,6 +1,7 @@
 package attachmenthandler
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -46,16 +47,20 @@ func (handler *attachmentHandler) AddProjectAttachment(w http.ResponseWriter, r 
 		if attachmentID, err := handler.service.SaveUploadedFile(file, header.Filename); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		} else {
-			attachment := domain.Attachment{
+			tmpAttachment := domain.Attachment{
 				ID:           attachmentID,
 				OriginalName: header.Filename,
 				ContentType:  header.Header.Get("Content-Type"),
 				Size:         uint32(header.Size),
 			}
 			projectID := chi.URLParam(r, "project_id")
-			if attachment, err := handler.service.AddProjectAttachment(r.Context(), projectID, attachment); err != nil {
-				handler.service.DeleteAttachment(attachment)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+			if attachment, err := handler.service.AddProjectAttachment(r.Context(), projectID, tmpAttachment); err != nil {
+				handler.service.DeleteAttachment(tmpAttachment)
+				if errors.Is(err, domain.AuthorizationError) {
+					http.Error(w, err.Error(), http.StatusForbidden)
+				} else {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+				}
 				return
 			} else {
 				w.Header().Set("Content-Type", "application/json")
@@ -133,7 +138,7 @@ func (handler *attachmentHandler) AddTaskAttachment(w http.ResponseWriter, r *ht
 		if attachmentID, err := handler.service.SaveUploadedFile(file, header.Filename); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		} else {
-			attachment := domain.Attachment{
+			tmpAttachment := domain.Attachment{
 				ID:           attachmentID,
 				OriginalName: header.Filename,
 				ContentType:  header.Header.Get("Content-Type"),
@@ -141,16 +146,19 @@ func (handler *attachmentHandler) AddTaskAttachment(w http.ResponseWriter, r *ht
 			}
 			projectID := chi.URLParam(r, "project_id")
 			taskID := chi.URLParam(r, "task_id")
-			if attachment, err := handler.service.AddTaskAttachment(r.Context(), projectID, taskID, attachment); err != nil {
-				handler.service.DeleteAttachment(attachment)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+			if attachment, err := handler.service.AddTaskAttachment(r.Context(), projectID, taskID, tmpAttachment); err != nil {
+				handler.service.DeleteAttachment(tmpAttachment)
+				if errors.Is(err, domain.AuthorizationError) {
+					http.Error(w, err.Error(), http.StatusForbidden)
+				} else {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+				}
 				return
 			} else {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusCreated)
 				handlers.ToHandlerJSONResponse(w, domainToResponse(attachment), nil)
 			}
-
 		}
 	}
 }
