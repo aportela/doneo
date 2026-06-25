@@ -61,10 +61,16 @@ func (service *attachmentService) getAttachmentPath(attachmentID string) string 
 }
 
 func (service *attachmentService) getAttachmentFilename(attachmentID string, attachmentOriginalFilename string) string {
+	if len(attachmentID) != 36 {
+		return ""
+	}
 	return attachmentID + filepath.Ext(attachmentOriginalFilename)
 }
 
 func (service *attachmentService) GetAttachmentFullPath(attachmentID string, attachmentFilename string) string {
+	if len(attachmentID) != 36 {
+		return ""
+	}
 	return filepath.Join(service.getAttachmentPath(attachmentID), service.getAttachmentFilename(attachmentID, attachmentFilename))
 }
 
