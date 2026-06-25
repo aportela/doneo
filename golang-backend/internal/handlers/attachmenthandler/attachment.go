@@ -112,8 +112,11 @@ func (handler *attachmentHandler) DownloadProjectAttachment(w http.ResponseWrite
 			w.Header().Set("Content-Type", attachment.ContentType)
 			http.ServeFile(w, r, attachmentPath)
 		} else {
-			// TODO: register error ?, attachment found in database but missing on disk
-			handlers.ToHandlerJSONResponse(w, nil, err, http.StatusNotFound)
+			if errors.Is(err, os.ErrNotExist) {
+				handlers.ToHandlerJSONResponse(w, nil, err, http.StatusNotFound)
+			} else {
+				handlers.ToHandlerJSONResponse(w, nil, err, http.StatusInternalServerError)
+			}
 		}
 	}
 }
@@ -206,8 +209,11 @@ func (handler *attachmentHandler) DownloadTaskAttachment(w http.ResponseWriter, 
 			w.Header().Set("Content-Type", attachment.ContentType)
 			http.ServeFile(w, r, attachmentPath)
 		} else {
-			// TODO: register error ?, attachment found in database but missing on disk
-			handlers.ToHandlerJSONResponse(w, nil, err, http.StatusNotFound)
+			if errors.Is(err, os.ErrNotExist) {
+				handlers.ToHandlerJSONResponse(w, nil, err, http.StatusNotFound)
+			} else {
+				handlers.ToHandlerJSONResponse(w, nil, err, http.StatusInternalServerError)
+			}
 		}
 	}
 }
