@@ -76,7 +76,8 @@ doneo-table tfoot th:last-of-type {
     border-radius: 3px;
     padding: 6px;
     min-width: 10em;
-    min-height: 1.4em;
+    min-height: 1.6em;
+    display: inline-block;
 }
 
 .doneo-md-code-container {
