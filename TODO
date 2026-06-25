@@ -53,4 +53,4 @@ deny actions (add notes, delete notes, add attachments by project privileges)
 
 only creator can update notes ?
 
-upload failed without view permissions ?
+entities users search selector 403
