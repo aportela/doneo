@@ -50,3 +50,7 @@ share change status dropdown component beween projects/tasks
 delete/undelete projects table
 
 deny actions (add notes, delete notes, add attachments by project privileges)
+
+disabled && readonly for all components
+
+add session store current user privileges
