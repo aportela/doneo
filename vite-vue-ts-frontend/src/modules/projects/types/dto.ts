@@ -9,6 +9,7 @@ import type { ProjectPriorityResponse } from "../../project-priorities/types/dto
 import type { ProjectStatusResponse } from "../../project-statuses/types/dto";
 import type { UserBaseResponse } from "../../users/types/dto";
 import type { TimestampRange } from "../../../shared/composables/timestamps";
+import type { AllowedProjectOperations } from "../../../shared/types/dto/allowed-project-operations";
 
 export type AddRequest = {
   slug: string;
@@ -65,12 +66,6 @@ export type SearchRequest = {
   pager: PagerRequest;
   order: Order;
   filter?: SearchRequestFilter;
-};
-
-export type AllowedProjectOperations = {
-  viewProject: boolean;
-  updateProject: boolean;
-  deleteProject: boolean;
 };
 
 export type ProjectResponse = {

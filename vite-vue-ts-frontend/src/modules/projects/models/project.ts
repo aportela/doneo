@@ -4,12 +4,7 @@ import { ProjectPriority } from "../../project-priorities/models/project-priorit
 import { ProjectStatus } from "../../project-statuses/models/project-status";
 import { UserBase } from "../../users/models/user";
 import { IDate } from "../../../shared/types/idate";
-
-type allowedProjectOperations = {
-  viewProject: boolean;
-  updateProject: boolean;
-  deleteProject: boolean;
-};
+import type { AllowedProjectOperations } from "../../../shared/types/dto/allowed-project-operations";
 
 export class Project {
   id: string | null;
@@ -30,7 +25,7 @@ export class Project {
   attachmentsCount: number;
   notesCount: number;
   historyOperationsCount: number;
-  allowedOperations: allowedProjectOperations;
+  allowedOperations: AllowedProjectOperations;
 
   constructor(data?: ProjectDTO) {
     this.id = data?.id ?? null;
@@ -52,9 +47,13 @@ export class Project {
     this.notesCount = data?.notesCount ?? 0;
     this.historyOperationsCount = data?.historyOperationsCount ?? 0;
     this.allowedOperations = data?.allowedOperations ?? {
-      viewProject: false,
       updateProject: false,
       deleteProject: false,
+      viewProject: false,
+      addTask: false,
+      updateTask: false,
+      deleteTask: false,
+      viewTask: false,
     };
   }
 
