@@ -4,6 +4,7 @@ import (
 	"github.com/aportela/doneo/internal/browser"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/handlers"
+	"github.com/aportela/doneo/internal/handlers/projecthandler"
 	"github.com/aportela/doneo/internal/handlers/taskpriorityhandler"
 	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
@@ -79,6 +80,15 @@ func DomainToResponse(task domain.Task) taskResponse {
 		NotesCount:             task.NotesCount,
 		HistoryOperationsCount: task.HistoryOperationsCount,
 		TimeTrackingsCount:     task.TimeTrackingsCount,
+		AllowedOperations: projecthandler.ProjectAllowedOperationsResponse{
+			AllowViewProject:   task.PermissionsBitMask.HasFlag(domain.PermissionViewProject),
+			AllowUpdateProject: task.PermissionsBitMask.HasFlag(domain.PermissionUpdateProject),
+			AllowDeleteProject: task.PermissionsBitMask.HasFlag(domain.PermissionDeleteProject),
+			AllowAddTask:       task.PermissionsBitMask.HasFlag(domain.PermissionAddTask),
+			AllowUpdateTask:    task.PermissionsBitMask.HasFlag(domain.PermissionUpdateTask),
+			AllowDeleteTask:    task.PermissionsBitMask.HasFlag(domain.PermissionDeleteTask),
+			AllowViewTask:      task.PermissionsBitMask.HasFlag(domain.PermissionViewTask),
+		},
 	}
 }
 

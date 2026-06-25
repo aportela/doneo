@@ -80,6 +80,7 @@ func toFilterDTO(filter domain.SearchTaskFilter) searchFilterDTO {
 		PriorityID:      filter.PriorityID,
 		StatusID:        filter.StatusID,
 		CreatedByUserID: filter.CreatedByUserID,
+		ViewByUserID:    filter.ViewByUserID,
 	}
 }
 

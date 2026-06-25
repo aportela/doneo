@@ -334,6 +334,7 @@ func (repository *taskRepository) Search(ctx context.Context, dbExecutor databas
 		INNER JOIN task_statuses TS ON TS.id = T.status_id
 		INNER JOIN users U ON U.ID = T.creator_id
 	`
+	sqlQueryVisibilityInnerJoins := ""
 	var field string
 	switch order.Field {
 	case "priority":
@@ -371,6 +372,16 @@ func (repository *taskRepository) Search(ctx context.Context, dbExecutor databas
 	sqlOrder := fmt.Sprintf(" ORDER BY %s %s ", field, sort)
 	sqlWhere := ""
 	var sqlWhereConditions []string
+	if filterDTO.ViewByUserID != nil && len(*filterDTO.ViewByUserID) > 0 {
+		sqlQueryVisibilityInnerJoins = `
+				INNER JOIN project_user_role ON project_user_role.project_id = T.project_id AND project_user_role.user_id = ?
+				INNER JOIN roles ON roles.id = project_user_role.role_id AND roles.permissions_bitmask & ? = ?
+			`
+		fmt.Println(*filterDTO.ViewByUserID)
+		filterArgs = append(filterArgs, *filterDTO.ViewByUserID)
+		filterArgs = append(filterArgs, domain.PermissionViewProject)
+		filterArgs = append(filterArgs, domain.PermissionViewProject)
+	}
 	if filterDTO.ProjectID != nil && len(*filterDTO.ProjectID) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "T.project_id = ?")
 		filterArgs = append(filterArgs, *filterDTO.ProjectID)
@@ -402,9 +413,6 @@ func (repository *taskRepository) Search(ctx context.Context, dbExecutor databas
 		sqlWhereConditions = append(sqlWhereConditions, "T.creator_id = ?")
 		filterArgs = append(filterArgs, *filterDTO.CreatedByUserID)
 	}
-	if filterDTO.ViewByUserID != nil && len(*filterDTO.ViewByUserID) > 0 {
-		// TODO: onlw show tasks with user view permission
-	}
 	if len(sqlWhereConditions) > 0 {
 		sqlWhere = " WHERE " + strings.Join(sqlWhereConditions, " AND ")
 	}
@@ -416,7 +424,7 @@ func (repository *taskRepository) Search(ctx context.Context, dbExecutor databas
 	} else {
 		sqlLimit = ""
 	}
-	sqlQuery = fmt.Sprintf("%s %s %s %s %s ", sqlQuery, sqlQueryInnerJoins, sqlWhere, sqlOrder, sqlLimit)
+	sqlQuery = fmt.Sprintf("%s %s %s %s %s %s ", sqlQuery, sqlQueryInnerJoins, sqlQueryVisibilityInnerJoins, sqlWhere, sqlOrder, sqlLimit)
 	rows, err := dbExecutor.QueryContext(ctx, sqlQuery, queryArgs...)
 	if err != nil {
 		return nil, browser.Result{}, err
@@ -460,7 +468,7 @@ func (repository *taskRepository) Search(ctx context.Context, dbExecutor databas
 				COUNT(*) AS total_tasks
 			FROM tasks T
 		`
-		sqlCountQuery = fmt.Sprintf("%s %s", sqlCountQuery, sqlWhere)
+		sqlCountQuery = fmt.Sprintf("%s %s %s", sqlCountQuery, sqlQueryVisibilityInnerJoins, sqlWhere)
 		err = dbExecutor.QueryRowContext(
 			ctx,
 			sqlCountQuery,

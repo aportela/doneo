@@ -82,7 +82,12 @@ func (service *taskService) Add(ctx context.Context, projectID string, task doma
 		}); err != nil {
 			return domain.Task{}, err
 		}
-		return task, nil
+		if permissionsBitMask, err := service.authorizationService.GetCurrentUserProjectPermissionBitmask(ctx, projectID); err != nil {
+			return domain.Task{}, fmt.Errorf("[TaskService] failed to get project permission bitmask with ID %s: %w", projectID, err)
+		} else {
+			task.PermissionsBitMask = permissionsBitMask
+			return task, nil
+		}
 	}
 }
 
@@ -147,7 +152,12 @@ func (service *taskService) Update(ctx context.Context, projectID string, task d
 			}); err != nil {
 				return domain.Task{}, err
 			}
-			return task, nil
+			if permissionsBitMask, err := service.authorizationService.GetCurrentUserProjectPermissionBitmask(ctx, projectID); err != nil {
+				return domain.Task{}, fmt.Errorf("[TaskService] failed to get project permission bitmask with ID %s: %w", projectID, err)
+			} else {
+				task.PermissionsBitMask = permissionsBitMask
+				return task, nil
+			}
 		}
 	}
 }
@@ -204,7 +214,12 @@ func (service *taskService) Patch(ctx context.Context, projectID string, task do
 			}); err != nil {
 				return domain.Task{}, err
 			}
-			return existentTask, nil
+			if permissionsBitMask, err := service.authorizationService.GetCurrentUserProjectPermissionBitmask(ctx, projectID); err != nil {
+				return domain.Task{}, fmt.Errorf("[TaskService] failed to get project permission bitmask with ID %s: %w", projectID, err)
+			} else {
+				existentTask.PermissionsBitMask = permissionsBitMask
+				return existentTask, nil
+			}
 		}
 	}
 }
@@ -251,19 +266,25 @@ func (service *taskService) Get(ctx context.Context, projectID string, taskID st
 			return domain.Task{}, fmt.Errorf("[TaskService] failed to get task tags with ID %s: %w", taskID, err)
 		} else {
 			task.Tags = taskTags
-			return task, nil
+			if permissionsBitMask, err := service.authorizationService.GetCurrentUserProjectPermissionBitmask(ctx, projectID); err != nil {
+				return domain.Task{}, fmt.Errorf("[TaskService] failed to get project permission bitmask with ID %s: %w", projectID, err)
+			} else {
+				task.PermissionsBitMask = permissionsBitMask
+				return task, nil
+			}
 		}
 	}
 }
 
 func (service *taskService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskFilter) ([]domain.Task, browser.Result, error) {
-	contextUser, ok := middlewares.GetContextUser(ctx)
-	if !ok {
-		return nil, browser.Result{}, fmt.Errorf("[TaskService] user not found in context")
-	}
-	contextUser, err := service.authorizationService.RequireUserAdminPermission(ctx)
+	_, err := service.authorizationService.RequireUserAdminPermission(ctx)
 	if err != nil {
-		// filter by tasks visible by current user when admin flag is not set
+		// current user has not admin privileges (view all tasks)
+		contextUser, ok := middlewares.GetContextUser(ctx)
+		if !ok {
+			return nil, browser.Result{}, fmt.Errorf("[TaskService] user not found in context")
+		}
+		// filter tasks visible by current user
 		filter.ViewByUserID = &contextUser.ID
 	}
 	tasks, pagerResult, err := service.taskRepository.Search(ctx, service.db, pager, order, filter)

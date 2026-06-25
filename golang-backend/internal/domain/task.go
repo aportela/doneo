@@ -26,6 +26,7 @@ type Task struct {
 	NotesCount             uint16
 	HistoryOperationsCount uint16
 	TimeTrackingsCount     uint16
+	PermissionsBitMask     Bitmask
 }
 
 type SearchTaskFilter struct {

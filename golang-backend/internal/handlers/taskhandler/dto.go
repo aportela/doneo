@@ -2,6 +2,7 @@ package taskhandler
 
 import (
 	"github.com/aportela/doneo/internal/handlers"
+	"github.com/aportela/doneo/internal/handlers/projecthandler"
 	"github.com/aportela/doneo/internal/handlers/taskpriorityhandler"
 	"github.com/aportela/doneo/internal/handlers/taskstatushandler"
 	"github.com/aportela/doneo/internal/handlers/userhandler"
@@ -58,29 +59,30 @@ type searchRequest struct {
 }
 
 type taskResponse struct {
-	ID                     string                                   `json:"id"`
-	ProjectID              string                                   `json:"projectId"`
-	Slug                   string                                   `json:"slug"`
-	Summary                string                                   `json:"summary"`
-	Description            *string                                  `json:"description"`
-	CreatedBy              userhandler.UserBaseResponse             `json:"createdBy"`
-	CreatedAt              int64                                    `json:"createdAt"`
-	UpdatedAt              *int64                                   `json:"updatedAt"`
-	DeletedAt              *int64                                   `json:"deletedAt"`
-	StartedAt              *int64                                   `json:"startedAt"`
-	FinishedAt             *int64                                   `json:"finishedAt"`
-	DueAt                  *int64                                   `json:"dueAt"`
-	EstimatedTime          uint64                                   `json:"estimatedTime"`
-	TotalSpentTime         uint64                                   `json:"totalSpentTime"`
-	Priority               taskpriorityhandler.TaskPriorityResponse `json:"priority"`
-	Status                 taskstatushandler.TaskStatusResponse     `json:"status"`
-	Tags                   []string                                 `json:"tags"`
-	TasksCount             uint16                                   `json:"tasksCount"`
-	PermissionsCount       uint16                                   `json:"permissionsCount"`
-	AttachmentsCount       uint16                                   `json:"attachmentsCount"`
-	NotesCount             uint16                                   `json:"notesCount"`
-	HistoryOperationsCount uint16                                   `json:"historyOperationsCount"`
-	TimeTrackingsCount     uint16                                   `json:"timeTrackingsCount"`
+	ID                     string                                          `json:"id"`
+	ProjectID              string                                          `json:"projectId"`
+	Slug                   string                                          `json:"slug"`
+	Summary                string                                          `json:"summary"`
+	Description            *string                                         `json:"description"`
+	CreatedBy              userhandler.UserBaseResponse                    `json:"createdBy"`
+	CreatedAt              int64                                           `json:"createdAt"`
+	UpdatedAt              *int64                                          `json:"updatedAt"`
+	DeletedAt              *int64                                          `json:"deletedAt"`
+	StartedAt              *int64                                          `json:"startedAt"`
+	FinishedAt             *int64                                          `json:"finishedAt"`
+	DueAt                  *int64                                          `json:"dueAt"`
+	EstimatedTime          uint64                                          `json:"estimatedTime"`
+	TotalSpentTime         uint64                                          `json:"totalSpentTime"`
+	Priority               taskpriorityhandler.TaskPriorityResponse        `json:"priority"`
+	Status                 taskstatushandler.TaskStatusResponse            `json:"status"`
+	Tags                   []string                                        `json:"tags"`
+	TasksCount             uint16                                          `json:"tasksCount"`
+	PermissionsCount       uint16                                          `json:"permissionsCount"`
+	AttachmentsCount       uint16                                          `json:"attachmentsCount"`
+	NotesCount             uint16                                          `json:"notesCount"`
+	HistoryOperationsCount uint16                                          `json:"historyOperationsCount"`
+	TimeTrackingsCount     uint16                                          `json:"timeTrackingsCount"`
+	AllowedOperations      projecthandler.ProjectAllowedOperationsResponse `json:"allowedOperations"`
 }
 
 type searchTasksResponse struct {
