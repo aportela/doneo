@@ -131,7 +131,7 @@ export function useMenu() {
       {
         label: t("layouts.sidebarMenu.options.settings"),
         key: "settings",
-        show: true,
+        show: sessionStore.sessionUserIsAdmin,
         icon: renderIcon(IconSettings)(menuOptionIconSize),
         children: [
           {
