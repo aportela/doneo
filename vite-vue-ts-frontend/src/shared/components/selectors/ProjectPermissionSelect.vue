@@ -6,7 +6,7 @@
 
     import type { ProjectPermissionSelectValue } from '../../types/project-permission-select-value';
 
-    interface RoleSelectorProps {
+    interface ProjectPermissionSelectProps {
         autoFocus?: boolean;
         required?: boolean;
         placeholder?: string;
@@ -21,7 +21,7 @@
 
     const selectedValue = ref<number | null>(null);
 
-    const props = defineProps<RoleSelectorProps>();
+    const props = defineProps<ProjectPermissionSelectProps>();
 
     const permission = defineModel<ProjectPermissionSelectValue | null>("permission", { default: null });
 

@@ -6,14 +6,14 @@
     import type { SelectMixedOption } from 'naive-ui/es/select/src/interface';
     import { type TimestampRange, getRange } from '../../composables/timestamps';
 
-    interface Props {
+    interface DateFilterSelectProps {
         disabled?: boolean;
         clearable?: boolean;
     }
 
     const { t } = useI18n();
 
-    const props = withDefaults(defineProps<Props>(), {
+    const props = withDefaults(defineProps<DateFilterSelectProps>(), {
         disabled: false,
         clearable: false,
     });
