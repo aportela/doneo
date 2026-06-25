@@ -1,27 +1,56 @@
 <script setup lang="ts">
     import { nextTick, onMounted } from 'vue';
+    import { useRoute, useRouter } from "vue-router";
 
     import { NDivider, NMenu } from 'naive-ui';
     import { IconDatabaseStar } from '@tabler/icons-vue';
-    import { useRoute } from 'vue-router'
-
-    import { menuOptionIconSize, useMenu } from '../shared/types/menu';
 
     import { useColorSchemeStore } from '../stores/colorScheme';
+    import { useLoadingStore } from '../stores/loading';
+    import { useSessionStore } from '../stores/session';
     import { useUserSettingsStore } from '../stores/userSettings';
+    import { menuOptionIconSize, useMenu } from '../shared/types/menu';
+    import { useCacheStore } from '../stores/cache';
+    import { authService } from '../modules/auth/services/auth';
 
     defineProps({
         collapsed: Boolean
     });
 
+    const route = useRoute();
+    const router = useRouter();
+    const loadingStore = useLoadingStore();
+    const sessionStore = useSessionStore();
     const colorSchemeStore = useColorSchemeStore();
     const userSettingsStore = useUserSettingsStore();
+    const cacheStore = useCacheStore();
 
-    const route = useRoute();
     const showBrand = false;
 
 
     const { menuOptions, lightTheme, darkTheme, notificationsDisabled, notificationsEnabled, topNavigation, sideNavigation } = useMenu();
+
+    const onSignOut = () => {
+        loadingStore.set(true);
+        authService.signOut().then(() => {
+            sessionStore.removeAccessToken();
+            cacheStore.clearAllCaches();
+            router.push(
+                { name: "login" }
+            ).catch((e) => {
+                console.error(e);
+            });
+        }).catch(() => {
+            sessionStore.removeAccessToken();
+            router.push(
+                { name: "login" }
+            ).catch((e) => {
+                console.error(e);
+            });
+        }).finally(() => {
+            loadingStore.set(false);
+        });
+    };
 
     const handleMenuSelect = (menuOptionKey: string) => {
         switch (menuOptionKey) {
@@ -48,6 +77,9 @@
                     topNavigation.value = userSettingsStore.topNavigationMode;
                     sideNavigation.value = userSettingsStore.sideNavigationMode;
                 });
+                break;
+            case "signout":
+                onSignOut();
                 break;
         }
     }
