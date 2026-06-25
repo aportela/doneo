@@ -3,8 +3,10 @@ package attachmentservice
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"time"
@@ -48,6 +50,9 @@ func NewService(db database.Database, basePath string, authorizationService auth
 }
 
 func (service *attachmentService) getAttachmentPath(attachmentID string) string {
+	if len(attachmentID) != 36 {
+		return ""
+	}
 	return filepath.Join(
 		service.basePath,
 		string(attachmentID[len(attachmentID)-2]),
@@ -84,6 +89,12 @@ func (service *attachmentService) SaveUploadedFile(sourceFile io.Reader, sourceF
 
 func (service *attachmentService) DeleteAttachment(attachment domain.Attachment) error {
 	attachmentPath := service.getAttachmentPath(attachment.ID)
+	if _, err := os.Stat(attachmentPath); err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			return nil
+		}
+		return err
+	}
 	attachmentFilename := attachment.ID + filepath.Ext(attachment.OriginalName)
 	fullPath := filepath.Join(attachmentPath, attachmentFilename)
 	if err := os.Remove(fullPath); err != nil {
