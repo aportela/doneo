@@ -67,7 +67,7 @@ export type SearchRequest = {
   filter?: SearchRequestFilter;
 };
 
-type allowedProjectOperations = {
+export type AllowedProjectOperations = {
   viewProject: boolean;
   updateProject: boolean;
   deleteProject: boolean;
@@ -92,7 +92,7 @@ export type ProjectResponse = {
   attachmentsCount: number;
   notesCount: number;
   historyOperationsCount: number;
-  allowedOperations: allowedProjectOperations;
+  allowedOperations: AllowedProjectOperations;
 };
 
 export type SearchResponse = {
