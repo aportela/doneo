@@ -76,6 +76,7 @@ func (service *noteService) UpdateProjectNote(ctx context.Context, projectID str
 		return domain.Note{}, err
 	} else {
 		note.UpdatedAt = utils.CurrentTimePtr()
+		note.CreatedBy.ID = contextUser.ID // the update statement is restricted to the original creator of the note; only the current user in the context can update it.
 		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.noteRepository.UpdateProjectNote(ctx, tx, note); err != nil {
 				return err
@@ -181,6 +182,7 @@ func (service *noteService) UpdateTaskNote(ctx context.Context, projectID string
 		return domain.Note{}, err
 	} else {
 		note.UpdatedAt = utils.CurrentTimePtr()
+		note.CreatedBy.ID = contextUser.ID // the update statement is restricted to the original creator of the note; only the current user in the context can update it.
 		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
 			if err := service.noteRepository.UpdateTaskNote(ctx, tx, note); err != nil {
 				return err

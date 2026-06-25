@@ -58,10 +58,13 @@ func (repository *noteRepository) UpdateProjectNote(ctx context.Context, dbExecu
 				body = ?
 			WHERE
 				id = ?
+			AND
+				creator_id = ?
         `,
 		dto.UpdatedAt,
 		dto.Body,
 		dto.ID,
+		dto.CreatorID,
 	)
 	if err != nil {
 		return mapSQLiteError(err)
@@ -166,10 +169,13 @@ func (repository *noteRepository) UpdateTaskNote(ctx context.Context, dbExecutor
 				body = ?
 			WHERE
 				id = ?
+			AND
+				creator_id = ?
         `,
 		dto.UpdatedAt,
 		dto.Body,
 		dto.ID,
+		dto.CreatorID,
 	)
 	if err != nil {
 		return mapSQLiteError(err)
