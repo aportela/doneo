@@ -194,6 +194,7 @@
             const payload: AddRequest = {
                 name: user.value.name ?? "",
                 email: user.value.email ?? "",
+                password: user.value.password ?? "",
                 permissions: {
                     isSuperUser: user.value.permissions?.isSuperUser ?? false,
                 }
@@ -395,7 +396,7 @@
                 </n-input>
                 <n-button v-else @click="onShowPasswordFormItem" block :disabled="state.ajaxRunning">{{
                     t("modules.user.components.UserForm.buttons.changePassword.label")
-                }}</n-button>
+                    }}</n-button>
             </n-form-item>
             <n-form-item :label="t('modules.user.components.UserForm.radios.permissions.label')">
                 <n-radio-group v-model:value="user.permissions.isSuperUser" name="radiogroup">

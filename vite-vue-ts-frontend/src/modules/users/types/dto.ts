@@ -24,6 +24,7 @@ interface UserPermissions {
 export type AddRequest = {
   name: string;
   email: string;
+  password: string;
   permissions: UserPermissions;
 };
 
