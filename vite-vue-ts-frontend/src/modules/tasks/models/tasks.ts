@@ -3,6 +3,7 @@ import { TaskPriority } from "../../task-priorities/models/task-priority";
 import { TaskStatus } from "../../task-statuses/models/task-status";
 import { UserBase } from "../../users/models/user";
 import { IDate } from "../../../shared/types/idate";
+import type { AllowedProjectOperations } from "../../../shared/types/dto/allowed-project-operations";
 
 export class Task {
   id: string | null;
@@ -26,6 +27,7 @@ export class Task {
   notesCount: number;
   historyOperationsCount: number;
   timeTrackingsCount: number;
+  allowedOperations: AllowedProjectOperations;
 
   constructor(data?: ProjectTaskDTO) {
     this.id = data?.id ?? null;
@@ -49,6 +51,15 @@ export class Task {
     this.notesCount = data?.notesCount ?? 0;
     this.historyOperationsCount = data?.historyOperationsCount ?? 0;
     this.timeTrackingsCount = data?.timeTrackingsCount ?? 0;
+    this.allowedOperations = data?.allowedOperations ?? {
+      updateProject: false,
+      deleteProject: false,
+      viewProject: false,
+      addTask: false,
+      updateTask: false,
+      deleteTask: false,
+      viewTask: false,
+    };
   }
 
   toDTO(): ProjectTaskDTO {
@@ -70,6 +81,7 @@ export class Task {
       notesCount: this.notesCount,
       historyOperationsCount: this.historyOperationsCount,
       timeTrackingsCount: this.timeTrackingsCount,
+      allowedOperations: this.allowedOperations,
     };
   }
 }

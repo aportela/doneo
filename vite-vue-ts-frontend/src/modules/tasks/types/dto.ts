@@ -8,6 +8,7 @@ import type { TaskPriorityResponse } from "../../task-priorities/types/dto";
 import type { TaskStatusResponse } from "../../task-statuses/types/dto";
 import type { UserBaseResponse } from "../../users/types/dto";
 import type { TimestampRange } from "../../../shared/composables/timestamps";
+import type { AllowedProjectOperations } from "../../../shared/types/dto/allowed-project-operations";
 
 export type AddRequest = {
   summary: string;
@@ -82,6 +83,7 @@ export type TaskResponse = {
   notesCount: number;
   historyOperationsCount: number;
   timeTrackingsCount: number;
+  allowedOperations: AllowedProjectOperations;
 };
 
 export type SearchResponse = {

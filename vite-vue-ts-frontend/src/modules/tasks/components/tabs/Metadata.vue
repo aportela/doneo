@@ -62,6 +62,8 @@
 
     const htmlMarkDownDescriptionPreview = computed(() => render(task.value.description ?? ""));
 
+    const taskUpdateDisabled = computed<boolean>(() => !task.value.allowedOperations.updateProject);
+
     const onGet = async (projectId: string, taskId: string) => {
         serverErrors.value = {};
         let notFoundError = false;
@@ -182,11 +184,13 @@
     const descriptionRef = ref<InputInst | null>(null);
 
     const onToggleDescriptionMode = () => {
-        descriptionEditMode.value = !descriptionEditMode.value;
-        if (descriptionEditMode.value) {
-            nextTick(() => {
-                descriptionRef.value?.focus();
-            });
+        if (!taskUpdateDisabled.value) {
+            descriptionEditMode.value = !descriptionEditMode.value;
+            if (descriptionEditMode.value) {
+                nextTick(() => {
+                    descriptionRef.value?.focus();
+                });
+            }
         }
     };
 
@@ -285,31 +289,43 @@
                 </span>
             </n-form-item>
             <n-form-item label="Started at">
-                <ToggleDateTimePicker clearable v-model:value="task.startedAt.msTimestamp" :disabled="props.disabled" />
+                <ToggleDateTimePicker clearable v-model:value="task.startedAt.msTimestamp" :disabled="props.disabled"
+                    v-if="!taskUpdateDisabled" />
+                <span class="doneo-datetime-label-readonly" v-else>
+                    {{ task.startedAt?.toLocaleString() }}
+                </span>
             </n-form-item>
             <n-form-item label="Finished at">
-                <ToggleDateTimePicker clearable v-model:value="task.finishedAt.msTimestamp"
-                    :disabled="props.disabled" />
+                <ToggleDateTimePicker clearable v-model:value="task.finishedAt.msTimestamp" :disabled="props.disabled"
+                    v-if="!taskUpdateDisabled" />
+                <span class="doneo-datetime-label-readonly" v-else>
+                    {{ task.finishedAt?.toLocaleString() }}
+                </span>
             </n-form-item>
             <n-form-item label="Due at">
-                <ToggleDateTimePicker clearable v-model:value="task.dueAt.msTimestamp" :disabled="props.disabled" />
+                <ToggleDateTimePicker clearable v-model:value="task.dueAt.msTimestamp" :disabled="props.disabled"
+                    v-if="!taskUpdateDisabled" />
+                <span class="doneo-datetime-label-readonly" v-else>
+                    {{ task.dueAt?.toLocaleString() }}
+                </span>
             </n-form-item>
         </n-flex>
         <n-form>
             <n-flex>
                 <n-form-item label="Priority">
-                    <TaskPrioritySelector v-model:id="task.priority.id" :disabled="props.disabled" />
+                    <TaskPrioritySelector v-model:id="task.priority.id" :disabled="props.disabled"
+                        :read-only="taskUpdateDisabled" />
                 </n-form-item>
                 <n-form-item label="Status">
                     <TaskStatusSelector v-model:id="task.status.id" :disabled="props.disabled"
-                        @fill-empty-start-date="onFillEmptyStartDate" @set-start-date="onSetStartDate"
-                        @fill-empty-finish-date="onFillEmptyFinishDate" @set-finish-date="onSetFinishDate"
-                        @unset-finish-date-on-leave="onUnsetFinishDateOnLeave" />
+                        :read-only="taskUpdateDisabled" @fill-empty-start-date="onFillEmptyStartDate"
+                        @set-start-date="onSetStartDate" @fill-empty-finish-date="onFillEmptyFinishDate"
+                        @set-finish-date="onSetFinishDate" @unset-finish-date-on-leave="onUnsetFinishDateOnLeave" />
                 </n-form-item>
             </n-flex>
             <n-form-item label="Summary">
                 <ToggleInput v-model:value="task.summary" show-count :max-length="MAX_SUMMARY_LENGTH"
-                    :disabled="props.disabled" />
+                    :disabled="props.disabled" :read-only="taskUpdateDisabled" />
             </n-form-item>
             <n-form-item label="description">
                 <template #label>
@@ -358,7 +374,7 @@
 
             </n-grid>
         </n-form>
-        <n-button @click="onUpdate" :disabled="props.disabled">
+        <n-button @click="onUpdate" :disabled="props.disabled" v-if="!taskUpdateDisabled">
             <template #icon>
                 <n-icon :component="IconDeviceFloppy" color="red"></n-icon>
             </template>
