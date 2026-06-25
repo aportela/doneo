@@ -40,12 +40,14 @@
             from: null,
             to: null,
         },
+        operationType: null,
     });
 
     const filteredItems = computed(() => {
         return items.value.filter((operation: HistoryOperation) => {
             return (
                 (filters.userId === null || filters.userId == operation.createdBy.id) &&
+                (filters.operationType === null || filters.operationType == operation.operationType) &&
                 ((filters.createdAt.from === null && filters.createdAt.to === null) || (operation.createdAt.msTimestamp != null && filters.createdAt.from != null && filters.createdAt.from <= operation.createdAt.msTimestamp && filters.createdAt.to != null && filters.createdAt.to >= operation.createdAt.msTimestamp))
             );
         });

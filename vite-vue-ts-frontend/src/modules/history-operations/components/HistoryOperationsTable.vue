@@ -17,6 +17,7 @@
     import UserSelector from '../../users/components/UserSelector.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import type { DateFilterSelectComponent } from '../../users/components/date-filter-select-component.ts';
+    import HistoryOperationSelect from '../../../shared/components/selectors/HistoryOperationSelect.vue';
 
     interface HistoryOperationsTableProps {
         disabled: boolean;
@@ -42,14 +43,16 @@
                 from: null,
                 to: null,
             },
+            operationType: null,
         })
     });
 
     const isFilteredByUser = computed<boolean>(() => filters.value.userId !== null);
     const isFilteredByCreatedAt = computed<boolean>(() => filters.value.createdAt.from != null || filters.value.createdAt.to != null);
+    const isFilteredByOperationType = computed<boolean>(() => filters.value.operationType !== null);
 
     const hasFilters = computed<boolean>(() =>
-        isFilteredByUser.value || isFilteredByCreatedAt.value
+        isFilteredByUser.value || isFilteredByOperationType.value || isFilteredByCreatedAt.value
     );
 
     const columns = computed<TableHeaderColumn[]>(() => [
@@ -65,7 +68,7 @@
             field: "operationType",
             visible: true,
             sortable: false,
-            isFiltered: () => false,
+            isFiltered: () => isFilteredByOperationType.value,
         },
         {
             label: t("modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.header.columns.user"),
@@ -82,6 +85,7 @@
 
     const onClearFilters = () => {
         filters.value.userId = null;
+        filters.value.operationType = null;
         createdAtFilterRef.value?.reset();
     };
 </script>
@@ -94,7 +98,11 @@
                     <DateFilterSelect clearable v-model:range="filters.createdAt" ref="createdAtFilterRef"
                         :disabled="props.disabled" />
                 </th>
-                <th></th>
+                <th>
+                    <HistoryOperationSelect v-model:history-operation-type="filters.operationType"
+                        :disabled="props.disabled" clearable
+                        :placeholder="t('modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.filters.operationType.placeholder')" />
+                </th>
                 <th>
                     <UserSelector v-model:id="filters.userId" :disabled="props.disabled" hide-avatar clearable
                         :placeholder="t('modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.filters.user.placeholder')" />
