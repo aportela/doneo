@@ -100,7 +100,7 @@
                 </th>
                 <th>
                     <HistoryOperationSelect v-model:history-operation-type="filters.operationType"
-                        :disabled="props.disabled" clearable
+                        :disabled="props.disabled" clearable :show-only-task-history-operations="!!props.taskId"
                         :placeholder="t('modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.filters.operationType.placeholder')" />
                 </th>
                 <th>

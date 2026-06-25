@@ -12,6 +12,7 @@
         clearable?: boolean;
         size?: SelectSize;
         disabled?: boolean;
+        showOnlyTaskHistoryOperations?: boolean;
     }
 
     const { t } = useI18n();
@@ -112,6 +113,8 @@
 
     ]);
 
+    const taskOptions = computed(() => options.value.filter((opt: SelectOption) => typeof opt.value === 'number' && opt.value >= 200));
+
     watch(selectedValue, (newValue: number | null) => {
         historyOperationType.value = newValue;
     });
@@ -137,8 +140,8 @@
 
 <template>
     <n-select filterable ref="selectInstRef" :required="props.required" :clearable="props.clearable"
-        v-model:value="selectedValue" :options="options" :placeholder="props.placeholder" :size="props.size"
-        :disabled="props.disabled" />
+        v-model:value="selectedValue" :options="props.showOnlyTaskHistoryOperations ? taskOptions : options"
+        :placeholder="props.placeholder" :size="props.size" :disabled="props.disabled" />
 </template>
 
 <style lang="css" scoped></style>
