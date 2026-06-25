@@ -52,3 +52,5 @@ delete/undelete projects table
 deny actions (add notes, delete notes, add attachments by project privileges)
 
 disabled && readonly for all components
+
+history operation type filter selector
