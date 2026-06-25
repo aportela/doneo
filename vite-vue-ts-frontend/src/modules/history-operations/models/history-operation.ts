@@ -24,6 +24,7 @@ export class HistoryOperation {
     };
   }
 
+  // TODO: i18n
   getOperationTypeLabel(): string {
     switch (this.operationType) {
       case 100:
@@ -31,7 +32,7 @@ export class HistoryOperation {
       case 101:
         return "project updated";
       case 102:
-        return "project deleleted";
+        return "project deleted";
       case 110:
         return "project note added";
       case 111:
