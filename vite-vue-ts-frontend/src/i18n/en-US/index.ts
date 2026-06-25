@@ -160,7 +160,6 @@ export default {
             taskTimeEntryAdded: "Task time entry added",
             taskTimeEntryUpdated: "Task time entry updated",
             taskTimeEntryDeleted: "Task time entry deleted",
-            unknownOperationType: "Unknown operation type",
           },
         },
         ToggleTagSelector: {
@@ -1073,6 +1072,34 @@ export default {
             },
             user: {
               placeholder: "search by user",
+            },
+          },
+          body: {
+            columns: {
+              operationType: {
+                projectCreated: "Project created",
+                projectUpdated: "Project updated",
+                projectDeleted: "Project deleted",
+                projectNoteAdded: "Project note added",
+                projectNoteUpdated: "Project note updated",
+                projectNoteDeleted: "Project note deleted",
+                projectAttachmentAdded: "Project attachment added",
+                projectAttachmentDeleted: "Project attachment deleted",
+                projectPermissionAdded: "Project permission added",
+                projectPermissionDeleted: "Project permission deleted",
+                taskCreated: "Task created",
+                taskUpdated: "Task updated",
+                taskDeleted: "Task deleted",
+                taskNoteAdded: "Task note added",
+                taskNoteUpdated: "Task note updated",
+                taskNoteDeleted: "Task note deleted",
+                taskAttachmentAdded: "Task attachment added",
+                taskAttachmentDeleted: "Task attachment deleted",
+                taskTimeEntryAdded: "Task time entry added",
+                taskTimeEntryUpdated: "Task time entry updated",
+                taskTimeEntryDeleted: "Task time entry deleted",
+                unknownOperationType: "Unknown operation type",
+              },
             },
           },
           warnings: {

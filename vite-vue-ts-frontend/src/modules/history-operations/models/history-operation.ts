@@ -24,53 +24,52 @@ export class HistoryOperation {
     };
   }
 
-  // TODO: i18n
   getOperationTypeLabel(): string {
     switch (this.operationType) {
       case 100:
-        return "project created";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.projectCreated";
       case 101:
-        return "project updated";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.projectUpdated";
       case 102:
-        return "project deleted";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.projectDeleted";
       case 110:
-        return "project note added";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.projectNoteAdded";
       case 111:
-        return "project note updated";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.projectNoteUpdated";
       case 112:
-        return "project note deleted";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.projectNoteDeleted";
       case 120:
-        return "project attachment added";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.projectAttachmentAdded";
       case 122:
-        return "project attachment deleted";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.projectAttachmentDeleted";
       case 130:
-        return "project permission added";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.projectPermissionAdded";
       case 132:
-        return "project permission deleted";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.projectPermissionDeleted";
       case 200:
-        return "task created";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.taskCreated";
       case 201:
-        return "task updated";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.taskUpdated";
       case 202:
-        return "task deleted";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.taskDeleted";
       case 210:
-        return "task note added";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.taskNoteAdded";
       case 211:
-        return "task note updated";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.taskNoteUpdated";
       case 212:
-        return "task note deleted";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.taskNoteDeleted";
       case 220:
-        return "task attachment added";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.taskAttachmentAdded";
       case 222:
-        return "task attachment deleted";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.taskAttachmentDeleted";
       case 230:
-        return "task time entry added";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.taskTimeEntryAdded";
       case 231:
-        return "task time entry updated";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.taskTimeEntryUpdated";
       case 232:
-        return "task time entry deleted";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.taskTimeEntryDeleted";
       default:
-        return "unknown operation";
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.unknownOperationType";
     }
   }
 }

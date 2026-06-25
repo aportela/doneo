@@ -116,12 +116,11 @@
             <tr v-for="projectHistoryOperation, index in items" :key="projectHistoryOperation.id ?? index">
                 <td>{{ projectHistoryOperation.createdAt.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}
                 </td>
-                <td>{{ projectHistoryOperation.getOperationTypeLabel() }}</td>
+                <td>{{ t(projectHistoryOperation.getOperationTypeLabel()) }}</td>
                 <td>
                     <AvatarUserName :user-id="projectHistoryOperation.createdBy?.id ?? ''"
                         :user-name="projectHistoryOperation.createdBy?.name ?? ''" />
                 </td>
-
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-preview :disabled="true || props.disabled" />
                 </td>
