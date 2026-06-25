@@ -47,4 +47,10 @@ toggle details as list / table (ex: notes as current or table)
 
 share change status dropdown component beween projects/tasks
 
-add 403 forbidden check on service api calls
+delete/undelete projects table
+
+deny actions (add notes, delete notes, add attachments by project privileges)
+
+only creator can update notes ?
+
+upload failed without view permissions ?
