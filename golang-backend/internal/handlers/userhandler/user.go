@@ -130,17 +130,7 @@ func (handler *userHandler) Get(w http.ResponseWriter, r *http.Request) {
 
 func (handler *userHandler) SearchBase(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	users, _, err := handler.service.Search(r.Context(),
-		browser.Params{
-			CurrentPage: 1,
-			ResultsPage: 0,
-		},
-		browser.Order{
-			Field: "name",
-			Sort:  "ASC",
-		},
-		domain.SearchUsersFilter{},
-	)
+	users, err := handler.service.SearchBase(r.Context())
 	handlers.ToHandlerJSONResponse(w, toSearchBaseResponse(users), err)
 }
 
