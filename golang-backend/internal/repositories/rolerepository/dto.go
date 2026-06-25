@@ -1,8 +1,12 @@
 package rolerepository
 
+type roleBaseDTO struct {
+	ID   string `db:"id"`
+	Name string `db:"name"`
+}
+
 type roleDTO struct {
-	ID                 string `db:"id"`
-	Name               string `db:"name"`
+	roleBaseDTO
 	PermissionsBitmask uint64 `db:"permissions_bitmask"`
 }
 

@@ -11,10 +11,27 @@ import (
 
 func toDTO(role domain.Role) roleDTO {
 	return roleDTO{
-		ID:                 role.ID,
-		Name:               role.Name,
+		roleBaseDTO: roleBaseDTO{
+			ID:   role.ID,
+			Name: role.Name,
+		},
 		PermissionsBitmask: uint64(role.PermissionsBitmask),
 	}
+}
+
+func toBaseDomain(role roleBaseDTO) domain.RoleBase {
+	return domain.RoleBase{
+		ID:   role.ID,
+		Name: role.Name,
+	}
+}
+
+func toBaseDomainArray(users []roleBaseDTO) []domain.RoleBase {
+	results := make([]domain.RoleBase, 0, len(users))
+	for _, role := range users {
+		results = append(results, toBaseDomain(role))
+	}
+	return results
 }
 
 func toDomain(role roleDTO) domain.Role {

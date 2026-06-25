@@ -17,6 +17,7 @@ type RoleService interface {
 	Update(ctx context.Context, role domain.Role) (domain.Role, error)
 	Delete(ctx context.Context, roleID string) error
 	Get(ctx context.Context, roleID string) (domain.Role, error)
+	SearchBase(ctx context.Context) ([]domain.RoleBase, error)
 	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error)
 }
 
@@ -69,6 +70,13 @@ func (service *roleService) Get(ctx context.Context, roleID string) (domain.Role
 	}
 }
 
+func (service *roleService) SearchBase(ctx context.Context) ([]domain.RoleBase, error) {
+	if roles, err := service.roleRepository.SearchBase(ctx, service.db); err != nil {
+		return nil, fmt.Errorf("[RoleService] failed to search base roles: %w", err)
+	} else {
+		return roles, nil
+	}
+}
 func (service *roleService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return nil, browser.Result{}, err

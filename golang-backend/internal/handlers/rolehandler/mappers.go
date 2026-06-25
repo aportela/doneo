@@ -80,7 +80,7 @@ func DomainToBaseResponse(role domain.Role) RoleBaseResponse {
 	}
 }
 
-func domainToBaseResponse(role domain.Role) RoleBaseResponse {
+func domainToBaseResponse(role domain.RoleBase) RoleBaseResponse {
 	return RoleBaseResponse{
 		ID:   role.ID,
 		Name: role.Name,
@@ -95,7 +95,7 @@ func domainArrayToResponseArray(roles []domain.Role) []RoleResponse {
 	return roleResponses
 }
 
-func domainArrayToBaseResponseArray(roles []domain.Role) []RoleBaseResponse {
+func domainArrayToBaseResponseArray(roles []domain.RoleBase) []RoleBaseResponse {
 	roleResponses := []RoleBaseResponse{}
 	for _, role := range roles {
 		roleResponses = append(roleResponses, domainToBaseResponse(role))
@@ -103,7 +103,7 @@ func domainArrayToBaseResponseArray(roles []domain.Role) []RoleBaseResponse {
 	return roleResponses
 }
 
-func toSearchBaseResponse(roles []domain.Role) searchBaseResponse {
+func toSearchBaseResponse(roles []domain.RoleBase) searchBaseResponse {
 	return searchBaseResponse{
 		Roles: domainArrayToBaseResponseArray(roles),
 	}

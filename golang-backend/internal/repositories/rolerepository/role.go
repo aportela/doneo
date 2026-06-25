@@ -17,6 +17,7 @@ type RoleRepository interface {
 	Update(ctx context.Context, dbExecutor database.DatabaseExecutor, role domain.Role) error
 	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, roleID string) error
 	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, roleID string) (domain.Role, error)
+	SearchBase(ctx context.Context, dbExecutor database.DatabaseExecutor) ([]domain.RoleBase, error)
 	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error)
 }
 
@@ -117,6 +118,36 @@ func (repository *roleRepository) Get(ctx context.Context, dbExecutor database.D
 		return domain.Role{}, err
 	}
 	return toDomain(dto), err
+}
+
+func (repository *roleRepository) SearchBase(ctx context.Context, dbExecutor database.DatabaseExecutor) ([]domain.RoleBase, error) {
+	rows, err := dbExecutor.QueryContext(
+		ctx,
+		`
+            SELECT
+				R.id, R.name
+			FROM roles R
+			ORDER BY R.name COLLATE NOCASE
+        `,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	dtos := make([]roleBaseDTO, 0)
+	for rows.Next() {
+		var dto roleBaseDTO
+		if err := rows.Scan(
+			&dto.ID, &dto.Name,
+		); err != nil {
+			return nil, err
+		}
+		dtos = append(dtos, dto)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return toBaseDomainArray(dtos), nil
 }
 
 func (repository *roleRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error) {
