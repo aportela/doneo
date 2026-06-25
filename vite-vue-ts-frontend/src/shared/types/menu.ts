@@ -5,6 +5,8 @@ import { RouterLink } from "vue-router";
 import { NInput, type MenuOption } from "naive-ui";
 import { renderIcon } from "../composables/naive-ui-icon";
 
+import { useSessionStore } from "../../stores/session";
+
 import {
   IconPresentation,
   IconUserCircle,
@@ -36,6 +38,8 @@ export { menuOptionIconSize };
 // TODO: i18n
 export function useMenu() {
   const { t } = useI18n();
+
+  const sessionStore = useSessionStore();
 
   const lightTheme = ref<boolean>(true);
   const darkTheme = ref<boolean>(false);
@@ -278,8 +282,7 @@ export function useMenu() {
         },
       },
       {
-        // TODO: use current username
-        label: "John Doe",
+        label: sessionStore.sessionUserName,
         key: "myuser",
         icon: renderIcon(IconUserCircle)(menuOptionIconSize),
         children: [
