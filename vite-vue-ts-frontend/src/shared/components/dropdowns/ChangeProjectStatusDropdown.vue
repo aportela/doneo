@@ -1,14 +1,19 @@
 <script setup lang="ts">
     import { computed } from 'vue';
+    import { useI18n } from "vue-i18n";
+
     import { NDropdown, NButton, NIcon, type DropdownOption } from 'naive-ui';
     import { IconStatusChange } from '@tabler/icons-vue';
+
     import type { TaskStatus } from '../../../modules/task-statuses/models/task-status';
     import { useCacheStore } from '../../../stores/cache';
 
     interface ChangeProjectStatusDropdownProps {
+        disabled?: boolean;
         currentStatus: TaskStatus
     };
 
+    const { t } = useI18n();
     const cacheStore = useCacheStore();
 
     const props = defineProps<ChangeProjectStatusDropdownProps>();
@@ -32,7 +37,7 @@
 </script>
 
 <template>
-    <n-dropdown trigger="click" :options="options" @select="onChange">
+    <n-dropdown trigger="click" :options="options" @select="onChange" v-if="!props.disabled">
         <n-button>
             <template #icon>
                 <n-icon :size="22" :component="IconStatusChange" />
@@ -40,6 +45,12 @@
             Change status
         </n-button>
     </n-dropdown>
+    <n-button v-else disabled>
+        <template #icon>
+            <n-icon :size="22" :component="IconStatusChange" />
+        </template>
+        {{ t("shared.components.dropDowns.ChangeTaskStatusDropdown.label") }}
+    </n-button>
 </template>
 
 <style lang="css" scoped></style>

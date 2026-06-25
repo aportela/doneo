@@ -236,6 +236,14 @@ export default {
           },
         },
       },
+      dropDowns: {
+        ChangeTaskStatusDropdown: {
+          label: "Change status",
+        },
+        ChangeProjectStatusDropdown: {
+          label: "Change status",
+        },
+      },
     },
     buttons: {
       Save: {
