@@ -26,6 +26,7 @@
     import Pager from '../../../../shared/components/tables/Pager.vue';
 
     interface ProjectTasksProps {
+        readOnly: boolean;
         style?: string | CSSProperties;
         projectId: string;
     }
@@ -202,7 +203,7 @@
             </template>
         </Pager>
         <TasksTable :items="items" :disabled="state.ajaxRunning" :project-id="props.projectId" @refresh="onRefresh"
-            @add="onShowAddForm" :sort="sort" @sort="onSort" v-model:filters="filters" />
+            @add="onShowAddForm" :sort="sort" @sort="onSort" v-model:filters="filters" :read-only="props.readOnly" />
     </n-card>
 </template>
 

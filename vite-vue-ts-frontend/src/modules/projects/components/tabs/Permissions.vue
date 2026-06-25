@@ -21,6 +21,7 @@
     import type { ProjectPermissionsTableFilters } from "../../../project-permissions/types/project-permissions-table-filter.ts";
 
     interface ProjectPermissionsProps {
+        readOnly: boolean;
         style?: string | CSSProperties;
         projectId: string;
     }
@@ -198,8 +199,8 @@
     </n-modal>
     <n-card bordered :style="props.style">
         <ProjectPermissionsTable :project-id="props.projectId" :items="filteredPermissions"
-            :disabled="state.ajaxRunning" v-model:filters="filters" @refresh="onRefresh" @add="onShowAddForm"
-            @delete="onDelete" />
+            :disabled="state.ajaxRunning" :read-only="props.readOnly" v-model:filters="filters" @refresh="onRefresh"
+            @add="onShowAddForm" @delete="onDelete" />
     </n-card>
 </template>
 

@@ -23,6 +23,7 @@
 
     interface Props {
         disabled: boolean;
+        readOnly?: boolean;
         items: ProjectPermission[];
         projectId: string;
         errorMessage?: string | null;
@@ -127,7 +128,7 @@
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
+    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd" :hide-add="props.readOnly">
         <template #thead>
             <tr>
                 <th>
@@ -242,8 +243,8 @@
                     </n-tooltip>
                 </td>
                 <td class="doneo-text-center">
-                    <ManageTableActionButtons show-delete @delete="onConfirmDelete(projectPermission, index)"
-                        :disabled="props.disabled" />
+                    <ManageTableActionButtons show-delete :delete-disabled="props.readOnly"
+                        @delete="onConfirmDelete(projectPermission, index)" :disabled="props.disabled" />
                 </td>
             </tr>
             <tr>

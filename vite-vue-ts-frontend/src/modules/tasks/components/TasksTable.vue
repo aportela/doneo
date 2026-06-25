@@ -26,6 +26,7 @@
 
     interface Props {
         disabled: boolean;
+        readOnly?: boolean;
         items: Task[];
         sort?: Sort;
         projectId?: string;
@@ -145,7 +146,7 @@
 
 <template>
     <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd"
-        :hideAdd="props.hideAdd">
+        :hideAdd="props.hideAdd || props.readOnly">
         <template #thead>
             <tr>
                 <th>
@@ -212,7 +213,7 @@
                                 </template>
                             </n-button>
                         </router-link>
-                        <ChangeTaskStatusDropdown :current-status="task.status"
+                        <ChangeTaskStatusDropdown :disabled="props.readOnly" :current-status="task.status"
                             @change="(status: TaskStatus) => onStatusChange(task, status)" />
                     </n-button-group>
                 </td>

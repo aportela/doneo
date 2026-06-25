@@ -15,6 +15,7 @@
     import { useMarkdown } from "../../../shared/composables/useMarkdown.ts";
 
     interface NoteItemProps {
+        readOnly?: boolean;
         note: Note;
     };
 
@@ -182,7 +183,7 @@
                     {{ t("shared.buttons.Cancel.label") }}
                 </n-button>
             </n-button-group>
-            <n-button-group size="small" class="doneo-note-bottom-action-buttons" v-else>
+            <n-button-group size="small" class="doneo-note-bottom-action-buttons" v-else-if="!props.readOnly">
                 <n-button @click="onUpdate">
                     <template #icon>
                         <n-icon :component="IconEdit"></n-icon>

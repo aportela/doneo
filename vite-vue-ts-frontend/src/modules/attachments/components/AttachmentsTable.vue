@@ -26,6 +26,7 @@
 
     interface Props {
         disabled: boolean;
+        readOnly?: boolean;
         items: Attachment[];
         projectId: string;
         errorMessage?: string | null;
@@ -158,7 +159,7 @@
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
+    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd" :hide-add="props.readOnly">
         <template #thead>
             <tr>
                 <th>

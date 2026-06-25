@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, reactive, watch, computed, type CSSProperties, nextTick, onMounted } from 'vue';
+    import { ref, reactive, watch, computed, type CSSProperties, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NCard, NForm, NFormItem, NInput, NButton, NButtonGroup, NIcon, type InputInst, NFlex, NEllipsis } from 'naive-ui';
@@ -11,7 +11,6 @@
     import { appBus } from '../../../../shared/composables/bus';
     import type { ProjectResponse, UpdateRequest } from '../../types/dto';
 
-    import type { FormMode } from '../../../../shared/types/form-mode';
     import { Project, MAX_SLUG_LENGTH, MAX_SUMMARY_LENGTH } from "../../models/project";
     import ProjectPrioritySelector from "../../../project-priorities/components/ProjectPrioritySelector.vue";
     import ProjectStatusSelector from "../../../project-statuses/components/ProjectStatusSelector.vue";
@@ -24,13 +23,12 @@
     import { IDate } from '../../../../shared/types/idate.ts';
 
     interface ProjectFormProps {
-        mode: FormMode;
+        readOnly: boolean;
         style?: string | CSSProperties;
         disabled?: boolean;
-        projectId: string;
     }
 
-    const project = ref<Project>(new Project());
+    const project = defineModel<Project>("project", { required: true });
 
     const props = defineProps<ProjectFormProps>();
 
@@ -67,63 +65,7 @@
 
     const htmlMarkDownDescriptionPreview = computed(() => render(project.value.description ?? ""));
 
-    const projectUpdateDisabled = computed<boolean>(() => !project.value.allowedOperations.updateProject);
-
-    const onGet = async (id: string) => {
-        serverErrors.value = {};
-        let notFoundError = false;
-        let deletedError = false;
-        let accessDeniedError = false;
-        Object.assign(state, defaultAjaxStateRunning);
-        try {
-            const response: ProjectResponse = await projectService.get(id);
-            if (response.id === id) {
-                project.value = new Project(response);
-                permissionCount.value = project.value.permissionsCount;
-                noteCount.value = project.value.notesCount;
-                attachmentCount.value = project.value.attachmentsCount;
-                historyOperationCount.value = project.value.historyOperationsCount;
-                taskCount.value = project.value.tasksCount;
-            } else {
-                state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.loadError");
-            }
-        } catch (error: unknown) {
-            state.ajaxErrors = true;
-            handleAPIError(error,
-                (apiError) => {
-                    switch (apiError.response?.status) {
-                        case 401:
-                            state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPage.onGet" } });
-                            break;
-                        case 403:
-                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
-                            accessDeniedError = true;
-                            break;
-                        case 404:
-                            state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.notFoundError");
-                            notFoundError = true;
-                            break;
-                        case 410:
-                            state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.deletedError");
-                            deletedError = true;
-                            break;
-                        default:
-                            state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.loadError");
-                            break;
-                    }
-                },
-                (fatalError) => {
-                    state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.loadError");
-                    console.error("Unhandled API error", { file: "ProjectPage.vue", method: "onGet" }, { err: fatalError });
-                });
-        } finally {
-            state.ajaxRunning = false;
-            if (state.ajaxErrorMessage) {
-                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage, denyCloseDialog: notFoundError || deletedError || accessDeniedError } });
-            }
-        }
-    };
+    const projectUpdateDisabled = computed<boolean>(() => props.readOnly || !project.value.allowedOperations.updateProject);
 
     const onUpdate = async () => {
         serverErrors.value = {};
@@ -283,11 +225,6 @@
         insertAtCursor(markdown)
     };
 
-    onMounted(() => {
-        if (props.projectId) {
-            onGet(props.projectId);
-        }
-    });
 
 </script>
 

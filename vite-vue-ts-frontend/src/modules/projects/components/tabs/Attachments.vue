@@ -26,6 +26,7 @@
     import PDFPreview from "../../../../shared/components/PDFPreview.vue";
 
     interface ProjectAttachmentsProps {
+        readOnly: boolean;
         style?: string | CSSProperties;
         projectId: string;
     }
@@ -241,7 +242,7 @@
     <n-card bordered :style="props.style">
         <AttachmentsTable :project-id="props.projectId" :items="filteredItems" :disabled="state.ajaxRunning"
             v-model:filters="filters" @refresh="onRefresh" @add="onShowUploadModal" @delete="onDelete"
-            @download="onDownload" @preview="onPreview" />
+            @download="onDownload" @preview="onPreview" :read-only="props.readOnly" />
     </n-card>
 </template>
 

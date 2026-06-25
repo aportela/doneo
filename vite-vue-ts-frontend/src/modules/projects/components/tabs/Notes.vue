@@ -17,6 +17,7 @@
     import { useSessionStore } from "../../../../stores/session.ts";
 
     interface ProjectNotesProps {
+        readOnly: boolean;
         style?: string | CSSProperties;
         projectId: string;
     }
@@ -141,12 +142,12 @@
 <template>
     <n-card bordered :style="props.style">
         <n-button-group style="margin-bottom: 16px;">
-            <n-button @click="onAddNote">Add Note</n-button>
+            <n-button @click="onAddNote" v-if="!props.readOnly">Add Note</n-button>
             <n-button @click="onRefresh">Refresh notes</n-button>
         </n-button-group>
         <n-space vertical size="large" style="margin-right: 12px;">
             <NoteItem v-for="note, index in items" :key="note.id ?? index" :note="note" @save="onSaveNote"
-                @delete="onDeleteNote" />
+                @delete="onDeleteNote" :read-only="props.readOnly" />
         </n-space>
     </n-card>
 </template>
