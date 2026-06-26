@@ -239,21 +239,21 @@
             </n-form-item>
             <n-form-item label="Started at">
                 <ToggleDateTimePicker clearable v-model:value="project.startedAt.msTimestamp"
-                    :disabled="props.disabled || state.ajaxRunning" v-if="props.readOnly" />
+                    :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly" />
                 <span class="doneo-datetime-label-readonly" v-else>
                     {{ project.startedAt?.toLocaleString() }}
                 </span>
             </n-form-item>
             <n-form-item label="Finished at">
                 <ToggleDateTimePicker clearable v-model:value="project.finishedAt.msTimestamp"
-                    :disabled="props.disabled || state.ajaxRunning" v-if="props.readOnly" />
+                    :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly" />
                 <span class="doneo-datetime-label-readonly" v-else>
                     {{ project.finishedAt?.toLocaleString() }}
                 </span>
             </n-form-item>
             <n-form-item label="Due at">
                 <ToggleDateTimePicker clearable v-model:value="project.dueAt.msTimestamp"
-                    :disabled="props.disabled || state.ajaxRunning" v-if="props.readOnly" />
+                    :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly" />
                 <span class="doneo-datetime-label-readonly" v-else>
                     {{ project.dueAt?.toLocaleString() }}
                 </span>
