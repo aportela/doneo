@@ -16,8 +16,10 @@ type AuthConfiguration struct {
 }
 
 type StorageConfiguration struct {
-	MaxUploadFilesize int64  `mapstructure:"max_upload_filesize"`
-	AttachmentsPath   string `mapstructure:"attachments_path"`
+	MaxUploadFilesize       int64  `mapstructure:"max_upload_filesize"`
+	AttachmentsPath         string `mapstructure:"attachments_path"`
+	MaxAvatarUploadFilesize int64  `mapstructure:"max_avatarupload_filesize"`
+	AvatarsPath             string `mapstructure:"avatars_path"`
 }
 
 type Configuration struct {

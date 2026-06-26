@@ -1,6 +1,10 @@
 import { axiosInstance } from "../../../api/client";
 
-import type { UpdateRequest, ProfileResponse } from "../types/dto";
+import type {
+  UpdateRequest,
+  ProfileResponse,
+  EmptyResponse,
+} from "../types/dto";
 
 export const profileService = {
   async update(payload: UpdateRequest): Promise<ProfileResponse> {
@@ -12,6 +16,11 @@ export const profileService = {
   },
   async get(): Promise<ProfileResponse> {
     const { data } = await axiosInstance.get<ProfileResponse>("/profile/");
+    return data;
+  },
+  async deleteAvatar(): Promise<EmptyResponse> {
+    const { data } =
+      await axiosInstance.delete<ProfileResponse>("/profile/avatar/");
     return data;
   },
 };

@@ -22,7 +22,8 @@ const httpServerPort = 8086
 const accessTokenExpirationHours = 1
 const refreshTokenExpirationDays = 365
 
-const maxUploadFilesize = 32 << 20 // 32 MiB
+const maxUploadFilesize = 32 << 20      // 32 MiB
+const maxAvatarUploadFilesize = 1 << 20 // 1 MiB
 
 func initViper() {
 	configFile := filepath.Join(data.GetDataPath(), configurationFilename)
@@ -53,6 +54,8 @@ func createDefaultConfiguration() error {
 
 	viper.Set("storage.attachments_path", filepath.Join(data.GetDataPath(), "attachments"))
 	viper.Set("storage.max_upload_filesize", maxUploadFilesize)
+	viper.Set("storage.avatars_path", filepath.Join(data.GetDataPath(), "avatars"))
+	viper.Set("storage.max_avatarupload_filesize", maxAvatarUploadFilesize)
 
 	return viper.WriteConfigAs(filepath.Join(data.GetDataPath(), configurationFilename))
 }

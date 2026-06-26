@@ -123,7 +123,7 @@ func NewApp(
 	taskTimeTrackingService := tasktimetrackingservice.NewService(db, authorizationService, historyOperationService, taskTimeTrackingRepository)
 	userTimerService := usertimerservice.NewService(db, userTimerRepository)
 	userService := userservice.NewService(db, cache, authorizationService, userRepository)
-	profileService := profileservice.NewService(db, cache, authorizationService, userRepository)
+	profileService := profileservice.NewService(db, cfg.Storage.AvatarsPath, cache, authorizationService, userRepository)
 
 	attachmentHandler := attachmenthandler.NewHandler(attachmentService, cfg.Storage.MaxUploadFilesize)
 	identityHandler := identityhandler.NewHandler(identityService, cfg.Auth.SecretKey, cfg.Auth.AccessTokenExpirationHours, cfg.Auth.RefreshTokenExpirationDays)
@@ -141,7 +141,7 @@ func NewApp(
 	taskTimeTrackingHandler := tasktimetrackinghandler.NewHandler(taskTimeTrackingService)
 	userTimerHandler := usertimerhandler.NewHandler(userTimerService)
 	userHandler := userhandler.NewHandler(userService)
-	profileHandler := profilehandler.NewHandler(profileService)
+	profileHandler := profilehandler.NewHandler(profileService, cfg.Storage.MaxAvatarUploadFilesize)
 
 	return &App{
 		DB:    db,

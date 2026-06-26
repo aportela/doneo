@@ -36,3 +36,4 @@ golang-backend/data/*.sqlite3-shm
 golang-backend/data/*.sqlite3-wal
 golang-backend/data/configuration.yaml
 golang-backend/data/attachments/*
+golang-backend/data/avatars/*

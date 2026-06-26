@@ -4,7 +4,7 @@
 
     import dayjs from 'dayjs'
 
-    import { NTabs, NTabPane, NCard, NAvatar, NFlex, NFormItem, NInputGroup, NInput, NButton, NButtonGroup, NPopover, NIcon, NGrid, NGridItem, NDivider } from 'naive-ui';
+    import { NTabs, NTabPane, NCard, NAvatar, NFlex, NFormItem, NInputGroup, NInput, NButton, NButtonGroup, NPopover, NIcon, NGrid, NGridItem, NDivider, NUpload, type UploadCustomRequestOptions } from 'naive-ui';
     import { IconFileUpload, IconTrash, IconSun, IconMoon, IconInfoCircle, IconLayoutSidebarLeftExpand, IconLayoutNavbarExpand, IconDeviceFloppy } from '@tabler/icons-vue';
 
     import { useNotify } from '../../../shared/composables/notification';
@@ -17,6 +17,7 @@
     import { useLoadingStore } from '../../../stores/loading';
     import { useColorSchemeStore } from '../../../stores/colorScheme';
     import { useUserSettingsStore } from '../../../stores/userSettings';
+    import { useSessionStore } from '../../../stores/session';
     import { Profile } from '../models/profile';
     import type { ProfileResponse, UpdateRequest } from '../types/dto';
     import { MIN_PASSWORD_LENGTH } from '../../users/models/user';
@@ -27,6 +28,7 @@
     const loadingStore = useLoadingStore();
     const colorSchemeStore = useColorSchemeStore();
     const userSettingsStore = useUserSettingsStore();
+    const sessionStore = useSessionStore();
 
     const profile = ref<Profile>(new Profile());
 
@@ -36,6 +38,8 @@
     const confirmedPassword = ref<string | null>(null);
 
     const currentTab = ref<string>("myAccount");
+
+    const currentAvatarURL = computed(() => "/api/wc/avatars/128/user/" + profile.value.id);
 
     const currentDatetimeMask = ref<string | null>(userSettingsStore.currentDatetimeMask);
 
@@ -152,6 +156,101 @@
         }
     };
 
+    const uploadFile = async ({
+        file,
+        headers,
+        onProgress,
+        onFinish,
+        onError
+    }: UploadCustomRequestOptions) => {
+        const formData = new FormData()
+        formData.append('file', file.file as Blob)
+
+        const xhr = new XMLHttpRequest()
+        xhr.open('POST', "/api/profile/avatar/")
+
+        const headerObj = typeof headers === 'function' ? headers({ file }) : headers
+        if (headerObj) {
+            for (const key in headerObj) {
+                xhr.setRequestHeader(key, headerObj[key])
+            }
+        }
+
+        xhr.setRequestHeader('Authorization', `Bearer ${sessionStore.accessToken}`)
+
+        xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+                const percent = (event.loaded / event.total) * 100
+                onProgress({ percent })
+            }
+        }
+
+        xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                onFinish()
+            } else {
+                onError()
+            }
+        }
+
+        xhr.onerror = () => {
+            onError()
+        }
+
+        xhr.send(formData)
+    }
+
+    const onDeleteAvatar = async () => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            await profileService.deleteAvatar();
+            notify('success', t("Avatar deleted"));
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "UserForm.onUpdate" } });
+                            break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
+                            break;
+                        case 404:
+                            state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.notFoundError");
+                            break;
+                        case 409:
+                            if (apiError.details?.field === "name") {
+                                //serverErrors.value.name = "modules.user.components.UserForm.inputs.name.errors.alreadyExists";
+                            } else if (apiError.details?.field === "email") {
+                                //serverErrors.value.email = "modules.user.components.UserForm.inputs.email.errors.alreadyExists";
+                            } else {
+                                state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.updateError");
+                            }
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.updateError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.updateError");
+                    console.error("Unhandled API error", { file: "UserForm.vue", method: "onUpdate" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+            if (state.ajaxErrors) {
+                if (state.ajaxErrorMessage) {
+                    appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+                } else {
+                    await nextTick();
+                    //userFormRef.value?.validate().then(() => { }).catch(() => { });
+                }
+            }
+        }
+    };
+
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -179,16 +278,18 @@
                 <p v-if="profile.updatedAt?.hasValue()">Account last update on {{
                     profile.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</p>
                 <n-flex style="align-items:center;">
-                    <n-avatar :size="128" :src="'/api/wc/avatars/128/user/' + profile.id" />
-                    <n-button>
-                        <template #icon>
-                            <n-icon>
-                                <IconFileUpload />
-                            </n-icon>
-                        </template>
-                        Change avatar
-                    </n-button>
-                    <n-button tertiary type="error">
+                    <n-avatar :size="128" :src="currentAvatarURL" />
+                    <n-upload :max="1" accept="image/*" action="/api/profile/avatar/" :custom-request="uploadFile">
+                        <n-button>
+                            <template #icon>
+                                <n-icon>
+                                    <IconFileUpload />
+                                </n-icon>
+                            </template>
+                            Change avatar
+                        </n-button>
+                    </n-upload>
+                    <n-button tertiary type="error" @click="onDeleteAvatar">
                         <template #icon>
                             <n-icon>
                                 <IconTrash />

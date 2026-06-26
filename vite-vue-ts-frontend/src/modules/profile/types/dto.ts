@@ -11,3 +11,5 @@ export type ProfileResponse = {
   createdAt: number;
   updatedAt: number | null;
 };
+
+export type EmptyResponse = {};

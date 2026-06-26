@@ -36,6 +36,7 @@ func NewRouter(app *app.App) http.Handler {
 
 	cookieAuthApiRouter.Route("/", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTCookieAuthentication(app.Cfg.Auth.SecretKey))
+		// TODO: add handler && check disk existence
 		r.Get("/avatars/{size:[0-9]+}/user/{id:"+uuidPattern+"}", func(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(
 				w,
@@ -135,6 +136,8 @@ func NewRouter(app *app.App) http.Handler {
 		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
 		r.Get("/", app.ProfileHandler.Get)
 		r.Put("/", app.ProfileHandler.Update)
+		r.Post("/avatar/", app.ProfileHandler.UploadAvatar)
+		r.Delete("/avatar/", app.ProfileHandler.DeleteAvatar)
 	})
 
 	apiRouter.Route("/user-timers", func(r chi.Router) {
