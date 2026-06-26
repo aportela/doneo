@@ -23,6 +23,7 @@
 
     interface TimeTrackingsTableProps {
         disabled: boolean;
+        readOnly?: boolean;
         items: TimeTracking[];
         projectId: string;
         taskId: string; // TODO: required ?
@@ -131,7 +132,7 @@
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
+    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd" :hide-add="props.readOnly">
         <template #thead>
             <tr>
                 <th>
@@ -171,7 +172,7 @@
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-delete show-download show-preview
                         @delete="onConfirmDelete(timeTracking, index)" :disabled="props.disabled"
-                        :delete-disabled="props.disabled" />
+                        :delete-disabled="props.disabled || props.readOnly" />
                 </td>
             </tr>
             <tr>
