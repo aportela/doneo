@@ -135,22 +135,22 @@
             <TaskMetadataTab v-if="task.id" v-model:task="task" :read-only="!task.allowedOperations.updateTask" />
         </n-tab-pane>
         <n-tab-pane name="notes" :tab="notesTabLabel" display-directive="show:lazy" key="notes"
-            :disabled="!projectId || !taskId || (!task.allowedOperations.updateTask)">
+            :disabled="!projectId || !taskId || (!task.allowedOperations.updateTask && task.notesCount === 0)">
             <TaskNotesTab v-if="projectId && taskId" :project-id="projectId" :task-id="taskId"
                 v-model:item-count="task.notesCount" />
         </n-tab-pane>
         <n-tab-pane name="attachments" :tab="attachmentsTabLabel" display-directive="show:lazy" key="attachments"
-            :disabled="!projectId || !taskId || (!task.allowedOperations.updateTask)">
+            :disabled="!projectId || !taskId || (!task.allowedOperations.updateTask && task.attachmentsCount === 0)">
             <TaskAttachmentsTab v-if="projectId && taskId" :project-id="projectId" :task-id="taskId"
                 v-model:item-count="task.attachmentsCount" />
         </n-tab-pane>
         <n-tab-pane name="timetrackings" :tab="timeTrackingsTabLabel" display-directive="show:lazy" key="timetrackings"
-            :disabled="!projectId || !taskId || (!task.allowedOperations.updateTask)">
+            :disabled="!projectId || !taskId || (!task.allowedOperations.updateTask && task.timeTrackingsCount === 0)">
             <TaskTimeTrackingsTab v-if="projectId && taskId" :project-id="projectId" :task-id="taskId"
                 v-model:item-count="task.timeTrackingsCount" />
         </n-tab-pane>
         <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy" key="history"
-            :disabled="!projectId || !taskId || (!task.allowedOperations.updateTask)">
+            :disabled="!projectId || !taskId || (!task.allowedOperations.updateTask && task.historyOperationsCount === 0)">
             <TaskHistoryTab v-if="projectId && taskId" :project-id="projectId" :task-id="taskId"
                 :key="task.historyOperationsCount" />
         </n-tab-pane>
