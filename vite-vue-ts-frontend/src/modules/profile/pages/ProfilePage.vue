@@ -3,16 +3,18 @@
 
     import dayjs from 'dayjs'
 
-    import { NTabs, NTabPane, NCard, NAvatar, NFlex, NInputGroup, NInput, NButton, NButtonGroup, NPopover, NIcon, NGrid, NGridItem } from 'naive-ui';
-    import { IconFileUpload, IconTrash, IconSun, IconMoon, IconInfoCircle } from '@tabler/icons-vue';
+    import { NTabs, NTabPane, NCard, NAvatar, NFlex, NFormItem, NInputGroup, NInput, NButton, NButtonGroup, NPopover, NIcon, NGrid, NGridItem, NDivider } from 'naive-ui';
+    import { IconFileUpload, IconTrash, IconSun, IconMoon, IconInfoCircle, IconLayoutSidebarLeftExpand, IconLayoutNavbarExpand } from '@tabler/icons-vue';
 
+    import { useSessionStore } from '../../../stores/session';
     import { useColorSchemeStore } from '../../../stores/colorScheme';
     import { useUserSettingsStore } from '../../../stores/userSettings';
 
+    const sessionStore = useSessionStore();
     const colorSchemeStore = useColorSchemeStore();
     const userSettingsStore = useUserSettingsStore();
 
-    const currentTab = ref<string>("mySettings");
+    const currentTab = ref<string>("myAccount");
 
     const currentDatetimeMask = ref<string | null>(userSettingsStore.currentDatetimeMask);
 
@@ -36,7 +38,7 @@
                 <h1>My account</h1>
                 <h2>Profile details</h2>
                 <n-flex style="align-items:center;">
-                    <n-avatar :size="128" src="/api/wc/avatars/128/user/019dfcaa-aa06-755b-aca0-bb05e4ea44a7" />
+                    <n-avatar :size="128" :src="'/api/wc/avatars/128/user/' + sessionStore.sessionUserId" />
                     <n-button>
                         <template #icon>
                             <n-icon>
@@ -45,7 +47,7 @@
                         </template>
                         Change avatar
                     </n-button>
-                    <n-button>
+                    <n-button tertiary type="error">
                         <template #icon>
                             <n-icon>
                                 <IconTrash />
@@ -54,18 +56,39 @@
                         Delete avatar
                     </n-button>
                 </n-flex>
+
+                <n-divider />
+
+                <n-form-item label="Name">
+                    <n-input v-model:value="sessionStore.sessionUserName" />
+                </n-form-item>
+                <n-form-item label="Email">
+                    <n-input v-model:value="sessionStore.sessionUserEmail" />
+                </n-form-item>
+
+                <p>Password</p>
+
+                <n-flex align="center">
+                    <n-form-item label="New password">
+                        <n-input type="password" placeholder="type new password" />
+                    </n-form-item>
+                    <n-form-item label="Confirm new password">
+                        <n-input type="password" placeholder="confirm new password" />
+                    </n-form-item>
+                </n-flex>
             </n-card>
         </n-tab-pane>
-        <n-tab-pane name="mySettings" tab="My settings">
+        <n-tab-pane name=" mySettings" tab="My settings">
             <n-card bordered>
                 <h1>My settings</h1>
 
                 <h2>Locale</h2>
 
-                <h3>Datetime format mask
+                <h3 class="doneo-flex-center-align">Datetime format mask
                     <n-popover>
                         <template #trigger>
-                            <n-icon class="doneo-cursor-help" :size="20" :component="IconInfoCircle" />
+                            <n-icon style="margin-left: 8px; margin-top: 2px;" class="doneo-cursor-help" :size="20"
+                                :component="IconInfoCircle" />
                         </template>
                         <template #header>
                             List of all available formats
@@ -227,6 +250,7 @@
                 </h3>
                 <n-input-group>
                     <n-input placeholder="Type datetime format current mask" v-model:value="currentDatetimeMask" />
+                    <n-button disabled>Mask preview (current datetime)</n-button>
                     <n-input placeholder="mask preview (current datetime)" v-model:value="currentDatetimeMaskPreview"
                         readonly />
                 </n-input-group>
@@ -251,8 +275,33 @@
                         dark
                     </n-button>
                 </n-button-group>
+
                 <h2>Layout</h2>
+
+                <n-button-group>
+                    <n-button :disabled="userSettingsStore.sideNavigationMode"
+                        @click="userSettingsStore.toggleNavigationMode">
+                        <template #icon>
+                            <n-icon>
+                                <IconLayoutSidebarLeftExpand />
+                            </n-icon>
+                        </template>
+                        side
+                    </n-button>
+                    <n-button :disabled="userSettingsStore.topNavigationMode"
+                        @click="userSettingsStore.toggleNavigationMode">
+                        <template #icon>
+                            <n-icon>
+                                <IconLayoutNavbarExpand />
+                            </n-icon>
+                        </template>
+                        top
+                    </n-button>
+                </n-button-group>
             </n-card>
+        </n-tab-pane>
+        <n-tab-pane name="myActivity" tab="My activity">
+            <h1>My activity</h1>
         </n-tab-pane>
     </n-tabs>
 </template>
