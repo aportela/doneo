@@ -50,17 +50,11 @@
         }
     });
 
-    const permissionCount = ref<number>(0);
-    const noteCount = ref<number>(0);
-    const attachmentCount = ref<number>(0);
-    const historyOperationCount = ref<number>(0);
-    const taskCount = ref<number>(0);
-
-    const permissionsTabLabel = computed(() => t("modules.project.components.ProjectPage.tabs.permissions.label", permissionCount.value));
-    const attachmentsTabLabel = computed(() => t("modules.project.components.ProjectPage.tabs.attachments.label", attachmentCount.value));
-    const notesTabLabel = computed(() => t("modules.project.components.ProjectPage.tabs.notes.label", noteCount.value));
-    const historyTabLabel = computed(() => t("modules.project.components.ProjectPage.tabs.history.label", historyOperationCount.value));
-    const tasksTabLabel = computed(() => t("modules.project.components.ProjectPage.tabs.tasks.label", taskCount.value));
+    const permissionsTabLabel = computed(() => t("modules.project.components.ProjectPage.tabs.permissions.label", project.value.permissionsCount));
+    const attachmentsTabLabel = computed(() => t("modules.project.components.ProjectPage.tabs.attachments.label", project.value.attachmentsCount));
+    const notesTabLabel = computed(() => t("modules.project.components.ProjectPage.tabs.notes.label", project.value.notesCount));
+    const historyTabLabel = computed(() => t("modules.project.components.ProjectPage.tabs.history.label", project.value.historyOperationsCount));
+    const tasksTabLabel = computed(() => t("modules.project.components.ProjectPage.tabs.tasks.label", project.value.tasksCount));
 
     const tabsRef = ref<TabsInst>();
 
@@ -97,11 +91,6 @@
             const response: ProjectResponse = await projectService.get(id);
             if (response.id === id) {
                 project.value = new Project(response);
-                permissionCount.value = project.value.permissionsCount;
-                noteCount.value = project.value.notesCount;
-                attachmentCount.value = project.value.attachmentsCount;
-                historyOperationCount.value = project.value.historyOperationsCount;
-                taskCount.value = project.value.tasksCount;
             } else {
                 state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.loadError");
             }
@@ -157,9 +146,7 @@
             <template #tab>
                 Metadata
             </template>
-            <ProjectMetadataTab v-if="projectId" v-model:project="project" v-model:permission-count="permissionCount"
-                v-model:note-count="noteCount" v-model:attachment-count="attachmentCount"
-                v-model:history-operation-count="historyOperationCount" v-model:task-count="taskCount"
+            <ProjectMetadataTab v-if="projectId" v-model:project="project"
                 :read-only="!project.allowedOperations.updateProject" />
         </n-tab-pane>
         <n-tab-pane name="permissions" display-directive="show:lazy" key="permissions"
@@ -167,33 +154,34 @@
             <template #tab>
                 {{ permissionsTabLabel }}
                 <n-icon :component="IconAlertTriangle" color="red" style="margin-left: 8px;"
-                    v-if="permissionCount < 1" />
+                    v-if="project.permissionsCount < 1" />
             </template>
-            <ProjectPermissionsTab v-if="projectId" :project-id="projectId" v-model:item-count="permissionCount"
-                :read-only="!project.allowedOperations.updateProject" />
+            <ProjectPermissionsTab v-if="projectId" :project-id="projectId"
+                v-model:item-count="project.permissionsCount" :read-only="!project.allowedOperations.updateProject" />
         </n-tab-pane>
         <n-tab-pane name="notes" :tab="notesTabLabel" display-directive="show:lazy" key="notes"
             :disabled="!projectId || (!project.allowedOperations.updateProject && project.notesCount === 0)">
-            <ProjectNotesTab v-if="projectId" :project-id="projectId" v-model:item-count="noteCount"
+            <ProjectNotesTab v-if="projectId" :project-id="projectId" v-model:item-count="project.notesCount"
                 :read-only="!project.allowedOperations.updateProject" />
         </n-tab-pane>
         <n-tab-pane name="attachments" :tab="attachmentsTabLabel" display-directive="show:lazy" key="attachments"
             :disabled="!projectId || (!project.allowedOperations.updateProject && project.attachmentsCount === 0)">
-            <ProjectAttachmentsTab v-if="projectId" :project-id="projectId" v-model:item-count="attachmentCount"
-                :read-only="!project.allowedOperations.updateProject" />
+            <ProjectAttachmentsTab v-if="projectId" :project-id="projectId"
+                v-model:item-count="project.attachmentsCount" :read-only="!project.allowedOperations.updateProject" />
         </n-tab-pane>
         <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy" key="history"
             :disabled="!projectId || (!project.allowedOperations.updateProject && project.historyOperationsCount === 0)">
-            <ProjectHistoryTab v-if="projectId" :project-id="projectId" v-model:item-count="historyOperationCount"
-                :key="historyOperationCount" />
+            <ProjectHistoryTab v-if="projectId" :project-id="projectId"
+                v-model:item-count="project.historyOperationsCount" :key="project.historyOperationsCount" />
         </n-tab-pane>
         <n-tab-pane name="tasks" display-directive="show:lazy" key="tasks"
             :disabled="!projectId || (!project.allowedOperations.updateProject && project.tasksCount === 0)">
             <template #tab>
                 {{ tasksTabLabel }}
-                <n-icon :component="IconAlertTriangle" color="red" style="margin-left: 8px;" v-if="taskCount < 1" />
+                <n-icon :component="IconAlertTriangle" color="red" style="margin-left: 8px;"
+                    v-if="project.tasksCount < 1" />
             </template>
-            <ProjectTasksTab v-if="projectId" :project-id="projectId" v-model:item-count="taskCount"
+            <ProjectTasksTab v-if="projectId" :project-id="projectId" v-model:item-count="project.tasksCount"
                 :read-only="!project.allowedOperations.updateProject" />
         </n-tab-pane>
     </n-tabs>

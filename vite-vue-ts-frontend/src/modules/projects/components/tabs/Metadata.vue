@@ -51,12 +51,6 @@
         setViewMode: () => void
     };
 
-    const permissionCount = defineModel<number>("permissionCount", { default: 0 });
-    const noteCount = defineModel<number>("noteCount", { default: 0 });
-    const attachmentCount = defineModel<number>("attachmentCount", { default: 0 });
-    const historyOperationCount = defineModel<number>("historyOperationCount", { default: 0 });
-    const taskCount = defineModel<number>("taskCount", { default: 0 });
-
     const slugRef = ref<ToggleInputComponent | undefined>();
 
     const descriptionEditMode = ref<boolean>(false);
@@ -92,12 +86,6 @@
             const response: ProjectResponse = await projectService.update(payload);
             if (response.id === project.value.id) {
                 project.value = new Project(response);
-                project.value = new Project(response);
-                permissionCount.value = project.value.permissionsCount;
-                noteCount.value = project.value.notesCount;
-                attachmentCount.value = project.value.attachmentsCount;
-                historyOperationCount.value = project.value.historyOperationsCount;
-                taskCount.value = project.value.tasksCount;
             } else {
                 state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.updateError");
             }
@@ -224,8 +212,6 @@
 
         insertAtCursor(markdown)
     };
-
-
 </script>
 
 <template>
