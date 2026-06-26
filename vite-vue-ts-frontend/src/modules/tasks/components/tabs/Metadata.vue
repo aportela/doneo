@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, reactive, watch, computed, type CSSProperties, nextTick, onMounted } from 'vue';
+    import { ref, reactive, watch, computed, type CSSProperties, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NCard, NForm, NFormItem, NInput, NButton, NButtonGroup, NIcon, type InputInst, NFlex, NEllipsis, NGrid, NGridItem } from 'naive-ui';
@@ -11,7 +11,6 @@
     import { appBus } from '../../../../shared/composables/bus';
     import type { TaskResponse, UpdateRequest } from '../../types/dto';
 
-    import type { FormMode } from '../../../../shared/types/form-mode';
     import { Task, MAX_SUMMARY_LENGTH } from "../../models/tasks.ts";
     import TaskPrioritySelector from '../../../task-priorities/components/TaskPrioritySelector.vue';
     import TaskStatusSelector from '../../../task-statuses/components/TaskStatusSelector.vue';
@@ -26,14 +25,12 @@
     import TaskSpentEstimatedPercent from '../../../../shared/components/progress/TaskSpentEstimatedPercent.vue';
 
     interface TaskMetadataTabProps {
-        mode: FormMode;
+        readOnly?: boolean;
         style?: string | CSSProperties;
         disabled?: boolean;
-        projectId: string;
-        taskId: string;
     }
 
-    const task = ref<Task>(new Task());
+    const task = defineModel<Task>("task", { required: true });
 
     const props = defineProps<TaskMetadataTabProps>();
 
@@ -51,73 +48,13 @@
         loadingStore.set(newValue.ajaxRunning);
     });
 
-    const noteCount = defineModel<number>("noteCount", { default: 0 });
-    const attachmentCount = defineModel<number>("attachmentCount", { default: 0 });
-    const historyOperationCount = defineModel<number>("historyOperationCount", { default: 0 });
-    const timeTrackingCount = defineModel<number>("timeTrackingCount", { default: 0 });
-
     const descriptionEditMode = ref<boolean>(false);
 
     const descriptionExpanded = ref<boolean>(true);
 
     const htmlMarkDownDescriptionPreview = computed(() => render(task.value.description ?? ""));
 
-    const taskUpdateDisabled = computed<boolean>(() => !task.value.allowedOperations.updateProject);
-
-    const onGet = async (projectId: string, taskId: string) => {
-        serverErrors.value = {};
-        let notFoundError = false;
-        let deletedError = false;
-        let accessDeniedError = false;
-        Object.assign(state, defaultAjaxStateRunning);
-        try {
-            const response: TaskResponse = await taskService.get(projectId, taskId);
-            if (response.id === taskId) {
-                task.value = new Task(response);
-                noteCount.value = task.value.notesCount;
-                attachmentCount.value = task.value.attachmentsCount;
-                historyOperationCount.value = task.value.historyOperationsCount;
-                timeTrackingCount.value = task.value.timeTrackingsCount;
-            } else {
-                state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.loadError");
-            }
-        } catch (error: unknown) {
-            state.ajaxErrors = true;
-            handleAPIError(error,
-                (apiError) => {
-                    switch (apiError.response?.status) {
-                        case 401:
-                            state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPage.onGet" } });
-                            break;
-                        case 403:
-                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
-                            accessDeniedError = true;
-                            break;
-                        case 404:
-                            state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.notFoundError");
-                            notFoundError = true;
-                            break;
-                        case 410:
-                            state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.deletedError");
-                            deletedError = true;
-                            break;
-                        default:
-                            state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.loadError");
-                            break;
-                    }
-                },
-                (fatalError) => {
-                    state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.loadError");
-                    console.error("Unhandled API error", { file: "TaskMetadataTab.vue", method: "onGet" }, { err: fatalError });
-                });
-        } finally {
-            state.ajaxRunning = false;
-            if (state.ajaxErrorMessage) {
-                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage, denyCloseDialog: notFoundError || deletedError || accessDeniedError } });
-            }
-        }
-    };
+    const taskUpdateDisabled = computed<boolean>(() => props.readOnly || !task.value.allowedOperations.updateProject);
 
     const onUpdate = async () => {
         serverErrors.value = {};
@@ -139,12 +76,9 @@
                 estimatedTime: task.value.estimatedTime ?? 0,
                 tags: task.value.tags,
             };
-            const response: TaskResponse = await taskService.update(props.projectId, payload);
+            const response: TaskResponse = await taskService.update(task.value.projectId ?? "", payload);
             if (response.id === task.value.id) {
                 task.value = new Task(response);
-                noteCount.value = task.value.notesCount;
-                attachmentCount.value = task.value.attachmentsCount;
-                historyOperationCount.value = task.value.historyOperationsCount;
             } else {
                 state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.updateError");
             }
@@ -260,23 +194,22 @@
 
         insertAtCursor(markdown)
     };
-
-    onMounted(() => {
-        if (props.projectId && props.taskId) {
-            onGet(props.projectId, props.taskId);
-        }
-    });
-
 </script>
 
 <template>
     <!-- TODO: add missing i18n labels -->
     <n-card bordered :style="props.style">
-        <n-form-item label="Created by">
-            <div class="note-user">
-                <AvatarUserName :user-id="task.createdBy.id" :user-name="task.createdBy.name" />
+        <n-flex align="center" justify="space-between">
+            <n-form-item label="Created by">
+                <div class="note-user">
+                    <AvatarUserName :user-id="task.createdBy.id" :user-name="task.createdBy.name" />
+                </div>
+            </n-form-item>
+            <div>
+                <div>Created at: {{ task.createdAt.toLocaleString() }}</div>
+                <div v-if="task.updatedAt.hasValue()">Updated at: {{ task.updatedAt?.toLocaleString() }}</div>
             </div>
-        </n-form-item>
+        </n-flex>
         <n-flex>
             <n-form-item label="Created at">
                 <span class="doneo-datetime-label-readonly">
@@ -289,22 +222,22 @@
                 </span>
             </n-form-item>
             <n-form-item label="Started at">
-                <ToggleDateTimePicker clearable v-model:value="task.startedAt.msTimestamp" :disabled="props.disabled"
-                    v-if="!taskUpdateDisabled" />
+                <ToggleDateTimePicker clearable v-model:value="task.startedAt.msTimestamp"
+                    :disabled="props.disabled || state.ajaxRunning" v-if="props.readOnly" />
                 <span class="doneo-datetime-label-readonly" v-else>
                     {{ task.startedAt?.toLocaleString() }}
                 </span>
             </n-form-item>
             <n-form-item label="Finished at">
-                <ToggleDateTimePicker clearable v-model:value="task.finishedAt.msTimestamp" :disabled="props.disabled"
-                    v-if="!taskUpdateDisabled" />
+                <ToggleDateTimePicker clearable v-model:value="task.finishedAt.msTimestamp"
+                    :disabled="props.disabled || state.ajaxRunning" v-if="props.readOnly" />
                 <span class="doneo-datetime-label-readonly" v-else>
                     {{ task.finishedAt?.toLocaleString() }}
                 </span>
             </n-form-item>
             <n-form-item label="Due at">
-                <ToggleDateTimePicker clearable v-model:value="task.dueAt.msTimestamp" :disabled="props.disabled"
-                    v-if="!taskUpdateDisabled" />
+                <ToggleDateTimePicker clearable v-model:value="task.dueAt.msTimestamp"
+                    :disabled="props.disabled || state.ajaxRunning" v-if="props.readOnly" />
                 <span class="doneo-datetime-label-readonly" v-else>
                     {{ task.dueAt?.toLocaleString() }}
                 </span>
