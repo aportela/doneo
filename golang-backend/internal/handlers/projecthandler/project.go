@@ -83,7 +83,6 @@ func (handler *projectHandler) Patch(w http.ResponseWriter, r *http.Request) {
 	}
 	project := patchRequestToDomain(request)
 	project.ID = chi.URLParam(r, "project_id")
-	project.UpdatedAt = utils.NowToTimePtr()
 	if project, err := handler.service.Patch(r.Context(), project); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[ProjectHandler] failed to patch project with ID %s: %w", project.ID, err))
 		return
