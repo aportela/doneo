@@ -4,10 +4,19 @@
 
     import { NFlex, NFormItem, NInputNumber } from 'naive-ui';
 
+    interface TimeSpentInputProps {
+        disabled?: boolean;
+        readOnly?: boolean;
+    };
+
+    const props = withDefaults(defineProps<TimeSpentInputProps>(), {
+        disabled: false,
+        readOnly: false,
+    });
+
     const { t } = useI18n();
 
     const seconds = defineModel<number>("seconds", { default: 0 });
-
 
     const DAY = 86400;
     const HOUR = 3600;
@@ -53,21 +62,24 @@
         <n-form-item :label="t('shared.components.inputs.TimeSpentInput.inputs.daysSpent.label')" style="">
             <n-input-number class="doneo-n-form-item-auto-size" :min="0"
                 :placeholder="t('shared.components.inputs.TimeSpentInput.inputs.daysSpent.placeholder')"
-                :value="parts.days" @update:value="val => updatePart('days', val)" clearable>
+                :value="parts.days" @update:value="val => updatePart('days', val)" clearable :disabled="props.disabled"
+                :readonly="props.readOnly">
             </n-input-number>
         </n-form-item>
         <n-form-item class="doneo-n-form-item-auto-size"
             :label="t('shared.components.inputs.TimeSpentInput.inputs.hoursSpent.label')">
             <n-input-number :min="0"
                 :placeholder="t('shared.components.inputs.TimeSpentInput.inputs.hoursSpent.placeholder')"
-                :value="parts.hours" @update:value="val => updatePart('hours', val)" clearable>
+                :value="parts.hours" @update:value="val => updatePart('hours', val)" clearable
+                :disabled="props.disabled" :readonly="props.readOnly">
             </n-input-number>
         </n-form-item>
         <n-form-item class="doneo-n-form-item-auto-size"
             :label="t('shared.components.inputs.TimeSpentInput.inputs.minutesSpent.label')">
             <n-input-number :min="0"
                 :placeholder="t('shared.components.inputs.TimeSpentInput.inputs.minutesSpent.placeholder')"
-                :value="parts.minutes" @update:value="val => updatePart('minutes', val)" clearable>
+                :value="parts.minutes" @update:value="val => updatePart('minutes', val)" clearable
+                :disabled="props.disabled" :readonly="props.readOnly">
             </n-input-number>
         </n-form-item>
     </n-flex>
