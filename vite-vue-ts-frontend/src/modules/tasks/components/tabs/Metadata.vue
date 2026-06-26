@@ -308,7 +308,7 @@
         </n-form>
         <n-button @click="onUpdate" :disabled="props.disabled" v-if="!props.readOnly">
             <template #icon>
-                <n-icon :component="IconDeviceFloppy" color="red"></n-icon>
+                <n-icon :component="IconDeviceFloppy"></n-icon>
             </template>
             {{ t("shared.buttons.Save.label") }}
         </n-button>
