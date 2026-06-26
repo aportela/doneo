@@ -6,8 +6,8 @@
     import { NTabs, NTabPane, NCard, NAvatar, NFlex, NInputGroup, NInput, NButton, NButtonGroup, NPopover, NIcon, NGrid, NGridItem } from 'naive-ui';
     import { IconFileUpload, IconTrash, IconSun, IconMoon, IconInfoCircle } from '@tabler/icons-vue';
 
-    import { useColorSchemeStore } from '../stores/colorScheme';
-    import { useUserSettingsStore } from '../stores/userSettings';
+    import { useColorSchemeStore } from '../../../stores/colorScheme';
+    import { useUserSettingsStore } from '../../../stores/userSettings';
 
     const colorSchemeStore = useColorSchemeStore();
     const userSettingsStore = useUserSettingsStore();
