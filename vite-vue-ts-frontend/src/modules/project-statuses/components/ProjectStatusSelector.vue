@@ -19,7 +19,7 @@
         size?: SelectSize;
         hidePrefix?: boolean;
         disabled?: boolean;
-        readonly?: boolean;
+        readOnly?: boolean;
         setDefaultValueOnStart?: boolean;
     }
 
@@ -167,7 +167,7 @@
         </n-button>
         <n-select filterable ref="selectInstRef" :required="props.required" :clearable="props.clearable"
             v-model:value="projectStatusId" :options="options" :placeholder="props.placeholder" :size="props.size"
-            :disabled="isDisabled" v-if="!props.readonly" />
+            :disabled="isDisabled" v-if="!props.readOnly" />
         <n-input v-else placeholder="" v-model:value="readOnlyLabel" readonly />
         <n-button secondary :disabled="true" class="doneo-cursor-default doneo-disable-opacity" v-if="state.ajaxErrors">
             <template #icon>
