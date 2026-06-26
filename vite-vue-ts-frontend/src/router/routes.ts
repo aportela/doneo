@@ -65,11 +65,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import("../pages/ReportsPage.vue"),
       },
       {
-        name: "settings",
-        path: "settings",
-        component: () => import("../pages/SettingsPage.vue"),
-      },
-      {
         name: "manageUsers",
         path: "manage/users",
         component: () => import("../modules/users/pages/ManageUsersPage.vue"),
@@ -89,19 +84,25 @@ const routes: RouteRecordRaw[] = [
         name: "manageProjectStatuses",
         path: "manage/project-statuses",
         component: () =>
-          import("../modules/project-statuses/pages/ManageProjectStatusesPage.vue"),
+          import(
+            "../modules/project-statuses/pages/ManageProjectStatusesPage.vue"
+          ),
       },
       {
         name: "manageProjectPriorities",
         path: "manage/project-priorities",
         component: () =>
-          import("../modules/project-priorities/pages/ManageProjectPrioritiesPage.vue"),
+          import(
+            "../modules/project-priorities/pages/ManageProjectPrioritiesPage.vue"
+          ),
       },
       {
         name: "manageTaskPriorities",
         path: "manage/task-priorities",
         component: () =>
-          import("../modules/task-priorities/pages/ManageTaskPrioritiesPage.vue"),
+          import(
+            "../modules/task-priorities/pages/ManageTaskPrioritiesPage.vue"
+          ),
       },
       {
         name: "manageTaskStatuses",
