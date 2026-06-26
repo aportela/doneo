@@ -20,6 +20,8 @@
     import TimeTrackingsTable from "../../../time-trackings/components/TimeTrackingsTable.vue";
 
     interface TimeTrackingsTabProps {
+        disabled?: boolean;
+        readOnly?: boolean;
         style?: string | CSSProperties;
         projectId: string;
         taskId: string;
@@ -169,8 +171,8 @@
     </n-modal>
     <n-card bordered :style="props.style">
         <TimeTrackingsTable :project-id="props.projectId" :task-id="props.taskId" :items="items"
-            :disabled="state.ajaxRunning" v-model:filters="filters" @refresh="onRefresh" @add="onShowAddForm"
-            @delete="onDelete" />
+            :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly" v-model:filters="filters"
+            @refresh="onRefresh" @add="onShowAddForm" @delete="onDelete" />
     </n-card>
 </template>
 

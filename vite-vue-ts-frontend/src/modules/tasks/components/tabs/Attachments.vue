@@ -26,6 +26,8 @@
     import PDFPreview from "../../../../shared/components/PDFPreview.vue";
 
     interface ProjectAttachmentsProps {
+        disabled?: boolean;
+        readOnly?: boolean;
         style?: string | CSSProperties;
         projectId: string;
         taskId: string;
@@ -237,12 +239,12 @@
         :items="pdfSources" :current-index="currentPDFPreviewIndex" />
 
     <!-- TODO: onupload notification -->
-    <UploadDialog v-if="props.projectId && props.taskId" v-model:show="showUploadModal" :project-id="props.projectId"
-        :task-id="props.taskId" v-model:upload-count="uploadCount" />
+    <UploadDialog v-if="props.projectId && props.taskId && !props.readOnly" v-model:show="showUploadModal"
+        :project-id="props.projectId" :task-id="props.taskId" v-model:upload-count="uploadCount" />
     <n-card bordered :style="props.style">
         <AttachmentsTable :project-id="props.projectId" :items="filteredItems" :disabled="state.ajaxRunning"
             v-model:filters="filters" @refresh="onRefresh" @add="onShowUploadModal" @delete="onDelete"
-            @download="onDownload" @preview="onPreview" />
+            @download="onDownload" @preview="onPreview" :read-only="props.readOnly" />
     </n-card>
 </template>
 

@@ -18,6 +18,8 @@
     import HistoryOperationsTable from "../../../history-operations/components/HistoryOperationsTable.vue";
 
     interface ProjectHistoryOperationsTabProps {
+        disabled?: boolean;
+        readOnly?: boolean;
         style?: string | CSSProperties;
         projectId: string;
         taskId: string;
