@@ -1,18 +1,23 @@
 <script setup lang="ts">
     import { computed, ref, watch } from 'vue';
+    import { useI18n } from "vue-i18n";
 
     import dayjs from 'dayjs'
 
     import { NTabs, NTabPane, NCard, NAvatar, NFlex, NFormItem, NInputGroup, NInput, NButton, NButtonGroup, NPopover, NIcon, NGrid, NGridItem, NDivider } from 'naive-ui';
-    import { IconFileUpload, IconTrash, IconSun, IconMoon, IconInfoCircle, IconLayoutSidebarLeftExpand, IconLayoutNavbarExpand } from '@tabler/icons-vue';
+    import { IconFileUpload, IconTrash, IconSun, IconMoon, IconInfoCircle, IconLayoutSidebarLeftExpand, IconLayoutNavbarExpand, IconDeviceFloppy } from '@tabler/icons-vue';
 
     import { useSessionStore } from '../../../stores/session';
     import { useColorSchemeStore } from '../../../stores/colorScheme';
     import { useUserSettingsStore } from '../../../stores/userSettings';
 
+    const { t } = useI18n();
     const sessionStore = useSessionStore();
     const colorSchemeStore = useColorSchemeStore();
     const userSettingsStore = useUserSettingsStore();
+
+    const newPassword = ref<string | null>(null);
+    const confirmedPassword = ref<string | null>(null);
 
     const currentTab = ref<string>("myAccount");
 
@@ -22,6 +27,8 @@
         userSettingsStore.setDatetimeMask(newValue || "YYYY-MM-DD HH:MM:SS")
     });
 
+    const matchedPasswords = computed<boolean>(() => newPassword.value === confirmedPassword.value);
+
     const currentDatetimeMaskPreview = computed<string | null>({
         get() {
             return currentDatetimeMask.value ? dayjs().format(currentDatetimeMask.value) : null;
@@ -29,6 +36,7 @@
         set(_value) { }
     });
 
+    const onUpdate = () => { };
 </script>
 
 <template>
@@ -70,12 +78,23 @@
 
                 <n-flex align="center">
                     <n-form-item label="New password">
-                        <n-input type="password" placeholder="type new password" />
+                        <n-input type="password" v-model:value="newPassword" placeholder="type new password"
+                            clearable />
                     </n-form-item>
-                    <n-form-item label="Confirm new password">
-                        <n-input type="password" placeholder="confirm new password" />
+                    <n-form-item label="Confirm new password"
+                        :feedback="!matchedPasswords ? 'passwords do not match' : undefined"
+                        :validation-status="!matchedPasswords ? 'error' : undefined">
+                        <n-input type="password" v-model:value="confirmedPassword" placeholder="confirm new password"
+                            clearable />
                     </n-form-item>
                 </n-flex>
+
+                <n-button @click="onUpdate" :disabled="false">
+                    <template #icon>
+                        <n-icon :component="IconDeviceFloppy" />
+                    </template>
+                    {{ t("shared.buttons.Save.label") }}
+                </n-button>
             </n-card>
         </n-tab-pane>
         <n-tab-pane name=" mySettings" tab="My settings">
