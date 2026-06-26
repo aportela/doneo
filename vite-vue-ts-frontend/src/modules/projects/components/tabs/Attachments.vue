@@ -237,8 +237,8 @@
         :current-index="currentPDFPreviewIndex" />
 
     <!-- TODO: onupload notification -->
-    <UploadDialog v-if="props.projectId" v-model:show="showUploadModal" :project-id="props.projectId"
-        v-model:upload-count="uploadCount" />
+    <UploadDialog v-if="props.projectId && !props.readOnly" v-model:show="showUploadModal"
+        :project-id="props.projectId" v-model:upload-count="uploadCount" />
     <n-card bordered :style="props.style">
         <AttachmentsTable :project-id="props.projectId" :items="filteredItems" :disabled="state.ajaxRunning"
             v-model:filters="filters" @refresh="onRefresh" @add="onShowUploadModal" @delete="onDelete"
