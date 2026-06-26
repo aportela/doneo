@@ -54,8 +54,6 @@
 
     const htmlMarkDownDescriptionPreview = computed(() => render(task.value.description ?? ""));
 
-    const taskUpdateDisabled = computed<boolean>(() => props.readOnly || !task.value.allowedOperations.updateProject);
-
     const onUpdate = async () => {
         serverErrors.value = {};
         Object.assign(state, defaultAjaxStateRunning);
@@ -118,7 +116,7 @@
     const descriptionRef = ref<InputInst | null>(null);
 
     const onToggleDescriptionMode = () => {
-        if (!taskUpdateDisabled.value) {
+        if (!props.readOnly) {
             descriptionEditMode.value = !descriptionEditMode.value;
             if (descriptionEditMode.value) {
                 nextTick(() => {
@@ -223,21 +221,21 @@
             </n-form-item>
             <n-form-item label="Started at">
                 <ToggleDateTimePicker clearable v-model:value="task.startedAt.msTimestamp"
-                    :disabled="props.disabled || state.ajaxRunning" v-if="props.readOnly" />
+                    :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly" />
                 <span class="doneo-datetime-label-readonly" v-else>
                     {{ task.startedAt?.toLocaleString() }}
                 </span>
             </n-form-item>
             <n-form-item label="Finished at">
                 <ToggleDateTimePicker clearable v-model:value="task.finishedAt.msTimestamp"
-                    :disabled="props.disabled || state.ajaxRunning" v-if="props.readOnly" />
+                    :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly" />
                 <span class="doneo-datetime-label-readonly" v-else>
                     {{ task.finishedAt?.toLocaleString() }}
                 </span>
             </n-form-item>
             <n-form-item label="Due at">
                 <ToggleDateTimePicker clearable v-model:value="task.dueAt.msTimestamp"
-                    :disabled="props.disabled || state.ajaxRunning" v-if="props.readOnly" />
+                    :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly" />
                 <span class="doneo-datetime-label-readonly" v-else>
                     {{ task.dueAt?.toLocaleString() }}
                 </span>
@@ -247,18 +245,18 @@
             <n-flex>
                 <n-form-item label="Priority">
                     <TaskPrioritySelector v-model:id="task.priority.id" :disabled="props.disabled"
-                        :read-only="taskUpdateDisabled" />
+                        :read-only="props.readOnly" />
                 </n-form-item>
                 <n-form-item label="Status">
                     <TaskStatusSelector v-model:id="task.status.id" :disabled="props.disabled"
-                        :read-only="taskUpdateDisabled" @fill-empty-start-date="onFillEmptyStartDate"
+                        :read-only="props.readOnly" @fill-empty-start-date="onFillEmptyStartDate"
                         @set-start-date="onSetStartDate" @fill-empty-finish-date="onFillEmptyFinishDate"
                         @set-finish-date="onSetFinishDate" @unset-finish-date-on-leave="onUnsetFinishDateOnLeave" />
                 </n-form-item>
             </n-flex>
             <n-form-item label="Summary">
                 <ToggleInput v-model:value="task.summary" show-count :max-length="MAX_SUMMARY_LENGTH"
-                    :disabled="props.disabled" :read-only="taskUpdateDisabled" />
+                    :disabled="props.disabled" :read-only="props.readOnly" />
             </n-form-item>
             <n-form-item label="description">
                 <template #label>
@@ -294,7 +292,8 @@
                 </n-ellipsis>
             </n-form-item>
             <n-form-item label="Tags">
-                <ToggleTagSelector v-model:value="task.tags" />
+                <ToggleTagSelector v-model:value="task.tags" :disabled="props.disabled || state.ajaxRunning"
+                    :read-only="props.readOnly" />
             </n-form-item>
             <n-grid :cols="2" :x-gap="8">
                 <n-grid-item>
@@ -302,12 +301,12 @@
                         :height="24" />
                 </n-grid-item>
                 <n-grid-item>
-                    <EstimatedTimeInput v-model:seconds="task.estimatedTime" />
+                    <EstimatedTimeInput v-model:seconds="task.estimatedTime"
+                        :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly" />
                 </n-grid-item>
-
             </n-grid>
         </n-form>
-        <n-button @click="onUpdate" :disabled="props.disabled" v-if="!taskUpdateDisabled">
+        <n-button @click="onUpdate" :disabled="props.disabled" v-if="!props.readOnly">
             <template #icon>
                 <n-icon :component="IconDeviceFloppy" color="red"></n-icon>
             </template>
