@@ -202,7 +202,7 @@
                     <ManageTableActionButtons show-delete show-download show-preview
                         @delete="onConfirmDelete(attachment, index)" @download="onDownload(attachment, index)"
                         @preview="onPreview(attachment, index)" :disabled="props.disabled"
-                        :delete-disabled="props.disabled" :download-disabled="props.disabled"
+                        :delete-disabled="props.disabled || props.readOnly" :download-disabled="props.disabled"
                         :preview-disabled="props.disabled || !(attachment.allowImagePreview() || attachment.allowAudioPreview() || attachment.allowPDFPreview())" />
                 </td>
             </tr>
