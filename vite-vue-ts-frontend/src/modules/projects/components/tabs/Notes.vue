@@ -17,7 +17,7 @@
     import { useSessionStore } from "../../../../stores/session.ts";
 
     interface ProjectNotesProps {
-        readOnly: boolean;
+        readOnly?: boolean;
         style?: string | CSSProperties;
         projectId: string;
     }

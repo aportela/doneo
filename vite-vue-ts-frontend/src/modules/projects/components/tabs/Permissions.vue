@@ -21,7 +21,7 @@
     import type { ProjectPermissionsTableFilters } from "../../../project-permissions/types/project-permissions-table-filter.ts";
 
     interface ProjectPermissionsProps {
-        readOnly: boolean;
+        readOnly?: boolean;
         style?: string | CSSProperties;
         projectId: string;
     }

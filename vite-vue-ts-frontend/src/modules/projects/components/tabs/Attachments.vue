@@ -26,7 +26,7 @@
     import PDFPreview from "../../../../shared/components/PDFPreview.vue";
 
     interface ProjectAttachmentsProps {
-        readOnly: boolean;
+        readOnly?: boolean;
         style?: string | CSSProperties;
         projectId: string;
     }

@@ -23,7 +23,7 @@
     import { IDate } from '../../../../shared/types/idate.ts';
 
     interface ProjectFormProps {
-        readOnly: boolean;
+        readOnly?: boolean;
         style?: string | CSSProperties;
         disabled?: boolean;
     }

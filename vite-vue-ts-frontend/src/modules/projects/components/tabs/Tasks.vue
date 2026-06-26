@@ -26,7 +26,7 @@
     import Pager from '../../../../shared/components/tables/Pager.vue';
 
     interface ProjectTasksProps {
-        readOnly: boolean;
+        readOnly?: boolean;
         style?: string | CSSProperties;
         projectId: string;
     }
