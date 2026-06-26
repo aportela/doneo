@@ -26,6 +26,8 @@ export const useSessionStore = defineStore("session", {
       state.session.user?.id || null,
     sessionUserName: (state: State): string | null =>
       state.session.user?.name || null,
+    sessionUserEmail: (state: State): string | null =>
+      state.session.user?.email || null,
     sessionUserIsAdmin: (state: State): boolean =>
       state.session.user?.permissions.isSuperUser ?? false,
     hasAccessToken: (state: State): boolean =>
