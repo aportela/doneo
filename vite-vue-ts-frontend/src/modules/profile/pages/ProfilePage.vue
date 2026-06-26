@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { computed, ref, watch } from 'vue';
+    import { computed, ref, reactive, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import dayjs from 'dayjs'
@@ -7,14 +7,30 @@
     import { NTabs, NTabPane, NCard, NAvatar, NFlex, NFormItem, NInputGroup, NInput, NButton, NButtonGroup, NPopover, NIcon, NGrid, NGridItem, NDivider } from 'naive-ui';
     import { IconFileUpload, IconTrash, IconSun, IconMoon, IconInfoCircle, IconLayoutSidebarLeftExpand, IconLayoutNavbarExpand, IconDeviceFloppy } from '@tabler/icons-vue';
 
-    import { useSessionStore } from '../../../stores/session';
+    import { useNotify } from '../../../shared/composables/notification';
+    import { appBus } from '../../../shared/composables/bus';
+
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
+    import { profileService } from '../services/profile';
+    import { handleAPIError } from '../../../api/client/errorHandler';
+
+    import { useLoadingStore } from '../../../stores/loading';
     import { useColorSchemeStore } from '../../../stores/colorScheme';
     import { useUserSettingsStore } from '../../../stores/userSettings';
+    import { Profile } from '../models/profile';
+    import type { ProfileResponse, UpdateRequest } from '../types/dto';
+    import { MIN_PASSWORD_LENGTH } from '../../users/models/user';
 
     const { t } = useI18n();
-    const sessionStore = useSessionStore();
+    const { notify } = useNotify();
+
+    const loadingStore = useLoadingStore();
     const colorSchemeStore = useColorSchemeStore();
     const userSettingsStore = useUserSettingsStore();
+
+    const profile = ref<Profile>(new Profile());
+
+    const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
     const newPassword = ref<string | null>(null);
     const confirmedPassword = ref<string | null>(null);
@@ -22,6 +38,10 @@
     const currentTab = ref<string>("myAccount");
 
     const currentDatetimeMask = ref<string | null>(userSettingsStore.currentDatetimeMask);
+
+    watch(state, (newValue: AjaxStateInterface) => {
+        loadingStore.set(newValue.ajaxRunning);
+    });
 
     watch(() => currentDatetimeMask.value, (newValue) => {
         userSettingsStore.setDatetimeMask(newValue || "YYYY-MM-DD HH:MM:SS")
@@ -36,7 +56,116 @@
         set(_value) { }
     });
 
-    const onUpdate = () => { };
+    const allowSubmit = computed<boolean>(() => !!profile.value.name && !!profile.value.email && matchedPasswords.value)
+
+    const onGet = async () => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const response: ProfileResponse = await profileService.get();
+            profile.value = new Profile(response);
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProfilePage.onRefresh" } });
+                            break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.projectType.components.ProfilePage.errors.refreshError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.projectType.components.ProfilePage.errors.refreshError");
+                    console.error("Unhandled API error", { file: "ProfilePage.vue", method: "onRefresh" }, { err: fatalError });
+                });
+        }
+        finally {
+            state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
+        }
+    };
+
+    const onUpdate = async () => {
+        //serverErrors.value = {};
+        //userFormRef.value?.restoreValidation();
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const payload: UpdateRequest = {
+                name: profile.value.name ?? "",
+                password: newPassword.value || undefined,
+                email: profile.value.email ?? "",
+            };
+            const response: ProfileResponse = await profileService.update(payload);
+            profile.value = new Profile(response);
+            notify('success', t("Profile updated"));
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "UserForm.onUpdate" } });
+                            break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
+                            break;
+                        case 404:
+                            state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.notFoundError");
+                            break;
+                        case 409:
+                            if (apiError.details?.field === "name") {
+                                //serverErrors.value.name = "modules.user.components.UserForm.inputs.name.errors.alreadyExists";
+                            } else if (apiError.details?.field === "email") {
+                                //serverErrors.value.email = "modules.user.components.UserForm.inputs.email.errors.alreadyExists";
+                            } else {
+                                state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.updateError");
+                            }
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.updateError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.updateError");
+                    console.error("Unhandled API error", { file: "UserForm.vue", method: "onUpdate" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+            if (state.ajaxErrors) {
+                if (state.ajaxErrorMessage) {
+                    appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+                } else {
+                    await nextTick();
+                    //userFormRef.value?.validate().then(() => { }).catch(() => { });
+                }
+            }
+        }
+    };
+
+    let stopBusReauthListener: () => void;
+
+    onMounted(() => {
+        onGet();
+        stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
+            if (payload.to.includes("ProfilePage.onRefresh")) {
+                onGet();
+            }
+        });
+    });
+
+    onBeforeUnmount(() => {
+        stopBusReauthListener();
+    });
 </script>
 
 <template>
@@ -45,8 +174,12 @@
             <n-card bordered>
                 <h1>My account</h1>
                 <h2>Profile details</h2>
+                <p>Account created on {{
+                    profile.createdAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</p>
+                <p v-if="profile.updatedAt?.hasValue()">Account last update on {{
+                    profile.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</p>
                 <n-flex style="align-items:center;">
-                    <n-avatar :size="128" :src="'/api/wc/avatars/128/user/' + sessionStore.sessionUserId" />
+                    <n-avatar :size="128" :src="'/api/wc/avatars/128/user/' + profile.id" />
                     <n-button>
                         <template #icon>
                             <n-icon>
@@ -68,28 +201,28 @@
                 <n-divider />
 
                 <n-form-item label="Name">
-                    <n-input v-model:value="sessionStore.sessionUserName" />
+                    <n-input v-model:value="profile.name" />
                 </n-form-item>
                 <n-form-item label="Email">
-                    <n-input v-model:value="sessionStore.sessionUserEmail" />
+                    <n-input v-model:value="profile.email" />
                 </n-form-item>
 
                 <p>Password</p>
 
                 <n-flex align="center">
                     <n-form-item label="New password">
-                        <n-input type="password" v-model:value="newPassword" placeholder="type new password"
-                            clearable />
+                        <n-input type="password" :min="MIN_PASSWORD_LENGTH" v-model:value="newPassword"
+                            placeholder="type new password" clearable />
                     </n-form-item>
                     <n-form-item label="Confirm new password"
                         :feedback="!matchedPasswords ? 'passwords do not match' : undefined"
                         :validation-status="!matchedPasswords ? 'error' : undefined">
-                        <n-input type="password" v-model:value="confirmedPassword" placeholder="confirm new password"
-                            clearable />
+                        <n-input type="password" :min="MIN_PASSWORD_LENGTH" v-model:value="confirmedPassword"
+                            placeholder="confirm new password" clearable />
                     </n-form-item>
                 </n-flex>
 
-                <n-button @click="onUpdate" :disabled="false">
+                <n-button @click="onUpdate" :disabled="!allowSubmit">
                     <template #icon>
                         <n-icon :component="IconDeviceFloppy" />
                     </template>

@@ -8,6 +8,7 @@ import (
 	"github.com/aportela/doneo/internal/handlers/historyoperationhandler"
 	"github.com/aportela/doneo/internal/handlers/identityhandler"
 	"github.com/aportela/doneo/internal/handlers/notehandler"
+	"github.com/aportela/doneo/internal/handlers/profilehandler"
 	"github.com/aportela/doneo/internal/handlers/projecthandler"
 	"github.com/aportela/doneo/internal/handlers/projectpermissionhandler"
 	"github.com/aportela/doneo/internal/handlers/projectpriorityhandler"
@@ -41,6 +42,7 @@ import (
 	"github.com/aportela/doneo/internal/services/historyoperationservice"
 	"github.com/aportela/doneo/internal/services/identityservice"
 	"github.com/aportela/doneo/internal/services/noteservice"
+	"github.com/aportela/doneo/internal/services/profileservice"
 	"github.com/aportela/doneo/internal/services/projectpermissionservice"
 	"github.com/aportela/doneo/internal/services/projectpriorityservice"
 	"github.com/aportela/doneo/internal/services/projectservice"
@@ -76,6 +78,7 @@ type App struct {
 	TaskTimeTrackingHandler  tasktimetrackinghandler.TaskTimeTrackingHandler
 	UserTimerHandler         usertimerhandler.UserTimerHandler
 	UserHandler              userhandler.UserHandler
+	ProfileHandler           profilehandler.ProfileHandler
 }
 
 func NewApp(
@@ -100,12 +103,10 @@ func NewApp(
 	//taskRelationRepository := taskrelationrepository.NewRepository()
 	taskStatusRepository := taskstatusrepository.NewRepository()
 	taskTimeTrackingRepository := tasktimetrackingrepository.NewRepository()
-
 	userTimerRepository := usertimerrepository.NewRepository()
 	userRepository := userrepository.NewRepository()
 
 	authorizationService := authorizationservice.NewService(db, cache, userRepository, projectPermissionRepository)
-
 	historyOperationService := historyoperationservice.NewService(authorizationService, historyOperationRepository)
 	attachmentService := attachmentservice.NewService(db, cfg.Storage.AttachmentsPath, authorizationService, historyOperationService, attachmentRepository)
 	identityService := identityservice.NewService(db, userRepository)
@@ -122,6 +123,7 @@ func NewApp(
 	taskTimeTrackingService := tasktimetrackingservice.NewService(db, authorizationService, historyOperationService, taskTimeTrackingRepository)
 	userTimerService := usertimerservice.NewService(db, userTimerRepository)
 	userService := userservice.NewService(db, cache, authorizationService, userRepository)
+	profileService := profileservice.NewService(db, cache, authorizationService, userRepository)
 
 	attachmentHandler := attachmenthandler.NewHandler(attachmentService, cfg.Storage.MaxUploadFilesize)
 	identityHandler := identityhandler.NewHandler(identityService, cfg.Auth.SecretKey, cfg.Auth.AccessTokenExpirationHours, cfg.Auth.RefreshTokenExpirationDays)
@@ -139,6 +141,7 @@ func NewApp(
 	taskTimeTrackingHandler := tasktimetrackinghandler.NewHandler(taskTimeTrackingService)
 	userTimerHandler := usertimerhandler.NewHandler(userTimerService)
 	userHandler := userhandler.NewHandler(userService)
+	profileHandler := profilehandler.NewHandler(profileService)
 
 	return &App{
 		DB:    db,
@@ -161,5 +164,6 @@ func NewApp(
 		TaskTimeTrackingHandler:  taskTimeTrackingHandler,
 		UserTimerHandler:         userTimerHandler,
 		UserHandler:              userHandler,
+		ProfileHandler:           profileHandler,
 	}
 }
