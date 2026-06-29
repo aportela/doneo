@@ -62,11 +62,14 @@
 
     const allowSubmit = computed<boolean>(() => !!profile.value.name && !!profile.value.email && matchedPasswords.value)
 
+    const lastAvatar = ref<number>(new Date().getTime());
+
     const onGet = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const response: ProfileResponse = await profileService.get();
             profile.value = new Profile(response);
+            lastAvatar.value = new Date().getTime();
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -187,6 +190,7 @@
 
         xhr.onload = () => {
             if (xhr.status >= 200 && xhr.status < 300) {
+                lastAvatar.value = new Date().getTime();
                 onFinish()
             } else {
                 onError()
@@ -240,6 +244,7 @@
                 });
         } finally {
             state.ajaxRunning = false;
+            lastAvatar.value = new Date().getTime();
             if (state.ajaxErrors) {
                 if (state.ajaxErrorMessage) {
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
@@ -278,7 +283,7 @@
                 <p v-if="profile.updatedAt?.hasValue()">Account last update on {{
                     profile.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</p>
                 <n-flex style="align-items:center;">
-                    <n-avatar :size="128" :src="currentAvatarURL" />
+                    <n-avatar :size="128" :src="currentAvatarURL" :key="lastAvatar" />
                     <n-upload :max="1" accept="image/*" action="/api/profile/avatar/" :custom-request="uploadFile">
                         <n-button>
                             <template #icon>
