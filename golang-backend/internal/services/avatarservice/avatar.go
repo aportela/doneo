@@ -3,6 +3,7 @@ package avatarservice
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -112,7 +113,11 @@ func (service *avatarService) DeleteUserAvatar(ctx context.Context, userID strin
 	}
 	fullPath := path.Join(avatarPath, userID+".jpg")
 	if _, err := os.Stat(fullPath); err != nil {
-		return err
+		if errors.Is(err, os.ErrNotExist) {
+			return nil
+		} else {
+			return err
+		}
 	}
 	return os.Remove(fullPath)
 }
