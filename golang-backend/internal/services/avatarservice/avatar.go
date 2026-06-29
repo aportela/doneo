@@ -26,6 +26,7 @@ type AvatarService interface {
 	SaveAvatar(ctx context.Context, sourceFile io.Reader, sourceFilename string) error
 	SaveUserAvatar(ctx context.Context, sourceFile io.Reader, sourceFilename string, userID string, size AvatarSize) (string, error)
 	DeleteAvatar(ctx context.Context) error
+	DeleteUserAvatar(ctx context.Context, userID string, size AvatarSize) error
 }
 
 type avatarService struct {
@@ -92,11 +93,24 @@ func (service *avatarService) DeleteAvatar(ctx context.Context) error {
 	if !ok {
 		return fmt.Errorf("[AvatarService] user not found in context")
 	}
-	if err := os.MkdirAll(service.avatarBasePath, 0755); err != nil {
+	if err := service.DeleteUserAvatar(ctx, contextUser.ID, AvatarSizeTiny); err != nil {
+		return fmt.Errorf("[AvatarService] error deleting avatar tiny: %w", err)
+	}
+	if err := service.DeleteUserAvatar(ctx, contextUser.ID, AvatarSizeSmall); err != nil {
+		return fmt.Errorf("[AvatarService] error deleting avatar small: %w", err)
+	}
+	if err := service.DeleteUserAvatar(ctx, contextUser.ID, AvatarSizeNormal); err != nil {
+		return fmt.Errorf("[AvatarService] error deleting avatar normal: %w", err)
+	}
+	return nil
+}
+
+func (service *avatarService) DeleteUserAvatar(ctx context.Context, userID string, size AvatarSize) error {
+	avatarPath := path.Join(service.avatarBasePath, strconv.FormatUint(uint64(size), 10))
+	if err := os.MkdirAll(avatarPath, 0755); err != nil {
 		return err
 	}
-	attachmentFilename := contextUser.ID + ".jpg"
-	fullPath := path.Join(service.avatarBasePath, attachmentFilename)
+	fullPath := path.Join(avatarPath, userID+".jpg")
 	if _, err := os.Stat(fullPath); err != nil {
 		return err
 	}
