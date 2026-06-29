@@ -5,6 +5,7 @@ import (
 	"github.com/aportela/doneo/internal/config"
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/handlers/attachmenthandler"
+	"github.com/aportela/doneo/internal/handlers/avatarhandler"
 	"github.com/aportela/doneo/internal/handlers/historyoperationhandler"
 	"github.com/aportela/doneo/internal/handlers/identityhandler"
 	"github.com/aportela/doneo/internal/handlers/notehandler"
@@ -39,6 +40,7 @@ import (
 	"github.com/aportela/doneo/internal/repositories/usertimerrepository"
 	"github.com/aportela/doneo/internal/services/attachmentservice"
 	"github.com/aportela/doneo/internal/services/authorizationservice"
+	"github.com/aportela/doneo/internal/services/avatarservice"
 	"github.com/aportela/doneo/internal/services/historyoperationservice"
 	"github.com/aportela/doneo/internal/services/identityservice"
 	"github.com/aportela/doneo/internal/services/noteservice"
@@ -79,6 +81,7 @@ type App struct {
 	UserTimerHandler         usertimerhandler.UserTimerHandler
 	UserHandler              userhandler.UserHandler
 	ProfileHandler           profilehandler.ProfileHandler
+	AvatarHandler            avatarhandler.AvatarHandler
 }
 
 func NewApp(
@@ -124,6 +127,7 @@ func NewApp(
 	userTimerService := usertimerservice.NewService(db, userTimerRepository)
 	userService := userservice.NewService(db, cache, authorizationService, userRepository)
 	profileService := profileservice.NewService(db, cfg.Storage.AvatarsPath, cache, authorizationService, userRepository)
+	avatarService := avatarservice.NewService(cfg.Storage.AvatarsPath)
 
 	attachmentHandler := attachmenthandler.NewHandler(attachmentService, cfg.Storage.MaxUploadFilesize)
 	identityHandler := identityhandler.NewHandler(identityService, cfg.Auth.SecretKey, cfg.Auth.AccessTokenExpirationHours, cfg.Auth.RefreshTokenExpirationDays)
@@ -142,6 +146,7 @@ func NewApp(
 	userTimerHandler := usertimerhandler.NewHandler(userTimerService)
 	userHandler := userhandler.NewHandler(userService)
 	profileHandler := profilehandler.NewHandler(profileService, cfg.Storage.MaxAvatarUploadFilesize)
+	avatarHandler := avatarhandler.NewHandler(avatarService)
 
 	return &App{
 		DB:    db,
@@ -165,5 +170,6 @@ func NewApp(
 		UserTimerHandler:         userTimerHandler,
 		UserHandler:              userHandler,
 		ProfileHandler:           profileHandler,
+		AvatarHandler:            avatarHandler,
 	}
 }

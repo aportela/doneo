@@ -36,15 +36,7 @@ func NewRouter(app *app.App) http.Handler {
 
 	cookieAuthApiRouter.Route("/", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTCookieAuthentication(app.Cfg.Auth.SecretKey))
-		// TODO: add handler && check disk existence
-		r.Get("/avatars/{size:[0-9]+}/user/{id:"+uuidPattern+"}", func(w http.ResponseWriter, r *http.Request) {
-			http.Redirect(
-				w,
-				r,
-				"https://i.pravatar.cc/"+chi.URLParam(r, "size")+"?u="+chi.URLParam(r, "id"),
-				http.StatusTemporaryRedirect,
-			)
-		})
+		r.Get("/avatars/{avatar_size:[0-9]+}/user/{user_id:"+uuidPattern+"}", app.AvatarHandler.GetAvatar)
 		r.Get("/attachments/project/{project_id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}/{mode}", app.AttachmentHandler.DownloadProjectAttachment)
 		r.Get("/attachments/project/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}/{mode}", app.AttachmentHandler.DownloadTaskAttachment)
 	})
