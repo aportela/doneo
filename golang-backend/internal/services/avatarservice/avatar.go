@@ -10,9 +10,9 @@ import (
 type AvatarSize uint16
 
 const (
-	AvatarSizeSmall  AvatarSize = 50
-	AvatarSizeNormal AvatarSize = 100
-	AvatarSizeLarge  AvatarSize = 200
+	AvatarSizeTiny   AvatarSize = 32
+	AvatarSizeSmall  AvatarSize = 64
+	AvatarSizeNormal AvatarSize = 128
 )
 
 type AvatarService interface {

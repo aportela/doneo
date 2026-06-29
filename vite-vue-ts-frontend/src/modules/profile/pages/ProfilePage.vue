@@ -39,7 +39,7 @@
 
     const currentTab = ref<string>("myAccount");
 
-    const currentAvatarURL = computed(() => "/api/wc/avatars/128/user/" + profile.value.id);
+    const currentAvatarURL = computed(() => profile.value.id ? `/api/wc/avatars/user/${profile.value.id}/normal` : undefined);
 
     const currentDatetimeMask = ref<string | null>(userSettingsStore.currentDatetimeMask);
 

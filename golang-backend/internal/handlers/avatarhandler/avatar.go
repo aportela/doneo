@@ -2,6 +2,7 @@ package avatarhandler
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/aportela/doneo/internal/services/avatarservice"
 	"github.com/go-chi/chi/v5"
@@ -21,6 +22,15 @@ func NewHandler(service avatarservice.AvatarService) AvatarHandler {
 
 func (handler *avatarHandler) GetAvatar(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "user_id")
-	avatarSize := chi.URLParam(r, "avatar_size")
-	http.Redirect(w, r, "https://i.pravatar.cc/"+avatarSize+"?u="+userID, http.StatusTemporaryRedirect)
+	var avatarSize avatarservice.AvatarSize
+	switch chi.URLParam(r, "avatar_size") {
+	case "tiny":
+		avatarSize = avatarservice.AvatarSizeTiny
+	case "small":
+		avatarSize = avatarservice.AvatarSizeSmall
+	case "normal":
+		avatarSize = avatarservice.AvatarSizeNormal
+	}
+
+	http.Redirect(w, r, "https://i.pravatar.cc/"+strconv.FormatUint(uint64(avatarSize), 10)+"?u="+userID, http.StatusTemporaryRedirect)
 }

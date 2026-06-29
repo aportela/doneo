@@ -3,22 +3,35 @@
 
     import { NAvatar } from 'naive-ui';
 
+    type AvatarSize = "tiny" | "small" | "normal";
+
     interface AvatarUserNameProps {
         userId: string | null;
         userName: string | null;
-        avatarSize?: number;
+        avatarSize?: AvatarSize;
     };
 
     const props = withDefaults(defineProps<AvatarUserNameProps>(), {
-        avatarSize: 32,
+        avatarSize: "tiny",
     });
 
-    const avatarURL = computed(() => `/api/wc/avatars/${props.avatarSize}/user/${props.userId}`);
+    const size = computed(() => {
+        switch (props.avatarSize) {
+            case "tiny":
+                return 32;
+            case "small":
+                return 64;
+            case "normal":
+                return 128;
+        }
+    });
+
+    const avatarURL = computed(() => `/api/wc/avatars/user/${props.userId}/${props.avatarSize}`);
 </script>
 
 <template>
     <div class="doneo-flex-center-align" style="gap: 8px;">
-        <n-avatar v-if="props.userId" :src="avatarURL" class="doneo-avatar-username" :size="props.avatarSize" />
+        <n-avatar v-if="props.userId" :src="avatarURL" class="doneo-avatar-username" :size="size" />
         {{ props.userName }}
     </div>
 </template>

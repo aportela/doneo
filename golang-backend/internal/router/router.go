@@ -36,7 +36,7 @@ func NewRouter(app *app.App) http.Handler {
 
 	cookieAuthApiRouter.Route("/", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTCookieAuthentication(app.Cfg.Auth.SecretKey))
-		r.Get("/avatars/{avatar_size:[0-9]+}/user/{user_id:"+uuidPattern+"}", app.AvatarHandler.GetAvatar)
+		r.Get("/avatars/user/{user_id:"+uuidPattern+"}/{avatar_size:(tiny|small|normal)}", app.AvatarHandler.GetAvatar)
 		r.Get("/attachments/project/{project_id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}/{mode}", app.AttachmentHandler.DownloadProjectAttachment)
 		r.Get("/attachments/project/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}/{mode}", app.AttachmentHandler.DownloadTaskAttachment)
 	})
