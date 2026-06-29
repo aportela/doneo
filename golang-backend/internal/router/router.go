@@ -128,8 +128,8 @@ func NewRouter(app *app.App) http.Handler {
 		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
 		r.Get("/", app.ProfileHandler.Get)
 		r.Put("/", app.ProfileHandler.Update)
-		r.Post("/avatar/", app.ProfileHandler.UploadAvatar)
-		r.Delete("/avatar/", app.ProfileHandler.DeleteAvatar)
+		r.Post("/avatar/", app.AvatarHandler.UploadAvatar)
+		r.Delete("/avatar/", app.AvatarHandler.DeleteAvatar)
 	})
 
 	apiRouter.Route("/user-timers", func(r chi.Router) {

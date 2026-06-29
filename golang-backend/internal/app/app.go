@@ -126,7 +126,7 @@ func NewApp(
 	taskTimeTrackingService := tasktimetrackingservice.NewService(db, authorizationService, historyOperationService, taskTimeTrackingRepository)
 	userTimerService := usertimerservice.NewService(db, userTimerRepository)
 	userService := userservice.NewService(db, cache, authorizationService, userRepository)
-	profileService := profileservice.NewService(db, cfg.Storage.AvatarsPath, cache, authorizationService, userRepository)
+	profileService := profileservice.NewService(db, cache, authorizationService, userRepository)
 	avatarService := avatarservice.NewService(cfg.Storage.AvatarsPath)
 
 	attachmentHandler := attachmenthandler.NewHandler(attachmentService, cfg.Storage.MaxUploadFilesize)
@@ -145,8 +145,8 @@ func NewApp(
 	taskTimeTrackingHandler := tasktimetrackinghandler.NewHandler(taskTimeTrackingService)
 	userTimerHandler := usertimerhandler.NewHandler(userTimerService)
 	userHandler := userhandler.NewHandler(userService)
-	profileHandler := profilehandler.NewHandler(profileService, cfg.Storage.MaxAvatarUploadFilesize)
-	avatarHandler := avatarhandler.NewHandler(avatarService)
+	profileHandler := profilehandler.NewHandler(profileService)
+	avatarHandler := avatarhandler.NewHandler(avatarService, cfg.Storage.MaxAvatarUploadFilesize)
 
 	return &App{
 		DB:    db,

@@ -13,17 +13,14 @@ import (
 type ProfileHandler interface {
 	Update(w http.ResponseWriter, r *http.Request)
 	Get(w http.ResponseWriter, r *http.Request)
-	UploadAvatar(w http.ResponseWriter, r *http.Request)
-	DeleteAvatar(w http.ResponseWriter, r *http.Request)
 }
 
 type profileHandler struct {
-	service                 profileservice.ProfileService
-	maxAvatarUploadFilesize int64
+	service profileservice.ProfileService
 }
 
-func NewHandler(service profileservice.ProfileService, maxAvatarUploadFilesize int64) ProfileHandler {
-	return &profileHandler{service: service, maxAvatarUploadFilesize: maxAvatarUploadFilesize}
+func NewHandler(service profileservice.ProfileService) ProfileHandler {
+	return &profileHandler{service: service}
 }
 
 func (handler *profileHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -54,33 +51,4 @@ func (handler *profileHandler) Get(w http.ResponseWriter, r *http.Request) {
 	} else {
 		handlers.ToHandlerJSONResponse(w, domainToResponse(user), nil)
 	}
-}
-
-func (handler *profileHandler) UploadAvatar(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseMultipartForm(handler.maxAvatarUploadFilesize); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	if file, header, err := r.FormFile("file"); err != nil {
-		http.Error(w, "file is required", http.StatusBadRequest)
-		return
-	} else {
-		defer file.Close()
-		if _, err := handler.service.SaveAvatar(r.Context(), file, header.Filename); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
-	}
-}
-
-func (handler *profileHandler) DeleteAvatar(w http.ResponseWriter, r *http.Request) {
-	if err := handler.service.DeleteAvatar(r.Context()); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
 }
