@@ -1694,6 +1694,35 @@ export default {
         },
       },
     },
+    profile: {
+      components: {
+        ProfilePage: {
+          inputs: {
+            name: {
+              errors: {
+                alreadyExists: "",
+              },
+            },
+            email: {
+              errors: {
+                alreadyExists: "",
+              },
+            },
+          },
+          errors: {
+            refreshError: "There was a problem while getting the profile data",
+            notFoundError: "We couldn’t find the specified profile",
+            updateError: "There was a problem while updating the profile",
+            updateAvatarError: "There was a problem while updating the avatar",
+          },
+          notifications: {
+            profileUpdated: "Profile has been updated",
+            avatarUpdated: "Avatar has been updated",
+            avatarDeleted: "Avatar has been deleted",
+          },
+        },
+      },
+    },
   },
 
   // common actions/operations

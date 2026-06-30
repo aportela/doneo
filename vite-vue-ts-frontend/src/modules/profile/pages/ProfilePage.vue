@@ -39,9 +39,9 @@
 
     const currentTab = ref<string>("myAccount");
 
-    const lastAvatar = ref<number>(new Date().getTime());
+    const lastAvatarTimestamp = ref<number>(new Date().getTime());
 
-    const currentAvatarURL = computed(() => profile.value.id ? `/api/wc/avatars/user/${profile.value.id}?t=${lastAvatar.value}` : undefined);
+    const currentAvatarURL = computed(() => profile.value.id ? `/api/wc/avatars/user/${profile.value.id}?t=${lastAvatarTimestamp.value}` : undefined);
 
     const showAvatarGeneratorModal = ref<boolean>(false);
 
@@ -66,13 +66,12 @@
 
     const allowSubmit = computed<boolean>(() => !!profile.value.name && !!profile.value.email && matchedPasswords.value)
 
-
     const onGet = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const response: ProfileResponse = await profileService.get();
             profile.value = new Profile(response);
-            lastAvatar.value = new Date().getTime();
+            lastAvatarTimestamp.value = new Date().getTime();
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -80,7 +79,7 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProfilePage.onRefresh" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProfilePage.onGet" } });
                             break;
                         case 403:
                             state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
@@ -92,7 +91,7 @@
                 },
                 (fatalError) => {
                     state.ajaxErrorMessage = t("modules.projectType.components.ProfilePage.errors.refreshError");
-                    console.error("Unhandled API error", { file: "ProfilePage.vue", method: "onRefresh" }, { err: fatalError });
+                    console.error("Unhandled API error", { file: "ProfilePage.vue", method: "onGet" }, { err: fatalError });
                 });
         }
         finally {
@@ -115,7 +114,7 @@
             };
             const response: ProfileResponse = await profileService.update(payload);
             profile.value = new Profile(response);
-            notify('success', t("Profile updated"));
+            notify('success', t("modules.profile.components.ProfilePage.notifications.profileUpdated"));
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -123,13 +122,13 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "UserForm.onUpdate" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProfilePage.onUpdate" } });
                             break;
                         case 403:
                             state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
                             break;
                         case 404:
-                            state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.notFoundError");
+                            state.ajaxErrorMessage = t("modules.profile.components.ProfilePage.errors.notFoundError");
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
@@ -137,17 +136,17 @@
                             } else if (apiError.details?.field === "email") {
                                 //serverErrors.value.email = "modules.user.components.UserForm.inputs.email.errors.alreadyExists";
                             } else {
-                                state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.updateError");
+                                state.ajaxErrorMessage = t("modules.profile.components.ProfilePage.errors.updateError");
                             }
                             break;
                         default:
-                            state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.updateError");
+                            state.ajaxErrorMessage = t("modules.profile.components.ProfilePage.errors.updateError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.updateError");
-                    console.error("Unhandled API error", { file: "UserForm.vue", method: "onUpdate" }, { err: fatalError });
+                    state.ajaxErrorMessage = t("modules.profile.components.ProfilePage.errors.updateError");
+                    console.error("Unhandled API error", { file: "ProfilePage.vue", method: "onUpdate" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
@@ -168,7 +167,7 @@
         try {
             const payload = { svg: svg };
             await profileService.saveAvatar(payload);
-            notify('success', t("New avatar saved"));
+            notify('success', t("modules.profile.components.ProfilePage.notifications.avatarUpdated"));
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -176,26 +175,26 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "UserForm.onUpdate" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProfilePage.onSaveAvatar" } });
                             break;
                         case 403:
                             state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
                             break;
                         case 404:
-                            state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.notFoundError");
+                            state.ajaxErrorMessage = t("modules.profile.components.ProfilePage.errors.notFoundError");
                             break;
                         default:
-                            state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.updateError");
+                            state.ajaxErrorMessage = t("modules.profile.components.ProfilePage.errors.updateAvatarError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.updateError");
-                    console.error("Unhandled API error", { file: "UserForm.vue", method: "onUpdate" }, { err: fatalError });
+                    state.ajaxErrorMessage = t("modules.profile.components.ProfilePage.errors.updateAvatarError");
+                    console.error("Unhandled API error", { file: "ProfilePage.vue", method: "onSaveAvatar" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
-            lastAvatar.value = new Date().getTime();
+            lastAvatarTimestamp.value = new Date().getTime();
             if (state.ajaxErrors) {
                 if (state.ajaxErrorMessage) {
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
@@ -211,7 +210,7 @@
         Object.assign(state, defaultAjaxStateRunning);
         try {
             await profileService.deleteAvatar();
-            notify('success', t("Avatar deleted"));
+            notify('success', t("modules.profile.components.ProfilePage.notifications.avatarDeleted"));
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -219,7 +218,7 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "UserForm.onUpdate" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProfilePage.onDeleteAvatar" } });
                             break;
                         case 403:
                             state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
@@ -243,11 +242,11 @@
                 },
                 (fatalError) => {
                     state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.updateError");
-                    console.error("Unhandled API error", { file: "UserForm.vue", method: "onUpdate" }, { err: fatalError });
+                    console.error("Unhandled API error", { file: "ProfilePage.vue", method: "onDeleteAvatar" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
-            lastAvatar.value = new Date().getTime();
+            lastAvatarTimestamp.value = new Date().getTime();
             if (state.ajaxErrors) {
                 if (state.ajaxErrorMessage) {
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
@@ -264,8 +263,12 @@
     onMounted(() => {
         onGet();
         stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
-            if (payload.to.includes("ProfilePage.onRefresh")) {
+            if (payload.to.includes("ProfilePage.onGet")) {
                 onGet();
+            } else if (payload.to.includes("ProfilePage.onUpdate")) {
+                onUpdate();
+            } else if (payload.to.includes("ProfilePage.onDeleteAvatar")) {
+                onDeleteAvatar();
             }
         });
     });
@@ -279,7 +282,7 @@
 <template>
     <GenerateAvatarModal v-model:show="showAvatarGeneratorModal" @confirm="(svg: string) => onSaveAvatar(svg)"
         @cancel="showAvatarGeneratorModal = false;" />
-    <n-tabs placement="left" type="line" animated v-model:value="currentTab">
+    <n-tabs placement="top" type="line" animated v-model:value="currentTab">
         <n-tab-pane name="myAccount" tab="My account">
             <n-card bordered>
                 <h1>My account</h1>
@@ -289,19 +292,21 @@
                 <p v-if="profile.updatedAt?.hasValue()">Account last update on {{
                     profile.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</p>
                 <n-flex style="align-items:center;">
-                    <n-avatar :size="128" :src="currentAvatarURL" :key="lastAvatar" color="transparent" />
-                    <n-button @click="showAvatarGeneratorModal = true">
-                        <template #icon>
-                            <n-icon :component="IconImageGeneration" />
-                        </template>
-                        Change avatar
-                    </n-button>
-                    <n-button tertiary type="error" @click="onDeleteAvatar">
-                        <template #icon>
-                            <n-icon :component="IconTrash" />
-                        </template>
-                        Delete avatar
-                    </n-button>
+                    <n-avatar :size="128" :src="currentAvatarURL" :key="lastAvatarTimestamp" color="transparent" />
+                    <div>
+                        <n-button @click="showAvatarGeneratorModal = true" block style="margin-bottom: 8px;">
+                            <template #icon>
+                                <n-icon :component="IconImageGeneration" />
+                            </template>
+                            Change avatar
+                        </n-button>
+                        <n-button tertiary type="error" @click="onDeleteAvatar" block>
+                            <template #icon>
+                                <n-icon :component="IconTrash" />
+                            </template>
+                            Delete avatar
+                        </n-button>
+                    </div>
                 </n-flex>
                 <n-divider />
                 <n-form-item label="Name">
@@ -553,16 +558,7 @@
                 </n-button-group>
             </n-card>
         </n-tab-pane>
-        <n-tab-pane name="myActivity" tab="My activity">
-            <h1>My activity</h1>
-        </n-tab-pane>
     </n-tabs>
 </template>
 
-<style lang="css" scoped>
-
-    svg {
-        width: 100% !important;
-        height: 100% !important;
-    }
-</style>
+<style lang="css" scoped></style>
