@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"hash/maphash"
 	"net/http"
 	"os"
 
@@ -35,18 +36,28 @@ func (handler *avatarHandler) Get(w http.ResponseWriter, r *http.Request) {
 		if info, err := os.Stat(avatarPath); err != nil {
 			if errors.Is(err, os.ErrNotExist) {
 				w.Header().Set("Content-Type", "image/svg+xml")
+				var seed = maphash.MakeSeed()
+				var hash maphash.Hash
+				hash.SetSeed(seed)
+				hash.WriteString(avatarservice.DefaultAvatar)
+				etag := fmt.Sprintf(`W/"%d"`, hash.Sum64())
+				if r.Header.Get("If-None-Match") == etag {
+					w.WriteHeader(http.StatusNotModified)
+					return
+				}
+				w.Header().Set("ETag", etag)
 				w.Write([]byte(avatarservice.DefaultAvatar))
 			} else {
 				w.WriteHeader(http.StatusInternalServerError)
 			}
 		} else {
+			w.Header().Set("Content-Type", "image/svg+xml")
 			etag := fmt.Sprintf(`W/"%x-%x"`, info.ModTime().Unix(), info.Size())
 			if r.Header.Get("If-None-Match") == etag {
 				w.WriteHeader(http.StatusNotModified)
 				return
 			}
 			w.Header().Set("ETag", etag)
-			w.Header().Set("Content-Type", "image/svg+xml")
 			http.ServeFile(w, r, avatarPath)
 		}
 	}
