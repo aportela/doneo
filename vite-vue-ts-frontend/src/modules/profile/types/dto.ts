@@ -4,6 +4,10 @@ export type UpdateRequest = {
   password?: string;
 };
 
+export type SaveAvatarRequest = {
+  svg: string;
+};
+
 export type ProfileResponse = {
   id: string;
   name: string;

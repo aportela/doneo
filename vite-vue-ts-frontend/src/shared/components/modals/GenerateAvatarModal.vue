@@ -39,7 +39,7 @@
     }
 
     const onConfirm = () => {
-        emit("confirm", { svg: svg.value })
+        emit("confirm", svg.value)
     };
     const onCancel = () => {
         emit("cancel")

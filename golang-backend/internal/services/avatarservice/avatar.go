@@ -1,33 +1,26 @@
 package avatarservice
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path"
-	"strconv"
 
 	"github.com/aportela/doneo/internal/middlewares"
-	"github.com/disintegration/imaging"
 )
 
-type AvatarSize uint16
-
 const (
-	AvatarSizeTiny   AvatarSize = 32
-	AvatarSizeSmall  AvatarSize = 64
-	AvatarSizeNormal AvatarSize = 128
+	DefaultAvatar string = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><circle cx="64" cy="64" r="60" fill="#E5E7EB"/><circle cx="64" cy="46" r="18" fill="#6B7280"/><path d="M30 102C30 82 46 70 64 70s34 12 34 32Z" fill="#6B7280"/></svg>`
 )
 
 type AvatarService interface {
-	GetUserAvatarPath(ctx context.Context, userID string, size AvatarSize) (string, error)
-	SaveAvatar(ctx context.Context, sourceFile io.Reader, sourceFilename string) error
-	SaveUserAvatar(ctx context.Context, sourceFile io.Reader, sourceFilename string, userID string, size AvatarSize) (string, error)
-	DeleteAvatar(ctx context.Context) error
-	DeleteUserAvatar(ctx context.Context, userID string, size AvatarSize) error
+	GetUserAvatarPath(ctx context.Context, userID string) (string, error)
+	GetContextUserAvatarPath(ctx context.Context) (string, error)
+	SaveUserAvatar(ctx context.Context, svg string, userID string) error
+	SaveContextUserAvatar(ctx context.Context, svg string) error
+	DeleteUserAvatar(ctx context.Context, userID string) error
+	DeleteContextUserAvatar(ctx context.Context) error
 }
 
 type avatarService struct {
@@ -38,86 +31,63 @@ func NewService(avatarBasePath string) AvatarService {
 	return &avatarService{avatarBasePath: avatarBasePath}
 }
 
-func (service *avatarService) GetUserAvatarPath(ctx context.Context, userID string, size AvatarSize) (string, error) {
-	if len(userID) != 32 {
+func (service *avatarService) GetUserAvatarPath(ctx context.Context, userID string) (string, error) {
+	if len(userID) != 36 {
 		return "", fmt.Errorf("[AvatarService] invalid userID")
 	}
-	avatarFilename := userID + ".jpg"
-	return path.Join(service.avatarBasePath, strconv.FormatUint(uint64(size), 10), avatarFilename), nil
+	return path.Join(service.avatarBasePath, userID+".svg"), nil
 }
 
-func (service *avatarService) SaveAvatar(ctx context.Context, sourceFile io.Reader, sourceFilename string) error {
+func (service *avatarService) GetContextUserAvatarPath(ctx context.Context) (string, error) {
 	contextUser, ok := middlewares.GetContextUser(ctx)
 	if !ok {
-		return fmt.Errorf("[AvatarService] user not found in context")
+		return "", fmt.Errorf("[AvatarService] user not found in context")
 	}
-	if data, err := io.ReadAll(sourceFile); err != nil {
-		return fmt.Errorf("[AvatarService] cannot read file: %w", err)
-	} else {
-		if _, err := service.SaveUserAvatar(ctx, bytes.NewReader(data), sourceFilename, contextUser.ID, AvatarSizeTiny); err != nil {
-			return fmt.Errorf("[AvatarService] error creating avatar tiny: %w", err)
-		}
-		if _, err := service.SaveUserAvatar(ctx, bytes.NewReader(data), sourceFilename, contextUser.ID, AvatarSizeSmall); err != nil {
-			return fmt.Errorf("[AvatarService] error creating avatar small: %w", err)
-		}
-		if _, err := service.SaveUserAvatar(ctx, bytes.NewReader(data), sourceFilename, contextUser.ID, AvatarSizeNormal); err != nil {
-			return fmt.Errorf("[AvatarService] error creating avatar normal: %w", err)
-		}
-	}
-	return nil
+	return service.GetUserAvatarPath(ctx, contextUser.ID)
 }
 
-func (service *avatarService) SaveUserAvatar(ctx context.Context, sourceFile io.Reader, sourceFilename string, userID string, size AvatarSize) (string, error) {
-	avatarPath := path.Join(service.avatarBasePath, strconv.FormatUint(uint64(size), 10))
-	if err := os.MkdirAll(avatarPath, 0755); err != nil {
-		return "", err
-	}
-	fullPath := path.Join(avatarPath, userID+".jpg")
-	if img, err := imaging.Decode(sourceFile); err != nil {
-		return "", err
-	} else {
-		avatar := imaging.Fill(img, int(size), int(size), imaging.Center, imaging.Lanczos)
-		if out, err := os.Create(fullPath); err != nil {
-			return "", err
-		} else {
-			defer out.Close()
-			if err := imaging.Encode(out, avatar, imaging.JPEG, imaging.JPEGQuality(85)); err != nil {
-				return "", err
-			}
-			return fullPath, nil
-		}
-	}
-}
-
-func (service *avatarService) DeleteAvatar(ctx context.Context) error {
-	contextUser, ok := middlewares.GetContextUser(ctx)
-	if !ok {
-		return fmt.Errorf("[AvatarService] user not found in context")
-	}
-	if err := service.DeleteUserAvatar(ctx, contextUser.ID, AvatarSizeTiny); err != nil {
-		return fmt.Errorf("[AvatarService] error deleting avatar tiny: %w", err)
-	}
-	if err := service.DeleteUserAvatar(ctx, contextUser.ID, AvatarSizeSmall); err != nil {
-		return fmt.Errorf("[AvatarService] error deleting avatar small: %w", err)
-	}
-	if err := service.DeleteUserAvatar(ctx, contextUser.ID, AvatarSizeNormal); err != nil {
-		return fmt.Errorf("[AvatarService] error deleting avatar normal: %w", err)
-	}
-	return nil
-}
-
-func (service *avatarService) DeleteUserAvatar(ctx context.Context, userID string, size AvatarSize) error {
-	avatarPath := path.Join(service.avatarBasePath, strconv.FormatUint(uint64(size), 10))
-	if err := os.MkdirAll(avatarPath, 0755); err != nil {
+func (service *avatarService) SaveUserAvatar(ctx context.Context, svg string, userID string) error {
+	if err := os.MkdirAll(service.avatarBasePath, 0755); err != nil {
 		return err
 	}
-	fullPath := path.Join(avatarPath, userID+".jpg")
-	if _, err := os.Stat(fullPath); err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return nil
-		} else {
+	avatarFullPath := path.Join(service.avatarBasePath, userID+".svg")
+
+	if out, err := os.Create(avatarFullPath); err != nil {
+		return err
+	} else {
+		defer out.Close()
+		if _, err := out.WriteString(svg); err != nil {
 			return err
 		}
 	}
-	return os.Remove(fullPath)
+	return nil
+}
+
+func (service *avatarService) SaveContextUserAvatar(ctx context.Context, svg string) error {
+	contextUser, ok := middlewares.GetContextUser(ctx)
+	if !ok {
+		return fmt.Errorf("[AvatarService] user not found in context")
+	}
+	return service.SaveUserAvatar(ctx, svg, contextUser.ID)
+}
+
+func (service *avatarService) DeleteUserAvatar(ctx context.Context, userID string) error {
+	avatarFullPath := path.Join(service.avatarBasePath, userID+".svg")
+	if _, err := os.Stat(avatarFullPath); err != nil {
+		if !errors.Is(err, os.ErrNotExist) {
+			return err
+		}
+	}
+	if err := os.Remove(avatarFullPath); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (service *avatarService) DeleteContextUserAvatar(ctx context.Context) error {
+	contextUser, ok := middlewares.GetContextUser(ctx)
+	if !ok {
+		return fmt.Errorf("[AvatarService] user not found in context")
+	}
+	return service.DeleteUserAvatar(ctx, contextUser.ID)
 }

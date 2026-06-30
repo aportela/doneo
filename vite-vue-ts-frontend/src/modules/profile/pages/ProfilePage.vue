@@ -4,8 +4,8 @@
 
     import dayjs from 'dayjs'
 
-    import { NTabs, NTabPane, NCard, NAvatar, NFlex, NFormItem, NInputGroup, NInput, NButton, NButtonGroup, NPopover, NIcon, NGrid, NGridItem, NDivider, NUpload, type UploadCustomRequestOptions } from 'naive-ui';
-    import { IconFileUpload, IconTrash, IconSun, IconMoon, IconInfoCircle, IconLayoutSidebarLeftExpand, IconLayoutNavbarExpand, IconDeviceFloppy } from '@tabler/icons-vue';
+    import { NTabs, NTabPane, NCard, NAvatar, NFlex, NFormItem, NInputGroup, NInput, NButton, NButtonGroup, NPopover, NIcon, NGrid, NGridItem, NDivider } from 'naive-ui';
+    import { IconTrash, IconSun, IconMoon, IconInfoCircle, IconLayoutSidebarLeftExpand, IconLayoutNavbarExpand, IconDeviceFloppy } from '@tabler/icons-vue';
 
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
@@ -17,10 +17,11 @@
     import { useLoadingStore } from '../../../stores/loading';
     import { useColorSchemeStore } from '../../../stores/colorScheme';
     import { useUserSettingsStore } from '../../../stores/userSettings';
-    import { useSessionStore } from '../../../stores/session';
     import { Profile } from '../models/profile';
     import type { ProfileResponse, UpdateRequest } from '../types/dto';
     import { MIN_PASSWORD_LENGTH } from '../../users/models/user';
+
+    import GenerateAvatarModal from '../../../shared/components/modals/GenerateAvatarModal.vue';
 
     const { t } = useI18n();
     const { notify } = useNotify();
@@ -28,7 +29,6 @@
     const loadingStore = useLoadingStore();
     const colorSchemeStore = useColorSchemeStore();
     const userSettingsStore = useUserSettingsStore();
-    const sessionStore = useSessionStore();
 
     const profile = ref<Profile>(new Profile());
 
@@ -39,7 +39,11 @@
 
     const currentTab = ref<string>("myAccount");
 
-    const currentAvatarURL = computed(() => profile.value.id ? `/api/wc/avatars/user/${profile.value.id}/normal` : undefined);
+    const lastAvatar = ref<number>(new Date().getTime());
+
+    const currentAvatarURL = computed(() => profile.value.id ? `/api/wc/avatars/user/${profile.value.id}?t=${lastAvatar.value}` : undefined);
+
+    const showAvatarGeneratorModal = ref<boolean>(false);
 
     const currentDatetimeMask = ref<string | null>(userSettingsStore.currentDatetimeMask);
 
@@ -62,7 +66,6 @@
 
     const allowSubmit = computed<boolean>(() => !!profile.value.name && !!profile.value.email && matchedPasswords.value)
 
-    const lastAvatar = ref<number>(new Date().getTime());
 
     const onGet = async () => {
         Object.assign(state, defaultAjaxStateRunning);
@@ -159,50 +162,50 @@
         }
     };
 
-    const uploadFile = async ({
-        file,
-        headers,
-        onProgress,
-        onFinish,
-        onError
-    }: UploadCustomRequestOptions) => {
-        const formData = new FormData()
-        formData.append('file', file.file as Blob)
-
-        const xhr = new XMLHttpRequest()
-        xhr.open('POST', "/api/profile/avatar/")
-
-        const headerObj = typeof headers === 'function' ? headers({ file }) : headers
-        if (headerObj) {
-            for (const key in headerObj) {
-                xhr.setRequestHeader(key, headerObj[key])
+    const onSaveAvatar = async (svg: string) => {
+        showAvatarGeneratorModal.value = false;
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const payload = { svg: svg };
+            await profileService.saveAvatar(payload);
+            notify('success', t("New avatar saved"));
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "UserForm.onUpdate" } });
+                            break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
+                            break;
+                        case 404:
+                            state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.notFoundError");
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.updateError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.updateError");
+                    console.error("Unhandled API error", { file: "UserForm.vue", method: "onUpdate" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+            lastAvatar.value = new Date().getTime();
+            if (state.ajaxErrors) {
+                if (state.ajaxErrorMessage) {
+                    appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+                } else {
+                    await nextTick();
+                    //userFormRef.value?.validate().then(() => { }).catch(() => { });
+                }
             }
         }
-
-        xhr.setRequestHeader('Authorization', `Bearer ${sessionStore.accessToken}`)
-
-        xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) {
-                const percent = (event.loaded / event.total) * 100
-                onProgress({ percent })
-            }
-        }
-
-        xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                lastAvatar.value = new Date().getTime();
-                onFinish()
-            } else {
-                onError()
-            }
-        }
-
-        xhr.onerror = () => {
-            onError()
-        }
-
-        xhr.send(formData)
-    }
+    };
 
     const onDeleteAvatar = async () => {
         Object.assign(state, defaultAjaxStateRunning);
@@ -270,9 +273,12 @@
     onBeforeUnmount(() => {
         stopBusReauthListener();
     });
+
 </script>
 
 <template>
+    <GenerateAvatarModal v-model:show="showAvatarGeneratorModal" @confirm="(svg: string) => onSaveAvatar(svg)"
+        @cancel="showAvatarGeneratorModal = false;" />
     <n-tabs placement="left" type="line" animated v-model:value="currentTab">
         <n-tab-pane name="myAccount" tab="My account">
             <n-card bordered>
@@ -284,16 +290,7 @@
                     profile.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</p>
                 <n-flex style="align-items:center;">
                     <n-avatar :size="128" :src="currentAvatarURL" :key="lastAvatar" />
-                    <n-upload :max="1" accept="image/*" action="/api/profile/avatar/" :custom-request="uploadFile">
-                        <n-button>
-                            <template #icon>
-                                <n-icon>
-                                    <IconFileUpload />
-                                </n-icon>
-                            </template>
-                            Change avatar
-                        </n-button>
-                    </n-upload>
+                    <n-button @click="showAvatarGeneratorModal = true">Generate new random avatar</n-button>
                     <n-button tertiary type="error" @click="onDeleteAvatar">
                         <template #icon>
                             <n-icon>
@@ -303,18 +300,14 @@
                         Delete avatar
                     </n-button>
                 </n-flex>
-
                 <n-divider />
-
                 <n-form-item label="Name">
                     <n-input v-model:value="profile.name" />
                 </n-form-item>
                 <n-form-item label="Email">
                     <n-input v-model:value="profile.email" />
                 </n-form-item>
-
                 <p>Password</p>
-
                 <n-flex align="center">
                     <n-form-item label="New password">
                         <n-input type="password" :min="MIN_PASSWORD_LENGTH" v-model:value="newPassword"
@@ -327,7 +320,6 @@
                             placeholder="confirm new password" clearable />
                     </n-form-item>
                 </n-flex>
-
                 <n-button @click="onUpdate" :disabled="!allowSubmit">
                     <template #icon>
                         <n-icon :component="IconDeviceFloppy" />
@@ -336,7 +328,7 @@
                 </n-button>
             </n-card>
         </n-tab-pane>
-        <n-tab-pane name=" mySettings" tab="My settings">
+        <n-tab-pane name="mySettings" tab="My settings">
             <n-card bordered>
                 <h1>My settings</h1>
 
@@ -564,4 +556,10 @@
     </n-tabs>
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+
+    svg {
+        width: 100% !important;
+        height: 100% !important;
+    }
+</style>

@@ -36,7 +36,7 @@ func NewRouter(app *app.App) http.Handler {
 
 	cookieAuthApiRouter.Route("/", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTCookieAuthentication(app.Cfg.Auth.SecretKey))
-		r.Get("/avatars/user/{user_id:"+uuidPattern+"}/{avatar_size:(tiny|small|normal)}", app.AvatarHandler.GetAvatar)
+		r.Get("/avatars/user/{user_id:"+uuidPattern+"}", app.AvatarHandler.Get)
 		r.Get("/attachments/project/{project_id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}/{mode}", app.AttachmentHandler.DownloadProjectAttachment)
 		r.Get("/attachments/project/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/attachment/{attachment_id:"+uuidPattern+"}/{mode}", app.AttachmentHandler.DownloadTaskAttachment)
 	})
@@ -128,8 +128,8 @@ func NewRouter(app *app.App) http.Handler {
 		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
 		r.Get("/", app.ProfileHandler.Get)
 		r.Put("/", app.ProfileHandler.Update)
-		r.Post("/avatar/", app.AvatarHandler.UploadAvatar)
-		r.Delete("/avatar/", app.AvatarHandler.DeleteAvatar)
+		r.Put("/avatar/", app.AvatarHandler.Add)
+		r.Delete("/avatar/", app.AvatarHandler.Delete)
 	})
 
 	apiRouter.Route("/user-timers", func(r chi.Router) {
