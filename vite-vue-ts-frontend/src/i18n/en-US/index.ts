@@ -48,6 +48,26 @@ export default {
             },
           },
         },
+        GenerateAvatarModal: {
+          title: "Avatar generator",
+          selectors: {
+            themeSelector: {
+              label: "Avatar theme (empty for random)",
+              placeholder: "Select theme",
+            },
+          },
+          buttons: {
+            generate: {
+              label: "Generate new random avatar",
+            },
+            confirm: {
+              label: "Confirm",
+            },
+            cancel: {
+              label: "Cancel",
+            },
+          },
+        },
       },
       inputs: {
         ToggleInput: {
