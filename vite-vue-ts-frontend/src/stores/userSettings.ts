@@ -1,5 +1,6 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
 import { createStorageEntry } from "../shared/composables/localStorage";
+import { defaultDateTimeMask } from "../shared/composables/datetime";
 
 type navigationMode = "top" | "side";
 
@@ -11,7 +12,7 @@ const localStorageUserSettingsDisableNotifications =
 
 const localStorageUserSettingsDatetimeMask = createStorageEntry<string>(
   "userSettings.datetimeMask",
-  "YYYY-MM-DD HH:MM:ss",
+  defaultDateTimeMask,
 );
 
 interface State {

@@ -20,6 +20,7 @@
     import { Profile } from '../models/profile';
     import type { ProfileResponse, UpdateRequest } from '../types/dto';
     import { MIN_PASSWORD_LENGTH } from '../../users/models/user';
+    import { defaultDateTimeMask } from '../../../shared/composables/datetime.ts';
 
     import GenerateAvatarModal from '../../../shared/components/modals/GenerateAvatarModal.vue';
 
@@ -52,7 +53,7 @@
     });
 
     watch(() => currentDatetimeMask.value, (newValue) => {
-        userSettingsStore.setDatetimeMask(newValue || "YYYY-MM-DD HH:MM:SS")
+        userSettingsStore.setDatetimeMask(newValue || defaultDateTimeMask)
     });
 
     const matchedPasswords = computed<boolean>(() => newPassword.value === confirmedPassword.value);

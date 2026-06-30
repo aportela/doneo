@@ -9,3 +9,5 @@ export const geti18nTimeParts = (seconds: number) => {
     { key: "shared.labels.time.minute", count: minutes },
   ].filter(({ count }) => count > 0);
 };
+
+export const defaultDateTimeMask = "YYYY-MM-DD HH:MM:ss";
