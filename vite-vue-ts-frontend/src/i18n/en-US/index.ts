@@ -1700,12 +1700,12 @@ export default {
           inputs: {
             name: {
               errors: {
-                alreadyExists: "",
+                alreadyExists: "Name already exists",
               },
             },
             email: {
               errors: {
-                alreadyExists: "",
+                alreadyExists: "Email already exists",
               },
             },
           },

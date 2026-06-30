@@ -4,7 +4,7 @@
 
     import dayjs from 'dayjs'
 
-    import { NTabs, NTabPane, NCard, NAvatar, NFlex, NFormItem, NInputGroup, NInput, NButton, NButtonGroup, NPopover, NIcon, NGrid, NGridItem, NDivider } from 'naive-ui';
+    import { NForm, NAvatar, NFlex, NFormItem, NInput, NButton, NButtonGroup, NPopover, NIcon, NGrid, NGridItem, NDivider, NTag, type FormInst, type FormRules, type FormItemRule } from 'naive-ui';
     import { IconTrash, IconSun, IconMoon, IconInfoCircle, IconLayoutSidebarLeftExpand, IconLayoutNavbarExpand, IconDeviceFloppy, IconImageGeneration } from '@tabler/icons-vue';
 
     import { useNotify } from '../../../shared/composables/notification';
@@ -19,10 +19,11 @@
     import { useUserSettingsStore } from '../../../stores/userSettings';
     import { Profile } from '../models/profile';
     import type { ProfileResponse, UpdateRequest } from '../types/dto';
-    import { MIN_PASSWORD_LENGTH } from '../../users/models/user';
+    import { MAX_EMAIL_LENGTH, MAX_NAME_LENGTH, MIN_PASSWORD_LENGTH } from '../../users/models/user';
     import { defaultDateTimeMask } from '../../../shared/composables/datetime.ts';
 
     import GenerateAvatarModal from '../../../shared/components/modals/GenerateAvatarModal.vue';
+    import { isValidEmail } from '../../../shared/composables/form-validators.ts';
 
     const { t } = useI18n();
     const { notify } = useNotify();
@@ -35,11 +36,57 @@
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
+    const serverErrors = ref<Record<string, string>>({});
+
+    const profileFormRef = ref<FormInst | null>(null);
+
     const newPassword = ref<string | null>(null);
     const confirmedPassword = ref<string | null>(null);
 
-    const currentTab = ref<string>("myAccount");
 
+    const profileFormRules: FormRules =
+    {
+        name: {
+            required: true,
+            validator: (_rule: FormItemRule, value: string) => {
+                if (state.ajaxRunning) {
+                    return true;
+                }
+                if (!value?.trim()) {
+                    return new Error(t("shared.warningMessages.fieldIsRequired"));
+                }
+                else if (value.length > MAX_NAME_LENGTH) {
+                    return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
+                } else if (serverErrors.value.name) {
+                    return new Error(t(serverErrors.value.name));
+                } else {
+                    return true;
+                }
+            },
+            trigger: ['blur'],
+        },
+        email: {
+            required: true,
+            validator: (_rule: FormItemRule, value: string) => {
+                if (state.ajaxRunning) {
+                    return true;
+                }
+                if (!value?.trim()) {
+                    return new Error(t("shared.warningMessages.fieldIsRequired"));
+                }
+                else if (!isValidEmail(value)) {
+                    return new Error(t("shared.warningMessages.fieldHasInvalidFormat"));
+                }
+                else if (value.length > MAX_EMAIL_LENGTH) {
+                    return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
+                } else if (serverErrors.value.email) {
+                    return new Error(t(serverErrors.value.email));
+                } else {
+                    return true;
+                }
+            }, trigger: ['blur'],
+        },
+    };
     const lastAvatarTimestamp = ref<number>(new Date().getTime());
 
     const currentAvatarURL = computed(() => profile.value.id ? `/api/wc/avatars/user/${profile.value.id}?t=${lastAvatarTimestamp.value}` : undefined);
@@ -65,7 +112,7 @@
         set(_value) { }
     });
 
-    const allowSubmit = computed<boolean>(() => !!profile.value.name && !!profile.value.email && matchedPasswords.value)
+    const allowSubmit = computed<boolean>(() => !!profile.value.name && !!profile.value.email && matchedPasswords.value);
 
     const onGet = async () => {
         Object.assign(state, defaultAjaxStateRunning);
@@ -94,8 +141,7 @@
                     state.ajaxErrorMessage = t("modules.projectType.components.ProfilePage.errors.refreshError");
                     console.error("Unhandled API error", { file: "ProfilePage.vue", method: "onGet" }, { err: fatalError });
                 });
-        }
-        finally {
+        } finally {
             state.ajaxRunning = false;
             if (state.ajaxErrorMessage) {
                 appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
@@ -104,8 +150,8 @@
     };
 
     const onUpdate = async () => {
-        //serverErrors.value = {};
-        //userFormRef.value?.restoreValidation();
+        serverErrors.value = {};
+        profileFormRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const payload: UpdateRequest = {
@@ -133,9 +179,9 @@
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
-                                //serverErrors.value.name = "modules.user.components.UserForm.inputs.name.errors.alreadyExists";
+                                serverErrors.value.name = "modules.profile.components.ProfilePage.inputs.name.errors.alreadyExists";
                             } else if (apiError.details?.field === "email") {
-                                //serverErrors.value.email = "modules.user.components.UserForm.inputs.email.errors.alreadyExists";
+                                serverErrors.value.email = "modules.profile.components.ProfilePage.inputs.email.errors.alreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("modules.profile.components.ProfilePage.errors.updateError");
                             }
@@ -156,7 +202,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    //userFormRef.value?.validate().then(() => { }).catch(() => { });
+                    profileFormRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -283,67 +329,109 @@
 <template>
     <GenerateAvatarModal v-model:show="showAvatarGeneratorModal" @confirm="(svg: string) => onSaveAvatar(svg)"
         @cancel="showAvatarGeneratorModal = false;" />
-    <n-tabs placement="top" type="line" animated v-model:value="currentTab">
-        <n-tab-pane name="myAccount" tab="My account">
-            <n-card bordered>
-                <h1>My account</h1>
-                <h2>Profile details</h2>
-                <p>Account created on {{
-                    profile.createdAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</p>
-                <p v-if="profile.updatedAt?.hasValue()">Account last update on {{
-                    profile.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</p>
-                <n-flex style="align-items:center;">
-                    <n-avatar :size="128" :src="currentAvatarURL" :key="lastAvatarTimestamp" color="transparent" />
-                    <div>
-                        <n-button @click="showAvatarGeneratorModal = true" block style="margin-bottom: 8px;">
-                            <template #icon>
-                                <n-icon :component="IconImageGeneration" />
-                            </template>
-                            Change avatar
-                        </n-button>
-                        <n-button tertiary type="error" @click="onDeleteAvatar" block>
-                            <template #icon>
-                                <n-icon :component="IconTrash" />
-                            </template>
-                            Delete avatar
-                        </n-button>
-                    </div>
-                </n-flex>
-                <n-divider />
-                <n-form-item label="Name">
-                    <n-input v-model:value="profile.name" />
-                </n-form-item>
-                <n-form-item label="Email">
-                    <n-input v-model:value="profile.email" />
-                </n-form-item>
-                <p>Password</p>
-                <n-flex align="center">
-                    <n-form-item label="New password">
-                        <n-input type="password" :min="MIN_PASSWORD_LENGTH" v-model:value="newPassword"
-                            placeholder="type new password" clearable />
-                    </n-form-item>
-                    <n-form-item label="Confirm new password"
-                        :feedback="!matchedPasswords ? 'passwords do not match' : undefined"
-                        :validation-status="!matchedPasswords ? 'error' : undefined">
-                        <n-input type="password" :min="MIN_PASSWORD_LENGTH" v-model:value="confirmedPassword"
-                            placeholder="confirm new password" clearable />
-                    </n-form-item>
-                </n-flex>
-                <n-button @click="onUpdate" :disabled="!allowSubmit">
-                    <template #icon>
-                        <n-icon :component="IconDeviceFloppy" />
-                    </template>
-                    {{ t("shared.buttons.Save.label") }}
-                </n-button>
-            </n-card>
-        </n-tab-pane>
-        <n-tab-pane name="mySettings" tab="My settings">
-            <n-card bordered>
-                <h1>My settings</h1>
+    <h1>Profile</h1>
 
-                <h2>Locale</h2>
+    <n-flex align="center" justify="space-between">
+        <h2>My account</h2>
+        <div>
+            <n-tag type="success">Created on {{
+                profile.createdAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</n-tag>
+            <n-tag type="info" v-if="profile.updatedAt?.hasValue()">Last update on {{
+                profile.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</n-tag>
+        </div>
 
-                <h3 class="doneo-flex-center-align">Datetime format mask
+    </n-flex>
+    <n-flex style="align-items:center;">
+        <n-avatar :size="128" :src="currentAvatarURL" :key="lastAvatarTimestamp" color="transparent" />
+
+
+        <n-button @click="showAvatarGeneratorModal = true">
+            <template #icon>
+                <n-icon :component="IconImageGeneration" />
+            </template>
+            Change avatar
+        </n-button>
+        <n-button tertiary type="error" @click="onDeleteAvatar">
+            <template #icon>
+                <n-icon :component="IconTrash" />
+            </template>
+            Delete avatar
+        </n-button>
+    </n-flex>
+
+    <n-divider />
+
+    <n-form ref="profileFormRef" :model="profile" :rules="state.ajaxRunning ? {} : profileFormRules"
+        :disabled="state.ajaxRunning">
+        <n-flex align="center">
+            <n-form-item label="Name" path="name" show-feedback>
+                <n-input v-model:value="profile.name" />
+            </n-form-item>
+            <n-form-item label="Email" path="email" show-feedback>
+                <n-input v-model:value="profile.email" />
+            </n-form-item>
+            <n-form-item label="New password">
+                <n-input type="password" :min="MIN_PASSWORD_LENGTH" v-model:value="newPassword"
+                    placeholder="type new password" clearable />
+            </n-form-item>
+            <n-form-item label="Confirm new password"
+                :feedback="!matchedPasswords ? 'passwords do not match' : undefined"
+                :validation-status="!matchedPasswords ? 'error' : undefined">
+                <n-input type="password" :min="MIN_PASSWORD_LENGTH" v-model:value="confirmedPassword"
+                    placeholder="confirm new password" clearable />
+            </n-form-item>
+            <n-button @click="onUpdate" :disabled="!allowSubmit">
+                <template #icon>
+                    <n-icon :component="IconDeviceFloppy" />
+                </template>
+                {{ t("shared.buttons.Save.label") }}
+            </n-button>
+        </n-flex>
+
+        <n-divider />
+
+        <h2>Settings</h2>
+
+        <n-flex align="center">
+            <div>
+                <h3>Theme</h3>
+                <n-button-group>
+                    <n-button :disabled="colorSchemeStore.light" @click="colorSchemeStore.toggle">
+                        <template #icon>
+                            <n-icon :component="IconSun" />
+                        </template>
+                        light
+                    </n-button>
+                    <n-button :disabled="colorSchemeStore.dark" @click="colorSchemeStore.toggle">
+                        <template #icon>
+                            <n-icon :component="IconMoon" />
+                        </template>
+                        dark
+                    </n-button>
+                </n-button-group>
+            </div>
+            <div>
+                <h3>Layout</h3>
+                <n-button-group>
+                    <n-button :disabled="userSettingsStore.sideNavigationMode"
+                        @click="userSettingsStore.toggleNavigationMode">
+                        <template #icon>
+                            <n-icon :component="IconLayoutSidebarLeftExpand" />
+                        </template>
+                        side
+                    </n-button>
+                    <n-button :disabled="userSettingsStore.topNavigationMode"
+                        @click="userSettingsStore.toggleNavigationMode">
+                        <template #icon>
+                            <n-icon :component="IconLayoutNavbarExpand" />
+                        </template>
+                        top
+                    </n-button>
+                </n-button-group>
+            </div>
+
+            <div>
+                <h3 class="doneo-flex-center-align">Locale
                     <n-popover>
                         <template #trigger>
                             <n-icon style="margin-left: 8px; margin-top: 2px;" class="doneo-cursor-help" :size="20"
@@ -507,59 +595,17 @@
                         </n-grid>
                     </n-popover>
                 </h3>
-                <n-input-group>
+                <n-button-group>
+                    <n-tag size="large">Datetime format mask</n-tag>
                     <n-input placeholder="Type datetime format current mask" v-model:value="currentDatetimeMask" />
-                    <n-button disabled>Mask preview (current datetime)</n-button>
+                    <n-tag size="large">Preview</n-tag>
                     <n-input placeholder="mask preview (current datetime)" v-model:value="currentDatetimeMaskPreview"
                         readonly />
-                </n-input-group>
-
-                <h2>Theme</h2>
-
-                <n-button-group>
-                    <n-button :disabled="colorSchemeStore.light" @click="colorSchemeStore.toggle">
-                        <template #icon>
-                            <n-icon>
-                                <IconSun />
-                            </n-icon>
-                        </template>
-                        light
-                    </n-button>
-                    <n-button :disabled="colorSchemeStore.dark" @click="colorSchemeStore.toggle">
-                        <template #icon>
-                            <n-icon>
-                                <IconMoon />
-                            </n-icon>
-                        </template>
-                        dark
-                    </n-button>
                 </n-button-group>
+            </div>
+        </n-flex>
+    </n-form>
 
-                <h2>Layout</h2>
-
-                <n-button-group>
-                    <n-button :disabled="userSettingsStore.sideNavigationMode"
-                        @click="userSettingsStore.toggleNavigationMode">
-                        <template #icon>
-                            <n-icon>
-                                <IconLayoutSidebarLeftExpand />
-                            </n-icon>
-                        </template>
-                        side
-                    </n-button>
-                    <n-button :disabled="userSettingsStore.topNavigationMode"
-                        @click="userSettingsStore.toggleNavigationMode">
-                        <template #icon>
-                            <n-icon>
-                                <IconLayoutNavbarExpand />
-                            </n-icon>
-                        </template>
-                        top
-                    </n-button>
-                </n-button-group>
-            </n-card>
-        </n-tab-pane>
-    </n-tabs>
 </template>
 
 <style lang="css" scoped></style>
