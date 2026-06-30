@@ -31,7 +31,7 @@
 
 <template>
     <div class="doneo-flex-center-align" style="gap: 8px;">
-        <n-avatar v-if="props.userId" :src="avatarURL" class="doneo-avatar-username" :size="size" />
+        <n-avatar v-if="props.userId" :src="avatarURL" class="doneo-avatar-username" :size="size" color="transparent" />
         {{ props.userName }}
     </div>
 </template>

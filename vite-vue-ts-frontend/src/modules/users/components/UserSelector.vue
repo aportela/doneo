@@ -105,7 +105,7 @@
 <template>
     <n-input-group>
         <div v-if="!props.hideAvatar">
-            <n-avatar v-if="avatarURL" :src="avatarURL" />
+            <n-avatar v-if="avatarURL" :src="avatarURL" color="transparent" />
             <n-button secondary :disabled="true" class="doneo-cursor-default doneo-disable-opacity" v-else>
                 <template #icon>
                     <n-icon :component="IconUserCircle">
