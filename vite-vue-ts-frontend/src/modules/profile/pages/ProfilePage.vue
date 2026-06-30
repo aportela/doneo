@@ -5,7 +5,7 @@
     import dayjs from 'dayjs'
 
     import { NTabs, NTabPane, NCard, NAvatar, NFlex, NFormItem, NInputGroup, NInput, NButton, NButtonGroup, NPopover, NIcon, NGrid, NGridItem, NDivider } from 'naive-ui';
-    import { IconTrash, IconSun, IconMoon, IconInfoCircle, IconLayoutSidebarLeftExpand, IconLayoutNavbarExpand, IconDeviceFloppy } from '@tabler/icons-vue';
+    import { IconTrash, IconSun, IconMoon, IconInfoCircle, IconLayoutSidebarLeftExpand, IconLayoutNavbarExpand, IconDeviceFloppy, IconImageGeneration } from '@tabler/icons-vue';
 
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
@@ -289,13 +289,16 @@
                 <p v-if="profile.updatedAt?.hasValue()">Account last update on {{
                     profile.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</p>
                 <n-flex style="align-items:center;">
-                    <n-avatar :size="128" :src="currentAvatarURL" :key="lastAvatar" />
-                    <n-button @click="showAvatarGeneratorModal = true">Generate new random avatar</n-button>
+                    <n-avatar :size="128" :src="currentAvatarURL" :key="lastAvatar" color="transparent" />
+                    <n-button @click="showAvatarGeneratorModal = true">
+                        <template #icon>
+                            <n-icon :component="IconImageGeneration" />
+                        </template>
+                        Change avatar
+                    </n-button>
                     <n-button tertiary type="error" @click="onDeleteAvatar">
                         <template #icon>
-                            <n-icon>
-                                <IconTrash />
-                            </n-icon>
+                            <n-icon :component="IconTrash" />
                         </template>
                         Delete avatar
                     </n-button>

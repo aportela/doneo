@@ -1,11 +1,11 @@
 <script setup lang="ts">
-    import { ref, onMounted } from 'vue';
+    import { ref, onMounted, watch } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NModal, NButton, NSelect, NFlex, NFormItem, NIcon } from 'naive-ui';
     import { IconCancel, IconDeviceFloppy, IconImageGeneration } from '@tabler/icons-vue';
 
-    import { generateAvatar, generateParams, getThemeNames } from 'avatarka';
+    import { generateAvatar, generateParams, getThemeNames, type ThemeName } from 'avatarka';
 
     const { t } = useI18n();
 
@@ -14,28 +14,34 @@
     const show = defineModel<boolean>("show");
 
     const bodyStyle = {
-        width: '600px'
-    }
+        width: '512px'
+    };
+
     const segmented = {
         content: 'soft',
         footer: 'soft'
-    } as const
+    } as const;
 
     const svg = ref<string>("");
 
-    const themes = getThemeNames();
-    const options = themes.map((t) => { return { label: t, value: t } })
+    const themes: ThemeName[] = getThemeNames();
+    const themeOptions = themes.map((item: ThemeName) => { return { label: item, value: item } })
+    const selectedTheme = ref<ThemeName>(themes[Math.floor(Math.random() * themes.length)]);
 
-    const selectedTheme = ref(null);
+    type BackgroundShape = "square" | "circle" | "rounded";
 
-    const generateRandomAvatar = async () => {
-        const theme = selectedTheme.value ? selectedTheme.value : themes[Math.floor(Math.random() * themes.length)];
-        const params = {
-            ...generateParams(theme),
-            backgroundShape: "square" as const,
+    const backgroundShapes: BackgroundShape[] = ["square", "circle", "rounded"];
+    const shapeOptions = backgroundShapes.map((item) => { return { label: item, value: item } })
+    const selectedShape = ref<BackgroundShape>(backgroundShapes[Math.floor(Math.random() * backgroundShapes.length)]);
 
+    const themeParams = ref();
+
+    const generateRandomAvatar = () => {
+        themeParams.value = {
+            ...generateParams(selectedTheme.value),
+            backgroundShape: selectedShape.value
         }
-        svg.value = generateAvatar(theme, params);
+        svg.value = generateAvatar(selectedTheme.value, themeParams.value);
     }
 
     const onConfirm = () => {
@@ -45,28 +51,31 @@
         emit("cancel")
     };
 
+    watch(() => [selectedTheme.value, selectedShape.value], () => {
+        generateRandomAvatar();
+    })
     onMounted(() => {
         generateRandomAvatar();
     });
-
 </script>
 
 <template>
     <n-modal v-model:show="show" :title="t('shared.components.dialogs.GenerateAvatarModal.title')" :closable="true"
-        preset="card" size="medium" :bordered="true" :segmented="segmented" :style="bodyStyle">
-        <n-flex justify="space-between">
+        preset="card" size="small" :bordered="true" :segmented="segmented" :style="bodyStyle">
+        <n-flex justify="space-between" align="center">
             <div class="avatar" v-html="svg" />
             <div>
                 <n-form-item :label="t('shared.components.dialogs.GenerateAvatarModal.selectors.themeSelector.label')">
-                    <n-select :options="options" v-model:value="selectedTheme"
-                        :placeholder="t('shared.components.dialogs.GenerateAvatarModal.selectors.themeSelector.placeholder')"
-                        clearable />
+                    <n-select :options="themeOptions" v-model:value="selectedTheme"
+                        :placeholder="t('shared.components.dialogs.GenerateAvatarModal.selectors.themeSelector.placeholder')" />
                 </n-form-item>
-                <n-button @click="generateRandomAvatar">
+                <n-form-item :label="t('shared.components.dialogs.GenerateAvatarModal.selectors.shapeSelector.label')">
+                    <n-select :options="shapeOptions" v-model:value="selectedShape"
+                        :placeholder="t('shared.components.dialogs.GenerateAvatarModal.selectors.shapeSelector.placeholder')" />
+                </n-form-item>
+                <n-button @click="generateRandomAvatar" block>
                     <template #icon>
-                        <n-icon>
-                            <IconImageGeneration />
-                        </n-icon>
+                        <n-icon :component="IconImageGeneration" />
                     </template>
                     {{ t("shared.components.dialogs.GenerateAvatarModal.buttons.generate.label") }}
                 </n-button>
@@ -76,17 +85,13 @@
             <n-flex justify="end">
                 <n-button @click="onConfirm">
                     <template #icon>
-                        <n-icon>
-                            <IconDeviceFloppy />
-                        </n-icon>
+                        <n-icon :component="IconDeviceFloppy" />
                     </template>
                     {{ t("shared.components.dialogs.GenerateAvatarModal.buttons.confirm.label") }}
                 </n-button>
                 <n-button @click="onCancel">
                     <template #icon>
-                        <n-icon>
-                            <IconCancel />
-                        </n-icon>
+                        <n-icon :component="IconCancel" />
                     </template>
                     {{ t("shared.components.dialogs.GenerateAvatarModal.buttons.cancel.label") }}
                 </n-button>
@@ -97,8 +102,8 @@
 
 <style lang="css" scoped>
     .avatar {
-        width: 256px;
-        height: 256px;
+        width: 192px;
+        height: 192px;
     }
 
     .avatar :deep(svg) {

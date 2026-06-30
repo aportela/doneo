@@ -52,13 +52,17 @@ export default {
           title: "Avatar generator",
           selectors: {
             themeSelector: {
-              label: "Avatar theme (empty for random)",
+              label: "Theme",
               placeholder: "Select theme",
+            },
+            shapeSelector: {
+              label: "Shape",
+              placeholder: "Select shape",
             },
           },
           buttons: {
             generate: {
-              label: "Generate new random avatar",
+              label: "Generate new avatar",
             },
             confirm: {
               label: "Confirm",
