@@ -103,6 +103,14 @@
         userSettingsStore.setDatetimeMask(newValue || defaultDateTimeMask)
     });
 
+    const validNewPassword = computed<boolean>(() => {
+        if (newPassword.value) {
+            return newPassword.value.length >= MIN_PASSWORD_LENGTH;
+        } else {
+            return true;
+        }
+    });
+
     const matchedPasswords = computed<boolean>(() => newPassword.value === confirmedPassword.value);
 
     const currentDatetimeMaskPreview = computed<string | null>({
@@ -112,7 +120,7 @@
         set(_value) { }
     });
 
-    const allowSubmit = computed<boolean>(() => !!profile.value.name && !!profile.value.email && matchedPasswords.value);
+    const allowSubmit = computed<boolean>(() => !!profile.value.name && !!profile.value.email && matchedPasswords.value && validNewPassword.value);
 
     const onGet = async () => {
         Object.assign(state, defaultAjaxStateRunning);
@@ -370,7 +378,8 @@
             <n-form-item label="Email" path="email" show-feedback>
                 <n-input v-model:value="profile.email" />
             </n-form-item>
-            <n-form-item label="New password">
+            <n-form-item label="New password" :feedback="!validNewPassword ? 'min password length 4 chars' : undefined"
+                :validation-status="!validNewPassword ? 'error' : undefined">
                 <n-input type="password" :min="MIN_PASSWORD_LENGTH" v-model:value="newPassword"
                     placeholder="type new password" clearable />
             </n-form-item>
