@@ -4,12 +4,14 @@
 
     import { NFlex, NFormItem, NInputNumber } from 'naive-ui';
 
-    interface EstimatedTimeInputProps {
+    import { DAY_SECONDS, HOUR_SECONDS, MINUTE_SECONDS, getSecondsDatetimeParts } from "../../types/datetime";
+
+    interface IProps {
         disabled?: boolean;
         readOnly?: boolean;
     };
 
-    const props = withDefaults(defineProps<EstimatedTimeInputProps>(), {
+    const props = withDefaults(defineProps<IProps>(), {
         disabled: false,
         readOnly: false,
     });
@@ -18,43 +20,31 @@
 
     const seconds = defineModel<number>("seconds", { default: 0 });
 
-    const DAY = 86400;
-    const HOUR = 3600;
-    const MINUTE = 60;
+    const parts = computed(() => getSecondsDatetimeParts(seconds.value || 0));
 
-    const parts = computed(() => {
-        const total = seconds.value || 0;
-
-        return {
-            days: Math.floor(total / DAY),
-            hours: Math.floor((total % DAY) / HOUR),
-            minutes: Math.floor((total % HOUR) / MINUTE),
-        };
-    });
-
-    function updatePart(part: "days" | "hours" | "minutes", value: number | null) {
+    const updatePart = (part: "days" | "hours" | "minutes", value: number | null) => {
         const v = value ?? 0;
 
         const total = seconds.value || 0;
 
-        const days = Math.floor(total / DAY);
-        const hours = Math.floor((total % DAY) / HOUR);
-        const minutes = Math.floor((total % HOUR) / MINUTE);
+        const days = Math.floor(total / DAY_SECONDS);
+        const hours = Math.floor((total % DAY_SECONDS) / HOUR_SECONDS);
+        const minutes = Math.floor((total % HOUR_SECONDS) / MINUTE_SECONDS);
 
         switch (part) {
             case "days":
-                seconds.value = v * DAY + hours * HOUR + minutes * MINUTE;
+                seconds.value = v * DAY_SECONDS + hours * HOUR_SECONDS + minutes * MINUTE_SECONDS;
                 break;
 
             case "hours":
-                seconds.value = days * DAY + v * HOUR + minutes * MINUTE;
+                seconds.value = days * DAY_SECONDS + v * HOUR_SECONDS + minutes * MINUTE_SECONDS;
                 break;
 
             case "minutes":
-                seconds.value = days * DAY + hours * HOUR + v * MINUTE;
+                seconds.value = days * DAY_SECONDS + hours * HOUR_SECONDS + v * MINUTE_SECONDS;
                 break;
         }
-    }
+    };
 </script>
 
 <template>

@@ -88,15 +88,15 @@ export default {
           inputs: {
             estimatedDays: {
               label: "Estimated days",
-              placeholder: "Enter estimated time (in days)",
+              placeholder: "type estimated days",
             },
             estimatedHours: {
               label: "Estimated hours",
-              placeholder: "Enter estimated time (in hours)",
+              placeholder: "type estimated hours",
             },
             estimatedMinutes: {
               label: "Estimated minutes",
-              placeholder: "Enter estimated time (in minutes)",
+              placeholder: "type estimated minutes",
             },
           },
         },
