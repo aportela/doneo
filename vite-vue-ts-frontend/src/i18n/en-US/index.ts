@@ -305,7 +305,7 @@ export default {
         },
       },
       formBlocks: {
-        EstimatedTimeInput: {
+        TimeFieldsInput: {
           inputs: {
             estimatedDays: {
               label: "Estimated days",
@@ -318,6 +318,18 @@ export default {
             estimatedMinutes: {
               label: "Estimated minutes",
               placeholder: "type estimated minutes",
+            },
+            spentDays: {
+              label: "Spent days",
+              placeholder: "type spent days",
+            },
+            spentHours: {
+              label: "Spent hours",
+              placeholder: "type spent hours",
+            },
+            spentMinutes: {
+              label: "Spent minutes",
+              placeholder: "type spent minutes",
             },
           },
         },

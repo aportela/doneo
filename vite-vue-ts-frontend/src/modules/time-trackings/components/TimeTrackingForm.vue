@@ -12,7 +12,7 @@
     import type { TimeTrackingResponse, AddRequest, } from '../types/dto';
     import type { FormMode } from '../../../shared/types/form-mode';
     import { appBus } from '../../../shared/composables/bus';
-    import TimeSpentInput from '../../../shared/components/forms/TimeSpentInput.vue';
+    import TimeFieldsInput from '../../../shared/components/form-blocks/TimeFieldsInput.vue';
 
     interface TimeTrackingFormProps {
         mode: FormMode;
@@ -160,7 +160,7 @@
                     :placeholder="t('modules.timeTracking.components.TimeTrackingForm.inputs.summary.placeholder')"
                     v-model:value="timeTracking.summary" />
             </n-form-item>
-            <TimeSpentInput v-model:seconds="timeTracking.spentTime" />
+            <TimeFieldsInput input-type="spent" v-model:seconds="timeTracking.spentTime" />
         </n-form>
         <template #action>
             <n-flex>

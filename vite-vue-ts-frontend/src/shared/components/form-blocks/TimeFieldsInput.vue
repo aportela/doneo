@@ -9,6 +9,7 @@
     interface IProps {
         disabled?: boolean;
         readOnly?: boolean;
+        inputType: "estimated" | "spent"
     };
 
     const props = withDefaults(defineProps<IProps>(), {
@@ -49,23 +50,26 @@
 
 <template>
     <n-flex justify="space-between">
-        <n-form-item :label="t('shared.components.formBlocks.EstimatedTimeInput.inputs.estimatedDays.label')">
+        <n-form-item
+            :label="t(props.inputType === 'estimated' ? 'shared.components.formBlocks.TimeFieldsInput.inputs.estimatedDays.label' : 'shared.components.formBlocks.TimeFieldsInput.inputs.spentDays.label')">
             <n-input-number :min="0"
-                :placeholder="t('shared.components.formBlocks.EstimatedTimeInput.inputs.estimatedDays.placeholder')"
+                :placeholder="t(props.inputType === 'estimated' ? 'shared.components.formBlocks.TimeFieldsInput.inputs.estimatedDays.placeholder' : 'shared.components.formBlocks.TimeFieldsInput.inputs.spentDays.placeholder')"
                 :value="parts.days" @update:value="val => updatePart('days', val)" clearable :disabled="props.disabled"
                 :readonly="props.readOnly">
             </n-input-number>
         </n-form-item>
-        <n-form-item :label="t('shared.components.formBlocks.EstimatedTimeInput.inputs.estimatedHours.label')">
+        <n-form-item
+            :label="t(props.inputType === 'estimated' ? 'shared.components.formBlocks.TimeFieldsInput.inputs.estimatedHours.label' : 'shared.components.formBlocks.TimeFieldsInput.inputs.spentHours.label')">
             <n-input-number :min="0"
-                :placeholder="t('shared.components.formBlocks.EstimatedTimeInput.inputs.estimatedHours.placeholder')"
+                :placeholder="t(props.inputType === 'estimated' ? 'shared.components.formBlocks.TimeFieldsInput.inputs.estimatedHours.placeholder' : 'shared.components.formBlocks.TimeFieldsInput.inputs.spentHours.placeholder')"
                 :value="parts.hours" @update:value="val => updatePart('hours', val)" clearable
                 :disabled="props.disabled" :readonly="props.readOnly">
             </n-input-number>
         </n-form-item>
-        <n-form-item :label="t('shared.components.formBlocks.EstimatedTimeInput.inputs.estimatedMinutes.label')">
+        <n-form-item
+            :label="t(props.inputType === 'estimated' ? 'shared.components.formBlocks.TimeFieldsInput.inputs.estimatedMinutes.label' : 'shared.components.formBlocks.TimeFieldsInput.inputs.spentMinutes.label')">
             <n-input-number :min="0"
-                :placeholder="t('shared.components.formBlocks.EstimatedTimeInput.inputs.estimatedMinutes.placeholder')"
+                :placeholder="t(props.inputType === 'estimated' ? 'shared.components.formBlocks.TimeFieldsInput.inputs.estimatedMinutes.placeholder' : 'shared.components.formBlocks.TimeFieldsInput.inputs.spentMinutes.placeholder')"
                 :value="parts.minutes" @update:value="val => updatePart('minutes', val)" clearable
                 :disabled="props.disabled" :readonly="props.readOnly">
             </n-input-number>

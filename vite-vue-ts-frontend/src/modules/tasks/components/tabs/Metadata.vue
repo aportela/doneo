@@ -21,7 +21,7 @@
     import ToggleDateTimePicker from '../../../../shared/components/ToggleDateTimePicker.vue';
     import { IDate } from '../../../../shared/types/idate.ts';
     import ToggleTagSelector from '../../../../shared/components/ToggleTagSelector.vue';
-    import EstimatedTimeInput from '../../../../shared/components/form-blocks/EstimatedTimeInput.vue';
+    import TimeFieldsInput from '../../../../shared/components/form-blocks/TimeFieldsInput.vue';
     import TaskSpentEstimatedPercent from '../../../../shared/components/progress/TaskSpentEstimatedPercent.vue';
 
     interface TaskMetadataTabProps {
@@ -301,8 +301,9 @@
                         :height="24" />
                 </n-grid-item>
                 <n-grid-item>
-                    <EstimatedTimeInput v-model:seconds="task.estimatedTime"
-                        :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly" />
+                    <TimeFieldsInput v-model:seconds="task.estimatedTime"
+                        :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly"
+                        input-type="estimated" />
                 </n-grid-item>
             </n-grid>
         </n-form>
