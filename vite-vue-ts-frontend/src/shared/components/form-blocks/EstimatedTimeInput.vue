@@ -49,23 +49,23 @@
 
 <template>
     <n-flex justify="space-between">
-        <n-form-item :label="t('shared.components.inputs.EstimatedTimeInput.inputs.estimatedDays.label')">
+        <n-form-item :label="t('shared.components.formBlocks.EstimatedTimeInput.inputs.estimatedDays.label')">
             <n-input-number :min="0"
-                :placeholder="t('shared.components.inputs.EstimatedTimeInput.inputs.estimatedDays.placeholder')"
+                :placeholder="t('shared.components.formBlocks.EstimatedTimeInput.inputs.estimatedDays.placeholder')"
                 :value="parts.days" @update:value="val => updatePart('days', val)" clearable :disabled="props.disabled"
                 :readonly="props.readOnly">
             </n-input-number>
         </n-form-item>
-        <n-form-item :label="t('shared.components.inputs.EstimatedTimeInput.inputs.estimatedHours.label')">
+        <n-form-item :label="t('shared.components.formBlocks.EstimatedTimeInput.inputs.estimatedHours.label')">
             <n-input-number :min="0"
-                :placeholder="t('shared.components.inputs.EstimatedTimeInput.inputs.estimatedHours.placeholder')"
+                :placeholder="t('shared.components.formBlocks.EstimatedTimeInput.inputs.estimatedHours.placeholder')"
                 :value="parts.hours" @update:value="val => updatePart('hours', val)" clearable
                 :disabled="props.disabled" :readonly="props.readOnly">
             </n-input-number>
         </n-form-item>
-        <n-form-item :label="t('shared.components.inputs.EstimatedTimeInput.inputs.estimatedMinutes.label')">
+        <n-form-item :label="t('shared.components.formBlocks.EstimatedTimeInput.inputs.estimatedMinutes.label')">
             <n-input-number :min="0"
-                :placeholder="t('shared.components.inputs.EstimatedTimeInput.inputs.estimatedMinutes.placeholder')"
+                :placeholder="t('shared.components.formBlocks.EstimatedTimeInput.inputs.estimatedMinutes.placeholder')"
                 :value="parts.minutes" @update:value="val => updatePart('minutes', val)" clearable
                 :disabled="props.disabled" :readonly="props.readOnly">
             </n-input-number>

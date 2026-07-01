@@ -84,22 +84,7 @@ export default {
             },
           },
         },
-        EstimatedTimeInput: {
-          inputs: {
-            estimatedDays: {
-              label: "Estimated days",
-              placeholder: "type estimated days",
-            },
-            estimatedHours: {
-              label: "Estimated hours",
-              placeholder: "type estimated hours",
-            },
-            estimatedMinutes: {
-              label: "Estimated minutes",
-              placeholder: "type estimated minutes",
-            },
-          },
-        },
+
         TimeSpentInput: {
           inputs: {
             daysSpent: {
@@ -316,6 +301,24 @@ export default {
             startError: "There was a problem while starting the user timer",
             stopError: "There was a problem while stopping the user timer",
             deleteError: "There was a problem while deleting the user timer",
+          },
+        },
+      },
+      formBlocks: {
+        EstimatedTimeInput: {
+          inputs: {
+            estimatedDays: {
+              label: "Estimated days",
+              placeholder: "type estimated days",
+            },
+            estimatedHours: {
+              label: "Estimated hours",
+              placeholder: "type estimated hours",
+            },
+            estimatedMinutes: {
+              label: "Estimated minutes",
+              placeholder: "type estimated minutes",
+            },
           },
         },
       },

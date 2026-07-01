@@ -21,7 +21,7 @@
     import ToggleDateTimePicker from '../../../../shared/components/ToggleDateTimePicker.vue';
     import { IDate } from '../../../../shared/types/idate.ts';
     import ToggleTagSelector from '../../../../shared/components/ToggleTagSelector.vue';
-    import EstimatedTimeInput from '../../../../shared/components/forms/EstimatedTimeInput.vue';
+    import EstimatedTimeInput from '../../../../shared/components/form-blocks/EstimatedTimeInput.vue';
     import TaskSpentEstimatedPercent from '../../../../shared/components/progress/TaskSpentEstimatedPercent.vue';
 
     interface TaskMetadataTabProps {
