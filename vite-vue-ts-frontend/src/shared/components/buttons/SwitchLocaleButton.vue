@@ -12,10 +12,12 @@
 
     interface IProps {
         iconSize?: number,
+        disabled?: boolean,
     };
 
     const props = withDefaults(defineProps<IProps>(), {
-        iconSize: BUTTON_DEFAULT_ICON_SIZE
+        iconSize: BUTTON_DEFAULT_ICON_SIZE,
+        disabled: false,
     });
 
     const { locale } = useI18n();
@@ -34,7 +36,7 @@
 <template>
     <n-dropdown trigger="click" @select="onChangeLocale" :options="availableLocaleSelectorOptionItems"
         v-model="selected">
-        <n-button quaternary>
+        <n-button quaternary :disabled="props.disabled">
             <n-icon :size="props.iconSize" :component="IconWorld" />
             <span class="selected_locale">{{ selectedLocale }}</span>
             <n-icon :size="props.iconSize" :component="IconSelector" />

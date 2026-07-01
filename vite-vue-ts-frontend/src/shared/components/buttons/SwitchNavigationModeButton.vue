@@ -10,10 +10,12 @@
 
     interface IProps {
         iconSize?: number,
+        disabled?: boolean,
     };
 
     const props = withDefaults(defineProps<IProps>(), {
-        iconSize: BUTTON_DEFAULT_ICON_SIZE
+        iconSize: BUTTON_DEFAULT_ICON_SIZE,
+        disabled: false,
     });
 
     const { t } = useI18n();
@@ -23,7 +25,8 @@
 <template>
     <n-tooltip trigger="hover">
         <template #trigger>
-            <n-button quaternary @click="userSettingsStore.toggleNavigationMode" @mousedown.prevent>
+            <n-button quaternary @click="userSettingsStore.toggleNavigationMode" @mousedown.prevent
+                :disabled="props.disabled">
                 <n-icon :size="props.iconSize"
                     :component="userSettingsStore.sideNavigationMode ? IconLayoutNavbarExpand : IconLayoutSidebarLeftExpand" />
             </n-button>
