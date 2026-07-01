@@ -6,12 +6,14 @@
 
     import { useUserSettingsStore } from "../../../stores/userSettings";
 
-    interface SwitchNotificationsButtonProps {
+    import { BUTTON_DEFAULT_ICON_SIZE } from '../../../constants';
+
+    interface IProps {
         iconSize?: number,
     };
 
-    withDefaults(defineProps<SwitchNotificationsButtonProps>(), {
-        iconSize: 20
+    const props = withDefaults(defineProps<IProps>(), {
+        iconSize: BUTTON_DEFAULT_ICON_SIZE
     });
 
     const { t } = useI18n();
@@ -23,7 +25,8 @@
     <n-tooltip trigger="hover">
         <template #trigger>
             <n-button quaternary @click.prevent="userSettingsStore.toggleNotifications" @mousedown.prevent>
-                <n-icon :size="iconSize" :component="userSettingsStore.disableNotifications ? IconBellOff : IconBell" />
+                <n-icon :size="props.iconSize"
+                    :component="userSettingsStore.disableNotifications ? IconBellOff : IconBell" />
             </n-button>
         </template>
         {{

@@ -8,16 +8,17 @@
     import { availableLocaleSelectorOptionItems, getlocaleSelectorOptionItem } from '../../../i18n';
     import { useI18nStore } from '../../../stores/i18n';
 
-    interface SwitchLocaleButtonProps {
+    import { BUTTON_DEFAULT_ICON_SIZE } from '../../../constants';
+
+    interface IProps {
         iconSize?: number,
     };
 
-    withDefaults(defineProps<SwitchLocaleButtonProps>(), {
-        iconSize: 20
+    const props = withDefaults(defineProps<IProps>(), {
+        iconSize: BUTTON_DEFAULT_ICON_SIZE
     });
 
     const { locale } = useI18n();
-
     const i18NStore = useI18nStore();
 
     const selected = ref(availableLocaleSelectorOptionItems[0]);
@@ -34,9 +35,9 @@
     <n-dropdown trigger="click" @select="onChangeLocale" :options="availableLocaleSelectorOptionItems"
         v-model="selected">
         <n-button quaternary>
-            <n-icon :size="iconSize" :component="IconWorld" />
+            <n-icon :size="props.iconSize" :component="IconWorld" />
             <span class="selected_locale">{{ selectedLocale }}</span>
-            <n-icon :size="iconSize" :component="IconSelector" />
+            <n-icon :size="props.iconSize" :component="IconSelector" />
         </n-button>
     </n-dropdown>
 </template>

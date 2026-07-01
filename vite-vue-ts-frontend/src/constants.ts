@@ -6,3 +6,5 @@ export const SERVER_API_BASE_PATH = "/api";
 export const SERVER_API_DEFAULT_TIMEOUT = 10000; // max timeout: 10 seconds
 
 export const DEFAULT_LOCALE = "en-US";
+
+export const BUTTON_DEFAULT_ICON_SIZE = 20;

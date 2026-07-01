@@ -6,17 +6,17 @@
 
     import { useUserSettingsStore } from "../../../stores/userSettings";
 
+    import { BUTTON_DEFAULT_ICON_SIZE } from '../../../constants';
 
-    interface SwitchFluidLayoutButtonProps {
+    interface IProps {
         iconSize?: number,
     };
 
-    withDefaults(defineProps<SwitchFluidLayoutButtonProps>(), {
-        iconSize: 20
+    const props = withDefaults(defineProps<IProps>(), {
+        iconSize: BUTTON_DEFAULT_ICON_SIZE
     });
 
     const { t } = useI18n();
-
     const userSettingsStore = useUserSettingsStore();
 </script>
 
@@ -24,7 +24,7 @@
     <n-tooltip trigger="hover">
         <template #trigger>
             <n-button quaternary @click="userSettingsStore.toggleNavigationMode" @mousedown.prevent>
-                <n-icon :size="iconSize"
+                <n-icon :size="props.iconSize"
                     :component="userSettingsStore.sideNavigationMode ? IconLayoutNavbarExpand : IconLayoutSidebarLeftExpand" />
             </n-button>
         </template>

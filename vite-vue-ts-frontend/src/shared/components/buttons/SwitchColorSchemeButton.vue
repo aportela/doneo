@@ -6,25 +6,26 @@
 
     import { useColorSchemeStore } from "../../../stores/colorScheme";
 
-    interface SwitchColorSchemeButtonProps {
+    import { BUTTON_DEFAULT_ICON_SIZE } from '../../../constants';
+
+    interface IProps {
         iconSize?: number,
     };
 
-    withDefaults(defineProps<SwitchColorSchemeButtonProps>(), {
-        iconSize: 20
+    const props = withDefaults(defineProps<IProps>(), {
+        iconSize: BUTTON_DEFAULT_ICON_SIZE
     });
 
     const { t } = useI18n();
 
     const colorSchemeStore = useColorSchemeStore();
-
 </script>
 
 <template>
     <n-tooltip trigger="hover">
         <template #trigger>
             <n-button quaternary @click.prevent="colorSchemeStore.toggle" @mousedown.prevent>
-                <n-icon :size="iconSize" :component="colorSchemeStore.light ? IconMoon : IconSun" />
+                <n-icon :size="props.iconSize" :component="colorSchemeStore.light ? IconMoon : IconSun" />
             </n-button>
         </template>
         {{
