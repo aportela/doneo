@@ -41,6 +41,8 @@ export default {
         confirmation: {
           continueMessage: "Do you want to continue ?",
         },
+      },
+      modals: {
         RemoteAPIAlertModal: {
           buttons: {
             backToHome: {
@@ -48,8 +50,6 @@ export default {
             },
           },
         },
-      },
-      modals: {
         GenerateAvatarModal: {
           title: "Avatar generator",
           selectors: {

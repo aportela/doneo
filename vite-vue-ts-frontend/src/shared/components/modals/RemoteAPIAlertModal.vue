@@ -58,7 +58,7 @@
                     <template #icon>
                         <n-icon :component="IconHome" />
                     </template>
-                    {{ t("shared.components.dialogs.RemoteAPIAlertModal.buttons.backToHome.label") }}
+                    {{ t("shared.components.modals.RemoteAPIAlertModal.buttons.backToHome.label") }}
                 </n-button>
             </n-flex>
         </template>
