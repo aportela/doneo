@@ -5,10 +5,13 @@
     import { NInputGroup, NInput, NButton, NIcon, NPopover, NCard, type InputInst, NCollapse, NCollapseItem, type ButtonType } from 'naive-ui';
     import { IconAlarm, IconClockCancel, IconClockPlay, IconClockStop, IconTrash } from '@tabler/icons-vue';
 
+    import { appBus } from '../../../shared/composables/bus';
+
     import { useUserSettingsStore } from '../../../stores/userSettings.ts';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from "../../../shared/types/ajaxState";
     import { userTimerService } from "../../../modules/user-timer/services/user-timer";
+    import { handleAPIError } from "../../../api/client/errorHandler.ts";
     import { type UserTimerResponse } from "../../../modules/user-timer/types/dto";
 
     import { IDate } from "../../types/idate";
@@ -39,9 +42,9 @@
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    const hasTimers = computed(() => timers.value.length > 0);
+    const hasTimers = computed<boolean>(() => timers.value.length > 0);
     const currentActiveTimer = computed<UserTimerResponse | undefined>(() => timers.value.find((timer) => timer.finishedAt === null));
-    const hasTimerRunning = computed(() => typeof currentActiveTimer.value !== "undefined");
+    const hasTimerRunning = computed<boolean>(() => typeof currentActiveTimer.value !== "undefined");
 
     const currentButtonIconColor = computed<string | undefined>(() => {
         return hasTimers.value ? "primary" : undefined;
@@ -59,13 +62,13 @@
         }
     });
 
-    const currentTimerElapsedSeconds = computed(() => Math.floor((now.value - (start.value ?? 0)) / 1000));
+    const currentTimerElapsedSeconds = computed<number>(() => Math.floor((now.value - (start.value ?? 0)) / 1000));
 
-    const hasFinishedTimers = computed(() => finishedTimers.value.length > 0);
+    const hasFinishedTimers = computed<boolean>(() => finishedTimers.value.length > 0);
 
-    const finishedTimers = computed(() => timers.value.filter((timer) => timer.finishedAt !== null));
+    const finishedTimers = computed<UserTimerResponse[]>(() => timers.value.filter((timer: UserTimerResponse) => timer.finishedAt !== null));
 
-    watch(hasTimerRunning, (running) => {
+    watch(hasTimerRunning, (running: boolean) => {
         if (running) {
             onStartInterval();
         } else {
@@ -93,11 +96,29 @@
             const response = await userTimerService.search();
             timers.value = response.userTimers;
             start.value = timers.value.find((timer) => timer.finishedAt === null)?.startedAt ?? null;
-        } catch (e) {
-            // TODO:
-            console.error(e);
+        } catch (error) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TimerButton.onGetTimers" } });
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.refreshError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.refreshError");
+                    console.error("Unhandled API error", { file: "TimerButton.vue", method: "onGetTimers" }, { err: fatalError });
+                });
         } finally {
             state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
         }
     };
 
@@ -109,15 +130,34 @@
                 showPopOver.value = false;
                 await onGetTimers();
                 newTimerSummary.value = "";
-
-            } catch (e) {
-                // TODO:
-                console.error(e);
+            } catch (error) {
+                state.ajaxErrors = true;
+                handleAPIError(error,
+                    (apiError) => {
+                        switch (apiError.response?.status) {
+                            case 401:
+                                state.ajaxErrors = false;
+                                appBus.emit({ type: "reauthRequired", payload: { emitter: "TimerButton.onStartTimer" } });
+                                break;
+                            default:
+                                state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.startError");
+                                break;
+                        }
+                    },
+                    (fatalError) => {
+                        state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.startError");
+                        console.error("Unhandled API error", { file: "TimerButton.vue", method: "onStartTimer" }, { err: fatalError });
+                    });
             } finally {
                 state.ajaxRunning = false;
+                if (state.ajaxErrorMessage) {
+                    appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+                }
             }
         }
     };
+
+    let stopTimerId: string = "";
 
     const onStopTimer = async (id: string) => {
         Object.assign(state, defaultAjaxStateRunning);
@@ -125,24 +165,64 @@
             await userTimerService.stop(id);
             showPopOver.value = false;
             await onGetTimers();
-        } catch (e) {
-            // TODO:
-            console.error(e);
+        } catch (error) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TimerButton.onStopTimer" } });
+                            stopTimerId = id;
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.stopError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.stopError");
+                    console.error("Unhandled API error", { file: "TimerButton.vue", method: "onStopTimer" }, { err: fatalError });
+                });
         } finally {
             state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
         }
     };
+
+    let deleteTimerId: string = "";
 
     const onDeleteTimer = async (id: string) => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
             await userTimerService.delete(id);
             await onGetTimers();
-        } catch (e) {
-            // TODO:
-            console.error(e);
+        } catch (error) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TimerButton.onDeleteTimer" } });
+                            deleteTimerId = id;
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.deleteError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.deleteError");
+                    console.error("Unhandled API error", { file: "TimerButton.vue", method: "onDeleteTimer" }, { err: fatalError });
+                });
         } finally {
             state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
         }
     };
 
@@ -152,11 +232,29 @@
             await userTimerService.clear();
             showPopOver.value = false;
             await onGetTimers();
-        } catch (e) {
-            // TODO:
-            console.error(e);
+        } catch (error) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TimerButton.onClearTimers" } });
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.clearError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.clearError");
+                    console.error("Unhandled API error", { file: "TimerButton.vue", method: "onClearTimers" }, { err: fatalError });
+                });
         } finally {
             state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
         }
     };
 
@@ -176,18 +274,34 @@
         interval = setInterval(() => {
             now.value = Date.now()
         }, 1000);
-    }
+    };
 
     const onStopInterval = () => {
         clearInterval(interval)
     };
 
+    let stopBusReauthListener: () => void;
+
     onMounted(() => {
         onGetTimers();
+        stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
+            if (payload.to.includes("TimerButton.onGetTimers")) {
+                onGetTimers();
+            } else if (payload.to.includes("TimerButton.onStartTimer")) {
+                onStartTimer();
+            } else if (payload.to.includes("TimerButton.onStopTimer")) {
+                onStopTimer(stopTimerId);
+            } else if (payload.to.includes("TimerButton.onDeleteTimer")) {
+                onDeleteTimer(deleteTimerId);
+            } else if (payload.to.includes("TimerButton.onClearTimers")) {
+                onClearTimers();
+            }
+        });
     });
 
     onBeforeUnmount(() => {
         onStopInterval();
+        stopBusReauthListener();
     });
 </script>
 
@@ -214,8 +328,9 @@
                             0) }}
                 </n-button>
                 <n-input-group v-else>
-                    <n-input size="small" ref="newTimerSummaryRef" placeholder="type new timer summary" :minlength="1"
-                        :maxlength="32" show-count v-model:value="newTimerSummary"
+                    <n-input size="small" ref="newTimerSummaryRef"
+                        :placeholder="t('shared.components.buttons.TimerButton.inputs.newTimer.placeholder')"
+                        :minlength="1" :maxlength="32" show-count v-model:value="newTimerSummary"
                         :disabled="props.disabled || state.ajaxRunning" @keydown.enter="onStartTimer" />
                     <n-button size="small" @click="onStartTimer"
                         :disabled="props.disabled || state.ajaxRunning || !newTimerSummary">

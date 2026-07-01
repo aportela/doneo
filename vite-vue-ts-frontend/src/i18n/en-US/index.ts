@@ -278,11 +278,24 @@ export default {
               label: "Clear timers",
             },
           },
+          inputs: {
+            newTimer: {
+              placeholder: "type new timer summary",
+            },
+          },
           labels: {
             previousTimers: "Previous timers",
             timerStarted: "Started:",
             timerFinished: "Finished:",
             totalTimer: "Total elapsed time:",
+          },
+          errors: {
+            refreshError:
+              "There was a problem while refreshing the user timers",
+            clearError: "There was a problem while clearing the user timers",
+            startError: "There was a problem while starting the user timer",
+            stopError: "There was a problem while stopping the user timer",
+            deleteError: "There was a problem while deleting the user timer",
           },
         },
       },
