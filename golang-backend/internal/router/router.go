@@ -194,6 +194,16 @@ func NewRouter(app *app.App) http.Handler {
 		r.Post("/search", app.TaskHandler.Search)
 	})
 
+	apiRouter.Route("/search", func(r chi.Router) {
+		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
+		r.Post("/", func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			if err := json.NewEncoder(w).Encode("{ results: [] }"); err != nil {
+				http.Error(w, "error encoding JSON: "+err.Error(), http.StatusInternalServerError)
+			}
+		})
+	})
+
 	// TODO: 404 route ?
 	baseRouter.Mount("/api", apiRouter)
 

@@ -74,6 +74,17 @@ export default {
             },
           },
         },
+        SearchModal: {
+          title: "Search",
+          inputs: {
+            query: {
+              placeholder: "type search query",
+            },
+          },
+          labels: {
+            noResults: "No results",
+          },
+        },
       },
       inputs: {
         ToggleInput: {

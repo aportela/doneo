@@ -1,24 +1,80 @@
 <script setup lang="ts">
+    import { ref, reactive, watch, nextTick } from 'vue';
+    import { useI18n } from "vue-i18n";
 
-    import { NModal, NInput, NEmpty } from 'naive-ui';
+    import { NModal, NInput, NEmpty, type InputInst } from 'naive-ui';
 
-    const show = defineModel<boolean>();
+    import { useDebounceFn } from '@vueuse/core';
+
+    import { appBus } from '../../../shared/composables/bus';
+
+    import { searchService } from '../../../modules/search/services/search';
+    import { SearchResultItem } from '../../../modules/search/models/search';
+
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from "../../../shared/types/ajaxState";
+
+    const { t } = useI18n();
+
+    const show = defineModel<boolean>("show");
+
     const bodyStyle = {
         width: '600px'
-    }
+    };
+
     const segmented = {
         content: 'soft',
         footer: 'soft'
-    } as const
+    } as const;
+
+
+    const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
+
+    const showWarningNoResults = ref<boolean>(false);
+
+    const searchQuery = ref<string>("");
+
+    const searchQueryRef = ref<InputInst | null>(null);
+
+    const debouncedSearch = useDebounceFn(() => {
+        onSearch(searchQuery.value);
+    }, 300);
+
+    watch(searchQuery, () => {
+        debouncedSearch();
+    });
+
+    const results = ref<SearchResultItem[]>([]);
+
+    const onSearch = async (query: string) => {
+        showWarningNoResults.value = false;
+        if (query) {
+            Object.assign(state, defaultAjaxStateRunning);
+            try {
+                results.value = (await searchService.search({})).results?.map((item) => new SearchResultItem(item));
+                showWarningNoResults.value = results.value?.length === 0;
+            } catch (error) {
+                // TODO
+                console.error(error);
+            } finally {
+                state.ajaxRunning = false;
+                await nextTick();
+                searchQueryRef.value?.focus();
+                if (state.ajaxErrorMessage) {
+                    appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+                }
+            }
+        }
+    };
 </script>
 
 <template>
-    <n-modal v-model:show="show" title="Search" :closable="true" preset="card" size="medium" :bordered="true"
-        :segmented="segmented" :style="bodyStyle">
-        <n-input placeholder="search..." autofocus clearable></n-input>
-
-        <n-empty description="No data results" style="margin-top: 16px;">
-        </n-empty>
+    <n-modal v-model:show="show" :title="t('shared.components.modals.SearchModal.title')" :closable="true" preset="card"
+        size="medium" :bordered="true" :segmented="segmented" :style="bodyStyle">
+        <n-input :placeholder="t('shared.components.modals.SearchModal.inputs.query.placeholder')" autofocus
+            :loading="state.ajaxRunning" :disabled="state.ajaxRunning" v-model:value="searchQuery"
+            ref="searchQueryRef" />
+        <n-empty v-if="showWarningNoResults" :description="t('shared.components.modals.SearchModal.labels.noResults')"
+            style="margin-top: 16px;" />
         <template #footer>
             <div class="shortcut">
                 <kbd>↵</kbd><span>Select</span>
@@ -26,14 +82,6 @@
                 <kbd>Del</kbd><span>Delete</span>
                 <kbd>Esc</kbd><span>Close</span>
             </div>
-
-            <!--
-            <div class="shortcut">
-                <kbd>Ctrl</kbd>
-                <span>+</span>
-                <kbd>K</kbd>
-            </div>
-            -->
         </template>
     </n-modal>
 </template>
