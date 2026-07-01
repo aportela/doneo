@@ -49,11 +49,9 @@
 
 <template>
     <n-modal v-model:show="show" :closable="closable" :close-on-esc="closable" :mask-closable="closable" preset="card"
-        size="medium" :bordered="true" :style="bodyStyle">
-        <template #header>
-        </template>
-        <RemoteAPIAlert type="error" :title="t('shared.errorMessages.Error')" :message="errorMessage" />
-
+        size="medium" bordered :style="bodyStyle">
+        <RemoteAPIAlert :title="t('shared.errorMessages.Error')" type="error" :message="errorMessage"
+            preformatted-message />
         <template #action v-if="!closable">
             <n-flex justify="end">
                 <n-button strong secondary @click="onGoHome">
