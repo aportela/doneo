@@ -27,6 +27,7 @@
 
     interface Props {
         disabled: boolean;
+        readOnly?: boolean;
         items: Project[];
         sort?: Sort;
     }
@@ -230,7 +231,8 @@
                                 </template>
                             </n-button>
                         </router-link>
-                        <ChangeProjectStatusDropdown :current-status="project.status"
+                        <ChangeProjectStatusDropdown :disabled="props.disabled" :read-only="props.readOnly"
+                            :current-status="project.status"
                             @change="(status: ProjectStatus) => onStatusChange(project, status)" />
                     </n-button-group>
                 </td>

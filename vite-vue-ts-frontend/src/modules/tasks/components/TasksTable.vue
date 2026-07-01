@@ -213,7 +213,8 @@
                                 </template>
                             </n-button>
                         </router-link>
-                        <ChangeTaskStatusDropdown :disabled="props.readOnly" :current-status="task.status"
+                        <ChangeTaskStatusDropdown :disabled="props.disabled" :read-only="props.readOnly"
+                            :current-status="task.status"
                             @change="(status: TaskStatus) => onStatusChange(task, status)" />
                     </n-button-group>
                 </td>

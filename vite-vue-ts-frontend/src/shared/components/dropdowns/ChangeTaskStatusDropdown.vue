@@ -8,17 +8,25 @@
     import type { TaskStatus } from '../../../modules/task-statuses/models/task-status';
     import { useCacheStore } from '../../../stores/cache';
 
-    interface ChangeTaskStatusDropdownProps {
-        disabled?: boolean;
-        currentStatus: TaskStatus
+    import { BUTTON_DEFAULT_ICON_SIZE } from '../../../constants';
+
+    interface IProps {
+        currentStatus: TaskStatus,
+        iconSize?: number,
+        disabled?: boolean,
+        readOnly?: boolean,
     };
+
+    const props = withDefaults(defineProps<IProps>(), {
+        iconSize: BUTTON_DEFAULT_ICON_SIZE,
+        disabled: false,
+        readOnly: false,
+    });
+
+    const emit = defineEmits(['change']);
 
     const { t } = useI18n();
     const cacheStore = useCacheStore();
-
-    const props = defineProps<ChangeTaskStatusDropdownProps>();
-
-    const emit = defineEmits(['change']);
 
     const options = computed<DropdownOption[]>(() =>
         cacheStore.taskStatuses.map(item => ({
@@ -37,17 +45,17 @@
 </script>
 
 <template>
-    <n-dropdown trigger="click" :options="options" @select="onChange" v-if="!props.disabled">
-        <n-button>
+    <n-dropdown trigger="click" :options="options" @select="onChange" v-if="!props.readOnly">
+        <n-button :disabled="props.disabled">
             <template #icon>
-                <n-icon :size="22" :component="IconStatusChange" />
+                <n-icon :size="props.iconSize" :component="IconStatusChange" />
             </template>
             {{ t("shared.components.dropDowns.ChangeTaskStatusDropdown.label") }}
         </n-button>
     </n-dropdown>
     <n-button v-else disabled>
         <template #icon>
-            <n-icon :size="22" :component="IconStatusChange" />
+            <n-icon :size="props.iconSize" :component="IconStatusChange" />
         </template>
         {{ t("shared.components.dropDowns.ChangeTaskStatusDropdown.label") }}
     </n-button>

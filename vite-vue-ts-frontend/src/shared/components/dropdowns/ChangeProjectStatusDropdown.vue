@@ -5,20 +5,28 @@
     import { NDropdown, NButton, NIcon, type DropdownOption } from 'naive-ui';
     import { IconStatusChange } from '@tabler/icons-vue';
 
-    import type { TaskStatus } from '../../../modules/task-statuses/models/task-status';
+    import type { ProjectStatus } from '../../../modules/project-statuses/models/project-status';
     import { useCacheStore } from '../../../stores/cache';
 
-    interface ChangeProjectStatusDropdownProps {
-        disabled?: boolean;
-        currentStatus: TaskStatus
+    import { BUTTON_DEFAULT_ICON_SIZE } from '../../../constants';
+
+    interface IProps {
+        currentStatus: ProjectStatus,
+        iconSize?: number,
+        disabled?: boolean,
+        readOnly?: boolean,
     };
+
+    const props = withDefaults(defineProps<IProps>(), {
+        iconSize: BUTTON_DEFAULT_ICON_SIZE,
+        disabled: false,
+        readOnly: false,
+    });
+
+    const emit = defineEmits(['change']);
 
     const { t } = useI18n();
     const cacheStore = useCacheStore();
-
-    const props = defineProps<ChangeProjectStatusDropdownProps>();
-
-    const emit = defineEmits(['change']);
 
     const options = computed<DropdownOption[]>(() =>
         cacheStore.projectStatuses.map(item => ({
@@ -37,17 +45,17 @@
 </script>
 
 <template>
-    <n-dropdown trigger="click" :options="options" @select="onChange" v-if="!props.disabled">
-        <n-button>
+    <n-dropdown trigger="click" :options="options" @select="onChange" v-if="!props.readOnly">
+        <n-button :disabled="props.disabled">
             <template #icon>
-                <n-icon :size="22" :component="IconStatusChange" />
+                <n-icon :size="props.iconSize" :component="IconStatusChange" />
             </template>
-            Change status
+            {{ t("shared.components.dropDowns.ChangeTaskStatusDropdown.label") }}
         </n-button>
     </n-dropdown>
     <n-button v-else disabled>
         <template #icon>
-            <n-icon :size="22" :component="IconStatusChange" />
+            <n-icon :size="props.iconSize" :component="IconStatusChange" />
         </template>
         {{ t("shared.components.dropDowns.ChangeTaskStatusDropdown.label") }}
     </n-button>
