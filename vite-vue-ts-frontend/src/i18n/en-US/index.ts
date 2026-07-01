@@ -266,12 +266,23 @@ export default {
             toolTip: "Switch to side navigation",
           },
         },
-        timer: {
-          enable: {
-            toolTip: "Enable timer",
+        TimerButton: {
+          buttons: {
+            stopCurrentTimer: {
+              label: "Stop current timer:",
+            },
+            startNewTimer: {
+              label: "Start new timer",
+            },
+            clearTimers: {
+              label: "Clear timers",
+            },
           },
-          disable: {
-            toolTip: "Disable timer",
+          labels: {
+            previousTimers: "Previous timers",
+            timerStarted: "Started:",
+            timerFinished: "Finished:",
+            totalTimer: "Total elapsed time:",
           },
         },
       },
