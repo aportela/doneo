@@ -7,6 +7,8 @@
 
     import { generateAvatar, generateParams, getThemeNames, type ThemeName } from 'avatarka';
 
+    import { BUTTON_DEFAULT_ICON_SIZE } from '../../../constants';
+
     const { t } = useI18n();
 
     const emit = defineEmits(['confirm', 'cancel']);
@@ -47,37 +49,39 @@
     const onConfirm = () => {
         emit("confirm", svg.value)
     };
+
     const onCancel = () => {
         emit("cancel")
     };
 
     watch(() => [selectedTheme.value, selectedShape.value], () => {
         generateRandomAvatar();
-    })
+    });
+
     onMounted(() => {
         generateRandomAvatar();
     });
 </script>
 
 <template>
-    <n-modal v-model:show="show" :title="t('shared.components.dialogs.GenerateAvatarModal.title')" :closable="true"
+    <n-modal v-model:show="show" :title="t('shared.components.modals.GenerateAvatarModal.title')" :closable="true"
         preset="card" size="small" :bordered="true" :segmented="segmented" :style="bodyStyle">
         <n-flex justify="space-between" align="center">
             <div class="avatar" v-html="svg" />
             <div>
-                <n-form-item :label="t('shared.components.dialogs.GenerateAvatarModal.selectors.themeSelector.label')">
+                <n-form-item :label="t('shared.components.modals.GenerateAvatarModal.selectors.themeSelector.label')">
                     <n-select :options="themeOptions" v-model:value="selectedTheme"
-                        :placeholder="t('shared.components.dialogs.GenerateAvatarModal.selectors.themeSelector.placeholder')" />
+                        :placeholder="t('shared.components.modals.GenerateAvatarModal.selectors.themeSelector.placeholder')" />
                 </n-form-item>
-                <n-form-item :label="t('shared.components.dialogs.GenerateAvatarModal.selectors.shapeSelector.label')">
+                <n-form-item :label="t('shared.components.modals.GenerateAvatarModal.selectors.shapeSelector.label')">
                     <n-select :options="shapeOptions" v-model:value="selectedShape"
-                        :placeholder="t('shared.components.dialogs.GenerateAvatarModal.selectors.shapeSelector.placeholder')" />
+                        :placeholder="t('shared.components.modals.GenerateAvatarModal.selectors.shapeSelector.placeholder')" />
                 </n-form-item>
                 <n-button @click="generateRandomAvatar" block>
                     <template #icon>
-                        <n-icon :component="IconImageGeneration" />
+                        <n-icon :component="IconImageGeneration" :size="BUTTON_DEFAULT_ICON_SIZE" />
                     </template>
-                    {{ t("shared.components.dialogs.GenerateAvatarModal.buttons.generate.label") }}
+                    {{ t("shared.components.modals.GenerateAvatarModal.buttons.generate.label") }}
                 </n-button>
             </div>
         </n-flex>
@@ -85,15 +89,15 @@
             <n-flex justify="end">
                 <n-button @click="onConfirm">
                     <template #icon>
-                        <n-icon :component="IconDeviceFloppy" />
+                        <n-icon :component="IconDeviceFloppy" :size="BUTTON_DEFAULT_ICON_SIZE" />
                     </template>
-                    {{ t("shared.components.dialogs.GenerateAvatarModal.buttons.confirm.label") }}
+                    {{ t("shared.components.modals.GenerateAvatarModal.buttons.confirm.label") }}
                 </n-button>
                 <n-button @click="onCancel">
                     <template #icon>
-                        <n-icon :component="IconCancel" />
+                        <n-icon :component="IconCancel" :size="BUTTON_DEFAULT_ICON_SIZE" />
                     </template>
-                    {{ t("shared.components.dialogs.GenerateAvatarModal.buttons.cancel.label") }}
+                    {{ t("shared.components.modals.GenerateAvatarModal.buttons.cancel.label") }}
                 </n-button>
             </n-flex>
         </template>

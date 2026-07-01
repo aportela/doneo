@@ -48,6 +48,8 @@ export default {
             },
           },
         },
+      },
+      modals: {
         GenerateAvatarModal: {
           title: "Avatar generator",
           selectors: {

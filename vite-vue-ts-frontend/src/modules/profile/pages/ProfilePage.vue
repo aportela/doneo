@@ -335,8 +335,8 @@
 </script>
 
 <template>
-    <GenerateAvatarModal v-model:show="showAvatarGeneratorModal" @confirm="(svg: string) => onSaveAvatar(svg)"
-        @cancel="showAvatarGeneratorModal = false;" />
+    <GenerateAvatarModal v-if="showAvatarGeneratorModal" v-model:show="showAvatarGeneratorModal"
+        @confirm="(svg: string) => onSaveAvatar(svg)" @cancel="showAvatarGeneratorModal = false;" />
     <h1>Profile</h1>
 
     <n-flex align="center" justify="space-between">
