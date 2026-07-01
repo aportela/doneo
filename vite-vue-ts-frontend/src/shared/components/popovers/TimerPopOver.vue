@@ -103,16 +103,16 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TimerButton.onGetTimers" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TimerPopOver.onGetTimers" } });
                             break;
                         default:
-                            state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.refreshError");
+                            state.ajaxErrorMessage = t("shared.components.popOvers.TimerPopOver.errors.refreshError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.refreshError");
-                    console.error("Unhandled API error", { file: "TimerButton.vue", method: "onGetTimers" }, { err: fatalError });
+                    state.ajaxErrorMessage = t("shared.components.popOvers.TimerPopOver.errors.refreshError");
+                    console.error("Unhandled API error", { file: "TimerPopOver.vue", method: "onGetTimers" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
@@ -137,16 +137,16 @@
                         switch (apiError.response?.status) {
                             case 401:
                                 state.ajaxErrors = false;
-                                appBus.emit({ type: "reauthRequired", payload: { emitter: "TimerButton.onStartTimer" } });
+                                appBus.emit({ type: "reauthRequired", payload: { emitter: "TimerPopOver.onStartTimer" } });
                                 break;
                             default:
-                                state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.startError");
+                                state.ajaxErrorMessage = t("shared.components.popOvers.TimerPopOver.errors.startError");
                                 break;
                         }
                     },
                     (fatalError) => {
-                        state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.startError");
-                        console.error("Unhandled API error", { file: "TimerButton.vue", method: "onStartTimer" }, { err: fatalError });
+                        state.ajaxErrorMessage = t("shared.components.popOvers.TimerPopOver.errors.startError");
+                        console.error("Unhandled API error", { file: "TimerPopOver.vue", method: "onStartTimer" }, { err: fatalError });
                     });
             } finally {
                 state.ajaxRunning = false;
@@ -172,17 +172,17 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TimerButton.onStopTimer" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TimerPopOver.onStopTimer" } });
                             stopTimerId = id;
                             break;
                         default:
-                            state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.stopError");
+                            state.ajaxErrorMessage = t("shared.components.popOvers.TimerPopOver.errors.stopError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.stopError");
-                    console.error("Unhandled API error", { file: "TimerButton.vue", method: "onStopTimer" }, { err: fatalError });
+                    state.ajaxErrorMessage = t("shared.components.popOvers.TimerPopOver.errors.stopError");
+                    console.error("Unhandled API error", { file: "TimerPopOver.vue", method: "onStopTimer" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
@@ -206,17 +206,17 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TimerButton.onDeleteTimer" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TimerPopOver.onDeleteTimer" } });
                             deleteTimerId = id;
                             break;
                         default:
-                            state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.deleteError");
+                            state.ajaxErrorMessage = t("shared.components.popOvers.TimerPopOver.errors.deleteError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.deleteError");
-                    console.error("Unhandled API error", { file: "TimerButton.vue", method: "onDeleteTimer" }, { err: fatalError });
+                    state.ajaxErrorMessage = t("shared.components.popOvers.TimerPopOver.errors.deleteError");
+                    console.error("Unhandled API error", { file: "TimerPopOver.vue", method: "onDeleteTimer" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
@@ -239,16 +239,16 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TimerButton.onClearTimers" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TimerPopOver.onClearTimers" } });
                             break;
                         default:
-                            state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.clearError");
+                            state.ajaxErrorMessage = t("shared.components.popOvers.TimerPopOver.errors.clearError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("shared.components.buttons.TimerButton.errors.clearError");
-                    console.error("Unhandled API error", { file: "TimerButton.vue", method: "onClearTimers" }, { err: fatalError });
+                    state.ajaxErrorMessage = t("shared.components.popOvers.TimerPopOver.errors.clearError");
+                    console.error("Unhandled API error", { file: "TimerPopOver.vue", method: "onClearTimers" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
@@ -285,15 +285,15 @@
     onMounted(() => {
         onGetTimers();
         stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
-            if (payload.to.includes("TimerButton.onGetTimers")) {
+            if (payload.to.includes("TimerPopOver.onGetTimers")) {
                 onGetTimers();
-            } else if (payload.to.includes("TimerButton.onStartTimer")) {
+            } else if (payload.to.includes("TimerPopOver.onStartTimer")) {
                 onStartTimer();
-            } else if (payload.to.includes("TimerButton.onStopTimer")) {
+            } else if (payload.to.includes("TimerPopOver.onStopTimer")) {
                 onStopTimer(stopTimerId);
-            } else if (payload.to.includes("TimerButton.onDeleteTimer")) {
+            } else if (payload.to.includes("TimerPopOver.onDeleteTimer")) {
                 onDeleteTimer(deleteTimerId);
-            } else if (payload.to.includes("TimerButton.onClearTimers")) {
+            } else if (payload.to.includes("TimerPopOver.onClearTimers")) {
                 onClearTimers();
             }
         });
@@ -323,13 +323,13 @@
                     <template #icon>
                         <n-icon :component="IconClockStop" :size="props.iconSize" />
                     </template>
-                    {{ t("shared.components.buttons.TimerButton.buttons.stopCurrentTimer.label") }} {{
+                    {{ t("shared.components.popOvers.TimerPopOver.buttons.stopCurrentTimer.label") }} {{
                         formatDuration(currentTimerElapsedSeconds > 0 ? currentTimerElapsedSeconds :
                             0) }}
                 </n-button>
                 <n-input-group v-else>
                     <n-input size="small" ref="newTimerSummaryRef"
-                        :placeholder="t('shared.components.buttons.TimerButton.inputs.newTimer.placeholder')"
+                        :placeholder="t('shared.components.popOvers.TimerPopOver.inputs.newTimer.placeholder')"
                         :minlength="1" :maxlength="32" show-count v-model:value="newTimerSummary"
                         :disabled="props.disabled || state.ajaxRunning" @keydown.enter="onStartTimer" />
                     <n-button size="small" @click="onStartTimer"
@@ -337,12 +337,12 @@
                         <template #icon>
                             <n-icon :component="IconClockPlay" :size="props.iconSize" />
                         </template>
-                        {{ t("shared.components.buttons.TimerButton.buttons.startNewTimer.label") }}
+                        {{ t("shared.components.popOvers.TimerPopOver.buttons.startNewTimer.label") }}
                     </n-button>
                 </n-input-group>
             </template>
             <template #footer v-if="hasFinishedTimers">
-                <p>{{ t("shared.components.buttons.TimerButton.labels.previousTimers") }}</p>
+                <p>{{ t("shared.components.popOvers.TimerPopOver.labels.previousTimers") }}</p>
                 <n-collapse display-directive="if" accordion :trigger-areas="['main', 'arrow']">
                     <n-collapse-item v-for="timer in finishedTimers" :key="timer.id" :name="timer.id"
                         :title="timer.summary">
@@ -354,11 +354,11 @@
                                 </template>
                             </n-button>
                         </template>
-                        <div>{{ t("shared.components.buttons.TimerButton.labels.timerStarted") }} {{ new
+                        <div>{{ t("shared.components.popOvers.TimerPopOver.labels.timerStarted") }} {{ new
                             IDate(timer.startedAt).toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</div>
-                        <div>{{ t("shared.components.buttons.TimerButton.labels.timerFinished") }} {{ new
+                        <div>{{ t("shared.components.popOvers.TimerPopOver.labels.timerFinished") }} {{ new
                             IDate(timer.finishedAt).toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</div>
-                        <div>{{ t("shared.components.buttons.TimerButton.labels.totalTimer") }} {{
+                        <div>{{ t("shared.components.popOvers.TimerPopOver.labels.totalTimer") }} {{
                             formatDuration(
                                 Math.round(
                                     ((timer.finishedAt ?? new Date().getTime()) - timer.startedAt) / 1000
@@ -373,7 +373,7 @@
                     <template #icon>
                         <n-icon :component="IconClockCancel" :size="props.iconSize" />
                     </template>
-                    {{ t("shared.components.buttons.TimerButton.buttons.clearTimers.label") }}
+                    {{ t("shared.components.popOvers.TimerPopOver.buttons.clearTimers.label") }}
                 </n-button>
             </template>
         </n-card>

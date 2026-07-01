@@ -16,7 +16,7 @@
     import { useLoadingStore } from '../stores/loading';
     import { useCacheStore } from "../stores/cache.ts";
     import { renderIcon } from '../shared/composables/naive-ui-icon';
-    import TimerButton from "../shared/components/buttons/TimerButton.vue";
+    import TimerPopOver from '../shared/components/popovers/TimerPopOver.vue';
 
     import { menuOptionIconSize, useMenu } from '../shared/types/menu';
 
@@ -172,7 +172,7 @@
                 <SwitchNavigationModeButton :icon-size="commonIconSize" />
                 <SwitchColorSchemeButton :icon-size="commonIconSize" />
                 <SwitchNotificationsButton :icon-size="commonIconSize" />
-                <TimerButton :icon-size="commonIconSize" />
+                <TimerPopOver :icon-size="commonIconSize" />
                 <GithubButton :icon-size="commonIconSize" />
                 <n-dropdown v-if="false" :options="userDropdownOptions" placement="bottom-end" trigger="hover"
                     @select="onUserDropDownSelect">

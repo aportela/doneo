@@ -16,8 +16,7 @@
     import { useLoadingStore } from '../stores/loading';
     import { useCacheStore } from "../stores/cache.ts";
     import { renderIcon } from '../shared/composables/naive-ui-icon';
-    import TimerButton from "../shared/components/buttons/TimerButton.vue";
-
+    import TimerPopOver from "../shared/components/popovers/TimerPopOver.vue";
 
     const router = useRouter();
 
@@ -99,7 +98,7 @@
                 <SwitchNotificationsButton :icon-size="commonIconSize" />
                 <SwitchColorSchemeButton :icon-size="commonIconSize" />
                 <SwitchNavigationModeButton :icon-size="commonIconSize" />
-                <TimerButton :icon-size="commonIconSize" />
+                <TimerPopOver :icon-size="commonIconSize" />
                 <n-dropdown :options="userDropdownOptions" placement="bottom-end" trigger="hover"
                     @select="onUserDropDownSelect">
                     <n-button quaternary>

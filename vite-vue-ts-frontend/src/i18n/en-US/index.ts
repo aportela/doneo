@@ -266,7 +266,27 @@ export default {
             toolTip: "Switch to side navigation",
           },
         },
-        TimerButton: {
+      },
+      progress: {
+        TaskSpentEstimatedPercent: {
+          labels: {
+            taskProgress: "Task progress",
+            spent: "Spent:",
+            estimated: "Estimated:",
+            overrun: "Overrun:",
+          },
+        },
+      },
+      dropDowns: {
+        ChangeTaskStatusDropdown: {
+          label: "Change status",
+        },
+        ChangeProjectStatusDropdown: {
+          label: "Change status",
+        },
+      },
+      popOvers: {
+        TimerPopOver: {
           buttons: {
             stopCurrentTimer: {
               label: "Stop current timer:",
@@ -297,24 +317,6 @@ export default {
             stopError: "There was a problem while stopping the user timer",
             deleteError: "There was a problem while deleting the user timer",
           },
-        },
-      },
-      progress: {
-        TaskSpentEstimatedPercent: {
-          labels: {
-            taskProgress: "Task progress",
-            spent: "Spent:",
-            estimated: "Estimated:",
-            overrun: "Overrun:",
-          },
-        },
-      },
-      dropDowns: {
-        ChangeTaskStatusDropdown: {
-          label: "Change status",
-        },
-        ChangeProjectStatusDropdown: {
-          label: "Change status",
         },
       },
     },
