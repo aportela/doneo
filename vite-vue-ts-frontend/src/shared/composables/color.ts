@@ -23,14 +23,6 @@ export const hexToRgba = (hex: string, alphaOverride?: number) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-export const tagColor = (base: string) => {
-  return {
-    color: hexToRgba(base, 0.2),
-    textColor: hexToRgba(base, 1),
-    borderColor: hexToRgba(base, 0.5),
-  };
-};
-
 export const getNaiveUITagColorProperty = (base: string) => {
   return {
     color: hexToRgba(base, 0.2),
