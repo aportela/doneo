@@ -43,7 +43,7 @@
             item => item.id === key
         );
         emit("change", status);
-    }
+    };
 </script>
 
 <template>
