@@ -3,7 +3,7 @@
     import type { InputSize } from "naive-ui";
     import { IconSearch } from '@tabler/icons-vue';
 
-    import { DEFAULT_INPUT_SIZE, DEFAULT_BUTTON_ICON_SIZE } from '../../constants';
+    import { DEFAULT_INPUT_SIZE, DEFAULT_BUTTON_ICON_SIZE } from '../../../constants';
 
     interface IProps {
         disabled?: boolean;
