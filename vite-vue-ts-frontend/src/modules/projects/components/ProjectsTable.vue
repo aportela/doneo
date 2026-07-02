@@ -165,18 +165,18 @@
                         v-model:value="filters.slug" @keydown-enter="onRefresh" />
                 </th>
                 <th>
-                    <ProjectTypeSelector :disabled="props.disabled" v-model:id="filters.typeId" :hide-prefix="true"
-                        clearable
+                    <ProjectTypeSelector :disabled="props.disabled" size="small" v-model:id="filters.typeId"
+                        :hide-prefix="true" clearable
                         :placeholder="t('modules.project.components.ProjectsTable.header.filters.type.placeholder')" />
                 </th>
                 <th>
-                    <ProjectPrioritySelector :disabled="props.disabled" v-model:id="filters.priorityId"
+                    <ProjectPrioritySelector :disabled="props.disabled" size="small" v-model:id="filters.priorityId"
                         :hide-prefix="true" clearable
                         :placeholder="t('modules.project.components.ProjectsTable.header.filters.priority.placeholder')" />
                 </th>
                 <th>
-                    <ProjectStatusSelector :disabled="props.disabled" v-model:id="filters.statusId" :hide-prefix="true"
-                        clearable
+                    <ProjectStatusSelector :disabled="props.disabled" size="small" v-model:id="filters.statusId"
+                        :hide-prefix="true" clearable
                         :placeholder="t('modules.project.components.ProjectsTable.header.filters.status.placeholder')" />
                 </th>
                 <th>
@@ -185,11 +185,12 @@
                         v-model:value="filters.summary" @keydown-enter="onRefresh" />
                 </th>
                 <th>
-                    <DateFilterSelect clearable ref="createdAtFilterRef" :disabled="props.disabled"
+                    <DateFilterSelect clearable ref="createdAtFilterRef" size="small" :disabled="props.disabled"
                         v-model:range="filters.createdAt" />
                 </th>
                 <th>
-                    <UserSelector hideAvatar clearable :disabled="props.disabled" v-model:id="filters.createdByUserId"
+                    <UserSelector hideAvatar clearable :disabled="props.disabled" size="small"
+                        v-model:id="filters.createdByUserId"
                         :placeholder="t('modules.project.components.ProjectsTable.header.filters.creator.placeholder')" />
                 </th>
                 <th class="doneo-text-center">

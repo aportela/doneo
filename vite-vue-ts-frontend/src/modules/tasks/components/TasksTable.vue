@@ -155,13 +155,13 @@
                         v-model:value="filters.slug" @keydown-enter="onRefresh" />
                 </th>
                 <th>
-                    <TaskPrioritySelector :disabled="props.disabled" v-model:id="filters.priorityId" :hide-prefix="true"
-                        clearable
+                    <TaskPrioritySelector :disabled="props.disabled" size="small" v-model:id="filters.priorityId"
+                        :hide-prefix="true" clearable
                         :placeholder="t('modules.task.components.TasksTable.header.filters.priority.placeholder')" />
                 </th>
                 <th>
-                    <TaskStatusSelector :disabled="props.disabled" v-model:id="filters.statusId" :hide-prefix="true"
-                        clearable
+                    <TaskStatusSelector :disabled="props.disabled" size="small" v-model:id="filters.statusId"
+                        :hide-prefix="true" clearable
                         :placeholder="t('modules.task.components.TasksTable.header.filters.status.placeholder')" />
                 </th>
                 <th>
@@ -170,11 +170,12 @@
                         v-model:value="filters.summary" @keydown-enter="onRefresh" />
                 </th>
                 <th>
-                    <DateFilterSelect clearable ref="createdAtFilterRef" :disabled="props.disabled"
+                    <DateFilterSelect clearable ref="createdAtFilterRef" :disabled="props.disabled" size="small"
                         v-model:range="filters.createdAt" />
                 </th>
                 <th>
-                    <UserSelector hideAvatar clearable :disabled="props.disabled" v-model:id="filters.createdByUserId"
+                    <UserSelector hideAvatar clearable :disabled="props.disabled" size="small"
+                        v-model:id="filters.createdByUserId"
                         :placeholder="t('modules.task.components.TasksTable.header.filters.creator.placeholder')" />
                 </th>
                 <th class="doneo-text-center">
