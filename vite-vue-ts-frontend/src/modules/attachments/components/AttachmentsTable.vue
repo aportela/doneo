@@ -13,7 +13,7 @@
 
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import ClearTableFiltersButton from '../../../shared/components/buttons/ClearTableFiltersButton.vue';
-    import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
+    import TextFilterInput from '../../../shared/components/form-blocks/TextFilterInput.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';

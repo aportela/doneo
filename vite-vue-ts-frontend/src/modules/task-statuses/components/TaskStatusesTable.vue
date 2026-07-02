@@ -12,7 +12,7 @@
     import { TaskStatus } from '../models/task-status';
 
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
-    import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
+    import TextFilterInput from '../../../shared/components/form-blocks/TextFilterInput.vue';
     import ClearTableFiltersButton from '../../../shared/components/buttons/ClearTableFiltersButton.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
@@ -129,7 +129,7 @@
             <tr v-for="taskStatus, index in items" :key="taskStatus.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(taskStatus.hexColor ?? '#888888')">{{ taskStatus.name
-                        }}</n-tag>
+                    }}</n-tag>
                 </td>
                 <td>{{ taskStatus.index }}</td>
                 <td class="doneo-text-center">

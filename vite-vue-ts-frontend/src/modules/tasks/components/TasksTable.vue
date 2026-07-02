@@ -13,7 +13,7 @@
     import type { TasksTableFilters } from '../types/tasks-table-filters.ts';
     import { Task } from '../models/tasks.ts';
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
-    import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
+    import TextFilterInput from '../../../shared/components/form-blocks/TextFilterInput.vue';
     import TaskPrioritySelector from '../../task-priorities/components/TaskPrioritySelector.vue';
     import TaskStatusSelector from '../../task-statuses/components/TaskStatusSelector.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';

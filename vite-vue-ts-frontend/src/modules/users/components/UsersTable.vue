@@ -18,7 +18,7 @@
 
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import UserPermissionsFilterSelector from '../components/UserPermissionsFilterSelector.vue';
-    import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
+    import TextFilterInput from '../../../shared/components/form-blocks/TextFilterInput.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import ClearTableFiltersButton from '../../../shared/components/buttons/ClearTableFiltersButton.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';

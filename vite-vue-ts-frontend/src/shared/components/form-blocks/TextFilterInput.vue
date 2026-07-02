@@ -3,16 +3,22 @@
     import type { InputSize } from "naive-ui";
     import { IconSearch } from '@tabler/icons-vue';
 
-    interface Props {
+    import { DEFAULT_INPUT_SIZE, DEFAULT_BUTTON_ICON_SIZE } from '../../constants';
+
+    interface IProps {
         disabled?: boolean;
+        readOnly?: boolean;
         size?: InputSize,
+        iconSize?: number;
         placeholder?: string;
         clearable?: boolean;
-    }
+    };
 
-    const props = withDefaults(defineProps<Props>(), {
+    const props = withDefaults(defineProps<IProps>(), {
         disabled: false,
-        size: "medium",
+        readOnly: false,
+        size: DEFAULT_INPUT_SIZE,
+        iconSize: DEFAULT_BUTTON_ICON_SIZE,
         clearable: false,
     });
 
@@ -24,16 +30,14 @@
 
     function onKeyDownEnter() {
         emit('keydownEnter');
-    }
+    };
 </script>
 
 <template>
     <n-input :size="props.size" :disabled="props.disabled" v-model:value="model" :placeholder="props.placeholder"
         :clearable="props.clearable" @keydown.enter="onKeyDownEnter">
         <template #prefix>
-            <n-icon>
-                <IconSearch />
-            </n-icon>
+            <n-icon :size="props.iconSize" :component="IconSearch" />
         </template>
     </n-input>
 </template>

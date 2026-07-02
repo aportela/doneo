@@ -13,7 +13,7 @@
     import { Role } from '../models/role';
 
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
-    import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
+    import TextFilterInput from '../../../shared/components/form-blocks/TextFilterInput.vue';
     import ProjectPermissionSelect from '../../../shared/components/selectors/ProjectPermissionSelect.vue';
     import TaskPermissionSelect from '../../../shared/components/selectors/TaskPermissionSelect.vue';
     import ClearTableFiltersButton from '../../../shared/components/buttons/ClearTableFiltersButton.vue';

@@ -13,7 +13,7 @@
     import { Project } from '../models/project';
 
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
-    import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
+    import TextFilterInput from '../../../shared/components/form-blocks/TextFilterInput.vue';
     import ProjectPrioritySelector from '../../project-priorities/components/ProjectPrioritySelector.vue';
     import ProjectTypeSelector from '../../project-types/components/ProjectTypeSelector.vue';
     import ProjectStatusSelector from '../../project-statuses/components/ProjectStatusSelector.vue';

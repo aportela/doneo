@@ -11,7 +11,7 @@
     import { ProjectType } from '../models/project-type';
 
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
-    import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
+    import TextFilterInput from '../../../shared/components/form-blocks/TextFilterInput.vue';
     import ClearTableFiltersButton from '../../../shared/components/buttons/ClearTableFiltersButton.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
@@ -104,7 +104,7 @@
             <tr v-for="projectType, index in items" :key="projectType.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(projectType.hexColor ?? '#888888')">{{ projectType.name
-                        }}</n-tag>
+                    }}</n-tag>
                 </td>
                 <td class="doneo-text-center">
                     <ManageTableActionButtons show-update show-delete :update-disabled="props.disabled"
