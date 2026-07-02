@@ -16,7 +16,7 @@
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
     import ProjectPermissionSelect from '../../../shared/components/selectors/ProjectPermissionSelect.vue';
     import TaskPermissionSelect from '../../../shared/components/selectors/TaskPermissionSelect.vue';
-    import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
+    import ClearTableFiltersButton from '../../../shared/components/buttons/ClearTableFiltersButton.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
 
     interface Props {
@@ -136,7 +136,7 @@
                         ref="taskPermissionSelectorRef" />
                 </th>
                 <th class="doneo-text-center">
-                    <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
+                    <ClearTableFiltersButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
                 </th>
             </tr>
         </template>

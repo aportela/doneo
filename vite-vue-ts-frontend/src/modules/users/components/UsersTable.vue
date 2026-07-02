@@ -20,7 +20,7 @@
     import UserPermissionsFilterSelector from '../components/UserPermissionsFilterSelector.vue';
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
-    import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
+    import ClearTableFiltersButton from '../../../shared/components/buttons/ClearTableFiltersButton.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
 
@@ -219,7 +219,7 @@
                         :disabled="props.disabled" />
                 </th>
                 <th>
-                    <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
+                    <ClearTableFiltersButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
                 </th>
             </tr>
         </template>

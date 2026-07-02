@@ -12,7 +12,7 @@
 
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
-    import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
+    import ClearTableFiltersButton from '../../../shared/components/buttons/ClearTableFiltersButton.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
     import type { Sort } from '../../../shared/types/models/sort.ts';
@@ -110,7 +110,7 @@
                 </th>
                 <th></th>
                 <th class="doneo-text-center">
-                    <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
+                    <ClearTableFiltersButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
                 </th>
             </tr>
         </template>
@@ -118,7 +118,7 @@
             <tr v-for="taskPriority, index in items" :key="taskPriority.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(taskPriority.hexColor ?? '#888888')">{{ taskPriority.name
-                        }}</n-tag>
+                    }}</n-tag>
                 </td>
                 <td>{{ taskPriority.index }}</td>
                 <td class="doneo-text-center">

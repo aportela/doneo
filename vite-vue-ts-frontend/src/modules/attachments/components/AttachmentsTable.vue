@@ -12,7 +12,7 @@
     import { Attachment } from '../models/attachment.ts';
 
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
-    import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
+    import ClearTableFiltersButton from '../../../shared/components/buttons/ClearTableFiltersButton.vue';
     import TextFilterInput from '../../../shared/components/TextFilterInput.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
@@ -184,7 +184,7 @@
                         :placeholder="t('modules.projectAttachment.components.projectAttachmentsTable.filters.user.placeholder')" />
                 </th>
                 <th class="doneo-text-center">
-                    <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
+                    <ClearTableFiltersButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
                 </th>
             </tr>
         </template>

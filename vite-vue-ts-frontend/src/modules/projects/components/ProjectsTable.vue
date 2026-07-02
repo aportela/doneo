@@ -19,7 +19,7 @@
     import ProjectStatusSelector from '../../project-statuses/components/ProjectStatusSelector.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
-    import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
+    import ClearTableFiltersButton from '../../../shared/components/buttons/ClearTableFiltersButton.vue';
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import ChangeProjectStatusDropdown from '../../../shared/components/dropdowns/ChangeProjectStatusDropdown.vue';
@@ -193,7 +193,7 @@
                         :placeholder="t('modules.project.components.ProjectsTable.header.filters.creator.placeholder')" />
                 </th>
                 <th class="doneo-text-center">
-                    <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
+                    <ClearTableFiltersButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
                 </th>
             </tr>
         </template>

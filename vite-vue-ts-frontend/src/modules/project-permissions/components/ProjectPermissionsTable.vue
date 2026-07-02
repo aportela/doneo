@@ -13,7 +13,7 @@
     import { ProjectPermission } from '../models/project-permission.ts';
 
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
-    import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
+    import ClearTableFiltersButton from '../../../shared/components/buttons/ClearTableFiltersButton.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
     import RoleSelector from '../../roles/components/RoleSelector.vue';
@@ -150,7 +150,7 @@
                         ref="taskPermissionSelectorRef" />
                 </th>
                 <th class="doneo-text-center">
-                    <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
+                    <ClearTableFiltersButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
                 </th>
             </tr>
         </template>

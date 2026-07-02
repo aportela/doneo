@@ -18,7 +18,7 @@
     import TaskStatusSelector from '../../task-statuses/components/TaskStatusSelector.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
-    import ClearFiltersTableButton from '../../../shared/components/tables/ClearFiltersTableButton.vue';
+    import ClearTableFiltersButton from '../../../shared/components/buttons/ClearTableFiltersButton.vue';
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import ChangeTaskStatusDropdown from '../../../shared/components/dropdowns/ChangeTaskStatusDropdown.vue';
@@ -178,7 +178,7 @@
                         :placeholder="t('modules.task.components.TasksTable.header.filters.creator.placeholder')" />
                 </th>
                 <th class="doneo-text-center">
-                    <ClearFiltersTableButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
+                    <ClearTableFiltersButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
                 </th>
             </tr>
         </template>
