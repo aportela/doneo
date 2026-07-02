@@ -2,22 +2,28 @@
     import { ref, watch } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NInputGroup, NSelect, NButtonGroup, NButton, NIcon, NTooltip, type SelectOption, NSpace, NTag } from 'naive-ui';
+    import { NInputGroup, NSelect, NButtonGroup, NButton, NIcon, NTooltip, type SelectOption, NFlex, NTag, type SelectSize } from 'naive-ui';
     import { IconCheck, IconX, IconTag } from '@tabler/icons-vue';
 
-    interface ToggleInputProps {
+    import { DEFAULT_SELECTOR_SIZE, DEFAULT_BUTTON_ICON_SIZE } from '../../../constants';
+
+    interface IProps {
         startupEditMode?: boolean;
         disabled?: boolean;
         readOnly?: boolean;
+        size?: SelectSize;
+        iconSize?: number;
         placeholder?: string;
         onConfirm?: (newValue: string[]) => void;
         onCancel?: () => void;
     };
 
-    const props = withDefaults(defineProps<ToggleInputProps>(), {
+    const props = withDefaults(defineProps<IProps>(), {
         startupEditMode: false,
         disabled: false,
         readOnly: false,
+        size: DEFAULT_SELECTOR_SIZE,
+        iconSize: DEFAULT_BUTTON_ICON_SIZE,
     });
 
     const { t } = useI18n();
@@ -72,30 +78,29 @@
             label: normalized,
             value: normalized
         };
-    }
-
+    };
 </script>
 
 <template>
     <n-input-group>
-        <n-space v-if="!editMode" class="doneo-tag-selector-container doneo-cursor-pointer" @click="toggleMode">
+        <n-flex v-if="!editMode" class="doneo-tag-selector-container doneo-cursor-pointer" @click="toggleMode">
             <!-- TODO: router-link filter by tag -->
-            <n-tag v-for="tag in editValue" :key="tag" class="doneo-cursor-pointer">
+            <n-tag :size="props.size" v-for="tag in editValue" :key="tag" class="doneo-cursor-pointer">
                 {{ tag }}
                 <template #icon>
-                    <n-icon :component="IconTag" />
+                    <n-icon :size="props.iconSize" :component="IconTag" />
                 </template>
             </n-tag>
-        </n-space>
-        <n-select v-else v-model:value="editValue" filterable multiple tag :show-arrow="false" :show="false"
-            :on-create="onAddTag" :placeholder="props.placeholder"
+        </n-flex>
+        <n-select v-else :size="props.size" v-model:value="editValue" filterable multiple tag :show-arrow="false"
+            :show="false" :on-create="onAddTag" :placeholder="props.placeholder"
             @click="() => { if (!editMode) { toggleMode(); } }" />
-        <n-button-group v-if="editMode">
+        <n-button-group :size="props.size" v-if="editMode">
             <n-tooltip trigger="hover">
                 <template #trigger>
-                    <n-button @click="confirmNewValue" :disabled="props.disabled">
+                    <n-button :size="props.size" @click="confirmNewValue" :disabled="props.disabled">
                         <template #icon>
-                            <n-icon :component="IconCheck" />
+                            <n-icon :size="props.iconSize" :component="IconCheck" />
                         </template>
                     </n-button>
                 </template>
@@ -103,9 +108,9 @@
             </n-tooltip>
             <n-tooltip trigger="hover">
                 <template #trigger>
-                    <n-button @click="cancelNewValue" :disabled="props.disabled">
+                    <n-button :size="props.size" @click="cancelNewValue" :disabled="props.disabled">
                         <template #icon>
-                            <n-icon :component="IconX" />
+                            <n-icon :size="props.iconSize" :component="IconX" />
                         </template>
                     </n-button>
                 </template>

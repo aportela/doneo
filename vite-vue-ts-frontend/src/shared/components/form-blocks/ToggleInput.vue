@@ -5,7 +5,7 @@
     import { NInputGroup, NInput, NButtonGroup, NButton, NIcon, NTooltip, type InputSize } from 'naive-ui';
     import { IconCheck, IconX } from '@tabler/icons-vue';
 
-    import { DEFAULT_INPUT_SIZE, DEFAULT_BUTTON_ICON_SIZE } from '../../constants';
+    import { DEFAULT_INPUT_SIZE, DEFAULT_BUTTON_ICON_SIZE } from '../../../constants';
 
     interface IProps {
         startupEditMode?: boolean;

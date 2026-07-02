@@ -20,7 +20,7 @@
     import ToggleInput from '../../../../shared/components/form-blocks/ToggleInput.vue';
     import ToggleDateTimePicker from '../../../../shared/components/ToggleDateTimePicker.vue';
     import { IDate } from '../../../../shared/types/idate.ts';
-    import ToggleTagSelector from '../../../../shared/components/ToggleTagSelector.vue';
+    import ToggleTagSelector from '../../../../shared/components/form-blocks/ToggleTagSelector.vue';
     import TimeFieldsInput from '../../../../shared/components/form-blocks/TimeFieldsInput.vue';
     import TaskTimeProgress from '../../../../shared/components/progress/TaskTimeProgress.vue';
 
