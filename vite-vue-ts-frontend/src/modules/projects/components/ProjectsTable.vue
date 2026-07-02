@@ -24,6 +24,7 @@
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import ChangeProjectStatusDropdown from '../../../shared/components/dropdowns/ChangeProjectStatusDropdown.vue';
     import type { ProjectStatus } from '../../project-statuses/models/project-status.ts';
+    import { DEFAULT_BUTTON_SIZE } from '../../../constants.ts';
 
     interface Props {
         disabled: boolean;
@@ -223,9 +224,9 @@
                 </td>
                 <td class="doneo-text-center">
                     <!-- TODO: use ManageTableActionButtons -->
-                    <n-button-group size="small">
+                    <n-button-group :size="DEFAULT_BUTTON_SIZE">
                         <router-link :to="{ name: 'projectTab', params: { projectId: project.id, tab: 'metadata' } }">
-                            <n-button :disabled="props.disabled">
+                            <n-button :disabled="props.disabled" :size="DEFAULT_BUTTON_SIZE">
                                 {{ t("shared.buttons.Open.label") }}
                                 <template #icon>
                                     <n-icon :size="22" :component="IconFilePencil" />
