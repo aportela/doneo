@@ -1,31 +1,34 @@
 <script setup lang="ts">
     import { useI18n } from "vue-i18n";
 
-    import { NButton, NIcon, NTooltip } from 'naive-ui';
+    import { NButton, NIcon, NTooltip, type ButtonSize } from 'naive-ui';
     import { IconLayoutSidebarLeftExpand, IconLayoutNavbarExpand } from '@tabler/icons-vue';
 
     import { useUserSettingsStore } from "../../../stores/userSettings";
 
-    import { DEFAULT_BUTTON_ICON_SIZE } from '../../../constants';
+    import { DEFAULT_SINGLE_ACTION_BUTTON_SIZE, DEFAULT_BUTTON_ICON_SIZE } from '../../../constants';
 
     interface IProps {
+        size?: ButtonSize;
         iconSize?: number,
         disabled?: boolean,
     };
 
     const props = withDefaults(defineProps<IProps>(), {
+        size: DEFAULT_SINGLE_ACTION_BUTTON_SIZE,
         iconSize: DEFAULT_BUTTON_ICON_SIZE,
         disabled: false,
     });
 
     const { t } = useI18n();
+
     const userSettingsStore = useUserSettingsStore();
 </script>
 
 <template>
     <n-tooltip trigger="hover">
         <template #trigger>
-            <n-button quaternary @click="userSettingsStore.toggleNavigationMode" @mousedown.prevent
+            <n-button :size="props.size" quaternary @click="userSettingsStore.toggleNavigationMode" @mousedown.prevent
                 :disabled="props.disabled">
                 <n-icon :size="props.iconSize"
                     :component="userSettingsStore.sideNavigationMode ? IconLayoutNavbarExpand : IconLayoutSidebarLeftExpand" />
