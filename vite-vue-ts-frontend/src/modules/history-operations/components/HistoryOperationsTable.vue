@@ -100,11 +100,13 @@
                 </th>
                 <th>
                     <HistoryOperationSelect v-model:history-operation-type="filters.operationType"
-                        :disabled="props.disabled" clearable :show-only-task-history-operations="!!props.taskId"
+                        :disabled="props.disabled" size="small" clearable
+                        :show-only-task-history-operations="!!props.taskId"
                         :placeholder="t('modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.filters.operationType.placeholder')" />
                 </th>
                 <th>
-                    <UserSelector v-model:id="filters.userId" :disabled="props.disabled" hide-avatar clearable
+                    <UserSelector v-model:id="filters.userId" :disabled="props.disabled" size="small" hide-avatar
+                        clearable
                         :placeholder="t('modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.filters.user.placeholder')" />
                 </th>
                 <th class="doneo-text-center">
