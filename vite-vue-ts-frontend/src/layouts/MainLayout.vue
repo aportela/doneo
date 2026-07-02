@@ -90,7 +90,7 @@
                 </n-drawer>
                 <SearchModal v-model:show="showSearchModal" />
                 <n-layout-header bordered>
-                    <TopHeaderNew />
+                    <TopHeaderNew @open-search-modal="showSearchModal = true;" />
                     <TopMenu v-if="false && userSettingsStore.topNavigationMode" />
                     <n-button v-if="isMobile" quaternary circle @click="mobileMenuOpen = true">☰</n-button>
                 </n-layout-header>

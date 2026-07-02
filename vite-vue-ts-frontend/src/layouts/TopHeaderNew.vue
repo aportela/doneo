@@ -37,6 +37,8 @@
 
     const { menuOptions, lightTheme, darkTheme, notificationsDisabled, notificationsEnabled, topNavigation, sideNavigation } = useMenu();
 
+    const emit = defineEmits(['openSearchModal']);
+
     const handleMenuSelect = (menuOptionKey: string) => {
         switch (menuOptionKey) {
             case "disableNotifications":
@@ -132,6 +134,10 @@
             sideNavigation.value = userSettingsStore.sideNavigationMode;
         });
 
+    const onSearch = () => {
+        emit('openSearchModal')
+    };
+
     onMounted(() => {
         notificationsEnabled.value = userSettingsStore.hasNotificationsEnabled;
         notificationsDisabled.value = !userSettingsStore.hasNotificationsEnabled;
@@ -151,7 +157,7 @@
             </div>
             <n-divider vertical />
             <BreadCrumb v-if="userSettingsStore.sideNavigationMode" />
-            <div class="search-container">
+            <div class="search-container" @click="onSearch">
                 <n-input placeholder="Search..." style="min-width: 50%;" round v-if="false">
                     <template #prefix>
                         <IconSearch :size="16" />
