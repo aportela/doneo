@@ -22,7 +22,7 @@
     import { IDate } from '../../../../shared/types/idate.ts';
     import ToggleTagSelector from '../../../../shared/components/ToggleTagSelector.vue';
     import TimeFieldsInput from '../../../../shared/components/form-blocks/TimeFieldsInput.vue';
-    import TaskSpentEstimatedPercent from '../../../../shared/components/progress/TaskSpentEstimatedPercent.vue';
+    import TaskTimeProgress from '../../../../shared/components/progress/TaskTimeProgress.vue';
 
     interface TaskMetadataTabProps {
         readOnly?: boolean;
@@ -297,7 +297,7 @@
             </n-form-item>
             <n-grid :cols="2" :x-gap="8">
                 <n-grid-item>
-                    <TaskSpentEstimatedPercent type="line" :estimated="task.estimatedTime" :spent="task.totalSpentTime"
+                    <TaskTimeProgress type="line" :estimated="task.estimatedTime" :spent="task.totalSpentTime"
                         :height="24" />
                 </n-grid-item>
                 <n-grid-item>
