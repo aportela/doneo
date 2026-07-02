@@ -1,19 +1,21 @@
 <script setup lang="ts">
     import { useI18n } from "vue-i18n";
 
-    import { NButton, NIcon, NTooltip } from 'naive-ui';
+    import { NButton, NIcon, NTooltip, type ButtonSize } from 'naive-ui';
     import { IconMoon, IconSun } from '@tabler/icons-vue';
 
     import { useColorSchemeStore } from "../../../stores/colorScheme";
 
-    import { DEFAULT_BUTTON_ICON_SIZE } from '../../../constants';
+    import { DEFAULT_SINGLE_ACTION_BUTTON_SIZE, DEFAULT_BUTTON_ICON_SIZE } from '../../../constants';
 
     interface IProps {
+        size?: ButtonSize;
         iconSize?: number,
         disabled?: boolean;
     };
 
     const props = withDefaults(defineProps<IProps>(), {
+        size: DEFAULT_SINGLE_ACTION_BUTTON_SIZE,
         iconSize: DEFAULT_BUTTON_ICON_SIZE,
         disabled: false,
     });
@@ -26,7 +28,8 @@
 <template>
     <n-tooltip trigger="hover">
         <template #trigger>
-            <n-button quaternary @click.prevent="colorSchemeStore.toggle" @mousedown.prevent :disabled="props.disabled">
+            <n-button :size="props.size" quaternary @click.prevent="colorSchemeStore.toggle" @mousedown.prevent
+                :disabled="props.disabled">
                 <n-icon :size="props.iconSize" :component="colorSchemeStore.light ? IconMoon : IconSun" />
             </n-button>
         </template>
