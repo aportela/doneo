@@ -71,16 +71,6 @@
         }
     );
 
-    const tabPlacement = ref<"top" | "left">("top");
-
-    const onToggleTabPlacement = () => {
-        if (tabPlacement.value == "top") {
-            tabPlacement.value = "left";
-        } else {
-            tabPlacement.value = "top";
-        }
-    };
-
     const onGet = async (id: string) => {
         serverErrors.value = {};
         let notFoundError = false;
@@ -140,8 +130,8 @@
 </script>
 
 <template>
-    <h1 class="doneo-cursor-pointer" @click="onToggleTabPlacement">PROJECT</h1>
-    <n-tabs :placement="tabPlacement" type="line" animated ref="tabsRef" v-model:value="tab">
+    <h1 class="doneo-cursor-pointer">PROJECT</h1>
+    <n-tabs placement="top" type="line" animated ref="tabsRef" v-model:value="tab">
         <n-tab-pane name="metadata" display-directive="show" key="metadata" :disabled="!projectId">
             <template #tab>
                 Metadata
