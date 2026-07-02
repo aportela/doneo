@@ -11,3 +11,5 @@ export const DEFAULT_BUTTON_SIZE = "small";
 export const DEFAULT_BUTTON_ICON_SIZE = 20;
 
 export const DEFAULT_SINGLE_ACTION_BUTTON_SIZE = "medium";
+
+export const DEFAULT_INPUT_SIZE = "small";
