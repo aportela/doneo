@@ -15,6 +15,8 @@
     import TaskStatusSelector from '../../task-statuses/components/TaskStatusSelector.vue';
     import TimeFieldsInput from '../../../shared/components/form-blocks/TimeFieldsInput.vue';
 
+    import { DEFAULT_INPUT_SIZE } from '../../../constants.ts';
+
     interface NewTaskFormProps {
         style?: string | CSSProperties;
         projectId: string;
@@ -197,14 +199,15 @@
             <n-form-item :label="t('modules.task.components.NewTaskForm.inputs.summary.label')" path="summary"
                 show-feedback>
                 <n-input type="text" :placeholder="t('modules.task.components.NewTaskForm.inputs.summary.placeholder')"
-                    v-model:value="task.summary" :maxlength="MAX_SUMMARY_LENGTH" :show-count="true" clearable required>
+                    :size="DEFAULT_INPUT_SIZE" v-model:value="task.summary" :maxlength="MAX_SUMMARY_LENGTH"
+                    :show-count="true" clearable required>
                 </n-input>
             </n-form-item>
             <n-form-item :label="t('modules.task.components.NewTaskForm.inputs.description.label')" path="description"
                 show-feedback>
                 <n-input type="textarea"
                     :placeholder="t('modules.task.components.NewTaskForm.inputs.description.placeholder')"
-                    v-model:value="task.description" clearable>
+                    :size="DEFAULT_INPUT_SIZE" v-model:value="task.description" clearable>
                 </n-input>
             </n-form-item>
             <n-grid :cols="2" x-gap="16">

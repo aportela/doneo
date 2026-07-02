@@ -15,6 +15,8 @@
     import ProjectPrioritySelector from '../../project-priorities/components/ProjectPrioritySelector.vue';
     import ProjectStatusSelector from '../../project-statuses/components/ProjectStatusSelector.vue';
 
+    import { DEFAULT_INPUT_SIZE } from '../../../constants.ts';
+
     interface NewProjectFormProps {
         style?: string | CSSProperties;
     }
@@ -234,23 +236,23 @@
                 show-feedback>
                 <n-input type="text"
                     :placeholder="t('modules.project.components.NewProjectForm.inputs.slug.placeholder')"
-                    v-model:value="project.slug" :maxlength="MAX_SLUG_LENGTH" :show-count="true" clearable required
-                    autofocus>
+                    :size="DEFAULT_INPUT_SIZE" v-model:value="project.slug" :maxlength="MAX_SLUG_LENGTH"
+                    :show-count="true" clearable required autofocus>
                 </n-input>
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.inputs.summary.label')" path="summary"
                 show-feedback>
                 <n-input type="text"
                     :placeholder="t('modules.project.components.NewProjectForm.inputs.summary.placeholder')"
-                    v-model:value="project.summary" :maxlength="MAX_SUMMARY_LENGTH" :show-count="true" clearable
-                    required>
+                    :size="DEFAULT_INPUT_SIZE" v-model:value="project.summary" :maxlength="MAX_SUMMARY_LENGTH"
+                    :show-count="true" clearable required>
                 </n-input>
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.inputs.description.label')"
                 path="description" show-feedback>
                 <n-input type="textarea"
                     :placeholder="t('modules.project.components.NewProjectForm.inputs.description.placeholder')"
-                    v-model:value="project.description" clearable>
+                    :size="DEFAULT_INPUT_SIZE" v-model:value="project.description" clearable>
                 </n-input>
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.selectors.projectType.label')"
