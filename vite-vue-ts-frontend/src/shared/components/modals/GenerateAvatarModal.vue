@@ -7,7 +7,7 @@
 
     import { generateAvatar, generateParams, getThemeNames, type ThemeName } from 'avatarka';
 
-    import { BUTTON_DEFAULT_ICON_SIZE } from '../../../constants';
+    import { DEFAULT_BUTTON_ICON_SIZE } from '../../../constants';
 
     const { t } = useI18n();
 
@@ -79,7 +79,7 @@
                 </n-form-item>
                 <n-button @click="generateRandomAvatar" block>
                     <template #icon>
-                        <n-icon :component="IconImageGeneration" :size="BUTTON_DEFAULT_ICON_SIZE" />
+                        <n-icon :component="IconImageGeneration" :size="DEFAULT_BUTTON_ICON_SIZE" />
                     </template>
                     {{ t("shared.components.modals.GenerateAvatarModal.buttons.generate.label") }}
                 </n-button>
@@ -89,13 +89,13 @@
             <n-flex justify="end">
                 <n-button @click="onConfirm">
                     <template #icon>
-                        <n-icon :component="IconDeviceFloppy" :size="BUTTON_DEFAULT_ICON_SIZE" />
+                        <n-icon :component="IconDeviceFloppy" :size="DEFAULT_BUTTON_ICON_SIZE" />
                     </template>
                     {{ t("shared.components.modals.GenerateAvatarModal.buttons.confirm.label") }}
                 </n-button>
                 <n-button @click="onCancel">
                     <template #icon>
-                        <n-icon :component="IconCancel" :size="BUTTON_DEFAULT_ICON_SIZE" />
+                        <n-icon :component="IconCancel" :size="DEFAULT_BUTTON_ICON_SIZE" />
                     </template>
                     {{ t("shared.components.modals.GenerateAvatarModal.buttons.cancel.label") }}
                 </n-button>

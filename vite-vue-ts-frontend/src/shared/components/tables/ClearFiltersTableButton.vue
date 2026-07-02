@@ -4,7 +4,7 @@
     import { NButton, NIcon, type ButtonSize } from 'naive-ui';
     import { IconFilterOff } from '@tabler/icons-vue';
 
-    import { DEFAULT_BUTTON_SIZE, BUTTON_DEFAULT_ICON_SIZE } from "../../../constants";
+    import { DEFAULT_BUTTON_SIZE, DEFAULT_BUTTON_ICON_SIZE } from "../../../constants";
 
     interface IProps {
         size?: ButtonSize;
@@ -14,7 +14,7 @@
 
     const props = withDefaults(defineProps<IProps>(), {
         size: DEFAULT_BUTTON_SIZE,
-        iconSize: BUTTON_DEFAULT_ICON_SIZE,
+        iconSize: DEFAULT_BUTTON_ICON_SIZE,
         disabled: false,
     });
 

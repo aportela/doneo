@@ -4,14 +4,14 @@
     import { NButton, NIcon, NTooltip } from 'naive-ui'
     import { IconBrandGithub } from '@tabler/icons-vue';
 
-    import { GITHUB_PROJECT_URL, BUTTON_DEFAULT_ICON_SIZE } from '../../../constants';
+    import { GITHUB_PROJECT_URL, DEFAULT_BUTTON_ICON_SIZE } from '../../../constants';
 
     interface IProps {
         iconSize?: number,
     };
 
     const props = withDefaults(defineProps<IProps>(), {
-        iconSize: BUTTON_DEFAULT_ICON_SIZE
+        iconSize: DEFAULT_BUTTON_ICON_SIZE
     });
 
     const { t } = useI18n();

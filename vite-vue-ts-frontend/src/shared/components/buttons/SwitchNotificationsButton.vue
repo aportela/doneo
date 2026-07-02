@@ -6,7 +6,7 @@
 
     import { useUserSettingsStore } from "../../../stores/userSettings";
 
-    import { BUTTON_DEFAULT_ICON_SIZE } from '../../../constants';
+    import { DEFAULT_BUTTON_ICON_SIZE } from '../../../constants';
 
     interface IProps {
         iconSize?: number,
@@ -14,7 +14,7 @@
     };
 
     const props = withDefaults(defineProps<IProps>(), {
-        iconSize: BUTTON_DEFAULT_ICON_SIZE,
+        iconSize: DEFAULT_BUTTON_ICON_SIZE,
         disabled: false,
     });
 

@@ -8,7 +8,7 @@
     import type { ProjectStatus } from '../../../modules/project-statuses/models/project-status';
     import { useCacheStore } from '../../../stores/cache';
 
-    import { BUTTON_DEFAULT_ICON_SIZE } from '../../../constants';
+    import { DEFAULT_BUTTON_ICON_SIZE } from '../../../constants';
 
     interface IProps {
         currentStatus: ProjectStatus,
@@ -18,7 +18,7 @@
     };
 
     const props = withDefaults(defineProps<IProps>(), {
-        iconSize: BUTTON_DEFAULT_ICON_SIZE,
+        iconSize: DEFAULT_BUTTON_ICON_SIZE,
         disabled: false,
         readOnly: false,
     });

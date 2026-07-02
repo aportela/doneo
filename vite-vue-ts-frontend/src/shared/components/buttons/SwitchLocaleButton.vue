@@ -8,7 +8,7 @@
     import { availableLocaleSelectorOptionItems, getlocaleSelectorOptionItem } from '../../../i18n';
     import { useI18nStore } from '../../../stores/i18n';
 
-    import { BUTTON_DEFAULT_ICON_SIZE } from '../../../constants';
+    import { DEFAULT_BUTTON_ICON_SIZE } from '../../../constants';
 
     interface IProps {
         iconSize?: number,
@@ -16,7 +16,7 @@
     };
 
     const props = withDefaults(defineProps<IProps>(), {
-        iconSize: BUTTON_DEFAULT_ICON_SIZE,
+        iconSize: DEFAULT_BUTTON_ICON_SIZE,
         disabled: false,
     });
 
