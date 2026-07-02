@@ -112,7 +112,7 @@
 
     const reset = () => {
         taskPriorityId.value = null;
-    }
+    };
 
     defineExpose({ reset });
 
@@ -144,7 +144,7 @@
         <n-select filterable ref="selectInstRef" :required="props.required" :clearable="props.clearable"
             v-model:value="taskPriorityId" :options="options" :placeholder="props.placeholder" :size="props.size"
             :disabled="isDisabled" v-if="!props.readOnly" />
-        <n-input v-else placeholder="" v-model:value="readOnlyLabel" readonly />
+        <n-input v-else :size="props.size" placeholder="" v-model:value="readOnlyLabel" readonly />
         <n-button secondary :size="props.size" :disabled="true" class="doneo-cursor-default doneo-disable-opacity"
             v-if="state.ajaxErrors">
             <template #icon>
