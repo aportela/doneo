@@ -1,3 +1,4 @@
+// TODO: i18n for locale param
 export const formatBytes = (bytes: number, locale = "es-ES") => {
   if (bytes === 0) return "0 B";
 
