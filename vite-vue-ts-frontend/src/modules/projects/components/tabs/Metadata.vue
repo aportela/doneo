@@ -244,21 +244,21 @@
             </n-form-item>
             <n-form-item label="Started at">
                 <ToggleDateTimePicker clearable v-model:value="project.startedAt.msTimestamp"
-                    :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly || readOnlyMode" />
+                    :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly && !readOnlyMode" />
                 <span class="doneo-datetime-label-readonly" v-else>
                     {{ project.startedAt?.toLocaleString() }}
                 </span>
             </n-form-item>
             <n-form-item label="Finished at">
                 <ToggleDateTimePicker clearable v-model:value="project.finishedAt.msTimestamp"
-                    :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly || readOnlyMode" />
+                    :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly && !readOnlyMode" />
                 <span class="doneo-datetime-label-readonly" v-else>
                     {{ project.finishedAt?.toLocaleString() }}
                 </span>
             </n-form-item>
             <n-form-item label="Due at">
                 <ToggleDateTimePicker clearable v-model:value="project.dueAt.msTimestamp"
-                    :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly || readOnlyMode" />
+                    :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly && !readOnlyMode" />
                 <span class="doneo-datetime-label-readonly" v-else>
                     {{ project.dueAt?.toLocaleString() }}
                 </span>
@@ -273,7 +273,7 @@
                 </n-form-item>
                 <n-form-item label="Type">
                     <ProjectTypeSelector v-model:id="project.type.id" :disabled="props.disabled || state.ajaxRunning"
-                        :read-only="props.readOnly" />
+                        :read-only="props.readOnly || readOnlyMode" />
                 </n-form-item>
                 <n-form-item label="Priority">
                     <ProjectPrioritySelector v-model:id="project.priority.id"
@@ -326,7 +326,7 @@
             </n-form-item>
         </n-form>
         <n-button @click="onUpdate" :disabled="props.disabled"
-            v-if="!props.readOnly && project.allowedOperations.updateProject">
+            v-if="!props.readOnly && !readOnlyMode && project.allowedOperations.updateProject">
             <template #icon>
                 <n-icon :component="IconDeviceFloppy"></n-icon>
             </template>
