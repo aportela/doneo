@@ -54,5 +54,3 @@ deny actions (add notes, delete notes, add attachments by project privileges)
 disabled && readonly for all components
 
 size & default for all components
-
-textarea markdown fullscreen modal editor with preview
