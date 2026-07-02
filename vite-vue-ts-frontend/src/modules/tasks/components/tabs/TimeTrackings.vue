@@ -166,7 +166,7 @@
 
 <template>
     <n-modal v-model:show="showForm">
-        <TimeTrackingForm :project-id="props.projectId" :task-id="props.taskId" mode="add" style="width: 40%;"
+        <TimeTrackingForm :project-id="props.projectId" :task-id="props.taskId" mode="add" style="width: 42%;"
             @add="onAdded" @cancel="onCancelForm" />
     </n-modal>
     <n-card bordered :style="props.style">
