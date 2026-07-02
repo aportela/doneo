@@ -10,17 +10,29 @@
     import type { TaskPriorityResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
     import { handleAPIError } from '../../../api/client/errorHandler';
+    import { DEFAULT_BUTTON_ICON_SIZE, DEFAULT_SELECTOR_SIZE } from '../../../constants';
 
-    interface TaskPrioritySelectorProps {
+    interface IProps {
         autoFocus?: boolean;
         required?: boolean;
         placeholder?: string;
         clearable?: boolean;
         size?: SelectSize;
+        iconSize?: number;
         hidePrefix?: boolean;
         disabled?: boolean;
         readOnly?: boolean;
-    }
+    };
+
+    const props = withDefaults(defineProps<IProps>(), {
+        autoFocus: false,
+        required: false,
+        clearable: false,
+        size: DEFAULT_SELECTOR_SIZE,
+        iconSize: DEFAULT_BUTTON_ICON_SIZE,
+        disabled: false,
+        readOnly: false,
+    });
 
     const cacheStore = useCacheStore();
 
@@ -34,7 +46,6 @@
 
     const taskPriorities = ref<TaskPriorityResponse[]>([]);
 
-    const props = defineProps<TaskPrioritySelectorProps>();
 
     const options = shallowRef<SelectOption[]>([]);
 
@@ -123,21 +134,21 @@
 
 <template>
     <n-input-group>
-        <n-button secondary :disabled="true" class="doneo-cursor-default doneo-disable-opacity"
+        <n-button :size="props.size" secondary :disabled="true" class="doneo-cursor-default doneo-disable-opacity"
             v-if="!props.hidePrefix">
             <template #icon v-if="!state.ajaxErrors">
-                <n-icon :color="selectedColor" :component="selectedColor ? IconSquareFilled : IconSquare">
-                </n-icon>
+                <n-icon :size="props.iconSize" :color="selectedColor"
+                    :component="selectedColor ? IconSquareFilled : IconSquare" />
             </template>
         </n-button>
         <n-select filterable ref="selectInstRef" :required="props.required" :clearable="props.clearable"
             v-model:value="taskPriorityId" :options="options" :placeholder="props.placeholder" :size="props.size"
             :disabled="isDisabled" v-if="!props.readOnly" />
         <n-input v-else placeholder="" v-model:value="readOnlyLabel" readonly />
-        <n-button secondary :disabled="true" class="doneo-cursor-default doneo-disable-opacity" v-if="state.ajaxErrors">
+        <n-button secondary :size="props.size" :disabled="true" class="doneo-cursor-default doneo-disable-opacity"
+            v-if="state.ajaxErrors">
             <template #icon>
-                <n-icon color="red" :component="IconAlertCircle">
-                </n-icon>
+                <n-icon :size="props.iconSize" color="red" :component="IconAlertCircle" />
             </template>
         </n-button>
     </n-input-group>
