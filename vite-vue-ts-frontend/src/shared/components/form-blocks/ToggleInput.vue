@@ -2,26 +2,32 @@
     import { ref, watch } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NInputGroup, NInput, NButtonGroup, NButton, NIcon, NTooltip } from 'naive-ui';
+    import { NInputGroup, NInput, NButtonGroup, NButton, NIcon, NTooltip, type InputSize } from 'naive-ui';
     import { IconCheck, IconX } from '@tabler/icons-vue';
 
-    interface ToggleInputProps {
+    import { DEFAULT_INPUT_SIZE, DEFAULT_BUTTON_ICON_SIZE } from '../../constants';
+
+    interface IProps {
         startupEditMode?: boolean;
         showCount?: boolean;
         maxLength?: number;
         disabled?: boolean;
         readOnly?: boolean;
+        size?: InputSize;
+        iconSize?: number;
         clearable?: boolean;
         placeholder?: string;
         onConfirm?: (newValue: string | null) => void;
         onCancel?: () => void;
     };
 
-    const props = withDefaults(defineProps<ToggleInputProps>(), {
+    const props = withDefaults(defineProps<IProps>(), {
         startupEditMode: false,
         showCount: false,
         disabled: false,
         readOnly: false,
+        size: DEFAULT_INPUT_SIZE,
+        iconSize: DEFAULT_BUTTON_ICON_SIZE,
         clearable: false,
     });
 
@@ -85,15 +91,16 @@
 
 <template>
     <n-input-group>
-        <n-input :readonly="!editMode" v-model:value="editValue" :show-count="editMode && props.showCount"
-            :maxlength="props.maxLength" :disabled="props.disabled" :clearable="props.clearable"
-            :placeholder="props.placeholder" @click="() => { if (!editMode) { toggleMode(); } }" @keydown="onKeydown" />
-        <n-button-group v-if="editMode">
+        <n-input :size="props.size" :readonly="!editMode" v-model:value="editValue"
+            :show-count="editMode && props.showCount" :maxlength="props.maxLength" :disabled="props.disabled"
+            :clearable="props.clearable" :placeholder="props.placeholder"
+            @click="() => { if (!editMode) { toggleMode(); } }" @keydown="onKeydown" />
+        <n-button-group v-if="editMode" :size="props.size">
             <n-tooltip trigger="hover">
                 <template #trigger>
-                    <n-button @click="confirmNewValue" :disabled="props.disabled">
+                    <n-button :size="props.size" @click="confirmNewValue" :disabled="props.disabled">
                         <template #icon>
-                            <n-icon :component="IconCheck" />
+                            <n-icon :size="props.iconSize" :component="IconCheck" />
                         </template>
                     </n-button>
                 </template>
@@ -101,9 +108,9 @@
             </n-tooltip>
             <n-tooltip trigger="hover">
                 <template #trigger>
-                    <n-button @click="cancelNewValue" :disabled="props.disabled">
+                    <n-button :size="props.size" @click="cancelNewValue" :disabled="props.disabled">
                         <template #icon>
-                            <n-icon :component="IconX" />
+                            <n-icon :size="props.iconSize" :component="IconX" />
                         </template>
                     </n-button>
                 </template>
