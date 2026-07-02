@@ -3,17 +3,17 @@
 
     import { NModal } from 'naive-ui';
 
-    import { Attachment } from '../../modules/attachments/models/attachment.ts';
-    import { formatBytes } from '../composables/format';
+    import { Attachment } from '../../../../modules/attachments/models/attachment.ts';
+    import { formatBytes } from '../../../composables/format.ts';
     import PDFWrapper from './PDFWrapper.vue';
 
-    interface PDFPreviewProps {
+    interface IProps {
         projectId: string;
         taskId?: string;
         items: Attachment[];
     };
 
-    const props = defineProps<PDFPreviewProps>();
+    const props = defineProps<IProps>();
 
     const show = defineModel('show', { default: false });
 
@@ -41,7 +41,7 @@
 
     const onClose = () => {
         show.value = false;
-    }
+    };
 </script>
 
 <template>

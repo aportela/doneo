@@ -1,13 +1,14 @@
 <script setup lang="ts">
     import { NImageGroup } from 'naive-ui';
 
-    interface ImagePreviewProps {
+    interface IProps {
         sources: string[];
     };
 
-    const props = defineProps<ImagePreviewProps>();
+    const props = defineProps<IProps>();
 
     const show = defineModel<boolean>("show");
+
     const currentIndex = defineModel<number>("currentIndex");
 </script>
 

@@ -3,12 +3,12 @@
 </template>
 
 <script setup lang="ts">
-  interface PDFWrapperProps {
+  interface IProps {
     url: string
     innerContentClass?: string;
   };
 
-  const props = defineProps<PDFWrapperProps>();
+  const props = defineProps<IProps>();
 </script>
 
 <style lang="css" scoped>

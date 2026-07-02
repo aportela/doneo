@@ -3,20 +3,21 @@
 
     import { NModal } from 'naive-ui';
 
-    import { Attachment } from '../../modules/attachments/models/attachment';
-    import { formatBytes } from '../composables/format';
+    import { Attachment } from '../../../../modules/attachments/models/attachment';
+    import { formatBytes } from '../../../composables/format';
 
-    interface AudioPreviewProps {
+    interface IProps {
         projectId: string;
         taskId?: string;
         items: Attachment[];
     };
 
-    const props = defineProps<AudioPreviewProps>();
+    const props = defineProps<IProps>();
 
     const bodyStyle = {
         width: '600px'
     };
+
     const show = defineModel('show', { default: false });
 
     const currentIndex = defineModel<number>("currentIndex", { default: 0 });
@@ -43,7 +44,7 @@
 
     const onClose = () => {
         show.value = false;
-    }
+    };
 </script>
 
 <template>
@@ -51,7 +52,7 @@
         <div style="background-color: rgba(250, 250, 252, 1); padding: 16px">
             <div v-if="currentItem" :key="currentItem.id ?? ''">
                 <p class="doneo-text-center"><strong>{{ currentItem.name }}</strong> ({{ formatBytes(currentItem.size)
-                    }})</p>
+                }})</p>
                 <audio controls autoplay>
                     <source :src="currentItem.getPreviewURL(props.projectId, props.taskId)"
                         :type="currentItem.contentType">

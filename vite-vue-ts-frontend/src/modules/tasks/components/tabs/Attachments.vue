@@ -17,13 +17,13 @@
     import { handleAPIError } from '../../../../api/client/errorHandler';
 
     import UploadDialog from "../../../attachments/components/UploadDialog.vue";
-    import ImagePreview from "../../../../shared/components/ImagePreview.vue";
 
     import AttachmentsTable from "../../../attachments/components/AttachmentsTable.vue";
     import type { AttachmentsTableFilters } from "../../../attachments/types/attachments-table-filter.ts";
     import { bgDownload } from "../../../../shared/composables/axios.ts";
-    import AudioPreview from "../../../../shared/components/AudioPreview.vue";
-    import PDFPreview from "../../../../shared/components/PDFPreview.vue";
+    import ImagePreview from "../../../../shared/components/widgets/preview/ImagePreview.vue";
+    import AudioPreview from "../../../../shared/components/widgets/preview/AudioPreview.vue";
+    import PDFPreview from "../../../../shared/components/widgets/preview/PDFPreview.vue";
 
     interface ProjectAttachmentsProps {
         disabled?: boolean;

@@ -17,13 +17,14 @@
     import { handleAPIError } from '../../../../api/client/errorHandler';
 
     import UploadDialog from "../../../attachments/components/UploadDialog.vue";
-    import ImagePreview from "../../../../shared/components/ImagePreview.vue";
+
 
     import AttachmentsTable from "../../../attachments/components/AttachmentsTable.vue";
     import type { AttachmentsTableFilters } from "../../../attachments/types/attachments-table-filter.ts";
     import { bgDownload } from "../../../../shared/composables/axios.ts";
-    import AudioPreview from "../../../../shared/components/AudioPreview.vue";
-    import PDFPreview from "../../../../shared/components/PDFPreview.vue";
+    import ImagePreview from "../../../../shared/components/widgets/preview/ImagePreview.vue";
+    import AudioPreview from "../../../../shared/components/widgets/preview/AudioPreview.vue";
+    import PDFPreview from "../../../../shared/components/widgets/preview/PDFPreview.vue";
 
     interface ProjectAttachmentsProps {
         readOnly?: boolean;
@@ -237,8 +238,8 @@
         :current-index="currentPDFPreviewIndex" />
 
     <!-- TODO: onupload notification -->
-    <UploadDialog v-if="props.projectId && !props.readOnly" v-model:show="showUploadModal"
-        :project-id="props.projectId" v-model:upload-count="uploadCount" />
+    <UploadDialog v-if="props.projectId && !props.readOnly" v-model:show="showUploadModal" :project-id="props.projectId"
+        v-model:upload-count="uploadCount" />
     <n-card bordered :style="props.style">
         <AttachmentsTable :project-id="props.projectId" :items="filteredItems" :disabled="state.ajaxRunning"
             v-model:filters="filters" @refresh="onRefresh" @add="onShowUploadModal" @delete="onDelete"
