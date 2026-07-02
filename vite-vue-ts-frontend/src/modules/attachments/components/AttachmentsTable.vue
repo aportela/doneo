@@ -180,7 +180,8 @@
                         :disabled="props.disabled" />
                 </th>
                 <th>
-                    <UserSelector hideAvatar clearable :disabled="props.disabled" v-model:id="filters.createdByUserId"
+                    <UserSelector hideAvatar clearable :disabled="props.disabled" size="small"
+                        v-model:id="filters.createdByUserId"
                         :placeholder="t('modules.projectAttachment.components.projectAttachmentsTable.filters.user.placeholder')" />
                 </th>
                 <th class="doneo-text-center">
