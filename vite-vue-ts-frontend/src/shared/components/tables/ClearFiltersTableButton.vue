@@ -4,19 +4,21 @@
     import { NButton, NIcon, type ButtonSize } from 'naive-ui';
     import { IconFilterOff } from '@tabler/icons-vue';
 
-    interface RefreshAddActionsColumnProps {
-        disabled?: boolean;
-        buttonSize?: ButtonSize
+    import { DEFAULT_BUTTON_SIZE, BUTTON_DEFAULT_ICON_SIZE } from "../../../constants";
+
+    interface IProps {
+        size?: ButtonSize;
         iconSize?: number;
+        disabled?: boolean;
     }
 
-    const emit = defineEmits(['clear'])
-
-    const props = withDefaults(defineProps<RefreshAddActionsColumnProps>(), {
+    const props = withDefaults(defineProps<IProps>(), {
+        size: DEFAULT_BUTTON_SIZE,
+        iconSize: BUTTON_DEFAULT_ICON_SIZE,
         disabled: false,
-        size: "small",
-        iconSize: 22,
     });
+
+    const emit = defineEmits(['clear'])
 
     const { t } = useI18n();
 
@@ -27,7 +29,7 @@
 </script>
 
 <template>
-    <n-button size="small" block @click="onClear" :disabled="props.disabled">
+    <n-button :size="props.size" block @click="onClear" :disabled="props.disabled">
         <template #icon>
             <n-icon :size="props.iconSize" :component="IconFilterOff" />
         </template>

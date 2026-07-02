@@ -7,4 +7,5 @@ export const SERVER_API_DEFAULT_TIMEOUT = 10000; // max timeout: 10 seconds
 
 export const DEFAULT_LOCALE = "en-US";
 
+export const DEFAULT_BUTTON_SIZE = "small";
 export const BUTTON_DEFAULT_ICON_SIZE = 20;
