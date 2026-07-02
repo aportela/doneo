@@ -11,7 +11,7 @@
     import GithubButton from '../shared/components/buttons/GithubButton.vue';
     import SwitchColorSchemeButton from '../shared/components/buttons/SwitchColorSchemeButton.vue';
     import SwitchLocaleDropdown from "../shared/components/dropdowns/SwitchLocaleDropdown.vue";
-    import { api } from '../shared/composables/api';
+    import { authService } from "../modules/auth/services/auth.ts";
     import { useSessionStore } from "../stores/session";
     import { useLoadingStore } from '../stores/loading';
     import { useCacheStore } from "../stores/cache.ts";
@@ -51,7 +51,7 @@
 
     const onSignOut = () => {
         loadingStore.set(true);
-        api.auth.signOut().then(() => {
+        authService.signOut().then(() => {
             sessionStore.removeAccessToken();
             cacheStore.clearAllCaches();
             router.push(
