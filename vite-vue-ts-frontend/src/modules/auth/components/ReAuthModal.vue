@@ -18,7 +18,7 @@
 
     const reAuthEmitters = reactive<Array<string>>([]);
 
-    const show = defineModel('show', { default: false });
+    const show = defineModel<boolean>('show', { default: false });
 
     const onSuccessReauth = () => {
         show.value = false;

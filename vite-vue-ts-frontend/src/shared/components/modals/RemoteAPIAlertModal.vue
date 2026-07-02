@@ -12,7 +12,7 @@
     const router = useRouter();
     const { t } = useI18n();
 
-    const show = defineModel('show', { default: false });
+    const show = defineModel<boolean>('show', { default: false });
 
     const closable = ref<boolean>(true);
 

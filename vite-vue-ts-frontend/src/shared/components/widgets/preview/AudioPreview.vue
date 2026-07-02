@@ -18,7 +18,7 @@
         width: '600px'
     };
 
-    const show = defineModel('show', { default: false });
+    const show = defineModel<boolean>('show', { default: false });
 
     const currentIndex = defineModel<number>("currentIndex", { default: 0 });
 
@@ -52,7 +52,7 @@
         <div style="background-color: rgba(250, 250, 252, 1); padding: 16px">
             <div v-if="currentItem" :key="currentItem.id ?? ''">
                 <p class="doneo-text-center"><strong>{{ currentItem.name }}</strong> ({{ formatBytes(currentItem.size)
-                }})</p>
+                    }})</p>
                 <audio controls autoplay>
                     <source :src="currentItem.getPreviewURL(props.projectId, props.taskId)"
                         :type="currentItem.contentType">
