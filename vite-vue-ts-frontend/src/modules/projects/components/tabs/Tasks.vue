@@ -193,7 +193,8 @@
 
 <template>
     <n-modal v-model:show="showModal">
-        <NewTaskForm class="modal-form" :project-id="props.projectId" @add="onAdded" @cancel="onCancelForm" />
+        <NewTaskForm class="modal-form" :project-id="props.projectId" @add="onAdded" @cancel="onCancelForm"
+            style="width: 42%;" />
     </n-modal>
     <n-card bordered :style="props.style">
         <Pager v-model:current-page="currentPage" v-model:page-size="pageSize" :total-pages="totalPages"
