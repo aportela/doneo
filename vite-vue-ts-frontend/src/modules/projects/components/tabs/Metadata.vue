@@ -210,21 +210,26 @@
 
         insertAtCursor(markdown)
     };
+
+    const currentMode = ref<"view" | "edit">("view");
+
+    const readOnlyMode = computed(() => currentMode.value === 'view');
 </script>
 
 <template>
     <!-- TODO: add missing i18n labels -->
-    <n-card bordered :style="props.style">
-        <n-flex align="center" justify="space-between">
-            <n-form-item label="Created by">
-                <div class="note-user">
-                    <AvatarUserName :user-id="project.createdBy.id" :user-name="project.createdBy.name" />
-                </div>
-            </n-form-item>
-            <div>
-                <div>Created at: {{ project.createdAt.toLocaleString() }}</div>
-                <div v-if="project.updatedAt.hasValue()">Updated at: {{ project.updatedAt?.toLocaleString() }}</div>
+    <n-card bordered :style="props.style" :class="{ 'doneo-cursor-pointer': currentMode === 'view' }"
+        @click="currentMode = 'edit'"">
+        <n-flex align=" center" justify="space-between">
+        <n-form-item label="Created by">
+            <div class="note-user">
+                <AvatarUserName :user-id="project.createdBy.id" :user-name="project.createdBy.name" />
             </div>
+        </n-form-item>
+        <div>
+            <div>Created at: {{ project.createdAt.toLocaleString() }}</div>
+            <div v-if="project.updatedAt.hasValue()">Updated at: {{ project.updatedAt?.toLocaleString() }}</div>
+        </div>
         </n-flex>
         <n-flex>
             <n-form-item label="Created at">
@@ -239,21 +244,21 @@
             </n-form-item>
             <n-form-item label="Started at">
                 <ToggleDateTimePicker clearable v-model:value="project.startedAt.msTimestamp"
-                    :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly" />
+                    :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly || readOnlyMode" />
                 <span class="doneo-datetime-label-readonly" v-else>
                     {{ project.startedAt?.toLocaleString() }}
                 </span>
             </n-form-item>
             <n-form-item label="Finished at">
                 <ToggleDateTimePicker clearable v-model:value="project.finishedAt.msTimestamp"
-                    :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly" />
+                    :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly || readOnlyMode" />
                 <span class="doneo-datetime-label-readonly" v-else>
                     {{ project.finishedAt?.toLocaleString() }}
                 </span>
             </n-form-item>
             <n-form-item label="Due at">
                 <ToggleDateTimePicker clearable v-model:value="project.dueAt.msTimestamp"
-                    :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly" />
+                    :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly || readOnlyMode" />
                 <span class="doneo-datetime-label-readonly" v-else>
                     {{ project.dueAt?.toLocaleString() }}
                 </span>
@@ -263,7 +268,7 @@
             <n-flex>
                 <n-form-item label="Slug">
                     <ToggleInput v-model:value="project.slug" show-count :max-length="MAX_SLUG_LENGTH"
-                        :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly"
+                        :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly || readOnlyMode"
                         v-on:confirm="onConfirmNewSlugValue" v-on:cancel="onCancelNewSlugValue" ref="slugRef" />
                 </n-form-item>
                 <n-form-item label="Type">
@@ -272,11 +277,11 @@
                 </n-form-item>
                 <n-form-item label="Priority">
                     <ProjectPrioritySelector v-model:id="project.priority.id"
-                        :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly" />
+                        :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly || readOnlyMode" />
                 </n-form-item>
                 <n-form-item label="Status">
                     <ProjectStatusSelector v-model:id="project.status.id"
-                        ::disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly"
+                        ::disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly || readOnlyMode"
                         @fill-empty-start-date="onFillEmptyStartDate" @set-start-date="onSetStartDate"
                         @fill-empty-finish-date="onFillEmptyFinishDate" @set-finish-date="onSetFinishDate"
                         @unset-finish-date-on-leave="onUnsetFinishDateOnLeave" />
@@ -284,7 +289,7 @@
             </n-flex>
             <n-form-item label="Summary">
                 <ToggleInput v-model:value="project.summary" show-count :max-length="MAX_SUMMARY_LENGTH"
-                    :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly" />
+                    :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly || readOnlyMode" />
             </n-form-item>
             <n-form-item label="description">
                 <template #label>
@@ -294,8 +299,8 @@
                 </template>
                 <div v-if="descriptionEditMode" style="width: 100%;">
                     <n-input v-model:value="project.description" type="textarea" clearable
-                        :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly" @paste="onPaste"
-                        ref="descriptionRef" :rows="8" />
+                        :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly || readOnlyMode"
+                        @paste="onPaste" ref="descriptionRef" :rows="8" />
                     <n-flex justify="end">
                         <n-button-group>
                             <n-button @click="onToggleDescriptionMode" :disabled="props.disabled">
