@@ -10,7 +10,7 @@
     import SwitchNavigationModeButton from '../shared/components/buttons/SwitchNavigationModeButton.vue';
     import GithubButton from '../shared/components/buttons/GithubButton.vue';
     import SwitchColorSchemeButton from '../shared/components/buttons/SwitchColorSchemeButton.vue';
-    import SwitchLocaleButton from '../shared/components/buttons/SwitchLocaleButton.vue';
+    import SwitchLocaleDropdown from "../shared/components/dropdowns/SwitchLocaleDropdown.vue";
     import { api } from '../shared/composables/api';
     import { useSessionStore } from "../stores/session";
     import { useLoadingStore } from '../stores/loading';
@@ -93,7 +93,7 @@
             </div>
             <n-flex>
 
-                <SwitchLocaleButton :icon-size="commonIconSize" />
+                <SwitchLocaleDropdown :icon-size="commonIconSize" />
                 <GithubButton :icon-size="commonIconSize" />
                 <SwitchNotificationsButton :icon-size="commonIconSize" />
                 <SwitchColorSchemeButton :icon-size="commonIconSize" />

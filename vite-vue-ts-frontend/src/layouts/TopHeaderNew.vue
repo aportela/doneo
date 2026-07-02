@@ -10,7 +10,7 @@
     import SwitchNavigationModeButton from '../shared/components/buttons/SwitchNavigationModeButton.vue';
     import GithubButton from '../shared/components/buttons/GithubButton.vue';
     import SwitchColorSchemeButton from '../shared/components/buttons/SwitchColorSchemeButton.vue';
-    import SwitchLocaleButton from '../shared/components/buttons/SwitchLocaleButton.vue';
+    import SwitchLocaleDropdown from '../shared/components/dropdowns/SwitchLocaleDropdown.vue';
     import { authService } from '../modules/auth/services/auth.ts';
     import { useSessionStore } from "../stores/session";
     import { useLoadingStore } from '../stores/loading';
@@ -167,8 +167,8 @@
                 v-if="userSettingsStore.topNavigationMode" />
 
 
-            <n-flex v-if="false">
-                <SwitchLocaleButton :icon-size="commonIconSize" />
+            <n-flex v-if="true">
+                <SwitchLocaleDropdown :icon-size="commonIconSize" />
                 <SwitchNavigationModeButton :icon-size="commonIconSize" />
                 <SwitchColorSchemeButton :icon-size="commonIconSize" />
                 <SwitchNotificationsButton :icon-size="commonIconSize" />

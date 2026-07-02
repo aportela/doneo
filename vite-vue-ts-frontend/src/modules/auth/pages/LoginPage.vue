@@ -8,7 +8,7 @@
     import LoginForm from "../components/LoginForm.vue";
     import GithubButton from "../../../shared/components/buttons/GithubButton.vue";
     import SwitchColorSchemeButton from "../../../shared/components/buttons/SwitchColorSchemeButton.vue";
-    import SwitchLocaleButton from "../../../shared/components/buttons/SwitchLocaleButton.vue";
+    import SwitchLocaleDropdown from "../../../shared/components/dropdowns/SwitchLocaleDropdown.vue";
     import RemoteAPIAlertModal from "../../../shared/components/modals/RemoteAPIAlertModal.vue";
 
     const router = useRouter();
@@ -32,9 +32,9 @@
                 <LoginForm @success="onSuccessLogin" />
                 <template #action>
                     <n-flex justify="space-around">
-                        <GithubButton :icon-size="20" />
-                        <SwitchColorSchemeButton :icon-size="20" />
-                        <SwitchLocaleButton :icon-size="20" />
+                        <GithubButton />
+                        <SwitchColorSchemeButton />
+                        <SwitchLocaleDropdown />
                     </n-flex>
                 </template>
             </n-card>
