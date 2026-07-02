@@ -19,7 +19,7 @@
     import { IconX, IconCheck, IconDeviceFloppy } from '@tabler/icons-vue';
     import { useMarkdown } from "../../../../shared/composables/useMarkdown.ts";
     import ToggleInput from '../../../../shared/components/form-blocks/ToggleInput.vue';
-    import ToggleDateTimePicker from '../../../../shared/components/ToggleDateTimePicker.vue';
+    import ToggleDateTimePicker from '../../../../shared/components/form-blocks/ToggleDateTimePicker.vue';
     import { IDate } from '../../../../shared/types/idate.ts';
 
     interface ProjectFormProps {

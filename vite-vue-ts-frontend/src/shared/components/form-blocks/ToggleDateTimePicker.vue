@@ -4,7 +4,7 @@
 
     import { NDatePicker } from 'naive-ui';
 
-    interface ToggleInputProps {
+    interface IProps {
         startupEditMode?: boolean;
         disabled?: boolean;
         readOnly?: boolean;
@@ -14,12 +14,14 @@
         onCancel?: () => void;
     };
 
-    const props = withDefaults(defineProps<ToggleInputProps>(), {
+    const props = withDefaults(defineProps<IProps>(), {
         startupEditMode: false,
         disabled: false,
         readOnly: false,
         clearable: false,
     });
+
+    // TODO: use props.readOnly v-else with doneo-datetime-label-readonly
 
     const { t } = useI18n();
 
@@ -42,7 +44,6 @@
     };
 
     defineExpose({ setEditMode, setViewMode });
-
 </script>
 
 <template>
