@@ -21,6 +21,7 @@
     import ToggleInput from '../../../../shared/components/form-blocks/ToggleInput.vue';
     import ToggleDateTimePicker from '../../../../shared/components/form-blocks/ToggleDateTimePicker.vue';
     import { IDate } from '../../../../shared/types/idate.ts';
+    import ToggleMarkDownEditor from '../../../../shared/components/form-blocks/ToggleMarkDownEditor.vue';
 
     interface ProjectFormProps {
         readOnly?: boolean;
@@ -84,6 +85,7 @@
             const response: ProjectResponse = await projectService.update(payload);
             if (response.id === project.value.id) {
                 project.value = new Project(response);
+                currentMode.value = "view";
             } else {
                 state.ajaxErrorMessage = t("modules.project.components.ProjectPage.errors.updateError");
             }
@@ -297,32 +299,36 @@
                         <span>Description</span>
                     </n-flex>
                 </template>
-                <div v-if="descriptionEditMode" style="width: 100%;">
-                    <n-input v-model:value="project.description" type="textarea" clearable
-                        :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly || readOnlyMode"
-                        @paste="onPaste" ref="descriptionRef" :rows="8" />
-                    <n-flex justify="end">
-                        <n-button-group>
-                            <n-button @click="onToggleDescriptionMode" :disabled="props.disabled">
-                                <template #icon>
-                                    <n-icon :component="IconCheck" />
-                                </template>
-                            </n-button>
-                            <n-button @click="onToggleDescriptionMode" :disabled="props.disabled">
-                                <template #icon>
-                                    <n-icon :component="IconX" />
-                                </template>
-                            </n-button>
-                        </n-button-group>
-                    </n-flex>
+                <ToggleMarkDownEditor :read-only="props.readOnly || readOnlyMode" v-model:value="project.description" />
+                <div v-if="false">
+                    <div v-if="descriptionEditMode" style="width: 100%;">
+                        <n-input v-model:value="project.description" type="textarea" clearable
+                            :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly || readOnlyMode"
+                            @paste="onPaste" ref="descriptionRef" :rows="8" />
+                        <n-flex justify="end">
+                            <n-button-group>
+                                <n-button @click="onToggleDescriptionMode" :disabled="props.disabled">
+                                    <template #icon>
+                                        <n-icon :component="IconCheck" />
+                                    </template>
+                                </n-button>
+                                <n-button @click="onToggleDescriptionMode" :disabled="props.disabled">
+                                    <template #icon>
+                                        <n-icon :component="IconX" />
+                                    </template>
+                                </n-button>
+                            </n-button-group>
+                        </n-flex>
+                    </div>
+                    <div v-else v-html="htmlMarkDownDescriptionPreview"
+                        class="doneo-project-description-markdown-preview"
+                        :class="{ 'doneo-project-description-markdown-preview-expanded': descriptionExpanded, 'doneo-cursor-pointer': !props.readOnly }"
+                        @click="onToggleDescriptionMode" />
+                    <!-- TODO: test alternatives -->
+                    <n-ellipsis v-if="false" expand-trigger="click" line-clamp="4" :tooltip="false" class="ellipsis"
+                        v-html="htmlMarkDownDescriptionPreview">
+                    </n-ellipsis>
                 </div>
-                <div v-else v-html="htmlMarkDownDescriptionPreview" class="doneo-project-description-markdown-preview"
-                    :class="{ 'doneo-project-description-markdown-preview-expanded': descriptionExpanded, 'doneo-cursor-pointer': !props.readOnly }"
-                    @click="onToggleDescriptionMode" />
-                <!-- TODO: test alternatives -->
-                <n-ellipsis v-if="false" expand-trigger="click" line-clamp="4" :tooltip="false" class="ellipsis"
-                    v-html="htmlMarkDownDescriptionPreview">
-                </n-ellipsis>
             </n-form-item>
         </n-form>
         <n-button @click="onUpdate" :disabled="props.disabled"
