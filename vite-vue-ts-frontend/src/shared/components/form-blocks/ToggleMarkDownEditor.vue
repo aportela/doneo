@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { computed } from 'vue';
 
-    import { MdEditor, MdPreview, MdCatalog } from 'md-editor-v3';
+    import { MdEditor, MdPreview } from 'md-editor-v3';
     import 'md-editor-v3/lib/style.css';
     import 'md-editor-v3/lib/preview.css';
 
@@ -28,15 +28,13 @@
         }
     });
 
-    const scrollElement = document.documentElement;
 </script>
 
 <template>
     <MdEditor v-model="markDown" :theme="colorSchemeStore.dark ? 'dark' : 'light'" language="en-US"
-        :disabled="props.disabled" :read-only="props.readOnly" v-if="!props.readOnly" />
+        :disabled="props.disabled" :read-only="props.readOnly" v-if="!props.readOnly" no-upload-img auto-focus />
     <div v-else class="doneo-md-preview">
-        <MdPreview v-model:model-value="markDown" />
-        <MdCatalog :scrollElement="scrollElement" />
+        <MdPreview id="mdeditor" v-model:model-value="markDown" no-img-zoom-in />
     </div>
 </template>
 
