@@ -95,7 +95,7 @@ func (service *taskService) Update(ctx context.Context, projectID string, task d
 	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
 		return domain.Task{}, err
 	} else {
-		if existentTask, err := service.taskRepository.Get(ctx, service.db, task.ID); err != nil {
+		if existentTask, err := service.taskRepository.Get(ctx, service.db, projectID, task.ID); err != nil {
 			return domain.Task{}, err
 		} else {
 			if existentTask.Status.ID != task.Status.ID {
@@ -166,7 +166,7 @@ func (service *taskService) Patch(ctx context.Context, projectID string, task do
 	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
 		return domain.Task{}, err
 	} else {
-		if existentTask, err := service.taskRepository.Get(ctx, service.db, task.ID); err != nil {
+		if existentTask, err := service.taskRepository.Get(ctx, service.db, projectID, task.ID); err != nil {
 			return domain.Task{}, err
 		} else {
 			if existentTask.Status.ID != task.Status.ID {
@@ -256,7 +256,7 @@ func (service *taskService) Get(ctx context.Context, projectID string, taskID st
 	if _, err := service.authorizationService.RequireTaskViewPermission(ctx, projectID); err != nil {
 		return domain.Task{}, err
 	}
-	if task, err := service.taskRepository.Get(ctx, service.db, taskID); err != nil {
+	if task, err := service.taskRepository.Get(ctx, service.db, projectID, taskID); err != nil {
 		return domain.Task{}, fmt.Errorf("[TaskService] failed to get task with ID %s: %w", taskID, err)
 	} else {
 		if task.DeletedAt != nil {

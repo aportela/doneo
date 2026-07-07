@@ -19,7 +19,7 @@ type TaskRepository interface {
 	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string, deletedAt int64) error
 	UnDelete(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) error
 	Purge(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) error
-	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) (domain.Task, error)
+	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, taskID string) (domain.Task, error)
 	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchTaskFilter) ([]domain.Task, browser.Result, error)
 }
 
@@ -197,7 +197,7 @@ func (repository *taskRepository) Purge(ctx context.Context, dbExecutor database
 	return nil
 }
 
-func (repository *taskRepository) Get(ctx context.Context, dbExecutor database.DatabaseExecutor, taskID string) (domain.Task, error) {
+func (repository *taskRepository) Get(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, taskID string) (domain.Task, error) {
 	var dto taskDTO
 	err := dbExecutor.QueryRowContext(
 		ctx,
@@ -260,9 +260,11 @@ func (repository *taskRepository) Get(ctx context.Context, dbExecutor database.D
 				GROUP BY task_id
 			) TTT_SUM ON TTT_SUM.task_id = T.id
             WHERE
+				P.id = ?
+			AND
 				T.id = ?
         `,
-		taskID).Scan(
+		projectID, taskID).Scan(
 		&dto.ID,
 		&dto.projectID,
 		&dto.Index,
