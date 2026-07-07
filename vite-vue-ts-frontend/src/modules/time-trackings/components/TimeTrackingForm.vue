@@ -1,8 +1,9 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, onMounted, onBeforeUnmount, type CSSProperties, nextTick } from 'vue';
+    import { ref, reactive, computed, watch, onMounted, onBeforeUnmount, type CSSProperties, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSpin, NCard, NFlex, NButton, NForm, type FormItemRule, type FormInst, type FormRules, NIcon, NFormItem, NInput } from 'naive-ui';
+    import { NSpin, NCard, NFlex, NButton, NForm, type FormItemRule, type FormInst, type FormRules, NIcon, NFormItem, NInput, NSelect, type SelectOption } from 'naive-ui';
+
     import { IconCancel, IconDeviceFloppy, IconEdit, IconPlus } from '@tabler/icons-vue';
 
     import { TimeTracking } from '../models/time-tracking.ts';
@@ -13,6 +14,9 @@
     import type { FormMode } from '../../../shared/types/form-mode';
     import { appBus } from '../../../shared/composables/bus';
     import TimeFieldsInput from '../../../shared/components/form-blocks/TimeFieldsInput.vue';
+    import { userTimerService } from '../../user-timer/services/user-timer.ts';
+    import { type UserTimerResponse } from '../../user-timer/types/dto.ts';
+    import { formatDuration } from '../../../shared/composables/datetime.ts';
 
     interface TimeTrackingFormProps {
         mode: FormMode;
@@ -26,6 +30,19 @@
     const props = defineProps<TimeTrackingFormProps>();
 
     const { t } = useI18n();
+
+    const currentUserTimers = ref<UserTimerResponse[]>([]);
+
+    const opts = computed<SelectOption[]>(() => {
+        if (currentUserTimers.value.length > 0) {
+            return [{ label: "Enter time manually", value: "0" }, { type: "group", label: "Current timers", key: "currentTimers", children: currentUserTimers.value.map((item) => { return ({ label: item.summary, value: item.id }); }) }];
+        } else {
+            return [{ label: "Enter time manually", value: "0" }];
+        }
+    });
+
+
+    const selectedOpt = ref<string>("0");
 
     const timeTracking = ref<TimeTracking>(new TimeTracking());
 
@@ -57,6 +74,49 @@
         return !timeTracking.value.summary || timeTracking.value.spentTime <= 0;
     });
 
+    watch(selectedOpt, (newValue) => {
+        if (newValue === "0") {
+            timeTracking.value.spentTime = 0;
+        } else {
+            let selectedUserTimer = currentUserTimers.value.find((item) => item.id === newValue);
+            timeTracking.value.spentTime = Math.round(((selectedUserTimer?.finishedAt ?? 0) - (selectedUserTimer?.startedAt ?? 0)) / 1000);
+        }
+    });
+
+    const onGetTimers = async () => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const response = await userTimerService.search();
+            currentUserTimers.value = response.userTimers.filter((item) => item.finishedAt !== null).map((item) => {
+                item.summary = `${item.summary} (${formatDuration(Math.round(((item.finishedAt ?? new Date().getTime()) - item.startedAt) / 1000))})`;
+                return item;
+            });
+        } catch (error) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TimeTrackingForm.onGetTimers" } });
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("shared.components.popOvers.TimerPopOver.errors.refreshError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("shared.components.popOvers.TimeTrackingForm.errors.refreshError");
+                    console.error("Unhandled API error", { file: "TimeTrackingForm.vue", method: "onGetTimers" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
+        }
+    };
+
     // TODO: allow updates
     const onSave = async () => {
         serverErrors.value = {};
@@ -75,7 +135,7 @@
     };
 
     const onCancel = () => {
-        emit('cancel')
+        emit('cancel');
     }
 
     const onAdd = async () => {
@@ -84,9 +144,10 @@
             timeTrackingFormRef.value?.restoreValidation();
             Object.assign(state, defaultAjaxStateRunning);
             try {
+                let selectedUserTimer = currentUserTimers.value.find((item) => item.id === selectedOpt.value);
                 const payload: AddRequest = {
                     summary: timeTracking.value.summary,
-                    spentTime: timeTracking.value.spentTime,
+                    spentTime: selectedOpt.value === "0" ? timeTracking.value.spentTime : Math.round(((selectedUserTimer?.finishedAt ?? 0) - (selectedUserTimer?.startedAt ?? 0)) / 1000)
                 };
                 const addedTimeTracking: TimeTrackingResponse = await timeTrackingService.addTaskTimeTracking(props.projectId, props.taskId, payload);
                 emit('add', new TimeTracking(addedTimeTracking));
@@ -126,6 +187,7 @@
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
+        onGetTimers();
         stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
             if (payload.to.includes("TimeTrackingForm.onAdd")) {
                 onAdd();
@@ -158,9 +220,14 @@
             <n-form-item :label="t('modules.timeTracking.components.TimeTrackingForm.inputs.summary.label')">
                 <n-input type="textarea"
                     :placeholder="t('modules.timeTracking.components.TimeTrackingForm.inputs.summary.placeholder')"
-                    v-model:value="timeTracking.summary" />
+                    v-model:value="timeTracking.summary" :disabled="state.ajaxRunning" />
             </n-form-item>
-            <TimeFieldsInput input-type="spent" v-model:seconds="timeTracking.spentTime" />
+            <n-form-item>
+                <n-select :options="opts" v-model:value="selectedOpt"
+                    :disabled="state.ajaxRunning || currentUserTimers.length < 1" />
+            </n-form-item>
+            <TimeFieldsInput input-type="spent" v-model:seconds="timeTracking.spentTime" :disabled="state.ajaxRunning"
+                v-if="selectedOpt === '0'" />
         </n-form>
         <template #action>
             <n-flex>
@@ -179,7 +246,6 @@
             </n-flex>
         </template>
     </n-card>
-
 </template>
 
 <style lang="css" scoped></style>
