@@ -12,6 +12,7 @@ type UserTimerRepository interface {
 	StopUserTimer(ctx context.Context, dbExecutor database.DatabaseExecutor, timerID string, userID string, finishedAt int64) error
 	DeleteUserTimer(ctx context.Context, dbExecutor database.DatabaseExecutor, timerID string, userID string) error
 	ClearUserTimers(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) error
+	GetUserTimer(ctx context.Context, dbExecutor database.DatabaseExecutor, timerID string, userID string) (domain.UserTimer, error)
 	GetUserTimers(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) ([]domain.UserTimer, error)
 }
 
@@ -107,6 +108,28 @@ func (repository *userTimerRepository) ClearUserTimers(ctx context.Context, dbEx
 		userID,
 	)
 	return err
+}
+
+func (repository *userTimerRepository) GetUserTimer(ctx context.Context, dbExecutor database.DatabaseExecutor, timerID string, userID string) (domain.UserTimer, error) {
+	var dto userTimerDTO
+	if err := dbExecutor.QueryRowContext(ctx,
+		`
+			SELECT
+				UT.id, UT.summary, UT.started_at, UT.finished_at
+			FROM user_timers UT
+			WHERE
+				UT.id = ?
+			AND
+				UT.user_id = ?
+		`,
+		timerID,
+		userID,
+	).Scan(
+		&dto.ID, &dto.Summary, &dto.StartedAt, &dto.FinishedAt,
+	); err != nil {
+		return domain.UserTimer{}, err
+	}
+	return toDomain(dto), nil
 }
 
 func (repository *userTimerRepository) GetUserTimers(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) ([]domain.UserTimer, error) {

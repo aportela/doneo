@@ -17,6 +17,7 @@ type UserTimerService interface {
 	StopUserTimer(ctx context.Context, userTimerID string) error
 	DeleteUserTimer(ctx context.Context, userTimerID string) error
 	ClearUserTimers(ctx context.Context) error
+	GetUserTimer(ctx context.Context, userTimerId string) (domain.UserTimer, error)
 	GetUserTimers(ctx context.Context) ([]domain.UserTimer, error)
 }
 
@@ -58,6 +59,18 @@ func (service *userTimerService) ClearUserTimers(ctx context.Context) error {
 		return fmt.Errorf("[UserTimerService] user not found in context")
 	} else {
 		return service.userTimerRepository.ClearUserTimers(ctx, service.db, contextUser.ID)
+	}
+}
+
+func (service *userTimerService) GetUserTimer(ctx context.Context, userTimerId string) (domain.UserTimer, error) {
+	if contextUser, ok := middlewares.GetContextUser(ctx); !ok {
+		return domain.UserTimer{}, fmt.Errorf("[UserTimerService] user not found in context")
+	} else {
+		if userTimer, err := service.userTimerRepository.GetUserTimer(ctx, service.db, userTimerId, contextUser.ID); err != nil {
+			return domain.UserTimer{}, fmt.Errorf("[UserTimerService] failed to get user timer: %w", err)
+		} else {
+			return userTimer, nil
+		}
 	}
 }
 
