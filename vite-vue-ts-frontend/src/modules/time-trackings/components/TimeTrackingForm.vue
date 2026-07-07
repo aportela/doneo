@@ -147,9 +147,11 @@
                 let selectedUserTimer = currentUserTimers.value.find((item) => item.id === selectedOpt.value);
                 const payload: AddRequest = {
                     summary: timeTracking.value.summary,
-                    spentTime: selectedOpt.value === "0" ? timeTracking.value.spentTime : Math.round(((selectedUserTimer?.finishedAt ?? 0) - (selectedUserTimer?.startedAt ?? 0)) / 1000)
+                    spentTime: selectedOpt.value === "0" ? timeTracking.value.spentTime : Math.round(((selectedUserTimer?.finishedAt ?? 0) - (selectedUserTimer?.startedAt ?? 0)) / 1000),
+                    userTimerId: selectedOpt.value !== "0" ? selectedOpt.value : null,
                 };
                 const addedTimeTracking: TimeTrackingResponse = await timeTrackingService.addTaskTimeTracking(props.projectId, props.taskId, payload);
+                // TODO: delete user timer
                 emit('add', new TimeTracking(addedTimeTracking));
             } catch (error: unknown) {
                 state.ajaxErrors = true;

@@ -3,8 +3,9 @@ package tasktimetrackinghandler
 import "github.com/aportela/doneo/internal/handlers/userhandler"
 
 type addRequest struct {
-	Summary   string `json:"summary"`
-	SpentTime uint64 `json:"spentTime"`
+	Summary     string `json:"summary"`
+	SpentTime   uint64 `json:"spentTime"`
+	UserTimerId string `json:"userTimerId"`
 }
 
 type updateRequest struct {

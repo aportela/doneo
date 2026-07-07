@@ -9,13 +9,14 @@ import (
 	"github.com/aportela/doneo/internal/database"
 	"github.com/aportela/doneo/internal/domain"
 	"github.com/aportela/doneo/internal/repositories/tasktimetrackingrepository"
+	"github.com/aportela/doneo/internal/repositories/usertimerrepository"
 	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/services/historyoperationservice"
 	"github.com/aportela/doneo/internal/utils"
 )
 
 type TaskTimeTrackingService interface {
-	Add(ctx context.Context, projectID string, taskID string, taskTimeTracking domain.TaskTimeTracking) (domain.TaskTimeTracking, error)
+	Add(ctx context.Context, projectID string, taskID string, taskTimeTracking domain.TaskTimeTracking, userTimerId string) (domain.TaskTimeTracking, error)
 	Update(ctx context.Context, projectID string, taskID string, taskTimeTracking domain.TaskTimeTracking) (domain.TaskTimeTracking, error)
 	Delete(ctx context.Context, projectID string, taskID string, taskTimeTrackingID string) error
 	GetTaskTimeTrackings(ctx context.Context, projectID string, taskID string) ([]domain.TaskTimeTracking, error)
@@ -25,14 +26,15 @@ type taskTimeTrackingService struct {
 	db                         database.Database
 	authorizationService       authorizationservice.AuthorizationService
 	historyOperationService    historyoperationservice.HistoryOperationService
+	userTimerRepository        usertimerrepository.UserTimerRepository
 	taskTimeTrackingRepository tasktimetrackingrepository.TaskTimeTrackingRepository
 }
 
-func NewService(db database.Database, authorizationService authorizationservice.AuthorizationService, historyOperationService historyoperationservice.HistoryOperationService, taskTimeTrackingRepository tasktimetrackingrepository.TaskTimeTrackingRepository) TaskTimeTrackingService {
-	return &taskTimeTrackingService{db: db, authorizationService: authorizationService, historyOperationService: historyOperationService, taskTimeTrackingRepository: taskTimeTrackingRepository}
+func NewService(db database.Database, authorizationService authorizationservice.AuthorizationService, historyOperationService historyoperationservice.HistoryOperationService, userTimerRepository usertimerrepository.UserTimerRepository, taskTimeTrackingRepository tasktimetrackingrepository.TaskTimeTrackingRepository) TaskTimeTrackingService {
+	return &taskTimeTrackingService{db: db, authorizationService: authorizationService, historyOperationService: historyOperationService, userTimerRepository: userTimerRepository, taskTimeTrackingRepository: taskTimeTrackingRepository}
 }
 
-func (service *taskTimeTrackingService) Add(ctx context.Context, projectID string, taskID string, taskTimeTracking domain.TaskTimeTracking) (domain.TaskTimeTracking, error) {
+func (service *taskTimeTrackingService) Add(ctx context.Context, projectID string, taskID string, taskTimeTracking domain.TaskTimeTracking, userTimerId string) (domain.TaskTimeTracking, error) {
 	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
 		return domain.TaskTimeTracking{}, err
 	} else {
@@ -41,8 +43,24 @@ func (service *taskTimeTrackingService) Add(ctx context.Context, projectID strin
 		taskTimeTracking.CreatedBy.Name = contextUser.Name
 		taskTimeTracking.CreatedAt = time.Now()
 		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+			if len(userTimerId) > 0 {
+				if userTimer, err := service.userTimerRepository.GetUserTimer(ctx, tx, userTimerId, contextUser.ID); err != nil {
+					return err
+				} else {
+					if userTimer.FinishedAt != nil {
+						taskTimeTracking.SpentTime = uint64(userTimer.FinishedAt.Sub(userTimer.StartedAt))
+					} else {
+						return fmt.Errorf("Selected user timer is not stopped")
+					}
+				}
+			}
 			if err := service.taskTimeTrackingRepository.Add(ctx, tx, taskID, taskTimeTracking); err != nil {
 				return err
+			}
+			if len(userTimerId) > 0 {
+				if err := service.userTimerRepository.DeleteUserTimer(ctx, tx, userTimerId, contextUser.ID); err != nil {
+					return err
+				}
 			}
 			if _, err := service.historyOperationService.AddTaskHistoryOperation(
 				ctx,

@@ -3,6 +3,7 @@ import type { UserBaseResponse } from "../../users/types/dto";
 export type AddRequest = {
   summary: string;
   spentTime: number;
+  userTimerId: string | null;
 };
 
 export type UpdateRequest = {

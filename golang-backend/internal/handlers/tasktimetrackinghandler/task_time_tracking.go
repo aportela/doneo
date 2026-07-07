@@ -35,7 +35,7 @@ func (handler *taskTimeTrackingHandler) Add(w http.ResponseWriter, r *http.Reque
 	taskTimeTracking := addRequestToDomain(request)
 	projectID := chi.URLParam(r, "project_id")
 	taskID := chi.URLParam(r, "task_id")
-	if taskTimeTracking, err := handler.service.Add(r.Context(), projectID, taskID, taskTimeTracking); err != nil {
+	if taskTimeTracking, err := handler.service.Add(r.Context(), projectID, taskID, taskTimeTracking, request.UserTimerId); err != nil {
 		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[TaskTimeTrackingHandler] failed to add task time tracking: %w", err))
 		return
 	} else {

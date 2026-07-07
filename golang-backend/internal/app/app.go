@@ -123,7 +123,7 @@ func NewApp(
 	roleService := roleservice.NewService(db, authorizationService, roleRepository)
 	taskPriorityService := taskpriorityservice.NewService(db, authorizationService, taskPriorityRepository)
 	taskStatusService := taskstatusservice.NewService(db, authorizationService, taskStatusRepository)
-	taskTimeTrackingService := tasktimetrackingservice.NewService(db, authorizationService, historyOperationService, taskTimeTrackingRepository)
+	taskTimeTrackingService := tasktimetrackingservice.NewService(db, authorizationService, historyOperationService, userTimerRepository, taskTimeTrackingRepository)
 	userTimerService := usertimerservice.NewService(db, userTimerRepository)
 	userService := userservice.NewService(db, cache, authorizationService, userRepository)
 	profileService := profileservice.NewService(db, cache, authorizationService, userRepository)
