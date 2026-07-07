@@ -3,6 +3,7 @@ import { useEventBus } from "@vueuse/core";
 type AppBusEvents = {
   reauthRequired: { emitter: string };
   reauthValidNotify: { to: string[] };
+  refreshUserTimers: {};
   // TODO: add more debug, http status code, http body response...
   remoteAPIError: { errorMessage: string; denyCloseDialog?: boolean };
 };

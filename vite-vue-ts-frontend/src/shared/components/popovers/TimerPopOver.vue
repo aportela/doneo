@@ -268,6 +268,7 @@
     };
 
     let stopBusReauthListener: () => void;
+    let stopBusRefreshUserTimersListener: () => void;
 
     onMounted(() => {
         onGetTimers();
@@ -284,11 +285,15 @@
                 onClearTimers();
             }
         });
+        stopBusRefreshUserTimersListener = appBus.on("refreshUserTimers", async () => {
+            onGetTimers();
+        });
     });
 
     onBeforeUnmount(() => {
         onStopInterval();
         stopBusReauthListener();
+        stopBusRefreshUserTimersListener();
     });
 </script>
 

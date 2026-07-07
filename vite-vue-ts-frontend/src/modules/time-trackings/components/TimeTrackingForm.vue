@@ -151,7 +151,9 @@
                     userTimerId: selectedOpt.value !== "0" ? selectedOpt.value : null,
                 };
                 const addedTimeTracking: TimeTrackingResponse = await timeTrackingService.addTaskTimeTracking(props.projectId, props.taskId, payload);
-                // TODO: delete user timer
+                if (selectedOpt.value !== "0") {
+                    appBus.emit({ type: "refreshUserTimers", payload: {} });
+                }
                 emit('add', new TimeTracking(addedTimeTracking));
             } catch (error: unknown) {
                 state.ajaxErrors = true;
