@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { computed } from "vue";
+    import { computed, watch } from "vue";
     import { useI18n } from "vue-i18n";
 
     import { NFlex, NFormItem, NInputNumber, type InputSize } from 'naive-ui';
@@ -25,7 +25,18 @@
 
     const seconds = defineModel<number>("seconds", { default: 0 });
 
+    let currentDirtySeconds = seconds.value;
+
     const parts = computed(() => getSecondsDatetimeParts(seconds.value || 0));
+
+    // watch for model changes on parent component
+    watch(seconds, (newValue, oldValue) => {
+        if (currentDirtySeconds != oldValue) {
+            updatePart('days', newValue);
+            updatePart('hours', newValue);
+            updatePart('minutes', newValue);
+        }
+    });
 
     const updatePart = (part: "days" | "hours" | "minutes", value: number | null) => {
         const v = value ?? 0;
@@ -47,6 +58,7 @@
                 seconds.value = days * DAY_SECONDS + hours * HOUR_SECONDS + v * MINUTE_SECONDS;
                 break;
         }
+        currentDirtySeconds = seconds.value;
     };
 </script>
 
