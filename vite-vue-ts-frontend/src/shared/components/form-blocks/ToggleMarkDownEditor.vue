@@ -34,7 +34,8 @@
     <MdEditor v-model="markDown" :theme="colorSchemeStore.dark ? 'dark' : 'light'" language="en-US"
         :disabled="props.disabled" :read-only="props.readOnly" v-if="!props.readOnly" no-upload-img auto-focus />
     <div v-else class="doneo-md-preview">
-        <MdPreview id="mdeditor" v-model:model-value="markDown" no-img-zoom-in />
+        <MdPreview id="mdeditor" v-model:model-value="markDown" no-img-zoom-in
+            :theme="colorSchemeStore.dark ? 'dark' : 'light'" language="en-US" />
     </div>
 </template>
 
