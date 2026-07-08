@@ -137,7 +137,7 @@
                 Metadata
             </template>
             <ProjectMetadataTab v-if="projectId" v-model:project="project"
-                :read-only="!project.allowedOperations.updateProject" />
+                :read-only="!project.allowedOperations.updateProject" @refresh="onGet(projectId)" />
         </n-tab-pane>
         <n-tab-pane name="permissions" display-directive="show:lazy" key="permissions"
             :disabled="!projectId || (!project.allowedOperations.updateProject && project.permissionsCount === 0)">

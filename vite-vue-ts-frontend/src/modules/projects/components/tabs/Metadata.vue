@@ -31,7 +31,7 @@
 
     const props = defineProps<ProjectFormProps>();
 
-    const emit = defineEmits(["save"]);
+    const emit = defineEmits(["save", "refresh"]);
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -138,6 +138,10 @@
     const currentMode = ref<"view" | "edit">("view");
 
     const readOnlyMode = computed(() => currentMode.value === 'view');
+
+    const onRefresh = () => {
+        emit("refresh");
+    };
 </script>
 
 <template>
@@ -233,7 +237,7 @@
                 </template>
                 {{ t("shared.buttons.Save.label") }}
             </n-button>
-            <n-button @click="currentMode = 'view'" :disabled="props.disabled">
+            <n-button @click="onRefresh" :disabled="props.disabled">
                 <template #icon>
                     <n-icon :component="IconCancel"></n-icon>
                 </template>
