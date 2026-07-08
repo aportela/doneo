@@ -99,7 +99,7 @@
                     password: signinFormValues.value.password
                 };
                 const response: SignInResponse = await authService.signIn(payload);
-                sessionStore.setAccessToken(response.accessToken.token, response.accessToken.expiresAtTimestamp);
+                sessionStore.setAccessToken(response.accessToken.token, response.accessToken.expiresAt);
                 sessionStore.setUser(new User(response.user));
                 localStorageLastUsedEmail.set(signinFormValues.value.email);
                 emit('success');
@@ -204,7 +204,7 @@
             <n-form-item>
                 <n-button secondary @click="onSignIn" block :disabled="state.ajaxRunning">{{
                     t("modules.auth.components.LoginForm.buttons.signIn.label")
-                    }}</n-button>
+                }}</n-button>
             </n-form-item>
         </n-form>
     </n-spin>

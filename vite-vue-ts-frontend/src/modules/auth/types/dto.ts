@@ -2,7 +2,7 @@ import type { UserResponse } from "../../users/types/dto";
 
 export type Token = {
   token: string;
-  expiresAtTimestamp: number;
+  expiresAt: number;
 };
 
 type ValidAuthTypes = "Bearer";

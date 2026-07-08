@@ -40,12 +40,12 @@
         }
     }
 
-    const accessTokenCheckInterval = 300; // check every 5 min (300 seconds)
+    const accessTokenSecondsCheckInterval = 300; // check every 5 min (300 seconds)
 
     const refreshAccessTokenIfNeeded = async (): Promise<boolean> => {
         if (
             sessionStore.hasAccessToken &&
-            sessionStore.accessTokenExpiresBeforeInterval(accessTokenCheckInterval)
+            sessionStore.accessTokenExpiresBeforeInterval(accessTokenSecondsCheckInterval)
         ) {
             return await TokenManager.refreshAccessToken(sessionStore);
         } else {
@@ -68,7 +68,7 @@
                     );
                 })
                 .finally(() => { });
-        }, accessTokenCheckInterval * 1000);
+        }, accessTokenSecondsCheckInterval * 1000);
     });
 
     onBeforeUnmount(() => {

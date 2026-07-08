@@ -13,7 +13,7 @@ export const TokenManager = {
         await authService.renewAccessToken();
       sessionStore.setAccessToken(
         response.accessToken.token,
-        response.accessToken.expiresAtTimestamp,
+        response.accessToken.expiresAt,
       );
       sessionStore.setUser(new User(response.user));
       return true;

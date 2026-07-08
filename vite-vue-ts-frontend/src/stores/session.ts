@@ -5,7 +5,7 @@ interface State {
   session: {
     accessToken: {
       token: string | null;
-      expiresAtTimestamp: number | null;
+      expiresAt: number | null;
     };
     user: User | null;
   };
@@ -16,7 +16,7 @@ export const useSessionStore = defineStore("session", {
     session: {
       accessToken: {
         token: null,
-        expiresAtTimestamp: null,
+        expiresAt: null,
       },
       user: null,
     },
@@ -32,19 +32,19 @@ export const useSessionStore = defineStore("session", {
       state.session.user?.permissions.isSuperUser ?? false,
     hasAccessToken: (state: State): boolean =>
       state.session.accessToken.token !== null &&
-      state.session.accessToken.expiresAtTimestamp !== null,
+      state.session.accessToken.expiresAt !== null,
     accessToken: (state: State): string | null =>
       state.session.accessToken.token,
     accessTokenExpirationTimestamp: (state): number | null =>
-      state.session.accessToken.expiresAtTimestamp,
+      state.session.accessToken.expiresAt,
   },
   actions: {
-    accessTokenExpiresBeforeInterval(interval: number) {
-      if (this.session.accessToken.expiresAtTimestamp) {
-        const currentTimestamp = Math.round(Date.now() / 1000);
+    accessTokenExpiresBeforeInterval(secondsInterval: number) {
+      if (this.session.accessToken.expiresAt) {
+        const currentTimestamp = Date.now();
         return (
-          this.session.accessToken.expiresAtTimestamp - currentTimestamp <=
-          interval
+          this.session.accessToken.expiresAt - currentTimestamp <=
+          secondsInterval * 1000
         );
       } else {
         return false;
@@ -52,11 +52,11 @@ export const useSessionStore = defineStore("session", {
     },
     setAccessToken(token: string, expiresAtTimestamp: number): void {
       this.session.accessToken.token = token;
-      this.session.accessToken.expiresAtTimestamp = expiresAtTimestamp;
+      this.session.accessToken.expiresAt = expiresAtTimestamp;
     },
     removeAccessToken(): void {
       this.session.accessToken.token = null;
-      this.session.accessToken.expiresAtTimestamp = null;
+      this.session.accessToken.expiresAt = null;
     },
     setUser(user: User): void {
       this.session.user = user;
