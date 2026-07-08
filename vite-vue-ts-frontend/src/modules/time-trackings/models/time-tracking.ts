@@ -31,11 +31,13 @@ export class TimeTracking {
     const days = Math.floor(this.spentTime / 86400);
     const hours = Math.floor((this.spentTime % 86400) / 3600);
     const minutes = Math.floor((this.spentTime % 3600) / 60);
+    const seconds = this.spentTime % 60;
 
     return [
       { key: "shared.labels.time.day", count: days },
       { key: "shared.labels.time.hour", count: hours },
       { key: "shared.labels.time.minute", count: minutes },
+      { key: "shared.labels.time.second", count: seconds },
     ].filter(({ count }) => count > 0);
   }
 }
