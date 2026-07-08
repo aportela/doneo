@@ -299,8 +299,9 @@
                         <span>Description</span>
                     </n-flex>
                 </template>
-                <ToggleMarkDownEditor :read-only="props.readOnly || readOnlyMode" v-model:value="project.description" />
-                <div v-if="false">
+                <ToggleMarkDownEditor v-if="true" :read-only="props.readOnly || readOnlyMode"
+                    v-model:value="project.description" @paste="onPaste" />
+                <div v-if="false" style="width: 100%;">
                     <div v-if="descriptionEditMode" style="width: 100%;">
                         <n-input v-model:value="project.description" type="textarea" clearable
                             :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly || readOnlyMode"
