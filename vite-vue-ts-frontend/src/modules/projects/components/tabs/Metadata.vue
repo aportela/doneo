@@ -140,6 +140,7 @@
     const readOnlyMode = computed(() => currentMode.value === 'view');
 
     const onRefresh = () => {
+        currentMode.value = "view";
         emit("refresh");
     };
 </script>
