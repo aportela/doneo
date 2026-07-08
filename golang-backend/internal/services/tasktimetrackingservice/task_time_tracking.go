@@ -48,7 +48,7 @@ func (service *taskTimeTrackingService) Add(ctx context.Context, projectID strin
 					return err
 				} else {
 					if userTimer.FinishedAt != nil {
-						taskTimeTracking.SpentTime = uint64(userTimer.FinishedAt.Sub(userTimer.StartedAt))
+						taskTimeTracking.SpentTime = uint64(userTimer.FinishedAt.Sub(userTimer.StartedAt).Seconds())
 					} else {
 						return fmt.Errorf("Selected user timer is not stopped")
 					}
