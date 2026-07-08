@@ -43,5 +43,6 @@
         border: 1px solid #e0e0e6;
         border-radius: var(--n-border-radius);
         padding: 4px 12px;
+        width: 100%;
     }
 </style>
