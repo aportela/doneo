@@ -1,8 +1,8 @@
 <script setup lang="ts">
-    import { ref, reactive, watch, computed, type CSSProperties, nextTick } from 'vue';
+    import { ref, reactive, watch, computed, type CSSProperties } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NCard, NForm, NFormItem, NInput, NButton, NButtonGroup, NIcon, type InputInst, NFlex, NEllipsis } from 'naive-ui';
+    import { NCard, NForm, NFormItem, NInput, NButton, NButtonGroup, NIcon, NFlex } from 'naive-ui';
 
     import { useLoadingStore } from '../../../../stores/loading';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../../shared/types/ajaxState';
@@ -16,9 +16,7 @@
     import ProjectStatusSelector from "../../../project-statuses/components/ProjectStatusSelector.vue";
     import ProjectTypeSelector from "../../../project-types/components/ProjectTypeSelector.vue";
     import AvatarUserName from '../../../../shared/components/AvatarUserName.vue';
-    import { IconX, IconCheck, IconDeviceFloppy } from '@tabler/icons-vue';
-    import { useMarkdown } from "../../../../shared/composables/useMarkdown.ts";
-    import ToggleInput from '../../../../shared/components/form-blocks/ToggleInput.vue';
+    import { IconDeviceFloppy, IconCancel } from '@tabler/icons-vue';
     import ToggleDateTimePicker from '../../../../shared/components/form-blocks/ToggleDateTimePicker.vue';
     import { IDate } from '../../../../shared/types/idate.ts';
     import ToggleMarkDownEditor from '../../../../shared/components/form-blocks/ToggleMarkDownEditor.vue';
@@ -41,24 +39,10 @@
 
     const { t } = useI18n();
     const loadingStore = useLoadingStore();
-    const { render, toMarkdown } = useMarkdown();
 
     watch(state, (newValue: AjaxStateInterface) => {
         loadingStore.set(newValue.ajaxRunning);
     });
-
-    interface ToggleInputComponent {
-        setEditMode: () => void
-        setViewMode: () => void
-    };
-
-    const slugRef = ref<ToggleInputComponent | undefined>();
-
-    const descriptionEditMode = ref<boolean>(false);
-
-    const descriptionExpanded = ref<boolean>(true);
-
-    const htmlMarkDownDescriptionPreview = computed(() => render(project.value.description ?? ""));
 
     const onUpdate = async () => {
         serverErrors.value = {};
@@ -122,51 +106,6 @@
         }
     };
 
-    const descriptionRef = ref<InputInst | null>(null);
-
-    const onConfirmNewSlugValue = (newValue: string | null) => {
-        if (project.value.slug != newValue) {
-            project.value.slug = newValue;
-        }
-        slugRef.value?.setViewMode();
-    };
-
-    const onCancelNewSlugValue = () => {
-        slugRef.value?.setViewMode();
-    };
-
-    const onToggleDescriptionMode = () => {
-        if (!props.readOnly && project.value.allowedOperations.updateProject) {
-            descriptionEditMode.value = !descriptionEditMode.value;
-            if (descriptionEditMode.value) {
-                nextTick(() => {
-                    descriptionRef.value?.focus();
-                });
-            }
-        }
-    };
-
-    const insertAtCursor = (value: string) => {
-        const el = document.activeElement as HTMLTextAreaElement
-        if (!el) {
-            project.value.description += value
-            return
-        }
-
-        const start = el.selectionStart ?? project.value.description?.length
-        const end = el.selectionEnd ?? project.value.description?.length
-
-        project.value.description =
-            project.value.description?.slice(0, start) +
-            value +
-            project.value.description?.slice(end)
-
-        // restore cursor
-        requestAnimationFrame(() => {
-            el.selectionStart = el.selectionEnd = start + value.length
-        })
-    }
-
     const onFillEmptyStartDate = () => {
         if (!project.value.startedAt.hasValue()) {
             project.value.startedAt = new IDate(new Date().getTime())
@@ -195,23 +134,6 @@
         }
     };
 
-    const onPaste = (e: ClipboardEvent) => {
-        const clipboard = e.clipboardData
-        if (!clipboard) return
-
-        const html = clipboard.getData('text/html')
-        const plain = clipboard.getData('text/plain')
-
-        let markdown = plain
-
-        if (html) {
-            markdown = toMarkdown(html)
-        }
-
-        e.preventDefault()
-
-        insertAtCursor(markdown)
-    };
 
     const currentMode = ref<"view" | "edit">("view");
 
@@ -220,18 +142,18 @@
 
 <template>
     <!-- TODO: add missing i18n labels -->
-    <n-card bordered :style="props.style" :class="{ 'doneo-cursor-pointer': currentMode === 'view' }"
-        @click="currentMode = 'edit'"">
+    <n-card bordered :style="props.style">
+        <n-button @click=" currentMode = 'edit'" secondary>Update form</n-button>
         <n-flex align=" center" justify="space-between">
-        <n-form-item label="Created by">
-            <div class="note-user">
-                <AvatarUserName :user-id="project.createdBy.id" :user-name="project.createdBy.name" />
+            <n-form-item label="Created by">
+                <div class="note-user">
+                    <AvatarUserName :user-id="project.createdBy.id" :user-name="project.createdBy.name" />
+                </div>
+            </n-form-item>
+            <div>
+                <div>Created at: {{ project.createdAt.toLocaleString() }}</div>
+                <div v-if="project.updatedAt.hasValue()">Updated at: {{ project.updatedAt?.toLocaleString() }}</div>
             </div>
-        </n-form-item>
-        <div>
-            <div>Created at: {{ project.createdAt.toLocaleString() }}</div>
-            <div v-if="project.updatedAt.hasValue()">Updated at: {{ project.updatedAt?.toLocaleString() }}</div>
-        </div>
         </n-flex>
         <n-flex>
             <n-form-item label="Created at">
@@ -269,9 +191,9 @@
         <n-form>
             <n-flex>
                 <n-form-item label="Slug">
-                    <ToggleInput v-model:value="project.slug" show-count :max-length="MAX_SLUG_LENGTH"
-                        :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly || readOnlyMode"
-                        v-on:confirm="onConfirmNewSlugValue" v-on:cancel="onCancelNewSlugValue" ref="slugRef" />
+                    <n-input v-model:value="project.slug" :show-count="!(props.readOnly || readOnlyMode)"
+                        :maxlength="MAX_SLUG_LENGTH" :disabled="props.disabled || state.ajaxRunning"
+                        :read-only="props.readOnly || readOnlyMode" />
                 </n-form-item>
                 <n-form-item label="Type">
                     <ProjectTypeSelector v-model:id="project.type.id" :disabled="props.disabled || state.ajaxRunning"
@@ -290,8 +212,9 @@
                 </n-form-item>
             </n-flex>
             <n-form-item label="Summary">
-                <ToggleInput v-model:value="project.summary" show-count :max-length="MAX_SUMMARY_LENGTH"
-                    :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly || readOnlyMode" />
+                <n-input v-model:value="project.summary" :show-count="!(props.readOnly || readOnlyMode)"
+                    :maxlength="MAX_SUMMARY_LENGTH" :disabled="props.disabled || state.ajaxRunning"
+                    :read-only="props.readOnly || readOnlyMode" />
             </n-form-item>
             <n-form-item label="description">
                 <template #label>
@@ -300,45 +223,23 @@
                     </n-flex>
                 </template>
                 <ToggleMarkDownEditor v-if="true" :read-only="props.readOnly || readOnlyMode"
-                    v-model:value="project.description" @paste="onPaste" />
-                <div v-if="false" style="width: 100%;">
-                    <div v-if="descriptionEditMode" style="width: 100%;">
-                        <n-input v-model:value="project.description" type="textarea" clearable
-                            :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly || readOnlyMode"
-                            @paste="onPaste" ref="descriptionRef" :rows="8" />
-                        <n-flex justify="end">
-                            <n-button-group>
-                                <n-button @click="onToggleDescriptionMode" :disabled="props.disabled">
-                                    <template #icon>
-                                        <n-icon :component="IconCheck" />
-                                    </template>
-                                </n-button>
-                                <n-button @click="onToggleDescriptionMode" :disabled="props.disabled">
-                                    <template #icon>
-                                        <n-icon :component="IconX" />
-                                    </template>
-                                </n-button>
-                            </n-button-group>
-                        </n-flex>
-                    </div>
-                    <div v-else v-html="htmlMarkDownDescriptionPreview"
-                        class="doneo-project-description-markdown-preview"
-                        :class="{ 'doneo-project-description-markdown-preview-expanded': descriptionExpanded, 'doneo-cursor-pointer': !props.readOnly }"
-                        @click="onToggleDescriptionMode" />
-                    <!-- TODO: test alternatives -->
-                    <n-ellipsis v-if="false" expand-trigger="click" line-clamp="4" :tooltip="false" class="ellipsis"
-                        v-html="htmlMarkDownDescriptionPreview">
-                    </n-ellipsis>
-                </div>
+                    v-model:value="project.description" />
             </n-form-item>
         </n-form>
-        <n-button @click="onUpdate" :disabled="props.disabled"
-            v-if="!props.readOnly && !readOnlyMode && project.allowedOperations.updateProject">
-            <template #icon>
-                <n-icon :component="IconDeviceFloppy"></n-icon>
-            </template>
-            {{ t("shared.buttons.Save.label") }}
-        </n-button>
+        <n-button-group v-if="!props.readOnly && !readOnlyMode && project.allowedOperations.updateProject">
+            <n-button @click="onUpdate" :disabled="props.disabled">
+                <template #icon>
+                    <n-icon :component="IconDeviceFloppy"></n-icon>
+                </template>
+                {{ t("shared.buttons.Save.label") }}
+            </n-button>
+            <n-button @click="currentMode = 'view'" :disabled="props.disabled">
+                <template #icon>
+                    <n-icon :component="IconCancel"></n-icon>
+                </template>
+                {{ t("shared.buttons.Cancel.label") }}
+            </n-button>
+        </n-button-group>
     </n-card>
 </template>
 
