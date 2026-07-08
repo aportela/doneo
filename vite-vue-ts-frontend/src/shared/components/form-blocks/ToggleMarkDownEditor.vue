@@ -1,6 +1,7 @@
 <script setup lang="ts">
     import { computed } from 'vue';
 
+    import { useMarkdown } from '../../composables/useMarkdown';
     import { MdEditor, MdPreview } from 'md-editor-v3';
     import 'md-editor-v3/lib/style.css';
     import 'md-editor-v3/lib/preview.css';
@@ -10,6 +11,7 @@
     interface IProps {
         disabled?: boolean;
         readOnly?: boolean;
+        maxLength?: number;
     };
 
     const props = withDefaults(defineProps<IProps>(), {
@@ -18,6 +20,7 @@
     });
 
     const colorSchemeStore = useColorSchemeStore();
+    const { toMarkdown } = useMarkdown();
 
     const value = defineModel<string | null>('value');
 
@@ -28,11 +31,51 @@
         }
     });
 
+    const insertAtCursor = (value: string) => {
+        const el = document.activeElement as HTMLTextAreaElement
+        if (!el) {
+            markDown.value += value
+            return
+        }
+
+        const start = el.selectionStart ?? markDown.value?.length
+        const end = el.selectionEnd ?? markDown.value?.length
+
+        markDown.value =
+            markDown.value?.slice(0, start) +
+            value +
+            markDown.value?.slice(end)
+
+        // restore cursor
+        requestAnimationFrame(() => {
+            el.selectionStart = el.selectionEnd = start + value.length
+        })
+    }
+
+    const onPaste = (e: ClipboardEvent) => {
+        const clipboard = e.clipboardData
+        if (!clipboard) return
+
+        const html = clipboard.getData('text/html')
+        const plain = clipboard.getData('text/plain')
+
+        let markdown = plain
+
+        if (html) {
+            markdown = toMarkdown(html)
+        }
+
+        e.preventDefault()
+
+        insertAtCursor(markdown)
+    };
+
 </script>
 
 <template>
-    <MdEditor v-model="markDown" :theme="colorSchemeStore.dark ? 'dark' : 'light'" language="en-US"
-        :disabled="props.disabled" :read-only="props.readOnly" v-if="!props.readOnly" no-upload-img auto-focus />
+    <MdEditor v-model="markDown" :max-length="props.maxLength" :theme="colorSchemeStore.dark ? 'dark' : 'light'"
+        language="en-US" :disabled="props.disabled" :read-only="props.readOnly" v-if="!props.readOnly" no-upload-img
+        auto-focus @paste="onPaste" />
     <div v-else class="doneo-md-preview">
         <MdPreview id="mdeditor" v-model:model-value="markDown" no-img-zoom-in
             :theme="colorSchemeStore.dark ? 'dark' : 'light'" language="en-US" />
