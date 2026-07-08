@@ -100,7 +100,6 @@
     };
 
     const onDelete = async (timeTracking: TimeTracking, _index?: number) => {
-        console.log(timeTracking);
         if (timeTracking.id) {
             Object.assign(state, defaultAjaxStateRunning);
             try {
