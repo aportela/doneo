@@ -52,3 +52,7 @@ deny actions (add notes, delete notes, add attachments by project privileges)
 disabled && readonly for all components
 
 size & default for all components
+
+add pages/wiki
+
+add generic image upload (for md-editor)
