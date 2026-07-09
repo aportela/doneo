@@ -60,7 +60,7 @@
         }));
     };
 
-    const excludedMDEditorToolBars: ToolbarNames[] = ["previewOnly", "htmlPreview", "catalog", "github"];
+    const excludedMDEditorToolBars: ToolbarNames[] = ["save", "previewOnly", "htmlPreview", "catalog", "github"];
 
 </script>
 
