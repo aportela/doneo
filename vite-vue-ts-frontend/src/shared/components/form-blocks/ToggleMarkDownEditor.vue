@@ -2,7 +2,7 @@
     import { computed } from 'vue';
 
     import { useMarkdown } from '../../composables/useMarkdown';
-    import { MdEditor, MdPreview } from 'md-editor-v3';
+    import { MdEditor, MdPreview, type ToolbarNames } from 'md-editor-v3';
     import 'md-editor-v3/lib/style.css';
     import 'md-editor-v3/lib/preview.css';
 
@@ -70,12 +70,14 @@
         insertAtCursor(markdown)
     };
 
+    const excludedMDEditorToolBars: ToolbarNames[] = ["previewOnly", "htmlPreview", "catalog", "github"];
+
 </script>
 
 <template>
     <MdEditor v-model="markDown" :max-length="props.maxLength" :theme="colorSchemeStore.dark ? 'dark' : 'light'"
         language="en-US" :disabled="props.disabled" :read-only="props.readOnly" v-if="!props.readOnly" no-upload-img
-        auto-focus @paste="onPaste" />
+        auto-focus @paste="onPaste" :toolbars-exclude="excludedMDEditorToolBars" :footers="[]" />
     <div v-else class="doneo-md-preview">
         <MdPreview id="mdeditor" v-model:model-value="markDown" no-img-zoom-in
             :theme="colorSchemeStore.dark ? 'dark' : 'light'" language="en-US" />
