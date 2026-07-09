@@ -1,8 +1,8 @@
 <script setup lang="ts">
-    import { computed } from 'vue';
+    import { ref, computed } from 'vue';
 
     import { useMarkdown } from '../../composables/useMarkdown';
-    import { MdEditor, MdPreview, type ToolbarNames } from 'md-editor-v3';
+    import { MdEditor, MdPreview, type ToolbarNames, type ExposeParam } from 'md-editor-v3';
     import 'md-editor-v3/lib/style.css';
     import 'md-editor-v3/lib/preview.css';
 
@@ -12,11 +12,17 @@
         disabled?: boolean;
         readOnly?: boolean;
         maxLength?: number;
+        hidePreview?: boolean;
+        placeholder?: string;
+        autoFocus?: boolean;
+        noUploadImg?: boolean;
     };
 
     const props = withDefaults(defineProps<IProps>(), {
         disabled: false,
         readOnly: false,
+        hidePreview: false,
+        noUploadImg: true,
     });
 
     const colorSchemeStore = useColorSchemeStore();
@@ -24,33 +30,14 @@
 
     const value = defineModel<string | null>('value');
 
+    const editorRef = ref<ExposeParam>();
+
     const markDown = computed<string>({
         get: () => value.value ?? "",
         set(markDownStr: string) {
             value.value = markDownStr === "" ? null : markDownStr;
         }
     });
-
-    const insertAtCursor = (value: string) => {
-        const el = document.activeElement as HTMLTextAreaElement
-        if (!el) {
-            markDown.value += value
-            return
-        }
-
-        const start = el.selectionStart ?? markDown.value?.length
-        const end = el.selectionEnd ?? markDown.value?.length
-
-        markDown.value =
-            markDown.value?.slice(0, start) +
-            value +
-            markDown.value?.slice(end)
-
-        // restore cursor
-        requestAnimationFrame(() => {
-            el.selectionStart = el.selectionEnd = start + value.length
-        })
-    }
 
     const onPaste = (e: ClipboardEvent) => {
         const clipboard = e.clipboardData
@@ -67,7 +54,10 @@
 
         e.preventDefault()
 
-        insertAtCursor(markdown)
+        editorRef.value?.insert((_selectedText) => ({
+            targetValue: markdown,
+            select: false
+        }));
     };
 
     const excludedMDEditorToolBars: ToolbarNames[] = ["previewOnly", "htmlPreview", "catalog", "github"];
@@ -75,20 +65,13 @@
 </script>
 
 <template>
-    <MdEditor v-model="markDown" :max-length="props.maxLength" :theme="colorSchemeStore.dark ? 'dark' : 'light'"
-        language="en-US" :disabled="props.disabled" :read-only="props.readOnly" v-if="!props.readOnly" no-upload-img
-        auto-focus @paste="onPaste" :toolbars-exclude="excludedMDEditorToolBars" :footers="[]" />
-    <div v-else class="doneo-md-preview">
-        <MdPreview id="mdeditor" v-model:model-value="markDown" no-img-zoom-in
-            :theme="colorSchemeStore.dark ? 'dark' : 'light'" language="en-US" />
-    </div>
+    <MdEditor ref="editorRef" v-model="markDown" :max-length="props.maxLength"
+        :theme="colorSchemeStore.dark ? 'dark' : 'light'" language="en-US" :disabled="props.disabled"
+        :read-only="props.readOnly" v-if="!props.readOnly" :no-upload-img="props.noUploadImg"
+        :auto-focus="props.autoFocus" @paste="onPaste" :toolbars-exclude="excludedMDEditorToolBars" :footers="[]"
+        :preview="!props.hidePreview" :placeholder="props.placeholder" />
+    <MdPreview v-else id="mdeditor" v-model:model-value="markDown" no-img-zoom-in
+        :theme="colorSchemeStore.dark ? 'dark' : 'light'" language="en-US" :code-foldable="false" />
 </template>
 
-<style lang="css" scoped>
-    .doneo-md-preview {
-        border: 1px solid #e0e0e6;
-        border-radius: var(--n-border-radius);
-        padding: 4px 12px;
-        width: 100%;
-    }
-</style>
+<style lang="css" scoped></style>
