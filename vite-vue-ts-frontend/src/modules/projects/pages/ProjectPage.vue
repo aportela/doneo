@@ -5,7 +5,7 @@
 
     import { NTabs, NTabPane, type TabsInst, NIcon } from 'naive-ui';
 
-    import { IconAlertTriangle } from '@tabler/icons-vue';
+    import { IconAlertTriangle, IconLock, IconLockOpen } from '@tabler/icons-vue';
 
     import { useLoadingStore } from '../../../stores/loading.ts';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
@@ -127,10 +127,13 @@
             onGet(projectId);
         }
     });
+
+    const readOnly = ref<boolean>(true);
 </script>
 
 <template>
-    <h1 class="doneo-cursor-pointer">PROJECT</h1>
+    <h1 class="doneo-cursor-pointer">PROJECT <n-icon :component="readOnly ? IconLock : IconLockOpen"
+            @click="readOnly = !readOnly" class="doneo-cursor-pointer" /></h1>
     <n-tabs placement="top" type="line" animated ref="tabsRef" v-model:value="tab">
         <n-tab-pane name="metadata" display-directive="show" key="metadata" :disabled="!projectId">
             <template #tab>
