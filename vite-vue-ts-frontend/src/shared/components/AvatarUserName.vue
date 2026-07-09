@@ -29,9 +29,11 @@
 
 <template>
     <div class="doneo-flex-center-align" style="gap: 8px;">
+        <slot name="before"></slot>
         <n-avatar v-if="props.userId" :src="avatarURL" class="doneo-avatar-username" :size="avatarPixelSize"
             color="transparent" />
         {{ props.userName }}
+        <slot name="after"></slot>
     </div>
 </template>
 
