@@ -24,6 +24,7 @@
     import ChangeTaskStatusDropdown from '../../../shared/components/dropdowns/ChangeTaskStatusDropdown.vue';
     import type { TaskStatus } from '../../task-statuses/models/task-status.ts';
     import { DEFAULT_BUTTON_SIZE } from '../../../constants.ts';
+    import TaskResumeFloatingCard from './TaskResumeFloatingCard.vue';
 
     interface Props {
         disabled: boolean;
@@ -143,9 +144,21 @@
         createdAtFilterRef.value?.reset();
         filters.value.createdByUserId = null;
     };
+
+    const showDrawer = ref<boolean>(false);
+
+    const currentTask = ref<Task | null>(null);
+
+    const onShowTaskResume = (task: Task) => {
+        showDrawer.value = true;
+        currentTask.value = task;
+    };
+
 </script>
 
 <template>
+    <TaskResumeFloatingCard v-if="showDrawer && currentTask?.projectId && currentTask.id" v-model:show="showDrawer"
+        :project-id="currentTask?.projectId" :task-id="currentTask?.id" />
     <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd"
         :hideAdd="props.hideAdd || props.readOnly">
         <template #thead>
@@ -206,15 +219,13 @@
                 <td class="doneo-text-center">
                     <!-- TODO: use ManageTableActionButtons -->
                     <n-button-group :size="DEFAULT_BUTTON_SIZE">
-                        <router-link
-                            :to="{ name: 'taskTab', params: { taskId: task.id, projectId: task.projectId, tab: 'metadata' } }">
-                            <n-button :disabled="props.disabled" :size="DEFAULT_BUTTON_SIZE">
-                                {{ t("shared.buttons.Open.label") }}
-                                <template #icon>
-                                    <n-icon :size="22" :component="IconFilePencil" />
-                                </template>
-                            </n-button>
-                        </router-link>
+                        <n-button :disabled="props.disabled" :size="DEFAULT_BUTTON_SIZE"
+                            @click="onShowTaskResume(task)">
+                            {{ t("shared.buttons.Open.label") }}
+                            <template #icon>
+                                <n-icon :size="22" :component="IconFilePencil" />
+                            </template>
+                        </n-button>
                         <ChangeTaskStatusDropdown :disabled="props.disabled" :read-only="props.readOnly"
                             :current-status="task.status"
                             @change="(status: TaskStatus) => onStatusChange(task, status)" />
