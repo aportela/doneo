@@ -2,8 +2,8 @@
     import { ref, reactive, onMounted } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NDrawer, NDrawerContent, NCollapse, NCollapseItem, NButton, NButtonGroup, NTag, NSpin, NIcon, NTimeline, NTimelineItem, NInput, NDivider, NFlex, NCard, NDropdown } from 'naive-ui';
-    import { IconAlertTriangle, IconAlignCenter, IconAlignLeft, IconAlignRight, IconBold, IconCalendarBolt, IconCalendarCheck, IconCalendarDue, IconCalendarTime, IconDots, IconFilter2, IconItalic, IconLink, IconMessage2, IconPaperclip, IconReport, IconSortDescending, IconStatusChange, IconStrikethrough, IconUnderline, IconUser } from '@tabler/icons-vue';
+    import { NDrawer, NDrawerContent, NCollapse, NCollapseItem, NButton, NButtonGroup, NTag, NSpin, NIcon, NTimeline, NTimelineItem, NDivider, NFlex, NDropdown } from 'naive-ui';
+    import { IconAlertTriangle, IconCalendarBolt, IconCalendarCheck, IconCalendarDue, IconCalendarTime, IconFilter2, IconLink, IconMessage2, IconPaperclip, IconReport, IconSortDescending, IconStatusChange, IconUser } from '@tabler/icons-vue';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { taskService } from '../services/task.ts';
@@ -16,6 +16,10 @@
     import TaskTimeProgress from '../../../shared/components/progress/TaskTimeProgress.vue';
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color.ts';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
+    import ToggleMarkDownEditor from '../../../shared/components/form-blocks/ToggleMarkDownEditor.vue';
+    import NoteItem from '../../notes/components/NoteItem.vue';
+    import { IDate } from '../../../shared/types/idate.ts';
+    import { Note } from '../../notes/models/note.ts';
 
     interface IProps {
         projectId: string;
@@ -89,17 +93,6 @@
         onGet(props.projectId, props.taskId);
     });
 
-    const noteOpts = [
-        {
-            label: "Update",
-            key: "update",
-        },
-        {
-            label: "Delete",
-            key: "delete"
-        }
-    ];
-
     const activityFilterOpts = [
         {
             label: "Updates",
@@ -110,6 +103,14 @@
             key: "notes",
         }
     ];
+
+    const noteBody = ref<string>("");
+
+    const defaultNote = new Note();
+    defaultNote.id = "019f4908-2f06-7e36-8751-f7c2d9a3e7c2";
+    defaultNote.createdBy.id = "019f4908-5229-740c-a4f1-284d512eb4a0";
+    defaultNote.createdAt = new IDate(new Date().getTime());
+    defaultNote.body = "We recommend configuring it at the project entry point, such as in main.js for projects created with Vite. Avoid calling config within components!";
 </script>
 
 <template>
@@ -197,19 +198,8 @@
                             </n-dropdown>
                         </n-button-group>
                     </n-flex>
-                    <div class="editor">
-                        <n-input type="textarea" placeholder="Add comment" />
-                        <div class="toolbar">
-                            <n-icon :size="20" :component="IconBold" />
-                            <n-icon :size="20" :component="IconItalic" />
-                            <n-icon :size="20" :component="IconUnderline" />
-                            <n-icon :size="20" :component="IconStrikethrough" />
-                            <n-divider vertical />
-                            <n-icon :size="20" :component="IconAlignLeft" />
-                            <n-icon :size="20" :component="IconAlignRight" />
-                            <n-icon :size="20" :component="IconAlignCenter" />
-                        </div>
-                    </div>
+
+                    <ToggleMarkDownEditor v-model:value="noteBody" hide-preview placeholder="Add comment" />
                     <n-timeline>
                         <n-timeline-item type="default">
                             <template #icon>
@@ -222,29 +212,7 @@
                                 <n-icon :component="IconMessage2" size="22" />
                             </template>
                             <template #default>
-                                <n-card>
-                                    <template #header>
-                                        <n-flex align="center">
-                                            <AvatarUserName :user-id="task.createdBy.id"
-                                                :user-name="task.createdBy.name" />
-                                            commented in less than a minute
-                                        </n-flex>
-                                    </template>
-                                    <template #header-extra>
-                                        <n-dropdown :options="noteOpts" trigger="click">
-                                            <n-button size="tiny">
-                                                <template #icon>
-                                                    <n-icon :component="IconDots" />
-                                                </template>
-                                            </n-button>
-                                        </n-dropdown>
-                                    </template>
-                                    <template #default>
-                                        Summary: Optimize existing workflows with the goal of improving customer
-                                        experience to improve time-to-market.
-
-                                    </template>
-                                </n-card>
+                                <NoteItem :note="defaultNote" />
                             </template>
                         </n-timeline-item>
                     </n-timeline>
