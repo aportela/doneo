@@ -47,7 +47,7 @@
                 from: null,
                 to: null,
             },
-            updatedAtAt: {
+            updatedAt: {
                 from: null,
                 to: null,
             },
