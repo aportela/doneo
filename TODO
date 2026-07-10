@@ -56,3 +56,5 @@ size & default for all components
 add pages/wiki
 
 add generic image upload (for md-editor)
+
+move project permissions -> members
