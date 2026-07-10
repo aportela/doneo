@@ -86,6 +86,7 @@ export type ProjectResponse = {
   permissionsCount: number;
   attachmentsCount: number;
   notesCount: number;
+  pagesCount: number;
   historyOperationsCount: number;
   allowedOperations: AllowedProjectOperations;
 };

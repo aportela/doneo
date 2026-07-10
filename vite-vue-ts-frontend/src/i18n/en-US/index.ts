@@ -1186,6 +1186,31 @@ export default {
         },
       },
     },
+    projectPage: {
+      components: {
+        ProjectPagesTable: {
+          header: {
+            columns: {
+              title: "Title",
+              createdAt: "Created at",
+              createdBy: "Created by",
+              updatedAt: "Updated at",
+            },
+          },
+          filters: {
+            title: {
+              placeholder: "search by title",
+            },
+            user: {
+              placeholder: "search by user",
+            },
+          },
+          warnings: {
+            noItemsFound: "No project pages operations found",
+          },
+        },
+      },
+    },
     project: {
       components: {
         NewProjectForm: {
@@ -1311,6 +1336,9 @@ export default {
             },
             notes: {
               label: "Notes | Notes ({count}) | Notes ({count})",
+            },
+            pages: {
+              label: "Pages | Pages ({count}) | Pages ({count})",
             },
             history: {
               label: "History | History ({count}) | History ({count})",

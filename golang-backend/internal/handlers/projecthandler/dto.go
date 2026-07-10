@@ -93,6 +93,7 @@ type projectResponse struct {
 	PermissionsCount       uint16                                         `json:"permissionsCount"`
 	AttachmentsCount       uint16                                         `json:"attachmentsCount"`
 	NotesCount             uint16                                         `json:"notesCount"`
+	PagesCount             uint16                                         `json:"pagesCount"`
 	HistoryOperationsCount uint16                                         `json:"historyOperationsCount"`
 	AllowedOperations      ProjectAllowedOperationsResponse               `json:"allowedOperations"`
 }

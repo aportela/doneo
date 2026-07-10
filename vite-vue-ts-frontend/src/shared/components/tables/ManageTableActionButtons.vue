@@ -2,7 +2,7 @@
     import { useI18n } from "vue-i18n";
 
     import { NButtonGroup, NButton, NIcon, type ButtonSize } from 'naive-ui';
-    import { IconEdit, IconTrash, IconTrashOff, IconDownload, IconEyeSearch } from '@tabler/icons-vue';
+    import { IconEdit, IconTrash, IconTrashOff, IconDownload, IconEyeSearch, IconArticle } from '@tabler/icons-vue';
 
     interface UpdateDeleteActionsColumnProps {
         disabled?: boolean;
@@ -18,9 +18,11 @@
         downloadDisabled?: boolean;
         showPreview?: boolean;
         previewDisabled?: boolean;
+        showOpen?: boolean;
+        openDisabled?: boolean;
     }
 
-    const emit = defineEmits(['update', 'delete', 'restore', 'download', 'preview'])
+    const emit = defineEmits(['update', 'delete', 'restore', 'download', 'preview', 'open'])
 
     const props = withDefaults(defineProps<UpdateDeleteActionsColumnProps>(), {
         disabled: false,
@@ -36,6 +38,8 @@
         downloadDisabled: false,
         showPreview: false,
         previewDisabled: false,
+        showOpen: false,
+        openDisabled: false,
     });
 
     const { t } = useI18n();
@@ -58,6 +62,10 @@
 
     const onPreview = () => {
         emit("preview");
+    };
+
+    const onOpen = () => {
+        emit("open");
     };
 </script>
 
@@ -96,6 +104,13 @@
             {{ t("shared.buttons.Preview.label") }}
             <template #icon>
                 <n-icon :size="props.iconSize" :component="IconEyeSearch" />
+            </template>
+        </n-button>
+        <n-button @click.prevent="onOpen" :disabled="props.disabled || props.openDisabled" v-if="showOpen"
+            class="doneo-table-actions-button">
+            {{ t("shared.buttons.Open.label") }}
+            <template #icon>
+                <n-icon :size="props.iconSize" :component="IconArticle" />
             </template>
         </n-button>
     </n-button-group>

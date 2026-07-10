@@ -159,6 +159,12 @@ func NewRouter(app *app.App) http.Handler {
 		r.Put("/{project_id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", app.NoteHandler.UpdateProjectNote)
 		r.Delete("/{project_id:"+uuidPattern+"}/notes/{note_id:"+uuidPattern+"}", app.NoteHandler.DeleteProjectNote)
 
+		r.Get("/{project_id:"+uuidPattern+"}/pages", app.PageHandler.GetProjectPages)
+		r.Get("/{project_id:"+uuidPattern+"}/pages/{page_id:"+uuidPattern+"}", app.PageHandler.GetProjectPage)
+		r.Post("/{project_id:"+uuidPattern+"}/pages", app.PageHandler.AddProjectPage)
+		r.Put("/{project_id:"+uuidPattern+"}/pages/{page_id:"+uuidPattern+"}", app.PageHandler.UpdateProjectPage)
+		r.Delete("/{project_id:"+uuidPattern+"}/pages/{page_id:"+uuidPattern+"}", app.PageHandler.DeleteProjectPage)
+
 		r.Get("/{project_id:"+uuidPattern+"}/attachments", app.AttachmentHandler.GetProjectAttachments)
 		r.Post("/{project_id:"+uuidPattern+"}/attachments", app.AttachmentHandler.AddProjectAttachment)
 		r.Delete("/{project_id:"+uuidPattern+"}/attachments/{attachment_id:"+uuidPattern+"}", app.AttachmentHandler.DeleteProjectAttachment)

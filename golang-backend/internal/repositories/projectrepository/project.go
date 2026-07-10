@@ -169,6 +169,7 @@ func (repository *projectRepository) Get(ctx context.Context, dbExecutor databas
 				U.name AS creator_name,
 				IFNULL(PUR.permissions_count, 0) AS permissions_count,
 				IFNULL(PN.notes_count, 0) AS notes_count,
+				IFNULL(PP.pages_count, 0) AS pages_count,
 				IFNULL(PA.attachments_count, 0) AS attachments_count,
 				IFNULL(PHO.history_operations_count, 0) AS history_operations_count,
 				IFNULL(PT.tasks_count, 0) AS tasks_count
@@ -187,7 +188,12 @@ func (repository *projectRepository) Get(ctx context.Context, dbExecutor databas
     			FROM project_notes
     			GROUP BY project_id
 			) PN ON PN.project_id = P.id
-			 LEFT JOIN (
+			LEFT JOIN (
+    			SELECT project_id, COUNT(*) AS pages_count
+    			FROM project_pages
+    			GROUP BY project_id
+			) PP ON PP.project_id = P.id
+			LEFT JOIN (
     			SELECT project_id, COUNT(*) AS attachments_count
     			FROM project_attachments
     			GROUP BY project_id
@@ -232,6 +238,7 @@ func (repository *projectRepository) Get(ctx context.Context, dbExecutor databas
 		&dto.CreatorName,
 		&dto.PermissionsCount,
 		&dto.NotesCount,
+		&dto.PagesCount,
 		&dto.AttachmentsCount,
 		&dto.HistoryOperationsCount,
 		&dto.TasksCount,

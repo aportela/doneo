@@ -43,6 +43,11 @@ const routes: RouteRecordRaw[] = [
         ],
       },
       {
+        name: "projectPage",
+        path: "projects/:projectId/pages/:pageId",
+        component: () => import("../modules/pages/pages/ProjectPage.vue"),
+      },
+      {
         name: "manageTasks",
         path: "tasks",
         component: () => import("../modules/tasks/pages/ManageTasksPage.vue"),

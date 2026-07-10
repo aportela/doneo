@@ -9,6 +9,7 @@ import (
 	"github.com/aportela/doneo/internal/handlers/historyoperationhandler"
 	"github.com/aportela/doneo/internal/handlers/identityhandler"
 	"github.com/aportela/doneo/internal/handlers/notehandler"
+	"github.com/aportela/doneo/internal/handlers/pagehandler"
 	"github.com/aportela/doneo/internal/handlers/profilehandler"
 	"github.com/aportela/doneo/internal/handlers/projecthandler"
 	"github.com/aportela/doneo/internal/handlers/projectpermissionhandler"
@@ -25,6 +26,7 @@ import (
 	"github.com/aportela/doneo/internal/repositories/attachmentrepository"
 	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
 	"github.com/aportela/doneo/internal/repositories/noterepository"
+	"github.com/aportela/doneo/internal/repositories/pagerepository"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/projectpriorityrepository"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
@@ -44,6 +46,7 @@ import (
 	"github.com/aportela/doneo/internal/services/historyoperationservice"
 	"github.com/aportela/doneo/internal/services/identityservice"
 	"github.com/aportela/doneo/internal/services/noteservice"
+	"github.com/aportela/doneo/internal/services/pageservice"
 	"github.com/aportela/doneo/internal/services/profileservice"
 	"github.com/aportela/doneo/internal/services/projectpermissionservice"
 	"github.com/aportela/doneo/internal/services/projectpriorityservice"
@@ -68,6 +71,7 @@ type App struct {
 	IdentityHandler          identityhandler.IdentityHandler
 	HistoryOperationHandler  historyoperationhandler.HistoryOperationHandler
 	NoteHandler              notehandler.NoteHandler
+	PageHandler              pagehandler.PageHandler
 	ProjectPermissionHandler projectpermissionhandler.ProjectPermissionHandler
 	ProjectPriorityHandler   projectpriorityhandler.ProjectPriorityHandler
 	ProjectHandler           projecthandler.ProjectHandler
@@ -94,6 +98,7 @@ func NewApp(
 	attachmentRepository := attachmentrepository.NewRepository()
 	historyOperationRepository := historyoperationrepository.NewRepository()
 	noteRepository := noterepository.NewRepository()
+	pageRepository := pagerepository.NewRepository()
 	projectPermissionRepository := projectpermissionrepository.NewRepository()
 	projectPriorityRepository := projectpriorityrepository.NewRepository()
 	projectRepository := projectrepository.NewRepository()
@@ -114,6 +119,7 @@ func NewApp(
 	attachmentService := attachmentservice.NewService(db, cfg.Storage.AttachmentsPath, authorizationService, historyOperationService, attachmentRepository)
 	identityService := identityservice.NewService(db, userRepository)
 	noteService := noteservice.NewService(db, authorizationService, historyOperationService, noteRepository)
+	pageService := pageservice.NewService(db, authorizationService, historyOperationService, pageRepository)
 	projectPermissionService := projectpermissionservice.NewService(db, cache, authorizationService, historyOperationService, projectPermissionRepository)
 	projectPriorityService := projectpriorityservice.NewService(db, authorizationService, projectPriorityRepository)
 	projectService := projectservice.NewService(db, cache, authorizationService, historyOperationService, projectRepository)
@@ -133,6 +139,7 @@ func NewApp(
 	identityHandler := identityhandler.NewHandler(identityService, cfg.Auth.SecretKey, cfg.Auth.AccessTokenExpirationHours, cfg.Auth.RefreshTokenExpirationDays)
 	historyOperationHandler := historyoperationhandler.NewHandler(db, historyOperationService)
 	noteHandler := notehandler.NewHandler(noteService)
+	pageHandler := pagehandler.NewHandler(pageService)
 	projectPermissionHandler := projectpermissionhandler.NewHandler(projectPermissionService)
 	projectPriorityHandler := projectpriorityhandler.NewHandler(projectPriorityService)
 	projectHandler := projecthandler.NewHandler(projectService)
@@ -157,6 +164,7 @@ func NewApp(
 		IdentityHandler:          identityHandler,
 		HistoryOperationHandler:  historyOperationHandler,
 		NoteHandler:              noteHandler,
+		PageHandler:              pageHandler,
 		ProjectPermissionHandler: projectPermissionHandler,
 		ProjectPriorityHandler:   projectPriorityHandler,
 		ProjectHandler:           projectHandler,

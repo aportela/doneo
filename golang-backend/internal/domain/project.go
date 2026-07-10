@@ -21,6 +21,7 @@ type Project struct {
 	PermissionsCount       uint16
 	AttachmentsCount       uint16
 	NotesCount             uint16
+	PagesCount             uint16
 	HistoryOperationsCount uint16
 	PermissionsBitMask     Bitmask
 	//lead, asignee

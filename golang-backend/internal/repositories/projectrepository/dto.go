@@ -29,6 +29,7 @@ type projectDTO struct {
 	PriorityName           string         `db:"priority_name"`
 	PriorityHexColor       string         `db:"priority_hex_color"`
 	TasksCount             uint16         `db:"tasks_count"`
+	PagesCount             uint16         `db:"pages_count"`
 	PermissionsCount       uint16         `db:"permissions_count"`
 	AttachmentsCount       uint16         `db:"attachments_count"`
 	NotesCount             uint16         `db:"notes_count"`

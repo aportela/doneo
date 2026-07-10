@@ -309,6 +309,20 @@ var schemaQueries = []schemaMigration{
 				CREATE INDEX IF NOT EXISTS idx_task_time_trackings_task_id ON task_time_trackings(task_id);
 				CREATE INDEX IF NOT EXISTS idx_task_time_trackings_creator_id ON task_time_trackings(creator_id);
 			`,
+			`
+				CREATE TABLE IF NOT EXISTS project_pages (
+					id TEXT NOT NULL CHECK(length(id) == 36),
+					project_id TEXT NOT NULL CHECK(length(project_id) == 36),
+					title TEXT NOT NULL CHECK(length(title) BETWEEN 1 AND 128),
+					body TEXT,
+					creator_id TEXT NOT NULL CHECK(length(creator_id) == 36),
+					created_at INTEGER NOT NULL,
+					updated_at INTEGER,
+					deleted_at INTEGER,
+					PRIMARY KEY (id),
+					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE
+				) STRICT;
+			`,
 		},
 	},
 }

@@ -21,6 +21,10 @@ const (
 	EventProjectPermissionAdded   HistoryOperationEventType = 130
 	EventProjectPermissionDeleted HistoryOperationEventType = 132
 
+	EventProjectPageAdded   HistoryOperationEventType = 140
+	EventProjectPageUpdated HistoryOperationEventType = 141
+	EventProjectPageDeleted HistoryOperationEventType = 142
+
 	EventTaskCreated HistoryOperationEventType = 200
 	EventTaskUpdated HistoryOperationEventType = 201
 	EventTaskDeleted HistoryOperationEventType = 202

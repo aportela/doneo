@@ -37,6 +37,7 @@ func toDTO(project domain.Project) projectDTO {
 		PermissionsCount:       project.PermissionsCount,
 		AttachmentsCount:       project.AttachmentsCount,
 		NotesCount:             project.NotesCount,
+		PagesCount:             project.PagesCount,
 		HistoryOperationsCount: project.HistoryOperationsCount,
 	}
 }
@@ -61,6 +62,7 @@ func toDomain(project projectDTO) domain.Project {
 		PermissionsCount:       project.PermissionsCount,
 		AttachmentsCount:       project.AttachmentsCount,
 		NotesCount:             project.NotesCount,
+		PagesCount:             project.PagesCount,
 		HistoryOperationsCount: project.HistoryOperationsCount,
 	}
 }

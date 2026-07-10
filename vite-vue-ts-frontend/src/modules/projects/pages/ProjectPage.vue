@@ -18,6 +18,7 @@
     import ProjectPermissionsTab from '../components/tabs/Permissions.vue';
     import ProjectAttachmentsTab from '../components/tabs/Attachments.vue';
     import ProjectNotesTab from '../components/tabs/Notes.vue';
+    import ProjectPagesTab from '../components/tabs/Pages.vue';
     import ProjectHistoryTab from '../components/tabs/History.vue';
     import type { ProjectResponse } from '../types/dto.ts';
     import { Project } from '../models/project.ts';
@@ -53,6 +54,7 @@
     const permissionsTabLabel = computed(() => t("modules.project.components.ProjectPage.tabs.permissions.label", project.value.permissionsCount));
     const attachmentsTabLabel = computed(() => t("modules.project.components.ProjectPage.tabs.attachments.label", project.value.attachmentsCount));
     const notesTabLabel = computed(() => t("modules.project.components.ProjectPage.tabs.notes.label", project.value.notesCount));
+    const pagesTabLabel = computed(() => t("modules.project.components.ProjectPage.tabs.pages.label", project.value.pagesCount));
     const historyTabLabel = computed(() => t("modules.project.components.ProjectPage.tabs.history.label", project.value.historyOperationsCount));
     const tasksTabLabel = computed(() => t("modules.project.components.ProjectPage.tabs.tasks.label", project.value.tasksCount));
 
@@ -64,7 +66,7 @@
 
     // recalc bar position on dynamic tab labels changes
     watch(
-        () => [permissionsTabLabel.value, attachmentsTabLabel.value, notesTabLabel.value, historyTabLabel.value, tasksTabLabel.value],
+        () => [permissionsTabLabel.value, attachmentsTabLabel.value, notesTabLabel.value, pagesTabLabel.value, historyTabLabel.value, tasksTabLabel.value],
         async () => {
             await nextTick();
             tabsRef.value?.syncBarPosition();
@@ -155,6 +157,11 @@
         <n-tab-pane name="notes" :tab="notesTabLabel" display-directive="show:lazy" key="notes"
             :disabled="!projectId || (!project.allowedOperations.updateProject && project.notesCount === 0)">
             <ProjectNotesTab v-if="projectId" :project-id="projectId" v-model:item-count="project.notesCount"
+                :read-only="!project.allowedOperations.updateProject" />
+        </n-tab-pane>
+        <n-tab-pane name="pages" :tab="pagesTabLabel" display-directive="show:lazy" key="pages"
+            :disabled="!projectId || (!project.allowedOperations.updateProject && project.notesCount === 0)">
+            <ProjectPagesTab v-if="projectId" :project-id="projectId" v-model:item-count="project.notesCount"
                 :read-only="!project.allowedOperations.updateProject" />
         </n-tab-pane>
         <n-tab-pane name="attachments" :tab="attachmentsTabLabel" display-directive="show:lazy" key="attachments"

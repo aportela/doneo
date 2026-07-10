@@ -24,6 +24,7 @@ export class Project {
   permissionsCount: number;
   attachmentsCount: number;
   notesCount: number;
+  pagesCount: number;
   historyOperationsCount: number;
   allowedOperations: AllowedProjectOperations;
 
@@ -45,6 +46,7 @@ export class Project {
     this.permissionsCount = data?.permissionsCount ?? 0;
     this.attachmentsCount = data?.attachmentsCount ?? 0;
     this.notesCount = data?.notesCount ?? 0;
+    this.pagesCount = data?.pagesCount ?? 0;
     this.historyOperationsCount = data?.historyOperationsCount ?? 0;
     this.allowedOperations = data?.allowedOperations ?? {
       updateProject: false,
@@ -72,6 +74,7 @@ export class Project {
       permissionsCount: this.permissionsCount,
       attachmentsCount: this.attachmentsCount,
       notesCount: this.notesCount,
+      pagesCount: this.pagesCount,
       historyOperationsCount: this.historyOperationsCount,
       allowedOperations: this.allowedOperations,
     };

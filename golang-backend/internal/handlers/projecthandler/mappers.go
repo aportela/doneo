@@ -80,6 +80,7 @@ func DomainToResponse(project domain.Project) projectResponse {
 		PermissionsCount:       project.PermissionsCount,
 		AttachmentsCount:       project.AttachmentsCount,
 		NotesCount:             project.NotesCount,
+		PagesCount:             project.PagesCount,
 		HistoryOperationsCount: project.HistoryOperationsCount,
 		AllowedOperations: ProjectAllowedOperationsResponse{
 			AllowViewProject:   project.PermissionsBitMask.HasFlag(domain.PermissionViewProject),

@@ -13,6 +13,7 @@ import (
 	"github.com/aportela/doneo/internal/middlewares"
 	"github.com/aportela/doneo/internal/repositories/historyoperationrepository"
 	"github.com/aportela/doneo/internal/repositories/noterepository"
+	"github.com/aportela/doneo/internal/repositories/pagerepository"
 	"github.com/aportela/doneo/internal/repositories/projectpermissionrepository"
 	"github.com/aportela/doneo/internal/repositories/projectrepository"
 	"github.com/aportela/doneo/internal/repositories/tagrepository"
@@ -21,6 +22,7 @@ import (
 	"github.com/aportela/doneo/internal/services/authorizationservice"
 	"github.com/aportela/doneo/internal/services/historyoperationservice"
 	"github.com/aportela/doneo/internal/services/noteservice"
+	"github.com/aportela/doneo/internal/services/pageservice"
 	"github.com/aportela/doneo/internal/services/projectpermissionservice"
 	"github.com/aportela/doneo/internal/services/projectservice"
 	"github.com/aportela/doneo/internal/services/taskservice"
@@ -237,6 +239,7 @@ func createProjects(db database.Database, projectTypeIds []string, projectPriori
 	historyOperationService := historyoperationservice.NewService(authorizationService, historyoperationrepository.NewRepository())
 	projectService := projectservice.NewService(db, permissionCache, authorizationService, historyOperationService, projectrepository.NewRepository())
 	noteService := noteservice.NewService(db, authorizationService, historyOperationService, noterepository.NewRepository())
+	pageService := pageservice.NewService(db, authorizationService, historyOperationService, pagerepository.NewRepository())
 	projectPermissionService := projectpermissionservice.NewService(db, permissionCache, authorizationService, historyOperationService, projectPermissionRepository)
 	taskService := taskservice.NewService(db, authorizationService, historyOperationService, taskrepository.NewRepository(), tagrepository.NewRepository())
 	for i := 1; i <= count; i++ {
@@ -264,6 +267,19 @@ func createProjects(db database.Database, projectTypeIds []string, projectPriori
 			}
 			if _, err := noteService.AddProjectNote(ctx, newProject.ID, note); err != nil {
 				fmt.Printf("Error creating project note: %s\n", err.Error())
+			}
+		}
+		for j := 0; j < 5; j++ {
+			page := domain.Page{
+				CreatedBy: domain.UserBase{
+					ID: userIds[j],
+				},
+				Title:     newProject.Slug + "-" + strconv.Itoa(j),
+				Body:      randomText(rand.Intn(384) + 128),
+				CreatedAt: time.Now().Add(time.Duration(j*5) * time.Minute),
+			}
+			if _, err := pageService.AddProjectPage(ctx, newProject.ID, page); err != nil {
+				fmt.Printf("Error creating project page: %s\n", err.Error())
 			}
 		}
 		for j := 0; j < 5; j++ {
