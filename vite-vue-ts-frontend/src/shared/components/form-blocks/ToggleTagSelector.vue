@@ -28,7 +28,9 @@
 
     const { t } = useI18n();
 
-    const value = defineModel<string[] | null>("value", { default: [] });
+    const value = defineModel<string[]>("value", {
+        default: () => []
+    });
 
     const editValue = ref<string[]>(value.value ?? []);
 
