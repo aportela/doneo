@@ -29,9 +29,9 @@ func (repository *pageRepository) AddProjectPage(ctx context.Context, dbExecutor
 		ctx,
 		`
             INSERT INTO project_pages
-				(id, project_id, title, body, creator_id, created_at, updated_at, deleted_at, archived_at)
+				(id, project_id, title, body, creator_id, created_at, updated_at, deleted_at)
 			VALUES
-				(?, ?, ?, ?, ?, ?, NULL, NULL, NULL)
+				(?, ?, ?, ?, ?, ?, NULL, NULL)
         `,
 		dto.ID,
 		projectID,
