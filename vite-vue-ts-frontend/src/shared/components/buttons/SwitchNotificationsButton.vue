@@ -2,7 +2,8 @@
     import { useI18n } from "vue-i18n";
 
     import { NButton, NIcon, NTooltip, type ButtonSize } from 'naive-ui';
-    import { IconBell, IconBellOff } from '@tabler/icons-vue';
+
+    import { Bell, BellOff } from "@lucide/vue";
 
     import { useUserSettingsStore } from "../../../stores/userSettings";
 
@@ -30,8 +31,7 @@
         <template #trigger>
             <n-button :size="props.size" quaternary @click.prevent="userSettingsStore.toggleNotifications"
                 @mousedown.prevent :disabled="props.disabled">
-                <n-icon :size="props.iconSize"
-                    :component="userSettingsStore.disableNotifications ? IconBellOff : IconBell" />
+                <n-icon :size="props.iconSize" :component="userSettingsStore.disableNotifications ? BellOff : Bell" />
             </n-button>
         </template>
         {{
