@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, reactive, watch, nextTick, onMounted } from 'vue';
+    import { ref, reactive, computed, watch, nextTick, onMounted } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NIcon, NSpin, NForm, NFormItem, NInput, NButton, type FormItemRule, type FormInst, type FormRules, type InputInst, NTooltip } from 'naive-ui'
@@ -87,6 +87,8 @@
 
     watch(() => signinFormValues.value.email, () => { delete serverErrors.value.email });
     watch(() => signinFormValues.value.password, () => { delete serverErrors.value.password });
+
+    const formHasFilledFields = computed(() => signinFormValues.value.email && signinFormValues.value.password);
 
     const onSubmit = async () => {
         if (signinFormValues.value.email && signinFormValues.value.password) {
@@ -202,9 +204,9 @@
                 </n-input>
             </n-form-item>
             <n-form-item>
-                <n-button secondary @click="onSignIn" block :disabled="state.ajaxRunning">{{
+                <n-button secondary @click="onSignIn" block :disabled="state.ajaxRunning || !formHasFilledFields">{{
                     t("modules.auth.components.LoginForm.buttons.signIn.label")
-                    }}</n-button>
+                }}</n-button>
             </n-form-item>
         </n-form>
     </n-spin>
