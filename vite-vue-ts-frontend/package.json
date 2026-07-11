@@ -17,7 +17,7 @@
     "dayjs": "^1.11.21",
     "dompurify": "^3.4.7",
     "highlight.js": "^11.11.1",
-    "markdown-it": "^14.2.0",
+    "markdown-it": "^14.3.0",
     "md-editor-v3": "^6.5.3",
     "naive-ui": "^2.44.1",
     "pinia": "^3.0.4",
