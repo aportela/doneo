@@ -3,7 +3,7 @@
     import { useI18n } from "vue-i18n";
 
     import { NIcon, NSpin, NForm, NFormItem, NInput, NButton, type FormItemRule, type FormInst, type FormRules, type InputInst, NTooltip } from 'naive-ui'
-    import { IconEye, IconEyeCancel, IconMail, IconKey } from '@tabler/icons-vue';
+    import { AtSign, KeyRound, Eye, EyeOff } from '@lucide/vue';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from "../../../shared/types/ajaxState";
     import { isValidEmail } from '../../../shared/composables/form-validators';
@@ -170,7 +170,7 @@
                     :placeholder="t('modules.auth.components.LoginForm.inputs.email.placeholder')"
                     :disabled="state.ajaxRunning" ref="inputEmailRef">
                     <template #prefix>
-                        <n-icon :component="IconMail" />
+                        <n-icon :component="AtSign" />
                     </template>
                 </n-input>
             </n-form-item>
@@ -181,12 +181,12 @@
                     show-password-on="click" :disabled="state.ajaxRunning" @keydown.enter="onSignIn"
                     ref="inputPasswordRef">
                     <template #prefix>
-                        <n-icon :component="IconKey" />
+                        <n-icon :component="KeyRound" />
                     </template>
                     <template #password-visible-icon>
                         <n-tooltip trigger="hover">
                             <template #trigger>
-                                <n-icon :size="16" :component="IconEyeCancel" />
+                                <n-icon :size="16" :component="EyeOff" />
                             </template>
                             {{ t("modules.auth.components.LoginForm.inputs.password.hidePasswordTooltipIcon") }}
                         </n-tooltip>
@@ -194,7 +194,7 @@
                     <template #password-invisible-icon>
                         <n-tooltip trigger="hover">
                             <template #trigger>
-                                <n-icon :size="16" :component="IconEye" />
+                                <n-icon :size="16" :component="Eye" />
                             </template>
                             {{ t("modules.auth.components.LoginForm.inputs.password.showPasswordTooltipIcon") }}
                         </n-tooltip>
@@ -204,7 +204,7 @@
             <n-form-item>
                 <n-button secondary @click="onSignIn" block :disabled="state.ajaxRunning">{{
                     t("modules.auth.components.LoginForm.buttons.signIn.label")
-                }}</n-button>
+                    }}</n-button>
             </n-form-item>
         </n-form>
     </n-spin>
