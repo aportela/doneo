@@ -25,9 +25,7 @@ export class UserBase {
   }
 }
 
-export class User {
-  id: string;
-  name: string;
+export class User extends UserBase {
   email: string;
   password: string;
   permissions: UserPermissions;
@@ -36,29 +34,28 @@ export class User {
   deletedAt: IDate | null;
 
   constructor(data?: UserDTO) {
-    this.id = data?.id ?? "";
-    this.name = data?.name ?? "";
+    super(data);
+
     this.email = data?.email ?? "";
     this.password = "";
     this.permissions = {
-      isSuperUser: data?.permissions.isSuperUser ?? false,
+      isSuperUser: data?.permissions?.isSuperUser ?? false,
     };
     this.createdAt = data?.createdAt
       ? new IDate(data.createdAt)
-      : new IDate(new Date().getTime());
+      : new IDate(Date.now());
     this.updatedAt = data?.updatedAt ? new IDate(data.updatedAt) : null;
     this.deletedAt = data?.deletedAt ? new IDate(data.deletedAt) : null;
   }
 
-  toDTO(): UserDTO {
+  override toDTO(): UserDTO {
     return {
-      id: this.id,
-      name: this.name,
+      ...super.toDTO(),
       email: this.email,
       permissions: {
-        isSuperUser: this.permissions.isSuperUser ?? false,
+        isSuperUser: this.permissions.isSuperUser,
       },
-      createdAt: this.createdAt.msTimestamp ?? new Date().getTime(),
+      createdAt: this.createdAt.msTimestamp ?? Date.now(),
       updatedAt: this.updatedAt?.msTimestamp ?? null,
       deletedAt: this.deletedAt?.msTimestamp ?? null,
     };
