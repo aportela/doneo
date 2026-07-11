@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@lucide/vue": "^1.24.0",
     "@tabler/core": "^1.4.0",
     "@tabler/icons-vue": "^3.44.0",
     "@vueuse/core": "^14.3.0",
