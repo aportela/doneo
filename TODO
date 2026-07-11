@@ -58,3 +58,5 @@ add pages/wiki
 add generic image upload (for md-editor)
 
 move project permissions -> members
+
+add length (count) to "Field is below minimum length"
