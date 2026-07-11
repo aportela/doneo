@@ -2,7 +2,7 @@
     import { useI18n } from "vue-i18n";
 
     import { NButton, NIcon, NTooltip, type ButtonSize } from 'naive-ui';
-    import { IconLayoutSidebarLeftExpand, IconLayoutNavbarExpand } from '@tabler/icons-vue';
+    import { PanelLeftOpen, PanelTopOpen } from "@lucide/vue";
 
     import { useUserSettingsStore } from "../../../stores/userSettings";
 
@@ -31,7 +31,7 @@
             <n-button :size="props.size" quaternary @click="userSettingsStore.toggleNavigationMode" @mousedown.prevent
                 :disabled="props.disabled">
                 <n-icon :size="props.iconSize"
-                    :component="userSettingsStore.sideNavigationMode ? IconLayoutNavbarExpand : IconLayoutSidebarLeftExpand" />
+                    :component="userSettingsStore.sideNavigationMode ? PanelTopOpen : PanelLeftOpen" />
             </n-button>
         </template>
         {{

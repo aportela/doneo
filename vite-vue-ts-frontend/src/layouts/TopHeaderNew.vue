@@ -2,9 +2,12 @@
     import { nextTick, onMounted, watch } from 'vue';
     import { useRoute, useRouter } from "vue-router";
 
-    import { NButton, NDropdown, NMenu } from 'naive-ui'
+    import { NButton, NDropdown, NMenu, NIcon } from 'naive-ui'
     import { NFlex, NInput, NDivider } from 'naive-ui'
-    import { IconUserCircle, IconDatabaseStar, IconId, IconLogout, IconSearch } from '@tabler/icons-vue';
+    import Doneo from '../shared/components/icons/Doneo.vue';
+    import { Search } from '@lucide/vue';
+
+    import { IconUserCircle, IconId, IconLogout } from '@tabler/icons-vue';
 
     import SwitchNotificationsButton from '../shared/components/buttons/SwitchNotificationsButton.vue';
     import SwitchNavigationModeButton from '../shared/components/buttons/SwitchNavigationModeButton.vue';
@@ -152,7 +155,7 @@
     <div class="top-header">
         <div class="top-header__container top-header__container--fluid">
             <div class="brand-container">
-                <IconDatabaseStar :size="commonIconSize" />
+                <n-icon :size="commonIconSize" :component="Doneo" />
                 <span class="brand-name">Doneo</span>
             </div>
             <n-divider vertical />
@@ -160,11 +163,11 @@
             <div class="search-container" @click="onSearch">
                 <n-input placeholder="Search..." style="min-width: 50%;" round v-if="false">
                     <template #prefix>
-                        <IconSearch :size="16" />
+                        <n-icon :size="16" :component="Search" />
                     </template>
                 </n-input>
                 <span class="shortcut">
-                    <IconSearch :size="16" />
+                    <n-icon :size="16" :component="Search" />
                     <kbd>Crtl</kbd>+<kbd>K</kbd> to open search
                 </span>
             </div>
