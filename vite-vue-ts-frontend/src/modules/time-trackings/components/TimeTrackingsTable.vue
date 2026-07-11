@@ -54,8 +54,7 @@
 
     const isFilteredByCreator = computed<boolean>(() => filters.value.createdByUserId !== null);
     const isFilteredByCreatedAt = computed<boolean>(() => filters.value.createdAt.from != null || filters.value.createdAt.to != null);
-    const isFilteredBySummary = computed<boolean>(() => filters.value.summary.length > 0);
-
+    const isFilteredBySummary = computed<boolean>(() => (filters.value.summary?.length ?? 0) > 0);
 
 
     const hasFilters = computed<boolean>(() =>
