@@ -30,14 +30,13 @@
 
     const lastUsedEmail = localStorageLastUsedEmail.get();
 
+    const signInFormRef = ref<FormInst | null>(null)
     const inputEmailRef = ref<InputInst | null>(null);
     const inputPasswordRef = ref<InputInst | null>(null);
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
     const serverErrors = ref<Record<string, string>>({});
-
-    const signInFormRef = ref<FormInst | null>(null)
 
     const signinFormValues = ref<signInFormValuesInterface>({
         email: lastUsedEmail || "",
@@ -91,53 +90,49 @@
     const formHasFilledFields = computed(() => signinFormValues.value.email && signinFormValues.value.password);
 
     const onSubmit = async () => {
-        if (signinFormValues.value.email && signinFormValues.value.password) {
-            serverErrors.value = {};
-            signInFormRef.value?.restoreValidation();
-            Object.assign(state, defaultAjaxStateRunning);
-            try {
-                const payload: SignInRequest = {
-                    email: signinFormValues.value.email,
-                    password: signinFormValues.value.password
-                };
-                const response: SignInResponse = await authService.signIn(payload);
-                sessionStore.setAccessToken(response.accessToken.token, response.accessToken.expiresAt);
-                sessionStore.setUser(new User(response.user));
-                localStorageLastUsedEmail.set(signinFormValues.value.email);
-                emit('success');
-            } catch (error: unknown) {
-                state.ajaxErrors = true;
-                handleAPIError(error,
-                    (apiError) => {
-                        switch (apiError.response?.status) {
-                            case 404:
-                                serverErrors.value.email = "modules.auth.components.LoginForm.warnings.noAccountFoundForThisEmail";
-                                break;
-                            case 401:
-                                serverErrors.value.password = "modules.auth.components.LoginForm.warnings.incorrectPassword";
-                                break;
-                            default:
-                                state.ajaxErrorMessage = t("modules.auth.components.LoginForm.errors.signInError");
-                                break;
-                        }
-                    },
-                    (fatalError) => {
-                        state.ajaxErrorMessage = t("modules.auth.components.LoginForm.errors.signInError");
-                        console.error("Fatal error", { file: "LoginForm.vue", method: "onSubmit", details: "uncaught exception", error: fatalError });
-                    });
-            } finally {
-                state.ajaxRunning = false;
-                if (state.ajaxErrors) {
-                    if (state.ajaxErrorMessage) {
-                        appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
-                    } else {
-                        await nextTick();
-                        signInFormRef.value?.validate().then(() => { }).catch(() => { });
+        serverErrors.value = {};
+        signInFormRef.value?.restoreValidation();
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const payload: SignInRequest = {
+                email: signinFormValues.value.email,
+                password: signinFormValues.value.password
+            };
+            const response: SignInResponse = await authService.signIn(payload);
+            sessionStore.setAccessToken(response.accessToken.token, response.accessToken.expiresAt);
+            sessionStore.setUser(new User(response.user));
+            localStorageLastUsedEmail.set(signinFormValues.value.email);
+            emit('success');
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 404:
+                            serverErrors.value.email = "modules.auth.components.LoginForm.warnings.noAccountFoundForThisEmail";
+                            break;
+                        case 401:
+                            serverErrors.value.password = "modules.auth.components.LoginForm.warnings.incorrectPassword";
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.auth.components.LoginForm.errors.signInError");
+                            break;
                     }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.auth.components.LoginForm.errors.signInError");
+                    console.error("Fatal error", { file: "LoginForm.vue", method: "onSubmit", details: "uncaught exception", error: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+            if (state.ajaxErrors) {
+                if (state.ajaxErrorMessage) {
+                    appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+                } else {
+                    await nextTick();
+                    signInFormRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
-        } else {
-            console.error("Fatal error", { file: "LoginForm.vue", method: "onSubmit", details: "missing email/password values" });
         }
     }
 
