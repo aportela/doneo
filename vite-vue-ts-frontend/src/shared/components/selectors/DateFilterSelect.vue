@@ -36,10 +36,10 @@
     ]);
 
     const range = defineModel<TimestampRange>("range", {
-        default: {
+        default: () => ({
             from: null,
             to: null
-        }
+        })
     });
 
     const selectorValue = ref<number | null>(0)
