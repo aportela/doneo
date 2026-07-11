@@ -88,7 +88,7 @@
         try {
             const response = await userTimerService.search();
             currentUserTimers.value = response.userTimers.filter((item) => item.finishedAt !== null).map((item) => {
-                item.summary = `${item.summary} (${formatDuration(Math.round(((item.finishedAt ?? new Date().getTime()) - item.startedAt) / 1000))})`;
+                item.summary = `${item.summary} (${formatDuration(Math.round(((item.finishedAt ?? Date.now()) - item.startedAt) / 1000))})`;
                 return item;
             });
         } catch (error) {

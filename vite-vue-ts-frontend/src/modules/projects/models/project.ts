@@ -36,7 +36,7 @@ export class Project {
     this.type = new ProjectType(data?.type);
     this.priority = new ProjectPriority(data?.priority);
     this.status = new ProjectStatus(data?.status);
-    this.createdAt = new IDate(data?.createdAt ?? new Date().getTime());
+    this.createdAt = new IDate(data?.createdAt ?? Date.now());
     this.updatedAt = new IDate(data?.updatedAt ?? null);
     this.startedAt = new IDate(data?.startedAt ?? null);
     this.finishedAt = new IDate(data?.finishedAt ?? null);

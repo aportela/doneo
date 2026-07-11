@@ -108,23 +108,23 @@
 
     const onFillEmptyStartDate = () => {
         if (!project.value.startedAt.hasValue()) {
-            project.value.startedAt = new IDate(new Date().getTime())
+            project.value.startedAt = new IDate(Date.now())
         }
     };
 
     const onSetStartDate = () => {
-        project.value.startedAt = new IDate(new Date().getTime())
+        project.value.startedAt = new IDate(Date.now())
     };
 
     const onFillEmptyFinishDate = () => {
         if (!project.value.finishedAt.hasValue()) {
-            project.value.finishedAt = new IDate(new Date().getTime())
+            project.value.finishedAt = new IDate(Date.now())
         }
     };
 
     const onSetFinishDate = () => {
         if (!project.value.finishedAt.hasValue()) {
-            project.value.finishedAt = new IDate(new Date().getTime())
+            project.value.finishedAt = new IDate(Date.now())
         }
     };
 

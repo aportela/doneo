@@ -80,7 +80,7 @@
                 id: sesionStore.sessionUserId ?? "",
                 name: sesionStore.sessionUserName ?? "",
             },
-            createdAt: new Date().getTime(),
+            createdAt: Date.now(),
             updatedAt: null,
             body: "",
         }),

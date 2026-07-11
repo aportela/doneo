@@ -128,23 +128,23 @@
 
     const onFillEmptyStartDate = () => {
         if (!task.value.startedAt.hasValue()) {
-            task.value.startedAt = new IDate(new Date().getTime())
+            task.value.startedAt = new IDate(Date.now())
         }
     };
 
     const onSetStartDate = () => {
-        task.value.startedAt = new IDate(new Date().getTime())
+        task.value.startedAt = new IDate(Date.now())
     };
 
     const onFillEmptyFinishDate = () => {
         if (!task.value.finishedAt.hasValue()) {
-            task.value.finishedAt = new IDate(new Date().getTime())
+            task.value.finishedAt = new IDate(Date.now())
         }
     };
 
     const onSetFinishDate = () => {
         if (!task.value.finishedAt) {
-            task.value.finishedAt = new IDate(new Date().getTime())
+            task.value.finishedAt = new IDate(Date.now())
         }
     };
 

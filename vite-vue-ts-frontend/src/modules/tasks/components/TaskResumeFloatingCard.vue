@@ -109,7 +109,7 @@
     const defaultNote = new Note();
     defaultNote.id = "019f4908-2f06-7e36-8751-f7c2d9a3e7c2";
     defaultNote.createdBy.id = "019f4908-5229-740c-a4f1-284d512eb4a0";
-    defaultNote.createdAt = new IDate(new Date().getTime());
+    defaultNote.createdAt = new IDate(Date.now());
     defaultNote.body = "We recommend configuring it at the project entry point, such as in main.js for projects created with Vite. Avoid calling config within components!";
 </script>
 
@@ -186,7 +186,7 @@
                         </n-flex>
                     </p>
                     <p>Tags: <n-tag v-for="tag in task.tags" :key="tag" size="small" class="mr-tiny">{{ tag
-                    }}</n-tag>
+                            }}</n-tag>
                     </p>
                     <n-divider />
                     <n-flex justify="space-between" align="center">

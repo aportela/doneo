@@ -87,7 +87,7 @@
             }, trigger: ['blur'],
         },
     };
-    const lastAvatarTimestamp = ref<number>(new Date().getTime());
+    const lastAvatarTimestamp = ref<number>(Date.now());
 
     const currentAvatarURL = computed(() => profile.value.id ? `/api/wc/avatars/user/${profile.value.id}?t=${lastAvatarTimestamp.value}` : undefined);
 
@@ -127,7 +127,7 @@
         try {
             const response: ProfileResponse = await profileService.get();
             profile.value = new Profile(response);
-            lastAvatarTimestamp.value = new Date().getTime();
+            lastAvatarTimestamp.value = Date.now();
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -249,7 +249,7 @@
                 });
         } finally {
             state.ajaxRunning = false;
-            lastAvatarTimestamp.value = new Date().getTime();
+            lastAvatarTimestamp.value = Date.now();
             if (state.ajaxErrors) {
                 if (state.ajaxErrorMessage) {
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
@@ -301,7 +301,7 @@
                 });
         } finally {
             state.ajaxRunning = false;
-            lastAvatarTimestamp.value = new Date().getTime();
+            lastAvatarTimestamp.value = Date.now();
             if (state.ajaxErrors) {
                 if (state.ajaxErrorMessage) {
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });

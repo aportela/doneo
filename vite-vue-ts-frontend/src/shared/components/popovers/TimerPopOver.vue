@@ -353,7 +353,7 @@
                         <div>{{ t("shared.components.popOvers.TimerPopOver.labels.totalTimer") }} {{
                             formatDuration(
                                 Math.round(
-                                    ((timer.finishedAt ?? new Date().getTime()) - timer.startedAt) / 1000
+                                    ((timer.finishedAt ?? Date.now()) - timer.startedAt) / 1000
                                 )
                             )
                         }}</div>
