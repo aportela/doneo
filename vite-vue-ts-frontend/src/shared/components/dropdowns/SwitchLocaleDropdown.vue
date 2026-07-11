@@ -3,8 +3,8 @@
     import { useI18n } from "vue-i18n";
 
     import { NDropdown, NButton, NIcon, type ButtonSize } from 'naive-ui';
-    import { IconWorld, IconSelector } from '@tabler/icons-vue';
 
+    import { Globe, ChevronsUpDown } from '@lucide/vue';
     import { availableLocaleSelectorOptionItems, getlocaleSelectorOptionItem } from '../../../i18n';
     import { useI18nStore } from '../../../stores/i18n';
 
@@ -39,9 +39,9 @@
     <n-dropdown trigger="click" @select="onChangeLocale" :options="availableLocaleSelectorOptionItems"
         v-model="selected">
         <n-button :size="props.size" quaternary :disabled="props.disabled">
-            <n-icon :size="props.iconSize" :component="IconWorld" />
+            <n-icon :size="props.iconSize" :component="Globe" />
             <span class="selected_locale">{{ selectedLocale }}</span>
-            <n-icon :size="props.iconSize" :component="IconSelector" />
+            <n-icon :size="props.iconSize" :component="ChevronsUpDown" />
         </n-button>
     </n-dropdown>
 </template>

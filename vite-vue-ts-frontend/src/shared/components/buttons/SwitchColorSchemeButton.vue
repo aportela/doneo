@@ -2,7 +2,7 @@
     import { useI18n } from "vue-i18n";
 
     import { NButton, NIcon, NTooltip, type ButtonSize } from 'naive-ui';
-    import { IconMoon, IconSun } from '@tabler/icons-vue';
+    import { Sun, Moon } from "@lucide/vue";
 
     import { useColorSchemeStore } from "../../../stores/colorScheme";
 
@@ -30,7 +30,7 @@
         <template #trigger>
             <n-button :size="props.size" quaternary @click.prevent="colorSchemeStore.toggle" @mousedown.prevent
                 :disabled="props.disabled">
-                <n-icon :size="props.iconSize" :component="colorSchemeStore.light ? IconMoon : IconSun" />
+                <n-icon :size="props.iconSize" :component="colorSchemeStore.light ? Moon : Sun" />
             </n-button>
         </template>
         {{
