@@ -27,7 +27,7 @@ import {
   PanelTopOpen,
 } from "@lucide/vue";
 
-export const MENU_ICON_SIZE = 20;
+export const MENU_ICON_SIZE = 16;
 
 export const menuIcons: Record<string, Component> = {
   home: Home,
