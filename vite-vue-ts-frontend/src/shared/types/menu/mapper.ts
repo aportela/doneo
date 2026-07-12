@@ -48,15 +48,12 @@ const mapMenuItem = (item: AppMenuItem): MenuMixedOption | null => {
     case "route":
       return {
         key: item.key,
-        //label: item.label,
         label: () =>
           h(
             RouterLink,
+            { to: { name: item.route } },
             {
-              to: { name: item.route },
-            },
-            {
-              default: item.label,
+              default: () => item.label,
             },
           ),
         icon: renderMenuIcon(item.icon),
