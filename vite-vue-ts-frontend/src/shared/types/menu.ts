@@ -1,4 +1,4 @@
-import { h, ref, computed } from "vue";
+import { h, ref, computed, type Component } from "vue";
 import { useI18n } from "vue-i18n";
 import { RouterLink } from "vue-router";
 
@@ -31,13 +31,128 @@ import {
   IconLayoutNavbarExpand,
 } from "@tabler/icons-vue";
 
+interface AppMenuItem {
+  key: string;
+  label: string;
+  icon?: Component;
+  route?: string;
+  show?: boolean;
+  disabled?: boolean;
+  children?: AppMenuItem[];
+}
+
 const menuOptionIconSize = 20;
+
+const menuIcons = {
+  home: renderIcon(IconPresentation)(menuOptionIconSize),
+  projects: renderIcon(IconSitemap)(menuOptionIconSize),
+  tasks: renderIcon(IconBug)(menuOptionIconSize),
+
+  reports: renderIcon(IconFileAnalytics)(menuOptionIconSize),
+  charts: renderIcon(IconChartHistogram)(menuOptionIconSize),
+
+  users: renderIcon(IconUsers)(menuOptionIconSize),
+  roles: renderIcon(IconUserCheck)(menuOptionIconSize),
+
+  settings: renderIcon(IconSettings)(menuOptionIconSize),
+
+  projectTypes: renderIcon(IconBookmark)(menuOptionIconSize),
+  priorities: renderIcon(IconFlagBolt)(menuOptionIconSize),
+  statuses: renderIcon(IconAdjustmentsBolt)(menuOptionIconSize),
+
+  currentUser: renderIcon(IconUserCircle)(menuOptionIconSize),
+  profile: renderIcon(IconId)(menuOptionIconSize),
+  logout: renderIcon(IconLogout)(menuOptionIconSize),
+
+  search: renderIcon(IconSearch)(menuOptionIconSize),
+  notifications: renderIcon(IconBell)(menuOptionIconSize),
+  notificationsOff: renderIcon(IconBellOff)(menuOptionIconSize),
+
+  lightTheme: renderIcon(IconSun)(menuOptionIconSize),
+  darkTheme: renderIcon(IconMoon)(menuOptionIconSize),
+
+  sideNavigation: renderIcon(IconLayoutSidebarLeftExpand)(menuOptionIconSize),
+
+  topNavigation: renderIcon(IconLayoutNavbarExpand)(menuOptionIconSize),
+};
 
 export { menuOptionIconSize };
 
 // TODO: i18n
 export function useMenu() {
+  interface MenuRouteOptions {
+    key: string;
+    route: string;
+    label: string;
+    icon?: Component;
+    disabled?: boolean;
+    show?: boolean;
+  }
+
+  function menuRoute({
+    key,
+    route,
+    label,
+    icon,
+    disabled,
+    show,
+  }: MenuRouteOptions): MenuOption {
+    return {
+      key,
+      disabled,
+      show,
+      label: () =>
+        h(
+          RouterLink,
+          {
+            to: { name: route },
+          },
+          {
+            default: () => t(label),
+          },
+        ),
+      icon: icon ? renderIcon(icon)(menuOptionIconSize) : undefined,
+    };
+  }
+
+  function menuGroup(
+    key: string,
+    label: string,
+    children: MenuOption[],
+    options?: {
+      icon?: Component;
+      show?: boolean;
+      disabled?: boolean;
+    },
+  ): MenuOption {
+    return {
+      key,
+      label,
+      children,
+      show: options?.show,
+      disabled: options?.disabled,
+      icon: options?.icon
+        ? renderIcon(options.icon)(menuOptionIconSize)
+        : undefined,
+    };
+  }
+
+  function menuDivider(key: string, show = true): MenuOption {
+    return {
+      key,
+      type: "divider",
+      show,
+      props: {
+        style: {
+          marginLeft: "32px",
+        },
+      },
+    };
+  }
+
   const { t } = useI18n();
+
+  const menuT = (key: string) => t(`layouts.sidebarMenu.options.${key}`);
 
   const sessionStore = useSessionStore();
 
@@ -48,7 +163,7 @@ export function useMenu() {
   const topNavigation = ref<boolean>(true);
   const sideNavigation = ref<boolean>(false);
 
-  const menuOptions = computed(() => {
+  const menuOptions = computed<MenuOption[]>(() => {
     return [
       {
         label: () =>
@@ -58,81 +173,72 @@ export function useMenu() {
           }),
         key: "search",
         show: false,
-        icon: renderIcon(IconSearch)(menuOptionIconSize),
+        icon: menuIcons.search,
       },
-      {
-        label: () =>
-          h(
-            RouterLink,
-            {
-              to: {
-                name: "home",
-                params: {},
-              },
-            },
-            { default: () => t("layouts.sidebarMenu.options.home") },
-          ),
+      menuRoute({
         key: "home",
-        icon: renderIcon(IconPresentation)(menuOptionIconSize),
-      },
-      {
-        label: () =>
-          h(
-            RouterLink,
-            {
-              to: {
-                name: "manageProjects",
-                params: {},
-              },
-            },
-            { default: () => t("layouts.sidebarMenu.options.projects") },
-          ),
-        key: "projects",
-        icon: renderIcon(IconSitemap)(menuOptionIconSize),
-      },
-      {
-        label: () =>
-          h(
-            RouterLink,
-            {
-              to: {
-                name: "manageTasks",
-                params: {},
-              },
-            },
-            { default: () => t("layouts.sidebarMenu.options.tasks") },
-          ),
-        key: "tasks",
-        disabled: false,
-        icon: renderIcon(IconBug)(menuOptionIconSize),
-      },
+        route: "home",
+        label: menuT("home"),
+        icon: IconPresentation,
+      }),
+      menuGroup(
+        "workspace",
+        "Workspace",
+        [
+          menuRoute({
+            key: "workspaceProjects",
+            route: "manageProjects",
+            label: menuT("projects"),
+            icon: IconSitemap,
+          }),
+          menuRoute({
+            key: "workspaceTasks",
+            route: "manageTasks",
+            label: menuT("tasks"),
+            icon: IconBug,
+          }),
+        ],
+        { show: true },
+      ),
       {
         label: t("layouts.sidebarMenu.options.reports"),
         key: "reports",
         disabled: true,
-        icon: renderIcon(IconFileAnalytics)(menuOptionIconSize),
+        show: false,
+        icon: menuIcons.reports,
       },
       {
         label: t("layouts.sidebarMenu.options.charts"),
         key: "charts",
         disabled: true,
-        icon: renderIcon(IconChartHistogram)(menuOptionIconSize),
-      },
-      {
-        key: "divider-2",
-        type: "divider",
         show: false,
-        props: {
-          style: {
-            marginLeft: "32px",
+        icon: menuIcons.charts,
+      },
+      menuDivider("divider-2", false),
+      {
+        label: "Projects",
+        show: true,
+        children: [
+          {
+            label: "Project 1",
+            show: true,
+            children: [
+              {
+                label: "Tasks",
+                show: true,
+              },
+              {
+                label: "Pages",
+                show: true,
+              },
+            ],
           },
-        },
+        ],
       },
       {
         label: t("layouts.sidebarMenu.options.settings"),
         key: "settings",
         show: sessionStore.sessionUserIsAdmin,
-        icon: renderIcon(IconSettings)(menuOptionIconSize),
         children: [
           {
             label: () =>
@@ -147,7 +253,7 @@ export function useMenu() {
                 { default: () => t("layouts.sidebarMenu.options.manageUsers") },
               ),
             key: "manageUsers",
-            icon: renderIcon(IconUsers)(menuOptionIconSize),
+            icon: menuIcons.users,
           },
           {
             label: () =>
@@ -162,12 +268,12 @@ export function useMenu() {
                 { default: () => t("layouts.sidebarMenu.options.manageRoles") },
               ),
             key: "roles",
-            icon: renderIcon(IconUserCheck)(menuOptionIconSize),
+            icon: menuIcons.roles,
           },
           {
             label: t("layouts.sidebarMenu.options.projectSettings"),
             key: "projectSettings",
-            icon: renderIcon(IconSettings)(menuOptionIconSize),
+            icon: menuIcons.settings,
             children: [
               {
                 label: () =>
@@ -185,7 +291,7 @@ export function useMenu() {
                     },
                   ),
                 key: "manageProjectTypes",
-                icon: renderIcon(IconBookmark)(menuOptionIconSize),
+                icon: menuIcons.projectTypes,
               },
               {
                 label: () =>
@@ -205,7 +311,7 @@ export function useMenu() {
                     },
                   ),
                 key: "manageProjectPriorities",
-                icon: renderIcon(IconFlagBolt)(menuOptionIconSize),
+                icon: menuIcons.priorities,
               },
               {
                 label: () =>
@@ -223,14 +329,14 @@ export function useMenu() {
                     },
                   ),
                 key: "manageProjectStatuses",
-                icon: renderIcon(IconAdjustmentsBolt)(menuOptionIconSize),
+                icon: menuIcons.statuses,
               },
             ],
           },
           {
             label: t("layouts.sidebarMenu.options.taskSettings"),
             key: "taskSettings",
-            icon: renderIcon(IconSettings)(menuOptionIconSize),
+            icon: menuIcons.settings,
             children: [
               {
                 label: () =>
@@ -248,7 +354,7 @@ export function useMenu() {
                     },
                   ),
                 key: "manageTaskPriorities",
-                icon: renderIcon(IconFlagBolt)(menuOptionIconSize),
+                icon: menuIcons.priorities,
               },
               {
                 label: () =>
@@ -266,61 +372,53 @@ export function useMenu() {
                     },
                   ),
                 key: "manageTaskStatuses",
-                icon: renderIcon(IconAdjustmentsBolt)(menuOptionIconSize),
+                icon: menuIcons.statuses,
               },
             ],
           },
         ],
       },
-      {
-        key: "divider-3",
-        type: "divider",
-        props: {
-          style: {
-            marginLeft: "32px",
-          },
-        },
-      },
+      menuDivider("divider-3", true),
       {
         label: sessionStore.sessionUserName,
         key: "myuser",
-        icon: renderIcon(IconUserCircle)(menuOptionIconSize),
+        icon: menuIcons.currentUser,
         children: [
           {
             label: "Side navigation",
             key: "sideNavigation",
             show: topNavigation.value,
-            icon: renderIcon(IconLayoutSidebarLeftExpand)(menuOptionIconSize),
+            icon: menuIcons.sideNavigation,
           },
           {
             label: "Top navigation",
             key: "topNavigation",
             show: sideNavigation.value,
-            icon: renderIcon(IconLayoutNavbarExpand)(menuOptionIconSize),
+            icon: menuIcons.topNavigation,
           },
           {
             label: t("layouts.sidebarMenu.options.disableNotifications"),
             key: "disableNotifications",
             show: notificationsDisabled.value,
-            icon: renderIcon(IconBellOff)(menuOptionIconSize),
+            icon: menuIcons.notificationsOff,
           },
           {
             label: t("layouts.sidebarMenu.options.enableNotifications"),
             key: "enableNotifications",
             show: notificationsEnabled.value,
-            icon: renderIcon(IconBell)(menuOptionIconSize),
+            icon: menuIcons.notifications,
           },
           {
             label: t("layouts.sidebarMenu.options.switchToLightTheme"),
             key: "switchToLightTheme",
             show: darkTheme.value,
-            icon: renderIcon(IconSun)(menuOptionIconSize),
+            icon: menuIcons.lightTheme,
           },
           {
             label: t("layouts.sidebarMenu.options.switchToDarkTheme"),
             key: "switchToDarkTheme",
             show: lightTheme.value,
-            icon: renderIcon(IconMoon)(menuOptionIconSize),
+            icon: menuIcons.darkTheme,
           },
           {
             label: () =>
@@ -335,12 +433,12 @@ export function useMenu() {
                 { default: () => t("layouts.sidebarMenu.options.profile") },
               ),
             key: "profile",
-            icon: renderIcon(IconId)(menuOptionIconSize),
+            icon: menuIcons.profile,
           },
           {
             label: t("layouts.sidebarMenu.options.signOut"),
             key: "signout",
-            icon: renderIcon(IconLogout)(menuOptionIconSize),
+            icon: menuIcons.logout,
           },
         ],
       },
