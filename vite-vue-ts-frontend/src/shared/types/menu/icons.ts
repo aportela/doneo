@@ -1,65 +1,71 @@
 import type { Component } from "vue";
 
 import {
-  IconPresentation,
-  IconUserCircle,
-  IconBug,
-  IconSitemap,
-  IconFileAnalytics,
-  IconUserCheck,
-  IconSettings,
-  IconUsers,
-  IconChartHistogram,
-  IconBookmark,
-  IconFlagBolt,
-  IconAdjustmentsBolt,
-  IconLogout,
-  IconId,
-  IconSearch,
-  IconBell,
-  IconBellOff,
-  IconMoon,
-  IconSun,
-  IconLayoutSidebarLeftExpand,
-  IconLayoutNavbarExpand,
-  IconDesk,
-} from "@tabler/icons-vue";
+  Home,
+  FolderKanban,
+  ListTodo,
+  Users,
+  UserKey,
+  Settings,
+  FolderCog,
+  FileCog,
+  Bookmark,
+  Goal,
+  Route,
+  CircleUser,
+  UserCog,
+  LogOut,
+  Search,
+  Bell,
+  BellOff,
+  Sun,
+  Moon,
+  Notebook,
+  Folder,
+  FileText,
+  PanelLeftOpen,
+  PanelTopOpen,
+} from "@lucide/vue";
 
 export const MENU_ICON_SIZE = 20;
 
 export const menuIcons: Record<string, Component> = {
-  home: IconPresentation,
+  home: Home,
 
-  workspace: IconDesk,
-  projects: IconSitemap,
-  tasks: IconBug,
+  workspace: Notebook,
+  projects: FolderKanban,
+  tasks: ListTodo,
 
-  reports: IconFileAnalytics,
-  charts: IconChartHistogram,
+  projectsGroup: Folder,
 
-  users: IconUsers,
-  roles: IconUserCheck,
+  users: Users,
+  roles: UserKey,
 
-  settings: IconSettings,
+  settings: Settings,
 
-  projectTypes: IconBookmark,
-  priorities: IconFlagBolt,
-  statuses: IconAdjustmentsBolt,
+  projectSettings: FolderCog,
+  taskSettings: FileCog,
 
-  currentUser: IconUserCircle,
-  profile: IconId,
-  logout: IconLogout,
+  projectPages: FileText,
 
-  search: IconSearch,
-  notifications: IconBell,
-  notificationsOff: IconBellOff,
+  projectTypes: Bookmark,
+  priorities: Goal,
+  statuses: Route,
 
-  lightTheme: IconSun,
-  darkTheme: IconMoon,
+  currentUser: CircleUser,
+  profile: UserCog,
+  logout: LogOut,
 
-  sideNavigation: IconLayoutSidebarLeftExpand,
+  search: Search,
+  notifications: Bell,
+  notificationsOff: BellOff,
 
-  topNavigation: IconLayoutNavbarExpand,
+  lightTheme: Sun,
+  darkTheme: Moon,
+
+  sideNavigation: PanelLeftOpen,
+
+  topNavigation: PanelTopOpen,
 };
 
 export type MenuIconName = keyof typeof menuIcons;
