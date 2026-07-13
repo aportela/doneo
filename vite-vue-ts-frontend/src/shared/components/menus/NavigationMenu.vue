@@ -1,0 +1,432 @@
+<script setup lang="ts">
+    import { h, computed } from 'vue';
+    import { useRoute, useRouter, RouterLink } from "vue-router";
+    import { useI18n } from "vue-i18n";
+
+    import { NMenu, NSpace, NButton } from 'naive-ui';
+    import type { MenuMixedOption } from "naive-ui/es/menu/src/interface";
+
+    import { useColorSchemeStore } from '../../../stores/colorScheme';
+    import { useLoadingStore } from '../../../stores/loading';
+    import { useSessionStore } from '../../../stores/session';
+    import { useUserSettingsStore } from '../../../stores/userSettings';
+    import { useCacheStore } from '../../../stores/cache';
+
+    import { authService } from '../../../modules/auth/services/auth';
+
+    import { renderIcon } from '../../composables/naive-ui-icon';
+
+    import {
+        Home,
+        FolderKanban,
+        ListTodo,
+        Users,
+        UserKey,
+        Settings,
+        FolderCog,
+        FileCog,
+        Bookmark,
+        Goal,
+        Route,
+        CircleUser,
+        UserCog,
+        LogOut,
+        //Search,
+        Bell,
+        BellOff,
+        Sun,
+        Moon,
+        Notebook,
+        Folder,
+        //FileText,
+        PanelLeftOpen,
+        PanelTopOpen,
+        SquarePlus,
+    } from "@lucide/vue";
+
+    const route = useRoute();
+    const router = useRouter();
+    const { t } = useI18n();
+
+    const loadingStore = useLoadingStore();
+    const sessionStore = useSessionStore();
+    const colorSchemeStore = useColorSchemeStore();
+    const userSettingsStore = useUserSettingsStore();
+    const cacheStore = useCacheStore();
+
+
+    const MENU_ICON_SIZE = 16;
+
+    const currentProjects = [{ id: 1, label: "PRJ-001" }, { id: 2, label: "PRJ-002" }, { id: 3, label: "PRJ-003" }];
+
+    const currentProjectsMenuItems = computed<MenuMixedOption[]>(() =>
+        currentProjects.map((project) => { return { key: project.id, label: project.label }; })
+    );
+
+    const menuOptions = computed<MenuMixedOption[]>(() =>
+        [
+            // home
+            {
+                key: "home",
+                label: () =>
+                    h(
+                        RouterLink,
+                        { to: { name: "home" } },
+                        {
+                            default: () => t("shared.components.menus.NavigationMenu.items.home"),
+                        },
+                    ),
+                icon: renderIcon(Home)(MENU_ICON_SIZE),
+                disabled: false,
+                show: true,
+            },
+            // workspace
+            {
+                key: "workspace",
+                label: t("shared.components.menus.NavigationMenu.items.workspace"),
+                icon: renderIcon(Notebook)(MENU_ICON_SIZE),
+                disabled: false,
+                show: true,
+                children: [
+                    {
+                        key: "workspaceProjects",
+                        label: () =>
+                            h(
+                                RouterLink,
+                                { to: { name: "manageProjects" } },
+                                {
+                                    default: () => t("shared.components.menus.NavigationMenu.items.projects"),
+                                },
+                            ),
+                        icon: renderIcon(FolderKanban)(MENU_ICON_SIZE),
+                        disabled: false,
+                        show: true,
+                    },
+                    {
+                        key: "workspaceTasks",
+                        label: () =>
+                            h(
+                                RouterLink,
+                                { to: { name: "manageTasks" } },
+                                {
+                                    default: () => t("shared.components.menus.NavigationMenu.items.tasks"),
+                                },
+                            ),
+                        icon: renderIcon(ListTodo)(MENU_ICON_SIZE),
+                        disabled: false,
+                        show: true,
+                    }
+                ],
+            },
+            // current projects (not archived)
+            {
+                key: "currentProjects",
+                label: t("shared.components.menus.NavigationMenu.items.currentProjects"),
+                /*
+                label: () =>
+                    h(
+                        NSpace,
+                        {
+                            justify: "space-between",
+                            align: "center",
+                            style: { width: "100%" }
+                        },
+                        {
+                            default: () => [
+                                t("shared.components.menus.NavigationMenu.items.currentProjects"),
+                                h(
+                                    NButton,
+                                    {
+                                        quaternary: true,
+                                        circle: true,
+                                        size: "tiny",
+                                        onClick: (e: MouseEvent) => {
+                                            e.stopPropagation();
+                                            console.log("Add");
+                                        }
+                                    },
+                                    {
+                                        icon: () => h(SquarePlus)
+                                    }
+                                )
+                            ]
+                        }
+                    ),
+                */
+                icon: renderIcon(Folder)(MENU_ICON_SIZE),
+                disabled: false,
+                show: currentProjects.length > 0,
+                children: currentProjects.length > 0 ? currentProjectsMenuItems.value : undefined,
+            },
+            // settings
+            {
+                key: "settings",
+                label: t("shared.components.menus.NavigationMenu.items.settings"),
+                icon: renderIcon(Settings)(MENU_ICON_SIZE),
+                disabled: false,
+                show: true,
+                children: [
+                    // manage users
+                    {
+                        key: "settingsManageUsers",
+                        label: () =>
+                            h(
+                                RouterLink,
+                                { to: { name: "manageUsers" } },
+                                {
+                                    default: () => t("shared.components.menus.NavigationMenu.items.manageUsers"),
+                                },
+                            ),
+                        icon: renderIcon(Users)(MENU_ICON_SIZE),
+                        disabled: false,
+                        show: true,
+                    },
+                    // manage roles
+                    {
+                        key: "settingsManageRoles",
+                        label: () =>
+                            h(
+                                RouterLink,
+                                { to: { name: "manageRoles" } },
+                                {
+                                    default: () => t("shared.components.menus.NavigationMenu.items.manageRoles"),
+                                },
+                            ),
+                        icon: renderIcon(UserKey)(MENU_ICON_SIZE),
+                        disabled: false,
+                        show: true,
+                    },
+                    // project settings
+                    {
+                        key: "projectSettings",
+                        label: t("shared.components.menus.NavigationMenu.items.projectSettings"),
+                        icon: renderIcon(FolderCog)(MENU_ICON_SIZE),
+                        disabled: false,
+                        show: true,
+                        children: [
+                            // project types
+                            {
+                                key: "manageProjectTypes",
+                                label: () =>
+                                    h(
+                                        RouterLink,
+                                        { to: { name: "manageProjectTypes" } },
+                                        {
+                                            default: () => t("shared.components.menus.NavigationMenu.items.manageProjectTypes"),
+                                        },
+                                    ),
+                                icon: renderIcon(Bookmark)(MENU_ICON_SIZE),
+                                disabled: false,
+                                show: true,
+                            },
+                            // project priorities
+                            {
+                                key: "manageProjectPriorities",
+                                label: () =>
+                                    h(
+                                        RouterLink,
+                                        { to: { name: "manageProjectPriorities" } },
+                                        {
+                                            default: () => t("shared.components.menus.NavigationMenu.items.manageProjectPriorities"),
+                                        },
+                                    ),
+                                icon: renderIcon(Goal)(MENU_ICON_SIZE),
+                                disabled: false,
+                                show: true,
+                            },
+                            // project statuses
+                            {
+                                key: "manageProjectStatuses",
+                                label: () =>
+                                    h(
+                                        RouterLink,
+                                        { to: { name: "manageProjectStatuses" } },
+                                        {
+                                            default: () => t("shared.components.menus.NavigationMenu.items.manageProjectStatuses"),
+                                        },
+                                    ),
+                                icon: renderIcon(Route)(MENU_ICON_SIZE),
+                                disabled: false,
+                                show: true,
+                            },
+                        ],
+                    },
+                    // task settings
+                    {
+                        key: "taskSettings",
+                        label: t("shared.components.menus.NavigationMenu.items.taskSettings"),
+                        icon: renderIcon(FileCog)(MENU_ICON_SIZE),
+                        disabled: false,
+                        show: true,
+                        children: [
+                            // task priorities
+                            {
+                                key: "manageTaskPriorities",
+                                label: () =>
+                                    h(
+                                        RouterLink,
+                                        { to: { name: "manageTaskPriorities" } },
+                                        {
+                                            default: () => t("shared.components.menus.NavigationMenu.items.manageTaskPriorities"),
+                                        },
+                                    ),
+                                icon: renderIcon(Goal)(MENU_ICON_SIZE),
+                                disabled: false,
+                                show: true,
+                            },
+                            // project statuses
+                            {
+                                key: "manageTaskStatuses",
+                                label: () =>
+                                    h(
+                                        RouterLink,
+                                        { to: { name: "manageTaskStatuses" } },
+                                        {
+                                            default: () => t("shared.components.menus.NavigationMenu.items.manageTaskStatuses"),
+                                        },
+                                    ),
+                                icon: renderIcon(Route)(MENU_ICON_SIZE),
+                                disabled: false,
+                                show: true,
+                            },
+                        ],
+                    }
+                ]
+            },
+            {
+                key: "divider",
+                type: "divider",
+            },
+            // current user
+            {
+                key: "currentUser",
+                label: "John Doe", // TODO
+                icon: renderIcon(CircleUser)(MENU_ICON_SIZE),
+                disabled: false,
+                show: true,
+                children: [
+                    {
+                        key: "switchTopNavigation",
+                        label:
+                            t("shared.components.menus.NavigationMenu.items.switchTopNavigation"),
+                        icon: renderIcon(PanelTopOpen)(MENU_ICON_SIZE),
+                        disabled: false,
+                        show: userSettingsStore.currentNavigationMode === "side",
+                    },
+                    {
+                        key: "switchSidebarNavigation",
+                        label:
+                            t("shared.components.menus.NavigationMenu.items.switchSidebarNavigation"),
+                        icon: renderIcon(PanelLeftOpen)(MENU_ICON_SIZE),
+                        disabled: false,
+                        show: userSettingsStore.currentNavigationMode === "top",
+                    },
+                    {
+                        key: "disableNotifications",
+                        label:
+                            t("shared.components.menus.NavigationMenu.items.disableNotifications"),
+                        icon: renderIcon(BellOff)(MENU_ICON_SIZE),
+                        disabled: false,
+                        show: userSettingsStore.hasNotificationsEnabled,
+                    },
+                    {
+                        key: "enableNotifications",
+                        label:
+                            t("shared.components.menus.NavigationMenu.items.enableNotifications"),
+                        icon: renderIcon(Bell)(MENU_ICON_SIZE),
+                        disabled: false,
+                        show: !userSettingsStore.hasNotificationsEnabled,
+                    },
+                    {
+                        key: "switchDarkTheme",
+                        label:
+                            t("shared.components.menus.NavigationMenu.items.switchToDarkTheme"),
+                        icon: renderIcon(Moon)(MENU_ICON_SIZE),
+                        disabled: false,
+                        show: colorSchemeStore.light,
+                    },
+                    {
+                        key: "switchLightTheme",
+                        label:
+                            t("shared.components.menus.NavigationMenu.items.switchToLightTheme"),
+                        icon: renderIcon(Sun)(MENU_ICON_SIZE),
+                        disabled: false,
+                        show: colorSchemeStore.dark,
+                    },
+                    // profile
+                    {
+                        key: "profile",
+                        label: () =>
+                            h(
+                                RouterLink,
+                                { to: { name: "profile" } },
+                                {
+                                    default: () => t("shared.components.menus.NavigationMenu.items.profile"),
+                                },
+                            ),
+                        icon: renderIcon(UserCog)(MENU_ICON_SIZE),
+                        disabled: false,
+                        show: true,
+                    },
+                    {
+                        key: "signout",
+                        label:
+                            t("shared.components.menus.NavigationMenu.items.signOut"),
+                        icon: renderIcon(LogOut)(MENU_ICON_SIZE),
+                        disabled: false,
+                        show: true,
+                    },
+                ]
+            }
+        ]
+    );
+
+    const onSignOut = () => {
+        loadingStore.set(true);
+        authService.signOut().then(() => {
+            sessionStore.removeAccessToken();
+            cacheStore.clearAllCaches();
+            router.push(
+                { name: "login" }
+            ).catch((e) => {
+                console.error(e);
+            });
+        }).catch(() => {
+            sessionStore.removeAccessToken();
+            router.push(
+                { name: "login" }
+            ).catch((e) => {
+                console.error(e);
+            });
+        }).finally(() => {
+            loadingStore.set(false);
+        });
+    };
+
+    const handleMenuSelect = (menuOptionKey: string) => {
+        switch (menuOptionKey) {
+            case "disableNotifications":
+            case "enableNotifications":
+                userSettingsStore.toggleNotifications();
+                break;
+            case "switchDarkTheme":
+            case "switchLightTheme":
+                colorSchemeStore.toggle();
+                break;
+            case "switchTopNavigation":
+            case "switchSidebarNavigation":
+                userSettingsStore.toggleNavigationMode();
+                break;
+            case "signout":
+                onSignOut();
+                break;
+        }
+    }
+
+</script>
+
+<template>
+    <n-menu :options="menuOptions" :value="route.name as string" accordion @update:value="handleMenuSelect" />
+</template>
+
+<style lang="css" scoped></style>
