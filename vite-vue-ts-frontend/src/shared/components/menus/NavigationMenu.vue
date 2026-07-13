@@ -298,7 +298,7 @@
             // current user
             {
                 key: "currentUser",
-                label: "John Doe", // TODO
+                label: sessionStore.sessionUserName,
                 icon: () => h(NIcon, null, { default: () => h(CircleUser) }),
                 disabled: false,
                 show: true,
