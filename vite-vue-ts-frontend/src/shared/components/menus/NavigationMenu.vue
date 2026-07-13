@@ -304,52 +304,28 @@
                 show: true,
                 children: [
                     {
-                        key: "switchTopNavigation",
+                        key: "switchNavigation",
                         label:
-                            t("shared.components.menus.NavigationMenu.items.switchTopNavigation"),
-                        icon: () => h(NIcon, null, { default: () => h(PanelTopOpen) }),
+                            t(userSettingsStore.currentNavigationMode === "side" ? "shared.components.menus.NavigationMenu.items.switchTopNavigation" : "shared.components.menus.NavigationMenu.items.switchSidebarNavigation"),
+                        icon: () => h(NIcon, null, { default: () => h(userSettingsStore.currentNavigationMode === "side" ? PanelTopOpen : PanelLeftOpen) }),
                         disabled: false,
-                        show: userSettingsStore.currentNavigationMode === "side",
+                        show: true,
                     },
                     {
-                        key: "switchSidebarNavigation",
+                        key: "switchNotifications",
                         label:
-                            t("shared.components.menus.NavigationMenu.items.switchSidebarNavigation"),
-                        icon: () => h(NIcon, null, { default: () => h(PanelLeftOpen) }),
+                            t(userSettingsStore.hasNotificationsEnabled ? "shared.components.menus.NavigationMenu.items.disableNotifications" : "shared.components.menus.NavigationMenu.items.enableNotifications"),
+                        icon: () => h(NIcon, null, { default: () => h(userSettingsStore.hasNotificationsEnabled ? BellOff : Bell) }),
                         disabled: false,
-                        show: userSettingsStore.currentNavigationMode === "top",
+                        show: true,
                     },
                     {
-                        key: "disableNotifications",
+                        key: "switchTheme",
                         label:
-                            t("shared.components.menus.NavigationMenu.items.disableNotifications"),
-                        icon: () => h(NIcon, null, { default: () => h(BellOff) }),
+                            t(colorSchemeStore.light ? "shared.components.menus.NavigationMenu.items.switchToDarkTheme" : "shared.components.menus.NavigationMenu.items.switchToLightTheme"),
+                        icon: () => h(NIcon, null, { default: () => h(colorSchemeStore.light ? Moon : Sun) }),
                         disabled: false,
-                        show: userSettingsStore.hasNotificationsEnabled,
-                    },
-                    {
-                        key: "enableNotifications",
-                        label:
-                            t("shared.components.menus.NavigationMenu.items.enableNotifications"),
-                        icon: () => h(NIcon, null, { default: () => h(Bell) }),
-                        disabled: false,
-                        show: !userSettingsStore.hasNotificationsEnabled,
-                    },
-                    {
-                        key: "switchDarkTheme",
-                        label:
-                            t("shared.components.menus.NavigationMenu.items.switchToDarkTheme"),
-                        icon: () => h(NIcon, null, { default: () => h(Moon) }),
-                        disabled: false,
-                        show: colorSchemeStore.light,
-                    },
-                    {
-                        key: "switchLightTheme",
-                        label:
-                            t("shared.components.menus.NavigationMenu.items.switchToLightTheme"),
-                        icon: () => h(NIcon, null, { default: () => h(Sun) }),
-                        disabled: false,
-                        show: colorSchemeStore.dark,
+                        show: true,
                     },
                     // profile
                     {
@@ -403,14 +379,17 @@
 
     const handleMenuSelect = (menuOptionKey: string) => {
         switch (menuOptionKey) {
+            case "switchNotifications":
             case "disableNotifications":
             case "enableNotifications":
                 userSettingsStore.toggleNotifications();
                 break;
+            case "switchTheme":
             case "switchDarkTheme":
             case "switchLightTheme":
                 colorSchemeStore.toggle();
                 break;
+            case "switchNavigation":
             case "switchTopNavigation":
             case "switchSidebarNavigation":
                 userSettingsStore.toggleNavigationMode();
