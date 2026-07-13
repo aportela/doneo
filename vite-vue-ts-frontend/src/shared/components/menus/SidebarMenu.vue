@@ -9,16 +9,17 @@
 
     //const { t } = useI18n();
 
+    const emit = defineEmits(['update'])
     const menuOptions = computed(() => buildMenuOptions(sidebarMenuConfig))
 
     function handleMenuSelect(key: string) {
-        console.log(key);
+        emit("update", key);
     }
 
 </script>
 
 <template>
-    <n-menu :options="menuOptions" @update:value="handleMenuSelect" />
+    <n-menu :options="menuOptions" @update:value="handleMenuSelect" :indent="24" />
 </template>
 
 <style lang="css" scoped></style>
