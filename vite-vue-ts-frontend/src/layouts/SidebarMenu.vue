@@ -12,6 +12,7 @@
     import { menuOptionIconSize, useMenu } from '../shared/types/menu';
     import { useCacheStore } from '../stores/cache';
     import { authService } from '../modules/auth/services/auth';
+    import SidebarMenu from '../shared/components/menus/SidebarMenu.vue';
 
     defineProps({
         collapsed: Boolean
@@ -101,7 +102,8 @@
         <span class="brand-name" v-if="!collapsed">Doneo</span>
     </div>
     <n-divider class="brand-divider" v-if="showBrand" />
-    <n-menu :collapsed-width="64" :collapsed-icon-size="menuOptionIconSize" :options="menuOptions"
+    <SidebarMenu @update="handleMenuSelect" />
+    <n-menu v-if="false" :collapsed-width="64" :collapsed-icon-size="menuOptionIconSize" :options="menuOptions"
         :value="route.name as string" accordion :collapsed="collapsed" @update:value="handleMenuSelect" />
 </template>
 
