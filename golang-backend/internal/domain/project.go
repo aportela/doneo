@@ -14,6 +14,7 @@ type Project struct {
 	StartedAt              *time.Time
 	FinishedAt             *time.Time
 	DueAt                  *time.Time
+	ArchivedAt             *time.Time
 	Type                   ProjectType
 	Priority               ProjectPriority
 	Status                 ProjectStatus

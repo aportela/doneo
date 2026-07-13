@@ -139,6 +139,14 @@ func getRandomProject(userIds []string, projectTypeIds []string, projectPriority
 	rand.Shuffle(len(projectStatusIds), func(i, j int) {
 		projectStatusIds[i], projectStatusIds[j] = projectStatusIds[j], projectStatusIds[i]
 	})
+
+	var archivedAt *time.Time
+
+	if rand.Intn(5) == 2 {
+		archivedAt = utils.Int64PtrToTimePtr(&ftime)
+	} else {
+		archivedAt = nil
+	}
 	return domain.Project{
 		Slug:        getRandomProjectSlug(),
 		Summary:     getRandomProjectSummary(),
@@ -149,6 +157,7 @@ func getRandomProject(userIds []string, projectTypeIds []string, projectPriority
 		StartedAt:   utils.Int64PtrToTimePtr(&stime),
 		FinishedAt:  utils.Int64PtrToTimePtr(&ftime),
 		DueAt:       utils.Int64PtrToTimePtr(&dtime),
+		ArchivedAt:  archivedAt,
 		Type:        domain.ProjectType{ID: projectTypeIds[rand.Intn(len(projectTypeIds))]},
 		Priority:    domain.ProjectPriority{ID: projectPriorityIds[rand.Intn(len(projectPriorityIds))]},
 		Status:      domain.ProjectStatus{ID: projectStatusIds[rand.Intn(len(projectStatusIds))]},

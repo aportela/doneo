@@ -41,6 +41,7 @@ type updateRequest struct {
 	StartedAt   *int64          `json:"startedAt"`
 	FinishedAt  *int64          `json:"finishedAt"`
 	DueAt       *int64          `json:"dueAt"`
+	ArchivedAt  *int64          `json:"archivedAt"`
 }
 
 type patchRequest struct {
@@ -86,6 +87,7 @@ type projectResponse struct {
 	StartedAt              *int64                                         `json:"startedAt"`
 	FinishedAt             *int64                                         `json:"finishedAt"`
 	DueAt                  *int64                                         `json:"dueAt"`
+	ArchivedAt             *int64                                         `json:"archivedAt"`
 	Type                   projecttypehandler.ProjectTypeResponse         `json:"type"`
 	Priority               projectpriorityhandler.ProjectPriorityResponse `json:"priority"`
 	Status                 projectstatushandler.ProjectStatusResponse     `json:"status"`

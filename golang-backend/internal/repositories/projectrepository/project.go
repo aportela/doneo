@@ -47,9 +47,9 @@ func (repository *projectRepository) Add(ctx context.Context, dbExecutor databas
 		ctx,
 		`
             INSERT INTO projects
-				(id, slug, summary, description, creator_id, created_at, updated_at, deleted_at, started_at, finished_at, due_at, priority_id, status_id, type_id)
+				(id, slug, summary, description, creator_id, created_at, updated_at, deleted_at, started_at, finished_at, due_at, archived_at, priority_id, status_id, type_id)
 			VALUES
-				(?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, ?)
+				(?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, ?, ?)
         `,
 		dto.ID,
 		dto.Slug,
@@ -60,6 +60,7 @@ func (repository *projectRepository) Add(ctx context.Context, dbExecutor databas
 		dto.StartedAt,
 		dto.FinishedAt,
 		dto.DueAt,
+		dto.ArchivedAt,
 		dto.PriorityID,
 		dto.StatusID,
 		dto.TypeID,
@@ -83,6 +84,7 @@ func (repository *projectRepository) Update(ctx context.Context, dbExecutor data
 				started_at = ?,
 				finished_at = ?,
 				due_at = ?,
+				archived_at = ?,
 				priority_id = ?,
 				status_id = ?,
 				type_id = ?
@@ -98,6 +100,7 @@ func (repository *projectRepository) Update(ctx context.Context, dbExecutor data
 		dto.StartedAt,
 		dto.FinishedAt,
 		dto.DueAt,
+		dto.ArchivedAt,
 		dto.PriorityID,
 		dto.StatusID,
 		dto.TypeID,
@@ -156,6 +159,7 @@ func (repository *projectRepository) Get(ctx context.Context, dbExecutor databas
 				P.started_at,
 				P.finished_at,
 				P.due_at,
+				P.archived_at,
 				P.status_id,
 				PS.name AS status_name,
 				PS.item_hex_color AS status_hex_color,
@@ -225,6 +229,7 @@ func (repository *projectRepository) Get(ctx context.Context, dbExecutor databas
 		&dto.StartedAt,
 		&dto.FinishedAt,
 		&dto.DueAt,
+		&dto.ArchivedAt,
 		&dto.StatusID,
 		&dto.StatusName,
 		&dto.StatusHexColor,
@@ -269,6 +274,7 @@ func (repository *projectRepository) Search(ctx context.Context, dbExecutor data
 				P.started_at,
 				P.finished_at,
 				P.due_at,
+				P.archived_at,
 				P.status_id,
 				PS.name AS status_name,
 				PS.item_hex_color AS status_hex_color,
@@ -313,6 +319,8 @@ func (repository *projectRepository) Search(ctx context.Context, dbExecutor data
 		field = "P.finished_at"
 	case "dueAt":
 		field = "P.due_at"
+	case "archivedAt":
+		field = "P.archived_at"
 	case "createdBy":
 		field = "U.name COLLATE NOCASE"
 	default:
@@ -407,6 +415,7 @@ func (repository *projectRepository) Search(ctx context.Context, dbExecutor data
 			&dto.StartedAt,
 			&dto.FinishedAt,
 			&dto.DueAt,
+			&dto.ArchivedAt,
 			&dto.StatusID,
 			&dto.StatusName,
 			&dto.StatusHexColor,

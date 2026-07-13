@@ -19,6 +19,7 @@ export class Project {
   startedAt: IDate;
   finishedAt: IDate;
   dueAt: IDate;
+  archivedAt: IDate;
   createdBy: UserBase;
   tasksCount: number;
   permissionsCount: number;
@@ -41,6 +42,7 @@ export class Project {
     this.startedAt = new IDate(data?.startedAt ?? null);
     this.finishedAt = new IDate(data?.finishedAt ?? null);
     this.dueAt = new IDate(data?.dueAt ?? null);
+    this.archivedAt = new IDate(data?.archivedAt ?? null);
     this.createdBy = new UserBase(data?.createdBy);
     this.tasksCount = data?.tasksCount ?? 0;
     this.permissionsCount = data?.permissionsCount ?? 0;

@@ -48,6 +48,7 @@ func updateRequestToDomain(request updateRequest) domain.Project {
 		StartedAt:  utils.Int64PtrToTimePtr(request.StartedAt),
 		FinishedAt: utils.Int64PtrToTimePtr(request.FinishedAt),
 		DueAt:      utils.Int64PtrToTimePtr(request.DueAt),
+		ArchivedAt: utils.Int64PtrToTimePtr(request.ArchivedAt),
 	}
 }
 
@@ -73,6 +74,7 @@ func DomainToResponse(project domain.Project) projectResponse {
 		StartedAt:              utils.TimePtrToInt64Ptr(project.StartedAt),
 		FinishedAt:             utils.TimePtrToInt64Ptr(project.FinishedAt),
 		DueAt:                  utils.TimePtrToInt64Ptr(project.DueAt),
+		ArchivedAt:             utils.TimePtrToInt64Ptr(project.ArchivedAt),
 		Type:                   projecttypehandler.DomainToResponse(project.Type),
 		Priority:               projectpriorityhandler.DomainToResponse(project.Priority),
 		Status:                 projectstatushandler.DomainToResponse(project.Status),

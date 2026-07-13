@@ -19,6 +19,7 @@ type projectDTO struct {
 	StartedAt              sql.NullInt64  `db:"started_at"`
 	FinishedAt             sql.NullInt64  `db:"finished_at"`
 	DueAt                  sql.NullInt64  `db:"due_at"`
+	ArchivedAt             sql.NullInt64  `db:"archived_at"`
 	TypeID                 string         `db:"type_id"`
 	TypeName               string         `db:"type_name"`
 	TypeHexColor           string         `db:"type_hex_color"`

@@ -82,6 +82,7 @@ export type ProjectResponse = {
   startedAt?: number;
   finishedAt?: number;
   dueAt?: number;
+  archivedAt?: number;
   tasksCount: number;
   permissionsCount: number;
   attachmentsCount: number;

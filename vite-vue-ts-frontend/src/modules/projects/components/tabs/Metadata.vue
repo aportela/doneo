@@ -149,6 +149,7 @@
     <!-- TODO: add missing i18n labels -->
     <n-card bordered :style="props.style">
         <n-button @click=" currentMode = 'edit'" secondary>Update form</n-button>
+        <n-button @click=" currentMode = 'edit'" secondary v-if="project.archivedAt.hasValue()">UnArchive</n-button>
         <n-flex align=" center" justify="space-between">
             <n-form-item label="Created by">
                 <div class="note-user">
@@ -190,6 +191,11 @@
                     :disabled="props.disabled || state.ajaxRunning" v-if="!props.readOnly && !readOnlyMode" />
                 <span class="doneo-datetime-label-readonly" v-else>
                     {{ project.dueAt?.toLocaleString() }}
+                </span>
+            </n-form-item>
+            <n-form-item label="Archived at">
+                <span class="doneo-datetime-label-readonly">
+                    {{ project.archivedAt?.toLocaleString() }}
                 </span>
             </n-form-item>
         </n-flex>

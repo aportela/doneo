@@ -200,7 +200,8 @@
             </tr>
         </template>
         <template #tbody>
-            <tr v-for="project, index in items" :key="project.id ?? index">
+            <tr v-for="project, index in items" :key="project.id ?? index"
+                :class="{ 'tr-archived-project': project.archivedAt.hasValue() }">
                 <td>
                     {{ project.slug }}
                 </td>
@@ -214,10 +215,12 @@
                 <td><n-tag :bordered="false"
                         :color="getNaiveUITagColorProperty(project.status.hexColor ?? '#888888')">{{
                             project.status.name }}</n-tag></td>
-                <td><router-link :to="{ name: 'projectTab', params: { projectId: project.id, tab: 'metadata' } }"
+                <td>
+                    <router-link :to="{ name: 'projectTab', params: { projectId: project.id, tab: 'metadata' } }"
                         class="doneo-link-text-color-default">{{
                             project.summary
-                        }}</router-link></td>
+                        }}</router-link>
+                </td>
                 <td>{{ project.createdAt.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</td>
                 <td>
                     <AvatarUserName :user-id="project.createdBy.id" :user-name="project.createdBy.name" />
@@ -249,4 +252,8 @@
     </ManageTable>
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+    .tr-archived-project td {
+        opacity: 0.5;
+    }
+</style>
