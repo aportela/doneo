@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { NDivider, NIcon } from 'naive-ui'
+    import { NIcon } from 'naive-ui'
     import { Search } from '@lucide/vue';
 
     import { useUserSettingsStore } from '../stores/userSettings';
@@ -24,79 +24,66 @@
 <template>
     <div class="top-header">
         <div class="top-header__container top-header__container--fluid">
-            <!-- bloque izquierdo del flex -->
+
             <div class="brand-container">
                 <n-icon :size="commonIconSize" :component="Doneo" />
                 <span class="brand-name">Doneo</span>
             </div>
-            <!-- bloque izquierdo del flex -->
-            <!-- bloque derecho del flex (cada uno de los elementos lleva un align space between)-->
-            <n-divider vertical />
-            <BreadCrumb v-if="showBreadCrumb" />
-            <n-divider vertical />
-            <div class=" search-container" @click="onSearch">
-                <span class="shortcut">
-                    <n-icon :size="16" :component="Search" />
-                    <kbd>Crtl</kbd>+<kbd>K</kbd> to open search
-                </span>
+
+            <div class="header-actions">
+                <div class="header-actions__left">
+                    <BreadCrumb v-if="showBreadCrumb" />
+                </div>
+
+                <div class="header-actions__center">
+                    <div @click="onSearch">
+                        <span class="shortcut">
+                            <n-icon :size="16" :component="Search" />
+                            <kbd>Ctrl</kbd>+<kbd>K</kbd> to open search
+                        </span>
+                    </div>
+                </div>
+
+                <div class="header-actions__right">
+                    <NavigationMenu mode="horizontal" v-if="userSettingsStore.topNavigationMode" />
+                </div>
+
             </div>
-            <NavigationMenu mode="horizontal" v-if="true || userSettingsStore.topNavigationMode" />
-            <!-- bloque derecho del flex (cada uno de los elementos lleva un align space between)-->
+
         </div>
     </div>
 </template>
 
 <style lang="css" scoped>
-    .top-header {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 48px;
-        padding: 0px 10px;
-        box-sizing: border-box;
-        width: 100%;
-        border-bottom: 1px solid rgb(239, 239, 245)
-    }
-
     .top-header__container {
-        width: 100%;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-    }
-
-    .top-header__container--contained {
-        max-width: 1320px;
-        margin: 0 auto;
-    }
-
-    .top-header__container--fluid {
-        max-width: 100%;
-        margin: 0;
+        justify-content: space-between;
+        width: 100%;
     }
 
     .brand-container {
         display: flex;
         align-items: center;
+        flex-shrink: 0;
         margin-left: 23px;
     }
 
-
-    .brand-name {
-        margin-left: 8px;
-        font-size: 18px;
-        font-weight: 600;
+    .header-actions {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-left: 172px;
+        margin-right: 16px;
     }
 
-    .search-container {
+    .header-actions__left,
+    .header-actions__center,
+    .header-actions__right {
         display: flex;
         align-items: center;
     }
-
-    .username {
-        margin-left: 8px;
-    }
-
 
     .shortcut {
         display: flex;
