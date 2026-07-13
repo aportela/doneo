@@ -9,7 +9,6 @@
     import { useLoadingStore } from '../stores/loading';
     import { useSessionStore } from '../stores/session';
     import TopHeaderNew from './TopHeaderNew.vue';
-    import TopMenu from './TopMenu.vue';
     import SearchModal from '../shared/components/modals/SearchModal.vue';
     import ReAuthModal from '../modules/auth/components/ReAuthModal.vue';
     import RemoteAPIAlertModal from '../shared/components/modals/RemoteAPIAlertModal.vue';
@@ -91,7 +90,6 @@
                 <SearchModal v-model:show="showSearchModal" />
                 <n-layout-header bordered>
                     <TopHeaderNew @open-search-modal="showSearchModal = true;" />
-                    <TopMenu v-if="false && userSettingsStore.topNavigationMode" />
                     <n-button v-if="isMobile" quaternary circle @click="mobileMenuOpen = true">☰</n-button>
                 </n-layout-header>
                 <n-layout :has-sider="true" v-if="userSettingsStore.sideNavigationMode">
