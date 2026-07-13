@@ -1,10 +1,10 @@
 <script setup lang="ts">
     import { NDivider, NIcon } from 'naive-ui'
-    import Doneo from '../shared/components/icons/Doneo.vue';
     import { Search } from '@lucide/vue';
 
     import { useUserSettingsStore } from '../stores/userSettings';
 
+    import Doneo from '../shared/components/icons/Doneo.vue';
     import BreadCrumb from './BreadCrumb.vue';
     import NavigationMenu from '../shared/components/menus/NavigationMenu.vue';
 
@@ -18,18 +18,21 @@
         emit('openSearchModal')
     };
 
-    const showBreadCrumb = false;
+    const showBreadCrumb = true;
 </script>
 
 <template>
     <div class="top-header">
         <div class="top-header__container top-header__container--fluid">
+            <!-- bloque izquierdo del flex -->
             <div class="brand-container">
                 <n-icon :size="commonIconSize" :component="Doneo" />
                 <span class="brand-name">Doneo</span>
             </div>
-            <n-divider vertical style="margin: 0px 48px;" />
-            <BreadCrumb style="margin: 0px 48px;" v-if="showBreadCrumb" />
+            <!-- bloque izquierdo del flex -->
+            <!-- bloque derecho del flex (cada uno de los elementos lleva un align space between)-->
+            <n-divider vertical />
+            <BreadCrumb v-if="showBreadCrumb" />
             <n-divider vertical />
             <div class=" search-container" @click="onSearch">
                 <span class="shortcut">
@@ -37,7 +40,8 @@
                     <kbd>Crtl</kbd>+<kbd>K</kbd> to open search
                 </span>
             </div>
-            <NavigationMenu mode="horizontal" v-if="userSettingsStore.topNavigationMode" style="margin: 0px 48px;" />
+            <NavigationMenu mode="horizontal" v-if="true || userSettingsStore.topNavigationMode" />
+            <!-- bloque derecho del flex (cada uno de los elementos lleva un align space between)-->
         </div>
     </div>
 </template>
