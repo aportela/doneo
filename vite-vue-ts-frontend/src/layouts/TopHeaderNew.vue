@@ -1,154 +1,24 @@
 <script setup lang="ts">
-    import { nextTick, onMounted, watch } from 'vue';
-    import { useRoute, useRouter } from "vue-router";
-
-    import { NButton, NDropdown, NMenu, NIcon } from 'naive-ui'
-    import { NFlex, NInput, NDivider } from 'naive-ui'
+    import { NDivider, NIcon } from 'naive-ui'
     import Doneo from '../shared/components/icons/Doneo.vue';
     import { Search } from '@lucide/vue';
 
-    import { IconUserCircle, IconId, IconLogout } from '@tabler/icons-vue';
-
-    import SwitchNotificationsButton from '../shared/components/buttons/SwitchNotificationsButton.vue';
-    import SwitchNavigationModeButton from '../shared/components/buttons/SwitchNavigationModeButton.vue';
-    import GithubButton from '../shared/components/buttons/GithubButton.vue';
-    import SwitchColorSchemeButton from '../shared/components/buttons/SwitchColorSchemeButton.vue';
-    import SwitchLocaleDropdown from '../shared/components/dropdowns/SwitchLocaleDropdown.vue';
-    import { authService } from '../modules/auth/services/auth.ts';
-    import { useSessionStore } from "../stores/session";
-    import { useLoadingStore } from '../stores/loading';
-    import { useCacheStore } from "../stores/cache.ts";
-    import { renderIcon } from '../shared/composables/naive-ui-icon';
-    import TimerPopOver from '../shared/components/popovers/TimerPopOver.vue';
-
-    import { menuOptionIconSize, useMenu } from '../shared/types/menu';
-
-    import { useColorSchemeStore } from '../stores/colorScheme';
     import { useUserSettingsStore } from '../stores/userSettings';
 
     import BreadCrumb from './BreadCrumb.vue';
+    import NavigationMenu from '../shared/components/menus/NavigationMenu.vue';
 
-    const route = useRoute();
-    const router = useRouter();
-
-    const sessionStore = useSessionStore();
-    const loadingStore = useLoadingStore();
-    const cacheStore = useCacheStore();
-
-    const colorSchemeStore = useColorSchemeStore();
     const userSettingsStore = useUserSettingsStore();
-
-    const { menuOptions, lightTheme, darkTheme, notificationsDisabled, notificationsEnabled, topNavigation, sideNavigation } = useMenu();
 
     const emit = defineEmits(['openSearchModal']);
 
-    const handleMenuSelect = (menuOptionKey: string) => {
-        switch (menuOptionKey) {
-            case "disableNotifications":
-            case "enableNotifications":
-                userSettingsStore.toggleNotifications();
-                nextTick(() => {
-                    notificationsEnabled.value = userSettingsStore.hasNotificationsEnabled;
-                    notificationsDisabled.value = !userSettingsStore.hasNotificationsEnabled;
-                });
-                break;
-            case "switchToLightTheme":
-            case "switchToDarkTheme":
-                colorSchemeStore.toggle();
-                nextTick(() => {
-                    lightTheme.value = colorSchemeStore.light;
-                    darkTheme.value = colorSchemeStore.dark;
-                });
-                break;
-            case "topNavigation":
-            case "sideNavigation":
-                userSettingsStore.toggleNavigationMode();
-                nextTick(() => {
-                    topNavigation.value = userSettingsStore.topNavigationMode;
-                    sideNavigation.value = userSettingsStore.sideNavigationMode;
-                });
-                break;
-            case "signout":
-                onSignOut();
-                break;
-        }
-    }
-
     const commonIconSize = 18;
-
-    const userDropdownOptions = [
-        {
-            label: 'Profile',
-            key: 'profile',
-            icon: renderIcon(IconId)(commonIconSize)
-        },
-        {
-            label: 'Logout',
-            key: 'logout',
-            icon: renderIcon(IconLogout)(commonIconSize)
-        }
-    ];
-
-    const onUserDropDownSelect = (key: string | number) => {
-        switch (key) {
-            case "profile":
-                break;
-            case "logout":
-                onSignOut();
-                break;
-        }
-    };
-
-    const onSignOut = () => {
-        loadingStore.set(true);
-        authService.signOut().then(() => {
-            sessionStore.removeAccessToken();
-            cacheStore.clearAllCaches();
-            router.push(
-                { name: "login" }
-            ).catch((e) => {
-                console.error(e);
-            });
-        }).catch(() => {
-            sessionStore.removeAccessToken();
-            router.push(
-                { name: "login" }
-            ).catch((e) => {
-                console.error(e);
-            });
-        }).finally(() => {
-            loadingStore.set(false);
-        });
-    };
-
-    watch(
-        [
-            () => userSettingsStore.hasNotificationsEnabled,
-            () => colorSchemeStore.light,
-            () => colorSchemeStore.dark,
-            () => userSettingsStore.topNavigationMode,
-            () => userSettingsStore.sideNavigationMode
-        ], () => {
-            notificationsEnabled.value = userSettingsStore.hasNotificationsEnabled;
-            notificationsDisabled.value = !userSettingsStore.hasNotificationsEnabled;
-            lightTheme.value = colorSchemeStore.light;
-            darkTheme.value = colorSchemeStore.dark;
-            topNavigation.value = userSettingsStore.topNavigationMode;
-            sideNavigation.value = userSettingsStore.sideNavigationMode;
-        });
 
     const onSearch = () => {
         emit('openSearchModal')
     };
 
-    onMounted(() => {
-        notificationsEnabled.value = userSettingsStore.hasNotificationsEnabled;
-        notificationsDisabled.value = !userSettingsStore.hasNotificationsEnabled;
-        lightTheme.value = colorSchemeStore.light;
-        darkTheme.value = colorSchemeStore.dark;
-        topNavigation.value = userSettingsStore.topNavigationMode;
-        sideNavigation.value = userSettingsStore.sideNavigationMode;
-    });
+    const showBreadCrumb = false;
 </script>
 
 <template>
@@ -158,39 +28,16 @@
                 <n-icon :size="commonIconSize" :component="Doneo" />
                 <span class="brand-name">Doneo</span>
             </div>
+            <n-divider vertical style="margin: 0px 48px;" />
+            <BreadCrumb style="margin: 0px 48px;" v-if="showBreadCrumb" />
             <n-divider vertical />
-            <BreadCrumb v-if="userSettingsStore.sideNavigationMode" />
-            <div class="search-container" @click="onSearch">
-                <n-input placeholder="Search..." style="min-width: 50%;" round v-if="false">
-                    <template #prefix>
-                        <n-icon :size="16" :component="Search" />
-                    </template>
-                </n-input>
+            <div class=" search-container" @click="onSearch">
                 <span class="shortcut">
                     <n-icon :size="16" :component="Search" />
                     <kbd>Crtl</kbd>+<kbd>K</kbd> to open search
                 </span>
             </div>
-            <n-menu :collapsed-width="64" :collapsed-icon-size="menuOptionIconSize" :options="menuOptions"
-                :value="route.name as string" mode="horizontal" @update:value="handleMenuSelect"
-                v-if="userSettingsStore.topNavigationMode" />
-
-
-            <n-flex v-if="true">
-                <SwitchLocaleDropdown :icon-size="commonIconSize" />
-                <SwitchNavigationModeButton :icon-size="commonIconSize" />
-                <SwitchColorSchemeButton :icon-size="commonIconSize" />
-                <SwitchNotificationsButton :icon-size="commonIconSize" />
-                <TimerPopOver :icon-size="commonIconSize" />
-                <GithubButton :icon-size="commonIconSize" />
-                <n-dropdown v-if="false" :options="userDropdownOptions" placement="bottom-end" trigger="hover"
-                    @select="onUserDropDownSelect">
-                    <n-button quaternary>
-                        <IconUserCircle :size="commonIconSize" />
-                        <span class="username">{{ sessionStore.sessionUserName }}</span>
-                    </n-button>
-                </n-dropdown>
-            </n-flex>
+            <NavigationMenu mode="horizontal" v-if="userSettingsStore.topNavigationMode" style="margin: 0px 48px;" />
         </div>
     </div>
 </template>

@@ -29,7 +29,7 @@
         CircleUser,
         UserCog,
         LogOut,
-        //Search,
+        Search,
         Bell,
         BellOff,
         Sun,
@@ -82,6 +82,14 @@
                 icon: () => h(NIcon, null, { default: () => h(Home) }),
                 disabled: false,
                 show: true,
+            },
+            // search
+            {
+                key: "search",
+                label: "Search",
+                icon: () => h(NIcon, null, { default: () => h(Search) }),
+                disabled: false,
+                show: false,
             },
             // workspace
             {

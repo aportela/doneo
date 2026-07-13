@@ -82,9 +82,9 @@
             <ReAuthModal />
             <RemoteAPIAlertModal />
             <n-layout>
-                <n-drawer v-model:show="mobileMenuOpen" placement="left" :width="220">
+                <n-drawer v-model:show="mobileMenuOpen" placement="left" :width="320">
                     <n-drawer-content closable>
-                        <SidebarMenu />
+                        <NavigationMenu mode="vertical" />
                     </n-drawer-content>
                 </n-drawer>
                 <SearchModal v-model:show="showSearchModal" />
