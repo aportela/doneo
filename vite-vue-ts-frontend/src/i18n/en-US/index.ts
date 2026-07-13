@@ -355,7 +355,7 @@ export default {
             workspace: "Workspace",
             projects: "Projects",
             tasks: "Tasks",
-            currentProjects: "Projects",
+            currentProjects: "Current projects",
             settings: "Settings",
             manageUsers: "Users",
             manageRoles: "Roles",

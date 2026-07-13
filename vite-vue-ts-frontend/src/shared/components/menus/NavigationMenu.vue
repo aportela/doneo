@@ -3,7 +3,7 @@
     import { useRoute, useRouter, RouterLink } from "vue-router";
     import { useI18n } from "vue-i18n";
 
-    import { NMenu } from 'naive-ui';
+    import { NMenu, NIcon } from 'naive-ui';
     import type { MenuMixedOption } from "naive-ui/es/menu/src/interface";
 
     import { useColorSchemeStore } from '../../../stores/colorScheme';
@@ -13,8 +13,6 @@
     import { useCacheStore } from '../../../stores/cache';
 
     import { authService } from '../../../modules/auth/services/auth';
-
-    import { renderIcon } from '../../composables/naive-ui-icon';
 
     import {
         Home,
@@ -55,7 +53,7 @@
     const cacheStore = useCacheStore();
 
 
-    const MENU_ICON_SIZE = 16;
+    //const MENU_ICON_SIZE = 16;
 
     const currentProjects = [{ id: 1, label: "PRJ-001" }, { id: 2, label: "PRJ-002" }, { id: 3, label: "PRJ-003" }];
 
@@ -76,7 +74,7 @@
                             default: () => t("shared.components.menus.NavigationMenu.items.home"),
                         },
                     ),
-                icon: renderIcon(Home)(MENU_ICON_SIZE),
+                icon: () => h(NIcon, null, { default: () => h(Home) }),
                 disabled: false,
                 show: true,
             },
@@ -84,7 +82,7 @@
             {
                 key: "workspace",
                 label: t("shared.components.menus.NavigationMenu.items.workspace"),
-                icon: renderIcon(Notebook)(MENU_ICON_SIZE),
+                icon: () => h(NIcon, null, { default: () => h(Notebook) }),
                 disabled: false,
                 show: true,
                 children: [
@@ -98,7 +96,7 @@
                                     default: () => t("shared.components.menus.NavigationMenu.items.projects"),
                                 },
                             ),
-                        icon: renderIcon(FolderKanban)(MENU_ICON_SIZE),
+                        icon: () => h(NIcon, null, { default: () => h(FolderKanban) }),
                         disabled: false,
                         show: true,
                     },
@@ -112,7 +110,7 @@
                                     default: () => t("shared.components.menus.NavigationMenu.items.tasks"),
                                 },
                             ),
-                        icon: renderIcon(ListTodo)(MENU_ICON_SIZE),
+                        icon: () => h(NIcon, null, { default: () => h(ListTodo) }),
                         disabled: false,
                         show: true,
                     }
@@ -153,7 +151,7 @@
                         }
                     ),
                 */
-                icon: renderIcon(Folder)(MENU_ICON_SIZE),
+                icon: () => h(NIcon, null, { default: () => h(Folder) }),
                 disabled: false,
                 show: currentProjects.length > 0,
                 children: currentProjects.length > 0 ? currentProjectsMenuItems.value : undefined,
@@ -162,7 +160,7 @@
             {
                 key: "settings",
                 label: t("shared.components.menus.NavigationMenu.items.settings"),
-                icon: renderIcon(Settings)(MENU_ICON_SIZE),
+                icon: () => h(NIcon, null, { default: () => h(Settings) }),
                 disabled: false,
                 show: true,
                 children: [
@@ -177,7 +175,7 @@
                                     default: () => t("shared.components.menus.NavigationMenu.items.manageUsers"),
                                 },
                             ),
-                        icon: renderIcon(Users)(MENU_ICON_SIZE),
+                        icon: () => h(NIcon, null, { default: () => h(Users) }),
                         disabled: false,
                         show: true,
                     },
@@ -192,7 +190,7 @@
                                     default: () => t("shared.components.menus.NavigationMenu.items.manageRoles"),
                                 },
                             ),
-                        icon: renderIcon(UserKey)(MENU_ICON_SIZE),
+                        icon: () => h(NIcon, null, { default: () => h(UserKey) }),
                         disabled: false,
                         show: true,
                     },
@@ -200,7 +198,7 @@
                     {
                         key: "projectSettings",
                         label: t("shared.components.menus.NavigationMenu.items.projectSettings"),
-                        icon: renderIcon(FolderCog)(MENU_ICON_SIZE),
+                        icon: () => h(NIcon, null, { default: () => h(FolderCog) }),
                         disabled: false,
                         show: true,
                         children: [
@@ -215,7 +213,7 @@
                                             default: () => t("shared.components.menus.NavigationMenu.items.manageProjectTypes"),
                                         },
                                     ),
-                                icon: renderIcon(Bookmark)(MENU_ICON_SIZE),
+                                icon: () => h(NIcon, null, { default: () => h(Bookmark) }),
                                 disabled: false,
                                 show: true,
                             },
@@ -230,7 +228,7 @@
                                             default: () => t("shared.components.menus.NavigationMenu.items.manageProjectPriorities"),
                                         },
                                     ),
-                                icon: renderIcon(Goal)(MENU_ICON_SIZE),
+                                icon: () => h(NIcon, null, { default: () => h(Goal) }),
                                 disabled: false,
                                 show: true,
                             },
@@ -245,7 +243,7 @@
                                             default: () => t("shared.components.menus.NavigationMenu.items.manageProjectStatuses"),
                                         },
                                     ),
-                                icon: renderIcon(Route)(MENU_ICON_SIZE),
+                                icon: () => h(NIcon, null, { default: () => h(Route) }),
                                 disabled: false,
                                 show: true,
                             },
@@ -255,7 +253,7 @@
                     {
                         key: "taskSettings",
                         label: t("shared.components.menus.NavigationMenu.items.taskSettings"),
-                        icon: renderIcon(FileCog)(MENU_ICON_SIZE),
+                        icon: () => h(NIcon, null, { default: () => h(FileCog) }),
                         disabled: false,
                         show: true,
                         children: [
@@ -270,7 +268,7 @@
                                             default: () => t("shared.components.menus.NavigationMenu.items.manageTaskPriorities"),
                                         },
                                     ),
-                                icon: renderIcon(Goal)(MENU_ICON_SIZE),
+                                icon: () => h(NIcon, null, { default: () => h(Goal) }),
                                 disabled: false,
                                 show: true,
                             },
@@ -285,7 +283,7 @@
                                             default: () => t("shared.components.menus.NavigationMenu.items.manageTaskStatuses"),
                                         },
                                     ),
-                                icon: renderIcon(Route)(MENU_ICON_SIZE),
+                                icon: () => h(NIcon, null, { default: () => h(Route) }),
                                 disabled: false,
                                 show: true,
                             },
@@ -301,7 +299,7 @@
             {
                 key: "currentUser",
                 label: "John Doe", // TODO
-                icon: renderIcon(CircleUser)(MENU_ICON_SIZE),
+                icon: () => h(NIcon, null, { default: () => h(CircleUser) }),
                 disabled: false,
                 show: true,
                 children: [
@@ -309,7 +307,7 @@
                         key: "switchTopNavigation",
                         label:
                             t("shared.components.menus.NavigationMenu.items.switchTopNavigation"),
-                        icon: renderIcon(PanelTopOpen)(MENU_ICON_SIZE),
+                        icon: () => h(NIcon, null, { default: () => h(PanelTopOpen) }),
                         disabled: false,
                         show: userSettingsStore.currentNavigationMode === "side",
                     },
@@ -317,7 +315,7 @@
                         key: "switchSidebarNavigation",
                         label:
                             t("shared.components.menus.NavigationMenu.items.switchSidebarNavigation"),
-                        icon: renderIcon(PanelLeftOpen)(MENU_ICON_SIZE),
+                        icon: () => h(NIcon, null, { default: () => h(PanelLeftOpen) }),
                         disabled: false,
                         show: userSettingsStore.currentNavigationMode === "top",
                     },
@@ -325,7 +323,7 @@
                         key: "disableNotifications",
                         label:
                             t("shared.components.menus.NavigationMenu.items.disableNotifications"),
-                        icon: renderIcon(BellOff)(MENU_ICON_SIZE),
+                        icon: () => h(NIcon, null, { default: () => h(BellOff) }),
                         disabled: false,
                         show: userSettingsStore.hasNotificationsEnabled,
                     },
@@ -333,7 +331,7 @@
                         key: "enableNotifications",
                         label:
                             t("shared.components.menus.NavigationMenu.items.enableNotifications"),
-                        icon: renderIcon(Bell)(MENU_ICON_SIZE),
+                        icon: () => h(NIcon, null, { default: () => h(Bell) }),
                         disabled: false,
                         show: !userSettingsStore.hasNotificationsEnabled,
                     },
@@ -341,7 +339,7 @@
                         key: "switchDarkTheme",
                         label:
                             t("shared.components.menus.NavigationMenu.items.switchToDarkTheme"),
-                        icon: renderIcon(Moon)(MENU_ICON_SIZE),
+                        icon: () => h(NIcon, null, { default: () => h(Moon) }),
                         disabled: false,
                         show: colorSchemeStore.light,
                     },
@@ -349,7 +347,7 @@
                         key: "switchLightTheme",
                         label:
                             t("shared.components.menus.NavigationMenu.items.switchToLightTheme"),
-                        icon: renderIcon(Sun)(MENU_ICON_SIZE),
+                        icon: () => h(NIcon, null, { default: () => h(Sun) }),
                         disabled: false,
                         show: colorSchemeStore.dark,
                     },
@@ -364,7 +362,7 @@
                                     default: () => t("shared.components.menus.NavigationMenu.items.profile"),
                                 },
                             ),
-                        icon: renderIcon(UserCog)(MENU_ICON_SIZE),
+                        icon: () => h(NIcon, null, { default: () => h(UserCog) }),
                         disabled: false,
                         show: true,
                     },
@@ -372,7 +370,7 @@
                         key: "signout",
                         label:
                             t("shared.components.menus.NavigationMenu.items.signOut"),
-                        icon: renderIcon(LogOut)(MENU_ICON_SIZE),
+                        icon: () => h(NIcon, null, { default: () => h(LogOut) }),
                         disabled: false,
                         show: true,
                     },
@@ -426,7 +424,8 @@
 </script>
 
 <template>
-    <n-menu :options="menuOptions" :value="route.name as string" accordion @update:value="handleMenuSelect" />
+    <n-menu :collapsed-width="64" :icon-size="16" :collapsed-icon-size="24" :options="menuOptions"
+        :value="route.name as string" accordion @update:value="handleMenuSelect" />
 </template>
 
 <style lang="css" scoped></style>
