@@ -98,7 +98,7 @@
                     <n-layout-sider v-if="!isMobile" collapse-mode="width" :collapsed-width="62" :width="220"
                         :collapsed="isCollapsed" @collapse="isCollapsed = true" @expand="isCollapsed = false"
                         show-trigger="arrow-circle">
-                        <NavigationMenu :collapsed="isCollapsed" />
+                        <NavigationMenu mode="vertical" :collapsed="isCollapsed" />
                     </n-layout-sider>
                     <n-layout-content>
                         <router-view />

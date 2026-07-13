@@ -44,6 +44,7 @@
 
     interface IProps {
         collapsed?: boolean;
+        mode: "horizontal" | "vertical";
     };
 
     const props = defineProps<IProps>();
@@ -409,7 +410,7 @@
 </script>
 
 <template>
-    <n-menu :collapsed-width="64" :icon-size="16" :collapsed-icon-size="24" :options="menuOptions"
+    <n-menu :mode="props.mode" :collapsed-width="64" :icon-size="16" :collapsed-icon-size="24" :options="menuOptions"
         :value="currentMenuValue" accordion :collapsed="props.collapsed" @update:value="handleMenuSelect" />
 </template>
 
