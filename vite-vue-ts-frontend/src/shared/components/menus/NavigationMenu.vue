@@ -3,7 +3,7 @@
     import { useRoute, useRouter, RouterLink } from "vue-router";
     import { useI18n } from "vue-i18n";
 
-    import { NMenu, NSpace, NButton } from 'naive-ui';
+    import { NMenu } from 'naive-ui';
     import type { MenuMixedOption } from "naive-ui/es/menu/src/interface";
 
     import { useColorSchemeStore } from '../../../stores/colorScheme';
@@ -41,7 +41,7 @@
         //FileText,
         PanelLeftOpen,
         PanelTopOpen,
-        SquarePlus,
+        //SquarePlus,
     } from "@lucide/vue";
 
     const route = useRoute();
