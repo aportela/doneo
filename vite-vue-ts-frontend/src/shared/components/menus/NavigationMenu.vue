@@ -42,7 +42,14 @@
         //SquarePlus,
     } from "@lucide/vue";
 
+    interface IProps {
+        collapsed?: boolean;
+    };
+
+    const props = defineProps<IProps>();
+
     const route = useRoute();
+
     const router = useRouter();
     const { t } = useI18n();
 
@@ -51,9 +58,6 @@
     const colorSchemeStore = useColorSchemeStore();
     const userSettingsStore = useUserSettingsStore();
     const cacheStore = useCacheStore();
-
-
-    //const MENU_ICON_SIZE = 16;
 
     const currentProjects = [{ id: 1, label: "PRJ-001" }, { id: 2, label: "PRJ-002" }, { id: 3, label: "PRJ-003" }];
 
@@ -400,11 +404,13 @@
         }
     }
 
+    const currentMenuValue = computed<string>(() => route.name as string);
+
 </script>
 
 <template>
     <n-menu :collapsed-width="64" :icon-size="16" :collapsed-icon-size="24" :options="menuOptions"
-        :value="route.name as string" accordion @update:value="handleMenuSelect" />
+        :value="currentMenuValue" accordion :collapsed="props.collapsed" @update:value="handleMenuSelect" />
 </template>
 
 <style lang="css" scoped></style>

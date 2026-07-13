@@ -11,9 +11,9 @@
     import TopHeaderNew from './TopHeaderNew.vue';
     import TopMenu from './TopMenu.vue';
     import SearchModal from '../shared/components/modals/SearchModal.vue';
-    import SidebarMenu from './SidebarMenu.vue';
     import ReAuthModal from '../modules/auth/components/ReAuthModal.vue';
     import RemoteAPIAlertModal from '../shared/components/modals/RemoteAPIAlertModal.vue';
+    import NavigationMenu from '../shared/components/menus/NavigationMenu.vue';
 
     const sessionStore = useSessionStore();
 
@@ -98,7 +98,7 @@
                     <n-layout-sider v-if="!isMobile" collapse-mode="width" :collapsed-width="62" :width="220"
                         :collapsed="isCollapsed" @collapse="isCollapsed = true" @expand="isCollapsed = false"
                         show-trigger="arrow-circle">
-                        <SidebarMenu :collapsed="isCollapsed" />
+                        <NavigationMenu :collapsed="isCollapsed" />
                     </n-layout-sider>
                     <n-layout-content>
                         <router-view />
