@@ -112,10 +112,14 @@
             console.error(e);
         });
     };
+
+    const onAdd = () => {
+
+    };
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" hide-add @refresh="onRefresh">
+    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
         <template #thead>
             <tr>
                 <th>
