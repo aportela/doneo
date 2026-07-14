@@ -5,13 +5,14 @@
 
     import { NBreadcrumb, NBreadcrumbItem, NIcon } from 'naive-ui';
 
-    import { Bookmark, CircleUser, FileCog, FolderCog, FolderKanban, Goal, Home, ListTodo, Notebook, Route, Settings, UserCog, UserKey, Users } from '@lucide/vue';
+    import { Bookmark, CircleUser, FileCog, FolderCog, FolderKanban, Goal, Home, LibraryBig, ListTodo, Notebook, Route, Settings, UserCog, UserKey, Users } from '@lucide/vue';
 
     import { useSessionStore } from '../stores/session';
 
     type AppRouteName =
         | 'manageProjects'
         | 'manageTasks'
+        | 'manageWiki'
         | 'manageUsers'
         | 'manageRoles'
         | 'manageProjectTypes'
@@ -40,7 +41,12 @@
 
         manageTasks: [
             { id: "workspace", label: () => 'Workspace', icon: Notebook, clickable: false },
-            { id: "manageTasks", label: () => 'Tasks', icon: ListTodo }
+            { id: "manageTasks", label: () => 'Tasks', icon: ListTodo },
+        ],
+
+        manageWiki: [
+            { id: "workspace", label: () => 'Workspace', icon: Notebook, clickable: false },
+            { id: "manageWiki", label: () => 'Wiki', icon: LibraryBig }
         ],
 
         manageUsers: [

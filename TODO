@@ -62,3 +62,5 @@ move project permissions -> members
 add length (count) to "Field is below minimum length"
 
 all menu keys as (UNIQUE) route names
+
+limit current projects menu by count

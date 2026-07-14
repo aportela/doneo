@@ -148,11 +148,11 @@
                         show: true,
                     },
                     {
-                        key: "workspaceWikiPages",
+                        key: "workspaceWiki",
                         label: () =>
                             h(
                                 RouterLink,
-                                { to: { name: "manageTasks" } },
+                                { to: { name: "manageWiki" } },
                                 {
                                     default: () => t("shared.components.menus.NavigationMenu.items.wiki"),
                                 },

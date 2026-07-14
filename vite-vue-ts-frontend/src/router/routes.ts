@@ -65,6 +65,11 @@ const routes: RouteRecordRaw[] = [
         ],
       },
       {
+        name: "manageWiki",
+        path: "wiki",
+        component: () => import("../modules/pages/pages/ManageWikiPage.vue"),
+      },
+      {
         name: "reports",
         path: "reports",
         component: () => import("../pages/ReportsPage.vue"),
