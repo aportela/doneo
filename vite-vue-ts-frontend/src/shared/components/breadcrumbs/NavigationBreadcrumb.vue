@@ -7,7 +7,7 @@
 
     import { Bookmark, CircleUser, FileCog, FolderCog, FolderKanban, Goal, Home, LibraryBig, ListTodo, Notebook, Route, Settings, UserCog, UserKey, Users } from '@lucide/vue';
 
-    import { useSessionStore } from '../stores/session';
+    import { useSessionStore } from '../../../stores/session';
 
     type AppRouteName =
         | 'manageProjects'
