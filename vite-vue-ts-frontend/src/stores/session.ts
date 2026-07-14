@@ -61,6 +61,16 @@ export const useSessionStore = defineStore("session", {
     setUser(user: User): void {
       this.session.user = user;
     },
+    setUserName(name: string): void {
+      if (this.session.user) {
+        this.session.user.name = name;
+      }
+    },
+    setEmail(email: string): void {
+      if (this.session.user) {
+        this.session.user.email = email;
+      }
+    },
   },
 });
 

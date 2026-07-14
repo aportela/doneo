@@ -9,6 +9,7 @@
 
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
+    import { useSessionStore } from '../../../stores/session.ts';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { profileService } from '../services/profile';
@@ -31,6 +32,7 @@
     const loadingStore = useLoadingStore();
     const colorSchemeStore = useColorSchemeStore();
     const userSettingsStore = useUserSettingsStore();
+    const sessionStore = useSessionStore();
 
     const profile = ref<Profile>(new Profile());
 
@@ -42,7 +44,6 @@
 
     const newPassword = ref<string | null>(null);
     const confirmedPassword = ref<string | null>(null);
-
 
     const profileFormRules: FormRules =
     {
@@ -169,7 +170,11 @@
             };
             const response: ProfileResponse = await profileService.update(payload);
             profile.value = new Profile(response);
+            // TODO: this API call must return complete User data object (login like)
+            sessionStore.setUserName(response.name);
+            sessionStore.setEmail(response.email);
             notify('success', t("modules.profile.components.ProfilePage.notifications.profileUpdated"));
+
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
