@@ -30,6 +30,6 @@ export class IDate {
     if (this.date === null && this.msTimestamp !== null) {
       this.date = new Date(this.msTimestamp);
     }
-    return dayjs(this.date).format(mask);
+    return this.date !== null ? dayjs(this.date).format(mask) : null;
   };
 }
