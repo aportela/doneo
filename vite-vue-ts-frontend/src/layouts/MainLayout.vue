@@ -88,21 +88,28 @@
                     </n-drawer-content>
                 </n-drawer>
                 <SearchModal v-model:show="showSearchModal" />
-                <n-layout-header bordered>
+                <n-layout-header bordered v-if="false">
                     <TopHeader @open-search-modal="showSearchModal = true;" />
                     <n-button v-if="isMobile" quaternary circle @click="mobileMenuOpen = true">☰</n-button>
                 </n-layout-header>
                 <n-layout :has-sider="true" v-if="userSettingsStore.sideNavigationMode">
                     <n-layout-sider v-if="!isMobile" collapse-mode="width" :collapsed-width="62" :width="220"
                         :collapsed="isCollapsed" @collapse="isCollapsed = true" @expand="isCollapsed = false"
-                        show-trigger="arrow-circle">
+                        show-trigger="arrow-circle" bordered>
                         <NavigationMenu mode="vertical" :collapsed="isCollapsed" />
                     </n-layout-sider>
-                    <n-layout-content>
-                        <router-view />
-                    </n-layout-content>
+                    <n-layout>
+                        <n-layout-header bordered>
+                            <TopHeader @open-search-modal="showSearchModal = true;" />
+                            <n-button v-if="isMobile" quaternary circle @click="mobileMenuOpen = true">☰</n-button>
+                        </n-layout-header>
+                        <n-layout-content>
+                            <router-view />
+                        </n-layout-content>
+                    </n-layout>
                 </n-layout>
                 <n-layout-content v-else>
+
                     <router-view />
                 </n-layout-content>
             </n-layout>
