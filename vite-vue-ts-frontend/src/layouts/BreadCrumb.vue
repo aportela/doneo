@@ -5,9 +5,9 @@
 
     import { NBreadcrumb, NBreadcrumbItem, NIcon } from 'naive-ui';
 
-    import { useSessionStore } from '../stores/session';
-
     import { Bookmark, CircleUser, FileCog, FolderCog, FolderKanban, Goal, Home, ListTodo, Notebook, Route, Settings, UserCog, UserKey, Users } from '@lucide/vue';
+
+    import { useSessionStore } from '../stores/session';
 
     type AppRouteName =
         | 'manageProjects'
@@ -29,6 +29,7 @@
     }
 
     const route = useRoute();
+
     const sessionStore = useSessionStore();
 
     const breadcrumbConfig: Record<AppRouteName, BreadcrumbItem[]> = {
@@ -72,7 +73,7 @@
 
         manageTaskPriorities: [
             { id: "settings", label: () => 'Settings', icon: Settings, clickable: false },
-            { id: "taskSettigns", label: () => 'Task settings', icon: FileCog },
+            { id: "taskSettings", label: () => 'Task settings', icon: FileCog },
             { id: "manageTaskPriorities", label: () => 'Task priorities', icon: Goal }
         ],
 
@@ -96,17 +97,21 @@
         ]
     };
 
+    const homeBreadcrumb: BreadcrumbItem = {
+        id: 'home',
+        label: () => 'Home',
+        icon: Home,
+        clickable: false
+    };
+
     const breadcrumbs = computed(() => {
-        const name = route.name as AppRouteName;
+        if (!route.name || !(route.name in breadcrumbConfig)) {
+            return [homeBreadcrumb];
+        }
 
         return [
-            {
-                id: "home",
-                label: () => 'Home',
-                icon: Home,
-                clickable: false,
-            },
-            ...(breadcrumbConfig[name] ?? [])
+            homeBreadcrumb,
+            ...(breadcrumbConfig[route.name as keyof typeof breadcrumbConfig] ?? [])
         ];
     });
 </script>
