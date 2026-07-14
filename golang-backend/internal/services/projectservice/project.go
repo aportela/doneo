@@ -271,7 +271,7 @@ func (service *projectService) GetCurrentProjects(ctx context.Context) ([]domain
 	if contextUser, ok := middlewares.GetContextUser(ctx); !ok {
 		return nil, fmt.Errorf("[ProjectService] user not found in context")
 	} else {
-		if projects, err := service.projectRepository.GetCurrentProjects(ctx, service.db, contextUser.ID); err != nil {
+		if projects, err := service.projectRepository.GetCurrentProjects(ctx, service.db, contextUser.ID, 8); err != nil {
 			return nil, fmt.Errorf("[ProjectService] failed to get current projects: %w", err)
 		} else {
 			return projects, nil

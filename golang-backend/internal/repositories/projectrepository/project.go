@@ -19,7 +19,7 @@ type ProjectRepository interface {
 	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, deletedAt int64) error
 	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) (domain.Project, error)
 	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.Result, error)
-	GetCurrentProjects(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) ([]domain.Project, error)
+	GetCurrentProjects(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string, count uint) ([]domain.Project, error)
 }
 
 type projectRepository struct{}
@@ -458,7 +458,7 @@ func (repository *projectRepository) Search(ctx context.Context, dbExecutor data
 	return toDomainArray(dtos), browser.NewResult(pager, totalResults), nil
 }
 
-func (repository *projectRepository) GetCurrentProjects(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) ([]domain.Project, error) {
+func (repository *projectRepository) GetCurrentProjects(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string, count uint) ([]domain.Project, error) {
 	rows, err := dbExecutor.QueryContext(ctx,
 		`
 			SELECT
@@ -485,14 +485,16 @@ func (repository *projectRepository) GetCurrentProjects(ctx context.Context, dbE
 				P.creator_id,
 				U.name AS creator_name
             FROM projects P
+			INNER JOIN project_user_role PUR ON PUR.project_id = P.id AND PUR.user_id = ?
 			INNER JOIN project_priorities PP ON PP.id = P.priority_id
 			INNER JOIN project_statuses PS ON PS.id = P.status_id
 			INNER JOIN project_types PT ON PT.id = P.type_id
 			INNER JOIN users U ON U.ID = P.creator_id
 			WHERE P.archived_at IS NULL
 			ORDER BY P.updated_at DESC, P.created_at DESC
+			LIMIT ?
 		`,
-		userID)
+		userID, count)
 	if err != nil {
 		return nil, err
 	}
