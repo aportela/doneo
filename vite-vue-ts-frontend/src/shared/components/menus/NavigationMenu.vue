@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { h, computed } from 'vue';
+    import { h, ref, computed, onMounted } from 'vue';
     import { useRoute, useRouter, RouterLink } from "vue-router";
     import { useI18n } from "vue-i18n";
 
@@ -13,6 +13,7 @@
     import { useCacheStore } from '../../../stores/cache';
 
     import { authService } from '../../../modules/auth/services/auth';
+    import { navigationMenuService } from './services/navigation-menu';
 
     import {
         Home,
@@ -41,6 +42,7 @@
         PanelTopOpen,
         //SquarePlus,
     } from "@lucide/vue";
+    import type { Project } from '../../../modules/projects/models/project';
 
     interface IProps {
         collapsed?: boolean;
@@ -60,14 +62,14 @@
     const userSettingsStore = useUserSettingsStore();
     const cacheStore = useCacheStore();
 
-    const currentProjects = [{ id: 1, label: "PRJ-001" }, { id: 2, label: "PRJ-002" }, { id: 3, label: "PRJ-003" }];
+    const currentProjects = ref<Project[]>([]);
 
     const currentProjectsMenuItems = computed<MenuMixedOption[]>(() =>
-        currentProjects.map((project) => {
+        currentProjects.value.map((project: Project) => {
             return (
                 {
-                    key: project.id,
-                    label: project.label,
+                    key: project.id || "",
+                    label: project.slug,
                     children: [
                         {
                             key: "T" + project.id,
@@ -149,7 +151,7 @@
             // current projects (not archived)
             {
                 key: "currentProjects",
-                label: t("shared.components.menus.NavigationMenu.items.currentProjects"),
+                label: t("shared.components.menus.NavigationMenu.items.currentProjects") + " (" + currentProjects.value.length + ")",
                 /*
                 label: () =>
                     h(
@@ -183,8 +185,8 @@
                 */
                 icon: () => h(NIcon, null, { default: () => h(Folder) }),
                 disabled: false,
-                show: currentProjects.length > 0,
-                children: currentProjects.length > 0 ? currentProjectsMenuItems.value : undefined,
+                show: currentProjects.value.length > 0,
+                children: currentProjects.value.length > 0 ? currentProjectsMenuItems.value : undefined,
             },
             // settings
             {
@@ -385,6 +387,15 @@
         ]
     );
 
+    const getCurrentProjects = async () => {
+        try {
+            const response = await navigationMenuService.getCurrentProjects();
+            currentProjects.value = response.projects;
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
     const onSignOut = () => {
         loadingStore.set(true);
         authService.signOut().then(() => {
@@ -432,6 +443,9 @@
 
     const currentMenuValue = computed<string>(() => route.name as string);
 
+    onMounted(async () => {
+        getCurrentProjects();
+    });
 </script>
 
 <template>

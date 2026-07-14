@@ -25,6 +25,7 @@ type ProjectService interface {
 	Delete(ctx context.Context, projectID string) error
 	Get(ctx context.Context, projectID string) (domain.Project, error)
 	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.Result, error)
+	GetCurrentProjects(ctx context.Context) ([]domain.Project, error)
 }
 
 type projectService struct {
@@ -263,5 +264,17 @@ func (service *projectService) Search(ctx context.Context, pager browser.Params,
 		return nil, browser.Result{}, fmt.Errorf("[ProjectService] failed to search projects: %w", err)
 	} else {
 		return projects, pagerResult, nil
+	}
+}
+
+func (service *projectService) GetCurrentProjects(ctx context.Context) ([]domain.Project, error) {
+	if contextUser, ok := middlewares.GetContextUser(ctx); !ok {
+		return nil, fmt.Errorf("[ProjectService] user not found in context")
+	} else {
+		if projects, err := service.projectRepository.GetCurrentProjects(ctx, service.db, contextUser.ID); err != nil {
+			return nil, fmt.Errorf("[ProjectService] failed to get current projects: %w", err)
+		} else {
+			return projects, nil
+		}
 	}
 }

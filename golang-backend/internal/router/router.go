@@ -140,6 +140,10 @@ func NewRouter(app *app.App) http.Handler {
 		r.Delete("/", app.UserTimerHandler.ClearUserTimers)
 		r.Get("/", app.UserTimerHandler.GetUserTimers)
 	})
+	apiRouter.Route("/menu", func(r chi.Router) {
+		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))
+		r.Get("/current_projects", app.ProjectHandler.GetCurrentProjects)
+	})
 
 	apiRouter.Route("/projects", func(r chi.Router) {
 		r.Use(middlewares.RequireJWTAuthentication(app.Cfg.Auth.SecretKey))

@@ -19,6 +19,7 @@ type ProjectRepository interface {
 	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, deletedAt int64) error
 	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) (domain.Project, error)
 	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.Result, error)
+	GetCurrentProjects(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) ([]domain.Project, error)
 }
 
 type projectRepository struct{}
@@ -455,4 +456,77 @@ func (repository *projectRepository) Search(ctx context.Context, dbExecutor data
 	}
 
 	return toDomainArray(dtos), browser.NewResult(pager, totalResults), nil
+}
+
+func (repository *projectRepository) GetCurrentProjects(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) ([]domain.Project, error) {
+	rows, err := dbExecutor.QueryContext(ctx,
+		`
+			SELECT
+                P.id,
+				P.slug,
+				P.summary,
+				P.description,
+				P.created_at,
+				P.updated_at,
+				P.deleted_at,
+				P.started_at,
+				P.finished_at,
+				P.due_at,
+				P.archived_at,
+				P.status_id,
+				PS.name AS status_name,
+				PS.item_hex_color AS status_hex_color,
+				P.priority_id,
+				PP.name AS priority_name,
+				PP.item_hex_color AS priority_hex_color,
+				P.type_id,
+				PT.name AS type_name,
+				PT.item_hex_color AS type_hex_color,
+				P.creator_id,
+				U.name AS creator_name
+            FROM projects P
+			INNER JOIN project_priorities PP ON PP.id = P.priority_id
+			INNER JOIN project_statuses PS ON PS.id = P.status_id
+			INNER JOIN project_types PT ON PT.id = P.type_id
+			INNER JOIN users U ON U.ID = P.creator_id
+			WHERE P.archived_at IS NULL
+			ORDER BY P.updated_at DESC, P.created_at DESC
+		`,
+		userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	dtos := make([]projectDTO, 0)
+	for rows.Next() {
+		var dto projectDTO
+		if err := rows.Scan(
+			&dto.ID,
+			&dto.Slug,
+			&dto.Summary,
+			&dto.Description,
+			&dto.CreatedAt,
+			&dto.UpdatedAt,
+			&dto.DeletedAt,
+			&dto.StartedAt,
+			&dto.FinishedAt,
+			&dto.DueAt,
+			&dto.ArchivedAt,
+			&dto.StatusID,
+			&dto.StatusName,
+			&dto.StatusHexColor,
+			&dto.PriorityID,
+			&dto.PriorityName,
+			&dto.PriorityHexColor,
+			&dto.TypeID,
+			&dto.TypeName,
+			&dto.TypeHexColor,
+			&dto.CreatorID,
+			&dto.CreatorName,
+		); err != nil {
+			return nil, err
+		}
+		dtos = append(dtos, dto)
+	}
+	return toDomainArray(dtos), nil
 }

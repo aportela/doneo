@@ -20,6 +20,7 @@ type ProjectHandler interface {
 	Delete(w http.ResponseWriter, r *http.Request)
 	Get(w http.ResponseWriter, r *http.Request)
 	Search(w http.ResponseWriter, r *http.Request)
+	GetCurrentProjects(w http.ResponseWriter, r *http.Request)
 }
 
 type projectHandler struct {
@@ -174,4 +175,10 @@ func (handler *projectHandler) Search(w http.ResponseWriter, r *http.Request) {
 		filter,
 	)
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(projects, pagerResult), err)
+}
+
+func (handler *projectHandler) GetCurrentProjects(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	projects, err := handler.service.GetCurrentProjects(r.Context())
+	handlers.ToHandlerJSONResponse(w, map[string]any{"projects": domainArrayToResponseArray(projects)}, err)
 }
