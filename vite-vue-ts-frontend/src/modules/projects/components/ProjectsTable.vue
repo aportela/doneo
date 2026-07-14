@@ -25,6 +25,7 @@
     import ChangeProjectStatusDropdown from '../../../shared/components/dropdowns/ChangeProjectStatusDropdown.vue';
     import type { ProjectStatus } from '../../project-statuses/models/project-status.ts';
     import { DEFAULT_BUTTON_SIZE } from '../../../constants.ts';
+    import ProjectResumeFloatingCard from './ProjectResumeFloatingCard.vue';
 
     interface Props {
         disabled: boolean;
@@ -154,9 +155,19 @@
         filters.value.createdByUserId = null;
     };
 
+    const showDrawer = ref<boolean>(false);
+
+    const currentProject = ref<Project | null>(null);
+
+    const onShowProjectResume = (project: Project) => {
+        showDrawer.value = true;
+        currentProject.value = project;
+    };
 </script>
 
 <template>
+    <ProjectResumeFloatingCard v-if="showDrawer && currentProject?.id" v-model:show="showDrawer"
+        :project-id="currentProject?.id" />
     <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd">
         <template #thead>
             <tr>
@@ -228,14 +239,13 @@
                 <td class="doneo-text-center">
                     <!-- TODO: use ManageTableActionButtons -->
                     <n-button-group :size="DEFAULT_BUTTON_SIZE">
-                        <router-link :to="{ name: 'projectTab', params: { projectId: project.id, tab: 'metadata' } }">
-                            <n-button :disabled="props.disabled" :size="DEFAULT_BUTTON_SIZE">
-                                {{ t("shared.buttons.Open.label") }}
-                                <template #icon>
-                                    <n-icon :size="22" :component="IconFilePencil" />
-                                </template>
-                            </n-button>
-                        </router-link>
+                        <n-button :disabled="props.disabled" :size="DEFAULT_BUTTON_SIZE"
+                            @click="onShowProjectResume(project)">
+                            {{ t("shared.buttons.Open.label") }}
+                            <template #icon>
+                                <n-icon :size="22" :component="IconFilePencil" />
+                            </template>
+                        </n-button>
                         <ChangeProjectStatusDropdown :disabled="props.disabled" :read-only="props.readOnly"
                             :current-status="project.status"
                             @change="(status: ProjectStatus) => onStatusChange(project, status)" />
