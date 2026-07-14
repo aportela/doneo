@@ -182,7 +182,7 @@ func (service *projectService) Patch(ctx context.Context, project domain.Project
 					domain.HistoryOperation{
 						ID:            utils.UUID(),
 						CreatedBy:     domain.UserBase{ID: contextUser.ID},
-						CreatedAt:     *project.UpdatedAt,
+						CreatedAt:     *existentProject.UpdatedAt,
 						OperationType: domain.EventProjectUpdated,
 					},
 				); err != nil {
