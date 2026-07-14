@@ -63,7 +63,24 @@
     const currentProjects = [{ id: 1, label: "PRJ-001" }, { id: 2, label: "PRJ-002" }, { id: 3, label: "PRJ-003" }];
 
     const currentProjectsMenuItems = computed<MenuMixedOption[]>(() =>
-        currentProjects.map((project) => { return { key: project.id, label: project.label }; })
+        currentProjects.map((project) => {
+            return (
+                {
+                    key: project.id,
+                    label: project.label,
+                    children: [
+                        {
+                            key: "T" + project.id,
+                            label: "Tasks",
+                        },
+                        {
+                            key: "P" + project.id,
+                            label: "Pages",
+                        }
+                    ]
+                }
+            );
+        })
     );
 
     const menuOptions = computed<MenuMixedOption[]>(() =>
