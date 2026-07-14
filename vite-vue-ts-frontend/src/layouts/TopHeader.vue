@@ -5,7 +5,7 @@
     import { useUserSettingsStore } from '../stores/userSettings';
 
     import Doneo from '../shared/components/icons/Doneo.vue';
-    import BreadCrumb from './BreadCrumb.vue';
+    import NavigationBreadcrumb from '../shared/components/breadcrumbs/NavigationBreadcrumb.vue';
     import NavigationMenu from '../shared/components/menus/NavigationMenu.vue';
 
     const userSettingsStore = useUserSettingsStore();
@@ -32,7 +32,7 @@
 
             <div class="header-actions">
                 <div class="header-actions__left">
-                    <BreadCrumb v-if="showBreadCrumb" />
+                    <NavigationBreadcrumb v-if="showBreadCrumb" />
                 </div>
 
                 <div class="header-actions__center">
