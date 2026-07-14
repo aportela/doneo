@@ -355,6 +355,7 @@ export default {
             workspace: "Workspace",
             projects: "Projects",
             tasks: "Tasks",
+            wiki: "Wiki",
             currentProjects: "Current projects",
             settings: "Settings",
             manageUsers: "Users",

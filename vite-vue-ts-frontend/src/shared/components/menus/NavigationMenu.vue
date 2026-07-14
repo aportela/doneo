@@ -40,6 +40,7 @@
         //FileText,
         PanelLeftOpen,
         PanelTopOpen,
+        LibraryBig,
         //SquarePlus,
     } from "@lucide/vue";
     import type { Project } from '../../../modules/projects/models/project';
@@ -143,6 +144,20 @@
                                 },
                             ),
                         icon: () => h(NIcon, null, { default: () => h(ListTodo) }),
+                        disabled: false,
+                        show: true,
+                    },
+                    {
+                        key: "workspaceWikiPages",
+                        label: () =>
+                            h(
+                                RouterLink,
+                                { to: { name: "manageTasks" } },
+                                {
+                                    default: () => t("shared.components.menus.NavigationMenu.items.wiki"),
+                                },
+                            ),
+                        icon: () => h(NIcon, null, { default: () => h(LibraryBig) }),
                         disabled: false,
                         show: true,
                     }
