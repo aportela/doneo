@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { ref, onMounted, onBeforeUnmount } from 'vue';
 
-    import { NLayout, NLayoutHeader, NLayoutSider, NLayoutContent, NSpin, NDialogProvider, NButton, NDrawer, NDrawerContent, NIcon } from 'naive-ui'
+    import { NLayout, NLayoutHeader, NLayoutSider, NLayoutContent, NSpin, NDialogProvider, NButton, NDrawer, NDrawerContent, NIcon, NFlex } from 'naive-ui'
 
     import { useBreakpoints } from '@vueuse/core';
     import { TokenManager } from '../modules/auth/services/tokenManager';
@@ -13,7 +13,7 @@
     import RemoteAPIAlertModal from '../shared/components/modals/RemoteAPIAlertModal.vue';
     import NavigationMenu from '../shared/components/menus/NavigationMenu.vue';
     import Doneo from '../shared/components/icons/Doneo.vue';
-    import { Search } from '@lucide/vue';
+    import { Menu, Search } from '@lucide/vue';
     import NavigationBreadcrumb from '../shared/components/breadcrumbs/NavigationBreadcrumb.vue';
 
     const sessionStore = useSessionStore();
@@ -112,8 +112,18 @@
                     </n-layout-sider>
                     <n-layout>
                         <n-layout-header bordered>
-                            <n-button v-if="isMobile" quaternary circle @click="mobileMenuOpen = true">☰</n-button>
-                            <NavigationBreadcrumb />
+                            <n-flex align-items="center">
+                                <n-button v-if="isMobile" quaternary @click="mobileMenuOpen = true">
+                                    <template #icon>
+                                        <n-icon :component="Menu" />
+                                    </template>
+                                </n-button>
+                                <div class="brand" v-if="isMobile">
+                                    <n-icon class="brand-icon" :component="Doneo" :size="isCollapsed ? 24 : 16" />
+                                    <span class="brand-name">Doneo</span>
+                                </div>
+                                <NavigationBreadcrumb v-if="!isMobile" />
+                            </n-flex>
                         </n-layout-header>
                         <n-layout-content>
                             <router-view />
