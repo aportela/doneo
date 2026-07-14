@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, reactive, onMounted } from 'vue';
+    import { ref, reactive, onMounted, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NDrawer, NDrawerContent, NCollapse, NCollapseItem, NButton, NButtonGroup, NTag, NSpin, NIcon, NTimeline, NTimelineItem, NDivider, NFlex, NDropdown } from 'naive-ui';
@@ -111,6 +111,8 @@
     defaultNote.createdBy.id = "019f4908-5229-740c-a4f1-284d512eb4a0";
     defaultNote.createdAt = new IDate(Date.now());
     defaultNote.body = "We recommend configuring it at the project entry point, such as in main.js for projects created with Vite. Avoid calling config within components!";
+
+    const hasDetails = computed(() => task.value.attachmentsCount > 0 || task.value.timeTrackingsCount > 0);
 </script>
 
 <template>
@@ -137,9 +139,9 @@
                                     href="#aa" /></template> Add
                             note</n-button>
                     </n-button-group>
-                    <n-divider />
-                    <n-collapse class="doneo-disable-user-select">
-                        <n-collapse-item title="Attachments" key="attachments">
+                    <n-divider v-if="hasDetails" />
+                    <n-collapse class="doneo-disable-user-select" v-if="hasDetails">
+                        <n-collapse-item title="Attachments" key="attachments" v-if="task.attachmentsCount > 0">
                             <template #header>
                                 <n-icon :component="IconPaperclip" /> Attachments
                             </template>
@@ -147,7 +149,7 @@
                                 ({{ task.attachmentsCount }})
                             </template>
                         </n-collapse-item>
-                        <n-collapse-item title="Relations" key="relations">
+                        <n-collapse-item title="Relations" key="relations" v-if="false">
                             <template #header>
                                 <n-icon :component="IconLink" /> Relations
                             </template>
@@ -155,7 +157,7 @@
                                 (0)
                             </template>
                         </n-collapse-item>
-                        <n-collapse-item title="Time trackings" key="timetrackings">
+                        <n-collapse-item title="Time trackings" key="timetrackings" v-if="task.timeTrackingsCount > 0">
                             <template #header>
                                 <n-icon :component="IconReport" /> Time trackings
                             </template>
@@ -186,7 +188,7 @@
                         </n-flex>
                     </p>
                     <p>Tags: <n-tag v-for="tag in task.tags" :key="tag" size="small" class="mr-tiny">{{ tag
-                            }}</n-tag>
+                    }}</n-tag>
                     </p>
                     <n-divider />
                     <n-flex justify="space-between" align="center">
