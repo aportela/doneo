@@ -51,6 +51,7 @@
     };
 
     const props = defineProps<IProps>();
+    const emit = defineEmits(['search']);
 
     const route = useRoute();
 
@@ -62,6 +63,8 @@
     const colorSchemeStore = useColorSchemeStore();
     const userSettingsStore = useUserSettingsStore();
     const cacheStore = useCacheStore();
+
+
 
     const currentProjects = ref<Project[]>([]);
 
@@ -88,6 +91,33 @@
 
     const menuOptions = computed<MenuMixedOption[]>(() =>
         [
+            // search
+            {
+                key: "search",
+                label: () =>
+                    h(
+                        'div',
+                        {
+                            style: {
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                width: '100%'
+                            }
+                        },
+                        [
+                            h('span', 'Search...'),
+                            h('span', { class: "menu-shortcut-keys" }, [
+                                h('kbd', { class: 'menu-shortcut-key' }, 'Ctrl'),
+                                ' + ',
+                                h('kbd', { class: 'menu-shortcut-key' }, 'K')
+                            ])
+                        ]
+                    ),
+                icon: () => h(NIcon, null, { default: () => h(Search) }),
+                disabled: false,
+                show: true,
+            },
             // home
             {
                 key: "home",
@@ -102,14 +132,6 @@
                 icon: () => h(NIcon, null, { default: () => h(Home) }),
                 disabled: false,
                 show: true,
-            },
-            // search
-            {
-                key: "search",
-                label: "Search",
-                icon: () => h(NIcon, null, { default: () => h(Search) }),
-                disabled: false,
-                show: false,
             },
             // workspace
             {
@@ -435,6 +457,9 @@
 
     const handleMenuSelect = (menuOptionKey: string) => {
         switch (menuOptionKey) {
+            case "search":
+                emit("search")
+                break;
             case "switchNotifications":
             case "disableNotifications":
             case "enableNotifications":
@@ -464,8 +489,22 @@
 </script>
 
 <template>
-    <n-menu :mode="props.mode" :collapsed-width="64" :icon-size="16" :collapsed-icon-size="24" :options="menuOptions"
+    <n-menu :mode="props.mode" :collapsed-width="64" :icon-size="16" :collapsed-icon-size="16" :options="menuOptions"
         :value="currentMenuValue" accordion :collapsed="props.collapsed" @update:value="handleMenuSelect" />
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+
+    :deep(.menu-shortcut-keys) {
+        margin-top: -2px;
+    }
+
+    :deep(.menu-shortcut-key) {
+        padding: 2px 8px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        font-family: monospace;
+        font-size: 12px;
+        color: var(--n-text-color);
+    }
+</style>

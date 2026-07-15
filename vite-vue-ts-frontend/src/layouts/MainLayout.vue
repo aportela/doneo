@@ -13,7 +13,7 @@
     import RemoteAPIAlertModal from '../shared/components/modals/RemoteAPIAlertModal.vue';
     import NavigationMenu from '../shared/components/menus/NavigationMenu.vue';
     import Doneo from '../shared/components/icons/Doneo.vue';
-    import { Menu, Search } from '@lucide/vue';
+    import { Menu, PanelLeftClose, PanelLeftOpen } from '@lucide/vue';
     import NavigationBreadcrumb from '../shared/components/breadcrumbs/NavigationBreadcrumb.vue';
 
     const sessionStore = useSessionStore();
@@ -91,29 +91,16 @@
                 </n-drawer>
                 <SearchModal v-model:show="showSearchModal" />
                 <n-layout-header bordered v-if="false">
-                    <TopHeader @open-search-modal="showSearchModal = true;" />
                     <n-button v-if="isMobile" quaternary circle @click="mobileMenuOpen = true">☰</n-button>
                 </n-layout-header>
                 <n-layout :has-sider="true" v-if="userSettingsStore.sideNavigationMode">
-                    <n-layout-sider v-if="!isMobile" collapse-mode="width" :collapsed-width="62" :width="220"
-                        :collapsed="isCollapsed" @collapse="isCollapsed = true" @expand="isCollapsed = false"
-                        show-trigger="arrow-circle" bordered>
+                    <n-layout-sider v-if="!isMobile" collapse-mode="width" :collapsed-width="72" :width="220"
+                        :collapsed="isCollapsed" @collapse="isCollapsed = true" @expand="isCollapsed = false" bordered>
                         <div class="brand">
-                            <n-icon class="brand-icon" :component="Doneo" :size="isCollapsed ? 24 : 16" />
-                            <span class="brand-name">Doneo</span>
+                            <n-icon class="brand-icon" :component="Doneo" :size="isCollapsed ? 16 : 16" />
+                            <span class="brand-name" v-if="!isCollapsed">Doneo</span>
                         </div>
-                        <div style="margin: 8px 0px;" v-if="!isCollapsed">
-                            <span class="shortcut" style="margin-left: 24px;" @click="showSearchModal = true;">
-                                <n-icon :size="16" :component="Search" />
-                                Search... <kbd>Ctrl</kbd>+<kbd>K</kbd>
-                            </span>
-                        </div>
-                        <n-button quaternary v-else style="margin-left: 10px;" @click="showSearchModal = true;">
-                            <template #icon>
-                                <n-icon :component="Search" :size="24" />
-                            </template>
-                        </n-button>
-                        <NavigationMenu mode="vertical" :collapsed="isCollapsed" />
+                        <NavigationMenu mode="vertical" :collapsed="isCollapsed" @search="showSearchModal = true" />
                     </n-layout-sider>
                     <n-layout>
                         <n-layout-header bordered>
@@ -124,9 +111,14 @@
                                     </template>
                                 </n-button>
                                 <div class="brand" v-if="isMobile">
-                                    <n-icon class="brand-icon" :component="Doneo" :size="isCollapsed ? 24 : 16" />
+                                    <n-icon class="brand-icon" :component="Doneo" :size="isCollapsed ? 16 : 16" />
                                     <span class="brand-name">Doneo</span>
                                 </div>
+                                <n-button quaternary v-else @click="isCollapsed = !isCollapsed">
+                                    <template #icon>
+                                        <n-icon :component="isCollapsed ? PanelLeftOpen : PanelLeftClose" />
+                                    </template>
+                                </n-button>
                                 <NavigationBreadcrumb v-if="!isMobile" />
                             </n-flex>
                         </n-layout-header>
@@ -167,26 +159,4 @@
     .brand span {
         margin-left: 12px;
     }
-
-    .shortcut {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 12px;
-        padding: 2px 6px;
-        border: 1px solid rgba(20, 20, 22, 0.274);
-        border-radius: 16px;
-        width: 172px;
-        cursor: pointer;
-    }
-
-    kbd {
-        padding: 2px 8px;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-        font-family: monospace;
-        font-size: 12px;
-        color: var(--n-text-color);
-    }
-
 </style>
