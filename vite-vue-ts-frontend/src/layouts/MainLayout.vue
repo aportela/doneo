@@ -102,12 +102,17 @@
                             <n-icon class="brand-icon" :component="Doneo" :size="isCollapsed ? 24 : 16" />
                             <span class="brand-name">Doneo</span>
                         </div>
-                        <div style="margin: 8px 0px;">
+                        <div style="margin: 8px 0px;" v-if="!isCollapsed">
                             <span class="shortcut" style="margin-left: 24px;" @click="showSearchModal = true;">
                                 <n-icon :size="16" :component="Search" />
                                 Search... <kbd>Ctrl</kbd>+<kbd>K</kbd>
                             </span>
                         </div>
+                        <n-button quaternary v-else style="margin-left: 10px;" @click="showSearchModal = true;">
+                            <template #icon>
+                                <n-icon :component="Search" :size="24" />
+                            </template>
+                        </n-button>
                         <NavigationMenu mode="vertical" :collapsed="isCollapsed" />
                     </n-layout-sider>
                     <n-layout>
