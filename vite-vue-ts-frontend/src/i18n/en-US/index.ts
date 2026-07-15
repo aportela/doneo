@@ -350,7 +350,8 @@ export default {
       menus: {
         NavigationMenu: {
           items: {
-            //search: "Search...",
+            search: "Search...",
+            projectPage: "Project page",
             home: "Home",
             workspace: "Workspace",
             projects: "Projects",

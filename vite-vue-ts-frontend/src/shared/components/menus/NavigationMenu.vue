@@ -44,10 +44,13 @@
         //SquarePlus,
     } from "@lucide/vue";
     import type { Project } from '../../../modules/projects/models/project';
+    import Doneo from '../icons/Doneo.vue';
+    import Github from '../icons/Github.vue';
 
     interface IProps {
         collapsed?: boolean;
         mode: "horizontal" | "vertical";
+        showBrandOption: boolean;
     };
 
     const props = defineProps<IProps>();
@@ -91,6 +94,46 @@
 
     const menuOptions = computed<MenuMixedOption[]>(() =>
         [
+            {
+                key: "doneo",
+                label: "Doneo",
+                icon: () => h(NIcon, null, { default: () => h(Doneo) }),
+                // TODO: show update notification
+                /*
+                extra: () =>
+                    h(
+                        NBadge,
+                        {
+                            value: 'Update available',
+                            type: 'success'
+                        }
+                    ),
+                */
+                children: [
+                    {
+                        key: "github",
+                        label: () =>
+                            h(
+                                'a',
+                                {
+                                    href: 'https://github.com/aportela/doneo',
+                                    target: '_blank',
+                                    rel: 'noopener noreferrer'
+                                },
+                                t("shared.components.menus.NavigationMenu.items.projectPage"),
+                            ),
+                        icon: () => h(NIcon, null, { default: () => h(Github) }),
+                    }
+                ],
+                disabled: false,
+                show: props.showBrandOption,
+            },
+            {
+                key: "divider0",
+                type: "divider",
+                disabled: false,
+                show: props.showBrandOption,
+            },
             // search
             {
                 key: "search",
@@ -106,7 +149,7 @@
                             }
                         },
                         [
-                            h('span', 'Search...'),
+                            h('span', t("shared.components.menus.NavigationMenu.items.search"),),
                             h('span', { class: "menu-shortcut-keys" }, [
                                 h('kbd', { class: 'menu-shortcut-key' }, 'Ctrl'),
                                 ' + ',
@@ -361,7 +404,7 @@
                 ]
             },
             {
-                key: "divider",
+                key: "divider1",
                 type: "divider",
             },
             // current user

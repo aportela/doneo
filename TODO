@@ -64,3 +64,5 @@ add length (count) to "Field is below minimum length"
 all menu keys as (UNIQUE) route names
 
 limit current projects menu by count
+
+remove top navigation

@@ -5,7 +5,6 @@
 
     import { useBreakpoints } from '@vueuse/core';
     import { TokenManager } from '../modules/auth/services/tokenManager';
-    import { useUserSettingsStore } from '../stores/userSettings';
     import { useLoadingStore } from '../stores/loading';
     import { useSessionStore } from '../stores/session';
     import SearchModal from '../shared/components/modals/SearchModal.vue';
@@ -22,8 +21,6 @@
         mobile: 768
     });
 
-    const userSettingsStore = useUserSettingsStore();
-
     const loadingStore = useLoadingStore();
 
     const isMobile = breakpoints.smaller('mobile')
@@ -32,7 +29,7 @@
 
     const showSearchModal = ref(false)
 
-    const mobileMenuOpen = ref(false)
+    const showMobileMenu = ref(false)
 
     function onGlobalKeydown(e: KeyboardEvent) {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
@@ -83,35 +80,36 @@
         <n-spin style="height: 100vh;" :show="loadingStore.isLoading">
             <ReAuthModal />
             <RemoteAPIAlertModal />
+            <SearchModal v-model:show="showSearchModal" />
             <n-layout>
-                <n-drawer v-model:show="mobileMenuOpen" placement="left" :width="320">
+                <!-- mobile menu on left drawer -->
+                <n-drawer v-model:show="showMobileMenu" placement="left" :width="320">
                     <n-drawer-content closable>
-                        <NavigationMenu mode="vertical" />
+                        <NavigationMenu :show-brand-option="false" mode="vertical" />
                     </n-drawer-content>
                 </n-drawer>
-                <SearchModal v-model:show="showSearchModal" />
-                <n-layout :has-sider="true" v-if="userSettingsStore.sideNavigationMode">
-                    <n-layout-sider v-if="!isMobile" collapse-mode="width" :collapsed-width="72" :width="220"
+                <n-layout :has-sider="true">
+                    <!-- desktop menu on left slider -->
+                    <n-layout-sider v-if="!isMobile" collapse-mode="width" :collapsed-width="72"
                         :collapsed="isCollapsed" @collapse="isCollapsed = true" @expand="isCollapsed = false" bordered>
-                        <div class="brand">
-                            <n-icon class="brand-icon" :component="Doneo" :size="isCollapsed ? 16 : 16" />
-                            <span class="brand-name" v-if="!isCollapsed">Doneo</span>
-                        </div>
-                        <NavigationMenu mode="vertical" :collapsed="isCollapsed" @search="showSearchModal = true" />
+                        <NavigationMenu mode="vertical" :collapsed="isCollapsed" @search="showSearchModal = true"
+                            show-brand-option />
                     </n-layout-sider>
                     <n-layout>
                         <n-layout-header bordered>
-                            <n-flex align-items="center">
-                                <n-button v-if="isMobile" quaternary @click="mobileMenuOpen = true">
+                            <div v-if="isMobile">
+                                <n-button quaternary @click="showMobileMenu = true">
                                     <template #icon>
                                         <n-icon :component="Menu" />
                                     </template>
                                 </n-button>
-                                <div class="brand" v-if="isMobile">
+                                <div class="brand">
                                     <n-icon class="brand-icon" :component="Doneo" :size="isCollapsed ? 16 : 16" />
                                     <span class="brand-name">Doneo</span>
                                 </div>
-                                <n-button quaternary v-else @click="isCollapsed = !isCollapsed">
+                            </div>
+                            <n-flex align-items="center" v-else>
+                                <n-button text @click="isCollapsed = !isCollapsed">
                                     <template #icon>
                                         <n-icon :component="isCollapsed ? PanelLeftOpen : PanelLeftClose" />
                                     </template>
@@ -124,9 +122,6 @@
                         </n-layout-content>
                     </n-layout>
                 </n-layout>
-                <n-layout-content v-else>
-                    <router-view />
-                </n-layout-content>
             </n-layout>
         </n-spin>
     </n-dialog-provider>
@@ -141,18 +136,4 @@
         padding: 16px;
     }
 */
-    .brand {
-        display: flex;
-        align-items: center;
-        border-bottom: solid 1px var(--n-border-color);
-        padding: 7px 0px;
-    }
-
-    .brand-icon {
-        margin-left: 34px;
-    }
-
-    .brand span {
-        margin-left: 12px;
-    }
 </style>
