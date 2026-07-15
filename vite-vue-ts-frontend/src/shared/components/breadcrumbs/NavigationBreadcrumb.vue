@@ -5,12 +5,14 @@
 
     import { NBreadcrumb, NBreadcrumbItem, NIcon } from 'naive-ui';
 
-    import { Bookmark, CircleUser, FileCog, FolderCog, FolderKanban, Goal, Home, LibraryBig, ListTodo, Notebook, Route, Settings, UserCog, UserKey, Users } from '@lucide/vue';
+    import { Bookmark, CircleUser, FileCog, FolderCog, FolderKanban, Form, Goal, Home, LibraryBig, ListTodo, Notebook, Route, Settings, UserCog, UserKey, Users } from '@lucide/vue';
 
     import { useSessionStore } from '../../../stores/session';
 
     type AppRouteName =
         | 'manageProjects'
+        | 'projectPage'
+        | 'projectTab'
         | 'manageTasks'
         | 'manageWiki'
         | 'manageUsers'
@@ -25,7 +27,7 @@
     interface BreadcrumbItem {
         id: string;
         label: () => string;
-        icon: Component;
+        icon?: Component;
         clickable?: boolean;
     }
 
@@ -37,6 +39,18 @@
         manageProjects: [
             { id: "workspace", label: () => 'Workspace', icon: Notebook, clickable: false },
             { id: "manageProjects", label: () => 'Projects', icon: FolderKanban }
+        ],
+
+        projectPage: [
+            { id: "workspace", label: () => 'Workspace', icon: Notebook, clickable: false },
+            { id: "manageProjects", label: () => 'Projects', icon: FolderKanban },
+            { id: "project", label: () => 'project slug', icon: Form }
+        ],
+
+        projectTab: [
+            { id: "workspace", label: () => 'Workspace', icon: Notebook, clickable: false },
+            { id: "manageProjects", label: () => 'Projects', icon: FolderKanban },
+            { id: "project", label: () => 'project slug', icon: Form }
         ],
 
         manageTasks: [
