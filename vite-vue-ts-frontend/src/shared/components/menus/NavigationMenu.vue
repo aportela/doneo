@@ -421,7 +421,7 @@
                             t(userSettingsStore.currentNavigationMode === "side" ? "shared.components.menus.NavigationMenu.items.switchTopNavigation" : "shared.components.menus.NavigationMenu.items.switchSidebarNavigation"),
                         icon: () => h(NIcon, null, { default: () => h(userSettingsStore.currentNavigationMode === "side" ? PanelTopOpen : PanelLeftOpen) }),
                         disabled: false,
-                        show: true,
+                        show: false,
                     },
                     {
                         key: "switchNotifications",
@@ -429,7 +429,7 @@
                             t(userSettingsStore.hasNotificationsEnabled ? "shared.components.menus.NavigationMenu.items.disableNotifications" : "shared.components.menus.NavigationMenu.items.enableNotifications"),
                         icon: () => h(NIcon, null, { default: () => h(userSettingsStore.hasNotificationsEnabled ? BellOff : Bell) }),
                         disabled: false,
-                        show: true,
+                        show: false,
                     },
                     {
                         key: "switchTheme",
@@ -437,7 +437,7 @@
                             t(colorSchemeStore.light ? "shared.components.menus.NavigationMenu.items.switchToDarkTheme" : "shared.components.menus.NavigationMenu.items.switchToLightTheme"),
                         icon: () => h(NIcon, null, { default: () => h(colorSchemeStore.light ? Moon : Sun) }),
                         disabled: false,
-                        show: true,
+                        show: false,
                     },
                     // profile
                     {
