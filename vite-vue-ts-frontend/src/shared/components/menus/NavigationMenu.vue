@@ -532,8 +532,8 @@
 </script>
 
 <template>
-    <n-menu :mode="props.mode" :collapsed-width="64" :icon-size="16" :collapsed-icon-size="16" :options="menuOptions"
-        :value="currentMenuValue" accordion :collapsed="props.collapsed" @update:value="handleMenuSelect" />
+    <n-menu :mode="props.mode" :options="menuOptions" :value="currentMenuValue" accordion :collapsed="props.collapsed"
+        @update:value="handleMenuSelect" />
 </template>
 
 <style lang="css" scoped>

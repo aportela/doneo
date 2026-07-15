@@ -96,8 +96,8 @@
                 </n-drawer>
                 <n-layout :has-sider="!isMobile" style="height: 100vh">
                     <!-- desktop menu on left slider -->
-                    <n-layout-sider v-if="!isMobile" collapse-mode="width" :collapsed-width="72"
-                        :collapsed="isCollapsed" @collapse="isCollapsed = true" @expand="isCollapsed = false" bordered>
+                    <n-layout-sider v-if="!isMobile" collapse-mode="width" :collapsed="isCollapsed"
+                        @collapse="isCollapsed = true" @expand="isCollapsed = false" bordered>
                         <NavigationMenu mode="vertical" :collapsed="isCollapsed" @search="showSearchModal = true"
                             show-brand-option />
                     </n-layout-sider>
