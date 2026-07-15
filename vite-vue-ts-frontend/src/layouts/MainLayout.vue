@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { ref, onMounted, onBeforeUnmount } from 'vue';
 
-    import { NLayout, NLayoutHeader, NLayoutSider, NLayoutContent, NSpin, NDialogProvider, NButton, NDrawer, NDrawerContent, NIcon, NFlex } from 'naive-ui'
+    import { NLayout, NLayoutHeader, NLayoutSider, NLayoutContent, NSpin, NDialogProvider, NButton, NDrawer, NDrawerContent, NIcon, NFlex, NCard } from 'naive-ui'
 
     import { useBreakpoints } from '@vueuse/core';
     import { TokenManager } from '../modules/auth/services/tokenManager';
@@ -85,10 +85,16 @@
                 <!-- mobile menu on left drawer -->
                 <n-drawer v-model:show="showMobileMenu" placement="left" :width="320">
                     <n-drawer-content closable>
+                        <template #header>
+                            <n-flex align-items="center">
+                                <n-icon class="brand-icon" :component="Doneo" :size="isCollapsed ? 16 : 16" />
+                                <span class="brand-name">Doneo</span>
+                            </n-flex>
+                        </template>
                         <NavigationMenu :show-brand-option="false" mode="vertical" />
                     </n-drawer-content>
                 </n-drawer>
-                <n-layout :has-sider="true">
+                <n-layout :has-sider="!isMobile" style="height: 100vh">
                     <!-- desktop menu on left slider -->
                     <n-layout-sider v-if="!isMobile" collapse-mode="width" :collapsed-width="72"
                         :collapsed="isCollapsed" @collapse="isCollapsed = true" @expand="isCollapsed = false" bordered>
@@ -96,28 +102,30 @@
                             show-brand-option />
                     </n-layout-sider>
                     <n-layout>
-                        <n-layout-header bordered>
-                            <div v-if="isMobile">
-                                <n-button quaternary @click="showMobileMenu = true">
-                                    <template #icon>
-                                        <n-icon :component="Menu" />
-                                    </template>
-                                </n-button>
-                                <div class="brand">
-                                    <n-icon class="brand-icon" :component="Doneo" :size="isCollapsed ? 16 : 16" />
-                                    <span class="brand-name">Doneo</span>
-                                </div>
-                            </div>
-                            <n-flex align-items="center" v-else>
-                                <n-button text @click="isCollapsed = !isCollapsed">
-                                    <template #icon>
-                                        <n-icon :component="isCollapsed ? PanelLeftOpen : PanelLeftClose" />
-                                    </template>
-                                </n-button>
-                                <NavigationBreadcrumb v-if="!isMobile" />
-                            </n-flex>
+                        <n-layout-header style="padding: 8px;">
+                            <n-card>
+                                <n-flex v-if="isMobile" align="center" justify="space-between">
+                                    <n-button quaternary @click="showMobileMenu = true">
+                                        <template #icon>
+                                            <n-icon :component="Menu" />
+                                        </template>
+                                    </n-button>
+                                    <div class="brand">
+                                        <n-icon class="brand-icon" :component="Doneo" :size="isCollapsed ? 16 : 16" />
+                                        <span class="brand-name">Doneo</span>
+                                    </div>
+                                </n-flex>
+                                <n-flex align-items="center" v-else>
+                                    <n-button text @click="isCollapsed = !isCollapsed">
+                                        <template #icon>
+                                            <n-icon :component="isCollapsed ? PanelLeftOpen : PanelLeftClose" />
+                                        </template>
+                                    </n-button>
+                                    <NavigationBreadcrumb v-if="!isMobile" />
+                                </n-flex>
+                            </n-card>
                         </n-layout-header>
-                        <n-layout-content>
+                        <n-layout-content style="padding: 8px;">
                             <router-view />
                         </n-layout-content>
                     </n-layout>
