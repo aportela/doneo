@@ -90,9 +90,6 @@
                     </n-drawer-content>
                 </n-drawer>
                 <SearchModal v-model:show="showSearchModal" />
-                <n-layout-header bordered v-if="false">
-                    <n-button v-if="isMobile" quaternary circle @click="mobileMenuOpen = true">☰</n-button>
-                </n-layout-header>
                 <n-layout :has-sider="true" v-if="userSettingsStore.sideNavigationMode">
                     <n-layout-sider v-if="!isMobile" collapse-mode="width" :collapsed-width="72" :width="220"
                         :collapsed="isCollapsed" @collapse="isCollapsed = true" @expand="isCollapsed = false" bordered>
@@ -128,7 +125,6 @@
                     </n-layout>
                 </n-layout>
                 <n-layout-content v-else>
-
                     <router-view />
                 </n-layout-content>
             </n-layout>
