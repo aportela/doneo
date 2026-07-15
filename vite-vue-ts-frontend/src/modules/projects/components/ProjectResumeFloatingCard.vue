@@ -3,7 +3,8 @@
     import { useI18n } from "vue-i18n";
 
     import { NDrawer, NDrawerContent, NCollapse, NCollapseItem, NButton, NButtonGroup, NTag, NSpin, NIcon, NTimeline, NTimelineItem, NDivider, NFlex, NDropdown } from 'naive-ui';
-    import { IconAlertTriangle, IconCalendarBolt, IconCalendarCheck, IconCalendarDue, IconCalendarTime, IconFilter2, IconLink, IconMessage2, IconPaperclip, IconReport, IconSortDescending, IconStatusChange, IconUser } from '@tabler/icons-vue';
+    import { IconAlertTriangle, IconCalendarBolt, IconCalendarCheck, IconCalendarDue, IconCalendarTime, IconFilter2, IconMessage2, IconPaperclip, IconSortDescending, IconStatusChange, IconUser } from '@tabler/icons-vue';
+    import { ListTodo } from '@lucide/vue';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { projectService } from '../services/project.ts';
@@ -110,7 +111,7 @@
     defaultNote.createdAt = new IDate(Date.now());
     defaultNote.body = "We recommend configuring it at the project entry point, such as in main.js for projects created with Vite. Avoid calling config within components!";
 
-    const hasDetails = computed(() => project.value.attachmentsCount > 0);
+    const hasDetails = computed(() => project.value.attachmentsCount > 0 || project.value.tasksCount > 0);
 </script>
 
 <template>
@@ -128,13 +129,12 @@
                     <n-button-group size="tiny" style="margin-top: 16px;">
                         <n-button round><template #icon><n-icon :component="IconPaperclip" /></template> Add
                             attachment</n-button>
-                        <n-button round><template #icon><n-icon :component="IconLink" /></template> Add
-                            relation</n-button>
-                        <n-button round><template #icon><n-icon :component="IconReport" /></template> Add time
-                            tracking</n-button>
+
                         <n-button round><template #icon><n-icon :component="IconMessage2" tag="a"
                                     href="#aa" /></template> Add
                             note</n-button>
+                        <n-button round><template #icon><n-icon :component="ListTodo" /></template> Add
+                            task</n-button>
                     </n-button-group>
                     <n-divider v-if="hasDetails" />
                     <n-collapse class="doneo-disable-user-select" v-if="hasDetails">
@@ -146,12 +146,12 @@
                                 ({{ project.attachmentsCount }})
                             </template>
                         </n-collapse-item>
-                        <n-collapse-item title="Relations" key="relations" v-if="false">
+                        <n-collapse-item title="Tasks" key="tasks" v-if="project.tasksCount > 0">
                             <template #header>
-                                <n-icon :component="IconLink" /> Relations
+                                <n-icon :component="ListTodo" /> Tasks
                             </template>
                             <template #header-extra>
-                                (0)
+                                ({{ project.tasksCount }})
                             </template>
                         </n-collapse-item>
                     </n-collapse>
