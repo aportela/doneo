@@ -3,7 +3,7 @@
     import { useI18n } from "vue-i18n";
 
     import { useDialog, NSelect, NEmpty, type SelectOption } from 'naive-ui';
-    import { IconTrash } from '@tabler/icons-vue';
+    import { Trash2 } from '@lucide/vue';
 
     import { useUserSettingsStore } from '../../../stores/userSettings.ts';
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
@@ -126,7 +126,7 @@
     const onConfirmDelete = (attachment: Attachment, index: number) => {
         dialog.warning({
             title: t("modules.projectAttachment.components.projectAttachmentsTable.dialogs.deleteConfirmation.title"),
-            icon: renderIcon(IconTrash)(24),
+            icon: renderIcon(Trash2)(24),
             content: () =>
                 h('div', [
                     t("modules.projectAttachment.components.projectAttachmentsTable.dialogs.deleteConfirmation.message", { name: attachment.name, size: formatBytes(attachment.size) }),

@@ -1,6 +1,6 @@
 <script setup lang="ts">
     import { NModal, NUpload, NUploadDragger, NIcon, NText, type UploadCustomRequestOptions } from 'naive-ui';
-    import { IconUpload } from '@tabler/icons-vue';
+    import { Upload } from '@lucide/vue';
 
     import { useSessionStore } from '../../../stores/session';
 
@@ -79,7 +79,7 @@
                     @finish="onUploadFinish">
                     <n-upload-dragger class="doneo-upload-dragger">
                         <div style=" margin-bottom: 12px">
-                            <n-icon size="64" :depth="3" :component="IconUpload" />
+                            <n-icon size="64" :depth="3" :component="Upload" />
                         </div>
                         <n-text style="font-size: 24px">
                             Click or drag a file to this area to upload
