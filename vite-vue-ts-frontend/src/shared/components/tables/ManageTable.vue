@@ -1,12 +1,12 @@
 <script setup lang="ts">
-    import { ref } from 'vue';
+    import { ref, computed } from 'vue';
 
-    import { NTable, type TableSize, NFlex, NIcon, NModal } from 'naive-ui';
-    import { IconEye, IconEyeOff, IconFilter, IconSortAscending, IconSortDescending } from '@tabler/icons-vue';
+    import { NTable, type TableSize, NFlex, NIcon, NDrawer, NDrawerContent, NCollapse, NCollapseItem, NButton, NButtonGroup } from 'naive-ui';
 
     import { type TableHeaderColumn } from '../../types/table-header-column';
     import RefreshAddActionsColumn from './RefreshAddActionsColumn.vue';
     import { Sort } from '../../types/models/sort.ts';
+    import { ArrowDown, ArrowDownWideNarrow, ArrowUp, ArrowUpWideNarrow, Eye, EyeOff, Funnel } from '@lucide/vue';
 
     interface ManageTableProps {
         disabled?: boolean;
@@ -17,14 +17,18 @@
         hideAdd?: boolean;
     };
 
-    const emit = defineEmits(['sort', 'refresh', 'add']);
+    const emit = defineEmits(['sort', 'refresh', 'add', 'showColumn', 'hideColumn']);
 
     const props = withDefaults(defineProps<ManageTableProps>(), {
         disabled: false,
         hideAdd: false,
     });
 
-    const showModal = ref<boolean>(false);
+    const visibleColumns = computed<TableHeaderColumn[]>(() => props.columns.filter((column: TableHeaderColumn) => column.visible));
+
+    const TABLE_HEADER_ICON_SIZE = 16;
+
+    const showDrawerSettings = ref(false);
 
     const onToggleSort = (column: TableHeaderColumn) => {
         if (!props.disabled && props.currentSort && column.sortable) {
@@ -48,38 +52,81 @@
 
     const onSettings = () => {
         if (!props.disabled) {
-            showModal.value = true;
+            showDrawerSettings.value = true;
         }
     };
 
-    const tableHeaderIconSize = 16;
+    const onToggleColumnVisibility = (column: TableHeaderColumn) => {
+        emit(column.visible ? "hideColumn" : "showColumn", column);
+    };
+
+    const onShowAllColumns = () => {
+        props.columns.forEach((column) => {
+            emit("showColumn", column);
+        });
+    };
+    const onHideAllColumns = () => {
+        props.columns.forEach((column) => {
+            emit("hideColumn", column);
+        });
+    };
+    const onToggleAllColumns = () => {
+        props.columns.forEach((column) => {
+            emit(column.visible ? "hideColumn" : "showColumn", column);
+        });
+    };
+
 </script>
 
 <template>
-    <n-modal v-model:show="showModal" preset="card" style="width: 50%;">
-        <div>
-            Table column visibility settings
-            <p v-for="column in columns" class="doneo-cursor-pointer doneo-flex-center-align">
-                <n-icon :size="22" :component="column.visible ? IconEye : IconEyeOff" style="margin-right: 4px;" />
-                {{ column.label }}
-            </p>
-        </div>
-    </n-modal>
+    <n-drawer v-model:show="showDrawerSettings" placement="right">
+        <n-drawer-content title="Table settings">
+            <n-collapse accordion default-expanded-names="columnVisibility">
+                <n-collapse-item title="Column settings" key="columnVisibility">
+                    <n-button-group size="tiny">
+                        <n-button @click="onShowAllColumns">Show all</n-button>
+                        <n-button @click="onHideAllColumns">Hide all</n-button>
+                        <n-button @click="onToggleAllColumns">Toggle values</n-button>
+                    </n-button-group>
+                    <p v-for="column in columns" class="doneo-cursor-pointer doneo-flex-center-align">
+                        <n-button-group size="tiny" style="margin-right: 8px;">
+                            <n-button>
+                                <template #icon>
+                                    <n-icon :component="ArrowUp" />
+                                </template>
+                            </n-button>
+                            <n-button>
+                                <template #icon>
+                                    <n-icon :component="ArrowDown" />
+                                </template>
+                            </n-button>
+                            <n-button @click="onToggleColumnVisibility(column)">
+                                <template #icon>
+                                    <n-icon :color="column.visible ? 'green' : 'red'"
+                                        :component="column.visible ? Eye : EyeOff" style="margin-right: 4px;" />
+                                </template>
+                            </n-button>
+                        </n-button-group>
+                        {{ column.label }}
+                    </p>
+                </n-collapse-item>
+            </n-collapse>
+        </n-drawer-content>
+    </n-drawer>
     <n-table :size="size" :striped="striped" class="doneo-table" :single-line="false" :single-column="false">
         <thead>
-            <tr v-if="props.columns && props.columns?.length > 0">
-                <th v-for="column in props.columns" :key="column.field" @click="onToggleSort(column)"
+            <tr>
+                <th v-for="column in visibleColumns" :key="column.field" @click="onToggleSort(column)"
                     :class="{ 'doneo-cursor-pointer': column.sortable }">
                     <n-flex justify="space-between">
-                        <span v-if="column.align === 'center'"> </span>
+                        <span v-if="column.align === 'center'"></span>
                         <span>{{ column.label }}</span>
                         <div>
-                            <n-icon :size="tableHeaderIconSize" :component="IconFilter" class="doneo-table-header-icon"
+                            <n-icon :size="TABLE_HEADER_ICON_SIZE" :component="Funnel" class="doneo-table-header-icon"
                                 v-if="column.isFiltered?.() ?? false" />
-                            <n-icon :size="tableHeaderIconSize" class="doneo-table-header-icon"
-                                v-if="column.sortable && props.currentSort?.field === column.field">
-                                <IconSortDescending v-if="props.currentSort?.order == 'DESC'" />
-                                <IconSortAscending v-else />
+                            <n-icon :size="TABLE_HEADER_ICON_SIZE" class="doneo-table-header-icon"
+                                v-if="column.sortable && props.currentSort?.field === column.field"
+                                :component="props.currentSort?.order == 'DESC' ? ArrowDownWideNarrow : ArrowUpWideNarrow">
                             </n-icon>
                         </div>
                     </n-flex>
