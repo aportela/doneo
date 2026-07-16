@@ -1,10 +1,7 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
 import { useNavigatorLanguage } from "@vueuse/core";
-import { createStorageEntry } from "../shared/composables/localStorage";
 import { availableSystemLocales } from "../i18n";
 import { DEFAULT_LOCALE } from "../constants";
-
-const localStorageLocale = createStorageEntry<string | null>("locale", null);
 
 const getMatchedLocale = (locale: string): string | null => {
   if (availableSystemLocales.includes(locale)) {
@@ -27,14 +24,16 @@ interface State {
 
 const { isSupported, language } = useNavigatorLanguage();
 
+const storePersistenceKey = "doneo.settings.i18n";
+
 export const useI18nStore = defineStore("i18nStore", {
+  persist: {
+    key: storePersistenceKey,
+  },
   state: (): State => ({
     locale:
       getMatchedLocale(
-        localStorageLocale.get() ||
-          getMatchedLocale(
-            isSupported ? new String(language).toString() : "",
-          ) ||
+        getMatchedLocale(isSupported ? new String(language).toString() : "") ||
           "",
       ) ?? DEFAULT_LOCALE,
   }),
@@ -46,7 +45,6 @@ export const useI18nStore = defineStore("i18nStore", {
       const matched = getMatchedLocale(locale);
       if (matched !== null) {
         this.locale = matched;
-        localStorageLocale.set(this.locale);
         return true;
       } else {
         return false;
