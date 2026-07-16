@@ -31,11 +31,11 @@
         <template #trigger>
             <n-button :size="props.size" quaternary @click.prevent="userSettingsStore.toggleNotifications"
                 @mousedown.prevent :disabled="props.disabled">
-                <n-icon :size="props.iconSize" :component="userSettingsStore.disableNotifications ? BellOff : Bell" />
+                <n-icon :size="props.iconSize" :component="userSettingsStore.notifications ? BellOff : Bell" />
             </n-button>
         </template>
         {{
-            t(userSettingsStore.disableNotifications ?
+            t(userSettingsStore.notifications ?
                 "shared.components.buttons.notifications.enable.toolTip" :
                 "shared.components.buttons.notifications.disable.toolTip")
         }}

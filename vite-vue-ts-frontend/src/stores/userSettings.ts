@@ -1,60 +1,34 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
-import { createStorageEntry } from "../shared/composables/localStorage";
 import { defaultDateTimeMask } from "../shared/composables/datetime";
 
-type navigationMode = "top" | "side";
-
-const localStorageUserSettingsNavigationMode =
-  createStorageEntry<navigationMode>("userSettings.navigationMode", "side");
-
-const localStorageUserSettingsDisableNotifications =
-  createStorageEntry<boolean>("userSettings.disableNotifications", false);
-
-const localStorageUserSettingsDatetimeMask = createStorageEntry<string>(
-  "userSettings.datetimeMask",
-  defaultDateTimeMask,
-);
-
 interface State {
-  navigationMode: navigationMode;
-  disableNotifications: boolean;
+  notifications: boolean;
   datetimeMask: string;
 }
 
+const storePersistenceKey = "doneo.settings";
+
 export const useUserSettingsStore = defineStore("userSettings", {
+  persist: {
+    key: storePersistenceKey,
+  },
   state: (): State => ({
-    navigationMode: localStorageUserSettingsNavigationMode.get(),
-    disableNotifications: localStorageUserSettingsDisableNotifications.get(),
-    datetimeMask: localStorageUserSettingsDatetimeMask.get(),
+    notifications: false,
+    datetimeMask: defaultDateTimeMask,
   }),
   getters: {
-    currentNavigationMode: (state): navigationMode => state.navigationMode,
-    topNavigationMode: (state): boolean => state.navigationMode === "top",
-    sideNavigationMode: (state): boolean => state.navigationMode === "side",
-    hasNotificationsEnabled: (state): boolean =>
-      state.disableNotifications !== true,
+    hasNotificationsEnabled: (state): boolean => state.notifications === true,
     currentDatetimeMask: (state): string => state.datetimeMask,
   },
   actions: {
-    setNavigationMode(mode: navigationMode): void {
-      this.navigationMode = mode;
-      localStorageUserSettingsNavigationMode.set(this.navigationMode);
-    },
-    toggleNavigationMode(): void {
-      this.setNavigationMode(this.navigationMode === "top" ? "side" : "top");
-    },
     setNotifications(enabled: boolean): void {
-      this.disableNotifications = !enabled;
-      localStorageUserSettingsDisableNotifications.set(
-        this.disableNotifications,
-      );
+      this.notifications = enabled;
     },
     toggleNotifications(): void {
-      this.setNotifications(!this.hasNotificationsEnabled);
+      this.setNotifications(!this.notifications);
     },
     setDatetimeMask(mask: string): void {
       this.datetimeMask = mask;
-      localStorageUserSettingsDatetimeMask.set(this.datetimeMask);
     },
   },
 });

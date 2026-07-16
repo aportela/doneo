@@ -5,7 +5,7 @@
     import dayjs from 'dayjs'
 
     import { NForm, NAvatar, NFlex, NFormItem, NInput, NButton, NButtonGroup, NPopover, NIcon, NGrid, NGridItem, NDivider, NTag, type FormInst, type FormRules, type FormItemRule } from 'naive-ui';
-    import { IconTrash, IconSun, IconMoon, IconInfoCircle, IconLayoutSidebarLeftExpand, IconLayoutNavbarExpand, IconDeviceFloppy, IconImageGeneration } from '@tabler/icons-vue';
+    import { IconTrash, IconSun, IconMoon, IconInfoCircle, IconDeviceFloppy, IconImageGeneration } from '@tabler/icons-vue';
 
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
@@ -23,8 +23,10 @@
     import { MAX_EMAIL_LENGTH, MAX_NAME_LENGTH, MIN_PASSWORD_LENGTH } from '../../users/models/user';
     import { defaultDateTimeMask } from '../../../shared/composables/datetime.ts';
 
+
     import GenerateAvatarModal from '../../../shared/components/modals/GenerateAvatarModal.vue';
     import { isValidEmail } from '../../../shared/composables/form-validators.ts';
+    import { Bell, BellOff } from '@lucide/vue';
 
     const { t } = useI18n();
     const { notify } = useNotify();
@@ -425,26 +427,6 @@
                 </n-button-group>
             </div>
             <div>
-                <h3>Layout</h3>
-                <n-button-group>
-                    <n-button :disabled="userSettingsStore.sideNavigationMode"
-                        @click="userSettingsStore.toggleNavigationMode">
-                        <template #icon>
-                            <n-icon :component="IconLayoutSidebarLeftExpand" />
-                        </template>
-                        side
-                    </n-button>
-                    <n-button :disabled="userSettingsStore.topNavigationMode"
-                        @click="userSettingsStore.toggleNavigationMode">
-                        <template #icon>
-                            <n-icon :component="IconLayoutNavbarExpand" />
-                        </template>
-                        top
-                    </n-button>
-                </n-button-group>
-            </div>
-
-            <div>
                 <h3 class="doneo-flex-center-align">Locale
                     <n-popover>
                         <template #trigger>
@@ -615,6 +597,25 @@
                     <n-tag size="large">Preview</n-tag>
                     <n-input placeholder="mask preview (current datetime)" v-model:value="currentDatetimeMaskPreview"
                         readonly />
+                </n-button-group>
+            </div>
+            <div>
+                <h3>Notifications</h3>
+                <n-button-group>
+                    <n-button :disabled="userSettingsStore.hasNotificationsEnabled"
+                        @click="userSettingsStore.toggleNotifications">
+                        <template #icon>
+                            <n-icon :component="Bell" />
+                        </template>
+                        Enabled
+                    </n-button>
+                    <n-button :disabled="!userSettingsStore.hasNotificationsEnabled"
+                        @click="userSettingsStore.toggleNotifications">
+                        <template #icon>
+                            <n-icon :component="BellOff" />
+                        </template>
+                        Disabled
+                    </n-button>
                 </n-button-group>
             </div>
         </n-flex>

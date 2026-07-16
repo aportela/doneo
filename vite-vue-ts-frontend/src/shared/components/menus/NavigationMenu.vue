@@ -38,8 +38,6 @@
         Notebook,
         Folder,
         //FileText,
-        PanelLeftOpen,
-        PanelTopOpen,
         LibraryBig,
         //SquarePlus,
     } from "@lucide/vue";
@@ -416,14 +414,6 @@
                 show: true,
                 children: [
                     {
-                        key: "switchNavigation",
-                        label:
-                            t(userSettingsStore.currentNavigationMode === "side" ? "shared.components.menus.NavigationMenu.items.switchTopNavigation" : "shared.components.menus.NavigationMenu.items.switchSidebarNavigation"),
-                        icon: () => h(NIcon, null, { default: () => h(userSettingsStore.currentNavigationMode === "side" ? PanelTopOpen : PanelLeftOpen) }),
-                        disabled: false,
-                        show: false,
-                    },
-                    {
                         key: "switchNotifications",
                         label:
                             t(userSettingsStore.hasNotificationsEnabled ? "shared.components.menus.NavigationMenu.items.disableNotifications" : "shared.components.menus.NavigationMenu.items.enableNotifications"),
@@ -512,11 +502,6 @@
             case "switchDarkTheme":
             case "switchLightTheme":
                 themeStore.toggle();
-                break;
-            case "switchNavigation":
-            case "switchTopNavigation":
-            case "switchSidebarNavigation":
-                userSettingsStore.toggleNavigationMode();
                 break;
             case "signout":
                 onSignOut();
