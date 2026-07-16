@@ -1,5 +1,11 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
 
+interface State {
+  theme: Theme;
+}
+
+const storePersistenceKey = "doneo.settings.theme";
+
 type Theme = "dark" | "light";
 
 const systemTheme: Theme = window.matchMedia("(prefers-color-scheme: dark)")
@@ -7,13 +13,9 @@ const systemTheme: Theme = window.matchMedia("(prefers-color-scheme: dark)")
   ? "dark"
   : "light";
 
-interface State {
-  theme: Theme;
-}
-
 export const useThemeStore = defineStore("themeStore", {
   persist: {
-    key: "doneo.settings.theme",
+    key: storePersistenceKey,
   },
   state: (): State => ({
     theme: systemTheme,
@@ -29,16 +31,6 @@ export const useThemeStore = defineStore("themeStore", {
     toggle(): void {
       this.set(this.theme === "light" ? "dark" : "light");
     },
-    /*
-    // TODO: REMOVE ?
-    initSystemListener(): void {
-      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-      const listener = (e: MediaQueryListEvent) => {
-        this.set(e.matches ? "dark" : "light");
-      };
-      mediaQuery.addEventListener("change", listener);
-    },
-    */
   },
 });
 
