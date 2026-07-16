@@ -184,38 +184,27 @@
         :show-no-items-warning-message="items.length < 1 && !props.disabled">
         <template #thead>
             <tr>
-                <th v-if="columnDefinitions.slug.visible">
-                    <TextFilterInput clearable :disabled="props.disabled" size="small"
+                <th v-for="column in columns" v-show="column.visible">
+                    <TextFilterInput v-if="column.field === 'slug'" clearable :disabled="props.disabled" size="small"
                         :placeholder="t('modules.project.components.ProjectsTable.header.filters.slug.placeholder')"
                         v-model:value="filters.slug" @keydown-enter="onRefresh" />
-                </th>
-                <th v-if="columnDefinitions.type.visible">
-                    <ProjectTypeSelector :disabled="props.disabled" size="small" v-model:id="filters.typeId"
-                        :hide-prefix="true" clearable
+                    <ProjectTypeSelector v-else-if="column.field === 'type'" :disabled="props.disabled" size="small"
+                        v-model:id="filters.typeId" :hide-prefix="true" clearable
                         :placeholder="t('modules.project.components.ProjectsTable.header.filters.type.placeholder')" />
-                </th>
-                <th v-if="columnDefinitions.priority.visible">
-                    <ProjectPrioritySelector :disabled="props.disabled" size="small" v-model:id="filters.priorityId"
-                        :hide-prefix="true" clearable
+                    <ProjectPrioritySelector v-else-if="column.field === 'priority'" :disabled="props.disabled"
+                        size="small" v-model:id="filters.priorityId" :hide-prefix="true" clearable
                         :placeholder="t('modules.project.components.ProjectsTable.header.filters.priority.placeholder')" />
-                </th>
-                <th v-if="columnDefinitions.status.visible">
-                    <ProjectStatusSelector :disabled="props.disabled" size="small" v-model:id="filters.statusId"
-                        :hide-prefix="true" clearable
+                    <ProjectStatusSelector v-else-if="column.field === 'status'" :disabled="props.disabled" size="small"
+                        v-model:id="filters.statusId" :hide-prefix="true" clearable
                         :placeholder="t('modules.project.components.ProjectsTable.header.filters.status.placeholder')" />
-                </th>
-                <th v-if="columnDefinitions.summary.visible">
-                    <TextFilterInput clearable :disabled="props.disabled" size="small"
+                    <TextFilterInput v-else-if="column.field === 'summary'" clearable :disabled="props.disabled"
+                        size="small"
                         :placeholder="t('modules.project.components.ProjectsTable.header.filters.summary.placeholder')"
                         v-model:value="filters.summary" @keydown-enter="onRefresh" />
-                </th>
-                <th v-if="columnDefinitions.createdAt.visible">
-                    <DateFilterSelect clearable ref="createdAtFilterRef" size="small" :disabled="props.disabled"
-                        v-model:range="filters.createdAt" />
-                </th>
-                <th v-if="columnDefinitions.createdBy.visible">
-                    <UserSelector hideAvatar clearable :disabled="props.disabled" size="small"
-                        v-model:id="filters.createdByUserId"
+                    <DateFilterSelect v-else-if="column.field === 'createdAt'" clearable ref="createdAtFilterRef"
+                        size="small" :disabled="props.disabled" v-model:range="filters.createdAt" />
+                    <UserSelector v-else-if="column.field === 'createdBy'" hideAvatar clearable
+                        :disabled="props.disabled" size="small" v-model:id="filters.createdByUserId"
                         :placeholder="t('modules.project.components.ProjectsTable.header.filters.creator.placeholder')" />
                 </th>
                 <th class="doneo-text-center">
