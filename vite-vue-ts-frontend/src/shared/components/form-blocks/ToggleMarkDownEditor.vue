@@ -6,7 +6,7 @@
     import 'md-editor-v3/lib/style.css';
     import 'md-editor-v3/lib/preview.css';
 
-    import { useThemeStore } from '../../../stores/theme';
+    import { useUserSettingsStore } from '../../../stores/userSettings';
 
     interface IProps {
         disabled?: boolean;
@@ -25,7 +25,7 @@
         noUploadImg: true,
     });
 
-    const themeStore = useThemeStore();
+    const userSettingsStore = useUserSettingsStore();
     const { toMarkdown } = useMarkdown();
 
     const value = defineModel<string | null>('value');
@@ -66,12 +66,12 @@
 
 <template>
     <MdEditor ref="editorRef" v-model="markDown" :max-length="props.maxLength"
-        :theme="themeStore.dark ? 'dark' : 'light'" language="en-US" :disabled="props.disabled"
+        :theme="userSettingsStore.darkTheme ? 'dark' : 'light'" language="en-US" :disabled="props.disabled"
         :read-only="props.readOnly" v-if="!props.readOnly" :no-upload-img="props.noUploadImg"
         :auto-focus="props.autoFocus" @paste="onPaste" :toolbars-exclude="excludedMDEditorToolBars" :footers="[]"
         :preview="!props.hidePreview" :placeholder="props.placeholder" />
     <MdPreview v-else id="mdeditor" v-model:model-value="markDown" no-img-zoom-in
-        :theme="themeStore.dark ? 'dark' : 'light'" language="en-US" :code-foldable="false" />
+        :theme="userSettingsStore.darkTheme ? 'dark' : 'light'" language="en-US" :code-foldable="false" />
 </template>
 
 <style lang="css" scoped></style>

@@ -2,15 +2,15 @@
   import { NConfigProvider, NNotificationProvider } from 'naive-ui';
   import { darkTheme } from 'naive-ui'
 
-  import { useThemeStore } from './stores/theme';
+  import { useUserSettingsStore } from './stores/userSettings';
 
-  const themeStore = useThemeStore();
+  const userSettingsStore = useUserSettingsStore();
 
 </script>
 
 <template>
-  <n-config-provider :theme="themeStore.dark ? darkTheme : undefined"
-    :theme-overrides="themeStore.dark ? undefined : undefined">
+  <n-config-provider :theme="userSettingsStore.darkTheme ? darkTheme : undefined"
+    :theme-overrides="userSettingsStore.darkTheme ? undefined : undefined">
     <n-notification-provider>
       <router-view />
     </n-notification-provider>

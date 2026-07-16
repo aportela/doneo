@@ -6,7 +6,6 @@
     import { NMenu, NIcon } from 'naive-ui';
     import type { MenuMixedOption } from "naive-ui/es/menu/src/interface";
 
-    import { useThemeStore } from '../../../stores/theme.ts';
     import { useLoadingStore } from '../../../stores/loading';
     import { useSessionStore } from '../../../stores/session';
     import { useUserSettingsStore } from '../../../stores/userSettings';
@@ -61,7 +60,6 @@
 
     const loadingStore = useLoadingStore();
     const sessionStore = useSessionStore();
-    const themeStore = useThemeStore();
     const userSettingsStore = useUserSettingsStore();
     const cacheStore = useCacheStore();
 
@@ -424,8 +422,8 @@
                     {
                         key: "switchTheme",
                         label:
-                            t(themeStore.light ? "shared.components.menus.NavigationMenu.items.switchToDarkTheme" : "shared.components.menus.NavigationMenu.items.switchToLightTheme"),
-                        icon: () => h(NIcon, null, { default: () => h(themeStore.light ? Moon : Sun) }),
+                            t(userSettingsStore.lightTheme ? "shared.components.menus.NavigationMenu.items.switchToDarkTheme" : "shared.components.menus.NavigationMenu.items.switchToLightTheme"),
+                        icon: () => h(NIcon, null, { default: () => h(userSettingsStore.lightTheme ? Moon : Sun) }),
                         disabled: false,
                         show: false,
                     },
@@ -501,7 +499,7 @@
             case "switchTheme":
             case "switchDarkTheme":
             case "switchLightTheme":
-                themeStore.toggle();
+                userSettingsStore.toggleTheme();
                 break;
             case "signout":
                 onSignOut();

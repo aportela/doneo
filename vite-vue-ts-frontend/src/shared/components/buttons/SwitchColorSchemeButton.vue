@@ -4,7 +4,7 @@
     import { NButton, NIcon, NTooltip, type ButtonSize } from 'naive-ui';
     import { Sun, Moon } from "@lucide/vue";
 
-    import { useThemeStore } from "../../../stores/theme";
+    import { useUserSettingsStore } from "../../../stores/userSettings";
 
     import { DEFAULT_SINGLE_ACTION_BUTTON_SIZE, DEFAULT_BUTTON_ICON_SIZE } from '../../../constants';
 
@@ -22,19 +22,19 @@
 
     const { t } = useI18n();
 
-    const themeStore = useThemeStore();
+    const userSettingsStore = useUserSettingsStore();
 </script>
 
 <template>
     <n-tooltip trigger="hover">
         <template #trigger>
-            <n-button :size="props.size" quaternary @click.prevent="themeStore.toggle" @mousedown.prevent
+            <n-button :size="props.size" quaternary @click.prevent="userSettingsStore.toggleTheme" @mousedown.prevent
                 :disabled="props.disabled">
-                <n-icon :size="props.iconSize" :component="themeStore.light ? Moon : Sun" />
+                <n-icon :size="props.iconSize" :component="userSettingsStore.lightTheme ? Moon : Sun" />
             </n-button>
         </template>
         {{
-            t(themeStore.light ?
+            t(userSettingsStore.lightTheme ?
                 "shared.components.buttons.colorScheme.darkMode.toolTip" :
                 "shared.components.buttons.colorScheme.lightMode.toolTip")
         }}
