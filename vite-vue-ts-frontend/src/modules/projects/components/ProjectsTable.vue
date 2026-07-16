@@ -182,9 +182,9 @@
         @show-column="onShowColumn" @hide-column="onHideColumn"
         :no-items-warning-message="t('modules.project.components.ProjectsTable.warnings.noItemsFound')"
         :show-no-items-warning-message="items.length < 1 && !props.disabled">
-        <template #thead>
+        <template #thead="{ columns }">
             <tr>
-                <th v-for="column in columns" v-show="column.visible">
+                <th v-for="column in columns">
                     <TextFilterInput v-if="column.field === 'slug'" clearable :disabled="props.disabled" size="small"
                         :placeholder="t('modules.project.components.ProjectsTable.header.filters.slug.placeholder')"
                         v-model:value="filters.slug" @keydown-enter="onRefresh" />
@@ -213,8 +213,7 @@
             </tr>
         </template>
         <template #tbody>
-            <tr v-for="project, index in items" :key="project.id ?? index"
-                :class="{ 'tr-archived-project': project.archivedAt.hasValue() }">
+            <tr v-for="project, index in items" :key="project.id ?? index">
                 <td v-if="columnDefinitions.slug.visible">
                     {{ project.slug }}
                 </td>
@@ -260,8 +259,4 @@
     </ManageTable>
 </template>
 
-<style lang="css" scoped>
-    .tr-archived-project td {
-        opacity: 0.5;
-    }
-</style>
+<style lang="css" scoped></style>

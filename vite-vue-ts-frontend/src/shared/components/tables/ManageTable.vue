@@ -120,7 +120,7 @@
             <tr>
                 <th v-for="column in visibleColumns" :key="column.field" @click="onToggleSort(column)"
                     :class="{ 'doneo-cursor-pointer': column.sortable }">
-                    <n-flex justify="space-between">
+                    <n-flex align="center" justify="space-between">
                         <span v-if="column.align === 'center'"></span>
                         <span>{{ column.label }}</span>
                         <div>
@@ -138,7 +138,7 @@
                         @refresh="onRefresh" @add="onAdd" @settings="onSettings" />
                 </th>
             </tr>
-            <slot name="thead" />
+            <slot name="thead" :columns="visibleColumns" />
         </thead>
         <tbody>
             <slot name="tbody" />
