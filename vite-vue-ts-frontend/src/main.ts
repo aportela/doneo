@@ -1,6 +1,7 @@
 import { createApp } from "vue";
 import { router } from "./router/index";
 import { createPinia } from "pinia";
+import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 import { createI18n } from "vue-i18n";
 import { messages } from "./i18n";
 import App from "./App.vue";
@@ -11,6 +12,7 @@ import { useSessionStore } from "./stores/session";
 import "./assets/styles/main.css";
 
 const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
 
 const app = createApp(App);
 app.use(pinia);
