@@ -1,12 +1,13 @@
 <script setup lang="ts">
     import { ref, computed } from 'vue';
+    import { useI18n } from "vue-i18n";
+
 
     import { NTable, type TableSize, NFlex, NIcon, NDrawer, NDrawerContent, NCollapse, NCollapseItem, NButton, NButtonGroup, NEmpty } from 'naive-ui';
 
     import { type TableHeaderColumn } from '../../types/table-header-column';
-    import RefreshAddActionsColumn from './RefreshAddActionsColumn.vue';
     import { Sort } from '../../types/models/sort.ts';
-    import { ArrowDown, ArrowDownWideNarrow, ArrowUp, ArrowUpWideNarrow, Eye, EyeOff, Funnel } from '@lucide/vue';
+    import { ArrowDown, ArrowDownWideNarrow, ArrowUp, ArrowUpWideNarrow, Eye, EyeOff, Funnel, ListRestart, Plus, Settings } from '@lucide/vue';
 
     interface ManageTableProps {
         disabled?: boolean;
@@ -14,7 +15,9 @@
         striped?: boolean;
         columns: TableHeaderColumn[];
         currentSort?: Sort,
+        hideRefresh?: boolean;
         hideAdd?: boolean;
+        hideSettings?: boolean;
         noItemsWarningMessage?: string;
         showNoItemsWarningMessage?: boolean;
     };
@@ -23,8 +26,12 @@
 
     const props = withDefaults(defineProps<ManageTableProps>(), {
         disabled: false,
+        hideRefresh: false,
         hideAdd: false,
+        hideSettings: false,
     });
+
+    const { t } = useI18n();
 
     const visibleColumns = computed<TableHeaderColumn[]>(() => props.columns.filter((column: TableHeaderColumn) => column.visible));
 
@@ -134,8 +141,29 @@
                     </n-flex>
                 </th>
                 <th>
-                    <RefreshAddActionsColumn :columns="columns" :disabled="props.disabled" :hide-add="props.hideAdd"
-                        @refresh="onRefresh" @add="onAdd" @settings="onSettings" />
+                    <n-button-group class="doneo-table-actions-button-group">
+                        <n-button @click="onRefresh" :disabled="props.disabled" v-if="!props.hideRefresh"
+                            class="doneo-table-actions-button">
+                            <template #icon>
+                                <n-icon :component="ListRestart" />
+                            </template>
+                            {{ t("shared.buttons.Refresh.label") }}
+                        </n-button>
+                        <n-button @click="onAdd" :disabled="props.disabled" v-if="!props.hideAdd"
+                            class="doneo-table-actions-button">
+                            <template #icon>
+                                <n-icon :component="Plus" />
+                            </template>
+                            {{ t("shared.buttons.Add.label") }}
+                        </n-button>
+                        <n-button @click="onSettings" :disabled="props.disabled" v-if="!props.hideSettings"
+                            class="doneo-table-actions-button">
+                            <template #icon>
+                                <n-icon :component="Settings" />
+                            </template>
+                            {{ t("shared.buttons.Settings.label") }}
+                        </n-button>
+                    </n-button-group>
                 </th>
             </tr>
             <slot name="thead" :columns="visibleColumns" />
