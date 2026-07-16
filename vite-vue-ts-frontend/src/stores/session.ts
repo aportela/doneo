@@ -11,7 +11,13 @@ interface State {
   };
 }
 
+const storePersistenceKey = "doneo.session";
+
 export const useSessionStore = defineStore("session", {
+  persist: {
+    key: storePersistenceKey,
+    omit: ["session.accessToken"],
+  },
   state: (): State => ({
     session: {
       accessToken: {
@@ -22,6 +28,8 @@ export const useSessionStore = defineStore("session", {
     },
   }),
   getters: {
+    lastUsedEmail: (state: State): string | undefined =>
+      state.session.user?.email,
     sessionUserId: (state: State): string | null =>
       state.session.user?.id || null,
     sessionUserName: (state: State): string | null =>

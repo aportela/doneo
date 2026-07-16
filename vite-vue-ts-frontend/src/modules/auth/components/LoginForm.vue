@@ -7,7 +7,6 @@
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from "../../../shared/types/ajaxState";
     import { isValidEmail } from '../../../shared/composables/form-validators';
-    import { createStorageEntry } from '../../../shared/composables/localStorage';
     import { useSessionStore } from "../../../stores/session";
     import { authService } from '../../../modules/auth/services/auth';
     import type { SignInRequest, SignInResponse } from '../../../modules/auth/types/dto';
@@ -26,10 +25,6 @@
 
     const sessionStore = useSessionStore();
 
-    const localStorageLastUsedEmail = createStorageEntry<string | null>("lastUsedEmail", null);
-
-    const lastUsedEmail = localStorageLastUsedEmail.get();
-
     const signInFormRef = ref<FormInst | null>(null)
     const inputEmailRef = ref<InputInst | null>(null);
     const inputPasswordRef = ref<InputInst | null>(null);
@@ -39,7 +34,7 @@
     const serverErrors = ref<Record<string, string>>({});
 
     const signinFormValues = ref<signInFormValuesInterface>({
-        email: lastUsedEmail || "",
+        email: sessionStore.lastUsedEmail || "",
         password: "",
     });
 
@@ -101,7 +96,6 @@
             const response: SignInResponse = await authService.signIn(payload);
             sessionStore.setAccessToken(response.accessToken.token, response.accessToken.expiresAt);
             sessionStore.setUser(new User(response.user));
-            localStorageLastUsedEmail.set(signinFormValues.value.email);
             emit('success');
         } catch (error: unknown) {
             state.ajaxErrors = true;
