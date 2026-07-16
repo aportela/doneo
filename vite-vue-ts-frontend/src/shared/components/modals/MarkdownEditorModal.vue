@@ -4,9 +4,9 @@
     import { MdEditor } from 'md-editor-v3';
     import 'md-editor-v3/lib/style.css';
 
-    import { useColorSchemeStore } from '../../../stores/colorScheme';
+    import { useThemeStore } from '../../../stores/theme';
 
-    const colorSchemeStore = useColorSchemeStore();
+    const themeStore = useThemeStore();
 
     const show = defineModel<boolean>('show', { default: false });
     const markDown = defineModel<string>('markDown');
@@ -14,7 +14,7 @@
 
 <template>
     <n-modal v-model:show="show" closable close-on-esc mask-closable preset="card" size="huge" bordered>
-        <MdEditor v-model="markDown" :theme="colorSchemeStore.dark ? 'dark' : 'light'" language="en-US" />
+        <MdEditor v-model="markDown" :theme="themeStore.dark ? 'dark' : 'light'" language="en-US" />
     </n-modal>
 </template>
 

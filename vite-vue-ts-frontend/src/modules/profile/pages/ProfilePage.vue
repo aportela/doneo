@@ -16,7 +16,7 @@
     import { handleAPIError } from '../../../api/client/errorHandler';
 
     import { useLoadingStore } from '../../../stores/loading';
-    import { useColorSchemeStore } from '../../../stores/colorScheme';
+    import { useThemeStore } from '../../../stores/theme.ts';
     import { useUserSettingsStore } from '../../../stores/userSettings';
     import { Profile } from '../models/profile';
     import type { ProfileResponse, UpdateRequest } from '../types/dto';
@@ -30,7 +30,7 @@
     const { notify } = useNotify();
 
     const loadingStore = useLoadingStore();
-    const colorSchemeStore = useColorSchemeStore();
+    const themeStore = useThemeStore();
     const userSettingsStore = useUserSettingsStore();
     const sessionStore = useSessionStore();
 
@@ -410,13 +410,13 @@
             <div>
                 <h3>Theme</h3>
                 <n-button-group>
-                    <n-button :disabled="colorSchemeStore.light" @click="colorSchemeStore.toggle">
+                    <n-button :disabled="themeStore.light" @click="themeStore.toggle">
                         <template #icon>
                             <n-icon :component="IconSun" />
                         </template>
                         light
                     </n-button>
-                    <n-button :disabled="colorSchemeStore.dark" @click="colorSchemeStore.toggle">
+                    <n-button :disabled="themeStore.dark" @click="themeStore.toggle">
                         <template #icon>
                             <n-icon :component="IconMoon" />
                         </template>
