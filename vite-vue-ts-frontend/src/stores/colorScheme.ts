@@ -1,25 +1,28 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
 import { createStorageEntry } from "../shared/composables/localStorage";
 
-type Schemes = "dark" | "light";
+type Theme = "dark" | "light";
 
-const systemTheme: Schemes = window.matchMedia("(prefers-color-scheme: dark)")
+const systemTheme: Theme = window.matchMedia("(prefers-color-scheme: dark)")
   .matches
   ? "dark"
   : "light";
 
-const localStorageColorScheme = createStorageEntry<Schemes>(
+const localStorageColorScheme = createStorageEntry<Theme>(
   "userSettings.colorScheme",
   systemTheme,
 );
 
-const savedScheme: Schemes = localStorageColorScheme.get();
+const savedScheme: Theme = localStorageColorScheme.get();
 
 interface State {
-  colorScheme: Schemes;
+  colorScheme: Theme;
 }
 
 export const useColorSchemeStore = defineStore("colorSchemeStore", {
+  persist: {
+    key: "doneo.settings.theme",
+  },
   state: (): State => ({
     colorScheme: savedScheme,
   }),
@@ -28,7 +31,7 @@ export const useColorSchemeStore = defineStore("colorSchemeStore", {
     dark: (state): boolean => state.colorScheme === "dark",
   },
   actions: {
-    set(scheme: Schemes): void {
+    set(scheme: Theme): void {
       this.colorScheme = scheme;
       localStorageColorScheme.set(this.colorScheme);
     },
