@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { ref, computed } from 'vue';
 
-    import { NTable, type TableSize, NFlex, NIcon, NDrawer, NDrawerContent, NCollapse, NCollapseItem, NButton, NButtonGroup } from 'naive-ui';
+    import { NTable, type TableSize, NFlex, NIcon, NDrawer, NDrawerContent, NCollapse, NCollapseItem, NButton, NButtonGroup, NEmpty } from 'naive-ui';
 
     import { type TableHeaderColumn } from '../../types/table-header-column';
     import RefreshAddActionsColumn from './RefreshAddActionsColumn.vue';
@@ -15,6 +15,8 @@
         columns: TableHeaderColumn[];
         currentSort?: Sort,
         hideAdd?: boolean;
+        noItemsWarningMessage?: string;
+        showNoItemsWarningMessage?: boolean;
     };
 
     const emit = defineEmits(['sort', 'refresh', 'add', 'showColumn', 'hideColumn']);
@@ -140,6 +142,12 @@
         </thead>
         <tbody>
             <slot name="tbody" />
+            <tr v-if="props.noItemsWarningMessage && props.showNoItemsWarningMessage">
+                <td :colspan="props.columns.length + 1">
+                    <n-empty :description="props.noItemsWarningMessage">
+                    </n-empty>
+                </td>
+            </tr>
         </tbody>
         <tfoot>
             <slot name="tfoot" />

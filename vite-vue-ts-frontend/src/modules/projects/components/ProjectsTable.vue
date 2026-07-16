@@ -2,7 +2,7 @@
     import { ref, reactive, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NEmpty, NTag, NButtonGroup, NButton, NIcon } from 'naive-ui';
+    import { NTag, NButtonGroup, NButton, NIcon } from 'naive-ui';
     import { IconFilePencil } from '@tabler/icons-vue';
 
     import { useUserSettingsStore } from '../../../stores/userSettings.ts';
@@ -179,7 +179,9 @@
     <ProjectResumeFloatingCard v-if="showDrawer && currentProject?.id" v-model:show="showDrawer"
         :project-id="currentProject?.id" />
     <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd"
-        @show-column="onShowColumn" @hide-column="onHideColumn">
+        @show-column="onShowColumn" @hide-column="onHideColumn"
+        :no-items-warning-message="t('modules.project.components.ProjectsTable.warnings.noItemsFound')"
+        :show-no-items-warning-message="items.length < 1 && !props.disabled">
         <template #thead>
             <tr>
                 <th v-if="columnDefinitions.slug.visible">
@@ -263,12 +265,6 @@
                             :read-only="props.readOnly" :current-status="project.status"
                             @change="(status: ProjectStatus) => onStatusChange(project, status)" />
                     </n-button-group>
-                </td>
-            </tr>
-            <tr>
-                <td :colspan="columns.length + 1" v-if="items.length < 1 && !props.disabled">
-                    <n-empty :description="t('modules.project.components.ProjectsTable.warnings.noItemsFound')">
-                    </n-empty>
                 </td>
             </tr>
         </template>
