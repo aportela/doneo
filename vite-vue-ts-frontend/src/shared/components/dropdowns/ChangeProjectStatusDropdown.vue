@@ -16,6 +16,7 @@
         iconSize?: number,
         disabled?: boolean,
         readOnly?: boolean,
+        className?: string;
     };
 
     const props = withDefaults(defineProps<IProps>(), {
@@ -48,14 +49,14 @@
 
 <template>
     <n-dropdown trigger="click" :options="options" @select="onChange" v-if="!props.readOnly">
-        <n-button :size="props.size" :disabled="props.disabled">
+        <n-button :class="props.className" :size="props.size" :disabled="props.disabled">
             <template #icon>
                 <n-icon :size="props.iconSize" :component="IconStatusChange" />
             </template>
             {{ t("shared.components.dropDowns.ChangeTaskStatusDropdown.label") }}
         </n-button>
     </n-dropdown>
-    <n-button v-else disabled :size="props.size">
+    <n-button :class="props.className" v-else disabled :size="props.size">
         <template #icon>
             <n-icon :size="props.iconSize" :component="IconStatusChange" />
         </template>
