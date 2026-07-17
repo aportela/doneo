@@ -22,7 +22,7 @@
         showNoItemsWarningMessage?: boolean;
     };
 
-    const emit = defineEmits(['sort', 'refresh', 'add', 'showColumn', 'hideColumn']);
+    const emit = defineEmits(['sort', 'refresh', 'add', 'showColumn', 'hideColumn', 'moveColumn']);
 
     const props = withDefaults(defineProps<ManageTableProps>(), {
         disabled: false,
@@ -85,6 +85,10 @@
         });
     };
 
+    const onSortColumn = (index: number, direction: "up" | "down") => {
+        emit("moveColumn", props.columns[index], direction);
+    };
+
 </script>
 
 <template>
@@ -97,14 +101,15 @@
                         <n-button @click="onHideAllColumns">Hide all</n-button>
                         <n-button @click="onToggleAllColumns">Toggle values</n-button>
                     </n-button-group>
-                    <p v-for="column in columns" class="doneo-cursor-pointer doneo-flex-center-align">
+                    <p v-for="column, index in props.columns" class="doneo-cursor-pointer doneo-flex-center-align">
                         <n-button-group size="tiny" style="margin-right: 8px;">
-                            <n-button>
+                            <n-button @click="onSortColumn(index, 'up')" :disabled="index < 1">
                                 <template #icon>
                                     <n-icon :component="ArrowUp" />
                                 </template>
                             </n-button>
-                            <n-button>
+                            <n-button @click="onSortColumn(index, 'down')"
+                                :disabled="index >= props.columns.length - 1">
                                 <template #icon>
                                     <n-icon :component="ArrowDown" />
                                 </template>
