@@ -184,7 +184,7 @@
         <tbody v-if="false">
             <slot name="tbody" />
             <tr v-if="props.noItemsWarningMessage && props.showNoItemsWarningMessage">
-                <td :colspan="props.columns.length + 1">
+                <td :colspan="visibleColumns.length + 1">
                     <n-empty :description="props.noItemsWarningMessage">
                     </n-empty>
                 </td>
