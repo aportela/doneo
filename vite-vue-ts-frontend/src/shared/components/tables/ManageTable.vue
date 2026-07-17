@@ -86,7 +86,7 @@
     };
 
     const onSortColumn = (index: number, direction: "up" | "down") => {
-        emit("moveColumn", props.columns[index], direction);
+        emit("moveColumn", props.columns[index].field, direction);
     };
 
     const onResetColumns = () => {
