@@ -16,7 +16,6 @@
         size?: TableSize;
         striped?: boolean;
         rows: T[];
-        renderRowActions?: (value: T) => VNodeChild;
         rowKey: (row: T) => string;
         columns: TableHeaderColumn<T>[];
         currentSort?: Sort,
@@ -181,8 +180,15 @@
             </tr>
             <slot name="thead" :columns="visibleColumns" />
         </thead>
-        <tbody v-if="false">
-            <slot name="tbody" />
+        <tbody>
+            <tr v-for="row in props.rows" :key="props.rowKey(row)">
+                <td v-for="column in visibleColumns" :key="String(column.field)">
+                    <RenderCell :render="column.render" :row="row" />
+                </td>
+                <td class="doneo-text-center">
+                    <slot name="rowactions" :row="row" />
+                </td>
+            </tr>
             <tr v-if="props.noItemsWarningMessage && props.showNoItemsWarningMessage">
                 <td :colspan="visibleColumns.length + 1">
                     <n-empty :description="props.noItemsWarningMessage">
@@ -190,20 +196,6 @@
                 </td>
             </tr>
         </tbody>
-        <tbody>
-            <tr v-for="row in props.rows" :key="props.rowKey(row)">
-                <td v-for="column in visibleColumns" :key="String(column.field)">
-                    <RenderCell :render="column.render" :row="row" />
-                </td>
-                <td class="doneo-text-center">
-                    <RenderCell v-if="props.renderRowActions" :render="props.renderRowActions" :row="row" />
-                </td>
-            </tr>
-        </tbody>
-
-        <tfoot>
-            <slot name="tfoot" />
-        </tfoot>
     </n-table>
 </template>
 

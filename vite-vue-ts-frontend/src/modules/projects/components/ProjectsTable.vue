@@ -82,8 +82,8 @@
         isFilteredByCreator.value
     );
 
-    const columnDefinitions = reactive<Record<string, TableHeaderColumn<Project>>>({
-        slug: {
+    const columnDefinitions = reactive<TableHeaderColumn<Project>[]>([
+        {
             label: t("modules.project.components.ProjectsTable.header.columns.slug"),
             field: "slug",
             visible: true,
@@ -93,7 +93,7 @@
                 return h("span", {}, { default: () => row.slug });
             }
         },
-        type: {
+        {
             label: t("modules.project.components.ProjectsTable.header.columns.type"),
             field: "type",
             visible: true,
@@ -112,7 +112,7 @@
                 );
             }
         },
-        priority: {
+        {
             label: t("modules.project.components.ProjectsTable.header.columns.priority"),
             field: "priority",
             visible: true,
@@ -131,7 +131,7 @@
                 );
             }
         },
-        status: {
+        {
             label: t("modules.project.components.ProjectsTable.header.columns.status"),
             field: "status",
             visible: true,
@@ -150,7 +150,7 @@
                 );
             }
         },
-        summary: {
+        {
             label: t("modules.project.components.ProjectsTable.header.columns.summary"),
             field: "summary",
             visible: true,
@@ -160,7 +160,7 @@
                 return h("span", {}, { default: () => row.summary });
             }
         },
-        createdAt: {
+        {
             label: t("modules.project.components.ProjectsTable.header.columns.createdAt"),
             field: "createdAt",
             visible: true,
@@ -170,7 +170,7 @@
                 return h("span", {}, { default: () => row.createdAt.toCustomMaskString(userSettingsStore.currentDatetimeMask) });
             }
         },
-        createdBy: {
+        {
             label: t("modules.project.components.ProjectsTable.header.columns.createdBy"),
             field: "createdBy",
             visible: true,
@@ -180,13 +180,13 @@
                 return h(AvatarUserName, { userId: row.createdBy.id, userName: row.createdBy.name });
             }
         },
-    });
+    ]);
 
 
     tableSettingsStore.register(
         props.id,
         {
-            columns: Object.values(columnDefinitions).map((column) => { return { field: column.field, visible: column.visible } }) ?? []
+            columns: columnDefinitions.map((column) => { return { field: column.field, visible: column.visible } }) ?? []
         }
     );
 
@@ -194,21 +194,18 @@
 
     const columns = computed<TableHeaderColumn<Project>[]>(() =>
         tableSettings.columns.map((column) => {
-            const definition = columnDefinitions[column.field];
+            const definition = columnDefinitions.find((c) => c.field === column.field);
             return {
-                label: definition.label,
+                label: definition!.label,
                 field: column.field,
                 visible: column.visible,
-                sortable: definition.sortable,
-                isFiltered: definition.isFiltered ?? (() => false),
-                render: definition.render,
+                sortable: definition!.sortable,
+                isFiltered: definition!.isFiltered ?? (() => false),
+                render: definition!.render,
             };
         }
         )
     );
-
-    //const visibleColumns = computed(() => tableSettings.columns.filter((column) => column.visible).map((column) => column.field));
-    const visibleColumns = computed(() => Object.values(columnDefinitions).filter((column) => column.visible));
 
     const onSort = (sort: Sort) => {
         emit("sort", sort);
@@ -283,27 +280,20 @@
                 </th>
             </tr>
         </template>
-        <template #tbody>
-            <tr v-for="project, index in items" :key="project.id ?? index">
-                <td v-for="column in visibleColumns" :key="String(column.field)">
-                    <RenderCell :field="column.field" :row="project" :render="column.render" />
-                </td>
-                <td class="doneo-text-center">
-                    <!-- TODO: use ManageTableActionButtons -->
-                    <n-button-group class="doneo-table-actions-button-group" :size="DEFAULT_BUTTON_SIZE">
-                        <n-button class="doneo-table-actions-button" :disabled="props.disabled"
-                            :size="DEFAULT_BUTTON_SIZE" @click="onShowProjectResume(project)">
-                            {{ t("shared.buttons.Open.label") }}
-                            <template #icon>
-                                <n-icon :size="22" :component="IconFilePencil" />
-                            </template>
-                        </n-button>
-                        <ChangeProjectStatusDropdown className="doneo-table-actions-button" :disabled="props.disabled"
-                            :read-only="props.readOnly" :current-status="project.status"
-                            @change="(status: ProjectStatus) => onStatusChange(project, status)" />
-                    </n-button-group>
-                </td>
-            </tr>
+        <template #rowactions="{ row }">
+            <!-- TODO: use ManageTableActionButtons -->
+            <n-button-group class="doneo-table-actions-button-group" :size="DEFAULT_BUTTON_SIZE">
+                <n-button class="doneo-table-actions-button" :disabled="props.disabled" :size="DEFAULT_BUTTON_SIZE"
+                    @click="onShowProjectResume(row)">
+                    {{ t("shared.buttons.Open.label") }}
+                    <template #icon>
+                        <n-icon :size="22" :component="IconFilePencil" />
+                    </template>
+                </n-button>
+                <ChangeProjectStatusDropdown className="doneo-table-actions-button" :disabled="props.disabled"
+                    :read-only="props.readOnly" :current-status="row.status"
+                    @change="(status: ProjectStatus) => onStatusChange(row, status)" />
+            </n-button-group>
         </template>
     </ManageTable>
 </template>
