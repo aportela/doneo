@@ -195,33 +195,13 @@
         showDrawer.value = true;
         currentProject.value = project;
     };
-
-    const onShowColumn = (column: TableHeaderColumn) => {
-        columnDefinitions[column.field].visible = true;
-        tableSettingsStore.addVisibleColumn(props.id, column.field);
-    };
-
-    const onHideColumn = (column: TableHeaderColumn) => {
-        columnDefinitions[column.field].visible = false;
-        tableSettingsStore.removeVisibleColumn(props.id, column.field);
-    };
-
-    const onMoveColumn = (field: string, direction: "up" | "down") => {
-        tableSettingsStore.moveColumn(props.id, field, direction);
-    };
-
-    const onResetColumns = () => {
-        tableSettingsStore.reset(props.id);
-        // TODO:
-    };
 </script>
 
 <template>
     <ProjectResumeFloatingCard v-if="showDrawer && currentProject?.id" v-model:show="showDrawer"
         :project-id="currentProject?.id" />
-    <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd"
-        @show-column="onShowColumn" @hide-column="onHideColumn" @move-column="onMoveColumn"
-        @reset-columns="onResetColumns"
+    <ManageTable id="ManageProjects" size="small" :columns="columns" :current-sort="sort" @sort="onSort"
+        @refresh="onRefresh" @add="onAdd"
         :no-items-warning-message="t('modules.project.components.ProjectsTable.warnings.noItemsFound')"
         :show-no-items-warning-message="items.length < 1 && !props.disabled">
         <template #thead="{ columns }">

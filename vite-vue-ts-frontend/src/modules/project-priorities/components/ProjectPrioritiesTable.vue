@@ -100,7 +100,8 @@
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd">
+    <ManageTable id="ManageProjectPriorities" size="small" :columns="columns" :current-sort="sort" @sort="onSort"
+        @refresh="onRefresh" @add="onAdd">
         <template #thead>
             <tr>
                 <th>
@@ -119,7 +120,7 @@
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(projectPriority.hexColor ?? '#888888')">{{
                         projectPriority.name
-                    }}</n-tag>
+                        }}</n-tag>
                 </td>
                 <td>{{ projectPriority.index }}</td>
                 <td class="doneo-text-center">

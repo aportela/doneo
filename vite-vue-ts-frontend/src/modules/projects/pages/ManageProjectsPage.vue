@@ -292,7 +292,7 @@
                 {{ t("modules.project.components.ManageProjectsPage.pager.totalItemsLabel", { total: totalResults }) }}
             </template>
         </Pager>
-        <ProjectsTable id="Projects" :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh"
+        <ProjectsTable id="ManageProjects" :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh"
             @add="onShowAddForm" :sort="sort" @sort="onSort" @status-changed="onStatusChanged"
             v-model:filters="filters" />
     </n-card>

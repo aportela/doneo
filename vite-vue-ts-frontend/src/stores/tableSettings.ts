@@ -120,6 +120,19 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
       }
     },
 
+    showAllColumns(tableId: string) {
+      const table = this.ensure(tableId);
+      table.columns.forEach((column) => (column.visible = true));
+    },
+    hideAllColumns(tableId: string) {
+      const table = this.ensure(tableId);
+      table.columns.forEach((column) => (column.visible = false));
+    },
+    toggleAllColumns(tableId: string) {
+      const table = this.ensure(tableId);
+      table.columns.forEach((column) => (column.visible = !column.visible));
+    },
+
     toggleVisibleColumn(tableId: string, field: string) {
       const table = this.ensure(tableId);
 

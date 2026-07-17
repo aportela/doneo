@@ -2,14 +2,15 @@
     import { ref, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
-
     import { NTable, type TableSize, NFlex, NIcon, NDrawer, NDrawerContent, NCollapse, NCollapseItem, NButton, NButtonGroup, NEmpty } from 'naive-ui';
 
     import { type TableHeaderColumn } from '../../types/table-header-column';
     import { Sort } from '../../types/models/sort.ts';
     import { ArrowDown, ArrowDownWideNarrow, ArrowUp, ArrowUpWideNarrow, Eye, EyeOff, Funnel, ListRestart, Plus, Settings } from '@lucide/vue';
+    import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
 
     interface ManageTableProps {
+        id: string;
         disabled?: boolean;
         size?: TableSize;
         striped?: boolean;
@@ -22,7 +23,7 @@
         showNoItemsWarningMessage?: boolean;
     };
 
-    const emit = defineEmits(['sort', 'refresh', 'add', 'showColumn', 'hideColumn', 'moveColumn', 'resetColumns']);
+    const emit = defineEmits(['sort', 'refresh', 'add']);
 
     const props = withDefaults(defineProps<ManageTableProps>(), {
         disabled: false,
@@ -32,6 +33,8 @@
     });
 
     const { t } = useI18n();
+
+    const tableSettingsStore = useTableSettingsStore();
 
     const visibleColumns = computed<TableHeaderColumn[]>(() => props.columns.filter((column: TableHeaderColumn) => column.visible));
 
@@ -66,31 +69,27 @@
     };
 
     const onToggleColumnVisibility = (column: TableHeaderColumn) => {
-        emit(column.visible ? "hideColumn" : "showColumn", column);
+        tableSettingsStore.toggleVisibleColumn(props.id, column.field);
     };
 
     const onShowAllColumns = () => {
-        props.columns.forEach((column) => {
-            emit("showColumn", column);
-        });
-    };
-    const onHideAllColumns = () => {
-        props.columns.forEach((column) => {
-            emit("hideColumn", column);
-        });
-    };
-    const onToggleAllColumns = () => {
-        props.columns.forEach((column) => {
-            emit(column.visible ? "hideColumn" : "showColumn", column);
-        });
+        tableSettingsStore.showAllColumns(props.id);
     };
 
-    const onSortColumn = (index: number, direction: "up" | "down") => {
-        emit("moveColumn", props.columns[index].field, direction);
+    const onHideAllColumns = () => {
+        tableSettingsStore.hideAllColumns(props.id);
+
+    };
+    const onToggleAllColumns = () => {
+        tableSettingsStore.toggleAllColumns(props.id);
+    };
+
+    const onSortColumn = (field: string, direction: "up" | "down") => {
+        tableSettingsStore.moveColumn(props.id, field, direction);
     };
 
     const onResetColumns = () => {
-        emit("resetColumns");
+        //emit("resetColumns");
     }
 
 </script>
@@ -108,12 +107,12 @@
                     </n-button-group>
                     <p v-for="column, index in props.columns" class="doneo-cursor-pointer doneo-flex-center-align">
                         <n-button-group size="tiny" style="margin-right: 8px;">
-                            <n-button @click="onSortColumn(index, 'up')" :disabled="index < 1">
+                            <n-button @click="onSortColumn(column.field, 'up')" :disabled="index < 1">
                                 <template #icon>
                                     <n-icon :component="ArrowUp" />
                                 </template>
                             </n-button>
-                            <n-button @click="onSortColumn(index, 'down')"
+                            <n-button @click="onSortColumn(column.field, 'down')"
                                 :disabled="index >= props.columns.length - 1">
                                 <template #icon>
                                     <n-icon :component="ArrowDown" />

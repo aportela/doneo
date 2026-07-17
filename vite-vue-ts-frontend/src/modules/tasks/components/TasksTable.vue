@@ -159,8 +159,8 @@
 <template>
     <TaskResumeFloatingCard v-if="showDrawer && currentTask?.projectId && currentTask.id" v-model:show="showDrawer"
         :project-id="currentTask?.projectId" :task-id="currentTask?.id" />
-    <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd"
-        :hideAdd="props.hideAdd || props.readOnly">
+    <ManageTable id="ManageTasks" size="small" :columns="columns" :current-sort="sort" @sort="onSort"
+        @refresh="onRefresh" @add="onAdd" :hideAdd="props.hideAdd || props.readOnly">
         <template #thead>
             <tr>
                 <th>

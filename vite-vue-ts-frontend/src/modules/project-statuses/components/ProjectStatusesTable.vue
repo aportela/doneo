@@ -110,7 +110,8 @@
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd">
+    <ManageTable id="ProjectStatuses" size="small" :columns="columns" :current-sort="sort" @sort="onSort"
+        @refresh="onRefresh" @add="onAdd">
         <template #thead>
             <tr>
                 <th>

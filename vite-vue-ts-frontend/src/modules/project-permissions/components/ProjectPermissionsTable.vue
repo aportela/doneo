@@ -128,7 +128,8 @@
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd" :hide-add="props.readOnly">
+    <ManageTable id="ProjectPermissions" size="small" :columns="columns" @refresh="onRefresh" @add="onAdd"
+        :hide-add="props.readOnly">
         <template #thead>
             <tr>
                 <th>

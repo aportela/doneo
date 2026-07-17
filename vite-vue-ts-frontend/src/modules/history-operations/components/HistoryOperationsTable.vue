@@ -91,7 +91,7 @@
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" hide-add @refresh="onRefresh">
+    <ManageTable id="HistoryOperations" size="small" :columns="columns" hide-add @refresh="onRefresh">
         <template #thead>
             <tr>
                 <th>

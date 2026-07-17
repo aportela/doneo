@@ -117,7 +117,7 @@
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
+    <ManageTable id="ManageRoles" size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
         <template #thead>
             <tr>
                 <th>

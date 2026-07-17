@@ -119,7 +119,7 @@
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
+    <ManageTable id="ProjectPages" size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
         <template #thead>
             <tr>
                 <th>
