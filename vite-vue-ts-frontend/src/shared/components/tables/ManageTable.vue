@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T">
-    import { ref, computed } from 'vue';
+    import { ref, computed, type VNodeChild } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NTable, type TableSize, NFlex, NIcon, NDrawer, NDrawerContent, NCollapse, NCollapseItem, NButton, NButtonGroup, NEmpty } from 'naive-ui';
@@ -16,6 +16,7 @@
         size?: TableSize;
         striped?: boolean;
         rows: T[];
+        renderRowActions?: (value: T) => VNodeChild;
         rowKey: (row: T) => string;
         columns: TableHeaderColumn<T>[];
         currentSort?: Sort,
@@ -195,7 +196,7 @@
                     <RenderCell :render="column.render" :row="row" />
                 </td>
                 <td class="doneo-text-center">
-                    actions
+                    <RenderCell v-if="props.renderRowActions" :render="props.renderRowActions" :row="row" />
                 </td>
             </tr>
         </tbody>
