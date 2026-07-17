@@ -4,7 +4,6 @@ import { type SortOrder } from "../shared/types/common";
 interface TableColumnConfig {
   field: string;
   visible: boolean;
-  sortable: boolean;
 }
 
 export interface TableConfig {
