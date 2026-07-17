@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T">
-    import { ref, computed, type VNodeChild } from 'vue';
+    import { ref, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NTable, type TableSize, NFlex, NIcon, NDrawer, NDrawerContent, NCollapse, NCollapseItem, NButton, NButtonGroup, NEmpty } from 'naive-ui';
