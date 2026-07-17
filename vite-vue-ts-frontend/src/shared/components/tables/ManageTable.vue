@@ -22,7 +22,7 @@
         showNoItemsWarningMessage?: boolean;
     };
 
-    const emit = defineEmits(['sort', 'refresh', 'add', 'showColumn', 'hideColumn', 'moveColumn']);
+    const emit = defineEmits(['sort', 'refresh', 'add', 'showColumn', 'hideColumn', 'moveColumn', 'resetColumns']);
 
     const props = withDefaults(defineProps<ManageTableProps>(), {
         disabled: false,
@@ -89,6 +89,10 @@
         emit("moveColumn", props.columns[index], direction);
     };
 
+    const onResetColumns = () => {
+        emit("resetColumns");
+    }
+
 </script>
 
 <template>
@@ -100,6 +104,7 @@
                         <n-button @click="onShowAllColumns">Show all</n-button>
                         <n-button @click="onHideAllColumns">Hide all</n-button>
                         <n-button @click="onToggleAllColumns">Toggle values</n-button>
+                        <n-button @click="onResetColumns">Reset values</n-button>
                     </n-button-group>
                     <p v-for="column, index in props.columns" class="doneo-cursor-pointer doneo-flex-center-align">
                         <n-button-group size="tiny" style="margin-right: 8px;">

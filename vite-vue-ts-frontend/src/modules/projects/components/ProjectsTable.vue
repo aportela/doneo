@@ -159,6 +159,8 @@
         )
     );
 
+    const visibleColumns = computed(() => tableSettings.columns.filter((column) => column.visible).map((column) => column.field));
+
     const onSort = (sort: Sort) => {
         emit("sort", sort);
     };
@@ -208,6 +210,10 @@
         tableSettingsStore.moveColumn(props.id, field, direction);
     };
 
+    const onResetColumns = () => {
+        tableSettingsStore.reset(props.id);
+        // TODO:
+    };
 </script>
 
 <template>
@@ -215,6 +221,7 @@
         :project-id="currentProject?.id" />
     <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd"
         @show-column="onShowColumn" @hide-column="onHideColumn" @move-column="onMoveColumn"
+        @reset-columns="onResetColumns"
         :no-items-warning-message="t('modules.project.components.ProjectsTable.warnings.noItemsFound')"
         :show-no-items-warning-message="items.length < 1 && !props.disabled">
         <template #thead="{ columns }">
@@ -249,29 +256,29 @@
         </template>
         <template #tbody>
             <tr v-for="project, index in items" :key="project.id ?? index">
-                <td v-if="columnDefinitions.slug.visible">
+                <td v-if="visibleColumns.includes('slug')">
                     {{ project.slug }}
                 </td>
-                <td v-if="columnDefinitions.type.visible"><n-tag :bordered="false"
+                <td v-if="visibleColumns.includes('type')"><n-tag :bordered="false"
                         :color="getNaiveUITagColorProperty(project.type.hexColor ?? '#888888')">{{
                             project.type.name }}</n-tag>
                 </td>
-                <td v-if="columnDefinitions.priority.visible"><n-tag :bordered="false"
+                <td v-if="visibleColumns.includes('priority')"><n-tag :bordered="false"
                         :color="getNaiveUITagColorProperty(project.priority.hexColor ?? '#888888')">{{
                             project.priority.name
                         }}</n-tag></td>
-                <td v-if="columnDefinitions.status.visible"><n-tag :bordered="false"
+                <td v-if="visibleColumns.includes('status')"><n-tag :bordered="false"
                         :color="getNaiveUITagColorProperty(project.status.hexColor ?? '#888888')">{{
                             project.status.name }}</n-tag></td>
-                <td v-if="columnDefinitions.summary.visible">
+                <td v-if="visibleColumns.includes('summary')">
                     <router-link :to="{ name: 'projectTab', params: { projectId: project.id, tab: 'metadata' } }"
                         class="doneo-link-text-color-default">{{
                             project.summary
                         }}</router-link>
                 </td>
-                <td v-if="columnDefinitions.createdAt.visible">{{
+                <td v-if="visibleColumns.includes('createdAt')">{{
                     project.createdAt.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</td>
-                <td v-if="columnDefinitions.createdBy.visible">
+                <td v-if="visibleColumns.includes('createdBy')">
                     <AvatarUserName :user-id="project.createdBy.id" :user-name="project.createdBy.name" />
                 </td>
                 <td class="doneo-text-center">
