@@ -46,49 +46,6 @@
 
     const props = defineProps<Props>();
 
-    tableSettingsStore.register(
-        props.id,
-        {
-            columns: [
-                {
-                    field: "slug",
-                    visible: true,
-                    sortable: true,
-                },
-                {
-                    field: "type",
-                    visible: true,
-                    sortable: true,
-                },
-                {
-                    field: "priority",
-                    visible: true,
-                    sortable: true,
-                },
-                {
-                    field: "status",
-                    visible: true,
-                    sortable: true,
-                },
-                {
-                    field: "summary",
-                    visible: true,
-                    sortable: true,
-                },
-                {
-                    field: "createdAt",
-                    visible: true,
-                    sortable: true,
-                },
-                {
-                    field: "createdBy",
-                    visible: true,
-                    sortable: true,
-                },
-            ]
-        }
-    );
-
     const createdAtFilterRef = ref<DateFilterSelectComponent | undefined>();
 
     const filters = defineModel<ProjectsTableFilters>("filters", {
@@ -176,7 +133,31 @@
         },
     });
 
-    const columns = computed<TableHeaderColumn[]>(() => Object.values(columnDefinitions))
+
+    tableSettingsStore.register(
+        props.id,
+        {
+            columns: Object.values(columnDefinitions).map((column) => { return { field: column.field, visible: column.visible } }) ?? []
+        }
+    );
+
+    const tableSettings = tableSettingsStore.get(props.id);
+
+    //const columns = computed<TableHeaderColumn[]>(() => Object.values(columnDefinitions))
+
+    const columns = computed<TableHeaderColumn[]>(() =>
+        tableSettings.columns.map((column) => {
+            const definition = columnDefinitions[column.field];
+            return {
+                label: definition.label,
+                field: column.field,
+                visible: column.visible,
+                sortable: definition.sortable,
+                isFiltered: definition.isFiltered ?? (() => false),
+            };
+        }
+        )
+    );
 
     const onSort = (sort: Sort) => {
         emit("sort", sort);
