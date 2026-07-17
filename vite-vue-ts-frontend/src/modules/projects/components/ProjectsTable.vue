@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, reactive, computed } from 'vue';
+    import { ref, reactive, computed, h } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NTag, NButtonGroup, NButton, NIcon } from 'naive-ui';
@@ -27,6 +27,7 @@
     import type { ProjectStatus } from '../../project-statuses/models/project-status.ts';
     import { DEFAULT_BUTTON_SIZE } from '../../../constants.ts';
     import ProjectResumeFloatingCard from './ProjectResumeFloatingCard.vue';
+    import RenderCell from '../../../shared/components/tables/RenderCell.ts';
 
     interface Props {
         disabled: boolean;
@@ -81,13 +82,16 @@
         isFilteredByCreator.value
     );
 
-    const columnDefinitions = reactive<Record<string, TableHeaderColumn>>({
+    const columnDefinitions = reactive<Record<string, TableHeaderColumn<Project>>>({
         slug: {
             label: t("modules.project.components.ProjectsTable.header.columns.slug"),
             field: "slug",
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredBySlug.value,
+            render: (row: Project) => {
+                return h("span", {}, { default: () => row.slug });
+            }
         },
         type: {
             label: t("modules.project.components.ProjectsTable.header.columns.type"),
@@ -95,6 +99,18 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByType.value,
+            render: (row: Project) => {
+                return h(
+                    NTag,
+                    {
+                        bordered: false,
+                        color: getNaiveUITagColorProperty(row.type.hexColor ?? "#888888"),
+                    },
+                    {
+                        default: () => row.type.name,
+                    }
+                );
+            }
         },
         priority: {
             label: t("modules.project.components.ProjectsTable.header.columns.priority"),
@@ -102,6 +118,18 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByPriority.value,
+            render: (row: Project) => {
+                return h(
+                    NTag,
+                    {
+                        bordered: false,
+                        color: getNaiveUITagColorProperty(row.priority.hexColor ?? "#888888"),
+                    },
+                    {
+                        default: () => row.priority.name,
+                    }
+                );
+            }
         },
         status: {
             label: t("modules.project.components.ProjectsTable.header.columns.status"),
@@ -109,6 +137,18 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByStatus.value,
+            render: (row: Project) => {
+                return h(
+                    NTag,
+                    {
+                        bordered: false,
+                        color: getNaiveUITagColorProperty(row.status.hexColor ?? "#888888"),
+                    },
+                    {
+                        default: () => row.status.name,
+                    }
+                );
+            }
         },
         summary: {
             label: t("modules.project.components.ProjectsTable.header.columns.summary"),
@@ -116,6 +156,9 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredBySummary.value,
+            render: (row: Project) => {
+                return h("span", {}, { default: () => row.summary });
+            }
         },
         createdAt: {
             label: t("modules.project.components.ProjectsTable.header.columns.createdAt"),
@@ -123,6 +166,9 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByCreationDate.value,
+            render: (row: Project) => {
+                return h("span", {}, { default: () => row.createdAt.toCustomMaskString(userSettingsStore.currentDatetimeMask) });
+            }
         },
         createdBy: {
             label: t("modules.project.components.ProjectsTable.header.columns.createdBy"),
@@ -130,6 +176,9 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByCreator.value,
+            render: (row: Project) => {
+                return h(AvatarUserName, { userId: row.createdBy.id, userName: row.createdBy.name });
+            }
         },
     });
 
@@ -143,9 +192,7 @@
 
     const tableSettings = tableSettingsStore.get(props.id);
 
-    //const columns = computed<TableHeaderColumn[]>(() => Object.values(columnDefinitions))
-
-    const columns = computed<TableHeaderColumn[]>(() =>
+    const columns = computed<TableHeaderColumn<Project>[]>(() =>
         tableSettings.columns.map((column) => {
             const definition = columnDefinitions[column.field];
             return {
@@ -154,12 +201,14 @@
                 visible: column.visible,
                 sortable: definition.sortable,
                 isFiltered: definition.isFiltered ?? (() => false),
+                render: definition.render,
             };
         }
         )
     );
 
-    const visibleColumns = computed(() => tableSettings.columns.filter((column) => column.visible).map((column) => column.field));
+    //const visibleColumns = computed(() => tableSettings.columns.filter((column) => column.visible).map((column) => column.field));
+    const visibleColumns = computed(() => Object.values(columnDefinitions).filter((column) => column.visible));
 
     const onSort = (sort: Sort) => {
         emit("sort", sort);
@@ -200,8 +249,8 @@
 <template>
     <ProjectResumeFloatingCard v-if="showDrawer && currentProject?.id" v-model:show="showDrawer"
         :project-id="currentProject?.id" />
-    <ManageTable id="ManageProjects" size="small" :columns="columns" :current-sort="sort" @sort="onSort"
-        @refresh="onRefresh" @add="onAdd"
+    <ManageTable id="ManageProjects" size="small" :rows="items" :row-key="row => row.id ?? ''" :columns="columns"
+        :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd"
         :no-items-warning-message="t('modules.project.components.ProjectsTable.warnings.noItemsFound')"
         :show-no-items-warning-message="items.length < 1 && !props.disabled">
         <template #thead="{ columns }">
@@ -236,30 +285,8 @@
         </template>
         <template #tbody>
             <tr v-for="project, index in items" :key="project.id ?? index">
-                <td v-if="visibleColumns.includes('slug')">
-                    {{ project.slug }}
-                </td>
-                <td v-if="visibleColumns.includes('type')"><n-tag :bordered="false"
-                        :color="getNaiveUITagColorProperty(project.type.hexColor ?? '#888888')">{{
-                            project.type.name }}</n-tag>
-                </td>
-                <td v-if="visibleColumns.includes('priority')"><n-tag :bordered="false"
-                        :color="getNaiveUITagColorProperty(project.priority.hexColor ?? '#888888')">{{
-                            project.priority.name
-                        }}</n-tag></td>
-                <td v-if="visibleColumns.includes('status')"><n-tag :bordered="false"
-                        :color="getNaiveUITagColorProperty(project.status.hexColor ?? '#888888')">{{
-                            project.status.name }}</n-tag></td>
-                <td v-if="visibleColumns.includes('summary')">
-                    <router-link :to="{ name: 'projectTab', params: { projectId: project.id, tab: 'metadata' } }"
-                        class="doneo-link-text-color-default">{{
-                            project.summary
-                        }}</router-link>
-                </td>
-                <td v-if="visibleColumns.includes('createdAt')">{{
-                    project.createdAt.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</td>
-                <td v-if="visibleColumns.includes('createdBy')">
-                    <AvatarUserName :user-id="project.createdBy.id" :user-name="project.createdBy.name" />
+                <td v-for="column in visibleColumns" :key="String(column.field)">
+                    <RenderCell :field="column.field" :row="project" :render="column.render" />
                 </td>
                 <td class="doneo-text-center">
                     <!-- TODO: use ManageTableActionButtons -->

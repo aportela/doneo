@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T">
     import { ref, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
@@ -8,13 +8,16 @@
     import { Sort } from '../../types/models/sort.ts';
     import { ArrowDown, ArrowDownWideNarrow, ArrowUp, ArrowUpWideNarrow, Eye, EyeOff, Funnel, ListRestart, Plus, Settings } from '@lucide/vue';
     import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
+    import RenderCell from './RenderCell.ts';
 
-    interface ManageTableProps {
+    interface IProps {
         id: string;
         disabled?: boolean;
         size?: TableSize;
         striped?: boolean;
-        columns: TableHeaderColumn[];
+        rows: T[];
+        rowKey: (row: T) => string;
+        columns: TableHeaderColumn<T>[];
         currentSort?: Sort,
         hideRefresh?: boolean;
         hideAdd?: boolean;
@@ -25,7 +28,7 @@
 
     const emit = defineEmits(['sort', 'refresh', 'add']);
 
-    const props = withDefaults(defineProps<ManageTableProps>(), {
+    const props = withDefaults(defineProps<IProps>(), {
         disabled: false,
         hideRefresh: false,
         hideAdd: false,
@@ -36,13 +39,13 @@
 
     const tableSettingsStore = useTableSettingsStore();
 
-    const visibleColumns = computed<TableHeaderColumn[]>(() => props.columns.filter((column: TableHeaderColumn) => column.visible));
+    const visibleColumns = computed<TableHeaderColumn<T>[]>(() => props.columns.filter((column: TableHeaderColumn<T>) => column.visible));
 
     const TABLE_HEADER_ICON_SIZE = 16;
 
     const showDrawerSettings = ref(false);
 
-    const onToggleSort = (column: TableHeaderColumn) => {
+    const onToggleSort = (column: TableHeaderColumn<T>) => {
         if (!props.disabled && props.currentSort && column.sortable) {
             const newSort = new Sort(props.currentSort?.field, props.currentSort?.order);
             newSort.toggleSort(column.field);
@@ -68,7 +71,7 @@
         }
     };
 
-    const onToggleColumnVisibility = (column: TableHeaderColumn) => {
+    const onToggleColumnVisibility = (column: TableHeaderColumn<T>) => {
         tableSettingsStore.toggleVisibleColumn(props.id, column.field);
     };
 
@@ -177,7 +180,7 @@
             </tr>
             <slot name="thead" :columns="visibleColumns" />
         </thead>
-        <tbody>
+        <tbody v-if="false">
             <slot name="tbody" />
             <tr v-if="props.noItemsWarningMessage && props.showNoItemsWarningMessage">
                 <td :colspan="props.columns.length + 1">
@@ -186,6 +189,17 @@
                 </td>
             </tr>
         </tbody>
+        <tbody>
+            <tr v-for="row in props.rows" :key="props.rowKey(row)">
+                <td v-for="column in visibleColumns" :key="String(column.field)">
+                    <RenderCell :render="column.render" :row="row" />
+                </td>
+                <td class="doneo-text-center">
+                    actions
+                </td>
+            </tr>
+        </tbody>
+
         <tfoot>
             <slot name="tfoot" />
         </tfoot>
