@@ -6,6 +6,6 @@ export interface TableHeaderColumn<T> {
   visible: boolean;
   sortable?: boolean;
   align?: "left" | "right" | "center";
-  isFiltered?: () => boolean;
+  isFiltered?: () => boolean; // TODO: remove func ?
   render: (value: T) => VNodeChild;
 }
