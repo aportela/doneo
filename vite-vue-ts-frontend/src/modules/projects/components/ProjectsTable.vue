@@ -6,6 +6,7 @@
     import { IconFilePencil } from '@tabler/icons-vue';
 
     import { useUserSettingsStore } from '../../../stores/userSettings.ts';
+    import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
     import type { Sort } from '../../../shared/types/models/sort.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { ProjectsTableFilters } from '../types/projects-table-filters.ts';
@@ -32,15 +33,61 @@
         readOnly?: boolean;
         items: Project[];
         sort?: Sort;
+        id: string;
     }
 
     const { t } = useI18n();
     const userSettingsStore = useUserSettingsStore();
+    const tableSettingsStore = useTableSettingsStore();
+
     // TODO: dialog for delete ?
 
     const emit = defineEmits(['refresh', 'add', 'sort', 'statusChanged']);
 
     const props = defineProps<Props>();
+
+    tableSettingsStore.register(
+        props.id,
+        {
+            columns: [
+                {
+                    field: "slug",
+                    visible: true,
+                    sortable: true,
+                },
+                {
+                    field: "type",
+                    visible: true,
+                    sortable: true,
+                },
+                {
+                    field: "priority",
+                    visible: true,
+                    sortable: true,
+                },
+                {
+                    field: "status",
+                    visible: true,
+                    sortable: true,
+                },
+                {
+                    field: "summary",
+                    visible: true,
+                    sortable: true,
+                },
+                {
+                    field: "createdAt",
+                    visible: true,
+                    sortable: true,
+                },
+                {
+                    field: "createdBy",
+                    visible: true,
+                    sortable: true,
+                },
+            ]
+        }
+    );
 
     const createdAtFilterRef = ref<DateFilterSelectComponent | undefined>();
 
@@ -168,18 +215,25 @@
 
     const onShowColumn = (column: TableHeaderColumn) => {
         columnDefinitions[column.field].visible = true;
+        tableSettingsStore.addVisibleColumn(props.id, column.field);
     };
 
     const onHideColumn = (column: TableHeaderColumn) => {
         columnDefinitions[column.field].visible = false;
+        tableSettingsStore.removeVisibleColumn(props.id, column.field);
     };
+
+    const onMoveColumn = (field: string, direction: "up" | "down") => {
+        tableSettingsStore.moveColumn(props.id, field, direction);
+    };
+
 </script>
 
 <template>
     <ProjectResumeFloatingCard v-if="showDrawer && currentProject?.id" v-model:show="showDrawer"
         :project-id="currentProject?.id" />
     <ManageTable size="small" :columns="columns" :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd"
-        @show-column="onShowColumn" @hide-column="onHideColumn"
+        @show-column="onShowColumn" @hide-column="onHideColumn" @move-column="onMoveColumn"
         :no-items-warning-message="t('modules.project.components.ProjectsTable.warnings.noItemsFound')"
         :show-no-items-warning-message="items.length < 1 && !props.disabled">
         <template #thead="{ columns }">
