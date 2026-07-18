@@ -27,7 +27,6 @@
     import type { ProjectStatus } from '../../project-statuses/models/project-status.ts';
     import { DEFAULT_BUTTON_SIZE } from '../../../constants.ts';
     import ProjectResumeFloatingCard from './ProjectResumeFloatingCard.vue';
-    import RenderCell from '../../../shared/components/tables/RenderCell.ts';
 
     interface Props {
         disabled: boolean;
