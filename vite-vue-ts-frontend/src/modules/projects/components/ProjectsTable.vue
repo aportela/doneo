@@ -228,7 +228,9 @@
         filters.value.priorityId = null;
         filters.value.statusId = null;
         filters.value.summary = "";
-        createdAtFilterRef.value?.reset();
+        if (createdAtFilterRef.value?.reset) { // TODO: fix
+            createdAtFilterRef.value?.reset();
+        }
         filters.value.createdByUserId = null;
     };
 
@@ -246,9 +248,9 @@
     <ProjectResumeFloatingCard v-if="showDrawer && currentProject?.id" v-model:show="showDrawer"
         :project-id="currentProject?.id" />
     <ManageTable id="ManageProjects" size="small" :rows="items" :row-key="row => row.id ?? ''" :columns="columns"
-        :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd"
+        :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd" @clear-filters="onClearFilters"
         :no-items-warning-message="t('modules.project.components.ProjectsTable.warnings.noItemsFound')"
-        :show-no-items-warning-message="items.length < 1 && !props.disabled">
+        :show-no-items-warning-message="items.length < 1 && !props.disabled" pager="top">
         <template #thead-column-filters="{ columns }">
             <th v-for="column in columns">
                 <TextFilterInput v-if="column.field === 'slug'" clearable :disabled="props.disabled" size="small"

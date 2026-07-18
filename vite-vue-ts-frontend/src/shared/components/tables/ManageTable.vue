@@ -10,6 +10,7 @@
 
     import { type TableHeaderColumn } from '../../types/table-header-column';
     import { Sort } from '../../types/models/sort.ts';
+    import Pager from './Pager.vue';
     import RenderCell from './RenderCell.ts';
 
     interface IProps {
@@ -26,6 +27,7 @@
         hideSettings?: boolean;
         noItemsWarningMessage?: string;
         showNoItemsWarningMessage?: boolean;
+        pager?: "top" | "bottom" | "both";
     };
 
     const emit = defineEmits(['sort', 'refresh', 'add', 'clearFilters']);
@@ -47,6 +49,9 @@
     const hasColumnsWithFilter = computed(() => props.columns.find((column) => column.isFiltered?.() === true))
 
     const showDrawerSettings = ref(false);
+
+    const showTopPager = computed(() => props.pager === "top" || props.pager === "both");
+    const showBottomPager = computed(() => props.pager === "bottom" || props.pager === "both");
 
     const onToggleSort = (column: TableHeaderColumn<T>) => {
         if (!props.disabled && props.currentSort && column.sortable) {
@@ -136,6 +141,7 @@
             </n-collapse>
         </n-drawer-content>
     </n-drawer>
+    <Pager v-if="showTopPager" :totalResults="0" :total-pages="1" class="doneo-table-pager" />
     <n-table :size="size" :striped="striped" class="doneo-table" :single-line="false" :single-column="false">
         <thead>
             <tr>
@@ -216,10 +222,17 @@
             </tr>
         </tbody>
     </n-table>
+    <Pager v-if="showBottomPager" :totalResults="0" :total-pages="1" class="doneo-table-pager" />
 </template>
 
 <style lang="css" scoped>
     .doneo-table-header-icon {
         margin-top: 4px;
     }
+
+    .doneo-table-pager {
+        margin: 4px 0px;
+    }
+
+
 </style>
