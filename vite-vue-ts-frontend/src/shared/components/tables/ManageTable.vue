@@ -72,8 +72,8 @@
         }
     };
 
-    const onToggleColumnVisibility = (column: TableHeaderColumn<T>) => {
-        tableSettingsStore.toggleVisibleColumn(props.id, column.field);
+    const onToggleVisibleColumn = (field: string) => {
+        tableSettingsStore.toggleVisibleColumn(props.id, field);
     };
 
     const onShowAllColumns = () => {
@@ -88,7 +88,7 @@
         tableSettingsStore.toggleAllColumns(props.id);
     };
 
-    const onSortColumn = (field: string, direction: "up" | "down") => {
+    const onMoveColumn = (field: string, direction: "up" | "down") => {
         tableSettingsStore.moveColumn(props.id, field, direction);
     };
 
@@ -106,21 +106,21 @@
                     </n-button-group>
                     <p v-for="column, index in props.columns" class="doneo-cursor-pointer doneo-flex-center-align">
                         <n-button-group size="tiny" style="margin-right: 8px;">
-                            <n-button @click="onSortColumn(column.field, 'up')" :disabled="index < 1">
+                            <n-button @click="onMoveColumn(column.field, 'up')" :disabled="index < 1">
                                 <template #icon>
                                     <n-icon :component="ArrowUp" />
                                 </template>
                             </n-button>
-                            <n-button @click="onSortColumn(column.field, 'down')"
+                            <n-button @click="onMoveColumn(column.field, 'down')"
                                 :disabled="index >= props.columns.length - 1">
                                 <template #icon>
                                     <n-icon :component="ArrowDown" />
                                 </template>
                             </n-button>
-                            <n-button @click="onToggleColumnVisibility(column)">
+                            <n-button @click="onToggleVisibleColumn(column.field)">
                                 <template #icon>
                                     <n-icon :color="column.visible ? 'green' : 'red'"
-                                        :component="column.visible ? Eye : EyeOff" style="margin-right: 4px;" />
+                                        :component="column.visible ? Eye : EyeOff" />
                                 </template>
                             </n-button>
                         </n-button-group>
