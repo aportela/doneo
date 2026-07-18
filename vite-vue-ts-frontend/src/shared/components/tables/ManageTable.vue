@@ -181,17 +181,18 @@
         </thead>
         <tbody>
             <tr v-for="row in props.rows" :key="props.rowKey(row)">
+                <!-- row content -->
                 <td v-for="column in visibleColumns" :key="String(column.field)">
                     <RenderCell :render="column.render" :row="row" />
                 </td>
+                <!-- row actions -->
                 <td class="doneo-text-center">
                     <slot name="rowactions" :row="row" />
                 </td>
             </tr>
-            <tr v-if="props.noItemsWarningMessage && props.showNoItemsWarningMessage">
+            <tr v-if="rows.length == 0 && props.noItemsWarningMessage && props.showNoItemsWarningMessage">
                 <td :colspan="visibleColumns.length + 1">
-                    <n-empty :description="props.noItemsWarningMessage">
-                    </n-empty>
+                    <n-empty :description="props.noItemsWarningMessage" />
                 </td>
             </tr>
         </tbody>
