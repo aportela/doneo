@@ -184,7 +184,7 @@
                     </n-button-group>
                 </th>
             </tr>
-            <tr v-if="slots.thead">
+            <tr v-if="slots['thead-column-filters']">
                 <!-- slot for extra header column filters -->
                 <slot name="thead-column-filters" :columns="visibleColumns" />
                 <!-- clear filters button -->
