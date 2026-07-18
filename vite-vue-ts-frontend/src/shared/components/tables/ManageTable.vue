@@ -1,9 +1,10 @@
 <script setup lang="ts" generic="T">
-    import { ref, computed } from 'vue';
+    import { ref, computed, useSlots } from 'vue';
     import { useI18n } from "vue-i18n";
 
+
     import { NTable, type TableSize, NFlex, NIcon, NDrawer, NDrawerContent, NCollapse, NCollapseItem, NButton, NButtonGroup, NEmpty } from 'naive-ui';
-    import { ArrowDown, ArrowDownWideNarrow, ArrowUp, ArrowUpWideNarrow, Eye, EyeOff, Funnel, ListRestart, Plus, Settings } from '@lucide/vue';
+    import { ArrowDown, ArrowDownWideNarrow, ArrowUp, ArrowUpWideNarrow, Eye, EyeOff, Funnel, FunnelX, ListRestart, Plus, Settings } from '@lucide/vue';
 
     import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
 
@@ -27,7 +28,7 @@
         showNoItemsWarningMessage?: boolean;
     };
 
-    const emit = defineEmits(['sort', 'refresh', 'add']);
+    const emit = defineEmits(['sort', 'refresh', 'add', 'clearFilters']);
 
     const props = withDefaults(defineProps<IProps>(), {
         disabled: false,
@@ -37,10 +38,13 @@
     });
 
     const { t } = useI18n();
+    const slots = useSlots()
 
     const tableSettingsStore = useTableSettingsStore();
 
     const visibleColumns = computed<TableHeaderColumn<T>[]>(() => props.columns.filter((column: TableHeaderColumn<T>) => column.visible));
+
+    const hasColumnsWithFilter = computed(() => props.columns.find((column) => column.isFiltered?.() === true))
 
     const TABLE_HEADER_ICON_SIZE = 16;
 
@@ -70,6 +74,10 @@
         if (!props.disabled) {
             showDrawerSettings.value = true;
         }
+    };
+
+    const onClearFilters = () => {
+        emit("clearFilters");
     };
 
     const onToggleVisibleColumn = (field: string) => {
@@ -176,8 +184,21 @@
                     </n-button-group>
                 </th>
             </tr>
-            <!-- slot for extra header content (filters?) -->
-            <slot name="thead" :columns="visibleColumns" />
+            <tr v-if="slots.thead">
+                <!-- slot for extra header column filters -->
+                <slot name="thead-column-filters" :columns="visibleColumns" />
+                <!-- clear filters button -->
+                <th class="doneo-text-center">
+                    <n-button :size="props.size" block @click="onClearFilters"
+                        :disabled="props.disabled || !hasColumnsWithFilter">
+                        <template #icon>
+                            <n-icon :component="FunnelX" />
+                        </template>
+                        <!-- TODO: remove component & change label -->
+                        {{ t("shared.components.table.filters.button.clearFilters.label") }}
+                    </n-button>
+                </th>
+            </tr>
         </thead>
         <tbody>
             <tr v-for="row in props.rows" :key="props.rowKey(row)">

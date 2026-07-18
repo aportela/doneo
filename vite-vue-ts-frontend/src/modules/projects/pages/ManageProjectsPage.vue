@@ -282,6 +282,7 @@
 
 <template>
 
+    <!-- TODO close icon-->
     <n-modal v-model:show="showModal">
         <NewProjectForm class="modal-form" @add="onAdded" @cancel="onCancelForm" />
     </n-modal>
