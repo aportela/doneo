@@ -3,11 +3,12 @@
     import { useI18n } from "vue-i18n";
 
     import { NTable, type TableSize, NFlex, NIcon, NDrawer, NDrawerContent, NCollapse, NCollapseItem, NButton, NButtonGroup, NEmpty } from 'naive-ui';
+    import { ArrowDown, ArrowDownWideNarrow, ArrowUp, ArrowUpWideNarrow, Eye, EyeOff, Funnel, ListRestart, Plus, Settings } from '@lucide/vue';
+
+    import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
 
     import { type TableHeaderColumn } from '../../types/table-header-column';
     import { Sort } from '../../types/models/sort.ts';
-    import { ArrowDown, ArrowDownWideNarrow, ArrowUp, ArrowUpWideNarrow, Eye, EyeOff, Funnel, ListRestart, Plus, Settings } from '@lucide/vue';
-    import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
     import RenderCell from './RenderCell.ts';
 
     interface IProps {
@@ -91,10 +92,6 @@
         tableSettingsStore.moveColumn(props.id, field, direction);
     };
 
-    const onResetColumns = () => {
-        //emit("resetColumns");
-    }
-
 </script>
 
 <template>
@@ -106,7 +103,6 @@
                         <n-button @click="onShowAllColumns">Show all</n-button>
                         <n-button @click="onHideAllColumns">Hide all</n-button>
                         <n-button @click="onToggleAllColumns">Toggle values</n-button>
-                        <n-button @click="onResetColumns">Reset values</n-button>
                     </n-button-group>
                     <p v-for="column, index in props.columns" class="doneo-cursor-pointer doneo-flex-center-align">
                         <n-button-group size="tiny" style="margin-right: 8px;">
@@ -137,6 +133,7 @@
     <n-table :size="size" :striped="striped" class="doneo-table" :single-line="false" :single-column="false">
         <thead>
             <tr>
+                <!-- column header labels -->
                 <th v-for="column in visibleColumns" :key="column.field" @click="onToggleSort(column)"
                     :class="{ 'doneo-cursor-pointer': column.sortable }">
                     <n-flex align="center" justify="space-between">
@@ -152,6 +149,7 @@
                         </div>
                     </n-flex>
                 </th>
+                <!-- common table actions (refresh/add/settings)-->
                 <th>
                     <n-button-group class="doneo-table-actions-button-group">
                         <n-button @click="onRefresh" :disabled="props.disabled" v-if="!props.hideRefresh"
@@ -178,6 +176,7 @@
                     </n-button-group>
                 </th>
             </tr>
+            <!-- slot for extra header content (filters?) -->
             <slot name="thead" :columns="visibleColumns" />
         </thead>
         <tbody>
