@@ -46,8 +46,6 @@
 
     const hasColumnsWithFilter = computed(() => props.columns.find((column) => column.isFiltered?.() === true))
 
-    const TABLE_HEADER_ICON_SIZE = 16;
-
     const showDrawerSettings = ref(false);
 
     const onToggleSort = (column: TableHeaderColumn<T>) => {
@@ -148,9 +146,9 @@
                         <span v-if="column.align === 'center'"></span>
                         <span>{{ column.label }}</span>
                         <div>
-                            <n-icon :size="TABLE_HEADER_ICON_SIZE" :component="Funnel" class="doneo-table-header-icon"
+                            <n-icon :component="Funnel" class="doneo-table-header-icon"
                                 v-if="column.isFiltered?.() ?? false" />
-                            <n-icon :size="TABLE_HEADER_ICON_SIZE" class="doneo-table-header-icon"
+                            <n-icon class="doneo-table-header-icon"
                                 v-if="column.sortable && props.currentSort?.field === column.field"
                                 :component="props.currentSort?.order == 'DESC' ? ArrowDownWideNarrow : ArrowUpWideNarrow">
                             </n-icon>
