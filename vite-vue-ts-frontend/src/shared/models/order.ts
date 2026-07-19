@@ -17,4 +17,11 @@ export class ClientOrder implements Order {
       this.direction = this.direction === "ASC" ? "DESC" : "ASC";
     }
   };
+
+  toDTO = (): Order => {
+    return {
+      field: this.field,
+      direction: this.direction,
+    };
+  };
 }

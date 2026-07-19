@@ -2,7 +2,7 @@ import type {
   PagerRequest,
   PagerResponse,
 } from "../../../shared/types/dto/pager";
-import type { Order_OLD } from "../../../shared/types/dto/order";
+import type { Order } from "../../../shared/types/order";
 
 export type AddRequest = {
   name: string;
@@ -21,7 +21,7 @@ type SearchRequestFilter = {
 
 export type SearchRequest = {
   pager: PagerRequest;
-  order: Order_OLD;
+  order: Order;
   filter?: SearchRequestFilter;
 };
 
