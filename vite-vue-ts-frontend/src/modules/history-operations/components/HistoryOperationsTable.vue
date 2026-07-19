@@ -16,7 +16,7 @@
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
-    import type { DateFilterSelectComponent } from '../../users/components/date-filter-select-component.ts';
+    import type { DateFilterSelectComponent } from '../../../shared/components/selectors/date-filter-select-component.ts';
     import HistoryOperationSelect from '../../../shared/components/selectors/HistoryOperationSelect.vue';
 
     interface HistoryOperationsTableProps {

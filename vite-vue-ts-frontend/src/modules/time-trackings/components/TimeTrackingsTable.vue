@@ -19,7 +19,7 @@
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
 
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
-    import type { DateFilterSelectComponent } from '../../users/components/date-filter-select-component.ts';
+    import type { DateFilterSelectComponent } from '../../../shared/components/selectors/date-filter-select-component.ts';
 
     interface TimeTrackingsTableProps {
         disabled: boolean;

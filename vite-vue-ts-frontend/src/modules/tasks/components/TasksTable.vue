@@ -6,9 +6,9 @@
     import { IconFilePencil } from '@tabler/icons-vue';
 
     import { useUserSettingsStore } from '../../../stores/userSettings.ts';
-    import type { Order } from '../../../shared/types/models/sort.ts';
+    import type { Order } from '../../../shared/types/order.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
-    import type { DateFilterSelectComponent } from '../../users/components/date-filter-select-component.ts';
+    import type { DateFilterSelectComponent } from '../../../shared/components/selectors/date-filter-select-component.ts';
 
     import type { TasksTableFilters } from '../types/tasks-table-filters.ts';
     import { Task } from '../models/tasks.ts';

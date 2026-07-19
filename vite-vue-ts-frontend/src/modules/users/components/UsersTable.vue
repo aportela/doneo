@@ -17,7 +17,7 @@
     import type { Order } from '../../../shared/types/order.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import { UserPermissionFilterValue, type UserPermissionFilter } from '../types/user-admin-permission-filter';
-    import type { DateFilterSelectComponent } from './date-filter-select-component.ts';
+    import type { DateFilterSelectComponent } from '../../../shared/components/selectors/date-filter-select-component.ts';
     import { User } from '../models/user';
     import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';

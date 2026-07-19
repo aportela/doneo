@@ -20,7 +20,7 @@
 
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import { formatBytes } from '../../../shared/composables/format.ts';
-    import type { DateFilterSelectComponent } from '../../users/components/date-filter-select-component.ts';
+    import type { DateFilterSelectComponent } from '../../../shared/components/selectors/date-filter-select-component.ts';
 
 
 

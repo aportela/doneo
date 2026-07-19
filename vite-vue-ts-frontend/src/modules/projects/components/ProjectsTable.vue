@@ -10,7 +10,7 @@
     import type { Order } from '../../../shared/types/order.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { ProjectsTableFilters } from '../types/projects-table-filters.ts';
-    import type { DateFilterSelectComponent } from '../../users/components/date-filter-select-component.ts';
+    import type { DateFilterSelectComponent } from '../../../shared/components/selectors/date-filter-select-component.ts';
     import { Project } from '../models/project';
 
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
