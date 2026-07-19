@@ -13,21 +13,30 @@
     import Pager from './Pager.vue';
     import RenderCell from './RenderCell.ts';
 
+
     interface IProps {
         id: string;
         disabled?: boolean;
         size?: TableSize;
         striped?: boolean;
+        columns: TableHeaderColumn<T>[];
         rows: T[];
         rowKey: (row: T) => string;
-        columns: TableHeaderColumn<T>[];
         currentSort?: Sort,
+
+        pagination?: {
+            currentPageIndex: number;
+            totalPages: number;
+            totalResults: number;
+        },
+        pagerPosition?: "top" | "bottom" | "both";
+
         hideRefresh?: boolean;
         hideAdd?: boolean;
         hideSettings?: boolean;
+
         noItemsWarningMessage?: string;
         showNoItemsWarningMessage?: boolean;
-        pagerPosition?: "top" | "bottom" | "both";
     };
 
     const emit = defineEmits(['sort', 'refresh', 'add', 'clearFilters']);
