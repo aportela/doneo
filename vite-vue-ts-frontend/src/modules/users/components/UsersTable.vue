@@ -33,33 +33,63 @@
     import type { TimestampRange } from '../../../shared/composables/timestamps.ts';
     import type { SearchRequest, UserResponse } from '../types/dto.ts';
     import UserForm from './UserForm.vue';
-    import { sortAndDeduplicateDiagnostics } from 'typescript';
 
     interface Props {
         id?: string;
-        //disabled: boolean;
     }
-
-    const { t } = useI18n();
-    const loadingStore = useLoadingStore();
-    const sessionStore = useSessionStore();
-    const dialog = useDialog();
-    const userSettingsStore = useUserSettingsStore();
-    const tableSettingsStore = useTableSettingsStore();
-    const cacheStore = useCacheStore();
-    const { notify } = useNotify();
-
-    //const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'undelete', 'sort']);
 
     const props = withDefaults(defineProps<Props>(), { id: "UsersTable" });;
 
+    const { t } = useI18n();
+    const dialog = useDialog();
+    const { notify } = useNotify();
+
+    const loadingStore = useLoadingStore();
+    const sessionStore = useSessionStore();
+    const userSettingsStore = useUserSettingsStore();
+    const tableSettingsStore = useTableSettingsStore();
+    const cacheStore = useCacheStore();
+
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
+    watch(
+        () => state.ajaxRunning,
+        (ajaxRunning) => {
+            loadingStore.set(ajaxRunning);
+        }
+    );
+
     const items = shallowRef<User[]>([]);
-    const selectedItem = ref<User>(new User());
+    const tmpUser = ref<User>(new User());
 
     const order = reactive<Order>({ field: "name", direction: "ASC" });
+
+    const onSort = (newOrder: Order) => {
+        order.field = newOrder.field;
+        order.direction = newOrder.direction;
+        onRefresh();
+    };
+
+
     const pagination = reactive<Pagination>({ currentPage: 1, resultsPage: PAGER_DEFAULT_RESULTS_PAGE, totalPages: 1, totalResults: 0 });
+    const resetPager = ref<boolean>(false);
+
+    watch(
+        () => pagination.resultsPage,
+        () => {
+            if (pagination.currentPage !== 1) {
+                resetPager.value = true;
+            } else {
+                onRefresh();
+            }
+        }
+    );
+
+    const onPagerChanged = (newPagination: Pagination) => {
+        pagination.currentPage = newPagination.currentPage;
+        pagination.resultsPage = newPagination.resultsPage;
+        onRefresh();
+    };
 
     const createdAtFilterRef = ref<DateFilterSelectComponent | undefined>();
     const updatedAtFilterRef = ref<DateFilterSelectComponent | undefined>();
@@ -94,12 +124,30 @@
         }
     );
 
+    watch(
+        filters,
+        () => {
+            resetPager.value = true;
+        },
+        { deep: true }
+    );
+
+
     const isFilteredByPermissions = computed<boolean>(() => filters.permissions != UserPermissionFilterValue.Any);
     const isFilteredByName = computed<boolean>(() => filters.name.length > 0);
     const isFilteredByEmail = computed<boolean>(() => filters.email.length > 0);
     const isFilteredByCreatedAt = computed<boolean>(() => filters.createdAt.from != null || filters.createdAt.to != null);
     const isFilteredByUpdatedAt = computed<boolean>(() => filters.updatedAt.from != null || filters.updatedAt.to != null);
     const isFilteredByDeletedAt = computed<boolean>(() => filters.deletedAt.from != null || filters.deletedAt.to != null);
+
+    const onClearFilters = () => {
+        filters.permissions = UserPermissionFilterValue.Any;
+        filters.name = "";
+        filters.email = "";
+        createdAtFilterRef.value?.reset();
+        updatedAtFilterRef.value?.reset();
+        deletedAtFilterRef.value?.reset();
+    };
 
     const columnDefinitions = reactive<TableHeaderColumn<User>[]>([
         {
@@ -115,21 +163,24 @@
                         class: "doneo-flex-center-align",
                     },
                     [
-                        h(NIcon, {
-                            size: 16,
-                            style: {
-                                marginRight: "6px",
-                            },
-                            component: row.permissions?.isSuperUser ? IconUserKey : IconUser,
-                            color: row.permissions?.isSuperUser ? "red" : undefined,
-                        }),
+                        h(
+                            NIcon,
+                            {
+                                size: 16,
+                                style: {
+                                    marginRight: "6px",
+                                },
+                                component: row.permissions?.isSuperUser ? IconUserKey : IconUser,
+                                color: row.permissions?.isSuperUser ? "red" : undefined,
+                            }
+                        ),
                         t(
                             row.permissions?.isSuperUser
                                 ? "modules.user.components.UsersTable.body.columns.permissions.administrator"
                                 : "modules.user.components.UsersTable.body.columns.permissions.user"
                         ),
                     ]
-                )
+                );
             }
         },
         {
@@ -139,10 +190,13 @@
             sortable: true,
             isFiltered: () => isFilteredByName.value,
             render: (row: User) => {
-                return h(AvatarUserName, {
-                    userId: row.id,
-                    userName: row.name,
-                })
+                return h(
+                    AvatarUserName,
+                    {
+                        userId: row.id,
+                        userName: row.name
+                    }
+                );
             }
         },
         {
@@ -168,7 +222,14 @@
             sortable: true,
             isFiltered: () => isFilteredByCreatedAt.value,
             render: (row: User) => {
-                return h("span", {}, { default: () => row.createdAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) });
+                return h(
+                    "span",
+                    {},
+                    {
+                        default: () => row.createdAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask)
+
+                    }
+                );
             }
         },
         {
@@ -178,7 +239,13 @@
             sortable: true,
             isFiltered: () => isFilteredByUpdatedAt.value,
             render: (row: User) => {
-                return h("span", {}, { default: () => row.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) });
+                return h(
+                    "span",
+                    {},
+                    {
+                        default: () => row.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask)
+                    }
+                );
             }
         },
         {
@@ -188,7 +255,13 @@
             sortable: true,
             isFiltered: () => isFilteredByDeletedAt.value,
             render: (row: User) => {
-                return h("span", {}, { default: () => row.deletedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) });
+                return h(
+                    "span",
+                    {},
+                    {
+                        default: () => row.deletedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask)
+                    }
+                );
             }
         },
     ]);
@@ -214,66 +287,43 @@
         })
     );
 
-    watch(state, (newValue: AjaxStateInterface) => {
-        loadingStore.set(newValue.ajaxRunning);
-    });
-
-    /*
-    const onSort = (sort: Order) => {
-        emit("sort", sort);
-    };
-
-    const onAdd = () => {
-        emit("add");
-    };
-
-    const onUpdate = (user: User, index: number) => {
-        emit("update", user, index);
-    };
-    */
-
     const onDelete = async (user: User) => {
-        if (user.id) {
-            Object.assign(state, defaultAjaxStateRunning);
-            try {
-                await userService.delete(user.id);
-                cacheStore.clearUsersCache();
-                // TODO: move i18n
-                notify('success', t("modules.user.components.ManageUsersPage.notifications.userDeleted", { name: user.name }));
-                onRefresh();
-            } catch (error: unknown) {
-                state.ajaxErrors = true;
-                handleAPIError(error,
-                    (apiError) => {
-                        switch (apiError.response?.status) {
-                            case 401:
-                                state.ajaxErrors = false;
-                                selectedItem.value = user;
-                                appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onDelete" } });
-                                break;
-                            case 403:
-                                state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
-                                break;
-                            case 404:
-                                state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.notFoundError");
-                                break;
-                            default:
-                                state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.deleteError");
-                                break;
-                        }
-                    },
-                    (fatalError) => {
-                        state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.deleteError");
-                        console.error("Unhandled API error", { file: "ManageUsersPage.vue", method: "onRefresh" }, { err: fatalError });
-                    });
-            } finally {
-                state.ajaxRunning = false;
-                if (state.ajaxErrorMessage) {
-                    appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
-                }
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            await userService.delete(user.id);
+            cacheStore.clearUsersCache();
+            notify('success', t("modules.user.components.UsersTable.notifications.userDeleted", { name: user.name }));
+            onRefresh();
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            tmpUser.value = user;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onDelete" } });
+                            break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
+                            break;
+                        case 404:
+                            state.ajaxErrorMessage = t("modules.user.components.UsersTable.errors.notFoundError");
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.user.components.UsersTable.errors.deleteError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.user.components.UsersTable.errors.deleteError");
+                    console.error("Unhandled API error", { file: "ManageUsersPage.vue", method: "onRefresh" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
             }
-        } else {
-            console.error("user id not set", { file: "ManageUsersPage.vue", method: "onDelete" });
         }
     };
 
@@ -297,46 +347,42 @@
     };
 
     const onUnDelete = async (user: User) => {
-        if (user.id) {
-            Object.assign(state, defaultAjaxStateRunning);
-            try {
-                await userService.unDelete(user.id);
-                cacheStore.clearUsersCache();
-                notify('success', t("modules.user.components.ManageUsersPage.notifications.userRestored", { name: user.name }));
-                onRefresh();
-            } catch (error: unknown) {
-                state.ajaxErrors = true;
-                handleAPIError(error,
-                    (apiError) => {
-                        switch (apiError.response?.status) {
-                            case 401:
-                                state.ajaxErrors = false;
-                                selectedItem.value = user;
-                                appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onUnDelete" } });
-                                break;
-                            case 403:
-                                state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
-                                break;
-                            case 404:
-                                state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.notFoundError");
-                                break;
-                            default:
-                                state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.restoreError");
-                                break;
-                        }
-                    },
-                    (fatalError) => {
-                        state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.restoreError");
-                        console.error("Unhandled API error", { file: "ManageUsersPage.vue", method: "onUnDelete" }, { err: fatalError });
-                    });
-            } finally {
-                state.ajaxRunning = false;
-                if (state.ajaxErrorMessage) {
-                    appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
-                }
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            await userService.unDelete(user.id);
+            cacheStore.clearUsersCache();
+            notify('success', t("modules.user.components.UsersTable.notifications.userRestored", { name: user.name }));
+            onRefresh();
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            tmpUser.value = user;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onUnDelete" } });
+                            break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
+                            break;
+                        case 404:
+                            state.ajaxErrorMessage = t("modules.user.components.UsersTable.errors.notFoundError");
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.user.components.UsersTable.errors.restoreError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.user.components.UsersTable.errors.restoreError");
+                    console.error("Unhandled API error", { file: "ManageUsersPage.vue", method: "onUnDelete" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
             }
-        } else {
-            console.error("user id not set", { file: "ManageUsersPage.vue", method: "onUnDelete" });
         }
     };
 
@@ -358,29 +404,6 @@
             },
         })
     };
-
-    const onClearFilters = () => {
-        filters.permissions = UserPermissionFilterValue.Any;
-        filters.name = "";
-        filters.email = "";
-        createdAtFilterRef.value?.reset();
-        updatedAtFilterRef.value?.reset();
-        deletedAtFilterRef.value?.reset();
-    };
-
-    const onPagerChanged = (newPagination: Pagination) => {
-        pagination.currentPage = newPagination.currentPage;
-        pagination.resultsPage = newPagination.resultsPage;
-        onRefresh();
-    };
-
-    const onSort = (newOrder: Order) => {
-        order.field = newOrder.field;
-        order.direction = newOrder.direction;
-        onRefresh();
-    };
-
-    const resetPager = ref<boolean>(false);
 
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
@@ -425,12 +448,12 @@
                             state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
                             break;
                         default:
-                            state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.refreshError");
+                            state.ajaxErrorMessage = t("modules.user.components.UsersTable.errors.refreshError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.refreshError");
+                    state.ajaxErrorMessage = t("modules.user.components.UsersTable.errors.refreshError");
                     console.error("Unhandled API error", { file: "ManageUsersPage.vue", method: "onRefresh" }, { err: fatalError });
                 });
         }
@@ -445,34 +468,34 @@
     const showUserFormModal = ref<boolean>(false);
 
     const onAdd = () => {
-        selectedItem.value = new User();
+        tmpUser.value = new User();
         showUserFormModal.value = true;
     };
 
     const onUpdate = (user: User) => {
-        selectedItem.value = user;
+        tmpUser.value = user;
         showUserFormModal.value = true;
     };
 
     const onUserAdded = (user: UserResponse) => {
         cacheStore.clearUsersCache();
         showUserFormModal.value = false;
-        // TODO: move i18n label
-        notify('success', t("modules.user.components.ManageUsersPage.notifications.userAdded", { name: user.name }));
+        tmpUser.value = new User();
+        notify('success', t("modules.user.components.UsersTable.notifications.userAdded", { name: user.name }));
         onRefresh();
     };
 
     const onUserUpdated = (user: UserResponse) => {
         cacheStore.clearUsersCache();
         showUserFormModal.value = false;
-        // TODO: move i18n label
-        notify('success', t("modules.user.components.ManageUsersPage.notifications.userUpdated", { name: user.name }));
+        tmpUser.value = new User();
+        notify('success', t("modules.user.components.UsersTable.notifications.userUpdated", { name: user.name }));
         onRefresh();
     };
 
     const hideUserForm = () => {
         showUserFormModal.value = false;
-        selectedItem.value = new User();
+        tmpUser.value = new User();
     };
 
     let stopBusReauthListener: () => void;
@@ -483,9 +506,9 @@
             if (payload.to.includes("ManageUsersPage.onRefresh")) {
                 onRefresh();
             } else if (payload.to.includes("ManageUsersPage.onDelete")) {
-                //onDelete(selectedItem.value)
+                onDelete(tmpUser.value);
             } else if (payload.to.includes("ManageUsersPage.onUnDelete")) {
-                //onUnDelete(selectedItem.value);
+                onUnDelete(tmpUser.value);
             }
         });
     });
@@ -497,10 +520,10 @@
 
 <template>
     <n-modal v-model:show="showUserFormModal" v-if="showUserFormModal">
-        <UserForm class="user-form" :user-id="selectedItem?.id" @add="onUserAdded" @update="onUserUpdated"
+        <UserForm class="user-form" :user-id="tmpUser.id" @add="onUserAdded" @update="onUserUpdated"
             @cancel="hideUserForm" />
     </n-modal>
-    <n-card :title="t('modules.user.components.ManageUsersPage.header.title')">
+    <n-card :title="t('modules.user.components.UsersTable.header.title')">
         <ManageTable size="small" :disabled="state.ajaxRunning" :rows="items" :row-key="row => row.id"
             :columns="columns" :order="order" :pager-data="pagination" pager-position="both" @sort="onSort"
             @refresh="onRefresh" @add="onAdd" @pager-changed="onPagerChanged">

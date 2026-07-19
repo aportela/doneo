@@ -9,7 +9,7 @@
     import { User, MAX_NAME_LENGTH, MAX_EMAIL_LENGTH, MIN_PASSWORD_LENGTH } from '../models/user';
     import { userService } from '../services/user'
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import type { UserResponse, AddRequest, UpdateRequest } from '../types/dto';
+    import type { UserResponse } from '../types/dto';
     import { isValidEmail } from '../../../shared/composables/form-validators';
     import { appBus } from '../../../shared/composables/bus';
 
@@ -368,7 +368,7 @@
                 </n-input>
                 <n-button v-else @click="onShowPasswordFormItem" block :disabled="state.ajaxRunning">{{
                     t("modules.user.components.UserForm.buttons.changePassword.label")
-                    }}</n-button>
+                }}</n-button>
             </n-form-item>
             <n-form-item :label="t('modules.user.components.UserForm.radios.permissions.label')">
                 <n-radio-group v-model:value="user.permissions.isSuperUser" name="radiogroup">

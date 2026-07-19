@@ -557,29 +557,9 @@ export default {
             updateError: "There was a problem while updating the user data",
           },
         },
-        ManageUsersPage: {
-          header: {
-            title: "Manage users",
-          },
-          pager: {
-            totalItemsLabel: "Total users: {total}",
-          },
-          notifications: {
-            userAdded: 'User "{name}" has been added',
-            userUpdated: 'User "{name}" has been updated',
-            userDeleted: 'User "{name}" has been deleted',
-            userRestored: 'User "{name}" has been restored',
-          },
-          errors: {
-            refreshError: "There was a problem while refreshing the user list",
-            deleteError: "There was a problem while deleting the user",
-            restoreError: "There was a problem while restoring the user",
-            // TODO: deduplicate
-            notFoundError: "We couldn’t find the specified user",
-          },
-        },
         UsersTable: {
           header: {
+            title: "Manage users",
             columns: {
               permissions: "Permissions",
               name: "Name",
@@ -619,6 +599,19 @@ export default {
           },
           warnings: {
             noItemsFound: "No users found",
+          },
+          errors: {
+            refreshError: "There was a problem while refreshing the user list",
+            deleteError: "There was a problem while deleting the user",
+            restoreError: "There was a problem while restoring the user",
+            // TODO: deduplicate
+            notFoundError: "We couldn’t find the specified user",
+          },
+          notifications: {
+            userAdded: 'User "{name}" has been added',
+            userUpdated: 'User "{name}" has been updated',
+            userDeleted: 'User "{name}" has been deleted',
+            userRestored: 'User "{name}" has been restored',
           },
         },
         UserPermissionsFilterSelector: {
