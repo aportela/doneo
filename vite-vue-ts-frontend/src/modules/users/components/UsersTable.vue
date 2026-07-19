@@ -70,7 +70,6 @@
         onRefresh();
     };
 
-
     const pagination = reactive<Pagination>({ currentPage: 1, resultsPage: PAGER_DEFAULT_RESULTS_PAGE, totalPages: 1, totalResults: 0 });
     const resetPager = ref<boolean>(false);
 
@@ -91,9 +90,9 @@
         onRefresh();
     };
 
-    const createdAtFilterRef = ref<DateFilterSelectComponent | undefined>();
-    const updatedAtFilterRef = ref<DateFilterSelectComponent | undefined>();
-    const deletedAtFilterRef = ref<DateFilterSelectComponent | undefined>();
+    const createdAtFilterRef = ref<InstanceType<typeof DateFilterSelect>[] | null>(null);
+    const updatedAtFilterRef = ref<InstanceType<typeof DateFilterSelect>[] | null>(null);
+    const deletedAtFilterRef = ref<InstanceType<typeof DateFilterSelect>[] | null>(null);
 
     interface UsersTableFilters {
         permissions: UserPermissionFilter;
@@ -144,9 +143,15 @@
         filters.permissions = UserPermissionFilterValue.Any;
         filters.name = "";
         filters.email = "";
-        createdAtFilterRef.value?.reset();
-        updatedAtFilterRef.value?.reset();
-        deletedAtFilterRef.value?.reset();
+        if (createdAtFilterRef.value) {
+            createdAtFilterRef.value[0]?.reset();
+        }
+        if (updatedAtFilterRef.value) {
+            updatedAtFilterRef.value[0].reset();
+        }
+        if (deletedAtFilterRef.value) {
+            deletedAtFilterRef.value[0]?.reset();
+        }
     };
 
     const columnDefinitions = reactive<TableHeaderColumn<User>[]>([
@@ -526,7 +531,7 @@
     <n-card :title="t('modules.user.components.UsersTable.header.title')">
         <ManageTable size="small" :disabled="state.ajaxRunning" :rows="items" :row-key="row => row.id"
             :columns="columns" :order="order" :pager-data="pagination" pager-position="both" @sort="onSort"
-            @refresh="onRefresh" @add="onAdd" @pager-changed="onPagerChanged">
+            @refresh="onRefresh" @add="onAdd" @pager-changed="onPagerChanged" @clear-filters="onClearFilters">
             <template #thead-column-filters="{ columns }">
                 <th v-for="column in columns">
                     <UserPermissionsFilterSelector v-if="column.field === 'permissions'" size="small"
