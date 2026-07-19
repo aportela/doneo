@@ -39,16 +39,38 @@
         buttons: () => ["refresh", "add", "settings"],
     });
 
-    const emit = defineEmits(['paginationChanged', 'sort', 'refresh', 'add', 'clearFilters', 'pagerChanged', 'toggleVisibleColumn', 'showAllColumns', 'hideAllColumns', 'toggleAllColumns', 'moveColumn']);
+    const emit = defineEmits(['pagerChanged', 'sort', 'refresh', 'add', 'clearFilters', 'toggleVisibleColumn', 'showAllColumns', 'hideAllColumns', 'toggleAllColumns', 'moveColumn']);
 
     const { t } = useI18n();
     const slots = useSlots()
 
+    const showSettingsDrawer = ref(false);
+
     const visibleColumns = computed<TableHeaderColumn<T>[]>(() => props.columns.filter((column: TableHeaderColumn<T>) => column.visible));
 
-    const hasColumnsWithFilter = computed(() => props.columns.find((column) => column.isFiltered?.() === true))
+    const isFiltered = computed(() => props.columns.find((column) => column.isFiltered?.() === true));
 
-    const showDrawerSettings = ref(false);
+    const currentPage = computed<number>({
+        get() {
+            return (props.pagerData?.currentPage ?? 1);
+        },
+        set(value: number) {
+            if (props.pagerData) {
+                emit("pagerChanged", { ...props.pagerData, currentPage: value });
+            }
+        },
+    });
+
+    const resultsPage = computed<number>({
+        get() {
+            return (props.pagerData?.resultsPage ?? PAGER_DEFAULT_RESULTS_PAGE);
+        },
+        set(value: number) {
+            if (props.pagerData) {
+                emit("pagerChanged", { ...props.pagerData, resultsPage: value });
+            }
+        },
+    });
 
     const onToggleSort = (column: TableHeaderColumn<T>) => {
         if (!props.disabled && props.order && column.sortable) {
@@ -74,7 +96,7 @@
 
     const onSettings = () => {
         if (!props.disabled) {
-            showDrawerSettings.value = true;
+            showSettingsDrawer.value = true;
         }
     };
 
@@ -94,6 +116,7 @@
         emit("hideAllColumns");
 
     };
+
     const onToggleAllColumns = () => {
         emit("toggleAllColumns");
     };
@@ -101,40 +124,23 @@
     const onMoveColumn = (field: string, direction: "up" | "down") => {
         emit("moveColumn", { field: field, direction: direction });
     };
-
-    const currentPage = computed<number>({
-        get() {
-            return (props.pagerData?.currentPage ?? 1);
-        },
-        set(value: number) {
-            if (props.pagerData) {
-                emit("pagerChanged", { ...props.pagerData, currentPage: value });
-            }
-        },
-    });
-
-    const resultsPage = computed<number>({
-        get() {
-            return (props.pagerData?.resultsPage ?? PAGER_DEFAULT_RESULTS_PAGE);
-        },
-        set(value: number) {
-            if (props.pagerData) {
-                emit("pagerChanged", { ...props.pagerData, resultsPage: value });
-            }
-        },
-    });
-
 </script>
 
 <template>
-    <n-drawer v-model:show="showDrawerSettings" placement="right">
-        <n-drawer-content title="Table settings">
+    <n-drawer v-model:show="showSettingsDrawer" placement="right">
+        <n-drawer-content :title="t('shared.components.tables.ManageTable.components.settingsDrawer.title')">
             <n-collapse accordion default-expanded-names="columnVisibility">
                 <n-collapse-item title="Column settings" key="columnVisibility">
                     <n-button-group size="tiny">
-                        <n-button @click="onShowAllColumns">Show all</n-button>
-                        <n-button @click="onHideAllColumns">Hide all</n-button>
-                        <n-button @click="onToggleAllColumns">Toggle values</n-button>
+                        <n-button @click="onShowAllColumns">{{
+                            t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.showAllColumns.label")
+                        }}</n-button>
+                        <n-button @click="onHideAllColumns">{{
+                            t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.HideAllColumns.label")
+                            }}</n-button>
+                        <n-button @click="onToggleAllColumns">{{
+                            t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.ToggleColumns.label")
+                        }}</n-button>
                     </n-button-group>
                     <p v-for="column, index in props.columns" class="doneo-cursor-pointer doneo-flex-center-align">
                         <n-button-group size="tiny" style="margin-right: 8px;">
@@ -192,21 +198,21 @@
                             <template #icon>
                                 <n-icon :component="ListRestart" />
                             </template>
-                            {{ t("shared.buttons.Refresh.label") }}
+                            {{ t("shared.components.tables.ManageTable.components.buttons.refresh.label") }}
                         </n-button>
                         <n-button @click="onAdd" :disabled="props.disabled" v-if="props.buttons.includes('add')"
                             class="doneo-table-actions-button">
                             <template #icon>
                                 <n-icon :component="Plus" />
                             </template>
-                            {{ t("shared.buttons.Add.label") }}
+                            {{ t("shared.components.tables.ManageTable.components.buttons.add.label") }}
                         </n-button>
                         <n-button @click="onSettings" :disabled="props.disabled"
                             v-if="props.buttons.includes('settings')" class="doneo-table-actions-button">
                             <template #icon>
                                 <n-icon :component="Settings" />
                             </template>
-                            {{ t("shared.buttons.Settings.label") }}
+                            {{ t("shared.components.tables.ManageTable.components.buttons.settings.label") }}
                         </n-button>
                     </n-button-group>
                 </th>
@@ -217,12 +223,12 @@
                 <!-- clear filters button -->
                 <th class="doneo-text-center">
                     <n-button :size="props.size" block @click="onClearFilters"
-                        :disabled="props.disabled || !hasColumnsWithFilter">
+                        :disabled="props.disabled || !isFiltered">
                         <template #icon>
                             <n-icon :component="FunnelX" />
                         </template>
                         <!-- TODO: remove component & change label -->
-                        {{ t("shared.components.table.filters.button.clearFilters.label") }}
+                        {{ t("shared.components.tables.ManageTable.components.buttons.clearFilters.label") }}
                     </n-button>
                 </th>
             </tr>

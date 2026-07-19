@@ -210,20 +210,6 @@ export default {
           placeholder: "Select date and time",
         },
       },
-      table: {
-        header: {
-          columns: {
-            actions: "Actions",
-          },
-        },
-        filters: {
-          button: {
-            clearFilters: {
-              label: "Clear filters",
-            },
-          },
-        },
-      },
       pager: {
         selector: {
           options: {
@@ -376,6 +362,45 @@ export default {
             switchSidebarNavigation: "Sidebar navigation",
             profile: "Profile",
             signOut: "Logout",
+          },
+        },
+      },
+      tables: {
+        ManageTable: {
+          components: {
+            settingsDrawer: {
+              title: "Table settings",
+              buttons: {
+                showAllColumns: {
+                  label: "Show all",
+                },
+                HideAllColumns: {
+                  label: "Hide all",
+                },
+                ToggleColumns: {
+                  label: "Toggle all",
+                },
+              },
+            },
+            header: {
+              columns: {
+                actions: "Actions",
+              },
+            },
+            buttons: {
+              refresh: {
+                label: "Refresh",
+              },
+              add: {
+                label: "Add",
+              },
+              settings: {
+                label: "Settings",
+              },
+              clearFilters: {
+                label: "Clear filters",
+              },
+            },
           },
         },
       },
