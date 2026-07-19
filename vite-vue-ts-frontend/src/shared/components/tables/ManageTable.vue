@@ -27,7 +27,7 @@
         hideSettings?: boolean;
         noItemsWarningMessage?: string;
         showNoItemsWarningMessage?: boolean;
-        pager?: "top" | "bottom" | "both";
+        pagerPosition?: "top" | "bottom" | "both";
     };
 
     const emit = defineEmits(['sort', 'refresh', 'add', 'clearFilters']);
@@ -44,14 +44,18 @@
 
     const tableSettingsStore = useTableSettingsStore();
 
+    const isPaginationEnabled = computed<boolean>(() => tableSettingsStore.tables[props.id]?.pagination.enabled ?? true)
+    const currentPageIndex = computed(() => tableSettingsStore.tables[props.id]?.pagination.page ?? 1);
+    const currentPageSize = computed(() => tableSettingsStore.tables[props.id]?.pagination.pageSize ?? 1);
+
     const visibleColumns = computed<TableHeaderColumn<T>[]>(() => props.columns.filter((column: TableHeaderColumn<T>) => column.visible));
 
     const hasColumnsWithFilter = computed(() => props.columns.find((column) => column.isFiltered?.() === true))
 
     const showDrawerSettings = ref(false);
 
-    const showTopPager = computed(() => props.pager === "top" || props.pager === "both");
-    const showBottomPager = computed(() => props.pager === "bottom" || props.pager === "both");
+    const showTopPager = computed(() => isPaginationEnabled.value && props.pagerPosition === "top" || props.pagerPosition === "both");
+    const showBottomPager = computed(() => isPaginationEnabled.value && props.pagerPosition === "bottom" || props.pagerPosition === "both");
 
     const onToggleSort = (column: TableHeaderColumn<T>) => {
         if (!props.disabled && props.currentSort && column.sortable) {
@@ -141,7 +145,8 @@
             </n-collapse>
         </n-drawer-content>
     </n-drawer>
-    <Pager v-if="showTopPager" :totalResults="0" :total-pages="1" class="doneo-table-pager" />
+    <Pager v-if="showTopPager" v-model:page-size="currentPageSize" v-model:current-page="currentPageIndex"
+        :total-results="0" :total-pages="1" class="doneo-table-pager" />
     <n-table :size="size" :striped="striped" class="doneo-table" :single-line="false" :single-column="false">
         <thead>
             <tr>
