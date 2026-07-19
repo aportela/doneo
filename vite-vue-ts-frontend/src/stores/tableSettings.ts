@@ -14,6 +14,7 @@ export interface TableConfig {
   columns: TableColumnConfig[];
   filters?: Record<string, unknown>;
   pagination: {
+    active: boolean;
     page: number;
     pageSize: number;
   };
@@ -34,6 +35,7 @@ function createDefaultTableConfig(): TableConfig {
     columns: [],
     filters: {},
     pagination: {
+      active: true,
       page: 1,
       pageSize: 16,
     },
@@ -93,6 +95,17 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
       table.sorting = {
         ...table.sorting,
         ...sorting,
+      };
+    },
+
+    setPagination(
+      tableId: string,
+      pagination: Partial<TableConfig["pagination"]>,
+    ) {
+      const table = this.ensure(tableId);
+      table.pagination = {
+        ...table.pagination,
+        ...pagination,
       };
     },
 
