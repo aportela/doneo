@@ -144,7 +144,7 @@ func (repository *projectStatusRepository) Search(ctx context.Context, dbExecuto
 		field = "PS.item_index"
 	}
 	var sort string
-	switch order.Sort {
+	switch order.Direction {
 	case "DESC":
 		sort = "DESC"
 	case "ASC":

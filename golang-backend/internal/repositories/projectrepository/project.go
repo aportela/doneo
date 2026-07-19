@@ -328,7 +328,7 @@ func (repository *projectRepository) Search(ctx context.Context, dbExecutor data
 		field = "P.slug COLLATE NOCASE"
 	}
 	var sort string
-	switch order.Sort {
+	switch order.Direction {
 	case "DESC":
 		sort = "DESC"
 	case "ASC":

@@ -169,8 +169,8 @@ func (handler *projectHandler) Search(w http.ResponseWriter, r *http.Request) {
 			ResultsPage: request.Pager.ResultsPage,
 		},
 		browser.Order{
-			Field: request.Order.Field,
-			Sort:  string(request.Order.Sort),
+			Field:     request.Order.Field,
+			Direction: string(request.Order.Direction),
 		},
 		filter,
 	)

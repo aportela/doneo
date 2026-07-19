@@ -16,18 +16,18 @@ type PagerResponse struct {
 	TotalResults int  `json:"totalResults"`
 }
 
+type OrderDirection string
+
 const (
-	SortAsc  SortOrder = "ASC"
-	SortDesc SortOrder = "DESC"
+	OrderDirectionAsc  OrderDirection = "ASC"
+	OrderDirectionDesc OrderDirection = "DESC"
 )
 
-type SortOrder string
-
-func (o SortOrder) IsValid() bool {
-	return o == SortAsc || o == SortDesc
+func (o OrderDirection) IsValid() bool {
+	return o == OrderDirectionAsc || o == OrderDirectionDesc
 }
 
 type OrderRequest struct {
-	Field string    `json:"field"`
-	Sort  SortOrder `json:"sort"`
+	Field     string         `json:"field"`
+	Direction OrderDirection `json:"direction"`
 }

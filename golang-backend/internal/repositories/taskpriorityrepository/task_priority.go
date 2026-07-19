@@ -140,7 +140,7 @@ func (repository *taskPriorityRepository) Search(ctx context.Context, dbExecutor
 		field = "TP.name COLLATE NOCASE"
 	}
 	var sort string
-	switch order.Sort {
+	switch order.Direction {
 	case "DESC":
 		sort = "DESC"
 	case "ASC":

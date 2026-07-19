@@ -167,7 +167,7 @@ func (repository *roleRepository) Search(ctx context.Context, dbExecutor databas
 		field = "R.name COLLATE NOCASE"
 	}
 	var sort string
-	switch order.Sort {
+	switch order.Direction {
 	case "DESC":
 		sort = "DESC"
 	case "ASC":

@@ -143,7 +143,7 @@ func (repository *taskStatusRepository) Search(ctx context.Context, dbExecutor d
 		field = "TS.item_index"
 	}
 	var sort string
-	switch order.Sort {
+	switch order.Direction {
 	case "DESC":
 		sort = "DESC"
 	case "ASC":

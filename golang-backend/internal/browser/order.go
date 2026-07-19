@@ -1,14 +1,14 @@
 package browser
 
 type Order struct {
-	Field string
-	Sort  string
+	Field     string
+	Direction string
 }
 
 func (p Order) hasAscendingSort() bool {
-	return p.Sort == "ASC"
+	return p.Direction == "ASC"
 }
 
 func (p Order) hasDescendingSort() bool {
-	return p.Sort == "DESC"
+	return p.Direction == "DESC"
 }
