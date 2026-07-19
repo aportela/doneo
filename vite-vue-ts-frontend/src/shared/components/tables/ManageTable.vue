@@ -170,8 +170,8 @@
         </n-drawer-content>
     </n-drawer>
     <Pager class="doneo-table-pager" v-if="props.pagerData && (pagerPosition === 'top' || pagerPosition === 'both')"
-        :total-results="props.pagerData.totalResults" :total-pages="props.pagerData.totalPages"
-        v-model:current-page="currentPage" v-model:page-size="resultsPage" />
+        :disabled="props.disabled" :total-results="props.pagerData.totalResults"
+        :total-pages="props.pagerData.totalPages" v-model:current-page="currentPage" v-model:page-size="resultsPage" />
     <n-table :size="size" :striped="striped" class="doneo-table" :single-line="false" :single-column="false">
         <thead>
             <tr>
@@ -253,8 +253,8 @@
         </tbody>
     </n-table>
     <Pager class="doneo-table-pager" v-if="props.pagerData && (pagerPosition === 'bottom' || pagerPosition === 'both')"
-        :total-results="props.pagerData.totalResults" :total-pages="props.pagerData.totalPages"
-        v-model:current-page="currentPage" v-model:page-size="resultsPage" />
+        :disabled="props.disabled" :total-results="props.pagerData.totalResults"
+        :total-pages="props.pagerData.totalPages" v-model:current-page="currentPage" v-model:page-size="resultsPage" />
 </template>
 
 <style lang="css" scoped>
