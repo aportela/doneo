@@ -98,21 +98,6 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
       };
     },
 
-    setPagination(
-      tableId: string,
-      pagination: Partial<TableConfig["pagination"]>,
-    ) {
-      const table = this.ensure(tableId);
-      table.pagination = {
-        ...table.pagination,
-        ...pagination,
-      };
-    },
-
-    setColumns(tableId: string, columns: TableColumnConfig[]) {
-      this.ensure(tableId).columns = columns;
-    },
-
     addVisibleColumn(tableId: string, field: string) {
       const table = this.ensure(tableId);
 
