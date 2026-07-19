@@ -5,6 +5,7 @@
     import { NTable, type TableSize, NFlex, NIcon, NDrawer, NDrawerContent, NCollapse, NCollapseItem, NButton, NButtonGroup, NEmpty } from 'naive-ui';
     import { ArrowDown, ArrowDownWideNarrow, ArrowUp, ArrowUpWideNarrow, Eye, EyeOff, Funnel, FunnelX, ListRestart, Plus, Settings } from '@lucide/vue';
 
+    import Pager from './Pager.vue';
     import { type TableHeaderColumn } from '../../types/table-header-column';
     import type { Order } from '../../types/order.ts';
     import RenderCell from './RenderCell.ts';
@@ -134,13 +135,13 @@
                     <n-button-group size="tiny">
                         <n-button @click="onShowAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.showAllColumns.label")
-                            }}</n-button>
+                        }}</n-button>
                         <n-button @click="onHideAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.HideAllColumns.label")
-                        }}</n-button>
+                            }}</n-button>
                         <n-button @click="onToggleAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.ToggleColumns.label")
-                            }}</n-button>
+                        }}</n-button>
                     </n-button-group>
                     <p v-for="column, index in props.columns" class="doneo-cursor-pointer doneo-flex-center-align">
                         <n-button-group size="tiny" style="margin-right: 8px;">
