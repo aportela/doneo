@@ -134,13 +134,13 @@
                     <n-button-group size="tiny">
                         <n-button @click="onShowAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.showAllColumns.label")
-                        }}</n-button>
+                            }}</n-button>
                         <n-button @click="onHideAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.HideAllColumns.label")
-                            }}</n-button>
+                        }}</n-button>
                         <n-button @click="onToggleAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.ToggleColumns.label")
-                        }}</n-button>
+                            }}</n-button>
                     </n-button-group>
                     <p v-for="column, index in props.columns" class="doneo-cursor-pointer doneo-flex-center-align">
                         <n-button-group size="tiny" style="margin-right: 8px;">
@@ -234,14 +234,14 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="row in props.rows" :key="props.rowKey(row)">
+            <tr v-for="row, index in props.rows" :key="props.rowKey(row)">
                 <!-- row content -->
                 <td v-for="column in visibleColumns" :key="String(column.field)">
                     <RenderCell :render="column.render" :row="row" />
                 </td>
                 <!-- row actions -->
                 <td class="doneo-text-center">
-                    <slot name="rowactions" :row="row" />
+                    <slot name="rowactions" :row="row" :index="index" />
                 </td>
             </tr>
             <tr v-if="rows.length == 0 && props.noItemsWarningMessage && props.showNoItemsWarningMessage">
