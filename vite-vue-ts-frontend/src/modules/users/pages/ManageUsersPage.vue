@@ -302,7 +302,7 @@
             </template>
         </Pager>
         <UsersTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
-            @update="onShowUpdateForm" @delete="onDelete" @undelete="onUnDelete" :sort="order" @sort="onSort"
+            @update="onShowUpdateForm" @delete="onDelete" @undelete="onUnDelete" :order="order" @sort="onSort"
             v-model:filters="filters" />
     </n-card>
 </template>

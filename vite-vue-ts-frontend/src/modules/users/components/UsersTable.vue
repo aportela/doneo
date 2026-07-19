@@ -1,39 +1,41 @@
 <script setup lang="ts">
-    import { h, ref, computed } from 'vue';
+    import { ref, reactive, computed, h } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { useDialog, NEmpty, NIcon } from 'naive-ui';
+    import { useDialog, NIcon } from 'naive-ui';
     import { IconUserKey, IconUser, IconTrash, IconTrashOff } from '@tabler/icons-vue';
 
     import { useSessionStore } from '../../../stores/session';
     import { useUserSettingsStore } from '../../../stores/userSettings.ts';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
-    import type { Order } from '../../../shared/types/models/sort.ts';
+    import type { Order } from '../../../shared/types/order.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { UsersTableFilters } from '../types/users-table-filters.ts';
     import { UserPermissionFilterValue } from '../types/user-admin-permission-filter';
     import type { DateFilterSelectComponent } from './date-filter-select-component.ts';
     import { User } from '../models/user';
+    import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
 
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import UserPermissionsFilterSelector from '../components/UserPermissionsFilterSelector.vue';
     import TextFilterInput from '../../../shared/components/form-blocks/TextFilterInput.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
-    import ClearTableFiltersButton from '../../../shared/components/buttons/ClearTableFiltersButton.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
 
     interface Props {
+        id: string;
         disabled: boolean;
         items: User[];
-        sort?: Order;
+        order: Order;
     }
 
     const { t } = useI18n();
     const sessionStore = useSessionStore();
     const dialog = useDialog();
     const userSettingsStore = useUserSettingsStore();
+    const tableSettingsStore = useTableSettingsStore();
 
     const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'undelete', 'sort']);
 
@@ -70,23 +72,36 @@
     const isFilteredByUpdatedAt = computed<boolean>(() => filters.value.updatedAt.from != null || filters.value.updatedAt.to != null);
     const isFilteredByDeletedAt = computed<boolean>(() => filters.value.deletedAt.from != null || filters.value.deletedAt.to != null);
 
-    const hasFilters = computed<boolean>(() =>
-        isFilteredByPermissions.value ||
-        isFilteredByName.value ||
-        isFilteredByEmail.value ||
-        isFilteredByCreatedAt.value ||
-        isFilteredByUpdatedAt.value ||
-        isFilteredByDeletedAt.value
-    );
-
-    const columns = computed<TableHeaderColumn[]>(() => [
+    const columnDefinitions = reactive<TableHeaderColumn<User>[]>([
         {
             label: t("modules.user.components.UsersTable.header.columns.permissions"),
             field: "permissions",
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByPermissions.value,
-
+            render: (row: User) => {
+                return h(
+                    "span",
+                    {
+                        class: "doneo-flex-center-align",
+                    },
+                    [
+                        h(NIcon, {
+                            size: 16,
+                            style: {
+                                marginRight: "6px",
+                            },
+                            component: row.permissions?.isSuperUser ? IconUserKey : IconUser,
+                            color: row.permissions?.isSuperUser ? "red" : undefined,
+                        }),
+                        t(
+                            row.permissions?.isSuperUser
+                                ? "modules.user.components.UsersTable.body.columns.permissions.administrator"
+                                : "modules.user.components.UsersTable.body.columns.permissions.user"
+                        ),
+                    ]
+                )
+            }
         },
         {
             label: t("modules.user.components.UsersTable.header.columns.name"),
@@ -94,6 +109,12 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByName.value,
+            render: (row: User) => {
+                return h(AvatarUserName, {
+                    userId: row.id,
+                    userName: row.name,
+                })
+            }
         },
         {
             label: t("modules.user.components.UsersTable.header.columns.email"),
@@ -101,6 +122,15 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByEmail.value,
+            render: (row: User) => {
+                return h(
+                    "a",
+                    {
+                        href: `mailto:${row.email}`,
+                    },
+                    row.email
+                );
+            }
         },
         {
             label: t("modules.user.components.UsersTable.header.columns.createdAt"),
@@ -108,6 +138,9 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByCreatedAt.value,
+            render: (row: User) => {
+                return h("span", {}, { default: () => row.createdAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) });
+            }
         },
         {
             label: t("modules.user.components.UsersTable.header.columns.updatedAt"),
@@ -115,14 +148,43 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByUpdatedAt.value,
+            render: (row: User) => {
+                return h("span", {}, { default: () => row.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) });
+            }
         },
         {
             label: t("modules.user.components.UsersTable.header.columns.deletedAt"),
             field: "deletedAt",
             visible: true,
             sortable: true,
+            isFiltered: () => isFilteredByDeletedAt.value,
+            render: (row: User) => {
+                return h("span", {}, { default: () => row.deletedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) });
+            }
         },
     ]);
+
+
+    // create (if not found) default settings for this table (column order & visibility)
+    tableSettingsStore.register(props.id, { columns: columnDefinitions.map((column) => { return { field: column.field, visible: column.visible } }) ?? [] });
+
+    // restore previous settings
+    const tableSettings = tableSettingsStore.get(props.id);
+
+    // build columns based on saved order visibility settings
+    const columns = computed<TableHeaderColumn<User>[]>(() =>
+        tableSettings.columns.map((column) => { // get saved ordered columns
+            const definition = columnDefinitions.find((c) => c.field === column.field);
+            return {
+                label: definition?.label ?? "",
+                field: column.field,
+                visible: column.visible,
+                sortable: definition!.sortable,
+                isFiltered: definition?.isFiltered ?? (() => false),
+                render: definition?.render ?? (() => "")
+            };
+        })
+    );
 
     const onSort = (sort: Order) => {
         emit("sort", sort);
@@ -189,75 +251,35 @@
 </script>
 
 <template>
-    <ManageTable id="ManageUsers" size="small" :columns="columns" :order="sort" @sort="onSort" @refresh="onRefresh"
-        @add="onAdd">
-        <template #thead>
-            <tr>
-                <th>
-                    <UserPermissionsFilterSelector size="small" v-model:value="filters.permissions"
-                        :disabled="props.disabled" />
-                </th>
-                <th>
-                    <TextFilterInput clearable size="small"
-                        :placeholder="t('modules.user.components.UsersTable.header.filters.name.placeholder')"
-                        v-model:value="filters.name" @keydown-enter="onRefresh" :disabled="props.disabled" />
-                </th>
-                <th>
-                    <TextFilterInput clearable size="small"
-                        :placeholder="t('modules.user.components.UsersTable.header.filters.email.placeholder')"
-                        v-model:value="filters.email" @keydown-enter="onRefresh" :disabled="props.disabled" />
-                </th>
-                <th>
-                    <DateFilterSelect clearable v-model:range="filters.createdAt" ref="createdAtFilterRef"
-                        :disabled="props.disabled" />
-                </th>
-                <th>
-                    <DateFilterSelect clearable v-model:range="filters.updatedAt" ref="updatedAtFilterRef"
-                        :disabled="props.disabled" />
-                </th>
-                <th>
-                    <DateFilterSelect clearable v-model:range="filters.deletedAt" ref="deletedAtFilterRef"
-                        :disabled="props.disabled" />
-                </th>
-                <th>
-                    <ClearTableFiltersButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
-                </th>
-            </tr>
+    <ManageTable id="ManageUsers" size="small" :rows="items" :row-key="row => row.id" :columns="columns" :order="order"
+        @sort="onSort" @refresh="onRefresh" @add="onAdd">
+        <template #thead-column-filters="{ columns }">
+            <th v-for="column in columns">
+                <UserPermissionsFilterSelector v-if="column.field === 'permissions'" size="small"
+                    v-model:value="filters.permissions" :disabled="props.disabled" />
+                <TextFilterInput v-else-if="column.field === 'name'" clearable size="small"
+                    :placeholder="t('modules.user.components.UsersTable.header.filters.name.placeholder')"
+                    v-model:value="filters.name" @keydown-enter="onRefresh" :disabled="props.disabled" />
+                <TextFilterInput v-else-if="column.field === 'email'" clearable size="small"
+                    :placeholder="t('modules.user.components.UsersTable.header.filters.email.placeholder')"
+                    v-model:value="filters.email" @keydown-enter="onRefresh" :disabled="props.disabled" />
+                <DateFilterSelect v-else-if="column.field === 'createdAt'" clearable v-model:range="filters.createdAt"
+                    ref="createdAtFilterRef" :disabled="props.disabled" />
+                <DateFilterSelect v-else-if="column.field === 'updatedAt'" clearable v-model:range="filters.updatedAt"
+                    ref="updatedAtFilterRef" :disabled="props.disabled" />
+                <DateFilterSelect v-else-if="column.field === 'deletedAt'" clearable v-model:range="filters.deletedAt"
+                    ref="deletedAtFilterRef" :disabled="props.disabled" />
+            </th>
         </template>
-        <template #tbody>
-            <tr v-for="user, index in items" :key="user.id ?? index">
-                <td class="doneo-text-center">
-                    <span class="doneo-flex-center-align">
-                        <n-icon :size="16" style="margin-right: 6px;"
-                            :component="user.permissions?.isSuperUser ? IconUserKey : IconUser"
-                            :color="user.permissions?.isSuperUser ? 'red' : undefined">
-                        </n-icon>
-                        {{ t(user.permissions?.isSuperUser ?
-                            "modules.user.components.UsersTable.body.columns.permissions.administrator" :
-                            "modules.user.components.UsersTable.body.columns.permissions.user") }}
-                    </span>
-                </td>
-                <td>
-                    <AvatarUserName :user-id="user.id" :user-name="user.name" />
-                </td>
-                <td><a :href="'mailto:' + user.email">{{ user.email }}</a></td>
-                <td>{{ user.createdAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</td>
-                <td>{{ user.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</td>
-                <td>{{ user.deletedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</td>
-                <td class="doneo-text-center">
-                    <ManageTableActionButtons show-update show-delete show-restore
-                        :update-disabled="props.disabled || !!user.deletedAt?.msTimestamp"
-                        :delete-disabled="props.disabled || sessionStore.sessionUserId === user.id || !!user.deletedAt?.msTimestamp"
-                        :restored-disabled="props.disabled || !user.deletedAt?.msTimestamp" :disabled="props.disabled"
-                        @update="onUpdate(user, index)" @delete="onConfirmDelete(user, index)"
-                        @restore="onConfirmUnDelete(user, index)" />
-                </td>
-            </tr>
-            <tr>
-                <td :colspan="columns.length + 1" v-if="!props.disabled && items.length < 1">
-                    <n-empty :description="t('modules.user.components.UsersTable.warnings.noItemsFound')" />
-                </td>
-            </tr>
+        <template #rowactions="{ row, index }">
+            <ManageTableActionButtons show-update show-delete show-restore
+                :update-disabled="props.disabled || !!row.deletedAt?.msTimestamp"
+                :delete-disabled="props.disabled || sessionStore.sessionUserId === row.id || !!row.deletedAt?.msTimestamp"
+                :restored-disabled="props.disabled || !row.deletedAt?.msTimestamp" :disabled="props.disabled"
+                @update="onUpdate(row, index)" @delete="onConfirmDelete(row, index)"
+                @restore="onConfirmUnDelete(row, index)" @clear-filters="onClearFilters"
+                :no-items-warning-message="t('modules.project.components.UsersTable.warnings.noItemsFound')"
+                :show-no-items-warning-message="items.length < 1 && !props.disabled" />
         </template>
     </ManageTable>
 </template>
