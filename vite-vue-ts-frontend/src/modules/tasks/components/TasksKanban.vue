@@ -11,7 +11,7 @@
     import { taskService } from '../services/task'
     import type { SearchRequest as SearchRequestTask } from '../types/dto'
 
-    import { SortClass } from '../../../shared/types/models/sort'
+    import { Sort } from '../../../shared/types/models/sort'
     import { IconPaperclip, IconMessages } from '@tabler/icons-vue'
 
     interface Task {
@@ -43,9 +43,9 @@
         }
     }
 
-    const statusSort = new SortClass("index", "ASC");
+    const statusSort = new Sort("index", "ASC");
 
-    const tasksSort = new SortClass("createdAt", "DESC");
+    const tasksSort = new Sort("createdAt", "DESC");
 
     const refreshStatus = async () => {
         const payload: SearchRequestStatus = {
@@ -131,7 +131,7 @@
                                     </template>
                                     <template #action>
                                         <n-space><n-tag v-for="tag in element.tags" :key="tag">{{ tag
-                                        }}</n-tag></n-space>
+                                                }}</n-tag></n-space>
                                     </template>
 
                                 </NCard>

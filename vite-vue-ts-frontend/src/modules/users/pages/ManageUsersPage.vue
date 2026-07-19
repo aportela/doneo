@@ -15,7 +15,7 @@
     import type { UsersTableFilters } from '../types/users-table-filters.ts';
     import { UserPermissionFilterValue } from '../types/user-admin-permission-filter';
 
-    import { SortClass } from '../../../shared/types/models/sort';
+    import { Sort } from '../../../shared/types/models/sort';
     import { User } from '../models/user';
 
     import { userService } from '../services/user';
@@ -34,7 +34,7 @@
 
     const items = shallowRef<User[]>([]);
 
-    const sort = reactive<SortClass>(new SortClass("name", "ASC"));
+    const sort = reactive<Sort>(new Sort("name", "ASC"));
 
     const resetPager = ref<boolean>(false);
     const currentPage = ref(1);
@@ -85,7 +85,7 @@
         onRefresh();
     });
 
-    const onSort = (newSort: SortClass) => {
+    const onSort = (newSort: Sort) => {
         sort.field = newSort.field;
         sort.order = newSort.order;
         onRefresh();

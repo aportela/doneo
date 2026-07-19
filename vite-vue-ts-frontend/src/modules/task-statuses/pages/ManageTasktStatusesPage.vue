@@ -14,7 +14,7 @@
     import type { SearchRequest, TaskStatusResponse } from '../types/dto';
     import type { TaskStatusesTableFilters } from '../types/task-statuses-table-filters.ts';
 
-    import { SortClass } from '../../../shared/types/models/sort';
+    import { Sort } from '../../../shared/types/models/sort';
     import { TaskStatus } from '../models/task-status';
 
     import { taskStatusService } from '../services/task-status';
@@ -32,7 +32,7 @@
 
     const items = shallowRef<TaskStatus[]>([]);
 
-    const sort = reactive<SortClass>(new SortClass("index", "ASC"));
+    const sort = reactive<Sort>(new Sort("index", "ASC"));
 
     const filters = reactive<TaskStatusesTableFilters>({
         name: "",
@@ -59,7 +59,7 @@
         loadingStore.set(newValue.ajaxRunning);
     });
 
-    const onSort = (newSort: SortClass) => {
+    const onSort = (newSort: Sort) => {
         sort.field = newSort.field;
         sort.order = newSort.order;
         onRefresh();

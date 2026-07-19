@@ -14,7 +14,7 @@
     import type { SearchRequest, ProjectStatusResponse } from '../types/dto';
     import type { ProjectStatusesTableFilters } from '../types/project-statuses-table-filters.ts';
 
-    import { SortClass } from '../../../shared/types/models/sort';
+    import { Sort } from '../../../shared/types/models/sort';
     import { ProjectStatus } from '../models/project-status';
 
     import { projectStatusService } from '../services/project-status';
@@ -32,7 +32,7 @@
 
     const items = shallowRef<ProjectStatus[]>([]);
 
-    const sort = reactive<SortClass>(new SortClass("index", "ASC"));
+    const sort = reactive<Sort>(new Sort("index", "ASC"));
 
     const filters = reactive<ProjectStatusesTableFilters>({
         name: "",
@@ -59,7 +59,7 @@
         loadingStore.set(newValue.ajaxRunning);
     });
 
-    const onSort = (newSort: SortClass) => {
+    const onSort = (newSort: Sort) => {
         sort.field = newSort.field;
         sort.order = newSort.order;
         onRefresh();

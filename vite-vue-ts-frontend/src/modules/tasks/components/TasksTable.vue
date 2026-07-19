@@ -6,7 +6,7 @@
     import { IconFilePencil } from '@tabler/icons-vue';
 
     import { useUserSettingsStore } from '../../../stores/userSettings.ts';
-    import type { SortClass } from '../../../shared/types/models/sort.ts';
+    import type { Sort } from '../../../shared/types/models/sort.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { DateFilterSelectComponent } from '../../users/components/date-filter-select-component.ts';
 
@@ -30,7 +30,7 @@
         disabled: boolean;
         readOnly?: boolean;
         items: Task[];
-        sort?: SortClass;
+        sort?: Sort;
         projectId?: string;
         hideAdd?: boolean;
     }
@@ -121,7 +121,7 @@
         },
     ]);
 
-    const onSort = (sort: SortClass) => {
+    const onSort = (sort: Sort) => {
         emit("sort", sort);
     };
 
