@@ -13,7 +13,7 @@
     import type { PatchRequest, SearchRequest, TaskResponse } from '../types/dto';
     import type { TasksTableFilters } from '../types/tasks-table-filters.ts';
 
-    import { Sort } from '../../../shared/types/models/sort';
+    import { Order } from '../../../shared/types/models/sort';
     import { Task } from '../models/tasks';
 
     import { taskService } from '../services/task.ts';
@@ -35,7 +35,7 @@
 
     const items = shallowRef<Task[]>([]);
 
-    const sort = reactive<Sort>(new Sort("createdAt", "DESC"));
+    const sort = reactive<Order>(new Order("createdAt", "DESC"));
 
     const resetPager = ref<boolean>(false);
     const currentPage = ref(1);
@@ -75,9 +75,9 @@
         onRefresh();
     });
 
-    const onSort = (newSort: Sort) => {
+    const onSort = (newSort: Order) => {
         sort.field = newSort.field;
-        sort.order = newSort.order;
+        sort.sort = newSort.sort;
         onRefresh();
     };
 
@@ -93,7 +93,7 @@
                 },
                 order: {
                     field: sort.field,
-                    sort: sort.order,
+                    sort: sort.sort,
                 },
                 filter: {
                     summary: filters.summary.length > 0 ? filters.summary : undefined,

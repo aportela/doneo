@@ -14,7 +14,7 @@
     import type { SearchRequest, TaskPriorityResponse } from '../types/dto';
     import type { TaskPrioritiesTableFilters } from '../types/task-priorities-table-filters.ts';
 
-    import { Sort } from '../../../shared/types/models/sort';
+    import { Order } from '../../../shared/types/models/sort';
     import { TaskPriority } from '../models/task-priority';
 
     import { taskPriorityService } from '../services/task-priority';
@@ -32,7 +32,7 @@
 
     const items = shallowRef<TaskPriority[]>([]);
 
-    const sort = reactive<Sort>(new Sort("index", "ASC"));
+    const sort = reactive<Order>(new Order("index", "ASC"));
 
     const filters = reactive<TaskPrioritiesTableFilters>({
         name: "",
@@ -59,9 +59,9 @@
         loadingStore.set(newValue.ajaxRunning);
     });
 
-    const onSort = (newSort: Sort) => {
+    const onSort = (newSort: Order) => {
         sort.field = newSort.field;
-        sort.order = newSort.order;
+        sort.sort = newSort.sort;
         onRefresh();
     };
 
@@ -90,7 +90,7 @@
                 },
                 order: {
                     field: sort.field,
-                    sort: sort.order,
+                    sort: sort.sort,
                 },
                 filter: {
                     //name: filters.name.length > 0 ? filters.name : undefined,

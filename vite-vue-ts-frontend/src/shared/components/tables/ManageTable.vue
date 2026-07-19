@@ -9,7 +9,7 @@
     import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
 
     import { type TableHeaderColumn } from '../../types/table-header-column';
-    import { Sort } from '../../types/models/sort.ts';
+    import { Order } from '../../types/models/sort.ts';
     import Pager from './Pager.vue';
     import RenderCell from './RenderCell.ts';
 
@@ -22,7 +22,7 @@
         columns: TableHeaderColumn<T>[];
         rows: T[];
         rowKey: (row: T) => string;
-        currentSort?: Sort,
+        currentSort?: Order,
 
         pagination?: {
             currentPageIndex: number;
@@ -68,7 +68,7 @@
 
     const onToggleSort = (column: TableHeaderColumn<T>) => {
         if (!props.disabled && props.currentSort && column.sortable) {
-            const newSort = new Sort(props.currentSort?.field, props.currentSort?.order);
+            const newSort = new Order(props.currentSort?.field, props.currentSort?.sort);
             newSort.toggleSort(column.field);
             emit("sort", newSort);
         }
@@ -170,7 +170,7 @@
                                 v-if="column.isFiltered?.() ?? false" />
                             <n-icon class="doneo-table-header-icon"
                                 v-if="column.sortable && props.currentSort?.field === column.field"
-                                :component="props.currentSort?.order == 'DESC' ? ArrowDownWideNarrow : ArrowUpWideNarrow">
+                                :component="props.currentSort?.sort == 'DESC' ? ArrowDownWideNarrow : ArrowUpWideNarrow">
                             </n-icon>
                         </div>
                     </n-flex>
