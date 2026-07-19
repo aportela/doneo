@@ -1,3 +1,5 @@
+export const PAGER_DEFAULT_RESULTS_PAGE = 16;
+
 export interface PagerQuery {
   currentPage: number;
   resultsPage: number;

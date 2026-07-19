@@ -110,7 +110,7 @@
 </script>
 
 <template>
-    <ManageTable id="ManageTaskStatuses" size="small" :columns="columns" :current-sort="sort" @sort="onSort"
+    <ManageTable id="ManageTaskStatuses" size="small" :columns="columns" :order="sort" @sort="onSort"
         @refresh="onRefresh" @add="onAdd">
         <template #thead>
             <tr>
@@ -130,7 +130,7 @@
             <tr v-for="taskStatus, index in items" :key="taskStatus.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(taskStatus.hexColor ?? '#888888')">{{ taskStatus.name
-                        }}</n-tag>
+                    }}</n-tag>
                 </td>
                 <td>{{ taskStatus.index }}</td>
                 <td class="doneo-text-center">

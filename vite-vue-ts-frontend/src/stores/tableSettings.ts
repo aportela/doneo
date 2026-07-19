@@ -1,5 +1,5 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
-import { type SortOrder } from "../shared/types/common";
+import type { SortDirection } from "../shared/types/order";
 
 interface TableColumnConfig {
   field: string;
@@ -7,12 +7,12 @@ interface TableColumnConfig {
 }
 
 export interface TableConfig {
-  sorting: {
-    field: string;
-    order: SortOrder;
-  };
   columns: TableColumnConfig[];
   filters?: Record<string, unknown>;
+  sort: {
+    field: string;
+    direction: SortDirection;
+  };
   pagination: {
     active: boolean;
     page: number;
@@ -28,12 +28,12 @@ const storePersistenceKey = "doneo.tableSettings";
 
 function createDefaultTableConfig(): TableConfig {
   return {
-    sorting: {
-      field: "",
-      order: "ASC",
-    },
     columns: [],
     filters: {},
+    sort: {
+      field: "",
+      direction: "ASC",
+    },
     pagination: {
       active: true,
       page: 1,
@@ -65,9 +65,9 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
         this.tables[tableId] = {
           ...createDefaultTableConfig(),
           ...defaults,
-          sorting: {
-            ...createDefaultTableConfig().sorting,
-            ...defaults.sorting,
+          sort: {
+            ...createDefaultTableConfig().sort,
+            ...defaults.sort,
           },
           columns: defaults.columns ?? createDefaultTableConfig().columns,
           pagination: {
@@ -89,11 +89,11 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
       delete this.tables[tableId];
     },
 
-    setSorting(tableId: string, sorting: Partial<TableConfig["sorting"]>) {
+    sort(tableId: string, sorting: Partial<TableConfig["sort"]>) {
       const table = this.ensure(tableId);
 
-      table.sorting = {
-        ...table.sorting,
+      table.sort = {
+        ...table.sort,
         ...sorting,
       };
     },
@@ -179,6 +179,11 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
       table.filters = {};
     },
 
+    hasPagination(tableId: string) {
+      const table = this.ensure(tableId);
+      return table.pagination.active;
+    },
+
     setPagination(
       tableId: string,
       pagination: Partial<TableConfig["pagination"]>,
@@ -205,9 +210,9 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
       this.tables[tableId] = {
         ...table,
         ...config,
-        sorting: {
-          ...table.sorting,
-          ...config.sorting,
+        sort: {
+          ...table.sort,
+          ...config.sort,
         },
         columns: config.columns ?? table.columns,
         pagination: {

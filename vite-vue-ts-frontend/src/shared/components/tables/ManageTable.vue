@@ -2,60 +2,47 @@
     import { ref, computed, useSlots } from 'vue';
     import { useI18n } from "vue-i18n";
 
-
     import { NTable, type TableSize, NFlex, NIcon, NDrawer, NDrawerContent, NCollapse, NCollapseItem, NButton, NButtonGroup, NEmpty } from 'naive-ui';
     import { ArrowDown, ArrowDownWideNarrow, ArrowUp, ArrowUpWideNarrow, Eye, EyeOff, Funnel, FunnelX, ListRestart, Plus, Settings } from '@lucide/vue';
 
-    import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
-
     import { type TableHeaderColumn } from '../../types/table-header-column';
-    import { Order } from '../../types/models/sort.ts';
-    import Pager from './Pager.vue';
+    import type { Order } from '../../types/order.ts';
     import RenderCell from './RenderCell.ts';
+    import { PAGER_DEFAULT_RESULTS_PAGE } from '../../types/pager.ts';
 
+    type actionButton = "refresh" | "add" | "settings";
 
     interface IProps {
-        id: string;
         disabled?: boolean;
         size?: TableSize;
         striped?: boolean;
         columns: TableHeaderColumn<T>[];
         rows: T[];
         rowKey: (row: T) => string;
-        currentSort?: Order,
-
-        pagination?: {
-            currentPageIndex: number;
+        order: Order,
+        pagerData?: {
+            currentPage: number;
+            resultsPage: number;
             totalPages: number;
             totalResults: number;
-        },
+        };
+
         pagerPosition?: "top" | "bottom" | "both";
 
-        hideRefresh?: boolean;
-        hideAdd?: boolean;
-        hideSettings?: boolean;
+        buttons?: actionButton[];
 
         noItemsWarningMessage?: string;
         showNoItemsWarningMessage?: boolean;
     };
 
-    const emit = defineEmits(['sort', 'refresh', 'add', 'clearFilters']);
-
     const props = withDefaults(defineProps<IProps>(), {
-        disabled: false,
-        hideRefresh: false,
-        hideAdd: false,
-        hideSettings: false,
+        buttons: () => ["refresh", "add", "settings"],
     });
+
+    const emit = defineEmits(['paginationChanged', 'sort', 'refresh', 'add', 'clearFilters', 'pagerChanged', 'toggleVisibleColumn', 'showAllColumns', 'hideAllColumns', 'toggleAllColumns', 'moveColumn']);
 
     const { t } = useI18n();
     const slots = useSlots()
-
-    const tableSettingsStore = useTableSettingsStore();
-
-    const isPaginationEnabled = computed<boolean>(() => tableSettingsStore.tables[props.id]?.pagination.enabled ?? true)
-    const currentPageIndex = computed(() => tableSettingsStore.tables[props.id]?.pagination.page ?? 1);
-    const currentPageSize = computed(() => tableSettingsStore.tables[props.id]?.pagination.pageSize ?? 1);
 
     const visibleColumns = computed<TableHeaderColumn<T>[]>(() => props.columns.filter((column: TableHeaderColumn<T>) => column.visible));
 
@@ -63,14 +50,13 @@
 
     const showDrawerSettings = ref(false);
 
-    const showTopPager = computed(() => isPaginationEnabled.value && props.pagerPosition === "top" || props.pagerPosition === "both");
-    const showBottomPager = computed(() => isPaginationEnabled.value && props.pagerPosition === "bottom" || props.pagerPosition === "both");
-
     const onToggleSort = (column: TableHeaderColumn<T>) => {
-        if (!props.disabled && props.currentSort && column.sortable) {
-            const newSort = new Order(props.currentSort?.field, props.currentSort?.sort);
-            newSort.toggleSort(column.field);
-            emit("sort", newSort);
+        if (!props.disabled && props.order && column.sortable) {
+            if (props.order.field !== column.field) {
+                emit("sort", { field: column.field, direction: "ASC" });
+            } else {
+                emit("sort", { field: props.order.field, direction: props.order.direction === "ASC" ? "DESC" : "ASC" });
+            }
         }
     };
 
@@ -97,24 +83,46 @@
     };
 
     const onToggleVisibleColumn = (field: string) => {
-        tableSettingsStore.toggleVisibleColumn(props.id, field);
+        emit("toggleVisibleColumn", field);
     };
 
     const onShowAllColumns = () => {
-        tableSettingsStore.showAllColumns(props.id);
+        emit("showAllColumns");
     };
 
     const onHideAllColumns = () => {
-        tableSettingsStore.hideAllColumns(props.id);
+        emit("hideAllColumns");
 
     };
     const onToggleAllColumns = () => {
-        tableSettingsStore.toggleAllColumns(props.id);
+        emit("toggleAllColumns");
     };
 
     const onMoveColumn = (field: string, direction: "up" | "down") => {
-        tableSettingsStore.moveColumn(props.id, field, direction);
+        emit("moveColumn", { field: field, direction: direction });
     };
+
+    const currentPage = computed<number>({
+        get() {
+            return (props.pagerData?.currentPage ?? 1);
+        },
+        set(value: number) {
+            if (props.pagerData) {
+                emit("pagerChanged", { ...props.pagerData, currentPage: value });
+            }
+        },
+    });
+
+    const resultsPage = computed<number>({
+        get() {
+            return (props.pagerData?.resultsPage ?? PAGER_DEFAULT_RESULTS_PAGE);
+        },
+        set(value: number) {
+            if (props.pagerData) {
+                emit("pagerChanged", { ...props.pagerData, resultsPage: value });
+            }
+        },
+    });
 
 </script>
 
@@ -154,8 +162,9 @@
             </n-collapse>
         </n-drawer-content>
     </n-drawer>
-    <Pager v-if="showTopPager" v-model:page-size="currentPageSize" v-model:current-page="currentPageIndex"
-        :total-results="0" :total-pages="1" class="doneo-table-pager" />
+    <Pager class="doneo-table-pager" v-if="props.pagerData && (pagerPosition === 'top' || pagerPosition === 'both')"
+        :total-results="props.pagerData.totalResults" :total-pages="props.pagerData.totalPages"
+        v-model:current-page="currentPage" v-model:page-size="resultsPage" />
     <n-table :size="size" :striped="striped" class="doneo-table" :single-line="false" :single-column="false">
         <thead>
             <tr>
@@ -169,8 +178,8 @@
                             <n-icon :component="Funnel" class="doneo-table-header-icon"
                                 v-if="column.isFiltered?.() ?? false" />
                             <n-icon class="doneo-table-header-icon"
-                                v-if="column.sortable && props.currentSort?.field === column.field"
-                                :component="props.currentSort?.sort == 'DESC' ? ArrowDownWideNarrow : ArrowUpWideNarrow">
+                                v-if="column.sortable && props.order?.field === column.field"
+                                :component="props.order?.direction == 'DESC' ? ArrowDownWideNarrow : ArrowUpWideNarrow">
                             </n-icon>
                         </div>
                     </n-flex>
@@ -178,22 +187,22 @@
                 <!-- common table actions (refresh/add/settings)-->
                 <th>
                     <n-button-group class="doneo-table-actions-button-group">
-                        <n-button @click="onRefresh" :disabled="props.disabled" v-if="!props.hideRefresh"
+                        <n-button @click="onRefresh" :disabled="props.disabled" v-if="props.buttons.includes('refresh')"
                             class="doneo-table-actions-button">
                             <template #icon>
                                 <n-icon :component="ListRestart" />
                             </template>
                             {{ t("shared.buttons.Refresh.label") }}
                         </n-button>
-                        <n-button @click="onAdd" :disabled="props.disabled" v-if="!props.hideAdd"
+                        <n-button @click="onAdd" :disabled="props.disabled" v-if="props.buttons.includes('add')"
                             class="doneo-table-actions-button">
                             <template #icon>
                                 <n-icon :component="Plus" />
                             </template>
                             {{ t("shared.buttons.Add.label") }}
                         </n-button>
-                        <n-button @click="onSettings" :disabled="props.disabled" v-if="!props.hideSettings"
-                            class="doneo-table-actions-button">
+                        <n-button @click="onSettings" :disabled="props.disabled"
+                            v-if="props.buttons.includes('settings')" class="doneo-table-actions-button">
                             <template #icon>
                                 <n-icon :component="Settings" />
                             </template>
@@ -236,7 +245,9 @@
             </tr>
         </tbody>
     </n-table>
-    <Pager v-if="showBottomPager" :totalResults="0" :total-pages="1" class="doneo-table-pager" />
+    <Pager class="doneo-table-pager" v-if="props.pagerData && (pagerPosition === 'bottom' || pagerPosition === 'both')"
+        :total-results="props.pagerData.totalResults" :total-pages="props.pagerData.totalPages"
+        v-model:current-page="currentPage" v-model:page-size="resultsPage" />
 </template>
 
 <style lang="css" scoped>
@@ -247,6 +258,4 @@
     .doneo-table-pager {
         margin: 4px 0px;
     }
-
-
 </style>

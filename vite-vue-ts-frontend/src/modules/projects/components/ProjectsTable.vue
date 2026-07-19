@@ -248,7 +248,7 @@
     <ProjectResumeFloatingCard v-if="showDrawer && currentProject?.id" v-model:show="showDrawer"
         :project-id="currentProject?.id" />
     <ManageTable id="ManageProjects" size="small" :rows="items" :row-key="row => row.id ?? ''" :columns="columns"
-        :current-sort="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd" @clear-filters="onClearFilters"
+        :order="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd" @clear-filters="onClearFilters"
         :no-items-warning-message="t('modules.project.components.ProjectsTable.warnings.noItemsFound')"
         :show-no-items-warning-message="items.length < 1 && !props.disabled" pagerPosition="top">
         <template #thead-column-filters="{ columns }">

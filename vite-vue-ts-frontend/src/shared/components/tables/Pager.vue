@@ -5,12 +5,12 @@
     import { NPagination } from 'naive-ui';
     import type { PaginationSizeOption } from "naive-ui";
 
-    interface PagerProps {
+    interface IProps {
         totalResults: number;
         totalPages: number;
     };
 
-    const props = defineProps<PagerProps>();
+    const props = defineProps<IProps>();
 
     const { t } = useI18n();
 

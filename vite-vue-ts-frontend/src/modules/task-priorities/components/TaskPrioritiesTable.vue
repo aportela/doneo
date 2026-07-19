@@ -100,7 +100,7 @@
 </script>
 
 <template>
-    <ManageTable id="ManageTaskPriorities" size="small" :columns="columns" :current-sort="sort" @sort="onSort"
+    <ManageTable id="ManageTaskPriorities" size="small" :columns="columns" :order="sort" @sort="onSort"
         @refresh="onRefresh" @add="onAdd">
         <template #thead>
             <tr>
@@ -119,7 +119,7 @@
             <tr v-for="taskPriority, index in items" :key="taskPriority.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(taskPriority.hexColor ?? '#888888')">{{ taskPriority.name
-                        }}</n-tag>
+                    }}</n-tag>
                 </td>
                 <td>{{ taskPriority.index }}</td>
                 <td class="doneo-text-center">
