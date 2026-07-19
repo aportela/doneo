@@ -6,6 +6,7 @@
     import type { PaginationSizeOption } from "naive-ui";
 
     interface IProps {
+        disabled?: boolean;
         totalResults: number;
         totalPages: number;
     };
@@ -58,8 +59,8 @@
             </slot>
         </div>
         <!-- TODO: simple property on small screens ? -->
-        <n-pagination v-model:page="currentPage" v-model:page-size="pageSize" :page-count="totalPages"
-            :page-sizes="pageSizes" show-size-picker :page-slot="8">
+        <n-pagination v-model:page="currentPage" v-model:page-size="pageSize" :page-count="props.totalPages"
+            :page-sizes="pageSizes" show-size-picker :page-slot="8" :disabled="props.disabled">
             <template #prefix="{ page, pageCount }">
                 {{ t("shared.components.pager.labels.currentPageOfTotal", { currentPage: page, totalPages: pageCount })
                 }}
