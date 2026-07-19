@@ -7,7 +7,7 @@
 
     import { useUserSettingsStore } from '../../../stores/userSettings.ts';
     import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
-    import type { Order } from '../../../shared/types/models/sort.ts';
+    import type { Order } from '../../../shared/types/order.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { ProjectsTableFilters } from '../types/projects-table-filters.ts';
     import type { DateFilterSelectComponent } from '../../users/components/date-filter-select-component.ts';
@@ -20,7 +20,6 @@
     import ProjectStatusSelector from '../../project-statuses/components/ProjectStatusSelector.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
-    import ClearTableFiltersButton from '../../../shared/components/buttons/ClearTableFiltersButton.vue';
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import ChangeProjectStatusDropdown from '../../../shared/components/dropdowns/ChangeProjectStatusDropdown.vue';
@@ -29,11 +28,11 @@
     import ProjectResumeFloatingCard from './ProjectResumeFloatingCard.vue';
 
     interface Props {
+        id: string;
         disabled: boolean;
         readOnly?: boolean;
         items: Project[];
-        sort?: Order;
-        id: string;
+        order: Order;
     }
 
     const { t } = useI18n();
@@ -181,15 +180,16 @@
         },
     ]);
 
+    const TABLE_ID = "ManageProjects";
 
     tableSettingsStore.register(
-        props.id,
+        TABLE_ID,
         {
             columns: columnDefinitions.map((column) => { return { field: column.field, visible: column.visible } }) ?? []
         }
     );
 
-    const tableSettings = tableSettingsStore.get(props.id);
+    const tableSettings = tableSettingsStore.get(TABLE_ID);
 
     const columns = computed<TableHeaderColumn<Project>[]>(() =>
         tableSettings.columns.map((column) => {
@@ -248,7 +248,7 @@
     <ProjectResumeFloatingCard v-if="showDrawer && currentProject?.id" v-model:show="showDrawer"
         :project-id="currentProject?.id" />
     <ManageTable id="ManageProjects" size="small" :rows="items" :row-key="row => row.id ?? ''" :columns="columns"
-        :order="sort" @sort="onSort" @refresh="onRefresh" @add="onAdd" @clear-filters="onClearFilters"
+        :order="order" @sort="onSort" @refresh="onRefresh" @add="onAdd" @clear-filters="onClearFilters"
         :no-items-warning-message="t('modules.project.components.ProjectsTable.warnings.noItemsFound')"
         :show-no-items-warning-message="items.length < 1 && !props.disabled" pagerPosition="top">
         <template #thead-column-filters="{ columns }">

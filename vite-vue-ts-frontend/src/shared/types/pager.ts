@@ -10,3 +10,10 @@ export interface PagerResult extends PagerQuery {
   totalPages: number;
   totalResults: number;
 }
+
+export interface Pagination {
+  currentPage: number;
+  resultsPage: number;
+  totalPages: number;
+  totalResults: number;
+}
