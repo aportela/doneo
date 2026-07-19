@@ -17,7 +17,7 @@ type ProjectStatusRepository interface {
 	Update(ctx context.Context, dbExecutor database.DatabaseExecutor, projectStatus domain.ProjectStatus) error
 	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, projectStatusID string) error
 	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, projectStatusID string) (domain.ProjectStatus, error)
-	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.Result, error)
+	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.PagerQuery, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.PagerResult, error)
 }
 
 type projectStatusRepository struct {
@@ -125,7 +125,7 @@ func (repository *projectStatusRepository) Get(ctx context.Context, dbExecutor d
 	return toDomain(dto), err
 }
 
-func (repository *projectStatusRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.Result, error) {
+func (repository *projectStatusRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.PagerQuery, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.PagerResult, error) {
 	filterDTO := toFilterDTO(filter)
 	var filterArgs []any
 	var queryArgs []any
@@ -174,7 +174,7 @@ func (repository *projectStatusRepository) Search(ctx context.Context, dbExecuto
 	sqlQuery = fmt.Sprintf("%s %s %s %s ", sqlQuery, sqlWhere, sqlOrder, sqlLimit)
 	rows, err := dbExecutor.QueryContext(ctx, sqlQuery, queryArgs...)
 	if err != nil {
-		return nil, browser.Result{}, err
+		return nil, browser.PagerResult{}, err
 	}
 	defer rows.Close()
 	dtos := make([]projectStatusDTO, 0)
@@ -183,12 +183,12 @@ func (repository *projectStatusRepository) Search(ctx context.Context, dbExecuto
 		if err := rows.Scan(
 			&dto.ID, &dto.Name, &dto.HexColor, &dto.Index, &dto.FlagsBitmask,
 		); err != nil {
-			return nil, browser.Result{}, err
+			return nil, browser.PagerResult{}, err
 		}
 		dtos = append(dtos, dto)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, browser.Result{}, err
+		return nil, browser.PagerResult{}, err
 	}
 
 	var totalResults int
@@ -207,11 +207,11 @@ func (repository *projectStatusRepository) Search(ctx context.Context, dbExecuto
 		).Scan(&totalResults)
 
 		if err != nil {
-			return nil, browser.Result{}, err
+			return nil, browser.PagerResult{}, err
 		}
 	} else {
 		totalResults = len(dtos)
 	}
 
-	return toDomainArray(dtos), browser.NewResult(pager, totalResults), nil
+	return toDomainArray(dtos), browser.NewPagerResult(pager, totalResults), nil
 }

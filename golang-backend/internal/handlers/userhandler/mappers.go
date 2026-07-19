@@ -88,7 +88,7 @@ func toSearchBaseResponse(users []domain.UserBase) searchBaseResponse {
 	}
 }
 
-func toSearchResponse(users []domain.User, pager browser.Result) searchResponse {
+func toSearchResponse(users []domain.User, pager browser.PagerResult) searchResponse {
 	return searchResponse{
 		Users: domainArrayToResponseArray(users),
 		Pager: handlers.PagerResponse{

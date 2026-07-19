@@ -1,7 +1,4 @@
-import type {
-  PagerRequest,
-  PagerResponse,
-} from "../../../shared/types/dto/pager";
+import type { PagerQuery, PagerResult } from "../../../shared/types/pager";
 import type { Order } from "../../../shared/types/order";
 
 export type AddRequest = {
@@ -20,7 +17,7 @@ type SearchRequestFilter = {
 };
 
 export type SearchRequest = {
-  pager: PagerRequest;
+  pager: PagerQuery;
   order: Order;
   filter?: SearchRequestFilter;
 };
@@ -33,5 +30,5 @@ export type ProjectTypeResponse = {
 
 export type SearchResponse = {
   projectTypes: ProjectTypeResponse[];
-  pager: PagerResponse;
+  pager: PagerResult;
 };

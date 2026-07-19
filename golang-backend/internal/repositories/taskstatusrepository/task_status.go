@@ -17,7 +17,7 @@ type TaskStatusRepository interface {
 	Update(ctx context.Context, dbExecutor database.DatabaseExecutor, taskStatus domain.TaskStatus) error
 	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, taskStatusID string) error
 	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, taskStatusID string) (domain.TaskStatus, error)
-	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchTaskStatusesFilter) ([]domain.TaskStatus, browser.Result, error)
+	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.PagerQuery, order browser.Order, filter domain.SearchTaskStatusesFilter) ([]domain.TaskStatus, browser.PagerResult, error)
 }
 
 type taskStatusRepository struct{}
@@ -124,7 +124,7 @@ func (repository *taskStatusRepository) Get(ctx context.Context, dbExecutor data
 	return toDomain(dto), err
 }
 
-func (repository *taskStatusRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchTaskStatusesFilter) ([]domain.TaskStatus, browser.Result, error) {
+func (repository *taskStatusRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.PagerQuery, order browser.Order, filter domain.SearchTaskStatusesFilter) ([]domain.TaskStatus, browser.PagerResult, error) {
 	filterDTO := toFilterDTO(filter)
 	var filterArgs []any
 	var queryArgs []any
@@ -173,7 +173,7 @@ func (repository *taskStatusRepository) Search(ctx context.Context, dbExecutor d
 	sqlQuery = fmt.Sprintf("%s %s %s %s ", sqlQuery, sqlWhere, sqlOrder, sqlLimit)
 	rows, err := dbExecutor.QueryContext(ctx, sqlQuery, queryArgs...)
 	if err != nil {
-		return nil, browser.Result{}, err
+		return nil, browser.PagerResult{}, err
 	}
 	defer rows.Close()
 	dtos := make([]taskStatusDTO, 0)
@@ -182,12 +182,12 @@ func (repository *taskStatusRepository) Search(ctx context.Context, dbExecutor d
 		if err := rows.Scan(
 			&dto.ID, &dto.Name, &dto.HexColor, &dto.Index, &dto.FlagsBitmask,
 		); err != nil {
-			return nil, browser.Result{}, err
+			return nil, browser.PagerResult{}, err
 		}
 		dtos = append(dtos, dto)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, browser.Result{}, err
+		return nil, browser.PagerResult{}, err
 	}
 
 	var totalResults int
@@ -206,11 +206,11 @@ func (repository *taskStatusRepository) Search(ctx context.Context, dbExecutor d
 		).Scan(&totalResults)
 
 		if err != nil {
-			return nil, browser.Result{}, err
+			return nil, browser.PagerResult{}, err
 		}
 	} else {
 		totalResults = len(dtos)
 	}
 
-	return toDomainArray(dtos), browser.NewResult(pager, totalResults), nil
+	return toDomainArray(dtos), browser.NewPagerResult(pager, totalResults), nil
 }

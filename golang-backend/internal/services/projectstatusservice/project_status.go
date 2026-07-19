@@ -17,8 +17,8 @@ type ProjectStatusService interface {
 	Update(ctx context.Context, projectStatus domain.ProjectStatus) (domain.ProjectStatus, error)
 	Delete(ctx context.Context, projectStatusID string) error
 	Get(ctx context.Context, projectStatusID string) (domain.ProjectStatus, error)
-	SearchBase(ctx context.Context) ([]domain.ProjectStatus, browser.Result, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.Result, error)
+	SearchBase(ctx context.Context) ([]domain.ProjectStatus, browser.PagerResult, error)
+	Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.PagerResult, error)
 }
 
 type projectStatusService struct {
@@ -70,20 +70,20 @@ func (service *projectStatusService) Get(ctx context.Context, projectStatusID st
 	}
 }
 
-func (service *projectStatusService) SearchBase(ctx context.Context) ([]domain.ProjectStatus, browser.Result, error) {
-	if projectStatuses, pagerResult, err := service.projectStatusRepository.Search(ctx, service.db, browser.Params{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "index", Direction: "ASC"}, domain.SearchProjectStatusesFilter{}); err != nil {
-		return nil, browser.Result{}, fmt.Errorf("[ProjectStatusService] failed to search project statuses: %w", err)
+func (service *projectStatusService) SearchBase(ctx context.Context) ([]domain.ProjectStatus, browser.PagerResult, error) {
+	if projectStatuses, pagerResult, err := service.projectStatusRepository.Search(ctx, service.db, browser.PagerQuery{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "index", Direction: "ASC"}, domain.SearchProjectStatusesFilter{}); err != nil {
+		return nil, browser.PagerResult{}, fmt.Errorf("[ProjectStatusService] failed to search project statuses: %w", err)
 	} else {
 		return projectStatuses, pagerResult, nil
 	}
 }
 
-func (service *projectStatusService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.Result, error) {
+func (service *projectStatusService) Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchProjectStatusesFilter) ([]domain.ProjectStatus, browser.PagerResult, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
-		return nil, browser.Result{}, err
+		return nil, browser.PagerResult{}, err
 	}
 	if projectStatuses, pagerResult, err := service.projectStatusRepository.Search(ctx, service.db, pager, order, filter); err != nil {
-		return nil, browser.Result{}, fmt.Errorf("[ProjectStatusService] failed to search project statuses: %w", err)
+		return nil, browser.PagerResult{}, fmt.Errorf("[ProjectStatusService] failed to search project statuses: %w", err)
 	} else {
 		return projectStatuses, pagerResult, nil
 	}

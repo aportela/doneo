@@ -1,12 +1,10 @@
-export type PagerRequest = {
+export interface PagerQuery {
   currentPage: number;
   resultsPage: number;
-};
+}
 
-export type PagerResponse = {
+export interface PagerResult extends PagerQuery {
   enabled: boolean;
-  currentPage: number;
-  resultsPage: number;
   totalPages: number;
   totalResults: number;
-};
+}

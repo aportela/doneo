@@ -109,7 +109,7 @@ func toSearchBaseResponse(roles []domain.RoleBase) searchBaseResponse {
 	}
 }
 
-func toSearchResponse(roles []domain.Role, pager browser.Result) searchResponse {
+func toSearchResponse(roles []domain.Role, pager browser.PagerResult) searchResponse {
 	return searchResponse{
 		Roles: domainArrayToResponseArray(roles),
 		Pager: handlers.PagerResponse{

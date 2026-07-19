@@ -21,7 +21,7 @@ type UserRepository interface {
 	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string) (domain.User, error)
 	GetByEmail(ctx context.Context, dbExecutor database.DatabaseExecutor, email string) (domain.User, error)
 	SearchBase(ctx context.Context, dbExecutor database.DatabaseExecutor) ([]domain.UserBase, error)
-	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchUsersFilter) ([]domain.User, browser.Result, error)
+	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.PagerQuery, order browser.Order, filter domain.SearchUsersFilter) ([]domain.User, browser.PagerResult, error)
 }
 
 type userRepository struct {
@@ -241,7 +241,7 @@ func (repository *userRepository) SearchBase(ctx context.Context, dbExecutor dat
 	return toBaseDomainArray(dtos), nil
 }
 
-func (repository *userRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchUsersFilter) ([]domain.User, browser.Result, error) {
+func (repository *userRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.PagerQuery, order browser.Order, filter domain.SearchUsersFilter) ([]domain.User, browser.PagerResult, error) {
 	filterDTO := toFilterDTO(filter)
 	var filterArgs []any
 	var queryArgs []any
@@ -339,19 +339,19 @@ func (repository *userRepository) Search(ctx context.Context, dbExecutor databas
 	sqlQuery = fmt.Sprintf("%s %s %s %s ", sqlQuery, sqlWhere, sqlOrder, sqlLimit)
 	rows, err := dbExecutor.QueryContext(ctx, sqlQuery, queryArgs...)
 	if err != nil {
-		return nil, browser.Result{}, err
+		return nil, browser.PagerResult{}, err
 	}
 	defer rows.Close()
 	dtos := make([]userDTO, 0)
 	for rows.Next() {
 		var dto userDTO
 		if err := rows.Scan(&dto.ID, &dto.Email, &dto.Name, &dto.CreatedAt, &dto.UpdatedAt, &dto.DeletedAt, &dto.PermissionsBitmask); err != nil {
-			return nil, browser.Result{}, err
+			return nil, browser.PagerResult{}, err
 		}
 		dtos = append(dtos, dto)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, browser.Result{}, err
+		return nil, browser.PagerResult{}, err
 	}
 
 	var totalResults int
@@ -370,11 +370,11 @@ func (repository *userRepository) Search(ctx context.Context, dbExecutor databas
 		).Scan(&totalResults)
 
 		if err != nil {
-			return nil, browser.Result{}, err
+			return nil, browser.PagerResult{}, err
 		}
 	} else {
 		totalResults = len(dtos)
 	}
 
-	return toDomainArray(dtos), browser.NewResult(pager, totalResults), nil
+	return toDomainArray(dtos), browser.NewPagerResult(pager, totalResults), nil
 }

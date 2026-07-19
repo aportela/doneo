@@ -104,7 +104,7 @@ func domainArrayToResponseArray(projects []domain.Project) []projectResponse {
 	return projectResponses
 }
 
-func toSearchResponse(users []domain.Project, pager browser.Result) searchProjectsResponse {
+func toSearchResponse(users []domain.Project, pager browser.PagerResult) searchProjectsResponse {
 	return searchProjectsResponse{
 		Projects: domainArrayToResponseArray(users),
 		Pager: handlers.PagerResponse{

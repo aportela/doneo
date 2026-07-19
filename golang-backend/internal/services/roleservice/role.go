@@ -18,7 +18,7 @@ type RoleService interface {
 	Delete(ctx context.Context, roleID string) error
 	Get(ctx context.Context, roleID string) (domain.Role, error)
 	SearchBase(ctx context.Context) ([]domain.RoleBase, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error)
+	Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.PagerResult, error)
 }
 
 type roleService struct {
@@ -77,12 +77,12 @@ func (service *roleService) SearchBase(ctx context.Context) ([]domain.RoleBase, 
 		return roles, nil
 	}
 }
-func (service *roleService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error) {
+func (service *roleService) Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.PagerResult, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
-		return nil, browser.Result{}, err
+		return nil, browser.PagerResult{}, err
 	}
 	if roles, pagerResult, err := service.roleRepository.Search(ctx, service.db, pager, order, filter); err != nil {
-		return nil, browser.Result{}, fmt.Errorf("[RoleService] failed to search roles: %w", err)
+		return nil, browser.PagerResult{}, fmt.Errorf("[RoleService] failed to search roles: %w", err)
 	} else {
 		return roles, pagerResult, nil
 	}

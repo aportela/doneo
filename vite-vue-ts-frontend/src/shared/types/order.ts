@@ -1,6 +1,6 @@
 export type SortDirection = "ASC" | "DESC";
 
-export type Order = {
+export interface Order {
   field: string;
   direction: SortDirection;
-};
+}

@@ -24,7 +24,7 @@ type ProjectService interface {
 	Patch(ctx context.Context, project domain.Project) (domain.Project, error)
 	Delete(ctx context.Context, projectID string) error
 	Get(ctx context.Context, projectID string) (domain.Project, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.Result, error)
+	Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.PagerResult, error)
 	GetCurrentProjects(ctx context.Context) ([]domain.Project, error)
 }
 
@@ -249,19 +249,19 @@ func (service *projectService) Get(ctx context.Context, projectID string) (domai
 	}
 }
 
-func (service *projectService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.Result, error) {
+func (service *projectService) Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.PagerResult, error) {
 	_, err := service.authorizationService.RequireUserAdminPermission(ctx)
 	if err != nil {
 		// current user has not admin privileges (view all projects)
 		contextUser, ok := middlewares.GetContextUser(ctx)
 		if !ok {
-			return nil, browser.Result{}, fmt.Errorf("[ProjectService] user not found in context")
+			return nil, browser.PagerResult{}, fmt.Errorf("[ProjectService] user not found in context")
 		}
 		// filter projects visible by current user
 		filter.ViewByUserID = &contextUser.ID
 	}
 	if projects, pagerResult, err := service.projectRepository.Search(ctx, service.db, pager, order, filter); err != nil {
-		return nil, browser.Result{}, fmt.Errorf("[ProjectService] failed to search projects: %w", err)
+		return nil, browser.PagerResult{}, fmt.Errorf("[ProjectService] failed to search projects: %w", err)
 	} else {
 		return projects, pagerResult, nil
 	}

@@ -111,7 +111,7 @@ func (handler *projectTypeHandler) Search(w http.ResponseWriter, r *http.Request
 		}
 	}
 	projectTypes, pagerResult, err := handler.service.Search(r.Context(),
-		browser.Params{
+		browser.PagerQuery{
 			CurrentPage: request.Pager.CurrentPage,
 			ResultsPage: request.Pager.ResultsPage,
 		},

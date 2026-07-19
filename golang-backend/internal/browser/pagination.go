@@ -9,19 +9,19 @@ const (
 	MaxResultsPage     = 500
 )
 
-type Params struct {
+type PagerQuery struct {
 	CurrentPage int
 	ResultsPage int
 }
 
-func (p Params) getCurrentPage() int {
+func (p PagerQuery) getCurrentPage() int {
 	if p.CurrentPage <= 0 {
 		return 1
 	}
 	return p.CurrentPage
 }
 
-func (p Params) getResultsPage() int {
+func (p PagerQuery) getResultsPage() int {
 	if p.ResultsPage < 0 {
 		return DefaultResultsPage
 	}
@@ -33,35 +33,35 @@ func (p Params) getResultsPage() int {
 	return p.ResultsPage
 }
 
-func (p Params) Limit() int {
+func (p PagerQuery) Limit() int {
 	return p.getResultsPage()
 }
 
-func (p Params) Offset() int {
+func (p PagerQuery) Offset() int {
 	return (p.getCurrentPage() - 1) * p.getResultsPage()
 }
 
-func (p Params) Enabled() bool {
+func (p PagerQuery) Enabled() bool {
 	return p.ResultsPage > 0
 }
 
-type Result struct {
+type PagerResult struct {
 	CurrentPage  int
 	ResultsPage  int
 	TotalResults int
 	TotalPages   int
 }
 
-func NewResult(params Params, totalResults int) Result {
-	resultsPage := params.getResultsPage()
-	currentPage := params.getCurrentPage()
+func NewPagerResult(pagerQuery PagerQuery, totalResults int) PagerResult {
+	resultsPage := pagerQuery.getResultsPage()
+	currentPage := pagerQuery.getCurrentPage()
 
 	totalPages := 0
 	if resultsPage > 0 && totalResults > 0 {
 		totalPages = int(math.Ceil(float64(totalResults) / float64(resultsPage)))
 	}
 
-	return Result{
+	return PagerResult{
 		CurrentPage:  currentPage,
 		ResultsPage:  resultsPage,
 		TotalResults: totalResults,

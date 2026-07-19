@@ -17,7 +17,7 @@ type ProjectPriorityRepository interface {
 	Update(ctx context.Context, dbExecutor database.DatabaseExecutor, projectPriority domain.ProjectPriority) error
 	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, projectPriorityID string) error
 	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, projectPriorityID string) (domain.ProjectPriority, error)
-	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchProjectPrioritiesFilter) ([]domain.ProjectPriority, browser.Result, error)
+	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.PagerQuery, order browser.Order, filter domain.SearchProjectPrioritiesFilter) ([]domain.ProjectPriority, browser.PagerResult, error)
 }
 
 type projectPriorityRepository struct{}
@@ -119,7 +119,7 @@ func (repository *projectPriorityRepository) Get(ctx context.Context, dbExecutor
 	return toDomain(dto), err
 }
 
-func (repository *projectPriorityRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchProjectPrioritiesFilter) ([]domain.ProjectPriority, browser.Result, error) {
+func (repository *projectPriorityRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.PagerQuery, order browser.Order, filter domain.SearchProjectPrioritiesFilter) ([]domain.ProjectPriority, browser.PagerResult, error) {
 	filterDTO := toFilterDTO(filter)
 	var filterArgs []any
 	var queryArgs []any
@@ -168,7 +168,7 @@ func (repository *projectPriorityRepository) Search(ctx context.Context, dbExecu
 	sqlQuery = fmt.Sprintf("%s %s %s %s ", sqlQuery, sqlWhere, sqlOrder, sqlLimit)
 	rows, err := dbExecutor.QueryContext(ctx, sqlQuery, queryArgs...)
 	if err != nil {
-		return nil, browser.Result{}, err
+		return nil, browser.PagerResult{}, err
 	}
 	defer rows.Close()
 	dtos := make([]projectPriorityDTO, 0)
@@ -177,12 +177,12 @@ func (repository *projectPriorityRepository) Search(ctx context.Context, dbExecu
 		if err := rows.Scan(
 			&dto.ID, &dto.Name, &dto.HexColor, &dto.Index,
 		); err != nil {
-			return nil, browser.Result{}, err
+			return nil, browser.PagerResult{}, err
 		}
 		dtos = append(dtos, dto)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, browser.Result{}, err
+		return nil, browser.PagerResult{}, err
 	}
 
 	var totalResults int
@@ -201,11 +201,11 @@ func (repository *projectPriorityRepository) Search(ctx context.Context, dbExecu
 		).Scan(&totalResults)
 
 		if err != nil {
-			return nil, browser.Result{}, err
+			return nil, browser.PagerResult{}, err
 		}
 	} else {
 		totalResults = len(dtos)
 	}
 
-	return toDomainArray(dtos), browser.NewResult(pager, totalResults), nil
+	return toDomainArray(dtos), browser.NewPagerResult(pager, totalResults), nil
 }

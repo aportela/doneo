@@ -1,7 +1,4 @@
-import type {
-  PagerRequest,
-  PagerResponse,
-} from "../../../shared/types/dto/pager";
+import type { PagerQuery, PagerResult } from "../../../shared/types/pager";
 import type { Order } from "../../../shared/types/order";
 
 import type { TaskPriorityResponse } from "../../task-priorities/types/dto";
@@ -56,7 +53,7 @@ type SearchRequestFilter = {
 };
 
 export type SearchRequest = {
-  pager: PagerRequest;
+  pager: PagerQuery;
   order: Order;
   filter?: SearchRequestFilter;
 };
@@ -88,5 +85,5 @@ export type TaskResponse = {
 
 export type SearchResponse = {
   tasks: TaskResponse[];
-  pager: PagerResponse;
+  pager: PagerResult;
 };

@@ -17,8 +17,8 @@ type TaskPriorityService interface {
 	Update(ctx context.Context, taskPriority domain.TaskPriority) (domain.TaskPriority, error)
 	Delete(ctx context.Context, taskPriorityID string) error
 	Get(ctx context.Context, taskPriorityID string) (domain.TaskPriority, error)
-	SearchBase(ctx context.Context) ([]domain.TaskPriority, browser.Result, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskPrioritiesFilter) ([]domain.TaskPriority, browser.Result, error)
+	SearchBase(ctx context.Context) ([]domain.TaskPriority, browser.PagerResult, error)
+	Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchTaskPrioritiesFilter) ([]domain.TaskPriority, browser.PagerResult, error)
 }
 
 type taskPriorityService struct {
@@ -73,20 +73,20 @@ func (service *taskPriorityService) Get(ctx context.Context, taskPriorityID stri
 	}
 }
 
-func (service *taskPriorityService) SearchBase(ctx context.Context) ([]domain.TaskPriority, browser.Result, error) {
-	if taskPriorities, pagerResult, err := service.taskPriorityRepository.Search(ctx, service.db, browser.Params{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "index", Direction: "ASC"}, domain.SearchTaskPrioritiesFilter{}); err != nil {
-		return nil, browser.Result{}, fmt.Errorf("[TaskPriorityService] failed to search task priorities: %w", err)
+func (service *taskPriorityService) SearchBase(ctx context.Context) ([]domain.TaskPriority, browser.PagerResult, error) {
+	if taskPriorities, pagerResult, err := service.taskPriorityRepository.Search(ctx, service.db, browser.PagerQuery{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "index", Direction: "ASC"}, domain.SearchTaskPrioritiesFilter{}); err != nil {
+		return nil, browser.PagerResult{}, fmt.Errorf("[TaskPriorityService] failed to search task priorities: %w", err)
 	} else {
 		return taskPriorities, pagerResult, nil
 	}
 }
 
-func (service *taskPriorityService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskPrioritiesFilter) ([]domain.TaskPriority, browser.Result, error) {
+func (service *taskPriorityService) Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchTaskPrioritiesFilter) ([]domain.TaskPriority, browser.PagerResult, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
-		return nil, browser.Result{}, err
+		return nil, browser.PagerResult{}, err
 	}
 	if taskPriorities, pagerResult, err := service.taskPriorityRepository.Search(ctx, service.db, pager, order, filter); err != nil {
-		return nil, browser.Result{}, fmt.Errorf("[TaskPriorityService] failed to search task priorities: %w", err)
+		return nil, browser.PagerResult{}, fmt.Errorf("[TaskPriorityService] failed to search task priorities: %w", err)
 	} else {
 		return taskPriorities, pagerResult, nil
 	}

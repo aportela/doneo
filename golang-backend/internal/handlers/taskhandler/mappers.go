@@ -100,7 +100,7 @@ func domainArrayToResponseArray(tasks []domain.Task) []taskResponse {
 	return taskResponses
 }
 
-func toSearchResponse(tasks []domain.Task, pager browser.Result) searchTasksResponse {
+func toSearchResponse(tasks []domain.Task, pager browser.PagerResult) searchTasksResponse {
 	return searchTasksResponse{
 		Tasks: domainArrayToResponseArray(tasks),
 		Pager: handlers.PagerResponse{

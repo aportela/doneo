@@ -1,7 +1,4 @@
-import type {
-  PagerRequest,
-  PagerResponse,
-} from "../../../shared/types/dto/pager";
+import type { PagerQuery, PagerResult } from "../../../shared/types/pager";
 import type { Order } from "../../../shared/types/order";
 
 export type Permissions = {
@@ -42,7 +39,7 @@ type SearchRequestFilter = {
 };
 
 export type SearchRequest = {
-  pager: PagerRequest;
+  pager: PagerQuery;
   order: Order;
   filter?: SearchRequestFilter;
 };
@@ -65,5 +62,5 @@ export type SearchBaseResponse = {
 
 export type SearchResponse = {
   roles: RoleResponse[];
-  pager: PagerResponse;
+  pager: PagerResult;
 };

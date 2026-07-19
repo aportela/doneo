@@ -18,7 +18,7 @@ type RoleRepository interface {
 	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, roleID string) error
 	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, roleID string) (domain.Role, error)
 	SearchBase(ctx context.Context, dbExecutor database.DatabaseExecutor) ([]domain.RoleBase, error)
-	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error)
+	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.PagerQuery, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.PagerResult, error)
 }
 
 type roleRepository struct {
@@ -150,7 +150,7 @@ func (repository *roleRepository) SearchBase(ctx context.Context, dbExecutor dat
 	return toBaseDomainArray(dtos), nil
 }
 
-func (repository *roleRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.Result, error) {
+func (repository *roleRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.PagerQuery, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.PagerResult, error) {
 	filterDTO := toFilterDTO(filter)
 	var filterArgs []any
 	var queryArgs []any
@@ -196,19 +196,19 @@ func (repository *roleRepository) Search(ctx context.Context, dbExecutor databas
 	sqlQuery = fmt.Sprintf("%s %s %s %s ", sqlQuery, sqlWhere, sqlOrder, sqlLimit)
 	rows, err := dbExecutor.QueryContext(ctx, sqlQuery, queryArgs...)
 	if err != nil {
-		return nil, browser.Result{}, err
+		return nil, browser.PagerResult{}, err
 	}
 	defer rows.Close()
 	dtos := make([]roleDTO, 0)
 	for rows.Next() {
 		var dto roleDTO
 		if err := rows.Scan(&dto.ID, &dto.Name, &dto.PermissionsBitmask); err != nil {
-			return nil, browser.Result{}, err
+			return nil, browser.PagerResult{}, err
 		}
 		dtos = append(dtos, dto)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, browser.Result{}, err
+		return nil, browser.PagerResult{}, err
 	}
 
 	var totalResults int
@@ -227,11 +227,11 @@ func (repository *roleRepository) Search(ctx context.Context, dbExecutor databas
 		).Scan(&totalResults)
 
 		if err != nil {
-			return nil, browser.Result{}, err
+			return nil, browser.PagerResult{}, err
 		}
 	} else {
 		totalResults = len(dtos)
 	}
 
-	return toDomainArray(dtos), browser.NewResult(pager, totalResults), nil
+	return toDomainArray(dtos), browser.NewPagerResult(pager, totalResults), nil
 }

@@ -25,7 +25,7 @@ type UserService interface {
 	Purge(ctx context.Context, userID string) error
 	Get(ctx context.Context, userID string) (domain.User, error)
 	SearchBase(ctx context.Context) ([]domain.UserBase, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchUsersFilter) ([]domain.User, browser.Result, error)
+	Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchUsersFilter) ([]domain.User, browser.PagerResult, error)
 }
 
 type userService struct {
@@ -151,12 +151,12 @@ func (service *userService) SearchBase(ctx context.Context) ([]domain.UserBase, 
 	}
 }
 
-func (service *userService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchUsersFilter) ([]domain.User, browser.Result, error) {
+func (service *userService) Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchUsersFilter) ([]domain.User, browser.PagerResult, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
-		return nil, browser.Result{}, err
+		return nil, browser.PagerResult{}, err
 	}
 	if users, pagerResult, err := service.userRepository.Search(ctx, service.db, pager, order, filter); err != nil {
-		return nil, browser.Result{}, fmt.Errorf("[UserService] failed to search users: %w", err)
+		return nil, browser.PagerResult{}, fmt.Errorf("[UserService] failed to search users: %w", err)
 	} else {
 		return users, pagerResult, nil
 	}

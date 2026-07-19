@@ -17,8 +17,8 @@ type ProjectPriorityService interface {
 	Update(ctx context.Context, projectPriority domain.ProjectPriority) (domain.ProjectPriority, error)
 	Delete(ctx context.Context, projectPriorityID string) error
 	Get(ctx context.Context, projectPriorityID string) (domain.ProjectPriority, error)
-	SearchBase(ctx context.Context) ([]domain.ProjectPriority, browser.Result, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectPrioritiesFilter) ([]domain.ProjectPriority, browser.Result, error)
+	SearchBase(ctx context.Context) ([]domain.ProjectPriority, browser.PagerResult, error)
+	Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchProjectPrioritiesFilter) ([]domain.ProjectPriority, browser.PagerResult, error)
 }
 
 type projectPriorityService struct {
@@ -70,20 +70,20 @@ func (service *projectPriorityService) Get(ctx context.Context, projectPriorityI
 	}
 }
 
-func (service *projectPriorityService) SearchBase(ctx context.Context) ([]domain.ProjectPriority, browser.Result, error) {
-	if projectPriorities, pagerResult, err := service.projectPriorityRepository.Search(ctx, service.db, browser.Params{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "index", Direction: "ASC"}, domain.SearchProjectPrioritiesFilter{}); err != nil {
-		return nil, browser.Result{}, fmt.Errorf("[ProjectPriorityService] failed to search project priorities: %w", err)
+func (service *projectPriorityService) SearchBase(ctx context.Context) ([]domain.ProjectPriority, browser.PagerResult, error) {
+	if projectPriorities, pagerResult, err := service.projectPriorityRepository.Search(ctx, service.db, browser.PagerQuery{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "index", Direction: "ASC"}, domain.SearchProjectPrioritiesFilter{}); err != nil {
+		return nil, browser.PagerResult{}, fmt.Errorf("[ProjectPriorityService] failed to search project priorities: %w", err)
 	} else {
 		return projectPriorities, pagerResult, nil
 	}
 }
 
-func (service *projectPriorityService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectPrioritiesFilter) ([]domain.ProjectPriority, browser.Result, error) {
+func (service *projectPriorityService) Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchProjectPrioritiesFilter) ([]domain.ProjectPriority, browser.PagerResult, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
-		return nil, browser.Result{}, err
+		return nil, browser.PagerResult{}, err
 	}
 	if projectPriorities, pagerResult, err := service.projectPriorityRepository.Search(ctx, service.db, pager, order, filter); err != nil {
-		return nil, browser.Result{}, fmt.Errorf("[ProjectPriorityService] failed to search project priorities: %w", err)
+		return nil, browser.PagerResult{}, fmt.Errorf("[ProjectPriorityService] failed to search project priorities: %w", err)
 	} else {
 		return projectPriorities, pagerResult, nil
 	}

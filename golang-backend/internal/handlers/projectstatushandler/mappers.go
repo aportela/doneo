@@ -78,7 +78,7 @@ func domainArrayToResponseArray(projectStatuses []domain.ProjectStatus) []Projec
 	return projectStatusResponses
 }
 
-func toSearchResponse(projectStatuses []domain.ProjectStatus, pager browser.Result) searchResponse {
+func toSearchResponse(projectStatuses []domain.ProjectStatus, pager browser.PagerResult) searchResponse {
 	return searchResponse{
 		ProjectStatuses: domainArrayToResponseArray(projectStatuses),
 		Pager: handlers.PagerResponse{

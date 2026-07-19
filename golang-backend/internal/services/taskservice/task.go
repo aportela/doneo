@@ -24,7 +24,7 @@ type TaskService interface {
 	Patch(ctx context.Context, projectID string, task domain.Task) (domain.Task, error)
 	Delete(ctx context.Context, projectID string, taskID string) error
 	Get(ctx context.Context, projectID string, taskID string) (domain.Task, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskFilter) ([]domain.Task, browser.Result, error)
+	Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchTaskFilter) ([]domain.Task, browser.PagerResult, error)
 }
 
 type taskService struct {
@@ -276,20 +276,20 @@ func (service *taskService) Get(ctx context.Context, projectID string, taskID st
 	}
 }
 
-func (service *taskService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskFilter) ([]domain.Task, browser.Result, error) {
+func (service *taskService) Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchTaskFilter) ([]domain.Task, browser.PagerResult, error) {
 	_, err := service.authorizationService.RequireUserAdminPermission(ctx)
 	if err != nil {
 		// current user has not admin privileges (view all tasks)
 		contextUser, ok := middlewares.GetContextUser(ctx)
 		if !ok {
-			return nil, browser.Result{}, fmt.Errorf("[TaskService] user not found in context")
+			return nil, browser.PagerResult{}, fmt.Errorf("[TaskService] user not found in context")
 		}
 		// filter tasks visible by current user
 		filter.ViewByUserID = &contextUser.ID
 	}
 	tasks, pagerResult, err := service.taskRepository.Search(ctx, service.db, pager, order, filter)
 	if err != nil {
-		return nil, browser.Result{}, fmt.Errorf("[TaskService] failed to search tasks: %w", err)
+		return nil, browser.PagerResult{}, fmt.Errorf("[TaskService] failed to search tasks: %w", err)
 	}
 	return tasks, pagerResult, nil
 }

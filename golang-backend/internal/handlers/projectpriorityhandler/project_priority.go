@@ -110,7 +110,7 @@ func (handler *projectPriorityHandler) Search(w http.ResponseWriter, r *http.Req
 		}
 	}
 	projectPriorities, pagerResult, err := handler.service.Search(r.Context(),
-		browser.Params{
+		browser.PagerQuery{
 			CurrentPage: request.Pager.CurrentPage,
 			ResultsPage: request.Pager.ResultsPage,
 		},

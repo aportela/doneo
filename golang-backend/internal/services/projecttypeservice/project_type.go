@@ -17,8 +17,8 @@ type ProjectTypeService interface {
 	Update(ctx context.Context, projectType domain.ProjectType) (domain.ProjectType, error)
 	Delete(ctx context.Context, projectTypeID string) error
 	Get(ctx context.Context, projectTypeID string) (domain.ProjectType, error)
-	SearchBase(ctx context.Context) ([]domain.ProjectType, browser.Result, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectTypesFilter) ([]domain.ProjectType, browser.Result, error)
+	SearchBase(ctx context.Context) ([]domain.ProjectType, browser.PagerResult, error)
+	Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchProjectTypesFilter) ([]domain.ProjectType, browser.PagerResult, error)
 }
 
 type projectTypeService struct {
@@ -71,20 +71,20 @@ func (service *projectTypeService) Get(ctx context.Context, projectTypeID string
 	}
 }
 
-func (service *projectTypeService) SearchBase(ctx context.Context) ([]domain.ProjectType, browser.Result, error) {
-	if projectTypes, pagerResult, err := service.projectTypeRepository.Search(ctx, service.db, browser.Params{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "index", Direction: "ASC"}, domain.SearchProjectTypesFilter{}); err != nil {
-		return nil, browser.Result{}, fmt.Errorf("[ProjectTypeService] failed to search project types: %w", err)
+func (service *projectTypeService) SearchBase(ctx context.Context) ([]domain.ProjectType, browser.PagerResult, error) {
+	if projectTypes, pagerResult, err := service.projectTypeRepository.Search(ctx, service.db, browser.PagerQuery{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "index", Direction: "ASC"}, domain.SearchProjectTypesFilter{}); err != nil {
+		return nil, browser.PagerResult{}, fmt.Errorf("[ProjectTypeService] failed to search project types: %w", err)
 	} else {
 		return projectTypes, pagerResult, nil
 	}
 }
 
-func (service *projectTypeService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchProjectTypesFilter) ([]domain.ProjectType, browser.Result, error) {
+func (service *projectTypeService) Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchProjectTypesFilter) ([]domain.ProjectType, browser.PagerResult, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
-		return nil, browser.Result{}, err
+		return nil, browser.PagerResult{}, err
 	}
 	if projectTypes, pagerResult, err := service.projectTypeRepository.Search(ctx, service.db, pager, order, filter); err != nil {
-		return nil, browser.Result{}, fmt.Errorf("[ProjectTypeService] failed to search project types: %w", err)
+		return nil, browser.PagerResult{}, fmt.Errorf("[ProjectTypeService] failed to search project types: %w", err)
 	} else {
 		return projectTypes, pagerResult, nil
 	}

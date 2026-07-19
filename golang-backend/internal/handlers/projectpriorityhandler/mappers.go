@@ -39,7 +39,7 @@ func domainArrayToResponseArray(projectPriorities []domain.ProjectPriority) []Pr
 	return projectPriorityResponses
 }
 
-func toSearchResponse(projectPriorities []domain.ProjectPriority, pager browser.Result) searchResponse {
+func toSearchResponse(projectPriorities []domain.ProjectPriority, pager browser.PagerResult) searchResponse {
 	return searchResponse{
 		ProjectPriorities: domainArrayToResponseArray(projectPriorities),
 		Pager: handlers.PagerResponse{

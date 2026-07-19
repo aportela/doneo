@@ -17,8 +17,8 @@ type TaskStatusService interface {
 	Update(ctx context.Context, taskStatus domain.TaskStatus) (domain.TaskStatus, error)
 	Delete(ctx context.Context, taskStatusID string) error
 	Get(ctx context.Context, taskStatusID string) (domain.TaskStatus, error)
-	SearchBase(ctx context.Context) ([]domain.TaskStatus, browser.Result, error)
-	Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskStatusesFilter) ([]domain.TaskStatus, browser.Result, error)
+	SearchBase(ctx context.Context) ([]domain.TaskStatus, browser.PagerResult, error)
+	Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchTaskStatusesFilter) ([]domain.TaskStatus, browser.PagerResult, error)
 }
 
 type taskStatusService struct {
@@ -70,20 +70,20 @@ func (service *taskStatusService) Get(ctx context.Context, taskStatusID string) 
 	}
 }
 
-func (service *taskStatusService) SearchBase(ctx context.Context) ([]domain.TaskStatus, browser.Result, error) {
-	if taskStatuses, pagerResult, err := service.taskStatusRepository.Search(ctx, service.db, browser.Params{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "index", Direction: "ASC"}, domain.SearchTaskStatusesFilter{}); err != nil {
-		return nil, browser.Result{}, fmt.Errorf("[TaskStatusService] failed to search task statuses: %w", err)
+func (service *taskStatusService) SearchBase(ctx context.Context) ([]domain.TaskStatus, browser.PagerResult, error) {
+	if taskStatuses, pagerResult, err := service.taskStatusRepository.Search(ctx, service.db, browser.PagerQuery{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "index", Direction: "ASC"}, domain.SearchTaskStatusesFilter{}); err != nil {
+		return nil, browser.PagerResult{}, fmt.Errorf("[TaskStatusService] failed to search task statuses: %w", err)
 	} else {
 		return taskStatuses, pagerResult, nil
 	}
 }
 
-func (service *taskStatusService) Search(ctx context.Context, pager browser.Params, order browser.Order, filter domain.SearchTaskStatusesFilter) ([]domain.TaskStatus, browser.Result, error) {
+func (service *taskStatusService) Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchTaskStatusesFilter) ([]domain.TaskStatus, browser.PagerResult, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
-		return nil, browser.Result{}, err
+		return nil, browser.PagerResult{}, err
 	}
 	if taskStatuses, pagerResult, err := service.taskStatusRepository.Search(ctx, service.db, pager, order, filter); err != nil {
-		return nil, browser.Result{}, fmt.Errorf("[TaskStatusService] failed to search task statuses: %w", err)
+		return nil, browser.PagerResult{}, fmt.Errorf("[TaskStatusService] failed to search task statuses: %w", err)
 	} else {
 		return taskStatuses, pagerResult, nil
 	}

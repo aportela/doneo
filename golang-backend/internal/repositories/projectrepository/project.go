@@ -18,7 +18,7 @@ type ProjectRepository interface {
 	Update(ctx context.Context, dbExecutor database.DatabaseExecutor, project domain.Project) error
 	Delete(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string, deletedAt int64) error
 	Get(ctx context.Context, dbExecutor database.DatabaseExecutor, projectID string) (domain.Project, error)
-	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.Result, error)
+	Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.PagerQuery, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.PagerResult, error)
 	GetCurrentProjects(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string, count uint) ([]domain.Project, error)
 }
 
@@ -259,7 +259,7 @@ func (repository *projectRepository) Get(ctx context.Context, dbExecutor databas
 
 }
 
-func (repository *projectRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.Params, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.Result, error) {
+func (repository *projectRepository) Search(ctx context.Context, dbExecutor database.DatabaseExecutor, pager browser.PagerQuery, order browser.Order, filter domain.SearchProjectFilter) ([]domain.Project, browser.PagerResult, error) {
 	filterDTO := toFilterDTO(filter)
 	var filterArgs []any
 	var queryArgs []any
@@ -399,7 +399,7 @@ func (repository *projectRepository) Search(ctx context.Context, dbExecutor data
 	//fmt.Println(sqlQuery)
 	rows, err := dbExecutor.QueryContext(ctx, sqlQuery, queryArgs...)
 	if err != nil {
-		return nil, browser.Result{}, err
+		return nil, browser.PagerResult{}, err
 	}
 	defer rows.Close()
 	dtos := make([]projectDTO, 0)
@@ -429,7 +429,7 @@ func (repository *projectRepository) Search(ctx context.Context, dbExecutor data
 			&dto.CreatorID,
 			&dto.CreatorName,
 		); err != nil {
-			return nil, browser.Result{}, err
+			return nil, browser.PagerResult{}, err
 		}
 		dtos = append(dtos, dto)
 	}
@@ -449,13 +449,13 @@ func (repository *projectRepository) Search(ctx context.Context, dbExecutor data
 		).Scan(&totalResults)
 
 		if err != nil {
-			return nil, browser.Result{}, err
+			return nil, browser.PagerResult{}, err
 		}
 	} else {
 		totalResults = len(dtos)
 	}
 
-	return toDomainArray(dtos), browser.NewResult(pager, totalResults), nil
+	return toDomainArray(dtos), browser.NewPagerResult(pager, totalResults), nil
 }
 
 func (repository *projectRepository) GetCurrentProjects(ctx context.Context, dbExecutor database.DatabaseExecutor, userID string, count uint) ([]domain.Project, error) {
