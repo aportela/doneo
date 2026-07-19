@@ -11,9 +11,12 @@
     import RenderCell from './RenderCell.ts';
     import { PAGER_DEFAULT_RESULTS_PAGE } from '../../types/pager.ts';
 
+    import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
+
     type actionButton = "refresh" | "add" | "settings";
 
     interface IProps {
+        id: string;
         disabled?: boolean;
         size?: TableSize;
         striped?: boolean;
@@ -40,10 +43,11 @@
         buttons: () => ["refresh", "add", "settings"],
     });
 
-    const emit = defineEmits(['pagerChanged', 'sort', 'refresh', 'add', 'clearFilters', 'toggleVisibleColumn', 'showAllColumns', 'hideAllColumns', 'toggleAllColumns', 'moveColumn']);
+    const emit = defineEmits(['pagerChanged', 'sort', 'refresh', 'add', 'clearFilters']);
 
     const { t } = useI18n();
     const slots = useSlots()
+    const tableSettingsStore = useTableSettingsStore();
 
     const showSettingsDrawer = ref(false);
 
@@ -106,24 +110,23 @@
     };
 
     const onToggleVisibleColumn = (field: string) => {
-        emit("toggleVisibleColumn", field);
+        tableSettingsStore.toggleVisibleColumn(props.id, field);
     };
 
     const onShowAllColumns = () => {
-        emit("showAllColumns");
+        tableSettingsStore.showAllColumns(props.id);
     };
 
     const onHideAllColumns = () => {
-        emit("hideAllColumns");
-
+        tableSettingsStore.hideAllColumns(props.id);
     };
 
     const onToggleAllColumns = () => {
-        emit("toggleAllColumns");
+        tableSettingsStore.toggleAllColumns(props.id);
     };
 
     const onMoveColumn = (field: string, direction: "up" | "down") => {
-        emit("moveColumn", { field: field, direction: direction });
+        tableSettingsStore.moveColumn(props.id, field, direction);
     };
 </script>
 
@@ -135,13 +138,13 @@
                     <n-button-group size="tiny">
                         <n-button @click="onShowAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.showAllColumns.label")
-                        }}</n-button>
+                            }}</n-button>
                         <n-button @click="onHideAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.HideAllColumns.label")
-                            }}</n-button>
+                        }}</n-button>
                         <n-button @click="onToggleAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.ToggleColumns.label")
-                        }}</n-button>
+                            }}</n-button>
                     </n-button-group>
                     <p v-for="column, index in props.columns" class="doneo-cursor-pointer doneo-flex-center-align">
                         <n-button-group size="tiny" style="margin-right: 8px;">

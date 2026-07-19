@@ -17,7 +17,6 @@
     import type { Order } from '../../../shared/types/order.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import { UserPermissionFilterValue, type UserPermissionFilter } from '../types/user-admin-permission-filter';
-    import type { DateFilterSelectComponent } from '../../../shared/components/selectors/date-filter-select-component.ts';
     import { User } from '../models/user';
     import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
@@ -529,7 +528,7 @@
             @cancel="hideUserForm" />
     </n-modal>
     <n-card :title="t('modules.user.components.UsersTable.header.title')">
-        <ManageTable size="small" :disabled="state.ajaxRunning" :rows="items" :row-key="row => row.id"
+        <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="items" :row-key="row => row.id"
             :columns="columns" :order="order" :pager-data="pagination" pager-position="both" @sort="onSort"
             @refresh="onRefresh" @add="onAdd" @pager-changed="onPagerChanged" @clear-filters="onClearFilters">
             <template #thead-column-filters="{ columns }">
