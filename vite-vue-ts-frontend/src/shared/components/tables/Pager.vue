@@ -4,16 +4,20 @@
 
     import { NPagination } from 'naive-ui';
     import type { PaginationSizeOption } from "naive-ui";
+    import { PAGER_DEFAULT_RESULTS_PAGE } from "../../types/pager";
 
-    interface IProps {
+    interface Props {
         disabled?: boolean;
         totalResults: number;
         totalPages: number;
     };
 
-    const props = defineProps<IProps>();
+    const props = defineProps<Props>();
 
     const { t } = useI18n();
+
+    const currentPage = defineModel<number>("currentPage", { default: 1 });
+    const pageSize = defineModel<number>("pageSize", { default: PAGER_DEFAULT_RESULTS_PAGE });
 
     const pageSizes = computed<PaginationSizeOption[]>(() => [
         {
@@ -46,9 +50,6 @@
         },
     ]);
 
-    const currentPage = defineModel<number>("currentPage");
-
-    const pageSize = defineModel<number>("pageSize");
 </script>
 
 <template>
@@ -59,10 +60,11 @@
             </slot>
         </div>
         <!-- TODO: simple property on small screens ? -->
-        <n-pagination v-model:page="currentPage" v-model:page-size="pageSize" :page-count="props.totalPages"
-            :page-sizes="pageSizes" show-size-picker :page-slot="8" :disabled="props.disabled">
+        <n-pagination :disabled="props.disabled" v-model:page="currentPage" v-model:page-size="pageSize"
+            :page-count="props.totalPages" :page-sizes="pageSizes" show-size-picker :page-slot="8">
             <template #prefix="{ page, pageCount }">
-                {{ t("shared.components.pager.labels.currentPageOfTotal", { currentPage: page, totalPages: pageCount })
+                {{
+                    t("shared.components.pager.labels.currentPageOfTotal", { currentPage: page, totalPages: pageCount })
                 }}
             </template>
         </n-pagination>
