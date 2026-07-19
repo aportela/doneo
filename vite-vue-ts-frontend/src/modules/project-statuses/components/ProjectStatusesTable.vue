@@ -6,7 +6,7 @@
     import { IconTrash, IconStar, IconCalendarBolt, IconCalendarCancel, IconCalendarMinus } from '@tabler/icons-vue';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
-    import type { Sort } from '../../../shared/types/models/sort.ts';
+    import type { SortClass } from '../../../shared/types/models/sort.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { ProjectStatusesTableFilters } from '../types/project-statuses-table-filters.ts';
     import { ProjectStatus } from '../models/project-status';
@@ -20,7 +20,7 @@
     interface Props {
         disabled: boolean;
         items: ProjectStatus[];
-        sort?: Sort;
+        sort?: SortClass;
     }
 
     const { t } = useI18n();
@@ -67,7 +67,7 @@
         },
     ]);
 
-    const onSort = (sort: Sort) => {
+    const onSort = (sort: SortClass) => {
         emit("sort", sort);
     };
 

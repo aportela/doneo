@@ -15,12 +15,12 @@
     import ClearTableFiltersButton from '../../../shared/components/buttons/ClearTableFiltersButton.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
-    import type { Sort } from '../../../shared/types/models/sort.ts';
+    import type { SortClass } from '../../../shared/types/models/sort.ts';
 
     interface Props {
         disabled: boolean;
         items: TaskPriority[];
-        sort?: Sort;
+        sort?: SortClass;
     }
 
     const { t } = useI18n();
@@ -59,7 +59,7 @@
         },
     ]);
 
-    const onSort = (sort: Sort) => {
+    const onSort = (sort: SortClass) => {
         emit("sort", sort);
     };
 
@@ -119,7 +119,7 @@
             <tr v-for="taskPriority, index in items" :key="taskPriority.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(taskPriority.hexColor ?? '#888888')">{{ taskPriority.name
-                        }}</n-tag>
+                    }}</n-tag>
                 </td>
                 <td>{{ taskPriority.index }}</td>
                 <td class="doneo-text-center">

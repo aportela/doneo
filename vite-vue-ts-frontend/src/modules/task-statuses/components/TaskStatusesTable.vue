@@ -6,7 +6,7 @@
     import { IconTrash, IconStar, IconCalendarBolt, IconCalendarCancel, IconCalendarMinus } from '@tabler/icons-vue';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
-    import type { Sort } from '../../../shared/types/models/sort.ts';
+    import type { SortClass } from '../../../shared/types/models/sort.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { TaskStatusesTableFilters } from '../types/task-statuses-table-filters.ts';
     import { TaskStatus } from '../models/task-status';
@@ -20,7 +20,7 @@
     interface Props {
         disabled: boolean;
         items: TaskStatus[];
-        sort?: Sort;
+        sort?: SortClass;
     }
 
     const { t } = useI18n();
@@ -67,7 +67,7 @@
         }
     ]);
 
-    const onSort = (sort: Sort) => {
+    const onSort = (sort: SortClass) => {
         emit("sort", sort);
     };
 
@@ -130,7 +130,7 @@
             <tr v-for="taskStatus, index in items" :key="taskStatus.id ?? index">
                 <td>
                     <n-tag :color="getNaiveUITagColorProperty(taskStatus.hexColor ?? '#888888')">{{ taskStatus.name
-                        }}</n-tag>
+                    }}</n-tag>
                 </td>
                 <td>{{ taskStatus.index }}</td>
                 <td class="doneo-text-center">

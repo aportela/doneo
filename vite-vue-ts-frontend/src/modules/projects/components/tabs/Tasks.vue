@@ -15,7 +15,7 @@
     import type { SearchResponse } from "../../../tasks/types/dto.ts";
     import type { TasksTableFilters } from "../../../tasks/types/tasks-table-filters.ts";
 
-    import { Sort } from '../../../../shared/types/models/sort';
+    import { SortClass } from '../../../../shared/types/models/sort';
     import { Task } from "../../../tasks/models/tasks.ts";
 
     import { taskService } from "../../../tasks/services/task.ts";
@@ -45,7 +45,7 @@
     const itemCount = defineModel<number>("itemCount", { default: 0 });
     itemCount.value = 0;
 
-    const sort = reactive<Sort>(new Sort("createdAt", "DESC"));
+    const sort = reactive<SortClass>(new SortClass("createdAt", "DESC"));
 
     const resetPager = ref<boolean>(false);
     const currentPage = ref(1);
@@ -88,7 +88,7 @@
         onRefresh();
     });
 
-    const onSort = (newSort: Sort) => {
+    const onSort = (newSort: SortClass) => {
         sort.field = newSort.field;
         sort.order = newSort.order;
         onRefresh();

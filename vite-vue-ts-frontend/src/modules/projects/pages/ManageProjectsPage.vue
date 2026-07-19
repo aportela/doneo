@@ -14,7 +14,7 @@
     import type { SearchRequest, ProjectResponse, PatchRequest } from '../types/dto';
     import type { ProjectsTableFilters } from '../types/projects-table-filters.ts';
 
-    import { Sort } from '../../../shared/types/models/sort';
+    import { SortClass } from '../../../shared/types/models/sort';
     import { Project } from '../models/project';
 
     import { projectService } from '../services/project';
@@ -34,7 +34,7 @@
 
     const items = shallowRef<Project[]>([]);
 
-    const sort = reactive<Sort>(new Sort("createdAt", "DESC"));
+    const sort = reactive<SortClass>(new SortClass("createdAt", "DESC"));
 
     const resetPager = ref<boolean>(false);
     const currentPage = ref(1);
@@ -80,7 +80,7 @@
         onRefresh();
     });
 
-    const onSort = (newSort: Sort) => {
+    const onSort = (newSort: SortClass) => {
         sort.field = newSort.field;
         sort.order = newSort.order;
         onRefresh();

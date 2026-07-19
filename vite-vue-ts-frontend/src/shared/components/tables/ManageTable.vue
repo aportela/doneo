@@ -9,7 +9,7 @@
     import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
 
     import { type TableHeaderColumn } from '../../types/table-header-column';
-    import { Sort } from '../../types/models/sort.ts';
+    import { SortClass } from '../../types/models/sort.ts';
     import Pager from './Pager.vue';
     import RenderCell from './RenderCell.ts';
 
@@ -22,7 +22,7 @@
         columns: TableHeaderColumn<T>[];
         rows: T[];
         rowKey: (row: T) => string;
-        currentSort?: Sort,
+        currentSort?: SortClass,
 
         pagination?: {
             currentPageIndex: number;
@@ -68,7 +68,7 @@
 
     const onToggleSort = (column: TableHeaderColumn<T>) => {
         if (!props.disabled && props.currentSort && column.sortable) {
-            const newSort = new Sort(props.currentSort?.field, props.currentSort?.order);
+            const newSort = new SortClass(props.currentSort?.field, props.currentSort?.order);
             newSort.toggleSort(column.field);
             emit("sort", newSort);
         }

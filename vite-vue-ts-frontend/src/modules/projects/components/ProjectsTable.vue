@@ -7,7 +7,7 @@
 
     import { useUserSettingsStore } from '../../../stores/userSettings.ts';
     import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
-    import type { Sort } from '../../../shared/types/models/sort.ts';
+    import type { SortClass } from '../../../shared/types/models/sort.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { ProjectsTableFilters } from '../types/projects-table-filters.ts';
     import type { DateFilterSelectComponent } from '../../users/components/date-filter-select-component.ts';
@@ -32,7 +32,7 @@
         disabled: boolean;
         readOnly?: boolean;
         items: Project[];
-        sort?: Sort;
+        sort?: SortClass;
         id: string;
     }
 
@@ -206,7 +206,7 @@
         )
     );
 
-    const onSort = (sort: Sort) => {
+    const onSort = (sort: SortClass) => {
         emit("sort", sort);
     };
 

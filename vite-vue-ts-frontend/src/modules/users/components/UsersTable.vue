@@ -9,7 +9,7 @@
     import { useUserSettingsStore } from '../../../stores/userSettings.ts';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
-    import type { Sort } from '../../../shared/types/models/sort.ts';
+    import type { SortClass } from '../../../shared/types/models/sort.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { UsersTableFilters } from '../types/users-table-filters.ts';
     import { UserPermissionFilterValue } from '../types/user-admin-permission-filter';
@@ -27,7 +27,7 @@
     interface Props {
         disabled: boolean;
         items: User[];
-        sort?: Sort;
+        sort?: SortClass;
     }
 
     const { t } = useI18n();
@@ -124,7 +124,7 @@
         },
     ]);
 
-    const onSort = (sort: Sort) => {
+    const onSort = (sort: SortClass) => {
         emit("sort", sort);
     };
 

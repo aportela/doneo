@@ -14,7 +14,7 @@
     import type { SearchRequest, ProjectPriorityResponse } from '../types/dto';
     import type { ProjectPrioritiesTableFilters } from '../types/project-priorities-table-filters.ts';
 
-    import { Sort } from '../../../shared/types/models/sort';
+    import { SortClass } from '../../../shared/types/models/sort';
     import { ProjectPriority } from '../models/project-priority';
 
     import { projectPriorityService } from '../services/project-priority';
@@ -32,7 +32,7 @@
 
     const items = shallowRef<ProjectPriority[]>([]);
 
-    const sort = reactive<Sort>(new Sort("index", "ASC"));
+    const sort = reactive<SortClass>(new SortClass("index", "ASC"));
 
     const filters = reactive<ProjectPrioritiesTableFilters>({
         name: "",
@@ -59,7 +59,7 @@
         loadingStore.set(newValue.ajaxRunning);
     });
 
-    const onSort = (newSort: Sort) => {
+    const onSort = (newSort: SortClass) => {
         sort.field = newSort.field;
         sort.order = newSort.order;
         onRefresh();

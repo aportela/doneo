@@ -1,6 +1,6 @@
 import type { SortOrder } from "../common";
 
-export class Sort {
+export class SortClass {
   field: string;
   order: SortOrder;
 
