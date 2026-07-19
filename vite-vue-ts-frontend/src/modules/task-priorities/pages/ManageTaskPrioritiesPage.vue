@@ -14,7 +14,7 @@
     import type { SearchRequest, TaskPriorityResponse } from '../types/dto';
     import type { TaskPrioritiesTableFilters } from '../types/task-priorities-table-filters.ts';
 
-    import { Order } from '../../../shared/types/models/sort';
+    import type { Order } from '../../../shared/types/order.ts';
     import { TaskPriority } from '../models/task-priority';
 
     import { taskPriorityService } from '../services/task-priority';
@@ -32,7 +32,7 @@
 
     const items = shallowRef<TaskPriority[]>([]);
 
-    const sort = reactive<Order>(new Order("index", "ASC"));
+    const order = reactive<Order>({ field: "name", direction: "ASC" });
 
     const filters = reactive<TaskPrioritiesTableFilters>({
         name: "",
@@ -60,8 +60,8 @@
     });
 
     const onSort = (newSort: Order) => {
-        sort.field = newSort.field;
-        sort.sort = newSort.sort;
+        order.field = newSort.field;
+        order.sort = newSort.sort;
         onRefresh();
     };
 
@@ -89,8 +89,8 @@
                     resultsPage: 0,
                 },
                 order: {
-                    field: sort.field,
-                    sort: sort.sort,
+                    field: order.field,
+                    direction: order.direction,
                 },
                 filter: {
                     //name: filters.name.length > 0 ? filters.name : undefined,
@@ -213,7 +213,7 @@
 
     <n-card :title="t('modules.taskPriority.components.ManageTaskPrioritiesPage.header.title')">
         <TaskPrioritiesTable :items="filteredItems" :disabled="state.ajaxRunning" @refresh="onRefresh"
-            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" :sort="sort" @sort="onSort"
+            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" :sort="order" @sort="onSort"
             v-model:filters="filters" />
     </n-card>
 </template>

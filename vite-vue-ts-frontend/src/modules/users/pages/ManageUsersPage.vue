@@ -15,7 +15,7 @@
     import type { UsersTableFilters } from '../types/users-table-filters.ts';
     import { UserPermissionFilterValue } from '../types/user-admin-permission-filter';
 
-    import { Order } from '../../../shared/types/models/sort';
+    import type { Order } from '../../../shared/types/order.ts';
     import { User } from '../models/user';
 
     import { userService } from '../services/user';
@@ -34,7 +34,7 @@
 
     const items = shallowRef<User[]>([]);
 
-    const sort = reactive<Order>(new Order("name", "ASC"));
+    const order = reactive<Order>({ field: "name", direction: "ASC" });
 
     const resetPager = ref<boolean>(false);
     const currentPage = ref(1);
@@ -85,9 +85,9 @@
         onRefresh();
     });
 
-    const onSort = (newSort: Order) => {
-        sort.field = newSort.field;
-        sort.sort = newSort.sort;
+    const onSort = (newOrder: Order) => {
+        order.field = newOrder.field;
+        order.direction = newOrder.direction;
         onRefresh();
     };
 
@@ -115,8 +115,8 @@
                     resultsPage: pageSize.value,
                 },
                 order: {
-                    field: sort.field,
-                    sort: sort.sort,
+                    field: order.field,
+                    direction: order.direction,
                 },
                 filter: {
                     name: filters.name,
@@ -302,7 +302,7 @@
             </template>
         </Pager>
         <UsersTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
-            @update="onShowUpdateForm" @delete="onDelete" @undelete="onUnDelete" :sort="sort" @sort="onSort"
+            @update="onShowUpdateForm" @delete="onDelete" @undelete="onUnDelete" :sort="order" @sort="onSort"
             v-model:filters="filters" />
     </n-card>
 </template>

@@ -13,7 +13,7 @@
     import type { SearchRequest, RoleResponse } from '../types/dto';
     import type { RolesTableFilters } from '../types/roles-table-filters.ts';
 
-    import { Order } from '../../../shared/types/models/sort';
+    import type { Order } from '../../../shared/types/order.ts';
     import { Role } from '../models/role';
 
     import { roleService as roleService } from '../services/role';
@@ -31,7 +31,7 @@
 
     const items = shallowRef<Role[]>([]);
 
-    const sort = reactive<Order>(new Order("name", "ASC"));
+    const order = reactive<Order>({ field: "name", direction: "ASC" });
 
     const filters = reactive<RolesTableFilters>({
         name: "",
@@ -105,8 +105,8 @@
                     resultsPage: 0,
                 },
                 order: {
-                    field: sort.field,
-                    sort: sort.sort,
+                    field: order.field,
+                    direction: order.direction,
                 },
                 filter: {
                     name: filters.name.length > 0 ? filters.name : undefined,

@@ -14,7 +14,7 @@
     import type { SearchRequest, ProjectTypeResponse } from '../types/dto';
     import type { ProjectTypesTableFilters } from '../types/project-types-table-filters.ts';
 
-    import { Order } from '../../../shared/types/models/sort';
+    import type { Order } from '../../../shared/types/order.ts';
     import { ProjectType } from '../models/project-type';
 
     import { projectTypeService } from '../services/project-type';
@@ -32,7 +32,7 @@
 
     const items = shallowRef<ProjectType[]>([]);
 
-    const sort = reactive<Order>(new Order("name", "ASC"));
+    const order = reactive<Order>({ field: "name", direction: "ASC" });
 
     const filters = reactive<ProjectTypesTableFilters>({
         name: "",
@@ -83,8 +83,8 @@
                     resultsPage: 0,
                 },
                 order: {
-                    field: sort.field,
-                    sort: sort.sort,
+                    field: order.field,
+                    direction: order.direction,
                 },
                 filter: {
                     //name: filters.name.length > 0 ? filters.name : undefined,

@@ -9,7 +9,7 @@ interface TableColumnConfig {
 export interface TableConfig {
   columns: TableColumnConfig[];
   filters?: Record<string, unknown>;
-  sort: {
+  order: {
     field: string;
     direction: SortDirection;
   };
@@ -30,7 +30,7 @@ function createDefaultTableConfig(): TableConfig {
   return {
     columns: [],
     filters: {},
-    sort: {
+    order: {
       field: "",
       direction: "ASC",
     },
@@ -65,9 +65,9 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
         this.tables[tableId] = {
           ...createDefaultTableConfig(),
           ...defaults,
-          sort: {
-            ...createDefaultTableConfig().sort,
-            ...defaults.sort,
+          order: {
+            ...createDefaultTableConfig().order,
+            ...defaults.order,
           },
           columns: defaults.columns ?? createDefaultTableConfig().columns,
           pagination: {
@@ -89,11 +89,11 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
       delete this.tables[tableId];
     },
 
-    sort(tableId: string, sorting: Partial<TableConfig["sort"]>) {
+    sort(tableId: string, sorting: Partial<TableConfig["order"]>) {
       const table = this.ensure(tableId);
 
-      table.sort = {
-        ...table.sort,
+      table.order = {
+        ...table.order,
         ...sorting,
       };
     },
@@ -210,9 +210,9 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
       this.tables[tableId] = {
         ...table,
         ...config,
-        sort: {
-          ...table.sort,
-          ...config.sort,
+        order: {
+          ...table.order,
+          ...config.order,
         },
         columns: config.columns ?? table.columns,
         pagination: {

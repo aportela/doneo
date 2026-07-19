@@ -14,7 +14,7 @@
     import type { SearchRequest, TaskStatusResponse } from '../types/dto';
     import type { TaskStatusesTableFilters } from '../types/task-statuses-table-filters.ts';
 
-    import { Order } from '../../../shared/types/models/sort';
+    import type { Order } from '../../../shared/types/order.ts';
     import { TaskStatus } from '../models/task-status';
 
     import { taskStatusService } from '../services/task-status';
@@ -32,7 +32,7 @@
 
     const items = shallowRef<TaskStatus[]>([]);
 
-    const sort = reactive<Order>(new Order("index", "ASC"));
+    const order = reactive<Order>({ field: "name", direction: "ASC" });
 
     const filters = reactive<TaskStatusesTableFilters>({
         name: "",
@@ -60,8 +60,8 @@
     });
 
     const onSort = (newSort: Order) => {
-        sort.field = newSort.field;
-        sort.sort = newSort.sort;
+        order.field = newSort.field;
+        order.sort = newSort.sort;
         onRefresh();
     };
 
@@ -89,8 +89,8 @@
                     resultsPage: 0,
                 },
                 order: {
-                    field: sort.field,
-                    sort: sort.sort,
+                    field: order.field,
+                    direction: order.direction,
                 },
                 filter: {
                     //name: filters.name.length > 0 ? filters.name : undefined,
@@ -213,7 +213,7 @@
 
     <n-card :title="t('modules.taskStatus.components.ManageTaskStatusesPage.header.title')">
         <TaskStatusesTable :items="filteredItems" :disabled="state.ajaxRunning" @refresh="onRefresh"
-            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" :sort="sort" @sort="onSort"
+            @add="onShowAddForm" @update="onShowUpdateForm" @delete="onDelete" :sort="order" @sort="onSort"
             v-model:filters="filters" />
     </n-card>
 </template>

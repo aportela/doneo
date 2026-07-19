@@ -76,13 +76,16 @@
         isFilteredByContentType.value
     );
 
-    const columns = computed<TableHeaderColumn[]>(() => [
+    const columns = computed<TableHeaderColumn<Attachment>[]>(() => [
         {
             label: t("modules.projectAttachment.components.projectAttachmentsTable.header.columns.name"),
             field: "name",
             visible: true,
             sortable: false,
             isFiltered: () => isFilteredByName.value,
+            render: (row: Attachment) => {
+                return h("span", {}, { default: () => row.name });
+            }
         },
         {
             label: t("modules.projectAttachment.components.projectAttachmentsTable.header.columns.size"),
@@ -90,6 +93,9 @@
             visible: true,
             sortable: false,
             isFiltered: () => false,
+            render: (row: Attachment) => {
+                return h("span", {}, { default: () => formatBytes(row.size) });
+            }
         },
         {
             label: t("modules.projectAttachment.components.projectAttachmentsTable.header.columns.contentType"),
@@ -97,6 +103,9 @@
             visible: true,
             sortable: false,
             isFiltered: () => isFilteredByContentType.value,
+            render: (row: Attachment) => {
+                return h("span", {}, { default: () => row.contentType });
+            }
         },
         {
             label: t("modules.project.components.ProjectsTable.header.columns.createdAt"),
@@ -104,6 +113,9 @@
             visible: true,
             sortable: false,
             isFiltered: () => isFilteredByCreatedAt.value,
+            render: (row: Attachment) => {
+                return h("span", {}, { default: () => row.createdAt.toCustomMaskString(userSettingsStore.currentDatetimeMask) });
+            }
         },
         {
             label: t("modules.project.components.ProjectsTable.header.columns.createdBy"),
@@ -111,6 +123,9 @@
             visible: true,
             sortable: false,
             isFiltered: () => isFilteredByCreator.value,
+            render: (row: Attachment) => {
+                return h(AvatarUserName, { userId: row.createdBy.id, userName: row.createdBy.name });
+            }
         },
     ]);
 

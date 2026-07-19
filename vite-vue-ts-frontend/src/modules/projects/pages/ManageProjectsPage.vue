@@ -36,6 +36,7 @@
     const items = shallowRef<Project[]>([]);
 
     const order = reactive<Order>({ field: "createdAt", direction: "DESC" });
+
     const pagination = reactive<Pagination>({ currentPage: 1, resultsPage: PAGER_DEFAULT_RESULTS_PAGE, totalPages: 1, totalResults: 0 });
 
     const resetPager = ref<boolean>(false);

@@ -1,7 +1,5 @@
-import type {
-  PagerRequest,
-  PagerResponse,
-} from "../../../shared/types/dto/pager";
+import type { PagerQuery, PagerResult } from "../../../shared/types/pager";
+
 import type { Order } from "../../../shared/types/order";
 import type { TimestampRange } from "../../../shared/composables/timestamps";
 
@@ -51,7 +49,7 @@ type SearchRequestFilter = {
 };
 
 export type SearchRequest = {
-  pager: PagerRequest;
+  pager: PagerQuery;
   order: Order;
   filter?: SearchRequestFilter;
 };
@@ -77,5 +75,5 @@ export type SearchBaseResponse = {
 
 export type SearchResponse = {
   users: UserResponse[];
-  pager: PagerResponse;
+  pager: PagerResult;
 };

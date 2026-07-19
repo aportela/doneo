@@ -13,7 +13,7 @@
     import type { PatchRequest, SearchRequest, TaskResponse } from '../types/dto';
     import type { TasksTableFilters } from '../types/tasks-table-filters.ts';
 
-    import { Order } from '../../../shared/types/models/sort';
+    import type { Order } from '../../../shared/types/order.ts';
     import { Task } from '../models/tasks';
 
     import { taskService } from '../services/task.ts';
@@ -35,7 +35,7 @@
 
     const items = shallowRef<Task[]>([]);
 
-    const sort = reactive<Order>(new Order("createdAt", "DESC"));
+    const order = reactive<Order>({ field: "name", direction: "ASC" });
 
     const resetPager = ref<boolean>(false);
     const currentPage = ref(1);
@@ -76,8 +76,8 @@
     });
 
     const onSort = (newSort: Order) => {
-        sort.field = newSort.field;
-        sort.sort = newSort.sort;
+        order.field = newSort.field;
+        order.sort = newSort.sort;
         onRefresh();
     };
 
@@ -92,8 +92,8 @@
                     resultsPage: pageSize.value,
                 },
                 order: {
-                    field: sort.field,
-                    sort: sort.sort,
+                    field: order.field,
+                    direction: order.direction,
                 },
                 filter: {
                     summary: filters.summary.length > 0 ? filters.summary : undefined,
@@ -222,7 +222,7 @@
                             }) }}
                         </template>
                     </Pager>
-                    <TasksTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" :sort="sort"
+                    <TasksTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" :sort="order"
                         @sort="onSort" v-model:filters="filters" @status-changed="onStatusChanged" :project-id="''"
                         hide-add />
                 </n-card>
