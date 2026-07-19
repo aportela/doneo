@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, onMounted, type CSSProperties, nextTick, watch, onBeforeUnmount } from 'vue';
+    import { ref, reactive, computed, onMounted, nextTick, watch, onBeforeUnmount } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NInput, NFlex, NButton, NRadio, NRadioGroup, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, type InputInst, NTooltip } from 'naive-ui';
@@ -11,30 +11,27 @@
     import { handleAPIError } from '../../../api/client/errorHandler';
     import type { UserResponse, AddRequest, UpdateRequest } from '../types/dto';
     import { isValidEmail } from '../../../shared/composables/form-validators';
-    import type { FormMode } from '../../../shared/types/form-mode';
     import { appBus } from '../../../shared/composables/bus';
 
-    interface UserFormProps {
-        mode: FormMode;
+    interface Props {
         userId?: string | null;
-        style?: string | CSSProperties;
     }
 
     const emit = defineEmits(['add', 'update', 'cancel'])
 
-    const props = defineProps<UserFormProps>();
+    const props = defineProps<Props>();
 
     const { t } = useI18n();
 
-    const user = ref<User>(new User());
-
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
+
+    const user = ref<User>(new User());
 
     const showPasswordField = ref<boolean>(true);
 
     const serverErrors = ref<Record<string, string>>({});
 
-    const userFormRef = ref<FormInst | null>(null)
+    const formRef = ref<FormInst | null>(null)
 
     const inputPasswordRef = ref<InputInst | null>(null);
 
@@ -120,10 +117,10 @@
 
     const onSave = async () => {
         serverErrors.value = {};
-        userFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         try {
-            await userFormRef.value?.validate();
-            if (props.mode === "add") {
+            await formRef.value?.validate();
+            if (!props.userId) {
                 await onAdd();
             } else {
                 await onUpdate()
@@ -140,15 +137,11 @@
 
     const onGet = async (id: string) => {
         serverErrors.value = {};
-        userFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const response: UserResponse = await userService.get(id);
-            if (response.id === id) {
-                user.value = new User(response);
-            } else {
-                state.ajaxErrorMessage = t("modules.user.components.UserForm.errors.loadError");
-            }
+            user.value = new User(response);
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -180,7 +173,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    userFormRef.value?.validate().then(() => { }).catch(() => { });
+                    formRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -188,18 +181,10 @@
 
     const onAdd = async () => {
         serverErrors.value = {};
-        userFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: AddRequest = {
-                name: user.value.name ?? "",
-                email: user.value.email ?? "",
-                password: user.value.password ?? "",
-                permissions: {
-                    isSuperUser: user.value.permissions?.isSuperUser ?? false,
-                }
-            };
-            const addedUser: UserResponse = await userService.add(payload);
+            const addedUser: UserResponse = await userService.add(user.value.toAddUserRequestPayload());
             emit('add', addedUser)
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -238,7 +223,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    userFormRef.value?.validate().then(() => { }).catch(() => { });
+                    formRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -246,19 +231,10 @@
 
     const onUpdate = async () => {
         serverErrors.value = {};
-        userFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: UpdateRequest = {
-                id: user.value.id ?? "",
-                name: user.value.name ?? "",
-                password: user.value.password || undefined,
-                email: user.value.email ?? "",
-                permissions: {
-                    isSuperUser: user.value.permissions?.isSuperUser ?? false,
-                }
-            };
-            const updatedUser: UserResponse = await userService.update(payload);
+            const updatedUser: UserResponse = await userService.update(user.value.toUpdateUserRequestPayload());
             emit('update', updatedUser)
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -300,7 +276,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    userFormRef.value?.validate().then(() => { }).catch(() => { });
+                    formRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -313,8 +289,6 @@
             if (payload.to.includes("UserForm.onGet")) {
                 if (props.userId) {
                     onGet(props.userId);
-                } else {
-                    console.error(`TODO: missing userId property for ${props.mode} action`);
                 }
             } else if (payload.to.includes("UserForm.onAdd")) {
                 onAdd();
@@ -322,13 +296,9 @@
                 onUpdate()
             }
         });
-        if (props.mode === "update") {
+        if (props.userId) {
             showPasswordField.value = false;
-            if (props.userId) {
-                onGet(props.userId);
-            } else {
-                console.error(`TODO: missing userId property for ${props.mode} action`);
-            }
+            onGet(props.userId);
         }
     });
 
@@ -338,18 +308,20 @@
 </script>
 
 <template>
-    <n-card :style="style" bordered>
+    <n-card bordered>
         <template #header>
             <div class="doneo-flex-center-align">
-                <n-icon :component="props.mode == 'add' ? IconUserPlus : IconUserEdit" />
-                {{ t(props.mode == "add" ? "modules.user.components.UserForm.headers.addUser" :
-                    "modules.user.components.UserForm.headers.updateUser") }}
+                <n-icon class="doneo-mr-4px" :component="!props.userId ? IconUserPlus : IconUserEdit" />
+                {{
+                    t(!props.userId ? "modules.user.components.UserForm.headers.addUser" :
+                        "modules.user.components.UserForm.headers.updateUser")
+                }}
             </div>
         </template>
         <template #header-extra>
             <n-spin v-if="state.ajaxRunning" size="small" />
         </template>
-        <n-form ref="userFormRef" :model="user" :rules="state.ajaxRunning ? {} : userFormRules"
+        <n-form ref="formRef" :model="user" :rules="state.ajaxRunning ? {} : userFormRules"
             :disabled="state.ajaxRunning">
             <n-form-item :label="t('modules.user.components.UserForm.inputs.name.label')" path="name" show-feedback>
                 <n-input type="text" :placeholder="t('modules.user.components.UserForm.inputs.name.placeholder')"
@@ -430,7 +402,7 @@
 </template>
 
 <style lang="css" scoped>
-    .doneo-flex-center-align .n-icon {
+    .doneo-mr-4px {
         margin-right: 4px;
     }
 </style>

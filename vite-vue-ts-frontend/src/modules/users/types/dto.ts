@@ -1,65 +1,53 @@
 import type { PagerQuery, PagerResult } from "../../../shared/types/pager";
-
 import type { Order } from "../../../shared/types/order";
+// TODO: move to shared/types
 import type { TimestampRange } from "../../../shared/composables/timestamps";
 
-/*
-export type UserRequest = {
-  id: string;
-  name: string;
-  email: string;
-  isSuperUser: boolean;
-  createdAt: number;
-  updatedAt: number | null;
-  deletedAt: number | null;
-};
-*/
-
-interface UserPermissions {
+export interface UserPermissions {
   isSuperUser: boolean;
 }
 
-export type AddRequest = {
+export interface AddRequest {
   name: string;
   email: string;
   password: string;
   permissions: UserPermissions;
-};
+}
 
-export type UpdateRequest = {
+export interface UpdateRequest {
   id: string;
   name: string;
   email: string;
   password?: string;
   permissions: UserPermissions;
-};
-
-interface SearchRequestUserPermissions {
-  isSuperUser?: boolean;
 }
 
-type SearchRequestFilter = {
-  type?: number;
-  name?: string;
-  email?: string;
-  permissions?: SearchRequestUserPermissions;
-  createdAt?: TimestampRange;
-  updatedAt?: TimestampRange;
-  deletedAt?: TimestampRange;
-};
-
-export type SearchRequest = {
+export interface SearchRequest {
   pager: PagerQuery;
   order: Order;
-  filter?: SearchRequestFilter;
-};
+  filter?: {
+    type?: number;
+    name?: string;
+    email?: string;
+    permissions?: {
+      isSuperUser?: boolean;
+    };
+    createdAt?: TimestampRange;
+    updatedAt?: TimestampRange;
+    deletedAt?: TimestampRange;
+  };
+}
 
-export type UserBaseResponse = {
+export interface UserBaseResponse {
   id: string;
   name: string;
-};
+}
 
-export type UserResponse = {
+export interface SearchBaseResponse {
+  users: UserBaseResponse[];
+}
+
+export interface UserResponse {
   id: string;
   name: string;
   email: string;
@@ -67,13 +55,9 @@ export type UserResponse = {
   createdAt: number;
   updatedAt: number | null;
   deletedAt: number | null;
-};
+}
 
-export type SearchBaseResponse = {
-  users: UserBaseResponse[];
-};
-
-export type SearchResponse = {
+export interface SearchResponse {
   users: UserResponse[];
   pager: PagerResult;
-};
+}

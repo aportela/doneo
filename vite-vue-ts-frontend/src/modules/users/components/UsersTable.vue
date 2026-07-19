@@ -1,52 +1,81 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, h } from 'vue';
+    import { ref, reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount, h } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { useDialog, NIcon } from 'naive-ui';
+    import { NModal, NCard, useDialog, NIcon } from 'naive-ui';
     import { IconUserKey, IconUser, IconTrash, IconTrashOff } from '@tabler/icons-vue';
 
+    import { useLoadingStore } from '../../../stores/loading';
+    import { useCacheStore } from '../../../stores/cache.ts';
     import { useSessionStore } from '../../../stores/session';
     import { useUserSettingsStore } from '../../../stores/userSettings.ts';
+
+    import { useNotify } from '../../../shared/composables/notification';
+    import { appBus } from '../../../shared/composables/bus';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
     import type { Order } from '../../../shared/types/order.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
-    import type { UsersTableFilters } from '../types/users-table-filters.ts';
-    import { UserPermissionFilterValue } from '../types/user-admin-permission-filter';
+    import { UserPermissionFilterValue, type UserPermissionFilter } from '../types/user-admin-permission-filter';
     import type { DateFilterSelectComponent } from './date-filter-select-component.ts';
     import { User } from '../models/user';
     import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
-
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
+    import { userService } from '../services/user';
+    import { handleAPIError } from '../../../api/client/errorHandler';
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import UserPermissionsFilterSelector from '../components/UserPermissionsFilterSelector.vue';
     import TextFilterInput from '../../../shared/components/form-blocks/TextFilterInput.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
+    import { PAGER_DEFAULT_RESULTS_PAGE, type Pagination } from '../../../shared/types/pager.ts';
+    import type { TimestampRange } from '../../../shared/composables/timestamps.ts';
+    import type { SearchRequest, UserResponse } from '../types/dto.ts';
+    import UserForm from './UserForm.vue';
+    import { sortAndDeduplicateDiagnostics } from 'typescript';
 
     interface Props {
-        id: string;
-        disabled: boolean;
-        items: User[];
-        order: Order;
+        id?: string;
+        //disabled: boolean;
     }
 
     const { t } = useI18n();
+    const loadingStore = useLoadingStore();
     const sessionStore = useSessionStore();
     const dialog = useDialog();
     const userSettingsStore = useUserSettingsStore();
     const tableSettingsStore = useTableSettingsStore();
+    const cacheStore = useCacheStore();
+    const { notify } = useNotify();
 
-    const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'undelete', 'sort']);
+    //const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'undelete', 'sort']);
 
-    const props = defineProps<Props>();
+    const props = withDefaults(defineProps<Props>(), { id: "UsersTable" });;
+
+    const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
+
+    const items = shallowRef<User[]>([]);
+    const selectedItem = ref<User>(new User());
+
+    const order = reactive<Order>({ field: "name", direction: "ASC" });
+    const pagination = reactive<Pagination>({ currentPage: 1, resultsPage: PAGER_DEFAULT_RESULTS_PAGE, totalPages: 1, totalResults: 0 });
 
     const createdAtFilterRef = ref<DateFilterSelectComponent | undefined>();
     const updatedAtFilterRef = ref<DateFilterSelectComponent | undefined>();
     const deletedAtFilterRef = ref<DateFilterSelectComponent | undefined>();
 
-    const filters = defineModel<UsersTableFilters>("filters", {
-        default: () => ({
+    interface UsersTableFilters {
+        permissions: UserPermissionFilter;
+        name: string;
+        email: string;
+        createdAt: TimestampRange;
+        updatedAt: TimestampRange;
+        deletedAt: TimestampRange;
+    };
+
+    const filters = reactive<UsersTableFilters>(
+        {
             permissions: UserPermissionFilterValue.Any,
             name: "",
             email: "",
@@ -62,15 +91,15 @@
                 from: null,
                 to: null,
             },
-        })
-    });
+        }
+    );
 
-    const isFilteredByPermissions = computed<boolean>(() => filters.value.permissions != UserPermissionFilterValue.Any);
-    const isFilteredByName = computed<boolean>(() => filters.value.name.length > 0);
-    const isFilteredByEmail = computed<boolean>(() => filters.value.email.length > 0);
-    const isFilteredByCreatedAt = computed<boolean>(() => filters.value.createdAt.from != null || filters.value.createdAt.to != null);
-    const isFilteredByUpdatedAt = computed<boolean>(() => filters.value.updatedAt.from != null || filters.value.updatedAt.to != null);
-    const isFilteredByDeletedAt = computed<boolean>(() => filters.value.deletedAt.from != null || filters.value.deletedAt.to != null);
+    const isFilteredByPermissions = computed<boolean>(() => filters.permissions != UserPermissionFilterValue.Any);
+    const isFilteredByName = computed<boolean>(() => filters.name.length > 0);
+    const isFilteredByEmail = computed<boolean>(() => filters.email.length > 0);
+    const isFilteredByCreatedAt = computed<boolean>(() => filters.createdAt.from != null || filters.createdAt.to != null);
+    const isFilteredByUpdatedAt = computed<boolean>(() => filters.updatedAt.from != null || filters.updatedAt.to != null);
+    const isFilteredByDeletedAt = computed<boolean>(() => filters.deletedAt.from != null || filters.deletedAt.to != null);
 
     const columnDefinitions = reactive<TableHeaderColumn<User>[]>([
         {
@@ -164,7 +193,6 @@
         },
     ]);
 
-
     // create (if not found) default settings for this table (column order & visibility)
     tableSettingsStore.register(props.id, { columns: columnDefinitions.map((column) => { return { field: column.field, visible: column.visible } }) ?? [] });
 
@@ -186,12 +214,13 @@
         })
     );
 
+    watch(state, (newValue: AjaxStateInterface) => {
+        loadingStore.set(newValue.ajaxRunning);
+    });
+
+    /*
     const onSort = (sort: Order) => {
         emit("sort", sort);
-    };
-
-    const onRefresh = () => {
-        emit("refresh");
     };
 
     const onAdd = () => {
@@ -201,8 +230,54 @@
     const onUpdate = (user: User, index: number) => {
         emit("update", user, index);
     };
+    */
 
-    const onConfirmDelete = (user: User, index: number) => {
+    const onDelete = async (user: User) => {
+        if (user.id) {
+            Object.assign(state, defaultAjaxStateRunning);
+            try {
+                await userService.delete(user.id);
+                cacheStore.clearUsersCache();
+                // TODO: move i18n
+                notify('success', t("modules.user.components.ManageUsersPage.notifications.userDeleted", { name: user.name }));
+                onRefresh();
+            } catch (error: unknown) {
+                state.ajaxErrors = true;
+                handleAPIError(error,
+                    (apiError) => {
+                        switch (apiError.response?.status) {
+                            case 401:
+                                state.ajaxErrors = false;
+                                selectedItem.value = user;
+                                appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onDelete" } });
+                                break;
+                            case 403:
+                                state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
+                                break;
+                            case 404:
+                                state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.notFoundError");
+                                break;
+                            default:
+                                state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.deleteError");
+                                break;
+                        }
+                    },
+                    (fatalError) => {
+                        state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.deleteError");
+                        console.error("Unhandled API error", { file: "ManageUsersPage.vue", method: "onRefresh" }, { err: fatalError });
+                    });
+            } finally {
+                state.ajaxRunning = false;
+                if (state.ajaxErrorMessage) {
+                    appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+                }
+            }
+        } else {
+            console.error("user id not set", { file: "ManageUsersPage.vue", method: "onDelete" });
+        }
+    };
+
+    const onConfirmDelete = (user: User) => {
         dialog.warning({
             title: t("modules.user.components.UsersTable.dialogs.deleteConfirmation.title"),
             icon: renderIcon(IconTrash)(24),
@@ -216,12 +291,56 @@
             positiveText: t("shared.buttons.Delete.label"),
             negativeText: t("shared.buttons.Cancel.label"),
             onPositiveClick: () => {
-                emit("delete", user, index)
+                onDelete(user);
             },
         });
     };
 
-    const onConfirmUnDelete = (user: User, index: number) => {
+    const onUnDelete = async (user: User) => {
+        if (user.id) {
+            Object.assign(state, defaultAjaxStateRunning);
+            try {
+                await userService.unDelete(user.id);
+                cacheStore.clearUsersCache();
+                notify('success', t("modules.user.components.ManageUsersPage.notifications.userRestored", { name: user.name }));
+                onRefresh();
+            } catch (error: unknown) {
+                state.ajaxErrors = true;
+                handleAPIError(error,
+                    (apiError) => {
+                        switch (apiError.response?.status) {
+                            case 401:
+                                state.ajaxErrors = false;
+                                selectedItem.value = user;
+                                appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onUnDelete" } });
+                                break;
+                            case 403:
+                                state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
+                                break;
+                            case 404:
+                                state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.notFoundError");
+                                break;
+                            default:
+                                state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.restoreError");
+                                break;
+                        }
+                    },
+                    (fatalError) => {
+                        state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.restoreError");
+                        console.error("Unhandled API error", { file: "ManageUsersPage.vue", method: "onUnDelete" }, { err: fatalError });
+                    });
+            } finally {
+                state.ajaxRunning = false;
+                if (state.ajaxErrorMessage) {
+                    appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+                }
+            }
+        } else {
+            console.error("user id not set", { file: "ManageUsersPage.vue", method: "onUnDelete" });
+        }
+    };
+
+    const onConfirmUnDelete = (user: User) => {
         dialog.warning({
             title: t("modules.user.components.UsersTable.dialogs.undeleteConfirmation.title"),
             icon: renderIcon(IconTrashOff)(24),
@@ -235,53 +354,191 @@
             positiveText: t("shared.buttons.Restore.label"),
             negativeText: t("shared.buttons.Cancel.label"),
             onPositiveClick: () => {
-                emit("undelete", user, index)
+                onUnDelete(user);
             },
         })
     };
 
     const onClearFilters = () => {
-        filters.value.permissions = UserPermissionFilterValue.Any;
-        filters.value.name = "";
-        filters.value.email = "";
+        filters.permissions = UserPermissionFilterValue.Any;
+        filters.name = "";
+        filters.email = "";
         createdAtFilterRef.value?.reset();
         updatedAtFilterRef.value?.reset();
         deletedAtFilterRef.value?.reset();
     };
+
+    const onPagerChanged = (newPagination: Pagination) => {
+        pagination.currentPage = newPagination.currentPage;
+        pagination.resultsPage = newPagination.resultsPage;
+        onRefresh();
+    };
+
+    const onSort = (newOrder: Order) => {
+        order.field = newOrder.field;
+        order.direction = newOrder.direction;
+        onRefresh();
+    };
+
+    const resetPager = ref<boolean>(false);
+
+    const onRefresh = async () => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const payload: SearchRequest = {
+                pager: {
+                    currentPage: resetPager.value ? 1 : pagination.currentPage,
+                    resultsPage: pagination.resultsPage,
+                },
+                order: {
+                    field: order.field,
+                    direction: order.direction,
+                },
+                filter: {
+                    name: filters.name,
+                    email: filters.email,
+                    permissions: {
+                        isSuperUser: filters.permissions == UserPermissionFilterValue.Any ? undefined : (filters.permissions === UserPermissionFilterValue.OnlyAdministrators ? true : false),
+                    },
+                    createdAt: filters.createdAt,
+                    updatedAt: filters.updatedAt,
+                    deletedAt: filters.deletedAt,
+                }
+            };
+            const response = await userService.search(payload);
+            pagination.totalPages = response.pager.totalPages;
+            pagination.totalResults = response.pager.totalResults;
+            pagination.currentPage = response.pager.currentPage;
+            items.value = response.users.map((user: UserResponse) => new User(user));
+            resetPager.value = false;
+        } catch (error: unknown) {
+            items.value = [];
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onRefresh" } });
+                            break;
+                        case 403:
+                            state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.refreshError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.user.components.ManageUsersPage.errors.refreshError");
+                    console.error("Unhandled API error", { file: "ManageUsersPage.vue", method: "onRefresh" }, { err: fatalError });
+                });
+        }
+        finally {
+            state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
+        }
+    };
+
+    const showUserFormModal = ref<boolean>(false);
+
+    const onAdd = () => {
+        selectedItem.value = new User();
+        showUserFormModal.value = true;
+    };
+
+    const onUpdate = (user: User) => {
+        selectedItem.value = user;
+        showUserFormModal.value = true;
+    };
+
+    const onUserAdded = (user: UserResponse) => {
+        cacheStore.clearUsersCache();
+        showUserFormModal.value = false;
+        // TODO: move i18n label
+        notify('success', t("modules.user.components.ManageUsersPage.notifications.userAdded", { name: user.name }));
+        onRefresh();
+    };
+
+    const onUserUpdated = (user: UserResponse) => {
+        cacheStore.clearUsersCache();
+        showUserFormModal.value = false;
+        // TODO: move i18n label
+        notify('success', t("modules.user.components.ManageUsersPage.notifications.userUpdated", { name: user.name }));
+        onRefresh();
+    };
+
+    const hideUserForm = () => {
+        showUserFormModal.value = false;
+        selectedItem.value = new User();
+    };
+
+    let stopBusReauthListener: () => void;
+
+    onMounted(() => {
+        onRefresh();
+        stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
+            if (payload.to.includes("ManageUsersPage.onRefresh")) {
+                onRefresh();
+            } else if (payload.to.includes("ManageUsersPage.onDelete")) {
+                //onDelete(selectedItem.value)
+            } else if (payload.to.includes("ManageUsersPage.onUnDelete")) {
+                //onUnDelete(selectedItem.value);
+            }
+        });
+    });
+
+    onBeforeUnmount(() => {
+        stopBusReauthListener();
+    });
 </script>
 
 <template>
-    <ManageTable id="ManageUsers" size="small" :rows="items" :row-key="row => row.id" :columns="columns" :order="order"
-        @sort="onSort" @refresh="onRefresh" @add="onAdd">
-        <template #thead-column-filters="{ columns }">
-            <th v-for="column in columns">
-                <UserPermissionsFilterSelector v-if="column.field === 'permissions'" size="small"
-                    v-model:value="filters.permissions" :disabled="props.disabled" />
-                <TextFilterInput v-else-if="column.field === 'name'" clearable size="small"
-                    :placeholder="t('modules.user.components.UsersTable.header.filters.name.placeholder')"
-                    v-model:value="filters.name" @keydown-enter="onRefresh" :disabled="props.disabled" />
-                <TextFilterInput v-else-if="column.field === 'email'" clearable size="small"
-                    :placeholder="t('modules.user.components.UsersTable.header.filters.email.placeholder')"
-                    v-model:value="filters.email" @keydown-enter="onRefresh" :disabled="props.disabled" />
-                <DateFilterSelect v-else-if="column.field === 'createdAt'" clearable v-model:range="filters.createdAt"
-                    ref="createdAtFilterRef" :disabled="props.disabled" />
-                <DateFilterSelect v-else-if="column.field === 'updatedAt'" clearable v-model:range="filters.updatedAt"
-                    ref="updatedAtFilterRef" :disabled="props.disabled" />
-                <DateFilterSelect v-else-if="column.field === 'deletedAt'" clearable v-model:range="filters.deletedAt"
-                    ref="deletedAtFilterRef" :disabled="props.disabled" />
-            </th>
-        </template>
-        <template #rowactions="{ row, index }">
-            <ManageTableActionButtons show-update show-delete show-restore
-                :update-disabled="props.disabled || !!row.deletedAt?.msTimestamp"
-                :delete-disabled="props.disabled || sessionStore.sessionUserId === row.id || !!row.deletedAt?.msTimestamp"
-                :restored-disabled="props.disabled || !row.deletedAt?.msTimestamp" :disabled="props.disabled"
-                @update="onUpdate(row, index)" @delete="onConfirmDelete(row, index)"
-                @restore="onConfirmUnDelete(row, index)" @clear-filters="onClearFilters"
-                :no-items-warning-message="t('modules.project.components.UsersTable.warnings.noItemsFound')"
-                :show-no-items-warning-message="items.length < 1 && !props.disabled" />
-        </template>
-    </ManageTable>
+    <n-modal v-model:show="showUserFormModal" v-if="showUserFormModal">
+        <UserForm class="user-form" :user-id="selectedItem?.id" @add="onUserAdded" @update="onUserUpdated"
+            @cancel="hideUserForm" />
+    </n-modal>
+    <n-card :title="t('modules.user.components.ManageUsersPage.header.title')">
+        <ManageTable size="small" :disabled="state.ajaxRunning" :rows="items" :row-key="row => row.id"
+            :columns="columns" :order="order" :pager-data="pagination" pager-position="both" @sort="onSort"
+            @refresh="onRefresh" @add="onAdd" @pager-changed="onPagerChanged">
+            <template #thead-column-filters="{ columns }">
+                <th v-for="column in columns">
+                    <UserPermissionsFilterSelector v-if="column.field === 'permissions'" size="small"
+                        v-model:value="filters.permissions" :disabled="state.ajaxRunning" />
+                    <TextFilterInput v-else-if="column.field === 'name'" clearable size="small"
+                        :placeholder="t('modules.user.components.UsersTable.header.filters.name.placeholder')"
+                        v-model:value="filters.name" @keydown-enter="onRefresh" :disabled="state.ajaxRunning" />
+                    <TextFilterInput v-else-if="column.field === 'email'" clearable size="small"
+                        :placeholder="t('modules.user.components.UsersTable.header.filters.email.placeholder')"
+                        v-model:value="filters.email" @keydown-enter="onRefresh" :disabled="state.ajaxRunning" />
+                    <DateFilterSelect v-else-if="column.field === 'createdAt'" clearable
+                        v-model:range="filters.createdAt" ref="createdAtFilterRef" :disabled="state.ajaxRunning" />
+                    <DateFilterSelect v-else-if="column.field === 'updatedAt'" clearable
+                        v-model:range="filters.updatedAt" ref="updatedAtFilterRef" :disabled="state.ajaxRunning" />
+                    <DateFilterSelect v-else-if="column.field === 'deletedAt'" clearable
+                        v-model:range="filters.deletedAt" ref="deletedAtFilterRef" :disabled="state.ajaxRunning" />
+                </th>
+            </template>
+            <template #rowactions="{ row }">
+                <ManageTableActionButtons show-update show-delete show-restore
+                    :update-disabled="state.ajaxRunning || !!row.deletedAt?.msTimestamp"
+                    :delete-disabled="state.ajaxRunning || sessionStore.sessionUserId === row.id || !!row.deletedAt?.msTimestamp"
+                    :restored-disabled="state.ajaxRunning || !row.deletedAt?.msTimestamp" :disabled="state.ajaxRunning"
+                    @update="onUpdate(row)" @delete="onConfirmDelete(row)" @restore="onConfirmUnDelete(row)"
+                    @clear-filters="onClearFilters"
+                    :no-items-warning-message="t('modules.user.components.UsersTable.warnings.noItemsFound')"
+                    :show-no-items-warning-message="items.length < 1 && !state.ajaxRunning" />
+            </template>
+        </ManageTable>
+    </n-card>
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+    .user-form {
+        width: 95%;
+        max-width: 640px;
+    }
+</style>

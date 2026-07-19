@@ -1,12 +1,11 @@
 import type {
   UserResponse as UserDTO,
   UserBaseResponse as UserBaseDTO,
+  UserPermissions,
+  AddRequest,
+  UpdateRequest,
 } from "../types/dto";
 import { IDate } from "../../../shared/types/idate";
-
-interface UserPermissions {
-  isSuperUser: boolean;
-}
 
 export class UserBase {
   id: string;
@@ -58,6 +57,29 @@ export class User extends UserBase {
       createdAt: this.createdAt.msTimestamp ?? Date.now(),
       updatedAt: this.updatedAt?.msTimestamp ?? null,
       deletedAt: this.deletedAt?.msTimestamp ?? null,
+    };
+  }
+
+  toAddUserRequestPayload(): AddRequest {
+    return {
+      name: this.name,
+      email: this.email,
+      password: this.password,
+      permissions: {
+        isSuperUser: this.permissions.isSuperUser,
+      },
+    };
+  }
+
+  toUpdateUserRequestPayload(): UpdateRequest {
+    return {
+      id: this.id,
+      name: this.name,
+      email: this.email,
+      password: this.password ? this.password : undefined,
+      permissions: {
+        isSuperUser: this.permissions.isSuperUser,
+      },
     };
   }
 }

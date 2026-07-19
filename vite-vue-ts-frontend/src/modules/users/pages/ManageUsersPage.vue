@@ -2,7 +2,7 @@
     import { ref, reactive, shallowRef, watch, onMounted, onBeforeUnmount } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NModal, NCard } from 'naive-ui';
+    import { NModal } from 'naive-ui';
 
     import { useLoadingStore } from '../../../stores/loading';
     import { useCacheStore } from '../../../stores/cache.ts';
@@ -21,7 +21,6 @@
     import { userService } from '../services/user';
     import { handleAPIError } from '../../../api/client/errorHandler';
 
-    import Pager from '../../../shared/components/tables/Pager.vue';
     import UserForm from '../components/UserForm.vue';
     import UsersTable from '../components/UsersTable.vue';
 
@@ -268,9 +267,10 @@
         onRefresh();
     };
 
-    let stopBusReauthListener: () => void;
+    //let stopBusReauthListener: () => void;
 
     onMounted(() => {
+        /*
         onRefresh();
         stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
             if (payload.to.includes("ManageUsersPage.onRefresh")) {
@@ -281,10 +281,11 @@
                 onUnDelete(selectedItem.value);
             }
         });
+        */
     });
 
     onBeforeUnmount(() => {
-        stopBusReauthListener();
+        //stopBusReauthListener();
     });
 </script>
 
@@ -293,18 +294,9 @@
         <UserForm :mode="modalFormMode == 'add' ? 'add' : 'update'" :user-id="selectedItem.id" class="modal-form"
             @add="onAdded" @update="onUpdated" @cancel="onCancelForm" />
     </n-modal>
-
-    <n-card :title="t('modules.user.components.ManageUsersPage.header.title')">
-        <Pager v-model:current-page="currentPage" v-model:page-size="pageSize" :total-pages="totalPages"
-            :total-results="totalResults" class="doneo-pager-container">
-            <template #total-results-label="{ totalResults }">
-                {{ t("modules.user.components.ManageUsersPage.pager.totalItemsLabel", { total: totalResults }) }}
-            </template>
-        </Pager>
-        <UsersTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
-            @update="onShowUpdateForm" @delete="onDelete" @undelete="onUnDelete" :order="order" @sort="onSort"
-            v-model:filters="filters" />
-    </n-card>
+    <UsersTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
+        @update="onShowUpdateForm" @delete="onDelete" @undelete="onUnDelete" :order="order" @sort="onSort"
+        v-model:filters="filters" />
 </template>
 
 <style lang="css" scoped>

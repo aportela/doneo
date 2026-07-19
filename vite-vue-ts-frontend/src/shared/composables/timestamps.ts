@@ -1,5 +1,6 @@
 type WeekStart = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
+// TODO: move to shared/types
 export type TimestampRange = {
   from: number | null;
   to: number | null;
