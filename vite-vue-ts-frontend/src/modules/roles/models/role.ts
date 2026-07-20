@@ -14,28 +14,28 @@ type Permissions = {
 };
 
 export class Role {
-  id: string | null;
-  name: string | null;
+  id: string;
+  name: string;
   permissions: Permissions;
 
   constructor(data?: RoleDTO) {
-    this.id = data?.id ?? null;
-    this.name = data?.name ?? null;
+    this.id = data?.id ?? "";
+    this.name = data?.name ?? "";
     this.permissions = data?.permissions ?? getDefaultPermissions();
   }
 
   toDTO(): RoleDTO {
     return {
-      id: this.id ?? "",
-      name: this.name ?? "",
+      id: this.id,
+      name: this.name,
       permissions: {
-        allowUpdateProject: this.permissions?.allowUpdateProject ?? false,
-        allowDeleteProject: this.permissions?.allowDeleteProject ?? false,
-        allowViewProject: this.permissions?.allowViewProject ?? false,
-        allowAddTask: this.permissions?.allowAddTask ?? false,
-        allowUpdateTask: this.permissions?.allowUpdateTask ?? false,
-        allowDeleteTask: this.permissions?.allowDeleteTask ?? false,
-        allowViewTask: this.permissions?.allowViewTask ?? false,
+        allowUpdateProject: this.permissions.allowUpdateProject,
+        allowDeleteProject: this.permissions.allowDeleteProject,
+        allowViewProject: this.permissions.allowViewProject,
+        allowAddTask: this.permissions.allowAddTask,
+        allowUpdateTask: this.permissions.allowUpdateTask,
+        allowDeleteTask: this.permissions.allowDeleteTask,
+        allowViewTask: this.permissions.allowViewTask,
       },
     };
   }

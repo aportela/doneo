@@ -1,3 +1,4 @@
+// TODO: move to component path
 export type ProjectPermissionSelectValue =
   | "updateProjectAllowed"
   | "updateProjectDenied"
