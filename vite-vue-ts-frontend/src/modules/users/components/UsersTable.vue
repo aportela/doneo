@@ -306,7 +306,7 @@
                         case 401:
                             state.ajaxErrors = false;
                             tmpUser.value = user;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onDelete" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "UsersTable.onDelete" } });
                             break;
                         case 403:
                             state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
@@ -321,7 +321,7 @@
                 },
                 (fatalError) => {
                     state.ajaxErrorMessage = t("modules.user.components.UsersTable.errors.deleteError");
-                    console.error("Unhandled API error", { file: "ManageUsersPage.vue", method: "onRefresh" }, { err: fatalError });
+                    console.error("Unhandled API error", { file: "UsersTable.vue", method: "onRefresh" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
@@ -365,7 +365,7 @@
                         case 401:
                             state.ajaxErrors = false;
                             tmpUser.value = user;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onUnDelete" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "UsersTable.onUnDelete" } });
                             break;
                         case 403:
                             state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
@@ -380,7 +380,7 @@
                 },
                 (fatalError) => {
                     state.ajaxErrorMessage = t("modules.user.components.UsersTable.errors.restoreError");
-                    console.error("Unhandled API error", { file: "ManageUsersPage.vue", method: "onUnDelete" }, { err: fatalError });
+                    console.error("Unhandled API error", { file: "UsersTable.vue", method: "onUnDelete" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
@@ -446,7 +446,7 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageUsersPage.onRefresh" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "UsersTable.onRefresh" } });
                             break;
                         case 403:
                             state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
@@ -458,7 +458,7 @@
                 },
                 (fatalError) => {
                     state.ajaxErrorMessage = t("modules.user.components.UsersTable.errors.refreshError");
-                    console.error("Unhandled API error", { file: "ManageUsersPage.vue", method: "onRefresh" }, { err: fatalError });
+                    console.error("Unhandled API error", { file: "UsersTable.vue", method: "onRefresh" }, { err: fatalError });
                 });
         }
         finally {
@@ -469,21 +469,21 @@
         }
     };
 
-    const showUserFormModal = ref<boolean>(false);
+    const showFormModal = ref<boolean>(false);
 
     const onAdd = () => {
         tmpUser.value = new User();
-        showUserFormModal.value = true;
+        showFormModal.value = true;
     };
 
     const onUpdate = (user: User) => {
         tmpUser.value = user;
-        showUserFormModal.value = true;
+        showFormModal.value = true;
     };
 
     const onUserAdded = (user: UserResponse) => {
         cacheStore.clearUsersCache();
-        showUserFormModal.value = false;
+        showFormModal.value = false;
         tmpUser.value = new User();
         notify('success', t("modules.user.components.UsersTable.notifications.userAdded", { name: user.name }));
         onRefresh();
@@ -491,14 +491,14 @@
 
     const onUserUpdated = (user: UserResponse) => {
         cacheStore.clearUsersCache();
-        showUserFormModal.value = false;
+        showFormModal.value = false;
         tmpUser.value = new User();
         notify('success', t("modules.user.components.UsersTable.notifications.userUpdated", { name: user.name }));
         onRefresh();
     };
 
-    const hideUserForm = () => {
-        showUserFormModal.value = false;
+    const hideFormModal = () => {
+        showFormModal.value = false;
         tmpUser.value = new User();
     };
 
@@ -507,11 +507,11 @@
     onMounted(() => {
         onRefresh();
         stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
-            if (payload.to.includes("ManageUsersPage.onRefresh")) {
+            if (payload.to.includes("UsersTable.onRefresh")) {
                 onRefresh();
-            } else if (payload.to.includes("ManageUsersPage.onDelete")) {
+            } else if (payload.to.includes("UsersTable.onDelete")) {
                 onDelete(tmpUser.value);
-            } else if (payload.to.includes("ManageUsersPage.onUnDelete")) {
+            } else if (payload.to.includes("UsersTable.onUnDelete")) {
                 onUnDelete(tmpUser.value);
             }
         });
@@ -523,9 +523,9 @@
 </script>
 
 <template>
-    <n-modal v-model:show="showUserFormModal" v-if="showUserFormModal">
+    <n-modal v-model:show="showFormModal" v-if="showFormModal">
         <UserForm class="user-form" :user-id="tmpUser.id" @add="onUserAdded" @update="onUserUpdated"
-            @cancel="hideUserForm" />
+            @cancel="hideFormModal" />
     </n-modal>
     <n-card :title="t('modules.user.components.UsersTable.header.title')">
         <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="items" :row-key="row => row.id"
