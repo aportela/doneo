@@ -4,35 +4,41 @@
 
     import { NModal, NCard, useDialog, NButtonGroup, NButton, NIcon } from 'naive-ui';
 
-    import { ArchiveRestore, ShieldUser, User as UserIcon, SquarePen, Trash2 } from '@lucide/vue';
+    import { DONEO_ICON_ACTION_DELETE, DONEO_ICON_ACTION_EDIT, DONEO_ICON_ADMIN_USER, DONEO_ICON_ACTIONRESTORE, DONEO_ICON_USER } from '../../../shared/types/icons.ts';
 
     import { useLoadingStore } from '../../../stores/loading';
     import { useCacheStore } from '../../../stores/cache.ts';
     import { useSessionStore } from '../../../stores/session';
     import { useUserSettingsStore } from '../../../stores/userSettings.ts';
+    import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
 
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
-    import type { Order } from '../../../shared/types/order.ts';
-    import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
-    import { UserPermissionFilterValue, type UserPermissionFilter } from '../types/user-admin-permission-filter';
+
+
     import { User } from '../models/user';
-    import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
+
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
+    import { PAGER_DEFAULT_RESULTS_PAGE, type Pagination } from '../../../shared/types/pager.ts';
+    import type { Order } from '../../../shared/types/order.ts';
     import { userService } from '../services/user';
     import { handleAPIError } from '../../../api/client/errorHandler';
+    import type { SearchRequest, UserResponse } from '../types/dto.ts';
+    import type { TimestampRange } from '../../../shared/composables/timestamps.ts';
+    import { UserPermissionFilterValue, type UserPermissionFilter } from '../types/user-admin-permission-filter';
+
+    import UserForm from './UserForm.vue';
+    import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import UserPermissionsFilterSelector from '../components/UserPermissionsFilterSelector.vue';
     import TextFilterInput from '../../../shared/components/form-blocks/TextFilterInput.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
 
-    import { PAGER_DEFAULT_RESULTS_PAGE, type Pagination } from '../../../shared/types/pager.ts';
-    import type { TimestampRange } from '../../../shared/composables/timestamps.ts';
-    import type { SearchRequest, UserResponse } from '../types/dto.ts';
-    import UserForm from './UserForm.vue';
+
+
 
     interface Props {
         id?: string;
@@ -164,7 +170,7 @@
                                 style: {
                                     marginRight: "6px",
                                 },
-                                component: row.permissions?.isSuperUser ? ShieldUser : UserIcon,
+                                component: row.permissions?.isSuperUser ? DONEO_ICON_ADMIN_USER : DONEO_ICON_USER,
                                 color: row.permissions?.isSuperUser ? "red" : undefined,
                             }
                         ),
@@ -324,7 +330,7 @@
     const onConfirmDelete = (user: User) => {
         dialog.warning({
             title: t("modules.user.components.UsersTable.dialogs.deleteConfirmation.title"),
-            icon: renderIcon(Trash2)(24),
+            icon: renderIcon(DONEO_ICON_ACTION_DELETE)(24),
             content: () =>
                 h('div', [
                     t("modules.user.components.UsersTable.dialogs.deleteConfirmation.message", { name: user.name }),
@@ -383,7 +389,7 @@
     const onConfirmUnDelete = (user: User) => {
         dialog.warning({
             title: t("modules.user.components.UsersTable.dialogs.undeleteConfirmation.title"),
-            icon: renderIcon(ArchiveRestore)(24),
+            icon: renderIcon(DONEO_ICON_ACTIONRESTORE)(24),
             content: () =>
                 h('div', [
                     t("modules.user.components.UsersTable.dialogs.undeleteConfirmation.message", { name: user.name }),
@@ -541,24 +547,26 @@
             </template>
             <template #rowactions="{ row }">
                 <n-button-group class="doneo-table-actions-button-group" size="small">
-                    <n-button @click="onUpdate(row)" :disabled="state.ajaxRunning" class="doneo-table-actions-button">
+                    <n-button @click="onUpdate(row)" :disabled="state.ajaxRunning || row.deletedAt?.hasValue()"
+                        class="doneo-table-actions-button">
                         {{ t("shared.buttons.Update.label") }}
                         <template #icon>
-                            <n-icon :component="SquarePen" />
+                            <n-icon :component="DONEO_ICON_ACTION_EDIT" />
                         </template>
                     </n-button>
-                    <n-button @click="onConfirmDelete(row)" :disabled="state.ajaxRunning"
+                    <n-button @click="onConfirmDelete(row)"
+                        :disabled="state.ajaxRunning || row.deletedAt?.hasValue() || sessionStore.sessionUserId === row.id"
                         class="doneo-table-actions-button">
                         {{ t("shared.buttons.Delete.label") }}
                         <template #icon>
-                            <n-icon :component="Trash2" />
+                            <n-icon :component="DONEO_ICON_ACTION_DELETE" />
                         </template>
                     </n-button>
-                    <n-button @click="onConfirmUnDelete(row)" :disabled="state.ajaxRunning"
-                        class="doneo-table-actions-button">
+                    <n-button @click="onConfirmUnDelete(row)"
+                        :disabled="state.ajaxRunning || !row.deletedAt?.hasValue()" class="doneo-table-actions-button">
                         {{ t("shared.buttons.Restore.label") }}
                         <template #icon>
-                            <n-icon :component="ArchiveRestore" />
+                            <n-icon :component="DONEO_ICON_ACTIONRESTORE" />
                         </template>
                     </n-button>
                 </n-button-group>
