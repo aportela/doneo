@@ -176,6 +176,7 @@
     <Pager class="doneo-table-pager" v-if="props.pagerData && (pagerPosition === 'top' || pagerPosition === 'both')"
         :disabled="props.disabled" :pagination="props.pagerData" @update-current-page-index="onUpdateCurrentPageIndex"
         @update-results-page="onUpdateResultsPage" />
+        <div class="doneo-table-container" role="region" aria-labelledby="table-caption" tabindex="0">
     <n-table :size="size" :striped="striped" class="doneo-table" :single-line="false" :single-column="false">
         <thead>
             <tr>
@@ -256,12 +257,18 @@
             </tr>
         </tbody>
     </n-table>
+</div>
     <Pager class="doneo-table-pager" v-if="props.pagerData && (pagerPosition === 'bottom' || pagerPosition === 'both')"
         :disabled="props.disabled" :pagination="props.pagerData" @update-current-page-index="onUpdateCurrentPageIndex"
         @update-results-page="onUpdateResultsPage" />
 </template>
 
 <style lang="css" scoped>
+    .doneo-table-container {
+        overflow-x: auto;
+        width: 100%;
+    }
+
     .doneo-table-header-icon {
         margin-top: 4px;
     }
@@ -269,4 +276,9 @@
     .doneo-table-pager {
         margin: 4px 0px;
     }
+
+    th {
+        min-width: 10em;
+    }
+
 </style>
