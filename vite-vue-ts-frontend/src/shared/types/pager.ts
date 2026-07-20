@@ -1,4 +1,5 @@
 export const PAGER_DEFAULT_RESULTS_PAGE = 10;
+export const PAGER_DEFAULT_RESULTS_PAGE_NO_PAGINATION = 0;
 
 export interface PagerQuery {
   currentPage: number;
