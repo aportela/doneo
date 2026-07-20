@@ -100,6 +100,10 @@ doneo-table tfoot th:last-of-type {
     opacity: 0.1;
 }
 
+.doneo-mr-4px {
+    margin-right: 4px;
+}
+
 @media (max-width: 768px) {
     .mobile-hidden {
         display: none;

@@ -14,7 +14,7 @@
     import { appBus } from '../../../shared/composables/bus';
 
     interface Props {
-        userId?: string | null;
+        userId?: string;
     }
 
     const emit = defineEmits(['add', 'update', 'cancel'])
@@ -368,7 +368,7 @@
                 </n-input>
                 <n-button v-else @click="onShowPasswordFormItem" block :disabled="state.ajaxRunning">{{
                     t("modules.user.components.UserForm.buttons.changePassword.label")
-                }}</n-button>
+                    }}</n-button>
             </n-form-item>
             <n-form-item :label="t('modules.user.components.UserForm.radios.permissions.label')">
                 <n-radio-group v-model:value="user.permissions.isSuperUser" name="radiogroup">
@@ -401,8 +401,4 @@
 
 </template>
 
-<style lang="css" scoped>
-    .doneo-mr-4px {
-        margin-right: 4px;
-    }
-</style>
+<style lang="css" scoped></style>
