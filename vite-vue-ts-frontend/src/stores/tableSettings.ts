@@ -8,7 +8,7 @@ interface TableColumnConfig {
 
 export interface TableConfig {
   columns: TableColumnConfig[];
-  filters?: Record<string, unknown>;
+  //filters?: Record<string, unknown>;
   order: {
     field: string;
     direction: SortDirection;
@@ -29,7 +29,7 @@ const storePersistenceKey = "doneo.tableSettings";
 function createDefaultTableConfig(): TableConfig {
   return {
     columns: [],
-    filters: {},
+    //filters: {},
     order: {
       field: "",
       direction: "ASC",
@@ -74,9 +74,11 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
             ...createDefaultTableConfig().pagination,
             ...defaults.pagination,
           },
+          /*
           filters: {
             ...defaults.filters,
           },
+          */
         };
       }
     },
@@ -158,11 +160,13 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
       ];
     },
 
+    /*
     setFilters(tableId: string, filters: Record<string, unknown>) {
       const table = this.ensure(tableId);
 
       table.filters = filters;
     },
+
 
     updateFilters(tableId: string, filters: Record<string, unknown>) {
       const table = this.ensure(tableId);
@@ -178,6 +182,7 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
 
       table.filters = {};
     },
+    */
 
     hasPagination(tableId: string) {
       const table = this.ensure(tableId);
@@ -219,10 +224,12 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
           ...table.pagination,
           ...config.pagination,
         },
+        /*
         filters: {
           ...table.filters,
           ...config.filters,
         },
+        */
       };
     },
   },
