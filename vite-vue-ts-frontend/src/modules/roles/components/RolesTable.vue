@@ -73,17 +73,6 @@
     const pagination = reactive<Pagination>({ currentPage: 1, resultsPage: PAGER_DEFAULT_RESULTS_PAGE_NO_PAGINATION, totalPages: 1, totalResults: 0 });
     const resetPager = ref<boolean>(false);
 
-    watch(
-        () => pagination.resultsPage,
-        () => {
-            if (pagination.currentPage !== 1) {
-                resetPager.value = true;
-            } else {
-                onRefresh();
-            }
-        }
-    );
-
     const onPagerChanged = (newPagination: Pagination) => {
         pagination.currentPage = newPagination.currentPage;
         pagination.resultsPage = newPagination.resultsPage;
