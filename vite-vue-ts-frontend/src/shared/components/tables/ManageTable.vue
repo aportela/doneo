@@ -151,7 +151,7 @@
 </script>
 
 <template>
-    <n-drawer v-model:show="showSettingsDrawer" placement="right">
+    <n-drawer v-if="props.id" v-model:show="showSettingsDrawer" placement="right">
         <n-drawer-content :title="t('shared.components.tables.ManageTable.components.settingsDrawer.title')">
             <n-collapse accordion default-expanded-names="columnVisibility">
                 <n-collapse-item title="Column settings" key="columnVisibility">
@@ -232,7 +232,7 @@
                             {{ t("shared.components.tables.ManageTable.components.buttons.add.label") }}
                         </n-button>
                         <n-button @click="onSettings" :disabled="props.disabled"
-                            v-if="props.buttons.includes('settings')" class="doneo-table-actions-button">
+                            v-if="props.buttons.includes('settings') && props.id" class="doneo-table-actions-button">
                             <template #icon>
                                 <n-icon :component="Settings" />
                             </template>
