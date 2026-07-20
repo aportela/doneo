@@ -285,6 +285,7 @@
                 field: column.field,
                 visible: column.visible,
                 sortable: definition!.sortable,
+                align: definition?.align,
                 isFiltered: definition?.isFiltered ?? (() => false),
                 render: definition?.render ?? (() => "")
             };

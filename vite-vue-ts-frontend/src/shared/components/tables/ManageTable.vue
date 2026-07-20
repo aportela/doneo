@@ -245,7 +245,8 @@
             <tbody>
                 <tr v-for="row, index in props.rows" :key="props.rowKey(row)">
                     <!-- row content -->
-                    <td v-for="column in visibleColumns" :key="String(column.field)">
+                    <td v-for="column in visibleColumns" :key="String(column.field)"
+                        :class="{ 'doneo-text-center': column.align === 'center' }">
                         <RenderCell :render="column.render" :row="row" />
                     </td>
                     <!-- row actions -->
