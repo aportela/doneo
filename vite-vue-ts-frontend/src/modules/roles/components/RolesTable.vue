@@ -1,14 +1,12 @@
 <script setup lang="ts">
-    import { ref, reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount, h } from 'vue';
+    import { ref, reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount, h, type Component } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NModal, NCard, useDialog, NIcon } from 'naive-ui';
+    import { NModal, NCard, useDialog, NIcon, NTooltip } from 'naive-ui';
     import { IconTrash } from '@tabler/icons-vue';
 
     import { useLoadingStore } from '../../../stores/loading';
     import { useCacheStore } from '../../../stores/cache.ts';
-    import { useSessionStore } from '../../../stores/session';
-    import { useUserSettingsStore } from '../../../stores/userSettings.ts';
 
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
@@ -34,6 +32,7 @@
     import type { RoleResponse, SearchRequest } from '../types/dto.ts';
     import { PAGER_DEFAULT_RESULTS_PAGE_NO_PAGINATION, type Pagination } from '../../../shared/types/pager.ts';
     import RoleForm from './RoleForm.vue';
+    import { DONEO_ICON_ACTION_ADD, DONEO_ICON_ACTION_DELETE, DONEO_ICON_ACTION_EDIT, DONEO_ICON_ACTION_SHOW } from '../../../shared/types/icons.ts';
 
     interface Props {
         id?: string;
@@ -142,79 +141,96 @@
         });
     });
 
+    type PermissionIcon = {
+        allowed: boolean;
+        icon: Component;
+        allowedKey: string;
+        deniedKey: string;
+    };
+
+    const renderPermissionIcons = (permissions: PermissionIcon[]) =>
+        h(
+            "div",
+            { class: "doneo-flex doneo-gap-2" },
+            permissions.map((permission) =>
+                h(
+                    NTooltip,
+                    { trigger: "hover" },
+                    {
+                        trigger: () =>
+                            h(NIcon, {
+                                size: 20,
+                                component: permission.icon,
+                                class: [
+                                    "doneo-cursor-help",
+                                    { "doneo-disabled-icon": !permission.allowed },
+                                ],
+                            }),
+                        default: () =>
+                            t(permission.allowed ? permission.allowedKey : permission.deniedKey),
+                    }
+                )
+            )
+        );
+
     const renderProjectPermissionColumn = (row: Role) => {
-        /*
-        <n-tooltip trigger="hover">
-                        <template #trigger>
-                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconEdit"
-                                :class="{ 'doneo-disabled-icon': !role.permissions.allowUpdateProject }" />
-                        </template>
-                        {{ t(role.permissions.allowUpdateProject ?
-                            "modules.role.components.RolesTable.body.columns.permissionsHints.updateProjectAllowed" :
-                            "modules.role.components.RolesTable.body.columns.permissionsHints.updateProjectDenied") }}
-                    </n-tooltip>
-                    <n-tooltip trigger="hover">
-                        <template #trigger>
-                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconTrash"
-                                :class="{ 'doneo-disabled-icon': !role.permissions.allowDeleteProject }" />
-                        </template>
-                        {{ t(role.permissions.allowDeleteProject ?
-                            "modules.role.components.RolesTable.body.columns.permissionsHints.deleteProjectAllowed" :
-                            "modules.role.components.RolesTable.body.columns.permissionsHints.deleteProjectDenied") }}
-                    </n-tooltip>
-                    <n-tooltip trigger="hover">
-                        <template #trigger>
-                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconEyeCheck"
-                                :class="{ 'doneo-disabled-icon': !role.permissions.allowViewProject }" />
-                        </template>
-                        {{ t(role.permissions.allowViewProject ?
-                            "modules.role.components.RolesTable.body.columns.permissionsHints.viewProjectAllowed" :
-                            "modules.role.components.RolesTable.body.columns.permissionsHints.viewProjectDenied") }}
-                    </n-tooltip>
-                    <n-tooltip trigger="hover">
-                        <template #trigger>
-                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconSquarePlus"
-                                :class="{ 'doneo-disabled-icon': !role.permissions.allowAddTask }" />
-                        </template>
-                        {{ t(role.permissions.allowAddTask ?
-                            "modules.role.components.RolesTable.body.columns.permissionsHints.addTaskAllowed" :
-                            "modules.role.components.RolesTable.body.columns.permissionsHints.addTaskDenied") }}
-                    </n-tooltip>
-        */
-        return (null);
+        return renderPermissionIcons([
+            {
+                allowed: row.permissions.allowUpdateProject,
+                icon: DONEO_ICON_ACTION_EDIT,
+                allowedKey:
+                    "modules.role.components.RolesTable.body.columns.permissionsHints.updateProjectAllowed",
+                deniedKey:
+                    "modules.role.components.RolesTable.body.columns.permissionsHints.updateProjectDenied",
+            },
+            {
+                allowed: row.permissions.allowDeleteProject,
+                icon: DONEO_ICON_ACTION_DELETE,
+                allowedKey:
+                    "modules.role.components.RolesTable.body.columns.permissionsHints.deleteProjectAllowed",
+                deniedKey:
+                    "modules.role.components.RolesTable.body.columns.permissionsHints.deleteProjectDenied",
+            },
+            {
+                allowed: row.permissions.allowViewProject,
+                icon: DONEO_ICON_ACTION_SHOW,
+                allowedKey:
+                    "modules.role.components.RolesTable.body.columns.permissionsHints.viewProjectAllowed",
+                deniedKey:
+                    "modules.role.components.RolesTable.body.columns.permissionsHints.viewProjectDenied",
+            },
+            {
+                allowed: row.permissions.allowAddTask,
+                icon: DONEO_ICON_ACTION_ADD,
+                allowedKey:
+                    "modules.role.components.RolesTable.body.columns.permissionsHints.addTaskAllowed",
+                deniedKey:
+                    "modules.role.components.RolesTable.body.columns.permissionsHints.addTaskDenied",
+            },
+        ]);
     };
 
     const renderTaskPermissionColumn = (row: Role) => {
-        /*
-        <n-tooltip trigger="hover">
-                        <template #trigger>
-                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconEdit"
-                                :class="{ 'doneo-disabled-icon': !role.permissions.allowUpdateTask }" />
-                        </template>
-                        {{ t(role.permissions.allowUpdateTask ?
-                            "modules.role.components.RolesTable.body.columns.permissionsHints.updateTaskAllowed" :
-                            "modules.role.components.RolesTable.body.columns.permissionsHints.updateTaskDenied") }}
-                    </n-tooltip>
-                    <n-tooltip trigger="hover">
-                        <template #trigger>
-                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconTrash"
-                                :class="{ 'doneo-disabled-icon': !role.permissions.allowDeleteTask }" />
-                        </template>
-                        {{ t(role.permissions.allowDeleteTask ?
-                            "modules.role.components.RolesTable.body.columns.permissionsHints.deleteTaskAllowed" :
-                            "modules.role.components.RolesTable.body.columns.permissionsHints.deleteTaskDenied") }}
-                    </n-tooltip>
-                    <n-tooltip trigger="hover">
-                        <template #trigger>
-                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconEyeCheck"
-                                :class="{ 'doneo-disabled-icon': !role.permissions.allowViewTask }" />
-                        </template>
-                        {{ t(role.permissions.allowViewTask ?
-                            "modules.role.components.RolesTable.body.columns.permissionsHints.viewTaskAllowed" :
-                            "modules.role.components.RolesTable.body.columns.permissionsHints.viewTaskDenied") }}
-                    </n-tooltip>
-        */
-        return (null);
+        return renderPermissionIcons([
+            {
+                allowed: row.permissions.allowUpdateTask,
+                icon: DONEO_ICON_ACTION_EDIT,
+                allowedKey: "modules.role.components.RolesTable.body.columns.permissionsHints.updateTaskAllowed",
+                deniedKey: "modules.role.components.RolesTable.body.columns.permissionsHints.updateTaskDenied",
+            },
+            {
+                allowed: row.permissions.allowDeleteTask,
+                icon: DONEO_ICON_ACTION_DELETE,
+                allowedKey: "modules.role.components.RolesTable.body.columns.permissionsHints.deleteTaskAllowed",
+                deniedKey: "modules.role.components.RolesTable.body.columns.permissionsHints.deleteTaskDenied",
+            },
+            {
+                allowed: row.permissions.allowViewTask,
+                icon: DONEO_ICON_ACTION_SHOW,
+                allowedKey: "modules.role.components.RolesTable.body.columns.permissionsHints.viewTaskAllowed",
+                deniedKey: "modules.role.components.RolesTable.body.columns.permissionsHints.viewTaskDenied",
+            },
+        ]);
     };
 
     const columnDefinitions = reactive<TableHeaderColumn<Role>[]>([
