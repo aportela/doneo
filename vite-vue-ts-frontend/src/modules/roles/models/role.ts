@@ -1,5 +1,7 @@
 import {
+  type AddRequest,
   type RoleResponse as RoleDTO,
+  type UpdateRequest,
   getDefaultPermissions,
 } from "../types/dto";
 
@@ -37,6 +39,21 @@ export class Role {
         allowDeleteTask: this.permissions.allowDeleteTask,
         allowViewTask: this.permissions.allowViewTask,
       },
+    };
+  }
+
+  toAddRoleRequestPayload(): AddRequest {
+    return {
+      name: this.name,
+      permissions: this.permissions,
+    };
+  }
+
+  toUpdateRoleRequestPayload(): UpdateRequest {
+    return {
+      id: this.id,
+      name: this.name,
+      permissions: this.permissions,
     };
   }
 }

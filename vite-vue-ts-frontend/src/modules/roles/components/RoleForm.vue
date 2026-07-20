@@ -10,19 +10,16 @@
     import { roleService } from '../services/role'
     import { handleAPIError } from '../../../api/client/errorHandler';
     import type { RoleResponse, AddRequest, UpdateRequest } from '../types/dto';
-    import type { FormMode } from '../../../shared/types/form-mode';
     import { appBus } from '../../../shared/composables/bus';
     import { getDefaultPermissions } from '../types/dto';
 
-    interface RoleFormProps {
-        mode: FormMode;
-        roleId?: string | null;
-        style?: string | CSSProperties;
+    interface Props {
+        roleId?: string;
     }
 
     const emit = defineEmits(['add', 'update', 'cancel'])
 
-    const props = defineProps<RoleFormProps>();
+    const props = defineProps<Props>();
 
     const { t } = useI18n();
 
@@ -70,7 +67,7 @@
         roleFormRef.value?.restoreValidation();
         try {
             await roleFormRef.value?.validate();
-            if (props.mode === "add") {
+            if (!props.roleId) {
                 await onAdd();
             } else {
                 await onUpdate()
@@ -138,11 +135,7 @@
         roleFormRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: AddRequest = {
-                name: role.value.name ?? "",
-                permissions: role.value.permissions ?? getDefaultPermissions(),
-            };
-            const addedRole: RoleResponse = await roleService.add(payload);
+            const addedRole: RoleResponse = await roleService.add(role.value.toAddRoleRequestPayload());
             emit('add', addedRole)
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -190,12 +183,7 @@
         roleFormRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: UpdateRequest = {
-                id: role.value.id ?? "",
-                name: role.value.name ?? "",
-                permissions: role.value.permissions ?? getDefaultPermissions(),
-            };
-            const updatedRole: RoleResponse = await roleService.update(payload);
+            const updatedRole: RoleResponse = await roleService.update(role.value.toUpdateRoleRequestPayload());
             emit('update', updatedRole)
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -248,8 +236,6 @@
             if (payload.to.includes("RoleForm.onGet")) {
                 if (props.roleId) {
                     onGet(props.roleId);
-                } else {
-                    console.error(`TODO: missing roleId property for ${props.mode} action`);
                 }
             } else if (payload.to.includes("RoleForm.onAdd")) {
                 onAdd();
@@ -257,13 +243,9 @@
                 onUpdate()
             }
         });
-        if (props.mode === "update") {
+        if (props.roleId) {
             showPasswordField.value = false;
-            if (props.roleId) {
-                onGet(props.roleId);
-            } else {
-                console.error(`TODO: missing roleId property for ${props.mode} action`);
-            }
+            onGet(props.roleId);
         }
     });
 
@@ -273,12 +255,14 @@
 </script>
 
 <template>
-    <n-card :style="style" bordered>
+    <n-card bordered>
         <template #header>
             <div class="doneo-flex-center-align">
-                <n-icon :component="props.mode == 'add' ? IconPlus : IconEdit" />
-                {{ t(props.mode == "add" ? "modules.role.components.RoleForm.headers.addRole" :
-                    "modules.role.components.RoleForm.headers.updateRole") }}
+                <n-icon class="doneo-mr-4px" :component="!props.roleId ? IconPlus : IconEdit" />
+                {{
+                    t(!props.roleId ? "modules.role.components.RoleForm.headers.addRole" :
+                        "modules.role.components.RoleForm.headers.updateRole")
+                }}
             </div>
         </template>
         <template #header-extra>
@@ -301,7 +285,7 @@
                 <n-gi>
                     <h4 class="doneo-permission-group-header">{{
                         t("modules.role.components.RoleForm.headers.projectPermissions")
-                    }}</h4>
+                        }}</h4>
                     <n-switch v-model:value="role.permissions.allowUpdateProject" class="doneo-permission-switch"
                         :disabled="state.ajaxRunning">
                         <template #checked>
@@ -333,7 +317,7 @@
                 <n-gi>
                     <h4 class="doneo-permission-group-header">{{
                         t("modules.role.components.RoleForm.headers.taskPermissions")
-                    }}
+                        }}
                     </h4>
                     <n-switch v-model:value="role.permissions.allowAddTask" class="doneo-permission-switch"
                         :disabled="state.ajaxRunning">
@@ -395,10 +379,6 @@
 </template>
 
 <style lang="css" scoped>
-    .doneo-flex-center-align .n-icon {
-        margin-right: 4px;
-    }
-
     .doneo-permission-group-header {
         margin: 0px;
     }

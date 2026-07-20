@@ -669,24 +669,10 @@ export default {
             nameAlreadyExists: "Name already exists",
           },
         },
-        ManageRolesPage: {
-          header: {
-            title: "Manage roles",
-          },
-          notifications: {
-            roleAdded: 'Role "{name}" has been added',
-            roleUpdated: 'Role "{name}" has been updated',
-            roleDeleted: 'Role "{name}" has been deleted',
-          },
-          errors: {
-            refreshError: "There was a problem while refreshing the role list",
-            deleteError: "There was a problem while deleting the role",
-            // TODO: deduplicate
-            notFoundError: "We couldn’t find the specified role",
-          },
-        },
+        ManageRolesPage: {},
         RolesTable: {
           header: {
+            title: "Manage roles",
             columns: {
               name: "Name",
               projectPermissions: "Project permissions",
@@ -727,6 +713,17 @@ export default {
           },
           warnings: {
             noItemsFound: "No roles found",
+          },
+          notifications: {
+            roleAdded: 'Role "{name}" has been added',
+            roleUpdated: 'Role "{name}" has been updated',
+            roleDeleted: 'Role "{name}" has been deleted',
+          },
+          errors: {
+            refreshError: "There was a problem while refreshing the role list",
+            deleteError: "There was a problem while deleting the role",
+            // TODO: deduplicate
+            notFoundError: "We couldn’t find the specified role",
           },
         },
       },
