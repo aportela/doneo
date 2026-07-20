@@ -3,17 +3,19 @@
     import { useI18n } from "vue-i18n";
 
     import { NTable, type TableSize, NFlex, NIcon, NDrawer, NDrawerContent, NCollapse, NCollapseItem, NButton, NButtonGroup, NEmpty } from 'naive-ui';
-    import { ArrowDown, ArrowDownWideNarrow, ArrowUp, ArrowUpWideNarrow, Eye, EyeOff, Funnel, FunnelX, ListRestart, Plus, Settings } from '@lucide/vue';
 
-    import Pager from './Pager.vue';
-    import { type TableHeaderColumn } from '../../types/table-header-column';
-    import type { Order } from '../../types/order.ts';
-    import RenderCell from './RenderCell.ts';
-    import { PAGER_DEFAULT_RESULTS_PAGE, type Pagination } from '../../types/pager.ts';
+    import { DONEO_ICON_ACTION_ADD, DONEO_ICON_ACTION_CLEAR_FILTERS, DONEO_ICON_ACTION_DOWN, DONEO_ICON_ACTION_HIDE, DONEO_ICON_ACTION_REFRESH, DONEO_ICON_ACTION_SETTINGS, DONEO_ICON_ACTION_SHOW, DONEO_ICON_ACTION_UP, DONEO_ICON_FILTERED, DONEO_ICON_TOGGLE_SORT_ASCENDING, DONEO_ICON_TOGGLE_SORT_DESCENDING } from '../../types/icons.ts';
 
     import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
 
-    type actionButton = "refresh" | "add" | "settings";
+    import { type TableHeaderColumn } from '../../types/table-header-column';
+    import type { Order } from '../../types/order.ts';
+    import RenderCell from './RenderCell.ts';
+    import { type Pagination } from '../../types/pager.ts';
+
+    import Pager from './Pager.vue';
+
+    type ActionButton = "refresh" | "add" | "settings";
 
     interface IProps {
         id?: string;
@@ -28,7 +30,7 @@
 
         pagerPosition?: "top" | "bottom" | "both";
 
-        buttons?: actionButton[];
+        buttons?: ActionButton[];
 
         noItemsWarningMessage?: string;
         showNoItemsWarningMessage?: boolean;
@@ -139,31 +141,31 @@
                     <n-button-group size="tiny">
                         <n-button @click="onShowAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.showAllColumns.label")
-                            }}</n-button>
+                        }}</n-button>
                         <n-button @click="onHideAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.HideAllColumns.label")
-                        }}</n-button>
+                            }}</n-button>
                         <n-button @click="onToggleAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.ToggleColumns.label")
-                            }}</n-button>
+                        }}</n-button>
                     </n-button-group>
                     <p v-for="column, index in props.columns" class="doneo-cursor-pointer doneo-flex-center-align">
                         <n-button-group size="tiny" style="margin-right: 8px;">
                             <n-button @click="onMoveColumn(column.field, 'up')" :disabled="index < 1">
                                 <template #icon>
-                                    <n-icon :component="ArrowUp" />
+                                    <n-icon :component="DONEO_ICON_ACTION_UP" />
                                 </template>
                             </n-button>
                             <n-button @click="onMoveColumn(column.field, 'down')"
                                 :disabled="index >= props.columns.length - 1">
                                 <template #icon>
-                                    <n-icon :component="ArrowDown" />
+                                    <n-icon :component="DONEO_ICON_ACTION_DOWN" />
                                 </template>
                             </n-button>
                             <n-button @click="onToggleVisibleColumn(column.field)">
                                 <template #icon>
                                     <n-icon :color="column.visible ? 'green' : 'red'"
-                                        :component="column.visible ? Eye : EyeOff" />
+                                        :component="column.visible ? DONEO_ICON_ACTION_SHOW : DONEO_ICON_ACTION_HIDE" />
                                 </template>
                             </n-button>
                         </n-button-group>
@@ -176,88 +178,89 @@
     <Pager class="doneo-table-pager" v-if="props.pagerData && (pagerPosition === 'top' || pagerPosition === 'both')"
         :disabled="props.disabled" :pagination="props.pagerData" @update-current-page-index="onUpdateCurrentPageIndex"
         @update-results-page="onUpdateResultsPage" />
-        <div class="doneo-table-container" role="region" aria-labelledby="table-caption" tabindex="0">
-    <n-table :size="size" :striped="striped" class="doneo-table" :single-line="false" :single-column="false">
-        <thead>
-            <tr>
-                <!-- column header labels -->
-                <th v-for="column in visibleColumns" :key="column.field" @click="onToggleSort(column)"
-                    :class="{ 'doneo-cursor-pointer': column.sortable }">
-                    <n-flex align="center" justify="space-between">
-                        <span v-if="column.align === 'center'"></span>
-                        <span>{{ column.label }}</span>
-                        <div>
-                            <n-icon :component="Funnel" class="doneo-table-header-icon"
-                                v-if="column.isFiltered?.() ?? false" />
-                            <n-icon class="doneo-table-header-icon"
-                                v-if="column.sortable && props.order?.field === column.field"
-                                :component="props.order?.direction == 'DESC' ? ArrowDownWideNarrow : ArrowUpWideNarrow">
-                            </n-icon>
-                        </div>
-                    </n-flex>
-                </th>
-                <!-- common table actions (refresh/add/settings)-->
-                <th>
-                    <n-button-group class="doneo-table-actions-button-group">
-                        <n-button @click="onRefresh" :disabled="props.disabled" v-if="props.buttons.includes('refresh')"
-                            class="doneo-table-actions-button">
+    <div class="doneo-table-container" role="region" aria-labelledby="table-caption" tabindex="0">
+        <n-table :size="size" :striped="striped" class="doneo-table" :single-line="false" :single-column="false">
+            <thead>
+                <tr>
+                    <!-- column header labels -->
+                    <th v-for="column in visibleColumns" :key="column.field" @click="onToggleSort(column)"
+                        :class="{ 'doneo-cursor-pointer': column.sortable }">
+                        <n-flex align="center" justify="space-between">
+                            <span v-if="column.align === 'center'"></span>
+                            <span>{{ column.label }}</span>
+                            <div>
+                                <n-icon :component="DONEO_ICON_FILTERED" class="doneo-table-header-icon"
+                                    v-if="column.isFiltered?.() ?? false" />
+                                <n-icon class="doneo-table-header-icon"
+                                    v-if="column.sortable && props.order?.field === column.field"
+                                    :component="props.order?.direction == 'DESC' ? DONEO_ICON_TOGGLE_SORT_DESCENDING : DONEO_ICON_TOGGLE_SORT_ASCENDING">
+                                </n-icon>
+                            </div>
+                        </n-flex>
+                    </th>
+                    <!-- common table actions (refresh/add/settings)-->
+                    <th>
+                        <n-button-group class="doneo-table-actions-button-group">
+                            <n-button @click="onRefresh" :disabled="props.disabled"
+                                v-if="props.buttons.includes('refresh')" class="doneo-table-actions-button">
+                                <template #icon>
+                                    <n-icon :component="DONEO_ICON_ACTION_REFRESH" />
+                                </template>
+                                {{ t("shared.components.tables.ManageTable.components.buttons.refresh.label") }}
+                            </n-button>
+                            <n-button @click="onAdd" :disabled="props.disabled" v-if="props.buttons.includes('add')"
+                                class="doneo-table-actions-button">
+                                <template #icon>
+                                    <n-icon :component="DONEO_ICON_ACTION_ADD" />
+                                </template>
+                                {{ t("shared.components.tables.ManageTable.components.buttons.add.label") }}
+                            </n-button>
+                            <n-button @click="onSettings" :disabled="props.disabled"
+                                v-if="props.buttons.includes('settings') && props.id"
+                                class="doneo-table-actions-button">
+                                <template #icon>
+                                    <n-icon :component="DONEO_ICON_ACTION_SETTINGS" />
+                                </template>
+                                {{ t("shared.components.tables.ManageTable.components.buttons.settings.label") }}
+                            </n-button>
+                        </n-button-group>
+                    </th>
+                </tr>
+                <tr v-if="slots['thead-column-filters']">
+                    <!-- slot for extra header column filters -->
+                    <slot name="thead-column-filters" :columns="visibleColumns" />
+                    <!-- clear filters button -->
+                    <th class="doneo-text-center">
+                        <n-button :size="props.size" block @click="onClearFilters"
+                            :disabled="props.disabled || !isFiltered">
                             <template #icon>
-                                <n-icon :component="ListRestart" />
+                                <n-icon :component="DONEO_ICON_ACTION_CLEAR_FILTERS" />
                             </template>
-                            {{ t("shared.components.tables.ManageTable.components.buttons.refresh.label") }}
+                            <!-- TODO: remove component & change label -->
+                            {{ t("shared.components.tables.ManageTable.components.buttons.clearFilters.label") }}
                         </n-button>
-                        <n-button @click="onAdd" :disabled="props.disabled" v-if="props.buttons.includes('add')"
-                            class="doneo-table-actions-button">
-                            <template #icon>
-                                <n-icon :component="Plus" />
-                            </template>
-                            {{ t("shared.components.tables.ManageTable.components.buttons.add.label") }}
-                        </n-button>
-                        <n-button @click="onSettings" :disabled="props.disabled"
-                            v-if="props.buttons.includes('settings') && props.id" class="doneo-table-actions-button">
-                            <template #icon>
-                                <n-icon :component="Settings" />
-                            </template>
-                            {{ t("shared.components.tables.ManageTable.components.buttons.settings.label") }}
-                        </n-button>
-                    </n-button-group>
-                </th>
-            </tr>
-            <tr v-if="slots['thead-column-filters']">
-                <!-- slot for extra header column filters -->
-                <slot name="thead-column-filters" :columns="visibleColumns" />
-                <!-- clear filters button -->
-                <th class="doneo-text-center">
-                    <n-button :size="props.size" block @click="onClearFilters"
-                        :disabled="props.disabled || !isFiltered">
-                        <template #icon>
-                            <n-icon :component="FunnelX" />
-                        </template>
-                        <!-- TODO: remove component & change label -->
-                        {{ t("shared.components.tables.ManageTable.components.buttons.clearFilters.label") }}
-                    </n-button>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="row, index in props.rows" :key="props.rowKey(row)">
-                <!-- row content -->
-                <td v-for="column in visibleColumns" :key="String(column.field)">
-                    <RenderCell :render="column.render" :row="row" />
-                </td>
-                <!-- row actions -->
-                <td class="doneo-text-center">
-                    <slot name="rowactions" :row="row" :index="index" />
-                </td>
-            </tr>
-            <tr v-if="rows.length == 0 && props.noItemsWarningMessage && props.showNoItemsWarningMessage">
-                <td :colspan="visibleColumns.length + 1">
-                    <n-empty :description="props.noItemsWarningMessage" />
-                </td>
-            </tr>
-        </tbody>
-    </n-table>
-</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="row, index in props.rows" :key="props.rowKey(row)">
+                    <!-- row content -->
+                    <td v-for="column in visibleColumns" :key="String(column.field)">
+                        <RenderCell :render="column.render" :row="row" />
+                    </td>
+                    <!-- row actions -->
+                    <td class="doneo-text-center">
+                        <slot name="rowactions" :row="row" :index="index" />
+                    </td>
+                </tr>
+                <tr v-if="rows.length == 0 && props.noItemsWarningMessage && props.showNoItemsWarningMessage">
+                    <td :colspan="visibleColumns.length + 1">
+                        <n-empty :description="props.noItemsWarningMessage" />
+                    </td>
+                </tr>
+            </tbody>
+        </n-table>
+    </div>
     <Pager class="doneo-table-pager" v-if="props.pagerData && (pagerPosition === 'bottom' || pagerPosition === 'both')"
         :disabled="props.disabled" :pagination="props.pagerData" @update-current-page-index="onUpdateCurrentPageIndex"
         @update-results-page="onUpdateResultsPage" />
