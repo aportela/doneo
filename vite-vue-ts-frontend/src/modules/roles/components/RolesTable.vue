@@ -30,7 +30,7 @@
     import type { ProjectPermissionSelectValue } from '../../../shared/types/project-permission-select-value.ts';
     import type { TaskPermissionSelectValue } from '../../../shared/types/task-permission-select-value.ts';
     import type { RoleResponse, SearchRequest } from '../types/dto.ts';
-    import { PAGER_DEFAULT_RESULTS_PAGE_NO_PAGINATION, type Pagination } from '../../../shared/types/pager.ts';
+    import { PAGER_DEFAULT_RESULTS_PAGE_NO_PAGINATION } from '../../../shared/types/pager.ts';
     import RoleForm from './RoleForm.vue';
     import { DONEO_ICON_ACTION_ADD, DONEO_ICON_ACTION_DELETE, DONEO_ICON_ACTION_EDIT, DONEO_ICON_ACTION_SHOW } from '../../../shared/types/icons.ts';
 
@@ -66,16 +66,16 @@
     const onSort = (newOrder: Order) => {
         order.field = newOrder.field;
         order.direction = newOrder.direction;
-        onRefresh();
-    };
-
-    const pagination = reactive<Pagination>({ currentPage: 1, resultsPage: PAGER_DEFAULT_RESULTS_PAGE_NO_PAGINATION, totalPages: 1, totalResults: 0 });
-    const resetPager = ref<boolean>(false);
-
-    const onPagerChanged = (newPagination: Pagination) => {
-        pagination.currentPage = newPagination.currentPage;
-        pagination.resultsPage = newPagination.resultsPage;
-        onRefresh();
+        // we have all results, use local sorting for avoiding server load
+        if (order.direction === "ASC") {
+            items.value = [...items.value].sort((a, b) =>
+                a.name.localeCompare(b.name)
+            );
+        } else {
+            items.value = [...items.value].sort((a, b) =>
+                b.name.localeCompare(a.name)
+            );
+        }
     };
 
     const projectPermissionFilterRef = ref<InstanceType<typeof ProjectPermissionSelect>[] | null>(null);
@@ -112,6 +112,7 @@
 
     const nameFilterLowerCase = computed(() => filters.name.toLowerCase());
 
+    // we have all results, use local filtering for avoiding server load
     const localFilteredItems = computed<Role[]>(() => {
         return items.value.filter((role: Role) => {
             const name = role.name?.toLowerCase();
@@ -148,6 +149,8 @@
         deniedKey: string;
     };
 
+
+    // return rendered permissions array
     const renderPermissionIcons = (permissions: PermissionIcon[]) =>
         h(
             "div",
@@ -173,6 +176,7 @@
             )
         );
 
+    // get project permissions array from role row
     const renderProjectPermissionColumn = (row: Role) => {
         return renderPermissionIcons([
             {
@@ -210,6 +214,7 @@
         ]);
     };
 
+    // get task permissions array from role row
     const renderTaskPermissionColumn = (row: Role) => {
         return renderPermissionIcons([
             {
@@ -238,7 +243,7 @@
             label: t("modules.role.components.RolesTable.header.columns.name"),
             field: "name",
             visible: true,
-            sortable: false,
+            sortable: true,
             isFiltered: () => isFilteredByName.value,
             render: (row: Role) => {
                 return h(
@@ -359,8 +364,8 @@
         try {
             const payload: SearchRequest = {
                 pager: {
-                    currentPage: resetPager.value ? 1 : pagination.currentPage,
-                    resultsPage: pagination.resultsPage,
+                    currentPage: 1,
+                    resultsPage: PAGER_DEFAULT_RESULTS_PAGE_NO_PAGINATION,
                 },
                 order: {
                     field: order.field,
@@ -436,7 +441,6 @@
         tmpRole.value = new Role();
     };
 
-
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -453,6 +457,7 @@
     onBeforeUnmount(() => {
         stopBusReauthListener();
     });
+
 </script>
 
 <template>
@@ -462,8 +467,7 @@
     </n-modal>
     <n-card :title="t('modules.role.components.RolesTable.header.title')">
         <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="localFilteredItems"
-            :row-key="row => row.id" :columns="columns" :order="order" :pager-data="pagination" pager-position="both"
-            @sort="onSort" @refresh="onRefresh" @add="onAdd" @pager-changed="onPagerChanged"
+            :row-key="row => row.id" :columns="columns" :order="order" @sort="onSort" @refresh="onRefresh" @add="onAdd"
             @clear-filters="onClearFilters">
             <template #thead-column-filters="{ columns }">
                 <th v-for="column in columns">
