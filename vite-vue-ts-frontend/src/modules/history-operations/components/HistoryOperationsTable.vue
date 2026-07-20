@@ -19,7 +19,7 @@
     import type { DateFilterSelectComponent } from '../../../shared/components/selectors/date-filter-select-component.ts';
     import HistoryOperationSelect from '../../../shared/components/selectors/HistoryOperationSelect.vue';
 
-    interface HistoryOperationsTableProps {
+    interface Props {
         id?: string;
         disabled: boolean;
         items: HistoryOperation[];
