@@ -15,9 +15,10 @@
     import ClearTableFiltersButton from '../../../shared/components/buttons/ClearTableFiltersButton.vue';
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
-    import type { Order } from '../../../shared/types/models/sort.ts';
+    import type { Order } from '../../../shared/types/order.ts';
 
     interface Props {
+        id?: string;
         disabled: boolean;
         items: TaskPriority[];
         sort?: Order;
@@ -28,7 +29,7 @@
 
     const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'sort']);
 
-    const props = defineProps<Props>();
+    const props = withDefaults(defineProps<Props>(), { id: "TasksPrioritiesTable" });;
 
     const filters = defineModel<TaskPrioritiesTableFilters>("filters", {
         default: () => ({
@@ -100,8 +101,8 @@
 </script>
 
 <template>
-    <ManageTable id="ManageTaskPriorities" size="small" :columns="columns" :order="sort" @sort="onSort"
-        @refresh="onRefresh" @add="onAdd">
+    <ManageTable :id="props.id" size="small" :columns="columns" :order="sort" @sort="onSort" @refresh="onRefresh"
+        @add="onAdd">
         <template #thead>
             <tr>
                 <th>

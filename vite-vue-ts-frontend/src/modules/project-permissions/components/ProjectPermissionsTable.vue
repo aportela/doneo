@@ -22,6 +22,7 @@
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
 
     interface Props {
+        id?: string;
         disabled: boolean;
         readOnly?: boolean;
         items: ProjectPermission[];
@@ -34,7 +35,7 @@
 
     const emit = defineEmits(['refresh', 'add', 'delete']);
 
-    const props = defineProps<Props>();
+    const props = withDefaults(defineProps<Props>(), { id: "ProjectPermissionsTable" });;
 
     const projectPermissionSelectorRef = ref<ReseteableComponent | undefined>();
     const taskPermissionSelectorRef = ref<ReseteableComponent | undefined>();
@@ -128,7 +129,7 @@
 </script>
 
 <template>
-    <ManageTable id="ProjectPermissions" size="small" :columns="columns" @refresh="onRefresh" @add="onAdd"
+    <ManageTable :id="props.id" size="small" :columns="columns" @refresh="onRefresh" @add="onAdd"
         :hide-add="props.readOnly">
         <template #thead>
             <tr>

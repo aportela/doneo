@@ -131,8 +131,7 @@
 </script>
 
 <template>
-    <ManageTable id="TimeTrackings" size="small" :columns="columns" @refresh="onRefresh" @add="onAdd"
-        :hide-add="props.readOnly">
+    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd" :hide-add="props.readOnly">
         <template #thead>
             <tr>
                 <th>

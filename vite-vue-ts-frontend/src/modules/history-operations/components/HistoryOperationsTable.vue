@@ -20,6 +20,7 @@
     import HistoryOperationSelect from '../../../shared/components/selectors/HistoryOperationSelect.vue';
 
     interface HistoryOperationsTableProps {
+        id?: string;
         disabled: boolean;
         items: HistoryOperation[];
         projectId: string;
@@ -32,7 +33,7 @@
 
     const emit = defineEmits(['refresh']);
 
-    const props = defineProps<HistoryOperationsTableProps>();
+    const props = withDefaults(defineProps<Props>(), { id: "HistoryOperationsTable" });;
 
     const createdAtFilterRef = ref<DateFilterSelectComponent | undefined>();
 
@@ -91,7 +92,7 @@
 </script>
 
 <template>
-    <ManageTable id="HistoryOperations" size="small" :columns="columns" hide-add @refresh="onRefresh">
+    <ManageTable :id="props.id" size="small" :columns="columns" hide-add @refresh="onRefresh">
         <template #thead>
             <tr>
                 <th>

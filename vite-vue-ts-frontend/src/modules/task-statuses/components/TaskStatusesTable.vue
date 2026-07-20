@@ -6,7 +6,7 @@
     import { IconTrash, IconStar, IconCalendarBolt, IconCalendarCancel, IconCalendarMinus } from '@tabler/icons-vue';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
-    import type { Order } from '../../../shared/types/models/sort.ts';
+    import type { Order } from '../../../shared/types/order.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { TaskStatusesTableFilters } from '../types/task-statuses-table-filters.ts';
     import { TaskStatus } from '../models/task-status';
@@ -18,6 +18,7 @@
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
 
     interface Props {
+        id?: string;
         disabled: boolean;
         items: TaskStatus[];
         sort?: Order;
@@ -28,7 +29,7 @@
 
     const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'sort']);
 
-    const props = defineProps<Props>();
+    const props = withDefaults(defineProps<Props>(), { id: "TasksStatusesTable" });;
 
     const filters = defineModel<TaskStatusesTableFilters>("filters", {
         default: () => ({
@@ -110,8 +111,8 @@
 </script>
 
 <template>
-    <ManageTable id="ManageTaskStatuses" size="small" :columns="columns" :order="sort" @sort="onSort"
-        @refresh="onRefresh" @add="onAdd">
+    <ManageTable :id="props.id" size="small" :columns="columns" :order="sort" @sort="onSort" @refresh="onRefresh"
+        @add="onAdd">
         <template #thead>
             <tr>
                 <th>

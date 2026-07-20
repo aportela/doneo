@@ -20,6 +20,7 @@
     import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
 
     interface Props {
+        id?: string;
         disabled: boolean;
         items: Role[];
     }
@@ -29,7 +30,7 @@
 
     const emit = defineEmits(['refresh', 'add', 'update', 'delete']);
 
-    const props = defineProps<Props>();
+    const props = withDefaults(defineProps<Props>(), { id: "RolesTable" });;
 
     const projectPermissionSelectorRef = ref<ReseteableComponent | undefined>();
     const taskPermissionSelectorRef = ref<ReseteableComponent | undefined>();
@@ -117,7 +118,7 @@
 </script>
 
 <template>
-    <ManageTable id="ManageRoles" size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
+    <ManageTable :id="props.id" size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
         <template #thead>
             <tr>
                 <th>

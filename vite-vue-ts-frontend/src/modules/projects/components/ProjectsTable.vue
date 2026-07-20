@@ -28,7 +28,7 @@
     import ProjectResumeFloatingCard from './ProjectResumeFloatingCard.vue';
 
     interface Props {
-        id: string;
+        id?: string;
         disabled: boolean;
         readOnly?: boolean;
         items: Project[];
@@ -43,7 +43,7 @@
 
     const emit = defineEmits(['refresh', 'add', 'sort', 'statusChanged']);
 
-    const props = defineProps<Props>();
+    const props = withDefaults(defineProps<Props>(), { id: "ProjectsTable" });;
 
     const createdAtFilterRef = ref<DateFilterSelectComponent | undefined>();
 
@@ -247,7 +247,7 @@
 <template>
     <ProjectResumeFloatingCard v-if="showDrawer && currentProject?.id" v-model:show="showDrawer"
         :project-id="currentProject?.id" />
-    <ManageTable id="ManageProjects" size="small" :rows="items" :row-key="row => row.id ?? ''" :columns="columns"
+    <ManageTable :id="props.id" size="small" :rows="items" :row-key="row => row.id ?? ''" :columns="columns"
         :order="order" @sort="onSort" @refresh="onRefresh" @add="onAdd" @clear-filters="onClearFilters"
         :no-items-warning-message="t('modules.project.components.ProjectsTable.warnings.noItemsFound')"
         :show-no-items-warning-message="items.length < 1 && !props.disabled" pagerPosition="top">

@@ -22,9 +22,8 @@
     import { formatBytes } from '../../../shared/composables/format.ts';
     import type { DateFilterSelectComponent } from '../../../shared/components/selectors/date-filter-select-component.ts';
 
-
-
     interface Props {
+        id?: string;
         disabled: boolean;
         readOnly?: boolean;
         items: Attachment[];
@@ -38,7 +37,7 @@
 
     const emit = defineEmits(['refresh', 'add', 'delete', 'download', 'preview']);
 
-    const props = defineProps<Props>();
+    const props = withDefaults(defineProps<Props>(), { id: "AttachmentsTable" });;
 
     const createdAtFilterRef = ref<DateFilterSelectComponent | undefined>();
 
@@ -174,7 +173,7 @@
 </script>
 
 <template>
-    <ManageTable id="Attachments" size="small" :columns="columns" @refresh="onRefresh" @add="onAdd"
+    <ManageTable :id="props.id" size="small" :columns="columns" @refresh="onRefresh" @add="onAdd"
         :hide-add="props.readOnly">
         <template #thead>
             <tr>

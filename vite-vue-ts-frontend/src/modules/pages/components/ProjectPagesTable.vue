@@ -20,7 +20,8 @@
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import type { DateFilterSelectComponent } from '../../../shared/components/selectors/date-filter-select-component.ts';
 
-    interface IProps {
+    interface Props {
+        id?: string;
         disabled: boolean;
         items: Page[];
         projectId: string;
@@ -34,7 +35,7 @@
 
     const emit = defineEmits(['refresh']);
 
-    const props = defineProps<IProps>();
+    const props = withDefaults(defineProps<Props>(), { id: "ProjectPagesTable" });;
 
     const createdAtFilterRef = ref<DateFilterSelectComponent | undefined>();
     const updatedAtFilterRef = ref<DateFilterSelectComponent | undefined>();
@@ -119,7 +120,7 @@
 </script>
 
 <template>
-    <ManageTable id="ProjectPages" size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
+    <ManageTable :id="props.id" size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
         <template #thead>
             <tr>
                 <th>

@@ -6,7 +6,7 @@
     import { IconTrash, IconStar, IconCalendarBolt, IconCalendarCancel, IconCalendarMinus } from '@tabler/icons-vue';
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
-    import type { Order } from '../../../shared/types/models/sort.ts';
+    import type { Order } from '../../../shared/types/order.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import type { ProjectStatusesTableFilters } from '../types/project-statuses-table-filters.ts';
     import { ProjectStatus } from '../models/project-status';
@@ -18,6 +18,7 @@
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
 
     interface Props {
+        id?: string;
         disabled: boolean;
         items: ProjectStatus[];
         sort?: Order;
@@ -28,7 +29,7 @@
 
     const emit = defineEmits(['refresh', 'add', 'update', 'delete', 'sort']);
 
-    const props = defineProps<Props>();
+    const props = withDefaults(defineProps<Props>(), { id: "ProjectStatusesTable" });;
 
     const filters = defineModel<ProjectStatusesTableFilters>("filters", {
         default: () => ({
@@ -110,7 +111,7 @@
 </script>
 
 <template>
-    <ManageTable id="ProjectStatuses" size="small" :columns="columns" :order="sort" @sort="onSort" @refresh="onRefresh"
+    <ManageTable :id="props.id" size="small" :columns="columns" :order="sort" @sort="onSort" @refresh="onRefresh"
         @add="onAdd">
         <template #thead>
             <tr>

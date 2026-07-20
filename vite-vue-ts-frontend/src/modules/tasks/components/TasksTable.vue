@@ -27,6 +27,7 @@
     import TaskResumeFloatingCard from './TaskResumeFloatingCard.vue';
 
     interface Props {
+        id?: string;
         disabled: boolean;
         readOnly?: boolean;
         items: Task[];
@@ -42,7 +43,7 @@
 
     const emit = defineEmits(['refresh', 'add', 'sort', 'statusChanged']);
 
-    const props = defineProps<Props>();
+    const props = withDefaults(defineProps<Props>(), { id: "TasksTable" });;
 
     const createdAtFilterRef = ref<DateFilterSelectComponent | undefined>();
 
@@ -159,7 +160,7 @@
 <template>
     <TaskResumeFloatingCard v-if="showDrawer && currentTask?.projectId && currentTask.id" v-model:show="showDrawer"
         :project-id="currentTask?.projectId" :task-id="currentTask?.id" />
-    <ManageTable id="ManageTasks" size="small" :columns="columns" :order="sort" @sort="onSort" @refresh="onRefresh"
+    <ManageTable :id="props.id" size="small" :columns="columns" :order="sort" @sort="onSort" @refresh="onRefresh"
         @add="onAdd" :hideAdd="props.hideAdd || props.readOnly">
         <template #thead>
             <tr>

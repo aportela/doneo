@@ -17,6 +17,7 @@
     import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
 
     interface Props {
+        id?: string;
         disabled: boolean;
         items: ProjectType[];
     }
@@ -26,7 +27,7 @@
 
     const emit = defineEmits(['refresh', 'add', 'update', 'delete']);
 
-    const props = defineProps<Props>();
+    const props = withDefaults(defineProps<Props>(), { id: "ProjectTypesTable" });;
 
     const filters = defineModel<ProjectTypesTableFilters>("filters", {
         default: () => ({
@@ -87,7 +88,7 @@
 </script>
 
 <template>
-    <ManageTable id="ManageProjectTypes" size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
+    <ManageTable :id="props.id" size="small" :columns="columns" @refresh="onRefresh" @add="onAdd">
         <template #thead>
             <tr>
                 <th>
