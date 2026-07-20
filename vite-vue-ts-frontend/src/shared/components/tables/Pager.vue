@@ -50,6 +50,7 @@
         },
     ]);
 
+    // TODO: if page size changes to disabled (0) on pageindex > 1 pageindex needs to be restarted at 1
 </script>
 
 <template>
