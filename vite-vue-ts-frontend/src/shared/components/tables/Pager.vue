@@ -3,21 +3,21 @@
     import { useI18n } from "vue-i18n";
 
     import { NPagination } from 'naive-ui';
-    import type { PaginationSizeOption } from "naive-ui";
-    import { PAGER_DEFAULT_RESULTS_PAGE } from "../../types/pager";
+    import type { PaginationSize, PaginationSizeOption } from "naive-ui";
+    import { type Pagination } from "../../types/pager";
 
     interface Props {
         disabled?: boolean;
-        totalResults: number;
-        totalPages: number;
+        size?: PaginationSize
+        simple?: boolean;
+        pagination: Pagination;
     };
 
     const props = defineProps<Props>();
 
-    const { t } = useI18n();
+    const emit = defineEmits(["updateCurrentPageIndex", "updateResultsPage"]);
 
-    const currentPage = defineModel<number>("currentPage", { default: 1 });
-    const pageSize = defineModel<number>("pageSize", { default: PAGER_DEFAULT_RESULTS_PAGE });
+    const { t } = useI18n();
 
     const pageSizes = computed<PaginationSizeOption[]>(() => [
         {
@@ -50,19 +50,30 @@
         },
     ]);
 
-    // TODO: if page size changes to disabled (0) on pageindex > 1 pageindex needs to be restarted at 1
+    const page = computed(() => props.pagination.currentPage);
+
+    const pageSize = computed(() => props.pagination.resultsPage);
+
+    const onUpdateCurrentPageIndex = (currentPageIndex: number) => {
+        emit("updateCurrentPageIndex", currentPageIndex);
+    };
+
+    const onUpdateResultsPage = (resultsPage: number) => {
+        emit("updateResultsPage", resultsPage);
+    };
 </script>
 
 <template>
     <div class="doneo-pagination-container">
         <div class="doneo-pagination-total-results-label">
-            <slot name="total-results-label" :total-results="props.totalResults">
-                {{ t("shared.components.pager.labels.totalResults") }} {{ props.totalResults }}
+            <slot name="total-results-label" :total-results="props.pagination.totalResults">
+                {{ t("shared.components.pager.labels.totalResults") }} {{ props.pagination.totalResults }}
             </slot>
         </div>
         <!-- TODO: simple property on small screens ? -->
-        <n-pagination :disabled="props.disabled" v-model:page="currentPage" v-model:page-size="pageSize"
-            :page-count="props.totalPages" :page-sizes="pageSizes" show-size-picker :page-slot="8">
+        <n-pagination :size="props.size" :simple="props.simple" :disabled="props.disabled" v-model:page="page"
+            v-model:page-size="pageSize" @update-page-size="onUpdateResultsPage" @update:page="onUpdateCurrentPageIndex"
+            :page-count="props.pagination.totalPages" :page-sizes="pageSizes" show-size-picker :page-slot="8">
             <template #prefix="{ page, pageCount }">
                 {{
                     t("shared.components.pager.labels.currentPageOfTotal", { currentPage: page, totalPages: pageCount })

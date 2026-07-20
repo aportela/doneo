@@ -9,7 +9,7 @@
     import { type TableHeaderColumn } from '../../types/table-header-column';
     import type { Order } from '../../types/order.ts';
     import RenderCell from './RenderCell.ts';
-    import { PAGER_DEFAULT_RESULTS_PAGE } from '../../types/pager.ts';
+    import { PAGER_DEFAULT_RESULTS_PAGE, type Pagination } from '../../types/pager.ts';
 
     import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
 
@@ -23,13 +23,8 @@
         columns: TableHeaderColumn<T>[];
         rows: T[];
         rowKey: (row: T) => string;
-        order: Order,
-        pagerData?: {
-            currentPage: number;
-            resultsPage: number;
-            totalPages: number;
-            totalResults: number;
-        };
+        order: Order;
+        pagerData?: Pagination;
 
         pagerPosition?: "top" | "bottom" | "both";
 
@@ -55,27 +50,13 @@
 
     const isFiltered = computed(() => props.columns.find((column) => column.isFiltered?.() === true));
 
-    const currentPage = computed<number>({
-        get() {
-            return (props.pagerData?.currentPage ?? 1);
-        },
-        set(value: number) {
-            if (props.pagerData) {
-                emit("pagerChanged", { ...props.pagerData, currentPage: value });
-            }
-        },
-    });
+    const onUpdateCurrentPageIndex = (currentPageIndex: number) => {
+        emit("pagerChanged", { ...props.pagerData, currentPage: currentPageIndex });
+    };
 
-    const resultsPage = computed<number>({
-        get() {
-            return (props.pagerData?.resultsPage ?? PAGER_DEFAULT_RESULTS_PAGE);
-        },
-        set(value: number) {
-            if (props.pagerData) {
-                emit("pagerChanged", { ...props.pagerData, resultsPage: value });
-            }
-        },
-    });
+    const onUpdateResultsPage = (resultsPage: number) => {
+        emit("pagerChanged", { ...props.pagerData, currentPage: 1, resultsPage: resultsPage });
+    };
 
     const onToggleSort = (column: TableHeaderColumn<T>) => {
         if (!props.disabled && props.order && column.sortable) {
@@ -158,13 +139,13 @@
                     <n-button-group size="tiny">
                         <n-button @click="onShowAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.showAllColumns.label")
-                        }}</n-button>
+                            }}</n-button>
                         <n-button @click="onHideAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.HideAllColumns.label")
-                            }}</n-button>
+                        }}</n-button>
                         <n-button @click="onToggleAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.ToggleColumns.label")
-                        }}</n-button>
+                            }}</n-button>
                     </n-button-group>
                     <p v-for="column, index in props.columns" class="doneo-cursor-pointer doneo-flex-center-align">
                         <n-button-group size="tiny" style="margin-right: 8px;">
@@ -193,8 +174,8 @@
         </n-drawer-content>
     </n-drawer>
     <Pager class="doneo-table-pager" v-if="props.pagerData && (pagerPosition === 'top' || pagerPosition === 'both')"
-        :disabled="props.disabled" :total-results="props.pagerData.totalResults"
-        :total-pages="props.pagerData.totalPages" v-model:current-page="currentPage" v-model:page-size="resultsPage" />
+        :disabled="props.disabled" :pagination="props.pagerData" @update-current-page-index="onUpdateCurrentPageIndex"
+        @update-results-page="onUpdateResultsPage" />
     <n-table :size="size" :striped="striped" class="doneo-table" :single-line="false" :single-column="false">
         <thead>
             <tr>
@@ -276,8 +257,8 @@
         </tbody>
     </n-table>
     <Pager class="doneo-table-pager" v-if="props.pagerData && (pagerPosition === 'bottom' || pagerPosition === 'both')"
-        :disabled="props.disabled" :total-results="props.pagerData.totalResults"
-        :total-pages="props.pagerData.totalPages" v-model:current-page="currentPage" v-model:page-size="resultsPage" />
+        :disabled="props.disabled" :pagination="props.pagerData" @update-current-page-index="onUpdateCurrentPageIndex"
+        @update-results-page="onUpdateResultsPage" />
 </template>
 
 <style lang="css" scoped>
