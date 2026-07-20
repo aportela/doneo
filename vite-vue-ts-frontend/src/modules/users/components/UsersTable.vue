@@ -2,8 +2,9 @@
     import { ref, reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount, h } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NModal, NCard, useDialog, NIcon } from 'naive-ui';
-    import { IconUserKey, IconUser, IconTrash, IconTrashOff } from '@tabler/icons-vue';
+    import { NModal, NCard, useDialog, NButtonGroup, NButton, NIcon } from 'naive-ui';
+
+    import { ArchiveRestore, ShieldUser, User as UserIcon, SquarePen, Trash2 } from '@lucide/vue';
 
     import { useLoadingStore } from '../../../stores/loading';
     import { useCacheStore } from '../../../stores/cache.ts';
@@ -27,7 +28,7 @@
     import TextFilterInput from '../../../shared/components/form-blocks/TextFilterInput.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
-    import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
+
     import { PAGER_DEFAULT_RESULTS_PAGE, type Pagination } from '../../../shared/types/pager.ts';
     import type { TimestampRange } from '../../../shared/composables/timestamps.ts';
     import type { SearchRequest, UserResponse } from '../types/dto.ts';
@@ -163,7 +164,7 @@
                                 style: {
                                     marginRight: "6px",
                                 },
-                                component: row.permissions?.isSuperUser ? IconUserKey : IconUser,
+                                component: row.permissions?.isSuperUser ? ShieldUser : UserIcon,
                                 color: row.permissions?.isSuperUser ? "red" : undefined,
                             }
                         ),
@@ -323,7 +324,7 @@
     const onConfirmDelete = (user: User) => {
         dialog.warning({
             title: t("modules.user.components.UsersTable.dialogs.deleteConfirmation.title"),
-            icon: renderIcon(IconTrash)(24),
+            icon: renderIcon(Trash2)(24),
             content: () =>
                 h('div', [
                     t("modules.user.components.UsersTable.dialogs.deleteConfirmation.message", { name: user.name }),
@@ -382,7 +383,7 @@
     const onConfirmUnDelete = (user: User) => {
         dialog.warning({
             title: t("modules.user.components.UsersTable.dialogs.undeleteConfirmation.title"),
-            icon: renderIcon(IconTrashOff)(24),
+            icon: renderIcon(ArchiveRestore)(24),
             content: () =>
                 h('div', [
                     t("modules.user.components.UsersTable.dialogs.undeleteConfirmation.message", { name: user.name }),
@@ -539,14 +540,28 @@
                 </th>
             </template>
             <template #rowactions="{ row }">
-                <ManageTableActionButtons show-update show-delete show-restore
-                    :update-disabled="state.ajaxRunning || !!row.deletedAt?.msTimestamp"
-                    :delete-disabled="state.ajaxRunning || sessionStore.sessionUserId === row.id || !!row.deletedAt?.msTimestamp"
-                    :restored-disabled="state.ajaxRunning || !row.deletedAt?.msTimestamp" :disabled="state.ajaxRunning"
-                    @update="onUpdate(row)" @delete="onConfirmDelete(row)" @restore="onConfirmUnDelete(row)"
-                    @clear-filters="onClearFilters"
-                    :no-items-warning-message="t('modules.user.components.UsersTable.warnings.noItemsFound')"
-                    :show-no-items-warning-message="items.length < 1 && !state.ajaxRunning" />
+                <n-button-group class="doneo-table-actions-button-group" size="small">
+                    <n-button @click="onUpdate(row)" :disabled="state.ajaxRunning" class="doneo-table-actions-button">
+                        {{ t("shared.buttons.Update.label") }}
+                        <template #icon>
+                            <n-icon :component="SquarePen" />
+                        </template>
+                    </n-button>
+                    <n-button @click="onConfirmDelete(row)" :disabled="state.ajaxRunning"
+                        class="doneo-table-actions-button">
+                        {{ t("shared.buttons.Delete.label") }}
+                        <template #icon>
+                            <n-icon :component="Trash2" />
+                        </template>
+                    </n-button>
+                    <n-button @click="onConfirmUnDelete(row)" :disabled="state.ajaxRunning"
+                        class="doneo-table-actions-button">
+                        {{ t("shared.buttons.Restore.label") }}
+                        <template #icon>
+                            <n-icon :component="ArchiveRestore" />
+                        </template>
+                    </n-button>
+                </n-button-group>
             </template>
         </ManageTable>
     </n-card>
