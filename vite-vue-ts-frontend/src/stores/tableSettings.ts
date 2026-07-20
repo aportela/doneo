@@ -1,5 +1,5 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
-import type { SortDirection } from "../shared/types/order";
+//import type { SortDirection } from "../shared/types/order";
 
 interface TableColumnConfig {
   field: string;
@@ -8,7 +8,8 @@ interface TableColumnConfig {
 
 export interface TableConfig {
   columns: TableColumnConfig[];
-  //filters?: Record<string, unknown>;
+  /*
+  filters?: Record<string, unknown>;
   order: {
     field: string;
     direction: SortDirection;
@@ -18,6 +19,7 @@ export interface TableConfig {
     page: number;
     pageSize: number;
   };
+  */
 }
 
 interface State {
@@ -29,7 +31,8 @@ const storePersistenceKey = "doneo.tableSettings";
 function createDefaultTableConfig(): TableConfig {
   return {
     columns: [],
-    //filters: {},
+    /*
+    filters: {},
     order: {
       field: "",
       direction: "ASC",
@@ -39,6 +42,7 @@ function createDefaultTableConfig(): TableConfig {
       page: 1,
       pageSize: 16,
     },
+    */
   };
 }
 
@@ -65,18 +69,18 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
         this.tables[tableId] = {
           ...createDefaultTableConfig(),
           ...defaults,
+          columns: defaults.columns ?? createDefaultTableConfig().columns,
+          /*
+          filters: {
+            ...defaults.filters,
+          },
           order: {
             ...createDefaultTableConfig().order,
             ...defaults.order,
           },
-          columns: defaults.columns ?? createDefaultTableConfig().columns,
           pagination: {
             ...createDefaultTableConfig().pagination,
             ...defaults.pagination,
-          },
-          /*
-          filters: {
-            ...defaults.filters,
           },
           */
         };
@@ -91,6 +95,7 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
       delete this.tables[tableId];
     },
 
+    /*
     sort(tableId: string, sorting: Partial<TableConfig["order"]>) {
       const table = this.ensure(tableId);
 
@@ -99,6 +104,7 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
         ...sorting,
       };
     },
+    */
 
     addVisibleColumn(tableId: string, field: string) {
       const table = this.ensure(tableId);
@@ -182,7 +188,6 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
 
       table.filters = {};
     },
-    */
 
     hasPagination(tableId: string) {
       const table = this.ensure(tableId);
@@ -209,25 +214,28 @@ export const useTableSettingsStore = defineStore("tableSettingsStore", {
       this.ensure(tableId).pagination.pageSize = pageSize;
     },
 
+    */
+
     replace(tableId: string, config: Partial<TableConfig>) {
       const table = this.ensure(tableId);
 
       this.tables[tableId] = {
         ...table,
         ...config,
-        order: {
-          ...table.order,
-          ...config.order,
-        },
         columns: config.columns ?? table.columns,
-        pagination: {
-          ...table.pagination,
-          ...config.pagination,
-        },
         /*
         filters: {
           ...table.filters,
           ...config.filters,
+        },
+
+        order: {
+          ...table.order,
+          ...config.order,
+        },
+        pagination: {
+          ...table.pagination,
+          ...config.pagination,
         },
         */
       };
