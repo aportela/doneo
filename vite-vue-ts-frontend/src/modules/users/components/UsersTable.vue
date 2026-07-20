@@ -17,7 +17,6 @@
 
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
 
-
     import { User } from '../models/user';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
@@ -36,9 +35,6 @@
     import TextFilterInput from '../../../shared/components/form-blocks/TextFilterInput.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
-
-
-
 
     interface Props {
         id?: string;
