@@ -50,17 +50,23 @@
         },
     ]);
 
-    const page = computed(() => props.pagination.currentPage);
+    const page = computed(
+        {
+            get() {
+                return props.pagination.currentPage;
+            },
+            set(currentPageIndex: number) { emit("updateCurrentPageIndex", currentPageIndex); },
+        }
+    );
 
-    const pageSize = computed(() => props.pagination.resultsPage);
-
-    const onUpdateCurrentPageIndex = (currentPageIndex: number) => {
-        emit("updateCurrentPageIndex", currentPageIndex);
-    };
-
-    const onUpdateResultsPage = (resultsPage: number) => {
-        emit("updateResultsPage", resultsPage);
-    };
+    const pageSize = computed(
+        {
+            get() {
+                return props.pagination.resultsPage;
+            },
+            set(resultsPage: number) { emit("updateResultsPage", resultsPage); },
+        }
+    );
 </script>
 
 <template>
@@ -72,8 +78,8 @@
         </div>
         <!-- TODO: simple property on small screens ? -->
         <n-pagination :size="props.size" :simple="props.simple" :disabled="props.disabled" v-model:page="page"
-            v-model:page-size="pageSize" @update-page-size="onUpdateResultsPage" @update:page="onUpdateCurrentPageIndex"
-            :page-count="props.pagination.totalPages" :page-sizes="pageSizes" show-size-picker :page-slot="8">
+            v-model:page-size="pageSize" :page-count="props.pagination.totalPages" :page-sizes="pageSizes"
+            show-size-picker :page-slot="8">
             <template #prefix="{ page, pageCount }">
                 {{
                     t("shared.components.pager.labels.currentPageOfTotal", { currentPage: page, totalPages: pageCount })
