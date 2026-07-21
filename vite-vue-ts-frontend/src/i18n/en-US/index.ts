@@ -559,7 +559,6 @@ export default {
         },
         UsersTable: {
           header: {
-            title: "Manage users",
             columns: {
               permissions: "Permissions",
               name: "Name",
@@ -612,6 +611,11 @@ export default {
             userUpdated: 'User "{name}" has been updated',
             userDeleted: 'User "{name}" has been deleted',
             userRestored: 'User "{name}" has been restored',
+          },
+        },
+        ManageUsersPage: {
+          header: {
+            title: "Manage users",
           },
         },
         UserPermissionsFilterSelector: {

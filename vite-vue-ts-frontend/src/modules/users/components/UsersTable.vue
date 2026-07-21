@@ -2,7 +2,7 @@
     import { ref, reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount, h } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NModal, NCard, useDialog, NButtonGroup, NButton, NIcon } from 'naive-ui';
+    import { NModal, useDialog, NButtonGroup, NButton, NIcon } from 'naive-ui';
 
     import { DONEO_ICON_ACTION_DELETE, DONEO_ICON_ACTION_EDIT, DONEO_ICON_ADMIN_USER, DONEO_ICON_ACTIONRESTORE, DONEO_ICON_USER } from '../../../shared/types/icons.ts';
 
@@ -531,56 +531,54 @@
         <UserForm class="user-form" :user-id="tmpItem.id" @add="onUserAdded" @update="onUserUpdated"
             @cancel="hideFormModal" />
     </n-modal>
-    <n-card :title="t('modules.user.components.UsersTable.header.title')">
-        <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="items" :row-key="row => row.id"
-            :columns="columns" :order="order" :pager-data="pagination" pager-position="both" @sort="onSort"
-            @refresh="onRefresh" @add="onAdd" @pager-changed="onPagerChanged" @clear-filters="onClearFilters">
-            <template #thead-column-filters="{ columns }">
-                <th v-for="column in columns">
-                    <UserPermissionsFilterSelector v-if="column.field === 'permissions'" size="small"
-                        v-model:value="filters.permissions" :disabled="state.ajaxRunning" />
-                    <TextFilterInput v-else-if="column.field === 'name'" clearable size="small"
-                        :placeholder="t('modules.user.components.UsersTable.header.filters.name.placeholder')"
-                        v-model:value="filters.name" @keydown-enter="onRefresh" :disabled="state.ajaxRunning" />
-                    <TextFilterInput v-else-if="column.field === 'email'" clearable size="small"
-                        :placeholder="t('modules.user.components.UsersTable.header.filters.email.placeholder')"
-                        v-model:value="filters.email" @keydown-enter="onRefresh" :disabled="state.ajaxRunning" />
-                    <DateFilterSelect v-else-if="column.field === 'createdAt'" clearable
-                        v-model:range="filters.createdAt" ref="createdAtFilterRef" :disabled="state.ajaxRunning" />
-                    <DateFilterSelect v-else-if="column.field === 'updatedAt'" clearable
-                        v-model:range="filters.updatedAt" ref="updatedAtFilterRef" :disabled="state.ajaxRunning" />
-                    <DateFilterSelect v-else-if="column.field === 'deletedAt'" clearable
-                        v-model:range="filters.deletedAt" ref="deletedAtFilterRef" :disabled="state.ajaxRunning" />
-                </th>
-            </template>
-            <template #rowactions="{ row }">
-                <n-button-group class="doneo-table-actions-button-group" size="small">
-                    <n-button @click="onUpdate(row)" :disabled="state.ajaxRunning || row.deletedAt?.hasValue()"
-                        class="doneo-table-actions-button">
-                        {{ t("shared.buttons.Update.label") }}
-                        <template #icon>
-                            <n-icon :component="DONEO_ICON_ACTION_EDIT" />
-                        </template>
-                    </n-button>
-                    <n-button @click="onConfirmDelete(row)"
-                        :disabled="state.ajaxRunning || row.deletedAt?.hasValue() || sessionStore.sessionUserId === row.id"
-                        class="doneo-table-actions-button">
-                        {{ t("shared.buttons.Delete.label") }}
-                        <template #icon>
-                            <n-icon :component="DONEO_ICON_ACTION_DELETE" />
-                        </template>
-                    </n-button>
-                    <n-button @click="onConfirmUnDelete(row)"
-                        :disabled="state.ajaxRunning || !row.deletedAt?.hasValue()" class="doneo-table-actions-button">
-                        {{ t("shared.buttons.Restore.label") }}
-                        <template #icon>
-                            <n-icon :component="DONEO_ICON_ACTIONRESTORE" />
-                        </template>
-                    </n-button>
-                </n-button-group>
-            </template>
-        </ManageTable>
-    </n-card>
+    <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="items" :row-key="row => row.id"
+        :columns="columns" :order="order" :pager-data="pagination" pager-position="both" @sort="onSort"
+        @refresh="onRefresh" @add="onAdd" @pager-changed="onPagerChanged" @clear-filters="onClearFilters">
+        <template #thead-column-filters="{ columns }">
+            <th v-for="column in columns">
+                <UserPermissionsFilterSelector v-if="column.field === 'permissions'" size="small"
+                    v-model:value="filters.permissions" :disabled="state.ajaxRunning" />
+                <TextFilterInput v-else-if="column.field === 'name'" clearable size="small"
+                    :placeholder="t('modules.user.components.UsersTable.header.filters.name.placeholder')"
+                    v-model:value="filters.name" @keydown-enter="onRefresh" :disabled="state.ajaxRunning" />
+                <TextFilterInput v-else-if="column.field === 'email'" clearable size="small"
+                    :placeholder="t('modules.user.components.UsersTable.header.filters.email.placeholder')"
+                    v-model:value="filters.email" @keydown-enter="onRefresh" :disabled="state.ajaxRunning" />
+                <DateFilterSelect v-else-if="column.field === 'createdAt'" clearable v-model:range="filters.createdAt"
+                    ref="createdAtFilterRef" :disabled="state.ajaxRunning" />
+                <DateFilterSelect v-else-if="column.field === 'updatedAt'" clearable v-model:range="filters.updatedAt"
+                    ref="updatedAtFilterRef" :disabled="state.ajaxRunning" />
+                <DateFilterSelect v-else-if="column.field === 'deletedAt'" clearable v-model:range="filters.deletedAt"
+                    ref="deletedAtFilterRef" :disabled="state.ajaxRunning" />
+            </th>
+        </template>
+        <template #rowactions="{ row }">
+            <n-button-group class="doneo-table-actions-button-group" size="small">
+                <n-button @click="onUpdate(row)" :disabled="state.ajaxRunning || row.deletedAt?.hasValue()"
+                    class="doneo-table-actions-button">
+                    {{ t("shared.buttons.Update.label") }}
+                    <template #icon>
+                        <n-icon :component="DONEO_ICON_ACTION_EDIT" />
+                    </template>
+                </n-button>
+                <n-button @click="onConfirmDelete(row)"
+                    :disabled="state.ajaxRunning || row.deletedAt?.hasValue() || sessionStore.sessionUserId === row.id"
+                    class="doneo-table-actions-button">
+                    {{ t("shared.buttons.Delete.label") }}
+                    <template #icon>
+                        <n-icon :component="DONEO_ICON_ACTION_DELETE" />
+                    </template>
+                </n-button>
+                <n-button @click="onConfirmUnDelete(row)" :disabled="state.ajaxRunning || !row.deletedAt?.hasValue()"
+                    class="doneo-table-actions-button">
+                    {{ t("shared.buttons.Restore.label") }}
+                    <template #icon>
+                        <n-icon :component="DONEO_ICON_ACTIONRESTORE" />
+                    </template>
+                </n-button>
+            </n-button-group>
+        </template>
+    </ManageTable>
 </template>
 
 <style lang="css" scoped>
