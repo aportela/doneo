@@ -77,6 +77,7 @@ func (service *roleService) SearchBase(ctx context.Context) ([]domain.RoleBase, 
 		return roles, nil
 	}
 }
+
 func (service *roleService) Search(ctx context.Context, pager browser.PagerQuery, order browser.Order, filter domain.SearchRolesFilter) ([]domain.Role, browser.PagerResult, error) {
 	if _, err := service.authorizationService.RequireUserAdminPermission(ctx); err != nil {
 		return nil, browser.PagerResult{}, err
