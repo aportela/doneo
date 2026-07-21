@@ -372,7 +372,7 @@
                     direction: order.direction,
                 },
                 filter: {
-                    name: filters.name.length > 0 ? filters.name : undefined,
+                    //name: filters.name.length > 0 ? filters.name : undefined,
                 }
             };
             const response = await roleService.search(payload);

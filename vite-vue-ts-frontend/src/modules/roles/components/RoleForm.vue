@@ -285,7 +285,7 @@
                 <n-gi>
                     <h4 class="doneo-permission-group-header">{{
                         t("modules.role.components.RoleForm.headers.projectPermissions")
-                        }}</h4>
+                    }}</h4>
                     <n-switch v-model:value="role.permissions.allowUpdateProject" class="doneo-permission-switch"
                         :disabled="state.ajaxRunning">
                         <template #checked>
@@ -317,7 +317,7 @@
                 <n-gi>
                     <h4 class="doneo-permission-group-header">{{
                         t("modules.role.components.RoleForm.headers.taskPermissions")
-                        }}
+                    }}
                     </h4>
                     <n-switch v-model:value="role.permissions.allowAddTask" class="doneo-permission-switch"
                         :disabled="state.ajaxRunning">
