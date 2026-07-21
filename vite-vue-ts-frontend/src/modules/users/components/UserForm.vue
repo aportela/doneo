@@ -106,7 +106,7 @@
     watch(() => user.value.password, () => { delete serverErrors.value.password });
 
     const isSaveDisabled = computed<boolean>(() => {
-        return !user.value.name;
+        return !user.value.name || state.ajaxRunning;
     });
 
     const onShowPasswordFormItem = async () => {
@@ -325,8 +325,8 @@
             :disabled="state.ajaxRunning">
             <n-form-item :label="t('modules.user.components.UserForm.inputs.name.label')" path="name" show-feedback>
                 <n-input type="text" :placeholder="t('modules.user.components.UserForm.inputs.name.placeholder')"
-                    v-model:value="user.name" :maxlength="MAX_NAME_LENGTH" :show-count="true" clearable required
-                    autofocus>
+                    v-model:value="user.name" :maxlength="MAX_NAME_LENGTH" :show-count="true"
+                    :disabled="state.ajaxRunning" clearable required autofocus>
                     <template #prefix>
                         <n-icon :component="IconUser" />
                     </template>
@@ -334,8 +334,8 @@
             </n-form-item>
             <n-form-item :label="t('modules.user.components.UserForm.inputs.email.label')" path="email" show-feedback>
                 <n-input type="text" :placeholder="t('modules.user.components.UserForm.inputs.email.placeholder')"
-                    v-model:value="user.email" :maxlength="MAX_EMAIL_LENGTH" :show-count="true" clearable required
-                    autofocus>
+                    v-model:value="user.email" :maxlength="MAX_EMAIL_LENGTH" :show-count="true"
+                    :disabled="state.ajaxRunning" clearable required autofocus>
                     <template #prefix>
                         <n-icon :component="IconMail" />
                     </template>
@@ -345,7 +345,8 @@
                 show-feedback>
                 <n-input v-if="showPasswordField" type="password"
                     :placeholder="t('modules.user.components.UserForm.inputs.password.placeholder')"
-                    v-model:value="user.password" show-password-on="click" ref="inputPasswordRef">
+                    v-model:value="user.password" show-password-on="click" ref="inputPasswordRef"
+                    :disabled="state.ajaxRunning">
                     <template #prefix>
                         <n-icon :component="IconKey" />
                     </template>
@@ -368,14 +369,14 @@
                 </n-input>
                 <n-button v-else @click="onShowPasswordFormItem" block :disabled="state.ajaxRunning">{{
                     t("modules.user.components.UserForm.buttons.changePassword.label")
-                    }}</n-button>
+                }}</n-button>
             </n-form-item>
             <n-form-item :label="t('modules.user.components.UserForm.radios.permissions.label')">
                 <n-radio-group v-model:value="user.permissions.isSuperUser" name="radiogroup">
-                    <n-radio :value="true" name="isSuperUser"
+                    <n-radio :disabled="state.ajaxRunning" :value="true" name="isSuperUser"
                         :label="t('modules.user.components.UserForm.radios.permissions.superUser.label')">
                     </n-radio>
-                    <n-radio :value="false" name="isSuperUser"
+                    <n-radio :disabled="state.ajaxRunning" :value="false" name="isSuperUser"
                         :label="t('modules.user.components.UserForm.radios.permissions.normalUser.label')">
                     </n-radio>
                 </n-radio-group>
