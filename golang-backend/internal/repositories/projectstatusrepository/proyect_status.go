@@ -165,7 +165,7 @@ func (repository *projectStatusRepository) Search(ctx context.Context, dbExecuto
 	}
 	queryArgs = append(queryArgs, filterArgs...)
 	var sqlLimit string
-	if pager.Enabled() {
+	if pager.Enabled {
 		sqlLimit = " LIMIT ? OFFSET ? "
 		queryArgs = append(queryArgs, pager.Limit(), pager.Offset())
 	} else {
@@ -193,7 +193,7 @@ func (repository *projectStatusRepository) Search(ctx context.Context, dbExecuto
 
 	var totalResults int
 
-	if pager.Enabled() {
+	if pager.Enabled {
 		sqlCountQuery := `
 			SELECT
 				COUNT(*) AS total_project_statuses

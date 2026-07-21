@@ -57,7 +57,11 @@
     };
 
     const onUpdateResultsPage = (resultsPage: number) => {
-        emit("pagerChanged", { ...props.pagerData, currentPage: 1, resultsPage: resultsPage });
+        if (resultsPage === 0) {
+            emit("pagerChanged", { ...props.pagerData, enabled: false, currentPage: 1, resultsPage: resultsPage });
+        } else {
+            emit("pagerChanged", { ...props.pagerData, enabled: true, currentPage: 1, resultsPage: resultsPage });
+        }
     };
 
     const onToggleSort = (column: TableHeaderColumn<T>) => {
@@ -141,13 +145,13 @@
                     <n-button-group size="tiny">
                         <n-button @click="onShowAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.showAllColumns.label")
-                        }}</n-button>
+                            }}</n-button>
                         <n-button @click="onHideAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.HideAllColumns.label")
-                            }}</n-button>
+                        }}</n-button>
                         <n-button @click="onToggleAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.ToggleColumns.label")
-                        }}</n-button>
+                            }}</n-button>
                     </n-button-group>
                     <p v-for="column, index in props.columns" class="doneo-flex-center-align">
                         <n-button-group size="tiny" style="margin-right: 8px;">

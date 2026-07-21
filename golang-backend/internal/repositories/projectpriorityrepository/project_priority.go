@@ -159,7 +159,7 @@ func (repository *projectPriorityRepository) Search(ctx context.Context, dbExecu
 	}
 	queryArgs = append(queryArgs, filterArgs...)
 	var sqlLimit string
-	if pager.Enabled() {
+	if pager.Enabled {
 		sqlLimit = " LIMIT ? OFFSET ? "
 		queryArgs = append(queryArgs, pager.Limit(), pager.Offset())
 	} else {
@@ -187,7 +187,7 @@ func (repository *projectPriorityRepository) Search(ctx context.Context, dbExecu
 
 	var totalResults int
 
-	if pager.Enabled() {
+	if pager.Enabled {
 		sqlCountQuery := `
 			SELECT
 				COUNT(*) AS total_project_priorities

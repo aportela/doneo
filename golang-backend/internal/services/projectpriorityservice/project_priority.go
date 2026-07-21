@@ -71,7 +71,7 @@ func (service *projectPriorityService) Get(ctx context.Context, projectPriorityI
 }
 
 func (service *projectPriorityService) SearchBase(ctx context.Context) ([]domain.ProjectPriority, browser.PagerResult, error) {
-	if projectPriorities, pagerResult, err := service.projectPriorityRepository.Search(ctx, service.db, browser.PagerQuery{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "index", Direction: "ASC"}, domain.SearchProjectPrioritiesFilter{}); err != nil {
+	if projectPriorities, pagerResult, err := service.projectPriorityRepository.Search(ctx, service.db, browser.PagerQuery{Enabled: false, CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "index", Direction: "ASC"}, domain.SearchProjectPrioritiesFilter{}); err != nil {
 		return nil, browser.PagerResult{}, fmt.Errorf("[ProjectPriorityService] failed to search project priorities: %w", err)
 	} else {
 		return projectPriorities, pagerResult, nil

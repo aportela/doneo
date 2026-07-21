@@ -161,7 +161,7 @@ func (repository *taskPriorityRepository) Search(ctx context.Context, dbExecutor
 	}
 	queryArgs = append(queryArgs, filterArgs...)
 	var sqlLimit string
-	if pager.Enabled() {
+	if pager.Enabled {
 		sqlLimit = " LIMIT ? OFFSET ? "
 		queryArgs = append(queryArgs, pager.Limit(), pager.Offset())
 	} else {
@@ -189,7 +189,7 @@ func (repository *taskPriorityRepository) Search(ctx context.Context, dbExecutor
 
 	var totalResults int
 
-	if pager.Enabled() {
+	if pager.Enabled {
 		sqlCountQuery := `
 			SELECT
 				COUNT(*) AS task_priorities

@@ -72,10 +72,11 @@
         onRefresh();
     };
 
-    const pagination = reactive<Pagination>({ currentPage: 1, resultsPage: PAGER_DEFAULT_RESULTS_PAGE, totalPages: 1, totalResults: 0 });
+    const pagination = reactive<Pagination>({ enabled: true, currentPage: 1, resultsPage: PAGER_DEFAULT_RESULTS_PAGE, totalPages: 1, totalResults: 0 });
     const resetPager = ref<boolean>(false);
 
     const onPagerChanged = (newPagination: Pagination) => {
+        pagination.enabled = newPagination.enabled;
         pagination.currentPage = newPagination.currentPage;
         pagination.resultsPage = newPagination.resultsPage;
         onRefresh();
@@ -407,6 +408,7 @@
         try {
             const payload: SearchRequest = {
                 pager: {
+                    enabled: pagination.enabled,
                     currentPage: resetPager.value ? 1 : pagination.currentPage,
                     resultsPage: pagination.resultsPage,
                 },
@@ -426,6 +428,7 @@
                 }
             };
             const response = await userService.search(payload);
+            pagination.enabled = response.pager.enabled;
             pagination.totalPages = response.pager.totalPages;
             pagination.totalResults = response.pager.totalResults;
             pagination.currentPage = response.pager.currentPage;

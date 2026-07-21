@@ -112,6 +112,7 @@ func (handler *roleHandler) Search(w http.ResponseWriter, r *http.Request) {
 	}
 	roles, pagerResult, err := handler.service.Search(r.Context(),
 		browser.PagerQuery{
+			Enabled:     request.Pager.Enabled,
 			CurrentPage: request.Pager.CurrentPage,
 			ResultsPage: request.Pager.ResultsPage,
 		},

@@ -10,6 +10,7 @@ const (
 )
 
 type PagerQuery struct {
+	Enabled     bool
 	CurrentPage int
 	ResultsPage int
 }
@@ -41,11 +42,8 @@ func (p PagerQuery) Offset() int {
 	return (p.getCurrentPage() - 1) * p.getResultsPage()
 }
 
-func (p PagerQuery) Enabled() bool {
-	return p.ResultsPage > 0
-}
-
 type PagerResult struct {
+	Emabled      bool
 	CurrentPage  int
 	ResultsPage  int
 	TotalResults int
@@ -62,6 +60,7 @@ func NewPagerResult(pagerQuery PagerQuery, totalResults int) PagerResult {
 	}
 
 	return PagerResult{
+		Emabled:      pagerQuery.Enabled,
 		CurrentPage:  currentPage,
 		ResultsPage:  resultsPage,
 		TotalResults: totalResults,

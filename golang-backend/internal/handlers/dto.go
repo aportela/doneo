@@ -4,8 +4,9 @@ type EmptyResponse struct {
 }
 
 type PagerRequest struct {
-	CurrentPage int `json:"currentPage"`
-	ResultsPage int `json:"resultsPage"`
+	Enabled     bool `json:"enabled"`
+	CurrentPage int  `json:"currentPage"`
+	ResultsPage int  `json:"resultsPage"`
 }
 
 type PagerResponse struct {

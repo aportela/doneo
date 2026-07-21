@@ -187,7 +187,7 @@ func (repository *roleRepository) Search(ctx context.Context, dbExecutor databas
 	}
 	queryArgs = append(queryArgs, filterArgs...)
 	var sqlLimit string
-	if pager.Enabled() {
+	if pager.Enabled {
 		sqlLimit = " LIMIT ? OFFSET ? "
 		queryArgs = append(queryArgs, pager.Limit(), pager.Offset())
 	} else {
@@ -213,7 +213,7 @@ func (repository *roleRepository) Search(ctx context.Context, dbExecutor databas
 
 	var totalResults int
 
-	if pager.Enabled() {
+	if pager.Enabled {
 		sqlCountQuery := `
 			SELECT
 				COUNT(*) AS total_roles

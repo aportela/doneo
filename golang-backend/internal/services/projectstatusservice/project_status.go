@@ -71,7 +71,7 @@ func (service *projectStatusService) Get(ctx context.Context, projectStatusID st
 }
 
 func (service *projectStatusService) SearchBase(ctx context.Context) ([]domain.ProjectStatus, browser.PagerResult, error) {
-	if projectStatuses, pagerResult, err := service.projectStatusRepository.Search(ctx, service.db, browser.PagerQuery{CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "index", Direction: "ASC"}, domain.SearchProjectStatusesFilter{}); err != nil {
+	if projectStatuses, pagerResult, err := service.projectStatusRepository.Search(ctx, service.db, browser.PagerQuery{Enabled: false, CurrentPage: 1, ResultsPage: 0}, browser.Order{Field: "index", Direction: "ASC"}, domain.SearchProjectStatusesFilter{}); err != nil {
 		return nil, browser.PagerResult{}, fmt.Errorf("[ProjectStatusService] failed to search project statuses: %w", err)
 	} else {
 		return projectStatuses, pagerResult, nil
