@@ -62,7 +62,7 @@
     );
 
     const items = shallowRef<User[]>([]);
-    const tmpUser = ref<User>(new User());
+    const tmpItem = ref<User>(new User());
 
     const order = reactive<Order>({ field: "name", direction: "ASC" });
 
@@ -93,7 +93,7 @@
         createdAt: TimestampRange;
         updatedAt: TimestampRange;
         deletedAt: TimestampRange;
-    };
+    }
 
     const filters = reactive<UsersTableFilters>(
         {
@@ -116,17 +116,25 @@
     );
 
     watch(
-        filters,
+        () => [
+            filters.permissions,
+            filters.name,
+            filters.email,
+            filters.createdAt.from,
+            filters.createdAt.to,
+            filters.updatedAt.from,
+            filters.updatedAt.to,
+            filters.deletedAt.from,
+            filters.deletedAt.to,
+        ],
         () => {
             resetPager.value = true;
         },
-        { deep: true }
     );
 
-
     const isFilteredByPermissions = computed<boolean>(() => filters.permissions != UserPermissionFilterValue.Any);
-    const isFilteredByName = computed<boolean>(() => filters.name.length > 0);
-    const isFilteredByEmail = computed<boolean>(() => filters.email.length > 0);
+    const isFilteredByName = computed<boolean>(() => filters.name !== "");
+    const isFilteredByEmail = computed<boolean>(() => filters.email !== "");
     const isFilteredByCreatedAt = computed<boolean>(() => filters.createdAt.from != null || filters.createdAt.to != null);
     const isFilteredByUpdatedAt = computed<boolean>(() => filters.updatedAt.from != null || filters.updatedAt.to != null);
     const isFilteredByDeletedAt = computed<boolean>(() => filters.deletedAt.from != null || filters.deletedAt.to != null);
@@ -139,7 +147,7 @@
             createdAtFilterRef.value[0]?.reset();
         }
         if (updatedAtFilterRef.value) {
-            updatedAtFilterRef.value[0].reset();
+            updatedAtFilterRef.value[0]?.reset();
         }
         if (deletedAtFilterRef.value) {
             deletedAtFilterRef.value[0]?.reset();
@@ -299,7 +307,7 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            tmpUser.value = user;
+                            tmpItem.value = user;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "UsersTable.onDelete" } });
                             break;
                         case 403:
@@ -358,7 +366,7 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            tmpUser.value = user;
+                            tmpItem.value = user;
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "UsersTable.onUnDelete" } });
                             break;
                         case 403:
@@ -468,19 +476,19 @@
     const showFormModal = ref<boolean>(false);
 
     const onAdd = () => {
-        tmpUser.value = new User();
+        tmpItem.value = new User();
         showFormModal.value = true;
     };
 
     const onUpdate = (user: User) => {
-        tmpUser.value = user;
+        tmpItem.value = user;
         showFormModal.value = true;
     };
 
     const onUserAdded = (user: UserResponse) => {
         cacheStore.clearUsersCache();
         showFormModal.value = false;
-        tmpUser.value = new User();
+        tmpItem.value = new User();
         notify('success', t("modules.user.components.UsersTable.notifications.userAdded", { name: user.name }));
         onRefresh();
     };
@@ -488,14 +496,14 @@
     const onUserUpdated = (user: UserResponse) => {
         cacheStore.clearUsersCache();
         showFormModal.value = false;
-        tmpUser.value = new User();
+        tmpItem.value = new User();
         notify('success', t("modules.user.components.UsersTable.notifications.userUpdated", { name: user.name }));
         onRefresh();
     };
 
     const hideFormModal = () => {
         showFormModal.value = false;
-        tmpUser.value = new User();
+        tmpItem.value = new User();
     };
 
     let stopBusReauthListener: () => void;
@@ -506,9 +514,9 @@
             if (payload.to.includes("UsersTable.onRefresh")) {
                 onRefresh();
             } else if (payload.to.includes("UsersTable.onDelete")) {
-                onDelete(tmpUser.value);
+                onDelete(tmpItem.value);
             } else if (payload.to.includes("UsersTable.onUnDelete")) {
-                onUnDelete(tmpUser.value);
+                onUnDelete(tmpItem.value);
             }
         });
     });
@@ -520,7 +528,7 @@
 
 <template>
     <n-modal v-model:show="showFormModal" v-if="showFormModal">
-        <UserForm class="user-form" :user-id="tmpUser.id" @add="onUserAdded" @update="onUserUpdated"
+        <UserForm class="user-form" :user-id="tmpItem.id" @add="onUserAdded" @update="onUserUpdated"
             @cancel="hideFormModal" />
     </n-modal>
     <n-card :title="t('modules.user.components.UsersTable.header.title')">
