@@ -3,7 +3,7 @@
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NInput, NFlex, NButton, NRadio, NRadioGroup, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, type InputInst, NTooltip } from 'naive-ui';
-    import { IconCancel, IconDeviceFloppy, IconEye, IconEyeCancel, IconMail, IconUser, IconUserEdit, IconUserPlus, IconKey } from '@tabler/icons-vue';
+    import { DONEO_ICON_ACTION_CANCEL, DONEO_ICON_ACTION_HIDE, DONEO_ICON_ACTION_SAVE, DONEO_ICON_ACTION_SHOW, DONEO_ICON_ADD, DONEO_ICON_EDIT, DONEO_ICON_EMAIL, DONEO_ICON_PASSWORD, DONEO_ICON_USER } from '../../../shared/types/icons';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { User, MAX_NAME_LENGTH, MAX_EMAIL_LENGTH, MIN_PASSWORD_LENGTH } from '../models/user';
@@ -311,10 +311,10 @@
     <n-card bordered>
         <template #header>
             <div class="doneo-flex-center-align">
-                <n-icon class="doneo-mr-4px" :component="!props.userId ? IconUserPlus : IconUserEdit" />
+                <n-icon class="doneo-mr-4px" :component="!props.userId ? DONEO_ICON_ADD : DONEO_ICON_EDIT" />
                 {{
                     t(!props.userId ? "modules.user.components.UserForm.headers.addUser" :
-                        "modules.user.components.UserForm.headers.updateUser")
+                        "modules.user.components.UserForm.headers.editUser")
                 }}
             </div>
         </template>
@@ -328,7 +328,7 @@
                     v-model:value="user.name" :maxlength="MAX_NAME_LENGTH" :show-count="true"
                     :disabled="state.ajaxRunning" clearable required autofocus>
                     <template #prefix>
-                        <n-icon :component="IconUser" />
+                        <n-icon :component="DONEO_ICON_USER" />
                     </template>
                 </n-input>
             </n-form-item>
@@ -337,7 +337,7 @@
                     v-model:value="user.email" :maxlength="MAX_EMAIL_LENGTH" :show-count="true"
                     :disabled="state.ajaxRunning" clearable required autofocus>
                     <template #prefix>
-                        <n-icon :component="IconMail" />
+                        <n-icon :component="DONEO_ICON_EMAIL" />
                     </template>
                 </n-input>
             </n-form-item>
@@ -348,12 +348,12 @@
                     v-model:value="user.password" show-password-on="click" ref="inputPasswordRef"
                     :disabled="state.ajaxRunning">
                     <template #prefix>
-                        <n-icon :component="IconKey" />
+                        <n-icon :component="DONEO_ICON_PASSWORD" />
                     </template>
                     <template #password-visible-icon>
                         <n-tooltip trigger="hover">
                             <template #trigger>
-                                <n-icon :size="16" :component="IconEyeCancel" />
+                                <n-icon :size="16" :component="DONEO_ICON_ACTION_HIDE" />
                             </template>
                             {{ t("modules.user.components.UserForm.inputs.password.hidePasswordTooltipIcon") }}
                         </n-tooltip>
@@ -361,7 +361,7 @@
                     <template #password-invisible-icon>
                         <n-tooltip trigger="hover">
                             <template #trigger>
-                                <n-icon :size="16" :component="IconEye" />
+                                <n-icon :size="16" :component="DONEO_ICON_ACTION_SHOW" />
                             </template>
                             {{ t("modules.user.components.UserForm.inputs.password.showPasswordTooltipIcon") }}
                         </n-tooltip>
@@ -386,13 +386,13 @@
             <n-flex>
                 <n-button @click="onSave" :disabled="isSaveDisabled">
                     <template #icon>
-                        <n-icon :component="IconDeviceFloppy" />
+                        <n-icon :component="DONEO_ICON_ACTION_SAVE" />
                     </template>
                     {{ t("shared.buttons.Save.label") }}
                 </n-button>
                 <n-button @click="onCancel" :disabled="state.ajaxRunning">
                     <template #icon>
-                        <n-icon :component="IconCancel" />
+                        <n-icon :component="DONEO_ICON_ACTION_CANCEL" />
                     </template>
                     {{ t("shared.buttons.Cancel.label") }}
                 </n-button>
