@@ -35,6 +35,8 @@ func ToHandlerJSONResponse(w http.ResponseWriter, data any, err error, statusCod
 }
 
 type TimestampFilter struct {
-	From *uint64 `json:"from"`
-	To   *uint64 `json:"to"`
+	From   *uint64 `json:"from"`
+	To     *uint64 `json:"to"`
+	Filled *bool   `json:"filled"`
+	Empty  *bool   `json:"empty"`
 }

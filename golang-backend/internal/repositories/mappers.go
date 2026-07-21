@@ -10,7 +10,9 @@ func TimestampFilterToDTO(filter *domain.TimestampFilter) *TimestampFilter {
 	}
 
 	return &TimestampFilter{
-		From: filter.From,
-		To:   filter.To,
+		From:   filter.From,
+		To:     filter.To,
+		Filled: filter.Filled,
+		Empty:  filter.Empty,
 	}
 }

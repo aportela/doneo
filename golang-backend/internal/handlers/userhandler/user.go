@@ -168,30 +168,48 @@ func (handler *userHandler) Search(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if request.Filter.CreatedAt != nil {
-			filter.CreatedAt = &domain.TimestampFilter{From: nil, To: nil}
-			if request.Filter.CreatedAt.From != nil {
-				filter.CreatedAt.From = request.Filter.CreatedAt.From
-			}
-			if request.Filter.CreatedAt.To != nil {
-				filter.CreatedAt.To = request.Filter.CreatedAt.To
+			filter.CreatedAt = &domain.TimestampFilter{From: nil, To: nil, Filled: nil, Empty: nil}
+			if request.Filter.CreatedAt.Filled != nil {
+				filter.CreatedAt.Filled = request.Filter.CreatedAt.Filled
+			} else if request.Filter.CreatedAt.Empty != nil {
+				filter.CreatedAt.Empty = request.Filter.CreatedAt.Empty
+			} else {
+				if request.Filter.CreatedAt.From != nil {
+					filter.CreatedAt.From = request.Filter.CreatedAt.From
+				}
+				if request.Filter.CreatedAt.To != nil {
+					filter.CreatedAt.To = request.Filter.CreatedAt.To
+				}
 			}
 		}
 		if request.Filter.UpdatedAt != nil {
-			filter.UpdatedAt = &domain.TimestampFilter{From: nil, To: nil}
-			if request.Filter.UpdatedAt.From != nil {
-				filter.UpdatedAt.From = request.Filter.UpdatedAt.From
-			}
-			if request.Filter.CreatedAt.To != nil {
-				filter.UpdatedAt.To = request.Filter.UpdatedAt.To
+			filter.UpdatedAt = &domain.TimestampFilter{From: nil, To: nil, Filled: nil, Empty: nil}
+			if request.Filter.UpdatedAt.Filled != nil {
+				filter.UpdatedAt.Filled = request.Filter.UpdatedAt.Filled
+			} else if request.Filter.UpdatedAt.Empty != nil {
+				filter.UpdatedAt.Empty = request.Filter.UpdatedAt.Empty
+			} else {
+				if request.Filter.UpdatedAt.From != nil {
+					filter.UpdatedAt.From = request.Filter.UpdatedAt.From
+				}
+				if request.Filter.UpdatedAt.To != nil {
+					filter.UpdatedAt.To = request.Filter.UpdatedAt.To
+				}
 			}
 		}
 		if request.Filter.DeletedAt != nil {
-			filter.DeletedAt = &domain.TimestampFilter{From: nil, To: nil}
-			if request.Filter.DeletedAt.From != nil {
-				filter.DeletedAt.From = request.Filter.DeletedAt.From
-			}
-			if request.Filter.DeletedAt.To != nil {
-				filter.DeletedAt.To = request.Filter.DeletedAt.To
+			filter.DeletedAt = &domain.TimestampFilter{From: nil, To: nil, Filled: nil, Empty: nil}
+			if request.Filter.DeletedAt.Filled != nil {
+				filter.DeletedAt.Filled = request.Filter.DeletedAt.Filled
+			} else if request.Filter.DeletedAt.Empty != nil {
+				filter.DeletedAt.Empty = request.Filter.DeletedAt.Empty
+			} else {
+				if request.Filter.DeletedAt.From != nil {
+					filter.DeletedAt.From = request.Filter.DeletedAt.From
+				}
+				if request.Filter.DeletedAt.To != nil {
+					filter.DeletedAt.To = request.Filter.DeletedAt.To
+				}
 			}
 		}
 	}

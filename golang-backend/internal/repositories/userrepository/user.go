@@ -296,33 +296,51 @@ func (repository *userRepository) Search(ctx context.Context, dbExecutor databas
 		filterArgs = append(filterArgs, filterDTO.ForbiddenPermissionsBitmask)
 	}
 	if filterDTO.CreatedAt != nil {
-		if filterDTO.CreatedAt.From != nil && *filterDTO.CreatedAt.From > 0 {
-			sqlWhereConditions = append(sqlWhereConditions, "U.created_at >= ?")
-			filterArgs = append(filterArgs, filterDTO.CreatedAt.From)
-		}
-		if filterDTO.CreatedAt.To != nil && *filterDTO.CreatedAt.To > 0 {
-			sqlWhereConditions = append(sqlWhereConditions, "U.created_at <= ?")
-			filterArgs = append(filterArgs, filterDTO.CreatedAt.To)
+		if filterDTO.CreatedAt.Empty != nil && *filterDTO.CreatedAt.Empty {
+			sqlWhereConditions = append(sqlWhereConditions, "U.created_at IS NULL")
+		} else if filterDTO.CreatedAt.Filled != nil && *filterDTO.CreatedAt.Filled {
+			sqlWhereConditions = append(sqlWhereConditions, "U.created_at IS NOT NULL")
+		} else {
+			if filterDTO.CreatedAt.From != nil && *filterDTO.CreatedAt.From > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "U.created_at >= ?")
+				filterArgs = append(filterArgs, filterDTO.CreatedAt.From)
+			}
+			if filterDTO.CreatedAt.To != nil && *filterDTO.CreatedAt.To > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "U.created_at <= ?")
+				filterArgs = append(filterArgs, filterDTO.CreatedAt.To)
+			}
 		}
 	}
 	if filterDTO.UpdatedAt != nil {
-		if filterDTO.UpdatedAt.From != nil && *filterDTO.UpdatedAt.From > 0 {
-			sqlWhereConditions = append(sqlWhereConditions, "U.updated_at >= ?")
-			filterArgs = append(filterArgs, filterDTO.UpdatedAt.From)
-		}
-		if filterDTO.UpdatedAt.To != nil && *filterDTO.UpdatedAt.To > 0 {
-			sqlWhereConditions = append(sqlWhereConditions, "U.updated_at <= ?")
-			filterArgs = append(filterArgs, filterDTO.UpdatedAt.To)
+		if filterDTO.UpdatedAt.Empty != nil && *filterDTO.UpdatedAt.Empty {
+			sqlWhereConditions = append(sqlWhereConditions, "U.updated_at IS NULL")
+		} else if filterDTO.UpdatedAt.Filled != nil && *filterDTO.UpdatedAt.Filled {
+			sqlWhereConditions = append(sqlWhereConditions, "U.updated_at IS NOT NULL")
+		} else {
+			if filterDTO.UpdatedAt.From != nil && *filterDTO.UpdatedAt.From > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "U.updated_at >= ?")
+				filterArgs = append(filterArgs, filterDTO.UpdatedAt.From)
+			}
+			if filterDTO.UpdatedAt.To != nil && *filterDTO.UpdatedAt.To > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "U.updated_at <= ?")
+				filterArgs = append(filterArgs, filterDTO.UpdatedAt.To)
+			}
 		}
 	}
 	if filterDTO.DeletedAt != nil {
-		if filterDTO.DeletedAt.From != nil && *filterDTO.DeletedAt.From > 0 {
-			sqlWhereConditions = append(sqlWhereConditions, "U.deleted_at >= ?")
-			filterArgs = append(filterArgs, filterDTO.DeletedAt.From)
-		}
-		if filterDTO.DeletedAt.To != nil && *filterDTO.DeletedAt.To > 0 {
-			sqlWhereConditions = append(sqlWhereConditions, "U.deleted_at <= ?")
-			filterArgs = append(filterArgs, filterDTO.DeletedAt.To)
+		if filterDTO.DeletedAt.Empty != nil && *filterDTO.DeletedAt.Empty {
+			sqlWhereConditions = append(sqlWhereConditions, "U.deleted_at IS NULL")
+		} else if filterDTO.DeletedAt.Filled != nil && *filterDTO.DeletedAt.Filled {
+			sqlWhereConditions = append(sqlWhereConditions, "U.deleted_at IS NOT NULL")
+		} else {
+			if filterDTO.DeletedAt.From != nil && *filterDTO.DeletedAt.From > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "U.deleted_at >= ?")
+				filterArgs = append(filterArgs, filterDTO.DeletedAt.From)
+			}
+			if filterDTO.DeletedAt.To != nil && *filterDTO.DeletedAt.To > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "U.deleted_at <= ?")
+				filterArgs = append(filterArgs, filterDTO.DeletedAt.To)
+			}
 		}
 	}
 	if len(sqlWhereConditions) > 0 {

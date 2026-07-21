@@ -19,26 +19,38 @@
     });
 
     const options = computed<SelectMixedOption[]>(() => [
-        { label: t("shared.components.selectors.dateFilter.options.anyDate"), value: 0 },
-        { label: t("shared.components.selectors.dateFilter.options.customDate"), value: 1 },
-        { label: t("shared.components.selectors.dateFilter.options.yesterday"), value: 2 },
-        { label: t("shared.components.selectors.dateFilter.options.today"), value: 3 },
-        { label: t("shared.components.selectors.dateFilter.options.tomorrow"), value: 4 },
-        { label: t("shared.components.selectors.dateFilter.options.lastWeek"), value: 5 },
-        { label: t("shared.components.selectors.dateFilter.options.thisWeek"), value: 6 },
-        { label: t("shared.components.selectors.dateFilter.options.nextWeek"), value: 7 },
-        { label: t("shared.components.selectors.dateFilter.options.lastMonth"), value: 8 },
-        { label: t("shared.components.selectors.dateFilter.options.thisMonth"), value: 9 },
-        { label: t("shared.components.selectors.dateFilter.options.nextMonth"), value: 10 },
-        { label: t("shared.components.selectors.dateFilter.options.lastYear"), value: 11 },
-        { label: t("shared.components.selectors.dateFilter.options.thisYear"), value: 12 },
-        { label: t("shared.components.selectors.dateFilter.options.nextYear"), value: 13 },
+        {
+            type: "group", label: t("shared.components.selectors.dateFilter.options.dateConditionsGroupLabel"), key: "dateConditions", children: [
+                { label: t("shared.components.selectors.dateFilter.options.anyDate"), value: 0 },
+                { label: t("shared.components.selectors.dateFilter.options.filledDate"), value: -1 },
+                { label: t("shared.components.selectors.dateFilter.options.emptyDate"), value: -2 },
+                { label: t("shared.components.selectors.dateFilter.options.customDate"), value: 1 },
+            ]
+        },
+        {
+            type: "group", label: t("shared.components.selectors.dateFilter.options.fixedGroupLabel"), key: "fixed", children: [
+                { label: t("shared.components.selectors.dateFilter.options.yesterday"), value: 2 },
+                { label: t("shared.components.selectors.dateFilter.options.today"), value: 3 },
+                { label: t("shared.components.selectors.dateFilter.options.tomorrow"), value: 4 },
+                { label: t("shared.components.selectors.dateFilter.options.lastWeek"), value: 5 },
+                { label: t("shared.components.selectors.dateFilter.options.thisWeek"), value: 6 },
+                { label: t("shared.components.selectors.dateFilter.options.nextWeek"), value: 7 },
+                { label: t("shared.components.selectors.dateFilter.options.lastMonth"), value: 8 },
+                { label: t("shared.components.selectors.dateFilter.options.thisMonth"), value: 9 },
+                { label: t("shared.components.selectors.dateFilter.options.nextMonth"), value: 10 },
+                { label: t("shared.components.selectors.dateFilter.options.lastYear"), value: 11 },
+                { label: t("shared.components.selectors.dateFilter.options.thisYear"), value: 12 },
+                { label: t("shared.components.selectors.dateFilter.options.nextYear"), value: 13 },
+            ]
+        }
     ]);
 
     const range = defineModel<TimestampRange>("range", {
         default: () => ({
             from: null,
-            to: null
+            to: null,
+            filled: undefined,
+            empty: undefined,
         })
     });
 
@@ -47,11 +59,25 @@
     const isDatePickerVisible = ref<boolean>(false);
 
     const recalcTimestamps = () => {
+        range.value.filled = undefined;
+        range.value.empty = undefined;
         switch (selectorValue.value) {
             case 0: // any date
                 range.value.from = null;
                 range.value.to = null;
                 break;
+            case -1: { // filled date
+                range.value.from = null;
+                range.value.to = null;
+                range.value.filled = true;
+                break;
+            }
+            case -2: { // empty date
+                range.value.from = null;
+                range.value.to = null;
+                range.value.empty = true;
+                break;
+            }
             case 1: // custom  date
                 if (datepickerValue.value) {
                     const from = new Date(datepickerValue.value);

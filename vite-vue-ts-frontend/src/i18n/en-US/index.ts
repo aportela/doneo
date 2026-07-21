@@ -118,7 +118,11 @@ export default {
       selectors: {
         dateFilter: {
           options: {
+            dateConditionsGroupLabel: "Date conditions",
+            fixedGroupLabel: "Fixed dates",
             anyDate: "Any date",
+            filledDate: "Filled date",
+            emptyDate: "Empty date",
             customDate: "Custom date",
             yesterday: "Yesterday",
             today: "Today",
