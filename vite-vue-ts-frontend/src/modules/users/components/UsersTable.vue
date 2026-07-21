@@ -556,7 +556,7 @@
             <n-button-group class="doneo-table-actions-button-group" size="small">
                 <n-button @click="onUpdate(row)" :disabled="state.ajaxRunning || row.deletedAt?.hasValue()"
                     class="doneo-table-actions-button">
-                    {{ t("shared.buttons.Update.label") }}
+                    {{ t("shared.buttons.Edit.label") }}
                     <template #icon>
                         <n-icon :component="DONEO_ICON_ACTION_EDIT" />
                     </template>

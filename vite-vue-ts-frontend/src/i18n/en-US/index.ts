@@ -431,6 +431,9 @@ export default {
       Update: {
         label: "Update",
       },
+      Edit: {
+        label: "Edit",
+      },
       Open: {
         label: "Open",
       },
@@ -510,7 +513,7 @@ export default {
         UserForm: {
           headers: {
             addUser: "Add user",
-            updateUser: "Update user",
+            editUser: "Edit user",
           },
           inputs: {
             name: {
