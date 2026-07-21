@@ -2,7 +2,7 @@
     import { ref, reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount, h, type Component } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NModal, NCard, useDialog, NIcon, NTooltip } from 'naive-ui';
+    import { NModal, useDialog, NIcon, NTooltip } from 'naive-ui';
     import { IconTrash } from '@tabler/icons-vue';
 
     import { useLoadingStore } from '../../../stores/loading';
@@ -465,32 +465,30 @@
         <RoleForm class="role-form" :role-id="tmpRole.id" @add="onRoleAdded" @update="onRoleUpdated"
             @cancel="hideFormModal" />
     </n-modal>
-    <n-card :title="t('modules.role.components.RolesTable.header.title')">
-        <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="localFilteredItems"
-            :row-key="row => row.id" :columns="columns" :order="order" @sort="onSort" @refresh="onRefresh" @add="onAdd"
-            @clear-filters="onClearFilters">
-            <template #thead-column-filters="{ columns }">
-                <th v-for="column in columns">
-                    <TextFilterInput v-if="column.field === 'name'" clearable :disabled="state.ajaxRunning" size="small"
-                        :placeholder="t('modules.role.components.RolesTable.filters.name.placeholder')"
-                        v-model:value="filters.name" />
-                    <ProjectPermissionSelect v-if="column.field == 'projectPermissions'"
-                        v-model:permission="filters.projectPermission"
-                        :placeholder="t('shared.components.selectors.ProjectPermissionSelect.placeholder')" clearable
-                        ref="projectPermissionSelectorRef" />
-                    <TaskPermissionSelect v-if="column.field === 'taskPermissions'"
-                        v-model:permission="filters.taskPermission"
-                        :placeholder="t('shared.components.selectors.TaskPermissionSelect.placeholder')" clearable
-                        ref="taskPermissionSelectorRef" />
-                </th>
-            </template>
-            <template #rowactions="{ row }">
-                <ManageTableActionButtons show-update show-delete :update-disabled="state.ajaxRunning"
-                    :delete-disabled="state.ajaxRunning" :disabled="state.ajaxRunning" @update="onUpdate(row)"
-                    @delete="onConfirmDelete(row)" />
-            </template>
-        </ManageTable>
-    </n-card>
+    <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="localFilteredItems"
+        :row-key="row => row.id" :columns="columns" :order="order" @sort="onSort" @refresh="onRefresh" @add="onAdd"
+        @clear-filters="onClearFilters">
+        <template #thead-column-filters="{ columns }">
+            <th v-for="column in columns">
+                <TextFilterInput v-if="column.field === 'name'" clearable :disabled="state.ajaxRunning" size="small"
+                    :placeholder="t('modules.role.components.RolesTable.filters.name.placeholder')"
+                    v-model:value="filters.name" />
+                <ProjectPermissionSelect v-if="column.field == 'projectPermissions'"
+                    v-model:permission="filters.projectPermission"
+                    :placeholder="t('shared.components.selectors.ProjectPermissionSelect.placeholder')" clearable
+                    ref="projectPermissionSelectorRef" />
+                <TaskPermissionSelect v-if="column.field === 'taskPermissions'"
+                    v-model:permission="filters.taskPermission"
+                    :placeholder="t('shared.components.selectors.TaskPermissionSelect.placeholder')" clearable
+                    ref="taskPermissionSelectorRef" />
+            </th>
+        </template>
+        <template #rowactions="{ row }">
+            <ManageTableActionButtons show-update show-delete :update-disabled="state.ajaxRunning"
+                :delete-disabled="state.ajaxRunning" :disabled="state.ajaxRunning" @update="onUpdate(row)"
+                @delete="onConfirmDelete(row)" />
+        </template>
+    </ManageTable>
 </template>
 
 <style lang="css" scoped>

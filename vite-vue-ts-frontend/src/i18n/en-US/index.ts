@@ -677,10 +677,13 @@ export default {
             nameAlreadyExists: "Name already exists",
           },
         },
-        ManageRolesPage: {},
-        RolesTable: {
+        ManageRolesPage: {
           header: {
             title: "Manage roles",
+          },
+        },
+        RolesTable: {
+          header: {
             columns: {
               name: "Name",
               projectPermissions: "Project permissions",
