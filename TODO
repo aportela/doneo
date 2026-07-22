@@ -66,3 +66,6 @@ all menu keys as (UNIQUE) route names
 limit current projects menu by count
 
 remove top navigation
+
+
+check project type/priority/status & task use before deleting
