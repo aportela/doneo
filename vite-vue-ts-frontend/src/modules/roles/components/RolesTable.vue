@@ -56,7 +56,9 @@
 
     const items = shallowRef<Role[]>([]);
 
-    const tmpRole = ref<Role>(new Role());
+    const tmpItem = ref<Role>(new Role());
+
+    const showNoItemsWarningMessage = ref<boolean>(false);
 
     const currentOrder = reactive<Order>({ field: "name", direction: "ASC" });
 
@@ -300,7 +302,7 @@
                         switch (apiError.response?.status) {
                             case 401:
                                 state.ajaxErrors = false;
-                                tmpRole.value = role;
+                                tmpItem.value = role;
                                 appBus.emit({ type: "reauthRequired", payload: { emitter: "RolesTable.onDelete" } });
                                 break;
                             case 403:
@@ -350,6 +352,7 @@
 
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
+        showNoItemsWarningMessage.value = false;
         try {
             const payload: SearchRequest = {
                 pager: {
@@ -367,6 +370,7 @@
             };
             const response = await roleService.search(payload);
             items.value = response.roles.map((role: RoleResponse) => new Role(role));
+            showNoItemsWarningMessage.value = items.value.length === 0;
         } catch (error: unknown) {
             items.value = [];
             state.ajaxErrors = true;
@@ -401,19 +405,19 @@
     const showFormModal = ref<boolean>(false);
 
     const onAdd = () => {
-        tmpRole.value = new Role();
+        tmpItem.value = new Role();
         showFormModal.value = true;
     };
 
     const onUpdate = (role: Role) => {
-        tmpRole.value = role;
+        tmpItem.value = role;
         showFormModal.value = true;
     };
 
     const onRoleAdded = (role: RoleResponse) => {
         cacheStore.clearUsersCache();
         showFormModal.value = false;
-        tmpRole.value = new Role();
+        tmpItem.value = new Role();
         notify('success', t("modules.role.components.RolesTable.notifications.roleAdded", { name: role.name }));
         onRefresh();
     };
@@ -421,14 +425,14 @@
     const onRoleUpdated = (role: RoleResponse) => {
         cacheStore.clearUsersCache();
         showFormModal.value = false;
-        tmpRole.value = new Role();
+        tmpItem.value = new Role();
         notify('success', t("modules.role.components.RolesTable.notifications.roleUpdated", { name: role.name }));
         onRefresh();
     };
 
     const hideFormModal = () => {
         showFormModal.value = false;
-        tmpRole.value = new Role();
+        tmpItem.value = new Role();
     };
 
     let stopBusReauthListener: () => void;
@@ -439,7 +443,7 @@
             if (payload.to.includes("RolesTable.onRefresh")) {
                 onRefresh();
             } else if (payload.to.includes("RolesTable.onDelete")) {
-                onDelete(tmpRole.value);
+                onDelete(tmpItem.value);
             }
         });
     });
@@ -452,12 +456,14 @@
 
 <template>
     <n-modal v-model:show="showFormModal" v-if="showFormModal">
-        <RoleForm class="role-form" :role-id="tmpRole.id" @add="onRoleAdded" @update="onRoleUpdated"
+        <RoleForm class="role-form" :role-id="tmpItem.id" @add="onRoleAdded" @update="onRoleUpdated"
             @cancel="hideFormModal" />
     </n-modal>
     <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="localFilteredItems"
-        :row-key="row => row.id" :columns="columns" :order="currentOrder" @sort="onSort" @refresh="onRefresh"
-        @add="onAdd" @clear-filters="onClearFilters">
+        :row-key="row => row.id" :columns="columns" :order="currentOrder"
+        :show-no-items-warning-message="showNoItemsWarningMessage || (items.length > 0 && localFilteredItems.length === 0)"
+        :no-items-warning-message="t('modules.role.components.RolesTable.warnings.noItemsFound')" @sort="onSort"
+        @refresh="onRefresh" @add="onAdd" @clear-filters="onClearFilters">
         <template #thead-column-filters="{ columns }">
             <th v-for="column in columns">
                 <TextFilterInput v-if="column.field === 'name'" clearable :disabled="state.ajaxRunning" size="small"
