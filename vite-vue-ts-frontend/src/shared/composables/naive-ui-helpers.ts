@@ -1,8 +1,9 @@
-import { h } from "vue";
+import { h, type Component } from "vue";
 
-import { NTag } from "naive-ui";
+import { NIcon, NTag } from "naive-ui";
 
 import { getNaiveUITagColorProperty } from "./color";
+import type { IconProps } from "@tabler/icons-vue";
 
 export const renderColoredTag = (
   name: string,
@@ -24,3 +25,10 @@ export const renderColoredTag = (
 
 export const renderLabel = (value: string, className?: string) =>
   h("span", { class: className }, { default: () => value });
+
+export const renderIcon =
+  (icon: Component, props: IconProps = {}) =>
+  () =>
+    h(NIcon, props, {
+      default: () => h(icon),
+    });
