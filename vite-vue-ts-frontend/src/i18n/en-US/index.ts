@@ -575,6 +575,9 @@ export default {
               deletedAt: "Deleted at",
             },
             filters: {
+              permissions: {
+                placeholder: "search by permissions",
+              },
               name: {
                 placeholder: "search by name",
               },

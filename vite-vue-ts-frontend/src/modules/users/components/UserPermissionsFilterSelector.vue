@@ -30,13 +30,25 @@
     ]);
 
 
-    const model = defineModel<UserPermissionFilter>({
-        default: UserPermissionFilterValue.Any,
+    const model = defineModel<UserPermissionFilter>('value', { default: UserPermissionFilterValue.Any });
+
+
+    const permission = computed({
+        get() {
+            return model.value;
+        },
+        set(value) {
+            if (value !== null) {
+                model.value = value;
+            } else {
+                model.value = UserPermissionFilterValue.Any;
+            }
+        }
     });
 </script>
 
 <template>
-    <n-select :size="props.size" :disabled="props.disabled" :options="options" v-model:value="model"
+    <n-select :size="props.size" :disabled="props.disabled" :options="options" v-model:value="permission"
         :placeholder="props.placeholder" :clearable="props.clearable" />
 </template>
 

@@ -64,21 +64,21 @@
     const items = shallowRef<User[]>([]);
     const tmpItem = ref<User>(new User());
 
-    const order = reactive<Order>({ field: "name", direction: "ASC" });
+    const currentOrder = reactive<Order>({ field: "name", direction: "ASC" });
 
     const onSort = (newOrder: Order) => {
-        order.field = newOrder.field;
-        order.direction = newOrder.direction;
+        currentOrder.field = newOrder.field;
+        currentOrder.direction = newOrder.direction;
         onRefresh();
     };
 
-    const pagination = reactive<Pagination>({ enabled: true, currentPage: 1, resultsPage: PAGER_DEFAULT_RESULTS_PAGE, totalPages: 1, totalResults: 0 });
+    const currentPagination = reactive<Pagination>({ enabled: true, currentPage: 1, resultsPage: PAGER_DEFAULT_RESULTS_PAGE, totalPages: 1, totalResults: 0 });
     const resetPager = ref<boolean>(false);
 
     const onPagerChanged = (newPagination: Pagination) => {
-        pagination.enabled = newPagination.enabled;
-        pagination.currentPage = newPagination.currentPage;
-        pagination.resultsPage = newPagination.resultsPage;
+        currentPagination.enabled = newPagination.enabled;
+        currentPagination.currentPage = newPagination.currentPage;
+        currentPagination.resultsPage = newPagination.resultsPage;
         onRefresh();
     };
 
@@ -132,7 +132,7 @@
         },
     );
 
-    const isFilteredByPermissions = computed<boolean>(() => filters.permissions != UserPermissionFilterValue.Any);
+    const isFilteredByPermissions = computed<boolean>(() => filters.permissions !== UserPermissionFilterValue.Any);
     const isFilteredByName = computed<boolean>(() => filters.name !== "");
     const isFilteredByEmail = computed<boolean>(() => filters.email !== "");
     const isFilteredByCreatedAt = computed<boolean>(() => filters.createdAt.from != null || filters.createdAt.to != null);
@@ -415,20 +415,13 @@
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const payload: SearchRequest = {
-                pager: {
-                    enabled: pagination.enabled,
-                    currentPage: resetPager.value ? 1 : pagination.currentPage,
-                    resultsPage: pagination.resultsPage,
-                },
-                order: {
-                    field: order.field,
-                    direction: order.direction,
-                },
+                pager: { ...currentPagination, currentPage: resetPager.value ? 1 : currentPagination.currentPage },
+                order: currentOrder,
                 filter: {
-                    name: filters.name,
-                    email: filters.email,
+                    name: isFilteredByName.value ? filters.name : undefined,
+                    email: isFilteredByEmail.value ? filters.email : undefined,
                     permissions: {
-                        isSuperUser: filters.permissions == UserPermissionFilterValue.Any ? undefined : (filters.permissions === UserPermissionFilterValue.OnlyAdministrators ? true : false),
+                        isSuperUser: filters.permissions === UserPermissionFilterValue.Any ? undefined : (filters.permissions === UserPermissionFilterValue.OnlyAdministrators ? true : false),
                     },
                     createdAt: filters.createdAt,
                     updatedAt: filters.updatedAt,
@@ -436,10 +429,11 @@
                 }
             };
             const response = await userService.search(payload);
-            pagination.enabled = response.pager.enabled;
-            pagination.totalPages = response.pager.totalPages;
-            pagination.totalResults = response.pager.totalResults;
-            pagination.currentPage = response.pager.currentPage;
+            currentPagination.enabled = response.pager.enabled;
+            currentPagination.currentPage = response.pager.currentPage;
+            currentPagination.resultsPage = response.pager.resultsPage;
+            currentPagination.totalPages = response.pager.totalPages;
+            currentPagination.totalResults = response.pager.totalResults;
             items.value = response.users.map((user: UserResponse) => new User(user));
             resetPager.value = false;
         } catch (error: unknown) {
@@ -532,12 +526,13 @@
             @cancel="hideFormModal" />
     </n-modal>
     <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="items" :row-key="row => row.id"
-        :columns="columns" :order="order" :pager-data="pagination" pager-position="both" @sort="onSort"
+        :columns="columns" :order="currentOrder" :pager-data="currentPagination" pager-position="both" @sort="onSort"
         @refresh="onRefresh" @add="onAdd" @pager-changed="onPagerChanged" @clear-filters="onClearFilters">
         <template #thead-column-filters="{ columns }">
             <th v-for="column in columns">
-                <UserPermissionsFilterSelector v-if="column.field === 'permissions'" size="small"
-                    v-model:value="filters.permissions" :disabled="state.ajaxRunning" />
+                <UserPermissionsFilterSelector v-if="column.field === 'permissions'" size="small" clearable
+                    v-model:value="filters.permissions" :disabled="state.ajaxRunning"
+                    :placeholder="t('modules.user.components.UsersTable.header.filters.permissions.placeholder')" />
                 <TextFilterInput v-else-if="column.field === 'name'" clearable size="small"
                     :placeholder="t('modules.user.components.UsersTable.header.filters.name.placeholder')"
                     v-model:value="filters.name" @keydown-enter="onRefresh" :disabled="state.ajaxRunning" />
