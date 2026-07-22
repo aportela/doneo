@@ -30,7 +30,6 @@
     import type { ProjectPermissionSelectValue } from '../../../shared/types/project-permission-select-value.ts';
     import type { TaskPermissionSelectValue } from '../../../shared/types/task-permission-select-value.ts';
     import type { RoleResponse, SearchRequest } from '../types/dto.ts';
-    import { PAGER_DEFAULT_RESULTS_PAGE_NO_PAGINATION } from '../../../shared/types/pager.ts';
     import RoleForm from './RoleForm.vue';
     import { DONEO_ICON_ACTION_ADD, DONEO_ICON_ACTION_DELETE, DONEO_ICON_ACTION_EDIT, DONEO_ICON_ACTION_SHOW } from '../../../shared/types/icons.ts';
 
@@ -364,8 +363,9 @@
         try {
             const payload: SearchRequest = {
                 pager: {
+                    enabled: false,
                     currentPage: 1,
-                    resultsPage: PAGER_DEFAULT_RESULTS_PAGE_NO_PAGINATION,
+                    resultsPage: 0,
                 },
                 order: {
                     field: order.field,
