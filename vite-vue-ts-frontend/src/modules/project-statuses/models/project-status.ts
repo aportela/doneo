@@ -1,4 +1,8 @@
-import type { ProjectStatusResponse as ProjectStatusDTO } from "../types/dto";
+import type {
+  AddRequest,
+  ProjectStatusResponse as ProjectStatusDTO,
+  UpdateRequest,
+} from "../types/dto";
 import type { StatusFlags } from "../../../shared/types/status-flags";
 
 export class ProjectStatus {
@@ -24,6 +28,25 @@ export class ProjectStatus {
   }
 
   toDTO(): ProjectStatusDTO {
+    return {
+      id: this.id,
+      name: this.name,
+      hexColor: this.hexColor,
+      index: this.index,
+      flags: this.flags,
+    };
+  }
+
+  toAddProjectStatusRequestPayload(): AddRequest {
+    return {
+      name: this.name,
+      hexColor: this.hexColor,
+      index: this.index,
+      flags: this.flags,
+    };
+  }
+
+  toUpdateProjectStatusRequestPayload(): UpdateRequest {
     return {
       id: this.id,
       name: this.name,

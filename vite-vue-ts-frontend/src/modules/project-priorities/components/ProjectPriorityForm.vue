@@ -1,35 +1,35 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, type CSSProperties, nextTick } from 'vue';
+    import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NInput, NInputNumber, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
-    import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette } from '@tabler/icons-vue';
+    import { DONEO_ICON_ACTION_CANCEL, DONEO_ICON_ACTION_SAVE, DONEO_ICON_ADD, DONEO_ICON_EDIT, DONEO_ICON_NAME, DONEO_ICON_PALETTE } from '../../../shared/types/icons';
 
     import { ProjectPriority, MAX_NAME_LENGTH } from '../models/project-priority';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { projectPriorityService } from '../services/project-priority';
     import { handleAPIError } from '../../../api/client/errorHandler';
     import { generateRandomSoftHexColor, getNaiveUITagColorProperty } from '../../../shared/composables/color';
-    import type { ProjectPriorityResponse, AddRequest, UpdateRequest } from '../types/dto';
-    import type { FormMode } from '../../../shared/types/form-mode';
+    import type { ProjectPriorityResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
 
-    interface ProjectStatusFormProps {
-        mode: FormMode;
+    interface Props {
         projectPriorityId?: string | null;
-        style?: string | CSSProperties;
     }
 
     const emit = defineEmits(['add', 'update', 'cancel'])
 
-    const props = defineProps<ProjectStatusFormProps>();
+    const props = defineProps<Props>();
 
     const { t } = useI18n();
 
     const projectPriority = ref<ProjectPriority>(new ProjectPriority());
+
     projectPriority.value.hexColor = generateRandomSoftHexColor();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
+
+    const serverErrors = ref<Record<string, string>>({});
 
     const projectPriorityFormRef = ref<FormInst | null>(null)
 
@@ -73,10 +73,8 @@
     watch(() => projectPriority.value.name, () => { delete serverErrors.value.name });
     watch(() => projectPriority.value.index, () => { delete serverErrors.value.index });
 
-    const serverErrors = ref<Record<string, string>>({});
-
     const isSaveDisabled = computed<boolean>(() => {
-        return !projectPriority.value.name;
+        return !projectPriority.value.name || state.ajaxRunning;
     });
 
     const onSave = async () => {
@@ -84,7 +82,7 @@
         projectPriorityFormRef.value?.restoreValidation();
         try {
             await projectPriorityFormRef.value?.validate();
-            if (props.mode === "add") {
+            if (!props.projectPriorityId) {
                 await onAdd();
             } else {
                 await onUpdate()
@@ -147,13 +145,8 @@
         projectPriorityFormRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: AddRequest = {
-                name: projectPriority.value.name ?? "",
-                hexColor: projectPriority.value.hexColor ?? "",
-                index: projectPriority.value.index ?? 0,
-            };
-            const addedRole: ProjectPriorityResponse = await projectPriorityService.add(payload);
-            emit('add', addedRole)
+            const addedProjectPriority: ProjectPriorityResponse = await projectPriorityService.add(projectPriority.value.toAddProjectPriorityRequestPayload());
+            emit('add', addedProjectPriority)
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -205,14 +198,8 @@
         projectPriorityFormRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: UpdateRequest = {
-                id: projectPriority.value.id ?? "",
-                name: projectPriority.value.name ?? "",
-                hexColor: projectPriority.value.hexColor ?? "",
-                index: projectPriority.value.index ?? 0,
-            };
-            const updatedRole: ProjectPriorityResponse = await projectPriorityService.update(payload);
-            emit('update', updatedRole)
+            const updatedProjectPriority: ProjectPriorityResponse = await projectPriorityService.update(projectPriority.value.toUpdateProjectPriorityRequestPayload());
+            emit('update', updatedProjectPriority)
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -263,8 +250,6 @@
             if (payload.to.includes("ProjectPriorityForm.onGet")) {
                 if (props.projectPriorityId) {
                     onGet(props.projectPriorityId);
-                } else {
-                    console.error(`TODO: missing projectPriorityId property for ${props.mode} action`);
                 }
             } else if (payload.to.includes("ProjectPriorityForm.onAdd")) {
                 onAdd();
@@ -272,12 +257,8 @@
                 onUpdate()
             }
         });
-        if (props.mode === "update") {
-            if (props.projectPriorityId) {
-                onGet(props.projectPriorityId);
-            } else {
-                console.error(`TODO: missing projectPriorityId property for ${props.mode} action`);
-            }
+        if (props.projectPriorityId) {
+            onGet(props.projectPriorityId);
         }
     });
 
@@ -287,13 +268,15 @@
 </script>
 
 <template>
-    <n-card :style="style" bordered>
+    <n-card>
         <template #header>
             <div class="doneo-flex-center-align">
-                <n-icon :component="props.mode == 'add' ? IconPlus : IconEdit" />
-                {{ t(props.mode == "add" ?
-                    "modules.projectPriority.components.ProjectPriorityForm.headers.addProjectPriority" :
-                    "modules.projectPriority.components.ProjectPriorityForm.headers.updateProjectPriority") }}
+                <n-icon class="doneo-mr-4px" :component="!props.projectPriorityId ? DONEO_ICON_ADD : DONEO_ICON_EDIT" />
+                {{
+                    t(props.projectPriorityId ?
+                        "modules.projectPriority.components.ProjectPriorityForm.headers.addProjectPriority" :
+                        "modules.projectPriority.components.ProjectPriorityForm.headers.updateProjectPriority")
+                }}
             </div>
         </template>
         <template #header-extra>
@@ -305,10 +288,10 @@
                 path="name" show-feedback>
                 <n-input type="text"
                     :placeholder="t('modules.projectPriority.components.ProjectPriorityForm.inputs.name.placeholder')"
-                    v-model:value="projectPriority.name" :maxlength="MAX_NAME_LENGTH" :show-count="true" clearable
-                    required autofocus>
+                    v-model:value="projectPriority.name" :maxlength="MAX_NAME_LENGTH" :show-count="true"
+                    :disabled="state.ajaxRunning" clearable required autofocus>
                     <template #prefix>
-                        <n-icon :component="IconUser" />
+                        <n-icon :component="DONEO_ICON_NAME" />
                     </template>
                 </n-input>
             </n-form-item>
@@ -316,7 +299,7 @@
                 path="index" show-feedback>
                 <n-input-number :min="0"
                     :placeholder="t('modules.projectPriority.components.ProjectPriorityForm.inputs.index.placeholder')"
-                    v-model:value="projectPriority.index" required>
+                    v-model:value="projectPriority.index" :disabled="state.ajaxRunning" required>
                 </n-input-number>
             </n-form-item>
             <n-form-item :label="t('modules.projectPriority.components.ProjectPriorityForm.inputs.preview.label')">
@@ -325,11 +308,12 @@
                         style="width: 100%;">
                         {{ projectPriority.name }}
                     </n-tag>
-                    <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="projectPriority.hexColor">
+                    <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="projectPriority.hexColor"
+                        :disabled="state.ajaxRunning">
                         <template #trigger="{ onClick, ref: triggerRef }">
                             <n-button :ref="triggerRef" quaternary @click="onClick">
                                 <template #icon>
-                                    <IconPalette />
+                                    <n-icon :component="DONEO_ICON_PALETTE" />
                                 </template>
                             </n-button>
                         </template>
@@ -341,13 +325,13 @@
             <n-flex>
                 <n-button @click="onSave" :disabled="isSaveDisabled">
                     <template #icon>
-                        <n-icon :component="IconDeviceFloppy" />
+                        <n-icon :component="DONEO_ICON_ACTION_SAVE" />
                     </template>
                     {{ t("shared.buttons.Save.label") }}
                 </n-button>
                 <n-button @click="onCancel" :disabled="state.ajaxRunning">
                     <template #icon>
-                        <n-icon :component="IconCancel" />
+                        <n-icon :component="DONEO_ICON_ACTION_CANCEL" />
                     </template>
                     {{ t("shared.buttons.Cancel.label") }}
                 </n-button>

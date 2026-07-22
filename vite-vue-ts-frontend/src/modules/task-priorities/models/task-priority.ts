@@ -1,4 +1,8 @@
-import type { TaskPriorityResponse as TaskPriorityDTO } from "../types/dto";
+import type {
+  AddRequest,
+  TaskPriorityResponse as TaskPriorityDTO,
+  UpdateRequest,
+} from "../types/dto";
 
 export class TaskPriority {
   id: string;
@@ -14,6 +18,23 @@ export class TaskPriority {
   }
 
   toDTO(): TaskPriorityDTO {
+    return {
+      id: this.id,
+      name: this.name,
+      hexColor: this.hexColor,
+      index: this.index,
+    };
+  }
+
+  toAddTaskPriorityRequestPayload(): AddRequest {
+    return {
+      name: this.name,
+      hexColor: this.hexColor,
+      index: this.index,
+    };
+  }
+
+  toUpdateTaskPriorityRequestPayload(): UpdateRequest {
     return {
       id: this.id,
       name: this.name,

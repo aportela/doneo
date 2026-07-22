@@ -1,37 +1,35 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, type CSSProperties, nextTick } from 'vue';
+    import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NInput, NInputNumber, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
-    import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette } from '@tabler/icons-vue';
+    import { DONEO_ICON_ACTION_CANCEL, DONEO_ICON_ACTION_SAVE, DONEO_ICON_ADD, DONEO_ICON_EDIT, DONEO_ICON_NAME, DONEO_ICON_PALETTE } from '../../../shared/types/icons';
 
     import { TaskPriority, MAX_NAME_LENGTH } from '../models/task-priority';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { taskPriorityService } from '../services/task-priority';
     import { handleAPIError } from '../../../api/client/errorHandler';
     import { generateRandomSoftHexColor, getNaiveUITagColorProperty } from '../../../shared/composables/color';
-    import type { TaskPriorityResponse, AddRequest, UpdateRequest } from '../types/dto';
-    import type { FormMode } from '../../../shared/types/form-mode';
+    import type { TaskPriorityResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
 
-    interface ProjectStatusFormProps {
-        mode: FormMode;
+    interface Props {
         taskPriorityId?: string | null;
-        style?: string | CSSProperties;
     }
 
     const emit = defineEmits(['add', 'update', 'cancel'])
 
-    const props = defineProps<ProjectStatusFormProps>();
+    const props = defineProps<Props>();
 
     const { t } = useI18n();
 
     const taskPriority = ref<TaskPriority>(new TaskPriority());
+
     taskPriority.value.hexColor = generateRandomSoftHexColor();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    const taskPriorityFormRef = ref<FormInst | null>(null)
+    const taskPriorityFormRef = ref<FormInst | null>(null);
 
     const taskPriorityFormRules: FormRules =
     {
@@ -76,7 +74,7 @@
     const serverErrors = ref<Record<string, string>>({});
 
     const isSaveDisabled = computed<boolean>(() => {
-        return !taskPriority.value.name;
+        return !taskPriority.value.name || state.ajaxRunning;
     });
 
     const onSave = async () => {
@@ -84,7 +82,7 @@
         taskPriorityFormRef.value?.restoreValidation();
         try {
             await taskPriorityFormRef.value?.validate();
-            if (props.mode === "add") {
+            if (!props.taskPriorityId) {
                 await onAdd();
             } else {
                 await onUpdate()
@@ -152,13 +150,8 @@
         taskPriorityFormRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: AddRequest = {
-                name: taskPriority.value.name ?? "",
-                hexColor: taskPriority.value.hexColor ?? "",
-                index: taskPriority.value.index ?? 0,
-            };
-            const addedRole: TaskPriorityResponse = await taskPriorityService.add(payload);
-            emit('add', addedRole)
+            const addedTaskPriority: TaskPriorityResponse = await taskPriorityService.add(taskPriority.value.toAddTaskPriorityRequestPayload());
+            emit('add', addedTaskPriority)
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -207,14 +200,8 @@
         taskPriorityFormRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: UpdateRequest = {
-                id: taskPriority.value.id ?? "",
-                name: taskPriority.value.name ?? "",
-                hexColor: taskPriority.value.hexColor ?? "",
-                index: taskPriority.value.index ?? 0,
-            };
-            const updatedRole: TaskPriorityResponse = await taskPriorityService.update(payload);
-            emit('update', updatedRole)
+            const updatedTaskPriority: TaskPriorityResponse = await taskPriorityService.update(taskPriority.value.toUpdateTaskPriorityRequestPayload());
+            emit('update', updatedTaskPriority)
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -268,8 +255,6 @@
             if (payload.to.includes("ProjectPriorityForm.onGet")) {
                 if (props.taskPriorityId) {
                     onGet(props.taskPriorityId);
-                } else {
-                    console.error(`TODO: missing taskPriorityId property for ${props.mode} action`);
                 }
             } else if (payload.to.includes("ProjectPriorityForm.onAdd")) {
                 onAdd();
@@ -277,12 +262,8 @@
                 onUpdate()
             }
         });
-        if (props.mode === "update") {
-            if (props.taskPriorityId) {
-                onGet(props.taskPriorityId);
-            } else {
-                console.error(`TODO: missing taskPriorityId property for ${props.mode} action`);
-            }
+        if (props.taskPriorityId) {
+            onGet(props.taskPriorityId);
         }
     });
 
@@ -292,13 +273,15 @@
 </script>
 
 <template>
-    <n-card :style="style" bordered>
+    <n-card bordered>
         <template #header>
             <div class="doneo-flex-center-align">
-                <n-icon :component="props.mode == 'add' ? IconPlus : IconEdit" />
-                {{ t(props.mode == "add" ?
-                    "modules.taskPriority.components.TaskPriorityForm.headers.addTaskPriority" :
-                    "modules.taskPriority.components.TaskPriorityForm.headers.updateTaskPriority") }}
+                <n-icon class="doneo-mr-4px" :component="!props.taskPriorityId ? DONEO_ICON_ADD : DONEO_ICON_EDIT" />
+                {{
+                    t(!props.taskPriorityId ?
+                        "modules.taskPriority.components.TaskPriorityForm.headers.addTaskPriority" :
+                        "modules.taskPriority.components.TaskPriorityForm.headers.updateTaskPriority")
+                }}
             </div>
         </template>
         <template #header-extra>
@@ -310,10 +293,10 @@
                 show-feedback>
                 <n-input type="text"
                     :placeholder="t('modules.taskPriority.components.TaskPriorityForm.inputs.name.placeholder')"
-                    v-model:value="taskPriority.name" :maxlength="MAX_NAME_LENGTH" :show-count="true" clearable required
-                    autofocus>
+                    v-model:value="taskPriority.name" :maxlength="MAX_NAME_LENGTH" :show-count="true"
+                    :disabled="state.ajaxRunning" clearable required autofocus>
                     <template #prefix>
-                        <n-icon :component="IconUser" />
+                        <n-icon :component="DONEO_ICON_NAME" />
                     </template>
                 </n-input>
             </n-form-item>
@@ -321,7 +304,7 @@
                 show-feedback>
                 <n-input-number :min="0"
                     :placeholder="t('modules.taskPriority.components.TaskPriorityForm.inputs.index.placeholder')"
-                    v-model:value="taskPriority.index" required>
+                    v-model:value="taskPriority.index" :disabled="state.ajaxRunning" required>
                 </n-input-number>
             </n-form-item>
             <n-form-item :label="t('modules.taskPriority.components.TaskPriorityForm.inputs.preview.label')">
@@ -329,11 +312,12 @@
                     <n-tag :color="getNaiveUITagColorProperty(taskPriority.hexColor ?? '#888888')" style="width: 100%;">
                         {{ taskPriority.name }}
                     </n-tag>
-                    <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="taskPriority.hexColor">
+                    <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="taskPriority.hexColor"
+                        :disabled="state.ajaxRunning">
                         <template #trigger="{ onClick, ref: triggerRef }">
                             <n-button :ref="triggerRef" quaternary @click="onClick">
                                 <template #icon>
-                                    <IconPalette />
+                                    <n-icon :component="DONEO_ICON_PALETTE" />
                                 </template>
                             </n-button>
                         </template>
@@ -345,13 +329,13 @@
             <n-flex>
                 <n-button @click="onSave" :disabled="isSaveDisabled">
                     <template #icon>
-                        <n-icon :component="IconDeviceFloppy" />
+                        <n-icon :component="DONEO_ICON_ACTION_SAVE" />
                     </template>
                     {{ t("shared.buttons.Save.label") }}
                 </n-button>
                 <n-button @click="onCancel" :disabled="state.ajaxRunning">
                     <template #icon>
-                        <n-icon :component="IconCancel" />
+                        <n-icon :component="DONEO_ICON_ACTION_CANCEL" />
                     </template>
                     {{ t("shared.buttons.Cancel.label") }}
                 </n-button>

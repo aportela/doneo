@@ -1,4 +1,8 @@
-import type { ProjectPriorityResponse as ProjectPriorityDTO } from "../types/dto";
+import type {
+  AddRequest,
+  ProjectPriorityResponse as ProjectPriorityDTO,
+  UpdateRequest,
+} from "../types/dto";
 
 export class ProjectPriority {
   id: string;
@@ -14,6 +18,23 @@ export class ProjectPriority {
   }
 
   toDTO(): ProjectPriorityDTO {
+    return {
+      id: this.id,
+      name: this.name,
+      hexColor: this.hexColor,
+      index: this.index,
+    };
+  }
+
+  toAddProjectPriorityRequestPayload(): AddRequest {
+    return {
+      name: this.name,
+      hexColor: this.hexColor,
+      index: this.index,
+    };
+  }
+
+  toUpdateProjectPriorityRequestPayload(): UpdateRequest {
     return {
       id: this.id,
       name: this.name,

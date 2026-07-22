@@ -1,35 +1,35 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, type CSSProperties, nextTick } from 'vue';
+    import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NInput, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
-    import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette } from '@tabler/icons-vue';
+    import { DONEO_ICON_ACTION_CANCEL, DONEO_ICON_ACTION_SAVE, DONEO_ICON_ADD, DONEO_ICON_EDIT, DONEO_ICON_NAME, DONEO_ICON_PALETTE } from '../../../shared/types/icons';
 
     import { ProjectType, MAX_NAME_LENGTH } from '../models/project-type';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { projectTypeService } from '../services/project-type';
     import { handleAPIError } from '../../../api/client/errorHandler';
     import { generateRandomSoftHexColor, getNaiveUITagColorProperty } from '../../../shared/composables/color';
-    import type { ProjectTypeResponse, AddRequest, UpdateRequest } from '../types/dto';
-    import type { FormMode } from '../../../shared/types/form-mode';
+    import type { ProjectTypeResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
 
-    interface ProjectTypeFormProps {
-        mode: FormMode;
-        projectTypeId?: string | null;
-        style?: string | CSSProperties;
+    interface Props {
+        projectTypeId?: string;
     }
 
     const emit = defineEmits(['add', 'update', 'cancel'])
 
-    const props = defineProps<ProjectTypeFormProps>();
+    const props = defineProps<Props>();
 
     const { t } = useI18n();
 
     const projectType = ref<ProjectType>(new ProjectType());
+
     projectType.value.hexColor = generateRandomSoftHexColor();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
+
+    const serverErrors = ref<Record<string, string>>({});
 
     const projectTypeFormRef = ref<FormInst | null>(null)
 
@@ -58,10 +58,8 @@
 
     watch(() => projectType.value.name, () => { delete serverErrors.value.name });
 
-    const serverErrors = ref<Record<string, string>>({});
-
     const isSaveDisabled = computed<boolean>(() => {
-        return !projectType.value.name;
+        return !projectType.value.name || state.ajaxRunning;
     });
 
     const onSave = async () => {
@@ -69,7 +67,7 @@
         projectTypeFormRef.value?.restoreValidation();
         try {
             await projectTypeFormRef.value?.validate();
-            if (props.mode === "add") {
+            if (!props.projectTypeId) {
                 await onAdd();
             } else {
                 await onUpdate()
@@ -132,12 +130,8 @@
         projectTypeFormRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: AddRequest = {
-                name: projectType.value.name ?? "",
-                HexColor: projectType.value.hexColor ?? "",
-            };
-            const addedRole: ProjectTypeResponse = await projectTypeService.add(payload);
-            emit('add', addedRole)
+            const addedProjectType: ProjectTypeResponse = await projectTypeService.add(projectType.value.toAddProjectTypeRequestPayload());
+            emit('add', addedProjectType)
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -184,13 +178,8 @@
         projectTypeFormRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: UpdateRequest = {
-                id: projectType.value.id ?? "",
-                name: projectType.value.name ?? "",
-                HexColor: projectType.value.hexColor ?? "",
-            };
-            const updatedRole: ProjectTypeResponse = await projectTypeService.update(payload);
-            emit('update', updatedRole)
+            const updatedProjectType: ProjectTypeResponse = await projectTypeService.update(projectType.value.toUpdateProjectTypeRequestPayload());
+            emit('update', updatedProjectType)
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -242,8 +231,6 @@
             if (payload.to.includes("ProjectTypeForm.onGet")) {
                 if (props.projectTypeId) {
                     onGet(props.projectTypeId);
-                } else {
-                    console.error(`TODO: missing projectTypeId property for ${props.mode} action`);
                 }
             } else if (payload.to.includes("ProjectTypeForm.onAdd")) {
                 onAdd();
@@ -251,12 +238,8 @@
                 onUpdate()
             }
         });
-        if (props.mode === "update") {
-            if (props.projectTypeId) {
-                onGet(props.projectTypeId);
-            } else {
-                console.error(`TODO: missing projectTypeId property for ${props.mode} action`);
-            }
+        if (props.projectTypeId) {
+            onGet(props.projectTypeId);
         }
     });
 
@@ -266,12 +249,14 @@
 </script>
 
 <template>
-    <n-card :style="style" bordered>
+    <n-card bordered>
         <template #header>
             <div class="doneo-flex-center-align">
-                <n-icon :component="props.mode == 'add' ? IconPlus : IconEdit" />
-                {{ t(props.mode == "add" ? "modules.projectType.components.ProjectTypeForm.headers.addProjectType" :
-                    "modules.projectType.components.ProjectTypeForm.headers.updateProjectType") }}
+                <n-icon class="doneo-mr-4px" :component="!props.projectTypeId ? DONEO_ICON_ADD : DONEO_ICON_EDIT" />
+                {{
+                    t(!props.projectTypeId ? "modules.projectType.components.ProjectTypeForm.headers.addProjectType" :
+                        "modules.projectType.components.ProjectTypeForm.headers.updateProjectType")
+                }}
             </div>
         </template>
         <template #header-extra>
@@ -283,10 +268,10 @@
                 show-feedback>
                 <n-input type="text"
                     :placeholder="t('modules.projectType.components.ProjectTypeForm.inputs.name.placeholder')"
-                    v-model:value="projectType.name" :maxlength="MAX_NAME_LENGTH" :show-count="true" clearable required
-                    autofocus>
+                    v-model:value="projectType.name" :maxlength="MAX_NAME_LENGTH" :show-count="true"
+                    :disabled="state.ajaxRunning" clearable required autofocus>
                     <template #prefix>
-                        <n-icon :component="IconUser" />
+                        <n-icon :component="DONEO_ICON_NAME" />
                     </template>
                 </n-input>
             </n-form-item>
@@ -295,11 +280,12 @@
                     <n-tag :color="getNaiveUITagColorProperty(projectType.hexColor ?? '#888888')" style="width: 100%;">
                         {{ projectType.name }}
                     </n-tag>
-                    <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="projectType.hexColor">
+                    <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="projectType.hexColor"
+                        :disabled="state.ajaxRunning">
                         <template #trigger="{ onClick, ref: triggerRef }">
                             <n-button :ref="triggerRef" quaternary @click="onClick">
                                 <template #icon>
-                                    <IconPalette />
+                                    <n-icon :component="DONEO_ICON_PALETTE" />
                                 </template>
                             </n-button>
                         </template>
@@ -311,13 +297,13 @@
             <n-flex>
                 <n-button @click="onSave" :disabled="isSaveDisabled">
                     <template #icon>
-                        <n-icon :component="IconDeviceFloppy" />
+                        <n-icon :component="DONEO_ICON_ACTION_SAVE" />
                     </template>
                     {{ t("shared.buttons.Save.label") }}
                 </n-button>
                 <n-button @click="onCancel" :disabled="state.ajaxRunning">
                     <template #icon>
-                        <n-icon :component="IconCancel" />
+                        <n-icon :component="DONEO_ICON_ACTION_CANCEL" />
                     </template>
                     {{ t("shared.buttons.Cancel.label") }}
                 </n-button>

@@ -1,4 +1,8 @@
-import type { TaskStatusResponse as TaskStatusDTO } from "../types/dto";
+import type {
+  AddRequest,
+  TaskStatusResponse as TaskStatusDTO,
+  UpdateRequest,
+} from "../types/dto";
 import type { StatusFlags } from "../../../shared/types/status-flags";
 
 export class TaskStatus {
@@ -24,6 +28,25 @@ export class TaskStatus {
   }
 
   toDTO(): TaskStatusDTO {
+    return {
+      id: this.id,
+      name: this.name,
+      hexColor: this.hexColor,
+      index: this.index,
+      flags: this.flags,
+    };
+  }
+
+  toAddTaskStatusRequestPayload(): AddRequest {
+    return {
+      name: this.name,
+      hexColor: this.hexColor,
+      index: this.index,
+      flags: this.flags,
+    };
+  }
+
+  toUpdateTaskStatusRequestPayload(): UpdateRequest {
     return {
       id: this.id,
       name: this.name,

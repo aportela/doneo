@@ -1,37 +1,35 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, type CSSProperties, nextTick } from 'vue';
+    import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NInput, NInputNumber, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NTooltip } from 'naive-ui';
-    import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette, IconStar, IconCalendarBolt, IconCalendarCancel, IconCalendarMinus } from '@tabler/icons-vue';
+    import { DONEO_ICON_ACTION_CANCEL, DONEO_ICON_ACTION_SAVE, DONEO_ICON_ADD, DONEO_ICON_CLEAR_DATE, DONEO_ICON_EDIT, DONEO_ICON_FILL_DATE, DONEO_ICON_FILL_EMTPY_DATE, DONEO_ICON_NAME, DONEO_ICON_PALETTE, DONEO_ICON_STAR } from '../../../shared/types/icons';
 
     import { TaskStatus, MAX_NAME_LENGTH } from '../models/task-status';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { taskStatusService } from '../services/task-status';
     import { handleAPIError } from '../../../api/client/errorHandler';
     import { generateRandomSoftHexColor, getNaiveUITagColorProperty } from '../../../shared/composables/color';
-    import type { TaskStatusResponse, AddRequest, UpdateRequest } from '../types/dto';
-    import type { FormMode } from '../../../shared/types/form-mode';
+    import type { TaskStatusResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
 
-    interface TaskStatusFormProps {
-        mode: FormMode;
+    interface Props {
         taskStatusId?: string | null;
-        style?: string | CSSProperties;
     }
 
     const emit = defineEmits(['add', 'update', 'cancel'])
 
-    const props = defineProps<TaskStatusFormProps>();
+    const props = defineProps<Props>();
 
     const { t } = useI18n();
 
     const taskStatus = ref<TaskStatus>(new TaskStatus());
+
     taskStatus.value.hexColor = generateRandomSoftHexColor();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    const taskStatusFormRef = ref<FormInst | null>(null)
+    const taskStatusFormRef = ref<FormInst | null>(null);
 
     const taskStatusFormRules: FormRules =
     {
@@ -76,7 +74,7 @@
     const serverErrors = ref<Record<string, string>>({});
 
     const isSaveDisabled = computed<boolean>(() => {
-        return !taskStatus.value.name;
+        return !taskStatus.value.name || state.ajaxRunning;
     });
 
     const onSave = async () => {
@@ -84,7 +82,7 @@
         taskStatusFormRef.value?.restoreValidation();
         try {
             await taskStatusFormRef.value?.validate();
-            if (props.mode === "add") {
+            if (!props.taskStatusId) {
                 await onAdd();
             } else {
                 await onUpdate()
@@ -147,21 +145,8 @@
         taskStatusFormRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: AddRequest = {
-                name: taskStatus.value.name ?? "",
-                hexColor: taskStatus.value.hexColor ?? "",
-                index: taskStatus.value.index ?? 0,
-                flags: {
-                    defaultStatusOnCreation: taskStatus.value.flags?.defaultStatusOnCreation ?? false,
-                    fillEmptyStartDate: taskStatus.value.flags?.fillEmptyStartDate ?? false,
-                    setStartDate: taskStatus.value.flags?.setStartDate ?? false,
-                    fillEmptyFinishDate: taskStatus.value.flags?.fillEmptyFinishDate ?? false,
-                    setFinishDate: taskStatus.value.flags?.setFinishDate ?? false,
-                    unsetFinishDateOnLeave: taskStatus.value.flags?.unsetFinishDateOnLeave ?? false,
-                }
-            };
-            const addedRole: TaskStatusResponse = await taskStatusService.add(payload);
-            emit('add', addedRole)
+            const addedTaskStatus: TaskStatusResponse = await taskStatusService.add(taskStatus.value.toAddTaskStatusRequestPayload());
+            emit('add', addedTaskStatus)
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -210,22 +195,8 @@
         taskStatusFormRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: UpdateRequest = {
-                id: taskStatus.value.id ?? "",
-                name: taskStatus.value.name ?? "",
-                hexColor: taskStatus.value.hexColor ?? "",
-                index: taskStatus.value.index ?? 0,
-                flags: {
-                    defaultStatusOnCreation: taskStatus.value.flags?.defaultStatusOnCreation ?? false,
-                    fillEmptyStartDate: taskStatus.value.flags?.fillEmptyStartDate ?? false,
-                    setStartDate: taskStatus.value.flags?.setStartDate ?? false,
-                    fillEmptyFinishDate: taskStatus.value.flags?.fillEmptyFinishDate ?? false,
-                    setFinishDate: taskStatus.value.flags?.setFinishDate ?? false,
-                    unsetFinishDateOnLeave: taskStatus.value.flags?.unsetFinishDateOnLeave ?? false,
-                }
-            };
-            const updatedRole: TaskStatusResponse = await taskStatusService.update(payload);
-            emit('update', updatedRole)
+            const updatedTaskStatus: TaskStatusResponse = await taskStatusService.update(taskStatus.value.toUpdateTaskStatusRequestPayload());
+            emit('update', updatedTaskStatus)
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -279,8 +250,6 @@
             if (payload.to.includes("TaskStatusForm.onGet")) {
                 if (props.taskStatusId) {
                     onGet(props.taskStatusId);
-                } else {
-                    console.error(`TODO: missing taskStatusId property for ${props.mode} action`);
                 }
             } else if (payload.to.includes("TaskStatusForm.onAdd")) {
                 onAdd();
@@ -288,12 +257,8 @@
                 onUpdate()
             }
         });
-        if (props.mode === "update") {
-            if (props.taskStatusId) {
-                onGet(props.taskStatusId);
-            } else {
-                console.error(`TODO: missing taskStatusId property for ${props.mode} action`);
-            }
+        if (props.taskStatusId) {
+            onGet(props.taskStatusId);
         }
     });
 
@@ -305,12 +270,14 @@
 </script>
 
 <template>
-    <n-card :style="style" bordered>
+    <n-card bordered>
         <template #header>
             <div class="doneo-flex-center-align">
-                <n-icon :component="props.mode == 'add' ? IconPlus : IconEdit" />
-                {{ t(props.mode == "add" ? "modules.taskStatus.components.TaskStatusForm.headers.addTaskStatus"
-                    : "modules.taskStatus.components.TaskStatusForm.headers.updateTaskStatus") }}
+                <n-icon class="doneo-mr-4px" :component="!props.taskStatusId ? DONEO_ICON_ADD : DONEO_ICON_EDIT" />
+                {{
+                    t(!props.taskStatusId ? "modules.taskStatus.components.TaskStatusForm.headers.addTaskStatus"
+                        : "modules.taskStatus.components.TaskStatusForm.headers.updateTaskStatus")
+                }}
             </div>
         </template>
         <template #header-extra>
@@ -321,10 +288,10 @@
                 show-feedback>
                 <n-input type="text"
                     :placeholder="t('modules.taskStatus.components.TaskStatusForm.inputs.name.placeholder')"
-                    v-model:value="taskStatus.name" :maxlength="MAX_NAME_LENGTH" :show-count="true" clearable required
-                    autofocus>
+                    v-model:value="taskStatus.name" :maxlength="MAX_NAME_LENGTH" :show-count="true"
+                    :disabled="state.ajaxRunning" clearable required autofocus>
                     <template #prefix>
-                        <n-icon :component="IconUser" />
+                        <n-icon :component="DONEO_ICON_NAME" />
                     </template>
                 </n-input>
             </n-form-item>
@@ -333,13 +300,13 @@
                     show-feedback>
                     <n-input-number :min="0"
                         :placeholder="t('modules.taskStatus.components.TaskStatusForm.inputs.index.placeholder')"
-                        v-model:value="taskStatus.index" required>
+                        v-model:value="taskStatus.index" :disabled="state.ajaxRunning" required>
                     </n-input-number>
                 </n-form-item>
                 <n-form-item :label="t('modules.taskStatus.components.TaskStatusForm.inputs.flags.label')">
                     <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :component="IconStar" :size="flagIconSize" class="doneo-cursor-help"
+                            <n-icon :component="DONEO_ICON_STAR" :size="flagIconSize" class="doneo-cursor-help"
                                 :class="{ 'doneo-disabled-icon': !taskStatus.flags.defaultStatusOnCreation }"
                                 @click="taskStatus.flags.defaultStatusOnCreation = !taskStatus.flags.defaultStatusOnCreation" />
                         </template>
@@ -351,7 +318,8 @@
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :component="IconCalendarBolt" :size="flagIconSize" class="doneo-cursor-help"
+                            <n-icon :component="DONEO_ICON_FILL_EMTPY_DATE" :size="flagIconSize"
+                                class="doneo-cursor-help"
                                 :class="{ 'doneo-disabled-icon': !taskStatus.flags.fillEmptyStartDate }"
                                 @click="taskStatus.flags.fillEmptyStartDate = !taskStatus.flags.fillEmptyStartDate" />
                         </template>
@@ -363,7 +331,7 @@
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :component="IconCalendarCancel" :size="flagIconSize" class="doneo-cursor-help"
+                            <n-icon :component="DONEO_ICON_FILL_DATE" :size="flagIconSize" class="doneo-cursor-help"
                                 :class="{ 'doneo-disabled-icon': !taskStatus.flags.setStartDate }"
                                 @click="taskStatus.flags.setStartDate = !taskStatus.flags.setStartDate" />
                         </template>
@@ -375,7 +343,8 @@
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :component="IconCalendarBolt" :size="flagIconSize" class="doneo-cursor-help"
+                            <n-icon :component="DONEO_ICON_FILL_EMTPY_DATE" :size="flagIconSize"
+                                class="doneo-cursor-help"
                                 :class="{ 'doneo-disabled-icon': !taskStatus.flags.fillEmptyFinishDate }"
                                 @click="taskStatus.flags.fillEmptyFinishDate = !taskStatus.flags.fillEmptyFinishDate" />
                         </template>
@@ -387,7 +356,7 @@
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :component="IconCalendarCancel" :size="flagIconSize" class="doneo-cursor-help"
+                            <n-icon :component="DONEO_ICON_FILL_DATE" :size="flagIconSize" class="doneo-cursor-help"
                                 :class="{ 'doneo-disabled-icon': !taskStatus.flags.setFinishDate }"
                                 @click="taskStatus.flags.setFinishDate = !taskStatus.flags.setFinishDate" />
                         </template>
@@ -399,7 +368,7 @@
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :component="IconCalendarMinus" :size="flagIconSize" class="doneo-cursor-help"
+                            <n-icon :component="DONEO_ICON_CLEAR_DATE" :size="flagIconSize" class="doneo-cursor-help"
                                 :class="{ 'doneo-disabled-icon': !taskStatus.flags.unsetFinishDateOnLeave }"
                                 @click="taskStatus.flags.unsetFinishDateOnLeave = !taskStatus.flags.unsetFinishDateOnLeave" />
                         </template>
@@ -416,11 +385,12 @@
                     <n-tag :color="getNaiveUITagColorProperty(taskStatus.hexColor ?? '#888888')" style="width: 100%;">
                         {{ taskStatus.name }}
                     </n-tag>
-                    <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="taskStatus.hexColor">
+                    <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="taskStatus.hexColor"
+                        :disabled="state.ajaxRunning">
                         <template #trigger="{ onClick, ref: triggerRef }">
                             <n-button :ref="triggerRef" quaternary @click="onClick">
                                 <template #icon>
-                                    <IconPalette />
+                                    <n-icon :component="DONEO_ICON_PALETTE" />
                                 </template>
                             </n-button>
                         </template>
@@ -432,13 +402,13 @@
             <n-flex>
                 <n-button @click="onSave" :disabled="isSaveDisabled">
                     <template #icon>
-                        <n-icon :component="IconDeviceFloppy" />
+                        <n-icon :component="DONEO_ICON_ACTION_SAVE" />
                     </template>
                     {{ t("shared.buttons.Save.label") }}
                 </n-button>
                 <n-button @click="onCancel" :disabled="state.ajaxRunning">
                     <template #icon>
-                        <n-icon :component="IconCancel" />
+                        <n-icon :component="DONEO_ICON_ACTION_CANCEL" />
                     </template>
                     {{ t("shared.buttons.Cancel.label") }}
                 </n-button>

@@ -1,37 +1,37 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, type CSSProperties, nextTick } from 'vue';
+    import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NInput, NInputNumber, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NTooltip } from 'naive-ui';
-    import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus, IconPalette, IconStar, IconCalendarBolt, IconCalendarCancel, IconCalendarMinus } from '@tabler/icons-vue';
+    import { DONEO_ICON_ACTION_CANCEL, DONEO_ICON_ACTION_SAVE, DONEO_ICON_ADD, DONEO_ICON_CLEAR_DATE, DONEO_ICON_EDIT, DONEO_ICON_FILL_DATE, DONEO_ICON_FILL_EMTPY_DATE, DONEO_ICON_NAME, DONEO_ICON_PALETTE, DONEO_ICON_STAR } from '../../../shared/types/icons';
 
     import { ProjectStatus, MAX_NAME_LENGTH } from '../models/project-status';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { projectStatusService } from '../services/project-status';
     import { handleAPIError } from '../../../api/client/errorHandler';
     import { generateRandomSoftHexColor, getNaiveUITagColorProperty } from '../../../shared/composables/color';
-    import type { ProjectStatusResponse, AddRequest, UpdateRequest } from '../types/dto';
-    import type { FormMode } from '../../../shared/types/form-mode';
+    import type { ProjectStatusResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
 
-    interface ProjectStatusFormProps {
-        mode: FormMode;
-        projectStatusId?: string | null;
-        style?: string | CSSProperties;
+    interface Props {
+        projectStatusId?: string;
     }
 
     const emit = defineEmits(['add', 'update', 'cancel'])
 
-    const props = defineProps<ProjectStatusFormProps>();
+    const props = defineProps<Props>();
 
     const { t } = useI18n();
 
     const projectStatus = ref<ProjectStatus>(new ProjectStatus());
+
     projectStatus.value.hexColor = generateRandomSoftHexColor();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    const projectStatusFormRef = ref<FormInst | null>(null)
+    const serverErrors = ref<Record<string, string>>({});
+
+    const projectStatusFormRef = ref<FormInst | null>(null);
 
     const projectStatusFormRules: FormRules =
     {
@@ -73,10 +73,9 @@
     watch(() => projectStatus.value.name, () => { delete serverErrors.value.name });
     watch(() => projectStatus.value.index, () => { delete serverErrors.value.index });
 
-    const serverErrors = ref<Record<string, string>>({});
 
     const isSaveDisabled = computed<boolean>(() => {
-        return !projectStatus.value.name;
+        return !projectStatus.value.name || state.ajaxRunning;
     });
 
     const onSave = async () => {
@@ -84,7 +83,7 @@
         projectStatusFormRef.value?.restoreValidation();
         try {
             await projectStatusFormRef.value?.validate();
-            if (props.mode === "add") {
+            if (!props.projectStatusId) {
                 await onAdd();
             } else {
                 await onUpdate()
@@ -147,21 +146,8 @@
         projectStatusFormRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: AddRequest = {
-                name: projectStatus.value.name ?? "",
-                hexColor: projectStatus.value.hexColor ?? "",
-                index: projectStatus.value.index ?? 0,
-                flags: {
-                    defaultStatusOnCreation: projectStatus.value.flags?.defaultStatusOnCreation ?? false,
-                    fillEmptyStartDate: projectStatus.value.flags?.fillEmptyStartDate ?? false,
-                    setStartDate: projectStatus.value.flags?.setStartDate ?? false,
-                    fillEmptyFinishDate: projectStatus.value.flags?.fillEmptyFinishDate ?? false,
-                    setFinishDate: projectStatus.value.flags?.setFinishDate ?? false,
-                    unsetFinishDateOnLeave: projectStatus.value.flags?.unsetFinishDateOnLeave ?? false,
-                }
-            };
-            const addedRole: ProjectStatusResponse = await projectStatusService.add(payload);
-            emit('add', addedRole)
+            const addedProjectStatus: ProjectStatusResponse = await projectStatusService.add(projectStatus.value.toAddProjectStatusRequestPayload());
+            emit('add', addedProjectStatus)
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -210,22 +196,8 @@
         projectStatusFormRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: UpdateRequest = {
-                id: projectStatus.value.id ?? "",
-                name: projectStatus.value.name ?? "",
-                hexColor: projectStatus.value.hexColor ?? "",
-                index: projectStatus.value.index ?? 0,
-                flags: {
-                    defaultStatusOnCreation: projectStatus.value.flags?.defaultStatusOnCreation ?? false,
-                    fillEmptyStartDate: projectStatus.value.flags?.fillEmptyStartDate ?? false,
-                    setStartDate: projectStatus.value.flags?.setStartDate ?? false,
-                    fillEmptyFinishDate: projectStatus.value.flags?.fillEmptyFinishDate ?? false,
-                    setFinishDate: projectStatus.value.flags?.setFinishDate ?? false,
-                    unsetFinishDateOnLeave: projectStatus.value.flags?.unsetFinishDateOnLeave ?? false,
-                }
-            };
-            const updatedRole: ProjectStatusResponse = await projectStatusService.update(payload);
-            emit('update', updatedRole)
+            const updatedProjectStatus: ProjectStatusResponse = await projectStatusService.update(projectStatus.value.toUpdateProjectStatusRequestPayload());
+            emit('update', updatedProjectStatus)
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -279,8 +251,6 @@
             if (payload.to.includes("ProjectStatusForm.onGet")) {
                 if (props.projectStatusId) {
                     onGet(props.projectStatusId);
-                } else {
-                    console.error(`TODO: missing projectStatusId property for ${props.mode} action`);
                 }
             } else if (payload.to.includes("ProjectStatusForm.onAdd")) {
                 onAdd();
@@ -288,12 +258,8 @@
                 onUpdate()
             }
         });
-        if (props.mode === "update") {
-            if (props.projectStatusId) {
-                onGet(props.projectStatusId);
-            } else {
-                console.error(`TODO: missing projectStatusId property for ${props.mode} action`);
-            }
+        if (props.projectStatusId) {
+            onGet(props.projectStatusId);
         }
     });
 
@@ -301,16 +267,19 @@
         stopBusReauthListener();
     });
 
-    const flagIconSize = 22;
+    const FLAG_ICON_SIZE = 22;
 </script>
 
 <template>
-    <n-card :style="style" bordered>
+    <n-card bordered>
         <template #header>
             <div class="doneo-flex-center-align">
-                <n-icon :component="props.mode == 'add' ? IconPlus : IconEdit" />
-                {{ t(props.mode == "add" ? "modules.projectStatus.components.ProjectStatusForm.headers.addProjectStatus"
-                    : "modules.projectStatus.components.ProjectStatusForm.headers.updateProjectStatus") }}
+                <n-icon class="doneo-mr-4px" :component="!props.projectStatusId ? DONEO_ICON_ADD : DONEO_ICON_EDIT" />
+                {{
+                    t(!props.projectStatusId ?
+                        "modules.projectStatus.components.ProjectStatusForm.headers.addProjectStatus"
+                        : "modules.projectStatus.components.ProjectStatusForm.headers.updateProjectStatus")
+                }}
             </div>
         </template>
         <template #header-extra>
@@ -322,10 +291,10 @@
                 show-feedback>
                 <n-input type="text"
                     :placeholder="t('modules.projectStatus.components.ProjectStatusForm.inputs.name.placeholder')"
-                    v-model:value="projectStatus.name" :maxlength="MAX_NAME_LENGTH" :show-count="true" clearable
-                    required autofocus>
+                    v-model:value="projectStatus.name" :maxlength="MAX_NAME_LENGTH" :show-count="true"
+                    :disabled="state.ajaxRunning" clearable required autofocus>
                     <template #prefix>
-                        <n-icon :component="IconUser" />
+                        <n-icon :component="DONEO_ICON_NAME" />
                     </template>
                 </n-input>
             </n-form-item>
@@ -334,13 +303,13 @@
                     path="index" show-feedback>
                     <n-input-number :min="0"
                         :placeholder="t('modules.projectStatus.components.ProjectStatusForm.inputs.index.placeholder')"
-                        v-model:value="projectStatus.index" required>
+                        v-model:value="projectStatus.index" required :disabled="state.ajaxRunning">
                     </n-input-number>
                 </n-form-item>
                 <n-form-item :label="t('modules.projectStatus.components.ProjectStatusForm.inputs.flags.label')">
                     <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :component="IconStar" :size="flagIconSize" class="doneo-cursor-help"
+                            <n-icon :component="DONEO_ICON_STAR" :size="FLAG_ICON_SIZE" class="doneo-cursor-help"
                                 :class="{ 'doneo-disabled-icon': !projectStatus.flags.defaultStatusOnCreation }"
                                 @click="projectStatus.flags.defaultStatusOnCreation = !projectStatus.flags.defaultStatusOnCreation" />
                         </template>
@@ -352,7 +321,8 @@
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :component="IconCalendarBolt" :size="flagIconSize" class="doneo-cursor-help"
+                            <n-icon :component="DONEO_ICON_FILL_EMTPY_DATE" :size="FLAG_ICON_SIZE"
+                                class="doneo-cursor-help"
                                 :class="{ 'doneo-disabled-icon': !projectStatus.flags.fillEmptyStartDate }"
                                 @click="projectStatus.flags.fillEmptyStartDate = !projectStatus.flags.fillEmptyStartDate" />
                         </template>
@@ -364,7 +334,7 @@
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :component="IconCalendarCancel" :size="flagIconSize" class="doneo-cursor-help"
+                            <n-icon :component="DONEO_ICON_FILL_DATE" :size="FLAG_ICON_SIZE" class="doneo-cursor-help"
                                 :class="{ 'doneo-disabled-icon': !projectStatus.flags.setStartDate }"
                                 @click="projectStatus.flags.setStartDate = !projectStatus.flags.setStartDate" />
                         </template>
@@ -376,7 +346,8 @@
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :component="IconCalendarBolt" :size="flagIconSize" class="doneo-cursor-help"
+                            <n-icon :component="DONEO_ICON_FILL_EMTPY_DATE" :size="FLAG_ICON_SIZE"
+                                class="doneo-cursor-help"
                                 :class="{ 'doneo-disabled-icon': !projectStatus.flags.fillEmptyFinishDate }"
                                 @click="projectStatus.flags.fillEmptyFinishDate = !projectStatus.flags.fillEmptyFinishDate" />
                         </template>
@@ -388,7 +359,7 @@
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :component="IconCalendarCancel" :size="flagIconSize" class="doneo-cursor-help"
+                            <n-icon :component="DONEO_ICON_FILL_DATE" :size="FLAG_ICON_SIZE" class="doneo-cursor-help"
                                 :class="{ 'doneo-disabled-icon': !projectStatus.flags.setFinishDate }"
                                 @click="projectStatus.flags.setFinishDate = !projectStatus.flags.setFinishDate" />
                         </template>
@@ -400,7 +371,7 @@
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :component="IconCalendarMinus" :size="flagIconSize" class="doneo-cursor-help"
+                            <n-icon :component="DONEO_ICON_CLEAR_DATE" :size="FLAG_ICON_SIZE" class="doneo-cursor-help"
                                 :class="{ 'doneo-disabled-icon': !projectStatus.flags.unsetFinishDateOnLeave }"
                                 @click="projectStatus.flags.unsetFinishDateOnLeave = !projectStatus.flags.unsetFinishDateOnLeave" />
                         </template>
@@ -418,11 +389,12 @@
                         style="width: 100%;">
                         {{ projectStatus.name }}
                     </n-tag>
-                    <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="projectStatus.hexColor">
+                    <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="projectStatus.hexColor"
+                        :disabled="state.ajaxRunning">
                         <template #trigger="{ onClick, ref: triggerRef }">
                             <n-button :ref="triggerRef" quaternary @click="onClick">
                                 <template #icon>
-                                    <IconPalette />
+                                    <n-icon :component="DONEO_ICON_PALETTE" />
                                 </template>
                             </n-button>
                         </template>
@@ -434,13 +406,13 @@
             <n-flex>
                 <n-button @click="onSave" :disabled="isSaveDisabled">
                     <template #icon>
-                        <n-icon :component="IconDeviceFloppy" />
+                        <n-icon :component="DONEO_ICON_ACTION_SAVE" />
                     </template>
                     {{ t("shared.buttons.Save.label") }}
                 </n-button>
                 <n-button @click="onCancel" :disabled="state.ajaxRunning">
                     <template #icon>
-                        <n-icon :component="IconCancel" />
+                        <n-icon :component="DONEO_ICON_ACTION_CANCEL" />
                     </template>
                     {{ t("shared.buttons.Cancel.label") }}
                 </n-button>
