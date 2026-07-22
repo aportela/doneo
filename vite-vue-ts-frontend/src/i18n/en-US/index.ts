@@ -1014,21 +1014,6 @@ export default {
           header: {
             title: "Manage project types",
           },
-          pager: {
-            totalItemsLabel: "Total project types: {total}",
-          },
-          notifications: {
-            projectTypeAdded: 'Project type "{name}" has been added',
-            projectTypeUpdated: 'Project type "{name}" has been updated',
-            projectTypeDeleted: 'Project type "{name}" has been deleted',
-          },
-          errors: {
-            refreshError:
-              "There was a problem while refreshing the project type list",
-            deleteError: "There was a problem while deleting the project type",
-            // TODO: deduplicate
-            notFoundError: "We couldn’t find the specified project type",
-          },
         },
         ProjectTypesTable: {
           header: {
@@ -1050,6 +1035,18 @@ export default {
           },
           warnings: {
             noItemsFound: "No project types found",
+          },
+          notifications: {
+            projectTypeAdded: 'Project type "{name}" has been added',
+            projectTypeUpdated: 'Project type "{name}" has been updated',
+            projectTypeDeleted: 'Project type "{name}" has been deleted',
+          },
+          errors: {
+            refreshError:
+              "There was a problem while refreshing the project type list",
+            deleteError: "There was a problem while deleting the project type",
+            // TODO: deduplicate
+            notFoundError: "We couldn’t find the specified project type",
           },
         },
       },
