@@ -2,7 +2,7 @@
     import { ref, reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount, h, type Component } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NModal, useDialog, NIcon, NTooltip } from 'naive-ui';
+    import { NModal, useDialog, NIcon, NTooltip, NButton, NButtonGroup } from 'naive-ui';
 
     import { useLoadingStore } from '../../../stores/loading';
     import { useCacheStore } from '../../../stores/cache.ts';
@@ -24,7 +24,6 @@
     import TextFilterInput from '../../../shared/components/form-blocks/TextFilterInput.vue';
     import ProjectPermissionSelect from '../../../shared/components/selectors/ProjectPermissionSelect.vue';
     import TaskPermissionSelect from '../../../shared/components/selectors/TaskPermissionSelect.vue';
-    import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
     import type { ProjectPermissionSelectValue } from '../../../shared/types/project-permission-select-value.ts';
     import type { TaskPermissionSelectValue } from '../../../shared/types/task-permission-select-value.ts';
     import type { RoleResponse, SearchRequest } from '../types/dto.ts';
@@ -475,9 +474,21 @@
             </th>
         </template>
         <template #rowactions="{ row }">
-            <ManageTableActionButtons show-update show-delete :update-disabled="state.ajaxRunning"
-                :delete-disabled="state.ajaxRunning" :disabled="state.ajaxRunning" @update="onUpdate(row)"
-                @delete="onConfirmDelete(row)" />
+            <n-button-group class="doneo-table-actions-button-group" size="small">
+                <n-button @click="onUpdate(row)" :disabled="state.ajaxRunning" class="doneo-table-actions-button">
+                    {{ t("shared.buttons.Edit.label") }}
+                    <template #icon>
+                        <n-icon :component="DONEO_ICON_ACTION_EDIT" />
+                    </template>
+                </n-button>
+                <n-button @click="onConfirmDelete(row)" :disabled="state.ajaxRunning"
+                    class="doneo-table-actions-button">
+                    {{ t("shared.buttons.Delete.label") }}
+                    <template #icon>
+                        <n-icon :component="DONEO_ICON_ACTION_DELETE" />
+                    </template>
+                </n-button>
+            </n-button-group>
         </template>
     </ManageTable>
 </template>
