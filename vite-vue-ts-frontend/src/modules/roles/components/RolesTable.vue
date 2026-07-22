@@ -3,7 +3,6 @@
     import { useI18n } from "vue-i18n";
 
     import { NModal, useDialog, NIcon, NTooltip } from 'naive-ui';
-    import { IconTrash } from '@tabler/icons-vue';
 
     import { useLoadingStore } from '../../../stores/loading';
     import { useCacheStore } from '../../../stores/cache.ts';
@@ -334,7 +333,7 @@
     const onConfirmDelete = (role: Role) => {
         dialog.warning({
             title: t("modules.role.components.RolesTable.dialogs.deleteConfirmation.title"),
-            icon: renderIcon(IconTrash, { size: 24 }),
+            icon: renderIcon(DONEO_ICON_ACTION_DELETE, { size: 24 }),
             content: () =>
                 h('div', [
                     t("modules.role.components.RolesTable.dialogs.deleteConfirmation.message", { name: role.name }),
