@@ -60,13 +60,13 @@
 
     const tmpRole = ref<Role>(new Role());
 
-    const order = reactive<Order>({ field: "name", direction: "ASC" });
+    const currentOrder = reactive<Order>({ field: "name", direction: "ASC" });
 
     const onSort = (newOrder: Order) => {
-        order.field = newOrder.field;
-        order.direction = newOrder.direction;
+        currentOrder.field = newOrder.field;
+        currentOrder.direction = newOrder.direction;
         // we have all results, use local sorting for avoiding server load
-        if (order.direction === "ASC") {
+        if (currentOrder.direction === "ASC") {
             items.value = [...items.value].sort((a, b) =>
                 a.name.localeCompare(b.name)
             );
@@ -360,8 +360,8 @@
                     resultsPage: 0,
                 },
                 order: {
-                    field: order.field,
-                    direction: order.direction,
+                    field: currentOrder.field,
+                    direction: currentOrder.direction,
                 },
                 filter: {
                     //name: filters.name.length > 0 ? filters.name : undefined,
@@ -458,8 +458,8 @@
             @cancel="hideFormModal" />
     </n-modal>
     <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="localFilteredItems"
-        :row-key="row => row.id" :columns="columns" :order="order" @sort="onSort" @refresh="onRefresh" @add="onAdd"
-        @clear-filters="onClearFilters">
+        :row-key="row => row.id" :columns="columns" :order="currentOrder" @sort="onSort" @refresh="onRefresh"
+        @add="onAdd" @clear-filters="onClearFilters">
         <template #thead-column-filters="{ columns }">
             <th v-for="column in columns">
                 <TextFilterInput v-if="column.field === 'name'" clearable :disabled="state.ajaxRunning" size="small"
