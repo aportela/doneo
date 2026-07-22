@@ -63,6 +63,8 @@
     const items = shallowRef<User[]>([]);
     const tmpItem = ref<User>(new User());
 
+    const showNoItemsWarningMessage = ref<boolean>(false);
+
     const currentOrder = reactive<Order>({ field: "name", direction: "ASC" });
 
     const onSort = (newOrder: Order) => {
@@ -387,6 +389,7 @@
 
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
+        showNoItemsWarningMessage.value = false;
         try {
             const payload: SearchRequest = {
                 pager: { ...currentPagination, currentPage: resetPager.value ? 1 : currentPagination.currentPage },
@@ -410,6 +413,7 @@
             currentPagination.totalResults = response.pager.totalResults;
             items.value = response.users.map((user: UserResponse) => new User(user));
             resetPager.value = false;
+            showNoItemsWarningMessage.value = items.value.length === 0;
         } catch (error: unknown) {
             items.value = [];
             state.ajaxErrors = true;
@@ -500,7 +504,9 @@
             @cancel="hideFormModal" />
     </n-modal>
     <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="items" :row-key="row => row.id"
-        :columns="columns" :order="currentOrder" :pager-data="currentPagination" pager-position="both" @sort="onSort"
+        :columns="columns" :order="currentOrder" :pager-data="currentPagination" pager-position="both"
+        :show-no-items-warning-message="showNoItemsWarningMessage"
+        :no-items-warning-message="t('modules.user.components.UsersTable.warnings.noItemsFound')" @sort="onSort"
         @refresh="onRefresh" @add="onAdd" @pager-changed="onPagerChanged" @clear-filters="onClearFilters">
         <template #thead-column-filters="{ columns }">
             <th v-for="column in columns">
