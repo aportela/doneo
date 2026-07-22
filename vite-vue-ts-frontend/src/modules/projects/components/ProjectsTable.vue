@@ -26,6 +26,7 @@
     import type { ProjectStatus } from '../../project-statuses/models/project-status.ts';
     import { DEFAULT_BUTTON_SIZE } from '../../../constants.ts';
     import ProjectResumeFloatingCard from './ProjectResumeFloatingCard.vue';
+    import { renderColoredTag } from '../../../shared/composables/naive-ui-helpers.ts';
 
     interface Props {
         id?: string;
@@ -97,18 +98,7 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByType.value,
-            render: (row: Project) => {
-                return h(
-                    NTag,
-                    {
-                        bordered: false,
-                        color: getNaiveUITagColorProperty(row.type.hexColor ?? "#888888"),
-                    },
-                    {
-                        default: () => row.type.name,
-                    }
-                );
-            }
+            render: (row: Project) => renderColoredTag(row.type.name, row.type.hexColor),
         },
         {
             label: t("modules.project.components.ProjectsTable.header.columns.priority"),
@@ -116,18 +106,7 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByPriority.value,
-            render: (row: Project) => {
-                return h(
-                    NTag,
-                    {
-                        bordered: false,
-                        color: getNaiveUITagColorProperty(row.priority.hexColor ?? "#888888"),
-                    },
-                    {
-                        default: () => row.priority.name,
-                    }
-                );
-            }
+            render: (row: Project) => renderColoredTag(row.priority.name, row.priority.hexColor),
         },
         {
             label: t("modules.project.components.ProjectsTable.header.columns.status"),
@@ -135,18 +114,7 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByStatus.value,
-            render: (row: Project) => {
-                return h(
-                    NTag,
-                    {
-                        bordered: false,
-                        color: getNaiveUITagColorProperty(row.status.hexColor ?? "#888888"),
-                    },
-                    {
-                        default: () => row.status.name,
-                    }
-                );
-            }
+            render: (row: Project) => renderColoredTag(row.status.name, row.status.hexColor),
         },
         {
             label: t("modules.project.components.ProjectsTable.header.columns.summary"),
