@@ -15,3 +15,6 @@ export const renderColoredTag = (name: string, color: string) =>
       default: () => name,
     },
   );
+
+export const renderLabel = (value: string) =>
+  h("span", {}, { default: () => value });
