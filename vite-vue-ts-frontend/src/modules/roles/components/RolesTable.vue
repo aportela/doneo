@@ -32,6 +32,7 @@
     import type { RoleResponse, SearchRequest } from '../types/dto.ts';
     import RoleForm from './RoleForm.vue';
     import { DONEO_ICON_ACTION_ADD, DONEO_ICON_ACTION_DELETE, DONEO_ICON_ACTION_EDIT, DONEO_ICON_ACTION_SHOW } from '../../../shared/types/icons.ts';
+    import { renderLabel } from '../../../shared/composables/naive-ui-helpers.ts';
 
     interface Props {
         id?: string;
@@ -244,15 +245,7 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByName.value,
-            render: (row: Role) => {
-                return h(
-                    "span",
-                    {},
-                    {
-                        default: () => row.name
-                    }
-                );
-            }
+            render: (row: Role) => renderLabel(row.name),
         },
         {
             label: t("modules.role.components.RolesTable.header.columns.projectPermissions"),

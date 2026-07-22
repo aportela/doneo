@@ -35,6 +35,7 @@
     import TextFilterInput from '../../../shared/components/form-blocks/TextFilterInput.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
+    import { renderLabel } from '../../../shared/composables/naive-ui-helpers.ts';
 
     interface Props {
         id?: string;
@@ -226,16 +227,7 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByCreatedAt.value,
-            render: (row: User) => {
-                return h(
-                    "span",
-                    {},
-                    {
-                        default: () => row.createdAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask)
-
-                    }
-                );
-            }
+            render: (row: User) => renderLabel(row.createdAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) ?? ""),
         },
         {
             label: t("modules.user.components.UsersTable.header.columns.updatedAt"),
@@ -243,15 +235,7 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByUpdatedAt.value,
-            render: (row: User) => {
-                return h(
-                    "span",
-                    {},
-                    {
-                        default: () => row.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask)
-                    }
-                );
-            }
+            render: (row: User) => renderLabel(row.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) ?? ""),
         },
         {
             label: t("modules.user.components.UsersTable.header.columns.deletedAt"),
@@ -259,15 +243,7 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByDeletedAt.value,
-            render: (row: User) => {
-                return h(
-                    "span",
-                    {},
-                    {
-                        default: () => row.deletedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask)
-                    }
-                );
-            }
+            render: (row: User) => renderLabel(row.deletedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) ?? ""),
         },
     ]);
 
