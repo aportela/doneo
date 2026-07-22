@@ -1,4 +1,4 @@
-import { h, type Component } from "vue";
+import { h, type Component, type VNodeChild } from "vue";
 
 import { NIcon, NTag } from "naive-ui";
 
@@ -10,7 +10,7 @@ export const renderColoredTag = (
   color: string,
   bordered: boolean,
   className?: string,
-) =>
+): VNodeChild =>
   h(
     NTag,
     {
@@ -23,12 +23,12 @@ export const renderColoredTag = (
     },
   );
 
-export const renderLabel = (value: string, className?: string) =>
-  h("span", { class: className }, { default: () => value });
+export const renderLabel = (value: string, className?: string): VNodeChild =>
+  className ? h("span", { class: className }, { default: () => value }) : value;
 
 export const renderIcon =
   (icon: Component, props: IconProps = {}) =>
-  () =>
+  (): VNodeChild =>
     h(NIcon, props, {
       default: () => h(icon),
     });
