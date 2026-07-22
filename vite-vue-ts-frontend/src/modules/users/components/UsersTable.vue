@@ -15,8 +15,6 @@
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
 
-    import { renderIcon } from '../../../shared/composables/naive-ui-icon';
-
     import { User } from '../models/user';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
@@ -35,7 +33,7 @@
     import TextFilterInput from '../../../shared/components/form-blocks/TextFilterInput.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
-    import { renderLabel } from '../../../shared/composables/naive-ui-helpers.ts';
+    import { renderIcon, renderLabel } from '../../../shared/composables/naive-ui-helpers.ts';
 
     interface Props {
         id?: string;
@@ -312,7 +310,7 @@
     const onConfirmDelete = (user: User) => {
         dialog.warning({
             title: t("modules.user.components.UsersTable.dialogs.deleteConfirmation.title"),
-            icon: renderIcon(DONEO_ICON_ACTION_DELETE)(24),
+            icon: renderIcon(DONEO_ICON_ACTION_DELETE, { size: 24 }),
             content: () =>
                 h('div', [
                     t("modules.user.components.UsersTable.dialogs.deleteConfirmation.message", { name: user.name }),
@@ -371,7 +369,7 @@
     const onConfirmUnDelete = (user: User) => {
         dialog.warning({
             title: t("modules.user.components.UsersTable.dialogs.undeleteConfirmation.title"),
-            icon: renderIcon(DONEO_ICON_ACTIONRESTORE)(24),
+            icon: renderIcon(DONEO_ICON_ACTIONRESTORE, { size: 24 }),
             content: () =>
                 h('div', [
                     t("modules.user.components.UsersTable.dialogs.undeleteConfirmation.message", { name: user.name }),

@@ -11,7 +11,6 @@
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
 
-    import { renderIcon } from '../../../shared/composables/naive-ui-icon';
     import type { Order } from '../../../shared/types/order.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
 
@@ -32,7 +31,7 @@
     import type { RoleResponse, SearchRequest } from '../types/dto.ts';
     import RoleForm from './RoleForm.vue';
     import { DONEO_ICON_ACTION_ADD, DONEO_ICON_ACTION_DELETE, DONEO_ICON_ACTION_EDIT, DONEO_ICON_ACTION_SHOW } from '../../../shared/types/icons.ts';
-    import { renderLabel } from '../../../shared/composables/naive-ui-helpers.ts';
+    import { renderIcon, renderLabel } from '../../../shared/composables/naive-ui-helpers.ts';
 
     interface Props {
         id?: string;
@@ -335,7 +334,7 @@
     const onConfirmDelete = (role: Role) => {
         dialog.warning({
             title: t("modules.role.components.RolesTable.dialogs.deleteConfirmation.title"),
-            icon: renderIcon(IconTrash)(24),
+            icon: renderIcon(IconTrash, { size: 24 }),
             content: () =>
                 h('div', [
                     t("modules.role.components.RolesTable.dialogs.deleteConfirmation.message", { name: role.name }),
