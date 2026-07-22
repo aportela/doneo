@@ -21,4 +21,10 @@ export {
   LockKeyhole as DONEO_ICON_PASSWORD,
   FilePlusCorner as DONEO_ICON_ADD,
   FilePen as DONEO_ICON_EDIT,
+  Palette as DONEO_ICON_PALETTE,
+  Pencil as DONEO_ICON_NAME, // TODO:
+  Star as DONEO_ICON_STAR,
+  CalendarSearch as DONEO_ICON_FILL_EMTPY_DATE, // TODO:
+  CalendarCheck as DONEO_ICON_FILL_DATE, // TODO:
+  CalendarMinus as DONEO_ICON_CLEAR_DATE, // TODO:
 } from "@lucide/vue";
