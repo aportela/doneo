@@ -1,15 +1,15 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, onMounted, type CSSProperties, watch, onBeforeUnmount, nextTick } from 'vue';
+    import { ref, reactive, computed, onMounted, watch, onBeforeUnmount, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NGrid, NGi, NSwitch } from 'naive-ui';
-    import { IconCancel, IconDeviceFloppy, IconUser, IconEdit, IconPlus } from '@tabler/icons-vue';
+    import { DONEO_ICON_ACTION_CANCEL, DONEO_ICON_ACTION_SAVE, DONEO_ICON_ADD, DONEO_ICON_EDIT, DONEO_ICON_USER } from '../../../shared/types/icons';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { Role, MAX_NAME_LENGTH } from '../models/role';
     import { roleService } from '../services/role'
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import type { RoleResponse, AddRequest, UpdateRequest } from '../types/dto';
+    import type { RoleResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
 
     interface Props {
@@ -30,7 +30,7 @@
 
     const serverErrors = ref<Record<string, string>>({});
 
-    const roleFormRef = ref<FormInst | null>(null)
+    const roleFormRef = ref<FormInst | null>(null);
 
     const roleFormRules: FormRules =
     {
@@ -257,7 +257,7 @@
     <n-card bordered>
         <template #header>
             <div class="doneo-flex-center-align">
-                <n-icon class="doneo-mr-4px" :component="!props.roleId ? IconPlus : IconEdit" />
+                <n-icon class="doneo-mr-4px" :component="!props.roleId ? DONEO_ICON_ADD : DONEO_ICON_EDIT" />
                 {{
                     t(!props.roleId ? "modules.role.components.RoleForm.headers.addRole" :
                         "modules.role.components.RoleForm.headers.updateRole")
@@ -274,7 +274,7 @@
                     v-model:value="role.name" :maxlength="MAX_NAME_LENGTH" :show-count="true"
                     :disabled="state.ajaxRunning" clearable required autofocus>
                     <template #prefix>
-                        <n-icon :component="IconUser" />
+                        <n-icon :component="DONEO_ICON_USER" />
                     </template>
                 </n-input>
             </n-form-item>
@@ -361,13 +361,13 @@
             <n-flex>
                 <n-button @click="onSave" :disabled="isSaveDisabled">
                     <template #icon>
-                        <n-icon :component="IconDeviceFloppy" />
+                        <n-icon :component="DONEO_ICON_ACTION_SAVE" />
                     </template>
                     {{ t("shared.buttons.Save.label") }}
                 </n-button>
                 <n-button @click="onCancel" :disabled="state.ajaxRunning">
                     <template #icon>
-                        <n-icon :component="IconCancel" />
+                        <n-icon :component="DONEO_ICON_ACTION_CANCEL" />
                     </template>
                     {{ t("shared.buttons.Cancel.label") }}
                 </n-button>
