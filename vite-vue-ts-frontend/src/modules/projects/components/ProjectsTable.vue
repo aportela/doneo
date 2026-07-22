@@ -98,7 +98,7 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByType.value,
-            render: (row: Project) => renderColoredTag(row.type.name, row.type.hexColor),
+            render: (row: Project) => renderColoredTag(row.type.name, row.type.hexColor, true),
         },
         {
             label: t("modules.project.components.ProjectsTable.header.columns.priority"),
@@ -106,7 +106,7 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByPriority.value,
-            render: (row: Project) => renderColoredTag(row.priority.name, row.priority.hexColor),
+            render: (row: Project) => renderColoredTag(row.priority.name, row.priority.hexColor, true),
         },
         {
             label: t("modules.project.components.ProjectsTable.header.columns.status"),
@@ -114,7 +114,7 @@
             visible: true,
             sortable: true,
             isFiltered: () => isFilteredByStatus.value,
-            render: (row: Project) => renderColoredTag(row.status.name, row.status.hexColor),
+            render: (row: Project) => renderColoredTag(row.status.name, row.status.hexColor, true),
         },
         {
             label: t("modules.project.components.ProjectsTable.header.columns.summary"),
