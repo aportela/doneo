@@ -53,9 +53,12 @@
         });
     });
 
-    watch(state, (newValue: AjaxStateInterface) => {
-        loadingStore.set(newValue.ajaxRunning);
-    });
+    watch(
+        () => state.ajaxRunning,
+        (ajaxRunning) => {
+            loadingStore.set(ajaxRunning);
+        }
+    );
 
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);

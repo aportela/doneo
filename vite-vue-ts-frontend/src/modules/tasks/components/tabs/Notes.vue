@@ -37,9 +37,12 @@
 
     const itemCount = defineModel<number>("itemCount", { default: 0 });
 
-    watch(state, (newValue: AjaxStateInterface) => {
-        loadingStore.set(newValue.ajaxRunning);
-    });
+    watch(
+        () => state.ajaxRunning,
+        (ajaxRunning) => {
+            loadingStore.set(ajaxRunning);
+        }
+    );
 
     watch(() => props.taskId, (newValue, oldValue) => {
         if (!oldValue && newValue) {

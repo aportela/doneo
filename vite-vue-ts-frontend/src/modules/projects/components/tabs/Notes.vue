@@ -36,10 +36,12 @@
 
     const itemCount = defineModel<number>("itemCount", { default: 0 });
 
-    watch(state, (newValue: AjaxStateInterface) => {
-        loadingStore.set(newValue.ajaxRunning);
-    });
-
+    watch(
+        () => state.ajaxRunning,
+        (ajaxRunning) => {
+            loadingStore.set(ajaxRunning);
+        }
+    );
 
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);

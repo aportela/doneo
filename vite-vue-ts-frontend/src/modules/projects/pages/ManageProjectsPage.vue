@@ -59,9 +59,12 @@
 
     const selectedItem = ref<Project>(new Project());
 
-    watch(state, (newValue: AjaxStateInterface) => {
-        loadingStore.set(newValue.ajaxRunning);
-    });
+    watch(
+        () => state.ajaxRunning,
+        (ajaxRunning) => {
+            loadingStore.set(ajaxRunning);
+        }
+    );
 
     watch(() => filters, () => {
         resetPager.value = true;

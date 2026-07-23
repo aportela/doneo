@@ -44,9 +44,12 @@
     const loadingStore = useLoadingStore();
     const { render, toMarkdown } = useMarkdown();
 
-    watch(state, (newValue: AjaxStateInterface) => {
-        loadingStore.set(newValue.ajaxRunning);
-    });
+    watch(
+        () => state.ajaxRunning,
+        (ajaxRunning) => {
+            loadingStore.set(ajaxRunning);
+        }
+    );
 
     const descriptionEditMode = ref<boolean>(false);
 

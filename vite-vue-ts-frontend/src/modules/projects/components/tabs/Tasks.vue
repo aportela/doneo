@@ -68,9 +68,12 @@
     const showModal = ref<boolean>(false);
     const modalFormMode = ref<FormMode>("add");
 
-    watch(state, (newValue: AjaxStateInterface) => {
-        loadingStore.set(newValue.ajaxRunning);
-    });
+    watch(
+        () => state.ajaxRunning,
+        (ajaxRunning) => {
+            loadingStore.set(ajaxRunning);
+        }
+    );
 
     watch(() => filters, () => {
         resetPager.value = true;

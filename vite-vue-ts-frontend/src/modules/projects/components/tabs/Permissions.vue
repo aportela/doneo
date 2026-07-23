@@ -80,9 +80,12 @@
 
     const selectedItem = ref<ProjectPermission>(new ProjectPermission());
 
-    watch(state, (newValue: AjaxStateInterface) => {
-        loadingStore.set(newValue.ajaxRunning);
-    });
+    watch(
+        () => state.ajaxRunning,
+        (ajaxRunning) => {
+            loadingStore.set(ajaxRunning);
+        }
+    );
 
     const onShowAddForm = () => {
         showForm.value = true;

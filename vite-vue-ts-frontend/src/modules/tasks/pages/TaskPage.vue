@@ -54,9 +54,12 @@
 
     const tabsRef = ref<TabsInst>();
 
-    watch(state, (newValue: AjaxStateInterface) => {
-        loadingStore.set(newValue.ajaxRunning);
-    });
+    watch(
+        () => state.ajaxRunning,
+        (ajaxRunning) => {
+            loadingStore.set(ajaxRunning);
+        }
+    );
 
     // recalc bar position on dynamic tab labels changes
     watch(

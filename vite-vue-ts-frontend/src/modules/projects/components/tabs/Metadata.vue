@@ -40,9 +40,12 @@
     const { t } = useI18n();
     const loadingStore = useLoadingStore();
 
-    watch(state, (newValue: AjaxStateInterface) => {
-        loadingStore.set(newValue.ajaxRunning);
-    });
+    watch(
+        () => state.ajaxRunning,
+        (ajaxRunning) => {
+            loadingStore.set(ajaxRunning);
+        }
+    );
 
     const onUpdate = async () => {
         serverErrors.value = {};
