@@ -370,13 +370,19 @@ func (repository *projectRepository) Search(ctx context.Context, dbExecutor data
 		filterArgs = append(filterArgs, *filterDTO.StatusID)
 	}
 	if filterDTO.CreatedAt != nil {
-		if filterDTO.CreatedAt.From != nil && *filterDTO.CreatedAt.From > 0 {
-			sqlWhereConditions = append(sqlWhereConditions, "P.created_at >= ?")
-			filterArgs = append(filterArgs, filterDTO.CreatedAt.From)
-		}
-		if filterDTO.CreatedAt.To != nil && *filterDTO.CreatedAt.To > 0 {
-			sqlWhereConditions = append(sqlWhereConditions, "P.created_at <= ?")
-			filterArgs = append(filterArgs, filterDTO.CreatedAt.To)
+		if filterDTO.CreatedAt.Empty != nil && *filterDTO.CreatedAt.Empty {
+			sqlWhereConditions = append(sqlWhereConditions, "P.created_at IS NULL")
+		} else if filterDTO.CreatedAt.Filled != nil && *filterDTO.CreatedAt.Filled {
+			sqlWhereConditions = append(sqlWhereConditions, "P.created_at IS NOT NULL")
+		} else {
+			if filterDTO.CreatedAt.From != nil && *filterDTO.CreatedAt.From > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "P.created_at >= ?")
+				filterArgs = append(filterArgs, filterDTO.CreatedAt.From)
+			}
+			if filterDTO.CreatedAt.To != nil && *filterDTO.CreatedAt.To > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "P.created_at <= ?")
+				filterArgs = append(filterArgs, filterDTO.CreatedAt.To)
+			}
 		}
 	}
 	// TODO: updatedat, deletedat, startedat, finishedat, dueat

@@ -151,12 +151,18 @@ func (handler *projectHandler) Search(w http.ResponseWriter, r *http.Request) {
 			filter.StatusID = request.Filter.StatusID
 		}
 		if request.Filter.CreatedAt != nil {
-			filter.CreatedAt = &domain.TimestampFilter{From: nil, To: nil}
-			if request.Filter.CreatedAt.From != nil {
-				filter.CreatedAt.From = request.Filter.CreatedAt.From
-			}
-			if request.Filter.CreatedAt.To != nil {
-				filter.CreatedAt.To = request.Filter.CreatedAt.To
+			filter.CreatedAt = &domain.TimestampFilter{From: nil, To: nil, Filled: nil, Empty: nil}
+			if request.Filter.CreatedAt.Filled != nil {
+				filter.CreatedAt.Filled = request.Filter.CreatedAt.Filled
+			} else if request.Filter.CreatedAt.Empty != nil {
+				filter.CreatedAt.Empty = request.Filter.CreatedAt.Empty
+			} else {
+				if request.Filter.CreatedAt.From != nil {
+					filter.CreatedAt.From = request.Filter.CreatedAt.From
+				}
+				if request.Filter.CreatedAt.To != nil {
+					filter.CreatedAt.To = request.Filter.CreatedAt.To
+				}
 			}
 		}
 		if request.Filter.CreatedByUserID != nil {
