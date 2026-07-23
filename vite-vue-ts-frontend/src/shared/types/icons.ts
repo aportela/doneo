@@ -27,4 +27,7 @@ export {
   CalendarSearch as DONEO_ICON_FILL_EMTPY_DATE, // TODO:
   CalendarCheck as DONEO_ICON_FILL_DATE, // TODO:
   CalendarMinus as DONEO_ICON_CLEAR_DATE, // TODO:
+  Expand as DONEO_ICON_EXPAND,
+  Maximize as DONEO_ICON_MAXIMIZE,
+  ExternalLink as DONEO_ICON_ACTION_OPEN,
 } from "@lucide/vue";

@@ -7,10 +7,10 @@ import { IDate } from "../../../shared/types/idate";
 import type { AllowedProjectOperations } from "../../../shared/types/dto/allowed-project-operations";
 
 export class Project {
-  id: string | null;
-  slug: string | null;
-  summary: string | null;
-  description: string | null;
+  id: string;
+  slug: string;
+  summary: string;
+  description: string;
   type: ProjectType;
   priority: ProjectPriority;
   status: ProjectStatus;
@@ -30,10 +30,10 @@ export class Project {
   allowedOperations: AllowedProjectOperations;
 
   constructor(data?: ProjectDTO) {
-    this.id = data?.id ?? null;
-    this.slug = data?.slug ?? null;
-    this.summary = data?.summary ?? null;
-    this.description = data?.description ?? null;
+    this.id = data?.id ?? "";
+    this.slug = data?.slug ?? "";
+    this.summary = data?.summary ?? "";
+    this.description = data?.description ?? "";
     this.type = new ProjectType(data?.type);
     this.priority = new ProjectPriority(data?.priority);
     this.status = new ProjectStatus(data?.status);
@@ -63,10 +63,10 @@ export class Project {
 
   toDTO(): ProjectDTO {
     return {
-      id: this.id ?? "",
-      slug: this.slug ?? "",
-      summary: this.summary ?? "",
-      description: this.description ?? "",
+      id: this.id,
+      slug: this.slug,
+      summary: this.summary,
+      description: this.description,
       type: this.type.toDTO(),
       priority: this.priority.toDTO(),
       status: this.status.toDTO(),

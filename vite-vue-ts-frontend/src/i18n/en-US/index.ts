@@ -1313,25 +1313,6 @@ export default {
           header: {
             title: "Manage projects",
           },
-          pager: {
-            totalItemsLabel: "Total projects: {total}",
-          },
-          notifications: {
-            projectAdded: 'Project "{summary}" has been added',
-            projectUpdated: 'Project "{summary}" has been updated',
-            projectDeleted: 'Project "{summary}" has been deleted',
-            projectStatusUpdated:
-              'Project "{summary}" changed status to {status}',
-          },
-          errors: {
-            refreshError:
-              "There was a problem while refreshing the project list",
-            deleteError: "There was a problem while deleting the project",
-            restoreError: "There was a problem while restoring the project",
-            // TODO: deduplicate
-            notFoundError: "We couldn’t find the specified project",
-            statusUpdateError: 'Error updating status for project "{summary}"',
-          },
         },
         ProjectsTable: {
           header: {
@@ -1377,6 +1358,22 @@ export default {
           },
           warnings: {
             noItemsFound: "No projects found",
+          },
+          notifications: {
+            projectAdded: 'Project "{summary}" has been added',
+            projectUpdated: 'Project "{summary}" has been updated',
+            projectDeleted: 'Project "{summary}" has been deleted',
+            projectStatusUpdated:
+              'Project "{summary}" changed status to {status}',
+          },
+          errors: {
+            refreshError:
+              "There was a problem while refreshing the project list",
+            deleteError: "There was a problem while deleting the project",
+            restoreError: "There was a problem while restoring the project",
+            // TODO: deduplicate
+            notFoundError: "We couldn’t find the specified project",
+            statusUpdateError: 'Error updating status for project "{summary}"',
           },
         },
         ProjectPage: {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, type CSSProperties, nextTick } from 'vue';
+    import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NSwitch } from 'naive-ui';
@@ -17,13 +17,8 @@
 
     import { DEFAULT_INPUT_SIZE } from '../../../constants.ts';
 
-    interface NewProjectFormProps {
-        style?: string | CSSProperties;
-    }
 
     const emit = defineEmits(['add', 'cancel'])
-
-    const props = defineProps<NewProjectFormProps>();
 
     const { t } = useI18n();
 
@@ -221,7 +216,7 @@
 </script>
 
 <template>
-    <n-card :style="style" bordered>
+    <n-card bordered>
         <template #header>
             <div class="doneo-flex-center-align">
                 <n-icon :component="IconPlus" />

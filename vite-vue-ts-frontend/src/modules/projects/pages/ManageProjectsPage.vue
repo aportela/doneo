@@ -1,6 +1,14 @@
 <script setup lang="ts">
-    import { onMounted, onBeforeUnmount, ref, reactive, shallowRef, watch } from 'vue';
     import { useI18n } from "vue-i18n";
+
+    import { NCard } from "naive-ui";
+
+    import ProjectsTable from '../components/ProjectsTable.vue';
+
+    const { t } = useI18n();
+
+    /*
+    import { onMounted, onBeforeUnmount, ref, reactive, shallowRef, watch } from 'vue';
     import { useRouter } from 'vue-router';
 
     import { NCard, NModal } from 'naive-ui';
@@ -21,13 +29,12 @@
     import { handleAPIError } from '../../../api/client/errorHandler';
 
     import NewProjectForm from '../components/NewProjectForm.vue';
-    import ProjectsTable from '../components/ProjectsTable.vue';
+
     import Pager from '../../../shared/components/tables/Pager.vue';
     import { type Pagination, PAGER_DEFAULT_RESULTS_PAGE } from '../../../shared/types/pager.ts';
     import type { ProjectStatus } from '../../project-statuses/models/project-status.ts';
 
     const router = useRouter();
-    const { t } = useI18n();
     const { notify } = useNotify();
     const loadingStore = useLoadingStore();
 
@@ -70,7 +77,7 @@
         resetPager.value = true;
     }, { deep: true });
 
-    watch([pagination.resultsPage], () => {
+    watch(() => pagination.resultsPage, () => {
         if (pagination.currentPage != 1) {
             pagination.currentPage = 1;
         } else {
@@ -280,22 +287,13 @@
     onBeforeUnmount(() => {
         stopBusReauthListener();
     });
+    */
 </script>
 
 <template>
-
-    <!-- TODO close icon-->
-    <n-modal v-model:show="showModal">
-        <NewProjectForm class="modal-form" @add="onAdded" @cancel="onCancelForm" />
-    </n-modal>
     <n-card :title="t('modules.project.components.ManageProjectsPage.header.title')">
-        <ProjectsTable :items="items" :disabled="state.ajaxRunning" @refresh="onRefresh" @add="onShowAddForm"
-            :order="order" @sort="onSort" @status-changed="onStatusChanged" v-model:filters="filters" />
+        <ProjectsTable />
     </n-card>
 </template>
 
-<style lang="css" scoped>
-    .modal-form {
-        width: 40%;
-    }
-</style>
+<style lang="css" scoped></style>
