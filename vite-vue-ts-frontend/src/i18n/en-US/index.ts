@@ -1464,21 +1464,6 @@ export default {
           header: {
             title: "Manage task statuses",
           },
-          pager: {
-            totalItemsLabel: "Total task statuses: {total}",
-          },
-          notifications: {
-            taskStatusAdded: 'Task status "{name}" has been added',
-            taskStatusUpdated: 'Task status "{name}" has been updated',
-            taskStatusDeleted: 'Task status "{name}" has been deleted',
-          },
-          errors: {
-            refreshError:
-              "There was a problem while refreshing the task status list",
-            deleteError: "There was a problem while deleting the task status",
-            // TODO: deduplicate
-            notFoundError: "We couldn’t find the specified task status",
-          },
         },
         TaskStatusesTable: {
           header: {
@@ -1530,6 +1515,18 @@ export default {
           },
           warnings: {
             noItemsFound: "No task statuses found",
+          },
+          notifications: {
+            taskStatusAdded: 'Task status "{name}" has been added',
+            taskStatusUpdated: 'Task status "{name}" has been updated',
+            taskStatusDeleted: 'Task status "{name}" has been deleted',
+          },
+          errors: {
+            refreshError:
+              "There was a problem while refreshing the task status list",
+            deleteError: "There was a problem while deleting the task status",
+            // TODO: deduplicate
+            notFoundError: "We couldn’t find the specified task status",
           },
         },
       },
