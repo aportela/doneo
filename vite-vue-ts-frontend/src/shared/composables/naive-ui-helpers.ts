@@ -23,7 +23,10 @@ export const renderColoredTag = (
     },
   );
 
-export const renderLabel = (value: string, className?: string): VNodeChild =>
+export const renderLabel = (
+  value: string | number,
+  className?: string,
+): VNodeChild =>
   className ? h("span", { class: className }, { default: () => value }) : value;
 
 export const renderIcon =
