@@ -2,7 +2,7 @@
     import { ref, reactive, computed, h } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NTag, NButtonGroup, NButton, NIcon } from 'naive-ui';
+    import { NButtonGroup, NButton, NIcon, NDrawer, NDrawerContent } from 'naive-ui';
     import { IconFilePencil } from '@tabler/icons-vue';
 
     import { useUserSettingsStore } from '../../../stores/userSettings.ts';
@@ -20,7 +20,6 @@
     import ProjectStatusSelector from '../../project-statuses/components/ProjectStatusSelector.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
-    import { getNaiveUITagColorProperty } from '../../../shared/composables/color';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import ChangeProjectStatusDropdown from '../../../shared/components/dropdowns/ChangeProjectStatusDropdown.vue';
     import type { ProjectStatus } from '../../project-statuses/models/project-status.ts';
@@ -213,8 +212,16 @@
 </script>
 
 <template>
-    <ProjectResumeFloatingCard v-if="showDrawer && currentProject?.id" v-model:show="showDrawer"
-        :project-id="currentProject?.id" />
+    <n-drawer v-model:show="showDrawer" :default-width="768" resizable placement="right">
+        <n-drawer-content :native-scrollbar="false">
+            <template #header>
+                Project {{ currentProject?.slug }}
+            </template>
+            <ProjectResumeFloatingCard v-if="showDrawer && currentProject?.id" v-model:show="showDrawer"
+                :project-id="currentProject?.id" />
+        </n-drawer-content>
+    </n-drawer>
+
     <ManageTable :id="props.id" size="small" :rows="items" :row-key="row => row.id ?? ''" :columns="columns"
         :order="order" @sort="onSort" @refresh="onRefresh" @add="onAdd" @clear-filters="onClearFilters"
         :no-items-warning-message="t('modules.project.components.ProjectsTable.warnings.noItemsFound')"
