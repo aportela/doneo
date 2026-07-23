@@ -815,24 +815,6 @@ export default {
           header: {
             title: "Manage project priorities",
           },
-          pager: {
-            totalItemsLabel: "Total project priorities: {total}",
-          },
-          notifications: {
-            projectPriorityAdded: 'Project priority "{name}" has been added',
-            projectPriorityUpdated:
-              'Project priority "{name}" has been updated',
-            projectPriorityDeleted:
-              'Project priority "{name}" has been deleted',
-          },
-          errors: {
-            refreshError:
-              "There was a problem while refreshing the project priority list",
-            deleteError:
-              "There was a problem while deleting the project priority",
-            // TODO: deduplicate
-            notFoundError: "We couldn’t find the specified project priority",
-          },
         },
         ProjectPrioritiesTable: {
           header: {
@@ -855,6 +837,21 @@ export default {
           },
           warnings: {
             noItemsFound: "No project priorities found",
+          },
+          notifications: {
+            projectPriorityAdded: 'Project priority "{name}" has been added',
+            projectPriorityUpdated:
+              'Project priority "{name}" has been updated',
+            projectPriorityDeleted:
+              'Project priority "{name}" has been deleted',
+          },
+          errors: {
+            refreshError:
+              "There was a problem while refreshing the project priority list",
+            deleteError:
+              "There was a problem while deleting the project priority",
+            // TODO: deduplicate
+            notFoundError: "We couldn’t find the specified project priority",
           },
         },
       },
