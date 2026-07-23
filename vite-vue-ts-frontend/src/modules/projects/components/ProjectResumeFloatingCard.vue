@@ -31,8 +31,6 @@
 
     const project = ref<Project>(new Project());
 
-    const show = defineModel<boolean>("show", { default: false });
-
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
     const serverErrors = ref<Record<string, string>>({});
