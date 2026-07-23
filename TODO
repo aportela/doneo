@@ -69,3 +69,5 @@ remove top navigation
 
 
 check project type/priority/status & task use before deleting
+
+check (backend) unique index on project/task status/priority
