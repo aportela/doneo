@@ -340,13 +340,12 @@
             <template #header>
                 <n-flex align="center" justify="space-between">
                     Project {{ currentProject.slug }}
-                    <router-link :to="{ name: 'ProjectPage', params: { id: currentProject.id } }">
+                    <router-link :to="{ name: 'project', params: { projectId: currentProject.id } }">
                         <n-icon :component="DONEO_ICON_MAXIMIZE" />
                     </router-link>
                 </n-flex>
             </template>
-            <ProjectResumeFloatingCard v-if="showDrawer && currentProject.id" v-model:show="showDrawer"
-                :project-id="currentProject?.id" />
+            <ProjectResumeFloatingCard v-if="showDrawer && currentProject.id" :project-id="currentProject.id" />
         </n-drawer-content>
     </n-drawer>
 
