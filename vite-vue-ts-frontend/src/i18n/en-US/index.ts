@@ -1581,21 +1581,6 @@ export default {
           header: {
             title: "Manage task priorities",
           },
-          pager: {
-            totalItemsLabel: "Total task priorities: {total}",
-          },
-          notifications: {
-            taskPriorityAdded: 'Task priority "{name}" has been added',
-            taskPriorityUpdated: 'Task priority "{name}" has been updated',
-            taskPriorityDeleted: 'Task priority "{name}" has been deleted',
-          },
-          errors: {
-            refreshError:
-              "There was a problem while refreshing the task priority list",
-            deleteError: "There was a problem while deleting the task priority",
-            // TODO: deduplicate
-            notFoundError: "We couldn’t find the specified task priority",
-          },
         },
         TaskPrioritiesTable: {
           header: {
@@ -1618,6 +1603,18 @@ export default {
           },
           warnings: {
             noItemsFound: "No task priorities found",
+          },
+          notifications: {
+            taskPriorityAdded: 'Task priority "{name}" has been added',
+            taskPriorityUpdated: 'Task priority "{name}" has been updated',
+            taskPriorityDeleted: 'Task priority "{name}" has been deleted',
+          },
+          errors: {
+            refreshError:
+              "There was a problem while refreshing the task priority list",
+            deleteError: "There was a problem while deleting the task priority",
+            // TODO: deduplicate
+            notFoundError: "We couldn’t find the specified task priority",
           },
         },
       },
