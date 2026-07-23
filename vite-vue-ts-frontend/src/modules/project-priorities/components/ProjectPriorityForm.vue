@@ -14,7 +14,7 @@
     import { appBus } from '../../../shared/composables/bus';
 
     interface Props {
-        projectPriorityId?: string | null;
+        projectPriorityId?: string;
     }
 
     const emit = defineEmits(['add', 'update', 'cancel'])
@@ -273,7 +273,7 @@
             <div class="doneo-flex-center-align">
                 <n-icon class="doneo-mr-4px" :component="!props.projectPriorityId ? DONEO_ICON_ADD : DONEO_ICON_EDIT" />
                 {{
-                    t(props.projectPriorityId ?
+                    t(!props.projectPriorityId ?
                         "modules.projectPriority.components.ProjectPriorityForm.headers.addProjectPriority" :
                         "modules.projectPriority.components.ProjectPriorityForm.headers.updateProjectPriority")
                 }}
