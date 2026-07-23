@@ -15,7 +15,7 @@
     import type { SearchResponse } from "../../../tasks/types/dto.ts";
     import type { TasksTableFilters } from "../../../tasks/types/tasks-table-filters.ts";
 
-    import { Order } from '../../../../shared/types/models/sort';
+    import type { Order } from "../../../../shared/types/order.ts";
     import { Task } from "../../../tasks/models/tasks.ts";
 
     import { taskService } from "../../../tasks/services/task.ts";
