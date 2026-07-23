@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount, h, type Component } from 'vue';
+    import { ref, reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount, h } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NModal, useDialog, NIcon, NButton, NButtonGroup } from 'naive-ui';
@@ -7,7 +7,6 @@
     import type { Order } from '../../../shared/types/order.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
 
-    import type { ProjectTypesTableFilters } from '../types/project-types-table-filters.ts';
     import { ProjectType } from '../models/project-type';
 
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
@@ -92,7 +91,6 @@
     };
 
     const nameFilterLowerCase = computed(() => filters.name.toLowerCase());
-
 
     // we have all results, use local filtering for avoiding server load
     const localFilteredItems = computed<ProjectType[]>(() => {
@@ -300,7 +298,6 @@
     onBeforeUnmount(() => {
         stopBusReauthListener();
     });
-
 </script>
 
 <template>
