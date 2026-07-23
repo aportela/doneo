@@ -14,7 +14,7 @@
     import { appBus } from '../../../shared/composables/bus';
 
     interface Props {
-        taskPriorityId?: string | null;
+        taskPriorityId?: string;
     }
 
     const emit = defineEmits(['add', 'update', 'cancel'])
