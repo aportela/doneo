@@ -904,22 +904,6 @@ export default {
           header: {
             title: "Manage project statuses",
           },
-          pager: {
-            totalItemsLabel: "Total project statuses: {total}",
-          },
-          notifications: {
-            projectStatusAdded: 'Project status "{name}" has been added',
-            projectStatusUpdated: 'Project status "{name}" has been updated',
-            projectStatusDeleted: 'Project status "{name}" has been deleted',
-          },
-          errors: {
-            refreshError:
-              "There was a problem while refreshing the project status list",
-            deleteError:
-              "There was a problem while deleting the project status",
-            // TODO: deduplicate
-            notFoundError: "We couldn’t find the specified project status",
-          },
         },
         ProjectStatusesTable: {
           header: {
@@ -971,6 +955,19 @@ export default {
           },
           warnings: {
             noItemsFound: "No project statuses found",
+          },
+          notifications: {
+            projectStatusAdded: 'Project status "{name}" has been added',
+            projectStatusUpdated: 'Project status "{name}" has been updated',
+            projectStatusDeleted: 'Project status "{name}" has been deleted',
+          },
+          errors: {
+            refreshError:
+              "There was a problem while refreshing the project status list",
+            deleteError:
+              "There was a problem while deleting the project status",
+            // TODO: deduplicate
+            notFoundError: "We couldn’t find the specified project status",
           },
         },
       },
