@@ -374,11 +374,11 @@
                 <TextFilterInput v-if="column.field === 'name'" clearable :disabled="state.ajaxRunning" size="small"
                     :placeholder="t('modules.role.components.RolesTable.filters.name.placeholder')"
                     v-model:value="filters.name" />
-                <ProjectPermissionSelect v-if="column.field == 'projectPermissions'"
+                <ProjectPermissionSelect v-else-if="column.field == 'projectPermissions'"
                     v-model:permission="filters.projectPermission"
                     :placeholder="t('shared.components.selectors.ProjectPermissionSelect.placeholder')" clearable
                     ref="projectPermissionSelectorRef" />
-                <TaskPermissionSelect v-if="column.field === 'taskPermissions'"
+                <TaskPermissionSelect v-else-if="column.field === 'taskPermissions'"
                     v-model:permission="filters.taskPermission"
                     :placeholder="t('shared.components.selectors.TaskPermissionSelect.placeholder')" clearable
                     ref="taskPermissionSelectorRef" />
