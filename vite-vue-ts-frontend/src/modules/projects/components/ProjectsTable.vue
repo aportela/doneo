@@ -353,7 +353,7 @@
     <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="items" :row-key="row => row.id"
         :columns="columns" :order="currentOrder" :pager-data="currentPagination" pager-position="both"
         :show-no-items-warning-message="showNoItemsWarningMessage"
-        :no-items-warning-message="t('modules.user.components.UsersTable.warnings.noItemsFound')" @sort="onSort"
+        :no-items-warning-message="t('modules.project.components.ProjectsTable.warnings.noItemsFound')" @sort="onSort"
         @refresh="onRefresh" @add="onAdd" @pager-changed="onPagerChanged" @clear-filters="onClearFilters">
         <template #thead-column-filters="{ columns }">
             <th v-for="column in columns">
