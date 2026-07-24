@@ -152,7 +152,7 @@
 
     const columnDefinitions = reactive<TableHeaderColumn<ProjectPermission>[]>([
         {
-            label: t("modules.projectPermission.components.projectPermissionsTable.header.columns.user"),
+            label: t("modules.projectPermission.components.ProjectPermissionsTablele.header.columns.user"),
             field: "user",
             visible: true,
             sortable: false,
@@ -160,7 +160,7 @@
             render: (row: ProjectPermission) => h(AvatarUserName, { userId: row.user.id, userName: row.user.name }),
         },
         {
-            label: t("modules.projectPermission.components.projectPermissionsTable.header.columns.role"),
+            label: t("modules.projectPermission.components.ProjectPermissionsTablele.header.columns.role"),
             field: "role",
             visible: true,
             sortable: false,
@@ -168,7 +168,7 @@
             render: (row: ProjectPermission) => renderLabel(row.role.name),
         },
         {
-            label: t("modules.projectPermission.components.projectPermissionsTable.header.columns.projectPermissions"),
+            label: t("modules.projectPermission.components.ProjectPermissionsTablele.header.columns.projectPermissions"),
             field: "projectPermissions",
             visible: true,
             sortable: false,
@@ -177,7 +177,7 @@
             render: (row: ProjectPermission) => renderProjectPermissionIcons(row.role, t),
         },
         {
-            label: t("modules.projectPermission.components.projectPermissionsTable.header.columns.taskPermissions"),
+            label: t("modules.projectPermission.components.ProjectPermissionsTablele.header.columns.taskPermissions"),
             field: "taskPermissions",
             visible: true,
             sortable: false,
@@ -216,7 +216,7 @@
                 await projectPermissionService.delete(props.projectId, projectPermission.id);
                 items.value = items.value.filter((item) => item.id != projectPermission.id)
                 itemCount.value = items.value?.length ?? 0;
-                notify('success', t("modules.projectPermission.components.projectPermissionsTab.notifications.projectPermissionDeleted", { user: projectPermission.user.name, role: projectPermission.role.name }));
+                notify('success', t("modules.projectPermission.components.ProjectPermissionsTable.notifications.projectPermissionDeleted", { user: projectPermission.user.name, role: projectPermission.role.name }));
             } catch (error: unknown) {
                 state.ajaxErrors = true;
                 handleAPIError(error,
@@ -225,19 +225,19 @@
                             case 401:
                                 state.ajaxErrors = false;
                                 tmpItem.value = projectPermission;
-                                appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPermissions.onDelete" } });
+                                appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPermissionsTable.onDelete" } });
                                 break;
                             case 404:
-                                state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.notFoundError");
+                                state.ajaxErrorMessage = t("modules.projectPermission.components.ProjectPermissionsTable.errors.notFoundError");
                                 break;
                             default:
-                                state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.deleteError");
+                                state.ajaxErrorMessage = t("modules.projectPermission.components.ProjectPermissionsTable.errors.deleteError");
                                 break;
                         }
                     },
                     (fatalError) => {
-                        state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.deleteError");
-                        console.error("Unhandled API error", { file: "ProjectPermissions.vue", method: "onRefresh" }, { err: fatalError });
+                        state.ajaxErrorMessage = t("modules.projectPermission.components.ProjectPermissionsTable.errors.deleteError");
+                        console.error("Unhandled API error", { file: "ProjectPermissionsTable.vue", method: "onRefresh" }, { err: fatalError });
                     });
             } finally {
                 state.ajaxRunning = false;
@@ -246,17 +246,17 @@
                 }
             }
         } else {
-            console.error("(project permission id || project id) not set", { file: "ProjectPermissions.vue", method: "onDelete" });
+            console.error("(project permission id || project id) not set", { file: "ProjectPermissionsTable.vue", method: "onDelete" });
         }
     };
 
     const onConfirmDelete = (projectPermission: ProjectPermission) => {
         dialog.warning({
-            title: t("modules.projectPermission.components.projectPermissionsTable.dialogs.deleteConfirmation.title"),
+            title: t("modules.projectPermission.components.ProjectPermissionsTablele.dialogs.deleteConfirmation.title"),
             icon: renderIcon(DONEO_ICON_ACTION_DELETE, { size: 24 }),
             content: () =>
                 h('div', [
-                    t("modules.projectPermission.components.projectPermissionsTable.dialogs.deleteConfirmation.message", { user: projectPermission.user.name, role: projectPermission.role.name }),
+                    t("modules.projectPermission.components.ProjectPermissionsTablele.dialogs.deleteConfirmation.message", { user: projectPermission.user.name, role: projectPermission.role.name }),
                     h('br'),
                     h('br'),
                     t("shared.components.dialogs.confirmation.continueMessage"),
@@ -283,16 +283,16 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPermissions.onRefresh" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPermissionsTable.onRefresh" } });
                             break;
                         default:
-                            state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.refreshError");
+                            state.ajaxErrorMessage = t("modules.projectPermission.components.ProjectPermissionsTable.errors.refreshError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.refreshError");
-                    console.error("Unhandled API error", { file: "ProjectPermissions.vue", method: "onRefresh" }, { err: fatalError });
+                    state.ajaxErrorMessage = t("modules.projectPermission.components.ProjectPermissionsTable.errors.refreshError");
+                    console.error("Unhandled API error", { file: "ProjectPermissionsTable.vue", method: "onRefresh" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
@@ -313,7 +313,7 @@
         cacheStore.clearUsersCache();
         showFormModal.value = false;
         tmpItem.value = new ProjectPermission();
-        notify('success', t("modules.projectPermission.components.projectPermissionsTab.notifications.projectPermissionAdded", { user: projectPermission.user.name, role: projectPermission.role.name }));
+        notify('success', t("modules.projectPermission.components.ProjectPermissionsTable.notifications.projectPermissionAdded", { user: projectPermission.user.name, role: projectPermission.role.name }));
         onRefresh();
     };
 
@@ -348,17 +348,17 @@
     <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="localFilteredItems"
         :row-key="row => row.id" :columns="columns" :order="currentOrder"
         :show-no-items-warning-message="showNoItemsWarningMessage || (items.length > 0 && localFilteredItems.length === 0)"
-        :no-items-warning-message="t('modules.projectPermission.components.projectPermissionsTable.warnings.noItemsFound')"
+        :no-items-warning-message="t('modules.projectPermission.components.ProjectPermissionsTablele.warnings.noItemsFound')"
         @sort="onSort" @refresh="onRefresh" @add="onAdd" @clear-filters="onClearFilters"
         :buttons="props.readOnly ? ['refresh', 'settings'] : ['refresh', 'add', 'settings']">
         <template #thead-column-filters="{ columns }">
             <th v-for="column in columns">
                 <UserSelector v-if="column.field === 'user'" hideAvatar clearable :disabled="state.ajaxRunning"
                     v-model:id="filters.userId"
-                    :placeholder="t('modules.projectPermission.components.projectPermissionsTable.filters.user.placeholder')" />
+                    :placeholder="t('modules.projectPermission.components.ProjectPermissionsTablele.filters.user.placeholder')" />
                 <RoleSelector v-if="column.field === 'role'" clearable :disabled="state.ajaxRunning"
                     v-model:id="filters.roleId"
-                    :placeholder="t('modules.projectPermission.components.projectPermissionsTable.filters.role.placeholder')" />
+                    :placeholder="t('modules.projectPermission.components.ProjectPermissionsTablele.filters.role.placeholder')" />
                 <ProjectPermissionSelect v-if="column.field === 'projectPermission'"
                     v-model:permission="filters.projectPermission"
                     :placeholder="t('shared.components.selectors.ProjectPermissionSelect.placeholder')" clearable

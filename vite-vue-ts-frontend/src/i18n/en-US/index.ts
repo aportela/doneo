@@ -1122,8 +1122,6 @@ export default {
           warnings: {
             noItemsFound: "No project permissions found",
           },
-        },
-        projectPermissionsTab: {
           notifications: {
             projectPermissionAdded:
               'Project permission of user "{user}" with role "{role}" has been added',
