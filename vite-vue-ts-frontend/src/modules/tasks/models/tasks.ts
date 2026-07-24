@@ -1,4 +1,4 @@
-import type { TaskResponse as ProjectTaskDTO } from "../types/dto";
+import type { AddRequest, TaskResponse as ProjectTaskDTO } from "../types/dto";
 import { TaskPriority } from "../../task-priorities/models/task-priority";
 import { TaskStatus } from "../../task-statuses/models/task-status";
 import { UserBase } from "../../users/models/user";
@@ -6,11 +6,11 @@ import { IDate } from "../../../shared/types/idate";
 import type { AllowedProjectOperations } from "../../../shared/types/dto/allowed-project-operations";
 
 export class Task {
-  id: string | null;
-  projectId: string | null;
-  slug: string | null;
-  summary: string | null;
-  description: string | null;
+  id: string;
+  projectId: string;
+  slug: string;
+  summary: string;
+  description: string;
   priority: TaskPriority;
   status: TaskStatus;
   createdAt: IDate;
@@ -30,11 +30,11 @@ export class Task {
   allowedOperations: AllowedProjectOperations;
 
   constructor(data?: ProjectTaskDTO) {
-    this.id = data?.id ?? null;
-    this.projectId = data?.projectId ?? null;
-    this.slug = data?.slug ?? null;
-    this.summary = data?.summary ?? null;
-    this.description = data?.description ?? null;
+    this.id = data?.id ?? "";
+    this.projectId = data?.projectId ?? "";
+    this.slug = data?.slug ?? "";
+    this.summary = data?.summary ?? "";
+    this.description = data?.description ?? "";
     this.priority = new TaskPriority(data?.priority);
     this.status = new TaskStatus(data?.status);
     this.createdAt = new IDate(data?.createdAt ?? Date.now());
@@ -64,11 +64,11 @@ export class Task {
 
   toDTO(): ProjectTaskDTO {
     return {
-      id: this.id ?? "",
-      projectId: this.projectId ?? "",
-      slug: this.slug ?? "",
-      summary: this.summary ?? "",
-      description: this.description ?? "",
+      id: this.id,
+      projectId: this.projectId,
+      slug: this.slug,
+      summary: this.summary,
+      description: this.description,
       priority: this.priority.toDTO(),
       status: this.status.toDTO(),
       createdAt: this.createdAt.msTimestamp ?? 0,
@@ -82,6 +82,17 @@ export class Task {
       historyOperationsCount: this.historyOperationsCount,
       timeTrackingsCount: this.timeTrackingsCount,
       allowedOperations: this.allowedOperations,
+    };
+  }
+
+  toAddRequestPayload(): AddRequest {
+    return {
+      summary: this.summary,
+      description: this.description,
+      priority: this.priority.toDTO(),
+      status: this.status.toDTO(),
+      estimatedTime: this.estimatedTime ?? 0,
+      tags: this.tags,
     };
   }
 }

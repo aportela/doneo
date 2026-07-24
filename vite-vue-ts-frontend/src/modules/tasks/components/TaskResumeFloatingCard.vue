@@ -2,7 +2,7 @@
     import { ref, reactive, onMounted, computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NDrawer, NDrawerContent, NCollapse, NCollapseItem, NButton, NButtonGroup, NTag, NSpin, NIcon, NTimeline, NTimelineItem, NDivider, NFlex, NDropdown } from 'naive-ui';
+    import { NCollapse, NCollapseItem, NButton, NButtonGroup, NTag, NSpin, NIcon, NTimeline, NTimelineItem, NDivider, NFlex, NDropdown } from 'naive-ui';
     import { IconAlertTriangle, IconCalendarBolt, IconCalendarCheck, IconCalendarDue, IconCalendarTime, IconFilter2, IconLink, IconMessage2, IconPaperclip, IconReport, IconSortDescending, IconStatusChange, IconUser } from '@tabler/icons-vue';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
@@ -21,18 +21,16 @@
     import { IDate } from '../../../shared/types/idate.ts';
     import { Note } from '../../notes/models/note.ts';
 
-    interface IProps {
+    interface Props {
         projectId: string;
         taskId: string;
     }
 
-    const props = defineProps<IProps>();
+    const props = defineProps<Props>();
 
     const { t } = useI18n();
 
     const task = ref<Task>(new Task());
-
-    const show = defineModel<boolean>("show", { default: false });
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -116,112 +114,104 @@
 </script>
 
 <template>
-    <n-drawer v-model:show="show" :width="768" placement="right">
-        <n-drawer-content :native-scrollbar="false">
-            <template #header>
-                Task {{ task.slug }}
-            </template>
-            <n-spin :show="state.ajaxRunning">
-                <div v-show="!state.ajaxRunning">
-                    <h3>{{ task.summary }}</h3>
+    <n-spin :show="state.ajaxRunning">
+        <div v-show="!state.ajaxRunning">
+            <h3>{{ task.summary }}</h3>
 
-                    <p>Description: {{ task.description }}</p>
-                    <task-time-progress :estimated="task.estimatedTime" :spent="task.totalSpentTime" />
+            <p>Description: {{ task.description }}</p>
+            <task-time-progress :estimated="task.estimatedTime" :spent="task.totalSpentTime" />
 
-                    <n-button-group size="tiny" style="margin-top: 16px;">
-                        <n-button round><template #icon><n-icon :component="IconPaperclip" /></template> Add
-                            attachment</n-button>
-                        <n-button round><template #icon><n-icon :component="IconLink" /></template> Add
-                            relation</n-button>
-                        <n-button round><template #icon><n-icon :component="IconReport" /></template> Add time
-                            tracking</n-button>
-                        <n-button round><template #icon><n-icon :component="IconMessage2" tag="a"
-                                    href="#aa" /></template> Add
-                            note</n-button>
-                    </n-button-group>
-                    <n-divider v-if="hasDetails" />
-                    <n-collapse class="doneo-disable-user-select" v-if="hasDetails">
-                        <n-collapse-item title="Attachments" key="attachments" v-if="task.attachmentsCount > 0">
-                            <template #header>
-                                <n-icon :component="IconPaperclip" /> Attachments
-                            </template>
-                            <template #header-extra>
-                                ({{ task.attachmentsCount }})
-                            </template>
-                        </n-collapse-item>
-                        <n-collapse-item title="Relations" key="relations" v-if="false">
-                            <template #header>
-                                <n-icon :component="IconLink" /> Relations
-                            </template>
-                            <template #header-extra>
-                                (0)
-                            </template>
-                        </n-collapse-item>
-                        <n-collapse-item title="Time trackings" key="timetrackings" v-if="task.timeTrackingsCount > 0">
-                            <template #header>
-                                <n-icon :component="IconReport" /> Time trackings
-                            </template>
-                            <template #header-extra>
-                                ({{ task.timeTrackingsCount }})
-                            </template>
-                        </n-collapse-item>
-                    </n-collapse>
-                    <n-divider />
-                    <h4>Properties</h4>
-                    <p><n-icon :component="IconStatusChange" /> State:
-                        <n-tag size="tiny" :color="getNaiveUITagColorProperty(task.status.hexColor ?? '#888888')">{{
-                            task.status.name }}</n-tag>
-                    </p>
-                    <p><n-icon :component="IconAlertTriangle" />Priority:
-                        <n-tag size="tiny" :color="getNaiveUITagColorProperty(task.priority.hexColor ?? '#888888')">{{
-                            task.priority.name }}</n-tag>
-                    </p>
-                    <p><n-icon :component="IconUser" />Asignee: John doe</p>
-                    <p><n-icon :component="IconCalendarBolt" /> Created at: {{ task.createdAt.toLocaleString() }} </p>
-                    <p><n-icon :component="IconCalendarTime" /> Started at: {{ task.startedAt.toLocaleString() }} </p>
-                    <p><n-icon :component="IconCalendarCheck" /> Finished at: {{ task.finishedAt.toLocaleString() }}
-                    </p>
-                    <p><n-icon :component="IconCalendarDue" /> Due at: {{ task.dueAt.toLocaleString() }} </p>
-                    <p><n-flex align="center">
-                            Created by:
-                            <AvatarUserName :user-id="task.createdBy.id" :user-name="task.createdBy.name" />
-                        </n-flex>
-                    </p>
-                    <p>Tags: <n-tag v-for="tag in task.tags" :key="tag" size="small" class="mr-tiny">{{ tag
-                    }}</n-tag>
-                    </p>
-                    <n-divider />
-                    <n-flex justify="space-between" align="center">
-                        <h4>Activity</h4>
-                        <n-button-group size="small">
-                            <n-button><template #icon><n-icon :component="IconSortDescending" /></template></n-button>
-                            <n-dropdown trigger="click" :options="activityFilterOpts">
-                                <n-button><template #icon><n-icon :component="IconFilter2" /></template></n-button>
-                            </n-dropdown>
-                        </n-button-group>
-                    </n-flex>
+            <n-button-group size="tiny" style="margin-top: 16px;">
+                <n-button round><template #icon><n-icon :component="IconPaperclip" /></template> Add
+                    attachment</n-button>
+                <n-button round><template #icon><n-icon :component="IconLink" /></template> Add
+                    relation</n-button>
+                <n-button round><template #icon><n-icon :component="IconReport" /></template> Add time
+                    tracking</n-button>
+                <n-button round><template #icon><n-icon :component="IconMessage2" tag="a" href="#aa" /></template> Add
+                    note</n-button>
+            </n-button-group>
+            <n-divider v-if="hasDetails" />
+            <n-collapse class="doneo-disable-user-select" v-if="hasDetails">
+                <n-collapse-item title="Attachments" key="attachments" v-if="task.attachmentsCount > 0">
+                    <template #header>
+                        <n-icon :component="IconPaperclip" /> Attachments
+                    </template>
+                    <template #header-extra>
+                        ({{ task.attachmentsCount }})
+                    </template>
+                </n-collapse-item>
+                <n-collapse-item title="Relations" key="relations" v-if="false">
+                    <template #header>
+                        <n-icon :component="IconLink" /> Relations
+                    </template>
+                    <template #header-extra>
+                        (0)
+                    </template>
+                </n-collapse-item>
+                <n-collapse-item title="Time trackings" key="timetrackings" v-if="task.timeTrackingsCount > 0">
+                    <template #header>
+                        <n-icon :component="IconReport" /> Time trackings
+                    </template>
+                    <template #header-extra>
+                        ({{ task.timeTrackingsCount }})
+                    </template>
+                </n-collapse-item>
+            </n-collapse>
+            <n-divider />
+            <h4>Properties</h4>
+            <p><n-icon :component="IconStatusChange" /> State:
+                <n-tag size="tiny" :color="getNaiveUITagColorProperty(task.status.hexColor ?? '#888888')">{{
+                    task.status.name }}</n-tag>
+            </p>
+            <p><n-icon :component="IconAlertTriangle" />Priority:
+                <n-tag size="tiny" :color="getNaiveUITagColorProperty(task.priority.hexColor ?? '#888888')">{{
+                    task.priority.name }}</n-tag>
+            </p>
+            <p><n-icon :component="IconUser" />Asignee: John doe</p>
+            <p><n-icon :component="IconCalendarBolt" /> Created at: {{ task.createdAt.toLocaleString() }} </p>
+            <p><n-icon :component="IconCalendarTime" /> Started at: {{ task.startedAt.toLocaleString() }} </p>
+            <p><n-icon :component="IconCalendarCheck" /> Finished at: {{ task.finishedAt.toLocaleString() }}
+            </p>
+            <p><n-icon :component="IconCalendarDue" /> Due at: {{ task.dueAt.toLocaleString() }} </p>
+            <p><n-flex align="center">
+                    Created by:
+                    <AvatarUserName :user-id="task.createdBy.id" :user-name="task.createdBy.name" />
+                </n-flex>
+            </p>
+            <p>Tags: <n-tag v-for="tag in task.tags" :key="tag" size="small" class="mr-tiny">{{ tag
+            }}</n-tag>
+            </p>
+            <n-divider />
+            <n-flex justify="space-between" align="center">
+                <h4>Activity</h4>
+                <n-button-group size="small">
+                    <n-button><template #icon><n-icon :component="IconSortDescending" /></template></n-button>
+                    <n-dropdown trigger="click" :options="activityFilterOpts">
+                        <n-button><template #icon><n-icon :component="IconFilter2" /></template></n-button>
+                    </n-dropdown>
+                </n-button-group>
+            </n-flex>
 
-                    <ToggleMarkDownEditor v-model:value="noteBody" hide-preview placeholder="Add comment" />
-                    <n-timeline>
-                        <n-timeline-item type="default">
-                            <template #icon>
-                                <n-icon :component="IconAlertTriangle" size="20" />
-                            </template>
-                            <template #default>John doe created task about 1 hour ago</template>
-                        </n-timeline-item>
-                        <n-timeline-item type="default">
-                            <template #icon>
-                                <n-icon :component="IconMessage2" size="22" />
-                            </template>
-                            <template #default>
-                                <NoteItem :note="defaultNote" />
-                            </template>
-                        </n-timeline-item>
-                    </n-timeline>
-                </div>
-            </n-spin>
-        </n-drawer-content>
-    </n-drawer>
+            <ToggleMarkDownEditor v-model:value="noteBody" hide-preview placeholder="Add comment" />
+            <n-timeline>
+                <n-timeline-item type="default">
+                    <template #icon>
+                        <n-icon :component="IconAlertTriangle" size="20" />
+                    </template>
+                    <template #default>John doe created task about 1 hour ago</template>
+                </n-timeline-item>
+                <n-timeline-item type="default">
+                    <template #icon>
+                        <n-icon :component="IconMessage2" size="22" />
+                    </template>
+                    <template #default>
+                        <NoteItem :note="defaultNote" />
+                    </template>
+                </n-timeline-item>
+            </n-timeline>
+        </div>
+    </n-spin>
 </template>
 
 <style lang="css" scoped>

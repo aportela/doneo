@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { onMounted, ref } from 'vue'
+    import { onMounted, reactive, ref } from 'vue'
 
     import { NCard, NButton, NInput, NScrollbar, NGrid, NGridItem, NIcon, NSpace, NTag } from 'naive-ui'
 
@@ -11,8 +11,9 @@
     import { taskService } from '../services/task'
     import type { SearchRequest as SearchRequestTask } from '../types/dto'
 
-    import { Order } from '../../../shared/types/models/sort'
+    import type { Order } from '../../../shared/types/order'
     import { IconPaperclip, IconMessages } from '@tabler/icons-vue'
+    import { PAGER_DEFAULT_RESULTS_PAGE_NO_PAGINATION, type Pagination } from '../../../shared/types/pager'
 
     interface Task {
         id: string
@@ -43,20 +44,16 @@
         }
     }
 
-    const statusSort = new Order("index", "ASC");
+    const currentPagination = reactive<Pagination>({ enabled: false, currentPage: 1, resultsPage: PAGER_DEFAULT_RESULTS_PAGE_NO_PAGINATION, totalPages: 1, totalResults: 0 });
 
-    const tasksSort = new Order("createdAt", "DESC");
+    const statusOrder = reactive<Order>({ field: "index", direction: "ASC" });
+
+    const tasksOrder = reactive<Order>({ field: "createdAt", direction: "DESC" });
 
     const refreshStatus = async () => {
         const payload: SearchRequestStatus = {
-            pager: {
-                currentPage: 1,
-                resultsPage: 0,
-            },
-            order: {
-                field: statusSort.field,
-                sort: statusSort.sort,
-            },
+            pager: currentPagination,
+            order: statusOrder,
             filter: {
                 //name: filters.name.length > 0 ? filters.name : undefined,
             }
@@ -71,14 +68,8 @@
 
     const refreshTasks = async () => {
         const payload: SearchRequestTask = {
-            pager: {
-                currentPage: 1,
-                resultsPage: 0,
-            },
-            order: {
-                field: tasksSort.field,
-                sort: tasksSort.sort,
-            },
+            pager: currentPagination,
+            order: tasksOrder,
             filter: {
                 //name: filters.name.length > 0 ? filters.name : undefined,
             }

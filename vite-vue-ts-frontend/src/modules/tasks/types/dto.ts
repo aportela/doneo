@@ -45,6 +45,7 @@ export type PatchRequest = {
 };
 
 type SearchRequestFilter = {
+  slug?: string;
   summary?: string;
   priorityId?: string;
   statusId?: string;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, onMounted, onBeforeUnmount, type CSSProperties, nextTick } from 'vue';
+    import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NSwitch, NGrid, NGridItem, NCollapse, NCollapseItem } from 'naive-ui';
@@ -9,7 +9,7 @@
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { taskService } from '../services/task.ts';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import type { TaskResponse, AddRequest } from '../types/dto';
+    import type { TaskResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
     import TaskPrioritySelector from '../../task-priorities/components/TaskPrioritySelector.vue';
     import TaskStatusSelector from '../../task-statuses/components/TaskStatusSelector.vue';
@@ -17,21 +17,19 @@
 
     import { DEFAULT_INPUT_SIZE } from '../../../constants.ts';
 
-    interface NewTaskFormProps {
-        style?: string | CSSProperties;
+    interface Props {
         projectId: string;
     }
 
-    const emit = defineEmits(['add', 'cancel'])
+    const props = defineProps<Props>();
 
-    const props = defineProps<NewTaskFormProps>();
+    const emit = defineEmits(['add', 'cancel'])
 
     const { t } = useI18n();
 
     const openTaskAfterCreate = ref<boolean>(true);
 
     const task = ref<Task>(new Task());
-
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -120,15 +118,7 @@
         newTaskFormRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            const payload: AddRequest = {
-                summary: task.value.summary ?? "",
-                description: task.value.description,
-                priority: { id: task.value.priority.id ?? "" },
-                status: { id: task.value.status.id ?? "" },
-                estimatedTime: task.value.estimatedTime ?? 0,
-                tags: task.value.tags,
-            };
-            const addedTask: TaskResponse = await taskService.add(props.projectId, payload);
+            const addedTask: TaskResponse = await taskService.add(props.projectId, task.value.toAddRequestPayload());
             emit('add', addedTask, openTaskAfterCreate.value)
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -168,7 +158,6 @@
         }
     };
 
-
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -185,7 +174,7 @@
 </script>
 
 <template>
-    <n-card :style="style" bordered>
+    <n-card bordered>
         <template #header>
             <div class="doneo-flex-center-align">
                 <n-icon :component="IconPlus" />

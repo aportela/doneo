@@ -1652,16 +1652,6 @@ export default {
           header: {
             title: "Manage tasks",
           },
-          pager: {
-            totalItemsLabel: "Total tasks: {total}",
-          },
-          notifications: {
-            taskStatusUpdated: 'Task "{summary}" changed status to {status}',
-          },
-          errors: {
-            notFoundError: "We couldn’t find the specified task",
-            statusUpdateError: 'Error updating status for task "{summary}"',
-          },
         },
         TasksTable: {
           header: {
@@ -1703,6 +1693,13 @@ export default {
           },
           warnings: {
             noItemsFound: "No tasks found",
+          },
+          notifications: {
+            taskStatusUpdated: 'Task "{summary}" changed status to {status}',
+          },
+          errors: {
+            notFoundError: "We couldn’t find the specified task",
+            statusUpdateError: 'Error updating status for task "{summary}"',
           },
         },
         TaskPage: {
