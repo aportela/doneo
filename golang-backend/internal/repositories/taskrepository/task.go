@@ -379,7 +379,6 @@ func (repository *taskRepository) Search(ctx context.Context, dbExecutor databas
 				INNER JOIN project_user_role ON project_user_role.project_id = T.project_id AND project_user_role.user_id = ?
 				INNER JOIN roles ON roles.id = project_user_role.role_id AND roles.permissions_bitmask & ? = ?
 			`
-		fmt.Println(*filterDTO.ViewByUserID)
 		filterArgs = append(filterArgs, *filterDTO.ViewByUserID)
 		filterArgs = append(filterArgs, domain.PermissionViewProject)
 		filterArgs = append(filterArgs, domain.PermissionViewProject)
@@ -401,13 +400,23 @@ func (repository *taskRepository) Search(ctx context.Context, dbExecutor databas
 		filterArgs = append(filterArgs, *filterDTO.StatusID)
 	}
 	if filterDTO.CreatedAt != nil {
-		if filterDTO.CreatedAt.From != nil && *filterDTO.CreatedAt.From > 0 {
-			sqlWhereConditions = append(sqlWhereConditions, "T.created_at >= ?")
-			filterArgs = append(filterArgs, filterDTO.CreatedAt.From)
-		}
-		if filterDTO.CreatedAt.To != nil && *filterDTO.CreatedAt.To > 0 {
-			sqlWhereConditions = append(sqlWhereConditions, "T.created_at <= ?")
-			filterArgs = append(filterArgs, filterDTO.CreatedAt.To)
+		fmt.Println("0000")
+		if filterDTO.CreatedAt.Empty != nil && *filterDTO.CreatedAt.Empty {
+			fmt.Println(11)
+			sqlWhereConditions = append(sqlWhereConditions, "T.created_at IS NULL")
+		} else if filterDTO.CreatedAt.Filled != nil && *filterDTO.CreatedAt.Filled {
+			fmt.Println(22)
+			sqlWhereConditions = append(sqlWhereConditions, "T.created_at IS NOT NULL")
+		} else {
+			fmt.Println(33)
+			if filterDTO.CreatedAt.From != nil && *filterDTO.CreatedAt.From > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "T.created_at >= ?")
+				filterArgs = append(filterArgs, filterDTO.CreatedAt.From)
+			}
+			if filterDTO.CreatedAt.To != nil && *filterDTO.CreatedAt.To > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "T.created_at <= ?")
+				filterArgs = append(filterArgs, filterDTO.CreatedAt.To)
+			}
 		}
 	}
 	// TODO: updatedat, deletedat, startedat, finishedat, dueat

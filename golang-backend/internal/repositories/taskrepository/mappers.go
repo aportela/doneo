@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/aportela/doneo/internal/domain"
+	"github.com/aportela/doneo/internal/repositories"
 	"github.com/aportela/doneo/internal/utils"
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
@@ -79,6 +80,7 @@ func toFilterDTO(filter domain.SearchTaskFilter) searchFilterDTO {
 		Summary:         filter.Summary,
 		PriorityID:      filter.PriorityID,
 		StatusID:        filter.StatusID,
+		CreatedAt:       repositories.TimestampFilterToDTO(filter.CreatedAt),
 		CreatedByUserID: filter.CreatedByUserID,
 		ViewByUserID:    filter.ViewByUserID,
 	}
