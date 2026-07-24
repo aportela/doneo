@@ -234,6 +234,7 @@
 
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
+        showNoItemsWarningMessage.value = false;
         try {
             const payload: SearchRequest = {
                 pager: { ...currentPagination, currentPage: resetPager.value ? 1 : currentPagination.currentPage },
