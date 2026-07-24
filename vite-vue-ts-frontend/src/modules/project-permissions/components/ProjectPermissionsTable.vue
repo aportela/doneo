@@ -24,13 +24,13 @@
     import UserSelector from '../../users/components/UserSelector.vue';
     import RoleSelector from '../../roles/components/RoleSelector.vue';
     import ProjectPermissionSelect from '../../../shared/components/selectors/ProjectPermissionSelect.vue';
+    import TaskPermissionSelect from '../../../shared/components/selectors/TaskPermissionSelect.vue';
     import type { ProjectPermissionSelectValue } from '../../../shared/types/project-permission-select-value.ts';
     import type { TaskPermissionSelectValue } from '../../../shared/types/task-permission-select-value.ts';
-    import TaskPermissionSelect from '../../../shared/components/selectors/TaskPermissionSelect.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
 
     import { renderIcon, renderLabel, renderProjectPermissionIcons, renderTaskPermissionIcons } from '../../../shared/composables/naive-ui-helpers.ts';
-    import { DONEO_ICON_ACTION_DELETE, DONEO_ICON_ACTION_EDIT } from '../../../shared/types/icons.ts';
+    import { DONEO_ICON_ACTION_DELETE } from '../../../shared/types/icons.ts';
     import type { ProjectPermissionResponse, SearchResponse } from '../types/dto.ts';
     import ProjectPermissionForm from './ProjectPermissionForm.vue';
 
@@ -40,7 +40,7 @@
         projectId: string;
     }
 
-    const props = withDefaults(defineProps<Props>(), { id: "ProjectPermissionsTable" });;
+    const props = withDefaults(defineProps<Props>(), { id: "ProjectPermissionsTable" });
 
     const emit = defineEmits(['add', 'delete']);
 
@@ -356,14 +356,14 @@
                 <UserSelector v-if="column.field === 'user'" hideAvatar clearable :disabled="state.ajaxRunning"
                     v-model:id="filters.userId"
                     :placeholder="t('modules.projectPermission.components.ProjectPermissionsTable.filters.user.placeholder')" />
-                <RoleSelector v-if="column.field === 'role'" clearable :disabled="state.ajaxRunning"
+                <RoleSelector v-else-if="column.field === 'role'" clearable :disabled="state.ajaxRunning"
                     v-model:id="filters.roleId"
                     :placeholder="t('modules.projectPermission.components.ProjectPermissionsTable.filters.role.placeholder')" />
-                <ProjectPermissionSelect v-if="column.field === 'projectPermission'"
+                <ProjectPermissionSelect v-else-if="column.field === 'projectPermissions'"
                     v-model:permission="filters.projectPermission"
                     :placeholder="t('shared.components.selectors.ProjectPermissionSelect.placeholder')" clearable
                     ref="projectPermissionSelectorRef" />
-                <TaskPermissionSelect v-if="column.field === 'taskPermission'"
+                <TaskPermissionSelect v-else-if="column.field === 'taskPermissions'"
                     v-model:permission="filters.taskPermission"
                     :placeholder="t('shared.components.selectors.TaskPermissionSelect.placeholder')" clearable
                     ref="taskPermissionSelectorRef" />
