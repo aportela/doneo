@@ -29,7 +29,7 @@
     import type { RoleResponse, SearchRequest } from '../types/dto.ts';
     import RoleForm from './RoleForm.vue';
     import { DONEO_ICON_ACTION_ADD, DONEO_ICON_ACTION_DELETE, DONEO_ICON_ACTION_EDIT, DONEO_ICON_ACTION_SHOW } from '../../../shared/types/icons.ts';
-    import { renderIcon, renderLabel } from '../../../shared/composables/naive-ui-helpers.ts';
+    import { renderIcon, renderLabel, renderProjectPermissionIcons, renderTaskPermissionIcons } from '../../../shared/composables/naive-ui-helpers.ts';
 
     interface Props {
         id?: string;
@@ -141,101 +141,6 @@
         });
     });
 
-    type PermissionIcon = {
-        allowed: boolean;
-        icon: Component;
-        allowedKey: string;
-        deniedKey: string;
-    };
-
-
-    // return rendered permissions array
-    const renderPermissionIcons = (permissions: PermissionIcon[]) =>
-        h(
-            "div",
-            { class: "doneo-flex doneo-gap-2" },
-            permissions.map((permission) =>
-                h(
-                    NTooltip,
-                    { trigger: "hover" },
-                    {
-                        trigger: () =>
-                            h(NIcon, {
-                                size: 20,
-                                component: permission.icon,
-                                class: [
-                                    "doneo-cursor-help",
-                                    { "doneo-disabled-icon": !permission.allowed },
-                                ],
-                            }),
-                        default: () =>
-                            t(permission.allowed ? permission.allowedKey : permission.deniedKey),
-                    }
-                )
-            )
-        );
-
-    // get project permissions array from role row
-    const renderProjectPermissionColumn = (row: Role) => {
-        return renderPermissionIcons([
-            {
-                allowed: row.permissions.allowUpdateProject,
-                icon: DONEO_ICON_ACTION_EDIT,
-                allowedKey:
-                    "modules.role.components.RolesTable.body.columns.permissionsHints.updateProjectAllowed",
-                deniedKey:
-                    "modules.role.components.RolesTable.body.columns.permissionsHints.updateProjectDenied",
-            },
-            {
-                allowed: row.permissions.allowDeleteProject,
-                icon: DONEO_ICON_ACTION_DELETE,
-                allowedKey:
-                    "modules.role.components.RolesTable.body.columns.permissionsHints.deleteProjectAllowed",
-                deniedKey:
-                    "modules.role.components.RolesTable.body.columns.permissionsHints.deleteProjectDenied",
-            },
-            {
-                allowed: row.permissions.allowViewProject,
-                icon: DONEO_ICON_ACTION_SHOW,
-                allowedKey:
-                    "modules.role.components.RolesTable.body.columns.permissionsHints.viewProjectAllowed",
-                deniedKey:
-                    "modules.role.components.RolesTable.body.columns.permissionsHints.viewProjectDenied",
-            },
-            {
-                allowed: row.permissions.allowAddTask,
-                icon: DONEO_ICON_ACTION_ADD,
-                allowedKey:
-                    "modules.role.components.RolesTable.body.columns.permissionsHints.addTaskAllowed",
-                deniedKey:
-                    "modules.role.components.RolesTable.body.columns.permissionsHints.addTaskDenied",
-            },
-        ]);
-    };
-
-    // get task permissions array from role row
-    const renderTaskPermissionColumn = (row: Role) => {
-        return renderPermissionIcons([
-            {
-                allowed: row.permissions.allowUpdateTask,
-                icon: DONEO_ICON_ACTION_EDIT,
-                allowedKey: "modules.role.components.RolesTable.body.columns.permissionsHints.updateTaskAllowed",
-                deniedKey: "modules.role.components.RolesTable.body.columns.permissionsHints.updateTaskDenied",
-            },
-            {
-                allowed: row.permissions.allowDeleteTask,
-                icon: DONEO_ICON_ACTION_DELETE,
-                allowedKey: "modules.role.components.RolesTable.body.columns.permissionsHints.deleteTaskAllowed",
-                deniedKey: "modules.role.components.RolesTable.body.columns.permissionsHints.deleteTaskDenied",
-            },
-            {
-                allowed: row.permissions.allowViewTask,
-                icon: DONEO_ICON_ACTION_SHOW,
-                allowedKey: "modules.role.components.RolesTable.body.columns.permissionsHints.viewTaskAllowed",
-                deniedKey: "modules.role.components.RolesTable.body.columns.permissionsHints.viewTaskDenied",
-            },
-        ]);
-    };
 
     const columnDefinitions = reactive<TableHeaderColumn<Role>[]>([
         {
@@ -253,7 +158,7 @@
             sortable: false,
             align: "center",
             isFiltered: () => isFilteredByProjectPermission.value,
-            render: (row: Role) => renderProjectPermissionColumn(row),
+            render: (row: Role) => renderProjectPermissionIcons(row, t),
         },
         {
             label: t("modules.role.components.RolesTable.header.columns.taskPermissions"),
@@ -262,7 +167,7 @@
             sortable: false,
             align: "center",
             isFiltered: () => isFilteredByTaskPermission.value,
-            render: (row: Role) => renderTaskPermissionColumn(row),
+            render: (row: Role) => renderTaskPermissionIcons(row, t),
         },
     ]);
 
