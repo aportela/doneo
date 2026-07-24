@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, onMounted, onBeforeUnmount, type CSSProperties, nextTick } from 'vue';
+    import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
@@ -11,20 +11,18 @@
     import { handleAPIError } from '../../../api/client/errorHandler';
     import type { ProjectPermissionResponse, AddRequest, } from '../types/dto';
     import { getDefaultPermissions } from '../../roles/types/dto.ts';
-    import type { FormMode } from '../../../shared/types/form-mode';
     import { appBus } from '../../../shared/composables/bus';
     import UserSelector from '../../users/components/UserSelector.vue';
     import RoleSelector from '../../roles/components/RoleSelector.vue';
+    import { DONEO_ICON_ADD } from '../../../shared/types/icons.ts';
 
-    interface ProjectPermissionFormProps {
-        mode: FormMode;
-        projectId?: string | null;
-        style?: string | CSSProperties;
+    interface Props {
+        projectId: string;
     }
 
-    const emit = defineEmits(['add', 'update', 'cancel'])
+    const props = defineProps<Props>();
 
-    const props = defineProps<ProjectPermissionFormProps>();
+    const emit = defineEmits(['add', 'cancel'])
 
     const { t } = useI18n();
 
@@ -83,11 +81,7 @@
         projectPermissionFormRef.value?.restoreValidation();
         try {
             await projectPermissionFormRef.value?.validate();
-            if (props.mode === "add") {
-                await onAdd();
-            } else {
-                console.error("invalid form mode", { file: "ProjectPermissionForm.vue", method: "onSave" });
-            }
+            await onAdd();
         }
         catch (error: any) {
             console.warn("Warning", { file: "ProjectPermissionForm.vue", method: "onSave", details: "form validation error", error: error });
@@ -104,19 +98,8 @@
             projectPermissionFormRef.value?.restoreValidation();
             Object.assign(state, defaultAjaxStateRunning);
             try {
-                const payload: AddRequest = {
-                    user: {
-                        id: projectPermission.value.user.id ?? "",
-                        name: "",
-                    },
-                    role: {
-                        id: projectPermission.value.role.id ?? "",
-                        name: "",
-                        permissions: getDefaultPermissions(),
-                    }
-                };
-                const addedPermission: ProjectPermissionResponse = await projectPermissionService.add(props.projectId, payload);
-                emit('add', new ProjectPermission(addedPermission));
+                const addedProjectPermission: ProjectPermissionResponse = await projectPermissionService.add(props.projectId, projectPermission.value.toAddRequestPayload());
+                emit('add', new ProjectPermission(addedProjectPermission));
             } catch (error: unknown) {
                 state.ajaxErrors = true;
                 handleAPIError(error,
@@ -167,9 +150,6 @@
                 onAdd();
             }
         });
-        if (props.mode !== "add") {
-            console.error("invalid form mode", { file: "ProjectPermissionForm.vue", method: "onSave" });
-        }
     });
 
     onBeforeUnmount(() => {
@@ -178,11 +158,10 @@
 </script>
 
 <template>
-    <n-card :style="style" bordered>
+    <n-card bordered>
         <template #header>
             <div class="doneo-flex-center-align">
-                <!-- TOOD: icon alignment ??? -->
-                <n-icon :component="props.mode == 'add' ? IconPlus : IconEdit" />
+                <n-icon class="doneo-mr-4px" :component="DONEO_ICON_ADD" />
                 {{ t("modules.projectPermission.components.ProjectPermissionForm.headers.addProjectPermission") }}
             </div>
         </template>

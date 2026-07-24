@@ -1,70 +1,163 @@
 <script setup lang="ts">
-    import { h, ref, computed } from 'vue';
+    import { ref, reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount, h } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { useDialog, NEmpty, NTooltip, NIcon } from 'naive-ui';
-    import { IconTrash, IconEdit, IconEyeCheck, IconSquarePlus } from '@tabler/icons-vue';
+    import { NModal, useDialog, NIcon, NButton, NButtonGroup } from 'naive-ui';
 
-    import { renderIcon } from '../../../shared/composables/naive-ui-icon';
+    import { useLoadingStore } from '../../../stores/loading';
+    import { useCacheStore } from '../../../stores/cache.ts';
+
+    import { useNotify } from '../../../shared/composables/notification';
+    import { appBus } from '../../../shared/composables/bus';
+
+    import type { Order } from '../../../shared/types/order.ts';
     import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
-    import type { ProjectPermissionsTableFilters } from '../types/project-permissions-table-filter.ts';
 
-    import type { ReseteableComponent } from '../../../shared/types/ReseteableComponent.ts';
     import { ProjectPermission } from '../models/project-permission.ts';
 
+    import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
+    import { projectPermissionService } from '../services/project-permission.ts';
+    import { handleAPIError } from '../../../api/client/errorHandler';
+
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
-    import ClearTableFiltersButton from '../../../shared/components/buttons/ClearTableFiltersButton.vue';
-    import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
     import RoleSelector from '../../roles/components/RoleSelector.vue';
     import ProjectPermissionSelect from '../../../shared/components/selectors/ProjectPermissionSelect.vue';
+    import type { ProjectPermissionSelectValue } from '../../../shared/types/project-permission-select-value.ts';
+    import type { TaskPermissionSelectValue } from '../../../shared/types/task-permission-select-value.ts';
     import TaskPermissionSelect from '../../../shared/components/selectors/TaskPermissionSelect.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
 
+    import { renderIcon, renderLabel, renderProjectPermissionIcons, renderTaskPermissionIcons } from '../../../shared/composables/naive-ui-helpers.ts';
+    import { DONEO_ICON_ACTION_DELETE, DONEO_ICON_ACTION_EDIT } from '../../../shared/types/icons.ts';
+    import type { ProjectPermissionResponse, SearchResponse } from '../types/dto.ts';
+    import ProjectPermissionForm from './ProjectPermissionForm.vue';
+
     interface Props {
         id?: string;
-        disabled: boolean;
         readOnly?: boolean;
-        items: ProjectPermission[];
         projectId: string;
-        errorMessage?: string | null;
     }
-
-    const { t } = useI18n();
-    const dialog = useDialog();
-
-    const emit = defineEmits(['refresh', 'add', 'delete']);
 
     const props = withDefaults(defineProps<Props>(), { id: "ProjectPermissionsTable" });;
 
-    const projectPermissionSelectorRef = ref<ReseteableComponent | undefined>();
-    const taskPermissionSelectorRef = ref<ReseteableComponent | undefined>();
+    const emit = defineEmits(['add', 'delete']);
 
-    const filters = defineModel<ProjectPermissionsTableFilters>("filters", {
-        default: () => ({
+    const itemCount = defineModel<number>("itemCount", { default: 0 });
+
+    const { t } = useI18n();
+    const dialog = useDialog();
+    const { notify } = useNotify();
+
+    const loadingStore = useLoadingStore();
+    const tableSettingsStore = useTableSettingsStore();
+    const cacheStore = useCacheStore();
+
+    const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
+
+    watch(
+        () => state.ajaxRunning,
+        (ajaxRunning) => {
+            loadingStore.set(ajaxRunning);
+        }
+    );
+
+    const items = shallowRef<ProjectPermission[]>([]);
+
+    const tmpItem = ref<ProjectPermission>(new ProjectPermission());
+
+    const showNoItemsWarningMessage = ref<boolean>(false);
+
+    const currentOrder = reactive<Order>({ field: "name", direction: "ASC" });
+
+    const onSort = (newOrder: Order) => {
+        currentOrder.field = newOrder.field;
+        currentOrder.direction = newOrder.direction;
+        // we have all results, use local sorting for avoiding server load
+        if (currentOrder.direction === "ASC") {
+            items.value = [...items.value].sort((a, b) =>
+                currentOrder.field === "user" ? a.user.name.localeCompare(b.user.name) : String(a.role.name).localeCompare(String(b.role.name))
+            );
+        } else {
+            items.value = [...items.value].sort((a, b) =>
+                currentOrder.field === "user" ? b.user.name.localeCompare(a.user.name) : String(b.role.name).localeCompare(String(a.role.name))
+            );
+        }
+    };
+
+    const projectPermissionSelectorRef = ref<InstanceType<typeof ProjectPermissionSelect>[] | null>(null);
+    const taskPermissionSelectorRef = ref<InstanceType<typeof ProjectPermissionSelect>[] | null>(null);
+
+    interface ProjectPermissionsTableFilters {
+        userId: string | null;
+        roleId: string | null;
+        projectPermission: ProjectPermissionSelectValue | null;
+        taskPermission: TaskPermissionSelectValue | null;
+    };
+
+    const filters = reactive<ProjectPermissionsTableFilters>(
+        {
             userId: null,
             roleId: null,
             projectPermission: null,
             taskPermission: null,
-        })
-    });
-
-    const isFilteredByUser = computed<boolean>(() => filters.value.userId !== null);
-    const isFilteredByRole = computed<boolean>(() => filters.value.roleId !== null);
-    const isFilteredByProjectPermission = computed<boolean>(() => filters.value.projectPermission !== null);
-    const isFilteredByTaskPermission = computed<boolean>(() => filters.value.taskPermission !== null);
-
-    const hasFilters = computed<boolean>(() =>
-        isFilteredByUser.value || isFilteredByRole.value || isFilteredByProjectPermission.value || isFilteredByTaskPermission.value
+        }
     );
 
-    const columns = computed<TableHeaderColumn[]>(() => [
+    const isFilteredByUser = computed<boolean>(() => filters.userId !== null);
+    const isFilteredByRole = computed<boolean>(() => filters.roleId !== null);
+    const isFilteredByProjectPermission = computed<boolean>(() => filters.projectPermission !== null);
+    const isFilteredByTaskPermission = computed<boolean>(() => filters.taskPermission !== null);
+
+    const onClearFilters = () => {
+        filters.userId = null;
+        filters.roleId = null;
+        if (projectPermissionSelectorRef.value) {
+            projectPermissionSelectorRef.value[0]?.reset();
+        }
+        if (taskPermissionSelectorRef.value) {
+            taskPermissionSelectorRef.value[0]?.reset();
+        }
+    };
+
+    const localFilteredItems = computed(() => {
+        return items.value.filter((permission: ProjectPermission) => {
+            return (
+                (filters.userId === null || filters.userId === permission.user.id) &&
+                (filters.roleId === null || filters.roleId === permission.role.id) &&
+                (filters.projectPermission === null || (filters.projectPermission !== null && (
+                    (filters.projectPermission === "updateProjectAllowed" && permission.role.permissions.allowUpdateProject) ||
+                    (filters.projectPermission === "updateProjectDenied" && !permission.role.permissions.allowUpdateProject) ||
+                    (filters.projectPermission === "deleteProjectAllowed" && permission.role.permissions.allowDeleteProject) ||
+                    (filters.projectPermission === "deleteProjectDenied" && !permission.role.permissions.allowDeleteProject) ||
+                    (filters.projectPermission === "viewProjectAllowed" && permission.role.permissions.allowViewProject) ||
+                    (filters.projectPermission === "viewProjectDenied" && !permission.role.permissions.allowViewProject) ||
+                    (filters.projectPermission === "addTaskAllowed" && permission.role.permissions.allowAddTask) ||
+                    (filters.projectPermission === "addTaskDenied" && !permission.role.permissions.allowAddTask)
+                ))
+                ) &&
+                (filters.taskPermission === null || (filters.taskPermission !== null && (
+                    (filters.taskPermission === "updateTaskAllowed" && permission.role.permissions.allowUpdateTask) ||
+                    (filters.taskPermission === "updateTaskDenied" && !permission.role.permissions.allowUpdateTask) ||
+                    (filters.taskPermission === "deleteTaskAllowed" && permission.role.permissions.allowDeleteTask) ||
+                    (filters.taskPermission === "deleteTaskDenied" && !permission.role.permissions.allowDeleteTask) ||
+                    (filters.taskPermission === "viewTaskAllowed" && permission.role.permissions.allowViewTask) ||
+                    (filters.taskPermission === "viewTaskDenied" && !permission.role.permissions.allowViewTask)
+                ))
+                )
+            );
+        });
+    });
+
+    const columnDefinitions = reactive<TableHeaderColumn<ProjectPermission>[]>([
         {
             label: t("modules.projectPermission.components.projectPermissionsTable.header.columns.user"),
             field: "user",
             visible: true,
             sortable: false,
             isFiltered: () => isFilteredByUser.value,
+            render: (row: ProjectPermission) => h(AvatarUserName, { userId: row.user.id, userName: row.user.name }),
         },
         {
             label: t("modules.projectPermission.components.projectPermissionsTable.header.columns.role"),
@@ -72,6 +165,7 @@
             visible: true,
             sortable: false,
             isFiltered: () => isFilteredByRole.value,
+            render: (row: ProjectPermission) => renderLabel(row.role.name),
         },
         {
             label: t("modules.projectPermission.components.projectPermissionsTable.header.columns.projectPermissions"),
@@ -80,6 +174,7 @@
             sortable: false,
             isFiltered: () => isFilteredByProjectPermission.value,
             align: "center",
+            render: (row: ProjectPermission) => renderProjectPermissionIcons(row.role, t),
         },
         {
             label: t("modules.projectPermission.components.projectPermissionsTable.header.columns.taskPermissions"),
@@ -88,21 +183,77 @@
             sortable: false,
             isFiltered: () => isFilteredByTaskPermission.value,
             align: "center",
+            render: (row: ProjectPermission) => renderTaskPermissionIcons(row.role, t),
         },
     ]);
 
-    const onRefresh = () => {
-        emit("refresh");
+    // create (if not found) default settings for this table (column order & visibility)
+    tableSettingsStore.register(props.id, { columns: columnDefinitions.map((column) => { return { field: column.field, visible: column.visible } }) ?? [] });
+
+    // restore previous settings
+    const tableSettings = tableSettingsStore.get(props.id);
+
+    // build columns based on saved order visibility settings
+    const columns = computed<TableHeaderColumn<ProjectPermission>[]>(() =>
+        tableSettings.columns.map((column) => { // get saved ordered columns
+            const definition = columnDefinitions.find((c) => c.field === column.field);
+            return {
+                label: definition?.label ?? "",
+                field: column.field,
+                visible: column.visible,
+                sortable: definition!.sortable,
+                align: definition?.align,
+                isFiltered: definition?.isFiltered ?? (() => false),
+                render: definition?.render ?? (() => "")
+            };
+        })
+    );
+
+    const onDelete = async (projectPermission: ProjectPermission) => {
+        if (projectPermission.id) {
+            Object.assign(state, defaultAjaxStateRunning);
+            try {
+                await projectPermissionService.delete(props.projectId, projectPermission.id);
+                items.value = items.value.filter((item) => item.id != projectPermission.id)
+                itemCount.value = items.value?.length ?? 0;
+                notify('success', t("modules.projectPermission.components.projectPermissionsTab.notifications.projectPermissionDeleted", { user: projectPermission.user.name, role: projectPermission.role.name }));
+            } catch (error: unknown) {
+                state.ajaxErrors = true;
+                handleAPIError(error,
+                    (apiError) => {
+                        switch (apiError.response?.status) {
+                            case 401:
+                                state.ajaxErrors = false;
+                                tmpItem.value = projectPermission;
+                                appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPermissions.onDelete" } });
+                                break;
+                            case 404:
+                                state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.notFoundError");
+                                break;
+                            default:
+                                state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.deleteError");
+                                break;
+                        }
+                    },
+                    (fatalError) => {
+                        state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.deleteError");
+                        console.error("Unhandled API error", { file: "ProjectPermissions.vue", method: "onRefresh" }, { err: fatalError });
+                    });
+            } finally {
+                state.ajaxRunning = false;
+                if (state.ajaxErrorMessage) {
+                    appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+                }
+            }
+        } else {
+            console.error("(project permission id || project id) not set", { file: "ProjectPermissions.vue", method: "onDelete" });
+        }
     };
 
-    const onAdd = () => {
-        emit("add");
-    };
-
-    const onConfirmDelete = (projectPermission: ProjectPermission, index: number) => {
+    const onConfirmDelete = (projectPermission: ProjectPermission) => {
         dialog.warning({
             title: t("modules.projectPermission.components.projectPermissionsTable.dialogs.deleteConfirmation.title"),
-            icon: renderIcon(IconTrash)(24),
+            icon: renderIcon(DONEO_ICON_ACTION_DELETE, { size: 24 }),
             content: () =>
                 h('div', [
                     t("modules.projectPermission.components.projectPermissionsTable.dialogs.deleteConfirmation.message", { user: projectPermission.user.name, role: projectPermission.role.name }),
@@ -113,151 +264,128 @@
             positiveText: t("shared.buttons.Delete.label"),
             negativeText: t("shared.buttons.Cancel.label"),
             onPositiveClick: () => {
-                emit("delete", projectPermission, index)
+                onDelete(projectPermission);
             },
         });
     };
 
-    const onClearFilters = () => {
-        filters.value.userId = null;
-        filters.value.roleId = null;
-        projectPermissionSelectorRef.value?.reset();
-        taskPermissionSelectorRef.value?.reset();
+    const onRefresh = async () => {
+        Object.assign(state, defaultAjaxStateRunning);
+        showNoItemsWarningMessage.value = false;
+        try {
+            const results: SearchResponse = await projectPermissionService.search(props.projectId);
+            items.value = results.projectPermissions.map((permission) => new ProjectPermission(permission));
+            itemCount.value = items.value?.length ?? 0;
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPermissions.onRefresh" } });
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.refreshError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissionsTab.errors.refreshError");
+                    console.error("Unhandled API error", { file: "ProjectPermissions.vue", method: "onRefresh" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
+        }
     };
 
-    const permissionIconSize = 22;
+    const showFormModal = ref<boolean>(false);
+
+    const onAdd = () => {
+        tmpItem.value = new ProjectPermission();
+        showFormModal.value = true;
+    };
+
+    const onProjectPermissionAdded = (projectPermission: ProjectPermissionResponse) => {
+        cacheStore.clearUsersCache();
+        showFormModal.value = false;
+        tmpItem.value = new ProjectPermission();
+        notify('success', t("modules.projectPermission.components.projectPermissionsTab.notifications.projectPermissionAdded", { user: projectPermission.user.name, role: projectPermission.role.name }));
+        onRefresh();
+    };
+
+    const hideFormModal = () => {
+        showFormModal.value = false;
+        tmpItem.value = new ProjectPermission();
+    };
+
+    let stopBusReauthListener: () => void;
+
+    onMounted(() => {
+        onRefresh();
+        stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
+            if (payload.to.includes("ProjectPermissionsTable.onRefresh")) {
+                onRefresh();
+            } else if (payload.to.includes("ProjectPermissionsTable.onDelete")) {
+                onDelete(tmpItem.value);
+            }
+        });
+    });
+
+    onBeforeUnmount(() => {
+        stopBusReauthListener();
+    });
 </script>
 
 <template>
-    <ManageTable :id="props.id" size="small" :columns="columns" @refresh="onRefresh" @add="onAdd"
-        :hide-add="props.readOnly">
-        <template #thead>
-            <tr>
-                <th>
-                    <UserSelector hideAvatar clearable :disabled="props.disabled" v-model:id="filters.userId"
-                        :placeholder="t('modules.projectPermission.components.projectPermissionsTable.filters.user.placeholder')" />
-                </th>
-                <th>
-                    <RoleSelector clearable :disabled="props.disabled" v-model:id="filters.roleId"
-                        :placeholder="t('modules.projectPermission.components.projectPermissionsTable.filters.role.placeholder')" />
-                </th>
-                <th>
-                    <ProjectPermissionSelect v-model:permission="filters.projectPermission"
-                        :placeholder="t('shared.components.selectors.ProjectPermissionSelect.placeholder')" clearable
-                        ref="projectPermissionSelectorRef" />
-                </th>
-                <th>
-                    <TaskPermissionSelect v-model:permission="filters.taskPermission"
-                        :placeholder="t('shared.components.selectors.TaskPermissionSelect.placeholder')" clearable
-                        ref="taskPermissionSelectorRef" />
-                </th>
-                <th class="doneo-text-center">
-                    <ClearTableFiltersButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
-                </th>
-            </tr>
+    <n-modal v-model:show="showFormModal" v-if="showFormModal">
+        <ProjectPermissionForm class="project-permission-form" :project-id="props.projectId"
+            @add="onProjectPermissionAdded" @cancel="hideFormModal" />
+    </n-modal>
+    <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="localFilteredItems"
+        :row-key="row => row.id" :columns="columns" :order="currentOrder"
+        :show-no-items-warning-message="showNoItemsWarningMessage || (items.length > 0 && localFilteredItems.length === 0)"
+        :no-items-warning-message="t('modules.projectPermission.components.projectPermissionsTable.warnings.noItemsFound')"
+        @sort="onSort" @refresh="onRefresh" @add="onAdd" @clear-filters="onClearFilters"
+        :buttons="props.readOnly ? ['refresh', 'settings'] : ['refresh', 'add', 'settings']">
+        <template #thead-column-filters="{ columns }">
+            <th v-for="column in columns">
+                <UserSelector v-if="column.field === 'user'" hideAvatar clearable :disabled="state.ajaxRunning"
+                    v-model:id="filters.userId"
+                    :placeholder="t('modules.projectPermission.components.projectPermissionsTable.filters.user.placeholder')" />
+                <RoleSelector v-if="column.field === 'role'" clearable :disabled="state.ajaxRunning"
+                    v-model:id="filters.roleId"
+                    :placeholder="t('modules.projectPermission.components.projectPermissionsTable.filters.role.placeholder')" />
+                <ProjectPermissionSelect v-if="column.field === 'projectPermission'"
+                    v-model:permission="filters.projectPermission"
+                    :placeholder="t('shared.components.selectors.ProjectPermissionSelect.placeholder')" clearable
+                    ref="projectPermissionSelectorRef" />
+                <TaskPermissionSelect v-if="column.field === 'taskPermission'"
+                    v-model:permission="filters.taskPermission"
+                    :placeholder="t('shared.components.selectors.TaskPermissionSelect.placeholder')" clearable
+                    ref="taskPermissionSelectorRef" />
+            </th>
         </template>
-        <template #tbody v-if="!props.errorMessage">
-            <tr v-for="projectPermission, index in items" :key="projectPermission.id ?? index">
-                <td>
-                    <AvatarUserName :user-id="projectPermission.user?.id ?? ''"
-                        :user-name="projectPermission.user?.name ?? ''" />
-                </td>
-                <td>{{ projectPermission.role.name }}</td>
-                <td class="doneo-text-center">
-                    <n-tooltip trigger="hover">
-                        <template #trigger>
-                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconEdit"
-                                :class="{ 'doneo-disabled-icon': !projectPermission.role.permissions.allowUpdateProject }" />
-                        </template>
-                        {{ t(projectPermission.role.permissions.allowUpdateProject ?
-                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.updateProjectAllowed"
-                            :
-                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.updateProjectDenied")
-                        }}
-                    </n-tooltip>
-                    <n-tooltip trigger="hover">
-                        <template #trigger>
-                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconTrash"
-                                :class="{ 'doneo-disabled-icon': !projectPermission.role.permissions.allowDeleteProject }" />
-                        </template>
-                        {{ t(projectPermission.role.permissions.allowDeleteProject ?
-                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.deleteProjectAllowed"
-                            :
-                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.deleteProjectDenied")
-                        }}
-                    </n-tooltip>
-                    <n-tooltip trigger="hover">
-                        <template #trigger>
-                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconEyeCheck"
-                                :class="{ 'doneo-disabled-icon': !projectPermission.role.permissions.allowViewProject }" />
-                        </template>
-                        {{ t(projectPermission.role.permissions.allowViewProject ?
-                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.viewProjectAllowed"
-                            :
-                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.viewProjectDenied")
-                        }}
-                    </n-tooltip>
-                    <n-tooltip trigger="hover">
-                        <template #trigger>
-                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconSquarePlus"
-                                :class="{ 'doneo-disabled-icon': !projectPermission.role.permissions.allowAddTask }" />
-                        </template>
-                        {{ t(projectPermission.role.permissions.allowAddTask ?
-                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.addTaskAllowed"
-                            :
-                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.addTaskDenied")
-                        }}
-                    </n-tooltip>
-                </td>
-                <td class="doneo-text-center">
-                    <n-tooltip trigger="hover">
-                        <template #trigger>
-                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconEdit"
-                                :class="{ 'doneo-disabled-icon': !projectPermission.role.permissions.allowUpdateTask }" />
-                        </template>
-                        {{ t(projectPermission.role.permissions.allowUpdateTask ?
-                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.updateTaskAllowed"
-                            :
-                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.updateTaskDenied")
-                        }}
-                    </n-tooltip>
-                    <n-tooltip trigger="hover">
-                        <template #trigger>
-                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconTrash"
-                                :class="{ 'doneo-disabled-icon': !projectPermission.role.permissions.allowDeleteTask }" />
-                        </template>
-                        {{ t(projectPermission.role.permissions.allowDeleteTask ?
-                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.deleteTaskAllowed"
-                            :
-                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.deleteTaskDenied")
-                        }}
-                    </n-tooltip>
-                    <n-tooltip trigger="hover">
-                        <template #trigger>
-                            <n-icon :size="permissionIconSize" class="doneo-cursor-help" :component="IconEyeCheck"
-                                :class="{ 'doneo-disabled-icon': !projectPermission.role.permissions.allowViewTask }" />
-                        </template>
-                        {{ t(projectPermission.role.permissions.allowViewTask ?
-                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.viewTaskAllowed"
-                            :
-                            "modules.projectPermission.components.projectPermissionsTable.body.columns.permissionsHints.viewTaskDenied")
-                        }}
-                    </n-tooltip>
-                </td>
-                <td class="doneo-text-center">
-                    <ManageTableActionButtons show-delete :delete-disabled="props.readOnly"
-                        @delete="onConfirmDelete(projectPermission, index)" :disabled="props.disabled" />
-                </td>
-            </tr>
-            <tr>
-                <td :colspan="columns.length + 1" v-if="items.length < 1 && !props.disabled">
-                    <n-empty
-                        :description="t('modules.projectPermission.components.projectPermissionsTable.warnings.noItemsFound')">
-                    </n-empty>
-                </td>
-            </tr>
+        <template #rowactions="{ row }">
+            <n-button-group class="doneo-table-actions-button-group" size="small">
+                <n-button @click="onConfirmDelete(row)" :disabled="state.ajaxRunning || props.readOnly"
+                    class="doneo-table-actions-button">
+                    {{ t("shared.buttons.Delete.label") }}
+                    <template #icon>
+                        <n-icon :component="DONEO_ICON_ACTION_DELETE" />
+                    </template>
+                </n-button>
+            </n-button-group>
         </template>
     </ManageTable>
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+    .project-permission-form {
+        width: 95%;
+        max-width: 640px;
+    }
+</style>
