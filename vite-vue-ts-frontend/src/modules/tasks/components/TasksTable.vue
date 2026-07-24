@@ -393,7 +393,7 @@
     <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning || props.readOnly" :rows="items"
         :row-key="row => row.id" :columns="columns" :order="currentOrder" :pager-data="currentPagination"
         pager-position="both" :show-no-items-warning-message="showNoItemsWarningMessage"
-        :no-items-warning-message="t('modules.user.components.UsersTable.warnings.noItemsFound')" @sort="onSort"
+        :no-items-warning-message="t('modules.task.components.TasksTable.warnings.noItemsFound')" @sort="onSort"
         @refresh="onRefresh" @add="onAdd" @pager-changed="onPagerChanged" @clear-filters="onClearFilters"
         :buttons="props.projectId && !props.readOnly ? ['refresh', 'add', 'settings'] : ['refresh', 'settings']">
         <template #thead-column-filters="{ columns }">
