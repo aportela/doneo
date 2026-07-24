@@ -1,8 +1,8 @@
 <script setup lang="ts">
-    import { ref, reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount, h, type Component } from 'vue';
+    import { ref, reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount, h } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NModal, useDialog, NIcon, NTooltip, NButton, NButtonGroup } from 'naive-ui';
+    import { NModal, useDialog, NIcon, NButton, NButtonGroup } from 'naive-ui';
 
     import { useLoadingStore } from '../../../stores/loading';
     import { useCacheStore } from '../../../stores/cache.ts';
@@ -28,7 +28,7 @@
     import type { TaskPermissionSelectValue } from '../../../shared/types/task-permission-select-value.ts';
     import type { RoleResponse, SearchRequest } from '../types/dto.ts';
     import RoleForm from './RoleForm.vue';
-    import { DONEO_ICON_ACTION_ADD, DONEO_ICON_ACTION_DELETE, DONEO_ICON_ACTION_EDIT, DONEO_ICON_ACTION_SHOW } from '../../../shared/types/icons.ts';
+    import { DONEO_ICON_ACTION_DELETE, DONEO_ICON_ACTION_EDIT } from '../../../shared/types/icons.ts';
     import { renderIcon, renderLabel, renderProjectPermissionIcons, renderTaskPermissionIcons } from '../../../shared/composables/naive-ui-helpers.ts';
 
     interface Props {
