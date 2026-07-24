@@ -1075,7 +1075,7 @@ export default {
             userAlreadyExists: "User already exists",
           },
         },
-        projectPermissionsTable: {
+        ProjectPermissionsTable: {
           header: {
             columns: {
               user: "User",

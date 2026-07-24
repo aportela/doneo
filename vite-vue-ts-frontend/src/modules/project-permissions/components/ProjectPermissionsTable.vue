@@ -152,7 +152,7 @@
 
     const columnDefinitions = reactive<TableHeaderColumn<ProjectPermission>[]>([
         {
-            label: t("modules.projectPermission.components.ProjectPermissionsTablele.header.columns.user"),
+            label: t("modules.projectPermission.components.ProjectPermissionsTable.header.columns.user"),
             field: "user",
             visible: true,
             sortable: false,
@@ -160,7 +160,7 @@
             render: (row: ProjectPermission) => h(AvatarUserName, { userId: row.user.id, userName: row.user.name }),
         },
         {
-            label: t("modules.projectPermission.components.ProjectPermissionsTablele.header.columns.role"),
+            label: t("modules.projectPermission.components.ProjectPermissionsTable.header.columns.role"),
             field: "role",
             visible: true,
             sortable: false,
@@ -168,7 +168,7 @@
             render: (row: ProjectPermission) => renderLabel(row.role.name),
         },
         {
-            label: t("modules.projectPermission.components.ProjectPermissionsTablele.header.columns.projectPermissions"),
+            label: t("modules.projectPermission.components.ProjectPermissionsTable.header.columns.projectPermissions"),
             field: "projectPermissions",
             visible: true,
             sortable: false,
@@ -177,7 +177,7 @@
             render: (row: ProjectPermission) => renderProjectPermissionIcons(row.role, t),
         },
         {
-            label: t("modules.projectPermission.components.ProjectPermissionsTablele.header.columns.taskPermissions"),
+            label: t("modules.projectPermission.components.ProjectPermissionsTable.header.columns.taskPermissions"),
             field: "taskPermissions",
             visible: true,
             sortable: false,
@@ -252,11 +252,11 @@
 
     const onConfirmDelete = (projectPermission: ProjectPermission) => {
         dialog.warning({
-            title: t("modules.projectPermission.components.ProjectPermissionsTablele.dialogs.deleteConfirmation.title"),
+            title: t("modules.projectPermission.components.ProjectPermissionsTable.dialogs.deleteConfirmation.title"),
             icon: renderIcon(DONEO_ICON_ACTION_DELETE, { size: 24 }),
             content: () =>
                 h('div', [
-                    t("modules.projectPermission.components.ProjectPermissionsTablele.dialogs.deleteConfirmation.message", { user: projectPermission.user.name, role: projectPermission.role.name }),
+                    t("modules.projectPermission.components.ProjectPermissionsTable.dialogs.deleteConfirmation.message", { user: projectPermission.user.name, role: projectPermission.role.name }),
                     h('br'),
                     h('br'),
                     t("shared.components.dialogs.confirmation.continueMessage"),
@@ -348,17 +348,17 @@
     <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="localFilteredItems"
         :row-key="row => row.id" :columns="columns" :order="currentOrder"
         :show-no-items-warning-message="showNoItemsWarningMessage || (items.length > 0 && localFilteredItems.length === 0)"
-        :no-items-warning-message="t('modules.projectPermission.components.ProjectPermissionsTablele.warnings.noItemsFound')"
+        :no-items-warning-message="t('modules.projectPermission.components.ProjectPermissionsTable.warnings.noItemsFound')"
         @sort="onSort" @refresh="onRefresh" @add="onAdd" @clear-filters="onClearFilters"
         :buttons="props.readOnly ? ['refresh', 'settings'] : ['refresh', 'add', 'settings']">
         <template #thead-column-filters="{ columns }">
             <th v-for="column in columns">
                 <UserSelector v-if="column.field === 'user'" hideAvatar clearable :disabled="state.ajaxRunning"
                     v-model:id="filters.userId"
-                    :placeholder="t('modules.projectPermission.components.ProjectPermissionsTablele.filters.user.placeholder')" />
+                    :placeholder="t('modules.projectPermission.components.ProjectPermissionsTable.filters.user.placeholder')" />
                 <RoleSelector v-if="column.field === 'role'" clearable :disabled="state.ajaxRunning"
                     v-model:id="filters.roleId"
-                    :placeholder="t('modules.projectPermission.components.ProjectPermissionsTablele.filters.role.placeholder')" />
+                    :placeholder="t('modules.projectPermission.components.ProjectPermissionsTable.filters.role.placeholder')" />
                 <ProjectPermissionSelect v-if="column.field === 'projectPermission'"
                     v-model:permission="filters.projectPermission"
                     :placeholder="t('shared.components.selectors.ProjectPermissionSelect.placeholder')" clearable
