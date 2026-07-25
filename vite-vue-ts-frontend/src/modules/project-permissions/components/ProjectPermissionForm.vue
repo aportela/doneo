@@ -3,14 +3,13 @@
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
-    import { IconCancel, IconDeviceFloppy, IconEdit, IconPlus } from '@tabler/icons-vue';
+    import { IconCancel, IconDeviceFloppy } from '@tabler/icons-vue';
 
     import { ProjectPermission } from '../models/project-permission.ts';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { projectPermissionService } from '../services/project-permission.ts';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import type { ProjectPermissionResponse, AddRequest, } from '../types/dto';
-    import { getDefaultPermissions } from '../../roles/types/dto.ts';
+    import type { ProjectPermissionResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
     import UserSelector from '../../users/components/UserSelector.vue';
     import RoleSelector from '../../roles/components/RoleSelector.vue';
