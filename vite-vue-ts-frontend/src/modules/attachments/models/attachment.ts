@@ -4,7 +4,7 @@ import { IDate } from "../../../shared/types/idate";
 import { isAudio, isImage, isPDF } from "../../../shared/composables/fileUtils";
 
 export class Attachment {
-  id: string | null;
+  id: string;
   createdBy: UserBase;
   createdAt: IDate;
   name: string;
@@ -12,7 +12,7 @@ export class Attachment {
   size: number;
 
   constructor(data?: AttachmentDTO) {
-    this.id = data?.id ?? null;
+    this.id = data?.id ?? "";
     this.createdBy = new UserBase(data?.createdBy);
     this.createdAt = new IDate(data?.createdAt ?? null);
     this.name = data?.name ?? "";
@@ -65,7 +65,7 @@ export class Attachment {
 
   toDTO(): AttachmentDTO {
     return {
-      id: this.id ?? "",
+      id: this.id,
       createdBy: this.createdBy.toDTO(),
       createdAt: this.createdAt?.msTimestamp ?? 0,
       name: this.name,
