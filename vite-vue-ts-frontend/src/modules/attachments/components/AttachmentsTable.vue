@@ -29,7 +29,7 @@
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import { formatBytes } from '../../../shared/composables/format.ts';
     import type { TimestampRange } from '../../../shared/composables/timestamps.ts';
-    import { renderIcon } from '../../../shared/composables/naive-ui-helpers.ts';
+    import { renderIcon, renderLabel } from '../../../shared/composables/naive-ui-helpers.ts';
 
     import UploadDialog from './UploadDialog.vue';
     import { bgDownload } from '../../../shared/composables/axios.ts';
@@ -46,7 +46,8 @@
         taskId?: string;
     }
 
-    const props = withDefaults(defineProps<Props>(), { id: "AttachmentsTable" });;
+    // TODO: this component is not completed, only warnings removed, missing i18n labels & code cleanups
+    const props = withDefaults(defineProps<Props>(), { id: "AttachmentsTable" });
 
     const itemCount = defineModel<number>("itemCount", { default: 0 });
 
@@ -106,6 +107,7 @@
         uploadCount.value = 0;
         showUploadModal.value = true;
     };
+
     const createdAtFilterRef = ref<InstanceType<typeof DateFilterSelect>[] | null>(null);
 
     interface AttachmentsTableFilters {
@@ -192,9 +194,7 @@
             visible: true,
             sortable: false,
             isFiltered: () => isFilteredByName.value,
-            render: (row: Attachment) => {
-                return h("span", {}, { default: () => row.name });
-            }
+            render: (row: Attachment) => renderLabel(row.name),
         },
         {
             label: t("modules.projectAttachment.components.projectAttachmentsTable.header.columns.size"),
@@ -202,9 +202,7 @@
             visible: true,
             sortable: false,
             isFiltered: () => false,
-            render: (row: Attachment) => {
-                return h("span", {}, { default: () => formatBytes(row.size) });
-            }
+            render: (row: Attachment) => renderLabel(formatBytes(row.size)),
         },
         {
             label: t("modules.projectAttachment.components.projectAttachmentsTable.header.columns.contentType"),
@@ -212,9 +210,7 @@
             visible: true,
             sortable: false,
             isFiltered: () => isFilteredByContentType.value,
-            render: (row: Attachment) => {
-                return h("span", {}, { default: () => row.contentType });
-            }
+            render: (row: Attachment) => renderLabel(row.contentType),
         },
         {
             label: t("modules.project.components.ProjectsTable.header.columns.createdAt"),
@@ -222,9 +218,8 @@
             visible: true,
             sortable: false,
             isFiltered: () => isFilteredByCreatedAt.value,
-            render: (row: Attachment) => {
-                return h("span", {}, { default: () => row.createdAt.toCustomMaskString(userSettingsStore.currentDatetimeMask) });
-            }
+            render: (row: Attachment) => renderLabel(row.createdAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) ?? ""),
+
         },
         {
             label: t("modules.project.components.ProjectsTable.header.columns.createdBy"),

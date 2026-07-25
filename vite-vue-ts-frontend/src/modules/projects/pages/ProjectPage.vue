@@ -18,10 +18,10 @@
     import ProjectPermissionsTab from '../components/tabs/Permissions.vue';
     import ProjectNotesTab from '../components/tabs/Notes.vue';
     import ProjectPagesTab from '../components/tabs/Pages.vue';
-    import ProjectHistoryTab from '../components/tabs/History.vue';
     import type { ProjectResponse } from '../types/dto.ts';
     import { Project } from '../models/project.ts';
     import AttachmentsTable from '../../attachments/components/AttachmentsTable.vue';
+    import HistoryOperationsTable from '../../history-operations/components/HistoryOperationsTable.vue';
 
     const { t } = useI18n();
     const loadingStore = useLoadingStore();
@@ -173,7 +173,7 @@
         </n-tab-pane>
         <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy" key="history"
             :disabled="!projectId || (!project.allowedOperations.updateProject && project.historyOperationsCount === 0)">
-            <ProjectHistoryTab v-if="projectId" :project-id="projectId"
+            <HistoryOperationsTable v-if="projectId" :project-id="projectId"
                 v-model:item-count="project.historyOperationsCount" :key="project.historyOperationsCount" />
         </n-tab-pane>
         <n-tab-pane name="tasks" display-directive="show:lazy" key="tasks"

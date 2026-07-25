@@ -14,10 +14,10 @@
     import TaskMetadataTab from '../components/tabs/Metadata.vue';
     import TaskNotesTab from '../components/tabs/Notes.vue';
     import TaskTimeTrackingsTab from '../components/tabs/TimeTrackings.vue';
-    import TaskHistoryTab from '../components/tabs/History.vue';
     import { Task } from '../models/tasks.ts';
     import type { TaskResponse } from '../types/dto.ts';
     import AttachmentsTable from '../../attachments/components/AttachmentsTable.vue';
+    import HistoryOperationsTable from '../../history-operations/components/HistoryOperationsTable.vue';
 
     const { t } = useI18n();
     const loadingStore = useLoadingStore();
@@ -154,7 +154,7 @@
         </n-tab-pane>
         <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy" key="history"
             :disabled="!projectId || !taskId || (!task.allowedOperations.updateTask && task.historyOperationsCount === 0)">
-            <TaskHistoryTab v-if="projectId && taskId" :project-id="projectId" :task-id="taskId"
+            <HistoryOperationsTable v-if="projectId && taskId" :project-id="projectId" :task-id="taskId"
                 :key="task.historyOperationsCount" />
         </n-tab-pane>
     </n-tabs>
