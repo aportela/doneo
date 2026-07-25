@@ -5,7 +5,7 @@
 
     import { NModal, NButtonGroup, NButton, NIcon, NDrawer, NDrawerContent, NFlex } from 'naive-ui';
 
-    import { DONEO_ICON_ACTION_CANCEL, DONEO_ICON_ACTION_EDIT, DONEO_ICON_ACTION_OPEN, DONEO_ICON_ACTION_PREVIEW } from '../../../shared/types/icons.ts';
+    import { DONEO_ICON_ACTION_CANCEL, DONEO_ICON_ACTION_EDIT, DONEO_ICON_ACTION_PREVIEW } from '../../../shared/types/icons.ts';
 
     import { useLoadingStore } from '../../../stores/loading';
     import { useUserSettingsStore } from '../../../stores/userSettings.ts';
@@ -38,7 +38,6 @@
     import { renderColoredTag, renderLabel } from '../../../shared/composables/naive-ui-helpers.ts';
 
     import ProjectResumeFloatingCard from './ProjectResumeFloatingCard.vue';
-    import { DONEO_ICON_MAXIMIZE } from '../../../shared/types/icons.ts';
 
     interface Props {
         id?: string;

@@ -17,11 +17,11 @@
     import ProjectTasksTab from '../components/tabs/Tasks.vue';
     import ProjectPermissionsTab from '../components/tabs/Permissions.vue';
     import ProjectNotesTab from '../components/tabs/Notes.vue';
-    import ProjectPagesTab from '../components/tabs/Pages.vue';
     import type { ProjectResponse } from '../types/dto.ts';
     import { Project } from '../models/project.ts';
     import AttachmentsTable from '../../attachments/components/AttachmentsTable.vue';
     import HistoryOperationsTable from '../../history-operations/components/HistoryOperationsTable.vue';
+    import ProjectPagesTable from '../../pages/components/ProjectPagesTable.vue';
 
     const { t } = useI18n();
     const loadingStore = useLoadingStore();
@@ -164,7 +164,7 @@
         </n-tab-pane>
         <n-tab-pane name="pages" :tab="pagesTabLabel" display-directive="show:lazy" key="pages"
             :disabled="!projectId || (!project.allowedOperations.updateProject && project.notesCount === 0)">
-            <ProjectPagesTab v-if="projectId" :project-id="projectId" v-model:item-count="project.notesCount"
+            <ProjectPagesTable v-if="projectId" :project-id="projectId" v-model:item-count="project.pagesCount"
                 :read-only="!project.allowedOperations.updateProject" />
         </n-tab-pane>
         <n-tab-pane name="attachments" :tab="attachmentsTabLabel" display-directive="show:lazy" key="attachments"
