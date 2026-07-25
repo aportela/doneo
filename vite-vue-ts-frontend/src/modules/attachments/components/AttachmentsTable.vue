@@ -161,12 +161,13 @@
 
     const showImagePreviewModal = ref<boolean>(false);
 
-    const imageSources = computed<string[]>(() => items.value.filter((item: Attachment) => item.allowImagePreview()).map((item: Attachment) => item.getPreviewURL(props.projectId)));
+
+    const imageSources = computed<string[]>(() => items.value.filter((item: Attachment) => item.allowImagePreview()).map((item: Attachment) => props.taskId ? item.getPreviewURL(props.projectId, props.taskId) : item.getPreviewURL(props.projectId)));
 
     const imageSourcesWithIds = computed(() => items.value.filter((item: Attachment) => item.allowImagePreview()).map((item: Attachment) => {
         return ({
             id: item.id,
-            url: item.getDownloadURL(props.projectId),
+            url: props.taskId ? item.getDownloadURL(props.projectId, props.taskId) : item.getDownloadURL(props.projectId),
         });
     }));
 
@@ -281,7 +282,7 @@
 
     const onDelete = async (attachment: Attachment) => {
         if (props.taskId) {
-
+            onDeleteTaskAttachment(attachment);
         } else {
             onDeleteProjectAttachment(attachment);
         }
@@ -327,6 +328,46 @@
         }
     };
 
+    const onDeleteTaskAttachment = async (projectAttachment: Attachment) => {
+        if (projectAttachment.id && props.taskId) {
+            Object.assign(state, defaultAjaxStateRunning);
+            try {
+                await attachmentService.deleteTaskAttachment(props.projectId, props.taskId, projectAttachment.id);
+                notify('success', t("modules.projectAttachment.components.AttachmentsTable.notifications.projectAttachmentDeleted", { name: projectAttachment.name }));
+                onRefresh();
+            } catch (error: unknown) {
+                state.ajaxErrors = true;
+                handleAPIError(error,
+                    (apiError) => {
+                        switch (apiError.response?.status) {
+                            case 401:
+                                state.ajaxErrors = false;
+                                tmpItem.value = projectAttachment;
+                                appBus.emit({ type: "reauthRequired", payload: { emitter: "AttachmentsTable.onDelete" } });
+                                break;
+                            case 404:
+                                state.ajaxErrorMessage = t("modules.projectAttachment.components.AttachmentsTable.errors.notFoundError");
+                                break;
+                            default:
+                                state.ajaxErrorMessage = t("modules.projectAttachment.components.AttachmentsTable.errors.deleteError");
+                                break;
+                        }
+                    },
+                    (fatalError) => {
+                        state.ajaxErrorMessage = t("modules.projectAttachment.components.AttachmentsTable.errors.deleteError");
+                        console.error("Unhandled API error", { file: "AttachmentsTable.vue", method: "onRefresh" }, { err: fatalError });
+                    });
+            } finally {
+                state.ajaxRunning = false;
+                if (state.ajaxErrorMessage) {
+                    appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+                }
+            }
+        } else {
+            console.error("project attachment id not set", { file: "AttachmentsTable.vue", method: "onDelete" });
+        }
+    };
+
     const refreshContentItemsOptions = () => {
         contentTypeOptions.value = [...new Set(items.value.map((item: Attachment) => { return (item.contentType) }))].map((contentType) => { return ({ label: contentType, value: contentType }); });
     };
@@ -334,9 +375,41 @@
     const onRefresh = async () => {
         if (props.projectId) {
             if (props.taskId) {
-                //onRefreshTaskAttachments();
+                onRefreshTaskAttachments();
             } else {
                 onRefreshProjectAttachments();
+            }
+        }
+    };
+
+    const onRefreshTaskAttachments = async () => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const results: SearchResponse = await attachmentService.getTaskAttachments(props.projectId, props.taskId);
+            items.value = results.attachments.map((attachment) => new Attachment(attachment));
+            itemCount.value = items.value?.length ?? 0;
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "AttachmentsTable.onRefresh" } });
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.projectAttachment.components.AttachmentsTable.errors.refreshError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.projectAttachment.components.AttachmentsTable.errors.refreshError");
+                    console.error("Unhandled API error", { file: "AttachmentsTable.vue", method: "onRefresh" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
             }
         }
     };
@@ -376,7 +449,11 @@
 
 
     const onDownload = (attachment: Attachment) => {
-        bgDownload(attachment.getBgDownloadURL(props.projectId), attachment.name)
+        if (props.taskId) {
+            bgDownload(attachment.getBgDownloadURL(props.projectId, props.taskId), attachment.name)
+        } else {
+            bgDownload(attachment.getBgDownloadURL(props.projectId), attachment.name)
+        }
     };
 
     const onPreview = (attachment: Attachment) => {

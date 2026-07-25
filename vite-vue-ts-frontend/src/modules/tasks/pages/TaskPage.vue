@@ -12,12 +12,12 @@
     import { appBus } from '../../../shared/composables/bus.ts';
 
     import TaskMetadataTab from '../components/tabs/Metadata.vue';
-    import TaskAttachmentsTab from '../components/tabs/Attachments.vue';
     import TaskNotesTab from '../components/tabs/Notes.vue';
     import TaskTimeTrackingsTab from '../components/tabs/TimeTrackings.vue';
     import TaskHistoryTab from '../components/tabs/History.vue';
     import { Task } from '../models/tasks.ts';
     import type { TaskResponse } from '../types/dto.ts';
+    import AttachmentsTable from '../../attachments/components/AttachmentsTable.vue';
 
     const { t } = useI18n();
     const loadingStore = useLoadingStore();
@@ -144,7 +144,7 @@
         </n-tab-pane>
         <n-tab-pane name="attachments" :tab="attachmentsTabLabel" display-directive="show:lazy" key="attachments"
             :disabled="!projectId || !taskId || (!task.allowedOperations.updateTask && task.attachmentsCount === 0)">
-            <TaskAttachmentsTab v-if="projectId && taskId" :project-id="projectId" :task-id="taskId"
+            <AttachmentsTable v-if="projectId && taskId" :project-id="projectId" :task-id="taskId"
                 v-model:item-count="task.attachmentsCount" />
         </n-tab-pane>
         <n-tab-pane name="timetrackings" :tab="timeTrackingsTabLabel" display-directive="show:lazy" key="timetrackings"
