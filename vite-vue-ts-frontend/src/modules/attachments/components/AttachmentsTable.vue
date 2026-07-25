@@ -37,7 +37,7 @@
     import AudioPreview from '../../../shared/components/widgets/preview/AudioPreview.vue';
     import PDFPreview from '../../../shared/components/widgets/preview/PDFPreview.vue';
     import type { SearchResponse } from '../types/dto.ts';
-    import { DONEO_ICON_ACTION_DELETE, DONEO_ICON_ACTION_DOWNLOAD } from '../../../shared/types/icons.ts';
+    import { DONEO_ICON_ACTION_DELETE, DONEO_ICON_ACTION_DOWNLOAD, DONEO_ICON_ACTION_PREVIEW } from '../../../shared/types/icons.ts';
 
     interface Props {
         id?: string;
@@ -445,34 +445,20 @@
                     :placeholder="t('modules.projectAttachment.components.projectAttachmentsTable.filters.user.placeholder')" />
             </th>
         </template>
-        <!--
-        <template #tbody v-if="!props.errorMessage">
-            <tr v-for="attachment, index in items" :key="attachment.id ?? index">
-                <td>{{ attachment.name }}</td>
-                <td>{{ formatBytes(attachment.size) }}</td>
-                <td>{{ attachment.contentType }}</td>
-                <td>{{ attachment.createdAt.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</td>
-                <td>
-                    <AvatarUserName :user-id="attachment.createdBy?.id ?? ''"
-                        :user-name="attachment.createdBy?.name ?? ''" />
-                </td>
-                <td class="doneo-text-center">
-                    <ManageTableActionButtons show-delete show-download show-preview
-                        @delete="onConfirmDelete(attachment, index)" @download="onDownload(attachment, index)"
-                        @preview="onPreview(attachment, index)" :disabled="state.ajaxRunning"
-                        :delete-disabled="state.ajaxRunning || props.readOnly" :download-disabled="state.ajaxRunning"
-                        :preview-disabled="state.ajaxRunning || !(attachment.allowImagePreview() || attachment.allowAudioPreview() || attachment.allowPDFPreview())" />
-                </td>
-            </tr>
-        </template>
-        -->
         <template #rowactions="{ row }">
             <n-button-group class="doneo-table-actions-button-group" size="small">
-                <n-button @click="onDownload(row)" :disabled="state.ajaxRunning || props.readOnly"
-                    class="doneo-table-actions-button">
+                <n-button @click="onDownload(row)" :disabled="state.ajaxRunning" class="doneo-table-actions-button">
                     {{ t("shared.buttons.Download.label") }}
                     <template #icon>
                         <n-icon :component="DONEO_ICON_ACTION_DOWNLOAD" />
+                    </template>
+                </n-button>
+                <n-button @click="onPreview(row)"
+                    :disabled="state.ajaxRunning || !(row.allowImagePreview() || row.allowAudioPreview() || row.allowPDFPreview())"
+                    class="doneo-table-actions-button">
+                    {{ t("shared.buttons.Preview.label") }}
+                    <template #icon>
+                        <n-icon :component="DONEO_ICON_ACTION_PREVIEW" />
                     </template>
                 </n-button>
                 <n-button @click="onConfirmDelete(row)" :disabled="state.ajaxRunning || props.readOnly"
