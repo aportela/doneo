@@ -30,4 +30,6 @@ export {
   Expand as DONEO_ICON_EXPAND,
   Maximize as DONEO_ICON_MAXIMIZE,
   ExternalLink as DONEO_ICON_ACTION_OPEN,
+  Download as DONEO_ICON_ACTION_DOWNLOAD,
+  ScanEye as DONEO_ICON_ACTION_PREVIEW,
 } from "@lucide/vue";

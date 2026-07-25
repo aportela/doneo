@@ -1,11 +1,11 @@
 <script setup lang="ts">
     import { ref, reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount, h } from 'vue';
-    import { RouterLink } from "vue-router";
+    import { useRouter } from "vue-router";
     import { useI18n } from "vue-i18n";
 
     import { NModal, NButtonGroup, NButton, NIcon, NDrawer, NDrawerContent, NFlex } from 'naive-ui';
 
-    import { DONEO_ICON_ACTION_OPEN } from '../../../shared/types/icons.ts';
+    import { DONEO_ICON_ACTION_CANCEL, DONEO_ICON_ACTION_EDIT, DONEO_ICON_ACTION_OPEN, DONEO_ICON_ACTION_PREVIEW } from '../../../shared/types/icons.ts';
 
     import { useLoadingStore } from '../../../stores/loading';
     import { useUserSettingsStore } from '../../../stores/userSettings.ts';
@@ -48,6 +48,7 @@
 
     const { t } = useI18n();
     const { notify } = useNotify();
+    const router = useRouter();
 
     const loadingStore = useLoadingStore();
     const userSettingsStore = useUserSettingsStore();
@@ -310,6 +311,18 @@
 
     const currentProject = ref<Project>(new Project());
 
+    const OpenProject = (project: Project) => {
+        router.push(
+            {
+                name: "project",
+                params: {
+                    projectId: project.id
+                }
+            }
+        ).catch((e) => {
+            console.error(e);
+        });
+    };
     const onShowProjectResume = (project: Project) => {
         showDrawer.value = true;
         currentProject.value = project;
@@ -341,9 +354,8 @@
             <template #header>
                 <n-flex align="center" justify="space-between">
                     Project {{ currentProject.slug }}
-                    <router-link :to="{ name: 'project', params: { projectId: currentProject.id } }">
-                        <n-icon :component="DONEO_ICON_MAXIMIZE" />
-                    </router-link>
+                    <n-icon :component="DONEO_ICON_ACTION_CANCEL" class="doneo-cursor-pointer"
+                        @click="showDrawer = false;" />
                 </n-flex>
             </template>
             <ProjectResumeFloatingCard v-if="showDrawer && currentProject.id" :project-id="currentProject.id" />
@@ -385,9 +397,15 @@
             <n-button-group class="doneo-table-actions-button-group" size="small">
                 <n-button class="doneo-table-actions-button" :disabled="state.ajaxRunning"
                     @click="onShowProjectResume(row)">
-                    {{ t("shared.buttons.Open.label") }}
+                    {{ t("shared.buttons.Preview.label") }}
                     <template #icon>
-                        <n-icon :component="DONEO_ICON_ACTION_OPEN" />
+                        <n-icon :component="DONEO_ICON_ACTION_PREVIEW" />
+                    </template>
+                </n-button>
+                <n-button class="doneo-table-actions-button" :disabled="state.ajaxRunning" @click="OpenProject(row)">
+                    {{ t("shared.buttons.Edit.label") }}
+                    <template #icon>
+                        <n-icon :component="DONEO_ICON_ACTION_EDIT" />
                     </template>
                 </n-button>
             </n-button-group>
