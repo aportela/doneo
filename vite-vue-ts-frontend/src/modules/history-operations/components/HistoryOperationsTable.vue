@@ -156,7 +156,7 @@
     const tableSettings = tableSettingsStore.get(props.id);
 
     // build columns based on saved order visibility settings
-    const columns = computed<TableHeaderColumn<Attachment>[]>(() =>
+    const columns = computed<TableHeaderColumn<HistoryOperation>[]>(() =>
         tableSettings.columns.map((column) => { // get saved ordered columns
             const definition = columnDefinitions.find((c) => c.field === column.field);
             return {
@@ -194,7 +194,7 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectAttachmentsTab.onRefresh" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "HistoryOperationsTable.onRefresh" } });
                             break;
                         default:
                             state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
@@ -203,7 +203,7 @@
                 },
                 (fatalError) => {
                     state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
-                    console.error("Unhandled API error", { file: "ProjectAttachmentsTab.vue", method: "onRefresh" }, { err: fatalError });
+                    console.error("Unhandled API error", { file: "HistoryOperationsTable.vue", method: "onRefresh" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
@@ -227,7 +227,7 @@
                         switch (apiError.response?.status) {
                             case 401:
                                 state.ajaxErrors = false;
-                                appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectAttachmentsTab.onRefresh" } });
+                                appBus.emit({ type: "reauthRequired", payload: { emitter: "HistoryOperationsTable.onRefresh" } });
                                 break;
                             default:
                                 state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
@@ -236,7 +236,7 @@
                     },
                     (fatalError) => {
                         state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
-                        console.error("Unhandled API error", { file: "ProjectAttachmentsTab.vue", method: "onRefresh" }, { err: fatalError });
+                        console.error("Unhandled API error", { file: "HistoryOperationsTable.vue", method: "onRefresh" }, { err: fatalError });
                     });
             } finally {
                 state.ajaxRunning = false;
