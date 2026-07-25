@@ -383,33 +383,35 @@
     };
 
     const onRefreshTaskAttachments = async () => {
-        Object.assign(state, defaultAjaxStateRunning);
-        try {
-            const results: SearchResponse = await attachmentService.getTaskAttachments(props.projectId, props.taskId);
-            items.value = results.attachments.map((attachment) => new Attachment(attachment));
-            itemCount.value = items.value?.length ?? 0;
-        } catch (error: unknown) {
-            state.ajaxErrors = true;
-            handleAPIError(error,
-                (apiError) => {
-                    switch (apiError.response?.status) {
-                        case 401:
-                            state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "AttachmentsTable.onRefresh" } });
-                            break;
-                        default:
-                            state.ajaxErrorMessage = t("modules.projectAttachment.components.AttachmentsTable.errors.refreshError");
-                            break;
-                    }
-                },
-                (fatalError) => {
-                    state.ajaxErrorMessage = t("modules.projectAttachment.components.AttachmentsTable.errors.refreshError");
-                    console.error("Unhandled API error", { file: "AttachmentsTable.vue", method: "onRefresh" }, { err: fatalError });
-                });
-        } finally {
-            state.ajaxRunning = false;
-            if (state.ajaxErrorMessage) {
-                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+        if (props.taskId) {
+            Object.assign(state, defaultAjaxStateRunning);
+            try {
+                const results: SearchResponse = await attachmentService.getTaskAttachments(props.projectId, props.taskId);
+                items.value = results.attachments.map((attachment) => new Attachment(attachment));
+                itemCount.value = items.value?.length ?? 0;
+            } catch (error: unknown) {
+                state.ajaxErrors = true;
+                handleAPIError(error,
+                    (apiError) => {
+                        switch (apiError.response?.status) {
+                            case 401:
+                                state.ajaxErrors = false;
+                                appBus.emit({ type: "reauthRequired", payload: { emitter: "AttachmentsTable.onRefresh" } });
+                                break;
+                            default:
+                                state.ajaxErrorMessage = t("modules.projectAttachment.components.AttachmentsTable.errors.refreshError");
+                                break;
+                        }
+                    },
+                    (fatalError) => {
+                        state.ajaxErrorMessage = t("modules.projectAttachment.components.AttachmentsTable.errors.refreshError");
+                        console.error("Unhandled API error", { file: "AttachmentsTable.vue", method: "onRefresh" }, { err: fatalError });
+                    });
+            } finally {
+                state.ajaxRunning = false;
+                if (state.ajaxErrorMessage) {
+                    appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+                }
             }
         }
     };
