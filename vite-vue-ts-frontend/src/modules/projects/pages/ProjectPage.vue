@@ -169,11 +169,12 @@
         </n-tab-pane>
         <n-tab-pane name="attachments" :tab="attachmentsTabLabel" display-directive="show:lazy" key="attachments"
             :disabled="!projectId || (!project.allowedOperations.updateProject && project.attachmentsCount === 0)">
-            <AttachmentsTable v-if="projectId" :project-id="projectId" v-model:item-count="project.attachmentsCount" />
+            <AttachmentsTable id="ProjectAttachmentsTable" v-if="projectId" :project-id="projectId"
+                v-model:item-count="project.attachmentsCount" />
         </n-tab-pane>
         <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy" key="history"
             :disabled="!projectId || (!project.allowedOperations.updateProject && project.historyOperationsCount === 0)">
-            <HistoryOperationsTable v-if="projectId" :project-id="projectId"
+            <HistoryOperationsTable id="ProjectHistoryOperationsTable" v-if="projectId" :project-id="projectId"
                 v-model:item-count="project.historyOperationsCount" :key="project.historyOperationsCount" />
         </n-tab-pane>
         <n-tab-pane name="tasks" display-directive="show:lazy" key="tasks"
@@ -183,8 +184,8 @@
                 <n-icon :component="IconAlertTriangle" color="red" style="margin-left: 8px;"
                     v-if="project.tasksCount < 1" />
             </template>
-            <TasksTable v-if="projectId" :project-id="projectId" v-model:item-count="project.tasksCount"
-                :read-only="!project.allowedOperations.updateProject" />
+            <TasksTable id="ProjectTasksTable" v-if="projectId" :project-id="projectId"
+                v-model:item-count="project.tasksCount" :read-only="!project.allowedOperations.updateProject" />
         </n-tab-pane>
     </n-tabs>
 </template>
