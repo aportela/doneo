@@ -42,8 +42,6 @@
 
     const props = withDefaults(defineProps<Props>(), { id: "ProjectPermissionsTable" });
 
-    const emit = defineEmits(['add', 'delete']);
-
     const itemCount = defineModel<number>("itemCount", { default: 0 });
 
     const { t } = useI18n();

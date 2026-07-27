@@ -10,8 +10,6 @@
 
     const props = defineProps<Props>();
 
-    const emit = defineEmits(['delete']);
-
     const itemCount = defineModel<number>("itemCount", { default: 0 });
 </script>
 
