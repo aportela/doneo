@@ -13,11 +13,11 @@
 
     import TaskMetadataTab from '../components/tabs/Metadata.vue';
     import TaskNotesTab from '../components/tabs/Notes.vue';
-    import TaskTimeTrackingsTab from '../components/tabs/TimeTrackings.vue';
     import { Task } from '../models/tasks.ts';
     import type { TaskResponse } from '../types/dto.ts';
     import AttachmentsTable from '../../attachments/components/AttachmentsTable.vue';
     import HistoryOperationsTable from '../../history-operations/components/HistoryOperationsTable.vue';
+    import TimeTrackingsTable from '../../time-trackings/components/TimeTrackingsTable.vue';
 
     const { t } = useI18n();
     const loadingStore = useLoadingStore();
@@ -144,18 +144,18 @@
         </n-tab-pane>
         <n-tab-pane name="attachments" :tab="attachmentsTabLabel" display-directive="show:lazy" key="attachments"
             :disabled="!projectId || !taskId || (!task.allowedOperations.updateTask && task.attachmentsCount === 0)">
-            <AttachmentsTable v-if="projectId && taskId" :project-id="projectId" :task-id="taskId"
-                v-model:item-count="task.attachmentsCount" />
+            <AttachmentsTable id="TaskAttachmentsTable" v-if="projectId && taskId" :project-id="projectId"
+                :task-id="taskId" v-model:item-count="task.attachmentsCount" />
         </n-tab-pane>
         <n-tab-pane name="timetrackings" :tab="timeTrackingsTabLabel" display-directive="show:lazy" key="timetrackings"
             :disabled="!projectId || !taskId || (!task.allowedOperations.updateTask && task.timeTrackingsCount === 0)">
-            <TaskTimeTrackingsTab v-if="projectId && taskId" :project-id="projectId" :task-id="taskId"
-                v-model:item-count="task.timeTrackingsCount" />
+            <TimeTrackingsTable id="TaskTimeTrackingsTable" v-if="projectId && taskId" :project-id="projectId"
+                :task-id="taskId" v-model:item-count="task.timeTrackingsCount" />
         </n-tab-pane>
         <n-tab-pane name="history" :tab="historyTabLabel" display-directive="show:lazy" key="history"
             :disabled="!projectId || !taskId || (!task.allowedOperations.updateTask && task.historyOperationsCount === 0)">
-            <HistoryOperationsTable v-if="projectId && taskId" :project-id="projectId" :task-id="taskId"
-                :key="task.historyOperationsCount" />
+            <HistoryOperationsTable id="TaskHistoryOperationsTable" v-if="projectId && taskId" :project-id="projectId"
+                :task-id="taskId" :key="task.historyOperationsCount" />
         </n-tab-pane>
     </n-tabs>
 </template>

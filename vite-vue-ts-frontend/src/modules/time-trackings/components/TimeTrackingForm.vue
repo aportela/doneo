@@ -1,33 +1,31 @@
 <script setup lang="ts">
-    import { ref, reactive, computed, watch, onMounted, onBeforeUnmount, type CSSProperties, nextTick } from 'vue';
+    import { ref, reactive, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NFlex, NButton, NForm, type FormItemRule, type FormInst, type FormRules, NIcon, NFormItem, NInput, NSelect, type SelectOption } from 'naive-ui';
 
-    import { IconCancel, IconDeviceFloppy, IconEdit, IconPlus } from '@tabler/icons-vue';
+    import { IconCancel, IconDeviceFloppy } from '@tabler/icons-vue';
 
     import { TimeTracking } from '../models/time-tracking.ts';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { timeTrackingService } from '../services/time-tracking.ts';
     import { handleAPIError } from '../../../api/client/errorHandler';
     import type { TimeTrackingResponse, AddRequest, } from '../types/dto';
-    import type { FormMode } from '../../../shared/types/form-mode';
     import { appBus } from '../../../shared/composables/bus';
     import TimeFieldsInput from '../../../shared/components/form-blocks/TimeFieldsInput.vue';
     import { userTimerService } from '../../user-timer/services/user-timer.ts';
     import { type UserTimerResponse } from '../../user-timer/types/dto.ts';
     import { formatDuration } from '../../../shared/composables/datetime.ts';
+    import { DONEO_ICON_ADD } from '../../../shared/types/icons.ts';
 
-    interface TimeTrackingFormProps {
-        mode: FormMode;
+    interface Props {
         projectId: string;
         taskId: string;
-        style?: string | CSSProperties;
     }
 
-    const emit = defineEmits(['add', 'update', 'cancel'])
+    const props = defineProps<Props>();
 
-    const props = defineProps<TimeTrackingFormProps>();
+    const emit = defineEmits(['add', 'cancel'])
 
     const { t } = useI18n();
 
@@ -123,11 +121,7 @@
         timeTrackingFormRef.value?.restoreValidation();
         try {
             await timeTrackingFormRef.value?.validate();
-            if (props.mode === "add") {
-                await onAdd();
-            } else {
-                console.error("invalid form mode", { file: "TimeTrackingForm.vue", method: "onSave" });
-            }
+            await onAdd();
         }
         catch (error: any) {
             console.warn("Warning", { file: "TimeTrackingForm.vue", method: "onSave", details: "form validation error", error: error });
@@ -197,9 +191,6 @@
                 onAdd();
             }
         });
-        if (props.mode !== "add") {
-            console.error("invalid form mode", { file: "TimeTrackingForm.vue", method: "onSave" });
-        }
     });
 
     onBeforeUnmount(() => {
@@ -208,11 +199,10 @@
 </script>
 
 <template>
-    <n-card :style="style" bordered>
+    <n-card bordered>
         <template #header>
             <div class="doneo-flex-center-align">
-                <!-- TOOD: icon alignment ??? -->
-                <n-icon :component="props.mode == 'add' ? IconPlus : IconEdit" />
+                <n-icon class="doneo-mr-4px" :component="DONEO_ICON_ADD" />
                 {{ t("modules.timeTracking.components.TimeTrackingForm.headers.addTimeTracking") }}
             </div>
         </template>

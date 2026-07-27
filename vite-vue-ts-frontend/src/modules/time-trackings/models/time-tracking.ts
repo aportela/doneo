@@ -3,14 +3,14 @@ import { UserBase } from "../../users/models/user";
 import { IDate } from "../../../shared/types/idate";
 
 export class TimeTracking {
-  id: string | null;
+  id: string;
   createdBy: UserBase;
   createdAt: IDate | null;
   summary: string;
   spentTime: number;
 
   constructor(data?: TimeTrackingDTO) {
-    this.id = data?.id ?? null;
+    this.id = data?.id ?? "";
     this.createdBy = new UserBase(data?.createdBy);
     this.createdAt = data?.createdAt ? new IDate(data.createdAt) : null;
     this.summary = data?.summary ?? "";
@@ -19,7 +19,7 @@ export class TimeTracking {
 
   toDTO(): TimeTrackingDTO {
     return {
-      id: this.id ?? "",
+      id: this.id,
       createdBy: this.createdBy.toDTO(),
       createdAt: this.createdAt?.msTimestamp ?? 0,
       summary: this.summary ?? "",

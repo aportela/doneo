@@ -1,75 +1,125 @@
 <script setup lang="ts">
-    import { h, ref, computed, } from 'vue';
+    import { ref, reactive, shallowRef, computed, watch, onMounted, onBeforeUnmount, h } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { useDialog, NEmpty } from 'naive-ui';
+    import { NModal, useDialog, NIcon, NButton, NButtonGroup } from 'naive-ui';
+
     import { IconTrash } from '@tabler/icons-vue';
+
+    import { useLoadingStore } from '../../../stores/loading';
+
+    import { useNotify } from '../../../shared/composables/notification';
+    import { appBus } from '../../../shared/composables/bus';
+
+    import type { Order } from '../../../shared/types/order.ts';
+    import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
+
+    import { TimeTracking } from '../models/time-tracking.ts';
+
+    import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
+    import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
+    import { timeTrackingService } from '../services/time-tracking.ts';
+    import { handleAPIError } from '../../../api/client/errorHandler';
 
     import { useUserSettingsStore } from '../../../stores/userSettings.ts';
     import { renderIcon } from '../../../shared/composables/naive-ui-icon';
-    import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
-    import type { TimeTrackingsTableFilters } from '../types/time-trackings-table-filters.ts';
-    import type { TimeTracking } from '../models/time-tracking.ts';
 
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
-    import ClearTableFiltersButton from '../../../shared/components/buttons/ClearTableFiltersButton.vue';
     import TextFilterInput from '../../../shared/components/form-blocks/TextFilterInput.vue';
     import UserSelector from '../../users/components/UserSelector.vue';
     import DateFilterSelect from '../../../shared/components/selectors/DateFilterSelect.vue';
-    import ManageTableActionButtons from '../../../shared/components/tables/ManageTableActionButtons.vue';
 
+    import TimeTrackingForm from './TimeTrackingForm.vue';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
-    import type { DateFilterSelectComponent } from '../../../shared/components/selectors/date-filter-select-component.ts';
+    import type { TimestampRange } from '../../../shared/composables/timestamps.ts';
+    import { renderLabel } from '../../../shared/composables/naive-ui-helpers.ts';
+    import type { SearchResponse } from '../types/dto.ts';
+    import { DONEO_ICON_ACTION_DELETE } from '../../../shared/types/icons.ts';
 
-    interface TimeTrackingsTableProps {
-        disabled: boolean;
+    interface Props {
+        id?: string;
         readOnly?: boolean;
-        items: TimeTracking[];
         projectId: string;
-        taskId: string; // TODO: required ?
-        errorMessage?: string | null;
+        taskId: string;
     }
+
+    const props = withDefaults(defineProps<Props>(), { id: "TimeTrackingsTable" });
+
+    const itemCount = defineModel<number>("itemCount", { default: 0 });
 
     const { t } = useI18n();
     const dialog = useDialog();
+    const { notify } = useNotify();
     const userSettingsStore = useUserSettingsStore();
 
-    const emit = defineEmits(['refresh', 'add', 'delete', 'download', 'preview']);
+    const loadingStore = useLoadingStore();
+    const tableSettingsStore = useTableSettingsStore();
 
-    const props = defineProps<TimeTrackingsTableProps>();
+    const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    const createdAtFilterRef = ref<DateFilterSelectComponent | undefined>();
+    watch(
+        () => state.ajaxRunning,
+        (ajaxRunning) => {
+            loadingStore.set(ajaxRunning);
+        }
+    );
 
-    const filters = defineModel<TimeTrackingsTableFilters>("filters", {
-        default: () => ({
+    const items = shallowRef<TimeTracking[]>([]);
+
+    const tmpItem = ref<TimeTracking>(new TimeTracking());
+
+    const showNoItemsWarningMessage = ref<boolean>(false);
+
+    const currentOrder = reactive<Order>({ field: "createdAt", direction: "DESC" });
+
+    const onSort = (newOrder: Order) => {
+        currentOrder.field = newOrder.field;
+        currentOrder.direction = newOrder.direction;
+        onRefresh();
+    };
+
+    const createdAtFilterRef = ref<InstanceType<typeof DateFilterSelect>[] | null>(null);
+
+    interface TimeTrackingsTableFilters {
+        createdByUserId: string | null;
+        createdAt: TimestampRange;
+        summary: string;
+        // TODO: spentTime
+    }
+
+
+    const filters = reactive<TimeTrackingsTableFilters>(
+        {
             createdByUserId: null,
             createdAt: {
                 from: null,
                 to: null,
             },
-            summary: null,
-        })
-    });
-
-
-    const isFilteredByCreator = computed<boolean>(() => filters.value.createdByUserId !== null);
-    const isFilteredByCreatedAt = computed<boolean>(() => filters.value.createdAt.from != null || filters.value.createdAt.to != null);
-    const isFilteredBySummary = computed<boolean>(() => (filters.value.summary?.length ?? 0) > 0);
-
-
-    const hasFilters = computed<boolean>(() =>
-        isFilteredByCreator.value ||
-        isFilteredByCreatedAt.value ||
-        isFilteredBySummary.value
+            summary: "",
+        }
     );
 
-    const columns = computed<TableHeaderColumn[]>(() => [
+
+    const isFilteredByCreator = computed<boolean>(() => filters.createdByUserId !== null);
+    const isFilteredByCreatedAt = computed<boolean>(() => filters.createdAt.from != null || filters.createdAt.to != null);
+    const isFilteredBySummary = computed<boolean>(() => filters.summary !== "");
+
+    const onClearFilters = () => {
+        filters.createdByUserId = null;
+        if (createdAtFilterRef.value) {
+            createdAtFilterRef.value[0]?.reset();
+        }
+        filters.summary = "";
+    };
+
+    const columnDefinitions = reactive<TableHeaderColumn<TimeTracking>[]>([
         {
             label: t("modules.timeTracking.components.TimeTrackingsTable.header.columns.summary"),
-            field: "name",
+            field: "summary",
             visible: true,
             sortable: false,
             isFiltered: () => isFilteredBySummary.value,
+            render: (row: TimeTracking) => renderLabel(row.summary),
         },
         {
             label: t("modules.timeTracking.components.TimeTrackingsTable.header.columns.spentTime"),
@@ -77,6 +127,7 @@
             visible: true,
             sortable: false,
             isFiltered: () => false,
+            render: (row: TimeTracking) => renderLabel(row.geti18nTimeParts().map(({ key, count }) => `${count} ${t(key, count)}`).join(", ")),
         },
         {
             label: t("modules.project.components.ProjectsTable.header.columns.createdAt"),
@@ -84,6 +135,7 @@
             visible: true,
             sortable: false,
             isFiltered: () => isFilteredByCreatedAt.value,
+            render: (row: TimeTracking) => renderLabel(row.createdAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) ?? ""),
         },
         {
             label: t("modules.project.components.ProjectsTable.header.columns.createdBy"),
@@ -91,19 +143,76 @@
             visible: true,
             sortable: false,
             isFiltered: () => isFilteredByCreator.value,
+            render: (row: TimeTracking) => {
+                return h(AvatarUserName, { userId: row.createdBy.id, userName: row.createdBy.name });
+            }
         },
     ]);
 
+    // create (if not found) default settings for this table (column order & visibility)
+    tableSettingsStore.register(props.id, { columns: columnDefinitions.map((column) => { return { field: column.field, visible: column.visible } }) ?? [] });
 
-    const onRefresh = () => {
-        emit("refresh");
+    // restore previous settings
+    const tableSettings = tableSettingsStore.get(props.id);
+
+    // build columns based on saved order visibility settings
+    const columns = computed<TableHeaderColumn<TimeTracking>[]>(() =>
+        tableSettings.columns.map((column) => { // get saved ordered columns
+            const definition = columnDefinitions.find((c) => c.field === column.field);
+            return {
+                label: definition?.label ?? "",
+                field: column.field,
+                visible: column.visible,
+                sortable: definition!.sortable,
+                align: definition?.align,
+                isFiltered: definition?.isFiltered ?? (() => false),
+                render: definition?.render ?? (() => "")
+            };
+        })
+    );
+
+    const onDelete = async (timeTracking: TimeTracking) => {
+        if (timeTracking.id) {
+            Object.assign(state, defaultAjaxStateRunning);
+            try {
+                await timeTrackingService.deleteTaskTimeTracking(props.projectId, props.taskId, timeTracking.id);
+                items.value = items.value.filter((item) => item.id != timeTracking.id)
+                itemCount.value = items.value?.length ?? 0;
+                notify('success', t("modules.timeTracking.components.taskTimeTrackingsTab.notifications.timeTrackingDeleted", { summary: timeTracking.summary }));
+            } catch (error: unknown) {
+                state.ajaxErrors = true;
+                handleAPIError(error,
+                    (apiError) => {
+                        switch (apiError.response?.status) {
+                            case 401:
+                                state.ajaxErrors = false;
+                                tmpItem.value = timeTracking;
+                                appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPermissions.onDelete" } });
+                                break;
+                            case 404:
+                                state.ajaxErrorMessage = t("modules.timeTracking.components.taskTimeTrackingsTab.errors.notFoundError");
+                                break;
+                            default:
+                                state.ajaxErrorMessage = t("modules.timeTracking.components.taskTimeTrackingsTab.errors.deleteError");
+                                break;
+                        }
+                    },
+                    (fatalError) => {
+                        state.ajaxErrorMessage = t("modules.timeTracking.components.taskTimeTrackingsTab.errors.deleteError");
+                        console.error("Unhandled API error", { file: "TimeTrackings.vue", method: "onRefresh" }, { err: fatalError });
+                    });
+            } finally {
+                state.ajaxRunning = false;
+                if (state.ajaxErrorMessage) {
+                    appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+                }
+            }
+        } else {
+            console.error("(project permission id || project id) not set", { file: "TimeTrackings.vue", method: "onDelete" });
+        }
     };
 
-    const onAdd = () => {
-        emit("add");
-    };
-
-    const onConfirmDelete = (timeTracking: TimeTracking, index: number) => {
+    const onConfirmDelete = (timeTracking: TimeTracking) => {
         dialog.warning({
             title: t("modules.timeTracking.components.TimeTrackingsTable.dialogs.deleteConfirmation.title"),
             icon: renderIcon(IconTrash)(24),
@@ -117,71 +226,110 @@
             positiveText: t("shared.buttons.Delete.label"),
             negativeText: t("shared.buttons.Cancel.label"),
             onPositiveClick: () => {
-                emit("delete", timeTracking, index)
+                onDelete(timeTracking);
             },
         });
     };
 
-    const onClearFilters = () => {
-        filters.value.createdByUserId = null;
-        createdAtFilterRef.value?.reset();
-        filters.value.summary = "";
-
+    const onRefresh = async () => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const results: SearchResponse = await timeTrackingService.getTaskTimeTrackings(props.projectId, props.taskId);
+            items.value = results.timeTrackings.map((timeTracking) => new TimeTracking(timeTracking));
+            itemCount.value = items.value?.length ?? 0;
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TrackTimeTrackingsTab.onRefresh" } });
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.task.components.TimeTrackingsTab.errors.refreshError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.task.components.TimeTrackingsTab.errors.refreshError");
+                    console.error("Unhandled API error", { file: "TrackTimeTrackingsTab.vue", method: "onRefresh" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
+        }
     };
+
+    const showFormModal = ref<boolean>(false);
+
+    const onAdd = () => {
+        tmpItem.value = new TimeTracking();
+        showFormModal.value = true;
+    };
+
+    const onTaskTimeTrackingAdded = (timeTracking: TimeTracking) => {
+        showFormModal.value = false;
+        notify('success', t("modules.timeTracking.components.taskTimeTrackingsTab.notifications.timeTrackingAdded", { summary: timeTracking.summary }));
+        onRefresh();
+    };
+
+    const hideFormModal = () => {
+        showFormModal.value = false;
+        tmpItem.value = new TimeTracking();
+    };
+
+    let stopBusReauthListener: () => void;
+
+    onMounted(() => {
+        onRefresh();
+        stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
+            if (payload.to.includes("TrackTimeTrackingsTab.onRefresh")) {
+                onRefresh();
+            }
+        });
+    });
+
+    onBeforeUnmount(() => {
+        stopBusReauthListener();
+    });
+
 </script>
 
 <template>
-    <ManageTable size="small" :columns="columns" @refresh="onRefresh" @add="onAdd" :hide-add="props.readOnly">
-        <template #thead>
-            <tr>
-                <th>
-                    <TextFilterInput clearable :disabled="props.disabled" size="small"
-                        :placeholder="t('modules.timeTracking.components.TimeTrackingsTable.filters.summary.placeholder')"
-                        v-model:value="filters.summary" />
-                </th>
-                <th></th>
-                <th>
-                    <DateFilterSelect clearable v-model:range="filters.createdAt" ref="createdAtFilterRef"
-                        :disabled="props.disabled" />
-                </th>
-                <th>
-                    <UserSelector hideAvatar clearable :disabled="props.disabled" size="small"
-                        v-model:id="filters.createdByUserId"
-                        :placeholder="t('modules.timeTracking.components.TimeTrackingsTable.filters.user.placeholder')" />
-                </th>
-                <th class="doneo-text-center">
-                    <ClearTableFiltersButton @clear="onClearFilters" :disabled="props.disabled || !hasFilters" />
-                </th>
-            </tr>
+    <n-modal v-model:show="showFormModal" v-if="showFormModal">
+        <TimeTrackingForm :project-id="props.projectId" :task-id="props.taskId" mode="add" style="width: 42%;"
+            @add="onTaskTimeTrackingAdded" @cancel="hideFormModal" />
+    </n-modal>
+    <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="items" :row-key="row => row.id"
+        :columns="columns" :order="currentOrder" :show-no-items-warning-message="showNoItemsWarningMessage"
+        :no-items-warning-message="t('modules.timeTracking.components.TimeTrackingsTable.warnings.noItemsFound')"
+        @sort="onSort" @refresh="onRefresh" @add="onAdd" @clear-filters="onClearFilters"
+        :buttons="props.readOnly ? ['refresh', 'settings'] : ['refresh', 'add', 'settings']">
+        <template #thead-column-filters="{ columns }">
+            <th v-for="column in columns">
+                <TextFilterInput v-if="column.field === 'summary'" clearable :disabled="state.ajaxRunning" size="small"
+                    :placeholder="t('modules.timeTracking.components.TimeTrackingsTable.filters.summary.placeholder')"
+                    v-model:value="filters.summary" />
+                <DateFilterSelect v-else-if="column.field === 'createdAt'" clearable v-model:range="filters.createdAt"
+                    ref="createdAtFilterRef" :disabled="state.ajaxRunning" />
+                <UserSelector v-else-if="column.field === 'createdBy'" hideAvatar clearable
+                    :disabled="state.ajaxRunning" size="small" v-model:id="filters.createdByUserId"
+                    :placeholder="t('modules.timeTracking.components.TimeTrackingsTable.filters.user.placeholder')" />
+            </th>
         </template>
-        <template #tbody v-if="!props.errorMessage">
-            <tr v-for="timeTracking, index in items" :key="timeTracking.id ?? index">
-                <td>{{ timeTracking.summary }}</td>
-                <td>
-                    {{
-                        timeTracking.geti18nTimeParts()
-                            .map(({ key, count }) => `${count} ${t(key, count)}`)
-                            .join(", ")
-                    }}
-                </td>
-                <td>{{ timeTracking.createdAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }}</td>
-                <td>
-                    <AvatarUserName :user-id="timeTracking.createdBy?.id ?? ''"
-                        :user-name="timeTracking.createdBy?.name ?? ''" />
-                </td>
-                <td class="doneo-text-center">
-                    <ManageTableActionButtons show-delete show-download show-preview
-                        @delete="onConfirmDelete(timeTracking, index)" :disabled="props.disabled"
-                        :delete-disabled="props.disabled || props.readOnly" />
-                </td>
-            </tr>
-            <tr>
-                <td :colspan="columns.length + 1" v-if="items.length < 1 && !props.disabled">
-                    <n-empty
-                        :description="t('modules.timeTracking.components.TimeTrackingsTable.warnings.noItemsFound')">
-                    </n-empty>
-                </td>
-            </tr>
+        <template #rowactions="{ row }">
+            <n-button-group class="doneo-table-actions-button-group" size="small">
+                <n-button @click="onConfirmDelete(row)" :disabled="state.ajaxRunning || props.readOnly"
+                    class="doneo-table-actions-button">
+                    {{ t("shared.buttons.Delete.label") }}
+                    <template #icon>
+                        <n-icon :component="DONEO_ICON_ACTION_DELETE" />
+                    </template>
+                </n-button>
+            </n-button-group>
         </template>
     </ManageTable>
 </template>
