@@ -43,7 +43,9 @@
         readOnly?: boolean;
     }
 
-    const props = withDefaults(defineProps<Props>(), { id: "TasksTable" });;
+    const props = withDefaults(defineProps<Props>(), { id: "TasksTable" });
+
+    const itemCount = defineModel<number>("itemCount", { default: 0 });
 
     const { t } = useI18n();
     const { notify } = useNotify();
@@ -241,7 +243,8 @@
             currentPagination.resultsPage = response.pager.resultsPage;
             currentPagination.totalPages = response.pager.totalPages;
             currentPagination.totalResults = response.pager.totalResults;
-            items.value = response.tasks.map((task: TaskResponse) => new Task(task))
+            items.value = response.tasks.map((task: TaskResponse) => new Task(task));
+            itemCount.value = items.value?.length ?? 0;
             resetPager.value = false;
             showNoItemsWarningMessage.value = items.value.length === 0;
         } catch (error: unknown) {
