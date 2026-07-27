@@ -77,8 +77,8 @@
         }
     };
 
-    const projectPermissionFilterRef = ref<InstanceType<typeof ProjectPermissionSelect>[] | null>(null);
-    const taskPermissionFilterRef = ref<InstanceType<typeof TaskPermissionSelect>[] | null>(null);
+    const projectPermissionSelectorRef = ref<InstanceType<typeof ProjectPermissionSelect>[] | null>(null);
+    const taskPermissionSelectorRef = ref<InstanceType<typeof TaskPermissionSelect>[] | null>(null);
 
     interface RolesTableFilters {
         name: string;
@@ -100,11 +100,11 @@
 
     const onClearFilters = () => {
         filters.name = "";
-        if (projectPermissionFilterRef.value) {
-            projectPermissionFilterRef.value[0]?.reset();
+        if (projectPermissionSelectorRef.value) {
+            projectPermissionSelectorRef.value[0]?.reset();
         }
-        if (taskPermissionFilterRef.value) {
-            taskPermissionFilterRef.value[0]?.reset();
+        if (taskPermissionSelectorRef.value) {
+            taskPermissionSelectorRef.value[0]?.reset();
         }
     };
 
