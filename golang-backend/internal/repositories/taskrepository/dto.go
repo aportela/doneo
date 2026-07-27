@@ -36,7 +36,7 @@ type taskDTO struct {
 }
 
 type searchFilterDTO struct {
-	ProjectID       *string // TODO ?????
+	ProjectID       *string
 	Summary         *string
 	PriorityID      *string
 	StatusID        *string

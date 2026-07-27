@@ -30,7 +30,7 @@ type Task struct {
 }
 
 type SearchTaskFilter struct {
-	ProjectID       *string // TODO ???
+	ProjectID       *string
 	Summary         *string
 	StatusID        *string
 	PriorityID      *string

@@ -45,6 +45,7 @@ type patchRequest struct {
 }
 
 type filterRequest struct {
+	ProjectID       *string                   `json:"projectId"`
 	Summary         *string                   `json:"summary"`
 	PriorityID      *string                   `json:"priorityId"`
 	StatusID        *string                   `json:"statusId"`

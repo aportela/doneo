@@ -226,6 +226,7 @@
                 pager: { ...currentPagination, currentPage: resetPager.value ? 1 : currentPagination.currentPage },
                 order: currentOrder,
                 filter: {
+                    projectId: props.projectId,
                     slug: filters.slug !== "" ? filters.slug : undefined,
                     summary: filters.summary !== "" ? filters.summary : undefined,
                     priorityId: filters.priorityId !== null ? filters.priorityId : undefined,

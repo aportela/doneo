@@ -136,6 +136,9 @@ func (handler *taskHandler) Search(w http.ResponseWriter, r *http.Request) {
 	filter := domain.SearchTaskFilter{}
 	filter.ProjectID = &projectID
 	if request.Filter != nil {
+		if request.Filter.ProjectID != nil {
+			filter.ProjectID = request.Filter.ProjectID
+		}
 		if request.Filter.Summary != nil {
 			filter.Summary = request.Filter.Summary
 		}

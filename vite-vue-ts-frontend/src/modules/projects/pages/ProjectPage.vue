@@ -14,7 +14,6 @@
     import { appBus } from '../../../shared/composables/bus.ts';
 
     import ProjectMetadataTab from '../components/tabs/Metadata.vue';
-    import ProjectTasksTab from '../components/tabs/Tasks.vue';
     import ProjectPermissionsTab from '../components/tabs/Permissions.vue';
     import ProjectNotesTab from '../components/tabs/Notes.vue';
     import type { ProjectResponse } from '../types/dto.ts';
@@ -22,6 +21,7 @@
     import AttachmentsTable from '../../attachments/components/AttachmentsTable.vue';
     import HistoryOperationsTable from '../../history-operations/components/HistoryOperationsTable.vue';
     import ProjectPagesTable from '../../pages/components/ProjectPagesTable.vue';
+    import TasksTable from '../../tasks/components/TasksTable.vue';
 
     const { t } = useI18n();
     const loadingStore = useLoadingStore();
@@ -183,7 +183,7 @@
                 <n-icon :component="IconAlertTriangle" color="red" style="margin-left: 8px;"
                     v-if="project.tasksCount < 1" />
             </template>
-            <ProjectTasksTab v-if="projectId" :project-id="projectId" v-model:item-count="project.tasksCount"
+            <TasksTable v-if="projectId" :project-id="projectId" v-model:item-count="project.tasksCount"
                 :read-only="!project.allowedOperations.updateProject" />
         </n-tab-pane>
     </n-tabs>
