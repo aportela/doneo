@@ -21,7 +21,7 @@
     import type { Order } from '../../../shared/types/order.ts';
     import { projectService } from '../services/project.ts';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import type { SearchRequest, ProjectResponse } from '../types/dto.ts';
+    import type { SearchRequest, ProjectResponse, PatchRequest } from '../types/dto.ts';
     import type { TimestampRange } from '../../../shared/composables/timestamps.ts';
 
     import NewProjectForm from './NewProjectForm.vue';
@@ -38,6 +38,8 @@
     import { renderColoredTag, renderLabel } from '../../../shared/composables/naive-ui-helpers.ts';
 
     import ProjectResumeFloatingCard from './ProjectResumeFloatingCard.vue';
+    import ChangeProjectStatusDropdown from '../../../shared/components/dropdowns/ChangeProjectStatusDropdown.vue';
+    import type { ProjectStatus } from '../../project-statuses/models/project-status.ts';
 
     interface Props {
         id?: string;
@@ -266,16 +268,16 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageProjectsPage.onRefresh" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectsTable.onRefresh" } });
                             break;
                         default:
-                            state.ajaxErrorMessage = t("modules.project.components.ManageProjectsPage.errors.refreshError");
+                            state.ajaxErrorMessage = t("modules.project.components.ProjectsTable.errors.refreshError");
                             break;
                     }
                 },
                 (fatalError) => {
-                    state.ajaxErrorMessage = t("modules.project.components.ManageProjectsPage.errors.refreshError");
-                    console.error("Unhandled API error", { file: "ManageProjectsPage.vue", method: "onRefresh" }, { err: fatalError });
+                    state.ajaxErrorMessage = t("modules.project.components.ProjectsTable.errors.refreshError");
+                    console.error("Unhandled API error", { file: "ProjectsTable.vue", method: "onRefresh" }, { err: fatalError });
                 });
         }
         finally {
@@ -327,6 +329,55 @@
         currentProject.value = project;
     };
 
+    let updatedStatus: ProjectStatus;
+
+    const onStatusChanged = async (updatedProject: Project, status: ProjectStatus) => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const payload: PatchRequest = {
+                id: updatedProject.id ?? "",
+                status: {
+                    id: status.id ?? ""
+                },
+            };
+            const response: ProjectResponse = await projectService.patch(payload);
+            if (response.id === updatedProject.id) {
+                onRefresh();
+                notify('success', t("modules.project.components.ProjectsTable.notifications.projectStatusUpdated", { summary: updatedProject.summary, status: status.name }));
+            } else {
+                state.ajaxErrorMessage = t("modules.project.components.ProjectsTable.errors.statusUpdateError", { summary: updatedProject.summary });
+            }
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            tmpItem.value = updatedProject;
+                            updatedStatus = status;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectsTable.onStatusChanged" } });
+                            break;
+                        case 404:
+                            state.ajaxErrorMessage = t("modules.project.components.ProjectsTable.errors.notFoundError");
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.project.components.ProjectsTable.errors.statusUpdateError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.project.components.ProjectsTable.errors.statusUpdateError");
+                    console.error("Unhandled API error", { file: "ProjectsTable.vue", method: "onStatusChanged" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
+        }
+    };
+
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -334,6 +385,8 @@
         stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
             if (payload.to.includes("ProjectsTable.onRefresh")) {
                 onRefresh();
+            } else if (payload.to.includes("ProjectsTable.onStatusChanged")) {
+                onStatusChanged(tmpItem.value, updatedStatus);
             }
         });
     });
@@ -407,6 +460,8 @@
                         <n-icon :component="DONEO_ICON_ACTION_EDIT" />
                     </template>
                 </n-button>
+                <ChangeProjectStatusDropdown :current-status="row.status" :disabled="state.ajaxRunning"
+                    @change="(newStatus: ProjectStatus) => onStatusChanged(row, newStatus)" />
             </n-button-group>
         </template>
     </ManageTable>
