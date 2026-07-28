@@ -1306,6 +1306,9 @@ export default {
           errors: {
             addError: "There was a problem while adding the project data",
           },
+          warnings: {
+            slugAlreadyExists: "Slug already exists",
+          },
         },
         ManageProjectsPage: {
           header: {

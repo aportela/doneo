@@ -17,7 +17,6 @@
 
     import { DEFAULT_INPUT_SIZE } from '../../../constants.ts';
 
-
     const emit = defineEmits(['add', 'cancel'])
 
     const { t } = useI18n();
@@ -36,15 +35,16 @@
             required: true,
             validator: (_rule: FormItemRule, value: string) => {
                 if (state.ajaxRunning) {
+                    console.log("es runing");
                     return true;
                 }
                 if (!value?.trim()) {
                     return new Error(t("shared.warningMessages.fieldIsRequired"));
-                }
-                else if (value.length > MAX_SLUG_LENGTH) {
+                } else if (value.length > MAX_SLUG_LENGTH) {
                     return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
-                } else if (serverErrors.value.name) {
-                    return new Error(t(serverErrors.value.name));
+                } else if (serverErrors.value.slug) {
+                    console.log("slug");
+                    return new Error(t(serverErrors.value.slug));
                 } else {
                     return true;
                 }
@@ -62,8 +62,8 @@
                 }
                 else if (value.length > MAX_SUMMARY_LENGTH) {
                     return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
-                } else if (serverErrors.value.name) {
-                    return new Error(t(serverErrors.value.name));
+                } else if (serverErrors.value.summary) {
+                    return new Error(t(serverErrors.value.summary));
                 } else {
                     return true;
                 }
@@ -126,7 +126,7 @@
     const serverErrors = ref<Record<string, string>>({});
 
     const isSaveDisabled = computed<boolean>(() => {
-        return !project.value.slug || !project.value.summary || !project.value.type.id || !project.value.priority.id || !project.value.status.id;
+        return !project.value.slug || !project.value.summary || !project.value.type.id || !project.value.priority.id || !project.value.status.id || state.ajaxRunning;
     });
 
     const onSave = async () => {
@@ -171,8 +171,9 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "NewProjectForm.onAdd" } });
                             break;
                         case 409:
-                            if (apiError.details?.field === "name") {
-                                serverErrors.value.name = "modules.project.components.NewProjectForm.warnings.nameAlreadyExists";
+                            if (apiError.details?.field === "slug") {
+                                // TODO: not working on duplicated slugs
+                                serverErrors.value.slug = "modules.project.components.NewProjectForm.warnings.slugAlreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("modules.project.components.NewProjectForm.errors.addError");
                             }
@@ -193,6 +194,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
+                    console.log("Falidate");
                     newProjectFormRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
@@ -232,7 +234,7 @@
                 <n-input type="text"
                     :placeholder="t('modules.project.components.NewProjectForm.inputs.slug.placeholder')"
                     :size="DEFAULT_INPUT_SIZE" v-model:value="project.slug" :maxlength="MAX_SLUG_LENGTH"
-                    :show-count="true" clearable required autofocus>
+                    :show-count="true" clearable required autofocus :disabled="state.ajaxRunning">
                 </n-input>
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.inputs.summary.label')" path="summary"
@@ -240,30 +242,34 @@
                 <n-input type="text"
                     :placeholder="t('modules.project.components.NewProjectForm.inputs.summary.placeholder')"
                     :size="DEFAULT_INPUT_SIZE" v-model:value="project.summary" :maxlength="MAX_SUMMARY_LENGTH"
-                    :show-count="true" clearable required>
+                    :show-count="true" clearable required :disabled="state.ajaxRunning">
                 </n-input>
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.inputs.description.label')"
                 path="description" show-feedback>
                 <n-input type="textarea"
                     :placeholder="t('modules.project.components.NewProjectForm.inputs.description.placeholder')"
-                    :size="DEFAULT_INPUT_SIZE" v-model:value="project.description" clearable>
+                    :size="DEFAULT_INPUT_SIZE" v-model:value="project.description" clearable
+                    :disabled="state.ajaxRunning">
                 </n-input>
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.selectors.projectType.label')"
                 path="type.id">
                 <ProjectTypeSelector required v-model:id="project.type.id"
-                    :placeholder="t('modules.project.components.NewProjectForm.selectors.projectType.placeholder')" />
+                    :placeholder="t('modules.project.components.NewProjectForm.selectors.projectType.placeholder')"
+                    :disabled="state.ajaxRunning" />
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.selectors.projectPriority.label')"
                 path="priority.id">
                 <ProjectPrioritySelector required v-model:id="project.priority.id"
-                    :placeholder="t('modules.project.components.NewProjectForm.selectors.projectPriority.placeholder')" />
+                    :placeholder="t('modules.project.components.NewProjectForm.selectors.projectPriority.placeholder')"
+                    :disabled="state.ajaxRunning" />
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.selectors.projectStatus.label')"
                 path="status.id">
                 <ProjectStatusSelector required v-model:id="project.status.id" set-default-value-on-start
-                    :placeholder="t('modules.project.components.NewProjectForm.selectors.projectStatus.placeholder')" />
+                    :placeholder="t('modules.project.components.NewProjectForm.selectors.projectStatus.placeholder')"
+                    :disabled="state.ajaxRunning" />
             </n-form-item>
         </n-form>
         <template #action>

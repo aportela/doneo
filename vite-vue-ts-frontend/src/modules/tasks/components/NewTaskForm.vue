@@ -48,8 +48,8 @@
                 }
                 else if (value.length > MAX_SUMMARY_LENGTH) {
                     return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
-                } else if (serverErrors.value.name) {
-                    return new Error(t(serverErrors.value.name));
+                } else if (serverErrors.value.summary) {
+                    return new Error(t(serverErrors.value.summary));
                 } else {
                     return true;
                 }
@@ -130,6 +130,7 @@
                             appBus.emit({ type: "reauthRequired", payload: { emitter: "NewTaskForm.onAdd" } });
                             break;
                         case 409:
+                            // TODO: check fields that return 409
                             if (apiError.details?.field === "name") {
                                 serverErrors.value.name = "modules.task.components.NewTaskForm.warnings.nameAlreadyExists";
                             } else {
