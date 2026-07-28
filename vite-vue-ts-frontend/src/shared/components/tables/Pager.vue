@@ -3,6 +3,7 @@
     import { useI18n } from "vue-i18n";
 
     import { NPagination } from 'naive-ui';
+
     import type { PaginationSize, PaginationSizeOption } from "naive-ui";
     import { type Pagination } from "../../types/pager";
 
@@ -18,6 +19,7 @@
     const emit = defineEmits(["updateCurrentPageIndex", "updateResultsPage"]);
 
     const { t } = useI18n();
+
 
     const pageSizes = computed<PaginationSizeOption[]>(() => [
         {
@@ -95,13 +97,12 @@
         display: flex;
         align-items: center;
         padding: 4px;
-        background-color: var(--n-th-color);
-        border: 1px solid var(--n-border-color);
-        border-radius: var(--n-border-radius);
+        background-color: rgb(255, 253, 253);
+        border: 1px solid rgb(222, 222, 226);
+        border-radius: 3px;
     }
 
     .doneo-pagination-total-results-label {
-        padding-top: 2px;
-        padding-left: 2px;
+        margin-left: 2px;
     }
 </style>
