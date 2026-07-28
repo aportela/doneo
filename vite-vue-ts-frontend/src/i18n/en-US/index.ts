@@ -623,11 +623,6 @@ export default {
             userRestored: 'User "{name}" has been restored',
           },
         },
-        ManageUsersPage: {
-          header: {
-            title: "Manage users",
-          },
-        },
         UserPermissionsFilterSelector: {
           options: {
             any: "Any",
