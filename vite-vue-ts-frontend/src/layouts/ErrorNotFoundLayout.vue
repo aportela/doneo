@@ -9,11 +9,11 @@
 
     const goHome = () => {
         router.push('/')
-    }
+    };
 
     const goBack = () => {
         router.back()
-    }
+    };
 </script>
 
 <template>
