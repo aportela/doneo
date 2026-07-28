@@ -4,12 +4,12 @@
 
     import { useSessionStore } from '../../../stores/session';
 
-    interface UploadDialogProps {
+    interface Props {
         projectId: string;
         taskId?: string;
     };
 
-    const props = defineProps<UploadDialogProps>();
+    const props = defineProps<Props>();
 
     const sessionStore = useSessionStore();
 
