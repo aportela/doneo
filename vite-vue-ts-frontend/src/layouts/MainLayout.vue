@@ -31,12 +31,12 @@
 
     const showMobileMenu = ref(false)
 
-    function onGlobalKeydown(e: KeyboardEvent) {
+    const onGlobalKeydown = (e: KeyboardEvent) => {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
             e.preventDefault()
             showSearchModal.value = true
         }
-    }
+    };
 
     const accessTokenSecondsCheckInterval = 300; // check every 5 min (300 seconds)
 
@@ -50,7 +50,6 @@
             return false;
         }
     };
-
 
     let refreshInterval: number;
 
@@ -135,13 +134,4 @@
     </n-dialog-provider>
 </template>
 
-<style lang="css" scoped>
-
-    /*
-    .n-layout-content {
-        height: calc(100vh - 64px);
-        overflow: auto;
-        padding: 16px;
-    }
-*/
-</style>
+<style lang="css" scoped></style>
