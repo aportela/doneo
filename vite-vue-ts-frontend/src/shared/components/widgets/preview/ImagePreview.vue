@@ -1,11 +1,11 @@
 <script setup lang="ts">
     import { NImageGroup } from 'naive-ui';
 
-    interface IProps {
+    interface Props {
         sources: string[];
     };
 
-    const props = defineProps<IProps>();
+    const props = defineProps<Props>();
 
     const show = defineModel<boolean>("show");
 

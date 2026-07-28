@@ -10,7 +10,7 @@
     import { appBus } from '../../../shared/composables/bus';
     import { handleAPIError } from '../../../api/client/errorHandler';
 
-    interface RoleSelectorProps {
+    interface Props {
         autoFocus?: boolean;
         required?: boolean;
         placeholder?: string;
@@ -18,6 +18,8 @@
         size?: SelectSize;
         disabled?: boolean;
     }
+
+    const props = defineProps<Props>();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
@@ -27,7 +29,6 @@
 
     const roleId = defineModel<string | null>('id');
 
-    const props = defineProps<RoleSelectorProps>();
 
     const options = shallowRef<SelectOption[]>([]);
 

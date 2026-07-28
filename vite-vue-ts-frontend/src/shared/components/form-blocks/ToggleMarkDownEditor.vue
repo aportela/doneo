@@ -8,7 +8,7 @@
 
     import { useUserSettingsStore } from '../../../stores/userSettings';
 
-    interface IProps {
+    interface Props {
         disabled?: boolean;
         readOnly?: boolean;
         maxLength?: number;
@@ -18,7 +18,7 @@
         noUploadImg?: boolean;
     };
 
-    const props = withDefaults(defineProps<IProps>(), {
+    const props = withDefaults(defineProps<Props>(), {
         disabled: false,
         readOnly: false,
         hidePreview: false,

@@ -8,14 +8,14 @@
 
     import { DEFAULT_INPUT_SIZE } from "../../../constants";
 
-    interface IProps {
+    interface Props {
         disabled?: boolean;
         readOnly?: boolean;
         inputType: "estimated" | "spent";
         inputSize?: InputSize;
     };
 
-    const props = withDefaults(defineProps<IProps>(), {
+    const props = withDefaults(defineProps<Props>(), {
         disabled: false,
         readOnly: false,
         inputSize: DEFAULT_INPUT_SIZE,

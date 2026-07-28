@@ -6,13 +6,13 @@
     import { Attachment } from '../../../../modules/attachments/models/attachment';
     import { formatBytes } from '../../../composables/format';
 
-    interface IProps {
+    interface Props {
         projectId: string;
         taskId?: string;
         items: Attachment[];
     };
 
-    const props = defineProps<IProps>();
+    const props = defineProps<Props>();
 
     const bodyStyle = {
         width: '600px'
@@ -52,7 +52,7 @@
         <div style="background-color: rgba(250, 250, 252, 1); padding: 16px">
             <div v-if="currentItem" :key="currentItem.id ?? ''">
                 <p class="doneo-text-center"><strong>{{ currentItem.name }}</strong> ({{ formatBytes(currentItem.size)
-                    }})</p>
+                }})</p>
                 <audio controls autoplay>
                     <source :src="currentItem.getPreviewURL(props.projectId, props.taskId)"
                         :type="currentItem.contentType">

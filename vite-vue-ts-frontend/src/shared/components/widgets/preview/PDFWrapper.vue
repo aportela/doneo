@@ -3,12 +3,12 @@
 </template>
 
 <script setup lang="ts">
-  interface IProps {
+  interface Props {
     url: string
     innerContentClass?: string;
   };
 
-  const props = defineProps<IProps>();
+  const props = defineProps<Props>();
 </script>
 
 <style lang="css" scoped>

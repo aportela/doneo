@@ -5,7 +5,7 @@
 
     import { DEFAULT_INPUT_SIZE, DEFAULT_BUTTON_ICON_SIZE } from '../../../constants';
 
-    interface IProps {
+    interface Props {
         disabled?: boolean;
         readOnly?: boolean;
         size?: InputSize,
@@ -14,7 +14,7 @@
         clearable?: boolean;
     };
 
-    const props = withDefaults(defineProps<IProps>(), {
+    const props = withDefaults(defineProps<Props>(), {
         disabled: false,
         readOnly: false,
         size: DEFAULT_INPUT_SIZE,

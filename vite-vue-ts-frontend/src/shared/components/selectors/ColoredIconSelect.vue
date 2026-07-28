@@ -4,8 +4,7 @@
     import { type NaiveUISelectOptionWithColor } from '../../types/customNaiveUI';
     import { IconSquareFilled } from '@tabler/icons-vue';
 
-
-    interface ColoredIconSelectProps {
+    interface Props {
         size?: SelectSize;
         disabled?: boolean;
         loading?: boolean;
@@ -17,8 +16,7 @@
         icon?: Component;
     };
 
-
-    const props = withDefaults(defineProps<ColoredIconSelectProps>(), {
+    const props = withDefaults(defineProps<Props>(), {
         size: "medium",
         disabled: false,
         loading: false,

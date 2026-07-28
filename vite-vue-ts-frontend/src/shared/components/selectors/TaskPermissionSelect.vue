@@ -6,7 +6,7 @@
 
     import type { TaskPermissionSelectValue } from '../../types/task-permission-select-value';
 
-    interface TaskPermissionSelectProps {
+    interface Props {
         autoFocus?: boolean;
         required?: boolean;
         placeholder?: string;
@@ -15,13 +15,13 @@
         disabled?: boolean;
     }
 
+    const props = defineProps<Props>();
+
     const { t } = useI18n();
 
     const selectInstRef = ref<SelectInst | null>(null)
 
     const selectedValue = ref<number | null>(null);
-
-    const props = defineProps<TaskPermissionSelectProps>();
 
     const permission = defineModel<TaskPermissionSelectValue | null>("permission", { default: null });
 

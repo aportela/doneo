@@ -6,7 +6,7 @@
 
     import type { ProjectPermissionSelectValue } from '../../types/project-permission-select-value';
 
-    interface ProjectPermissionSelectProps {
+    interface Props {
         autoFocus?: boolean;
         required?: boolean;
         placeholder?: string;
@@ -15,13 +15,13 @@
         disabled?: boolean;
     }
 
+    const props = defineProps<Props>();
+
     const { t } = useI18n();
 
     const selectInstRef = ref<SelectInst | null>(null)
 
     const selectedValue = ref<number | null>(null);
-
-    const props = defineProps<ProjectPermissionSelectProps>();
 
     const permission = defineModel<ProjectPermissionSelectValue | null>("permission", { default: null });
 

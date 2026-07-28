@@ -7,7 +7,7 @@
 
     import { DEFAULT_SELECTOR_SIZE, DEFAULT_BUTTON_ICON_SIZE } from '../../../constants';
 
-    interface IProps {
+    interface Props {
         startupEditMode?: boolean;
         disabled?: boolean;
         readOnly?: boolean;
@@ -18,7 +18,7 @@
         onCancel?: () => void;
     };
 
-    const props = withDefaults(defineProps<IProps>(), {
+    const props = withDefaults(defineProps<Props>(), {
         startupEditMode: false,
         disabled: false,
         readOnly: false,

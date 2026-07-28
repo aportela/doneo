@@ -4,7 +4,7 @@
     import { NButtonGroup, NButton, NIcon, type ButtonSize } from 'naive-ui';
     import { IconEdit, IconTrash, IconTrashOff, IconDownload, IconEyeSearch, IconArticle } from '@tabler/icons-vue';
 
-    interface UpdateDeleteActionsColumnProps {
+    interface Props {
         disabled?: boolean;
         buttonSize?: ButtonSize;
         iconSize?: number;
@@ -22,9 +22,7 @@
         openDisabled?: boolean;
     }
 
-    const emit = defineEmits(['update', 'delete', 'restore', 'download', 'preview', 'open'])
-
-    const props = withDefaults(defineProps<UpdateDeleteActionsColumnProps>(), {
+    const props = withDefaults(defineProps<Props>(), {
         disabled: false,
         buttonSize: "small",
         iconSize: 22,
@@ -41,6 +39,7 @@
         showOpen: false,
         openDisabled: false,
     });
+    const emit = defineEmits(['update', 'delete', 'restore', 'download', 'preview', 'open'])
 
     const { t } = useI18n();
 

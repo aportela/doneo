@@ -11,7 +11,7 @@
     import { appBus } from '../../../shared/composables/bus';
     import { handleAPIError } from '../../../api/client/errorHandler';
 
-    interface UserSelectorProps {
+    interface Props {
         autoFocus?: boolean;
         required?: boolean;
         placeholder?: string;
@@ -20,6 +20,8 @@
         hideAvatar?: boolean;
         disabled?: boolean;
     }
+
+    const props = defineProps<Props>();
 
     const cacheStore = useCacheStore();
 
@@ -32,8 +34,6 @@
     const userId = defineModel<string | null>('id');
 
     const avatarURL = computed(() => userId.value ? `/api/wc/avatars/user/${userId.value}` : null);
-
-    const props = defineProps<UserSelectorProps>();
 
     const options = shallowRef<SelectOption[]>([]);
 

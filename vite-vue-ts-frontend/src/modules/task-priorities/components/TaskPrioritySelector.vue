@@ -12,7 +12,7 @@
     import { handleAPIError } from '../../../api/client/errorHandler';
     import { DEFAULT_BUTTON_ICON_SIZE, DEFAULT_SELECTOR_SIZE } from '../../../constants';
 
-    interface IProps {
+    interface Props {
         autoFocus?: boolean;
         required?: boolean;
         placeholder?: string;
@@ -24,7 +24,7 @@
         readOnly?: boolean;
     };
 
-    const props = withDefaults(defineProps<IProps>(), {
+    const props = withDefaults(defineProps<Props>(), {
         autoFocus: false,
         required: false,
         clearable: false,

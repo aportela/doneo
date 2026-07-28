@@ -19,12 +19,12 @@
 
     import { DEFAULT_BUTTON_ICON_SIZE } from '../../../constants';
 
-    interface IProps {
+    interface Props {
         iconSize?: number,
         disabled?: boolean,
     };
 
-    const props = withDefaults(defineProps<IProps>(), {
+    const props = withDefaults(defineProps<Props>(), {
         iconSize: DEFAULT_BUTTON_ICON_SIZE,
         disabled: false,
     });

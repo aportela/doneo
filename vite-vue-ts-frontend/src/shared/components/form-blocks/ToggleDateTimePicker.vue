@@ -4,7 +4,7 @@
 
     import { NDatePicker } from 'naive-ui';
 
-    interface IProps {
+    interface Props {
         startupEditMode?: boolean;
         disabled?: boolean;
         readOnly?: boolean;
@@ -14,7 +14,7 @@
         onCancel?: () => void;
     };
 
-    const props = withDefaults(defineProps<IProps>(), {
+    const props = withDefaults(defineProps<Props>(), {
         startupEditMode: false,
         disabled: false,
         readOnly: false,

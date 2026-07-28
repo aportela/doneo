@@ -16,7 +16,7 @@
     import NoteItem from "../../../notes/components/NoteItem.vue";
     import { useSessionStore } from "../../../../stores/session.ts";
 
-    interface ProjectNotesProps {
+    interface Props {
         disabled?: boolean;
         readOnly?: boolean;
         style?: string | CSSProperties;
@@ -24,7 +24,7 @@
         taskId: string;
     }
 
-    const props = defineProps<ProjectNotesProps>();
+    const props = defineProps<Props>();
 
     const { t } = useI18n();
     const { notify } = useNotify();

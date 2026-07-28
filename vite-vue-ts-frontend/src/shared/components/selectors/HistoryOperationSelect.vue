@@ -4,8 +4,7 @@
 
     import { NSelect, type SelectOption, type SelectSize, type SelectInst } from 'naive-ui';
 
-
-    interface HistoryOperationSelectProps {
+    interface Props {
         autoFocus?: boolean;
         required?: boolean;
         placeholder?: string;
@@ -15,13 +14,14 @@
         showOnlyTaskHistoryOperations?: boolean;
     }
 
+    const props = defineProps<Props>();
+
     const { t } = useI18n();
 
     const selectInstRef = ref<SelectInst | null>(null)
 
     const selectedValue = ref<number | null>(null);
 
-    const props = defineProps<HistoryOperationSelectProps>();
 
     const historyOperationType = defineModel<number | null>("historyOperationType", { default: null });
 

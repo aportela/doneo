@@ -3,13 +3,13 @@
 
     import { NAvatar } from 'naive-ui';
 
-    interface IProps {
+    interface Props {
         userId: string | null;
         userName: string | null;
         avatarSize?: "tiny" | "small" | "normal";
     };
 
-    const props = withDefaults(defineProps<IProps>(), {
+    const props = withDefaults(defineProps<Props>(), {
         avatarSize: "tiny",
     });
 

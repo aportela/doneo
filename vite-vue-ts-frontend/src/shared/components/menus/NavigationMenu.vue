@@ -44,13 +44,13 @@
     import Doneo from '../icons/Doneo.vue';
     import Github from '../icons/Github.vue';
 
-    interface IProps {
+    interface Props {
         collapsed?: boolean;
         mode: "horizontal" | "vertical";
         showBrandOption: boolean;
     };
 
-    const props = defineProps<IProps>();
+    const props = defineProps<Props>();
     const emit = defineEmits(['search']);
 
     const route = useRoute();

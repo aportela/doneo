@@ -21,15 +21,15 @@
     import { IDate } from '../../../../shared/types/idate.ts';
     import ToggleMarkDownEditor from '../../../../shared/components/form-blocks/ToggleMarkDownEditor.vue';
 
-    interface ProjectFormProps {
+    interface Props {
         readOnly?: boolean;
         style?: string | CSSProperties;
         disabled?: boolean;
     }
 
-    const project = defineModel<Project>("project", { required: true });
+    const props = defineProps<Props>();
 
-    const props = defineProps<ProjectFormProps>();
+    const project = defineModel<Project>("project", { required: true });
 
     const emit = defineEmits(["save", "refresh"]);
 

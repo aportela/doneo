@@ -21,11 +21,11 @@
     import { IDate } from '../../../shared/types/idate.ts';
     import { Note } from '../../notes/models/note.ts';
 
-    interface IProps {
+    interface Props {
         projectId: string;
     }
 
-    const props = defineProps<IProps>();
+    const props = defineProps<Props>();
 
     const { t } = useI18n();
 

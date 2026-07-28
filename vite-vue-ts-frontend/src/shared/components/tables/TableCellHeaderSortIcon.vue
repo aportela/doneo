@@ -5,11 +5,11 @@
 
     import { type SortOrder } from '../../types/common';
 
-    interface TableCellHeaderSortIconProps {
+    interface Props {
         order?: SortOrder;
     };
 
-    const props = defineProps<TableCellHeaderSortIconProps>();
+    const props = defineProps<Props>();
 </script>
 
 <template>

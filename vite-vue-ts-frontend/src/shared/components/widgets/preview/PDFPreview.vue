@@ -7,13 +7,13 @@
     import { formatBytes } from '../../../composables/format.ts';
     import PDFWrapper from './PDFWrapper.vue';
 
-    interface IProps {
+    interface Props {
         projectId: string;
         taskId?: string;
         items: Attachment[];
     };
 
-    const props = defineProps<IProps>();
+    const props = defineProps<Props>();
 
     const show = defineModel<boolean>('show', { default: false });
 
@@ -49,7 +49,7 @@
         <div style="background-color: rgba(250, 250, 252, 1); padding: 16px">
             <div v-if="currentItem" :key="currentItem.id ?? 0">
                 <p class="doneo-text-center"><strong>{{ currentItem.name }}</strong> ({{ formatBytes(currentItem.size)
-                    }})</p>
+                }})</p>
                 <PDFWrapper :url="currentItem.getPreviewURL(props.projectId, props.taskId)"
                     inner-content-class="doneo-pdf-wrapper-inner-class" />
                 <div class="doneo-pdf-preview-toolbar">

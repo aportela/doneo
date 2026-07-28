@@ -6,14 +6,14 @@
 
     import { geti18nTimeParts } from '../../composables/datetime';
 
-    interface IProps {
+    interface Props {
         estimated: number;
         spent: number;
         height?: number;
         processing?: boolean;
     }
 
-    const props = defineProps<IProps>();
+    const props = defineProps<Props>();
 
     const { t } = useI18n();
 

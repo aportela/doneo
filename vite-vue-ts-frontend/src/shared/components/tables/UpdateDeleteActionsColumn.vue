@@ -6,18 +6,17 @@
     import { NButtonGroup, NButton, NIcon } from 'naive-ui';
     import { IconEdit, IconTrash } from '@tabler/icons-vue';
 
-
-    interface UpdateDeleteActionsColumnProps {
+    interface Props {
         disabled?: boolean;
         iconSize?: number;
     }
 
-    const emit = defineEmits(['update', 'delete'])
-
-    const props = withDefaults(defineProps<UpdateDeleteActionsColumnProps>(), {
+    const props = withDefaults(defineProps<Props>(), {
         disabled: false,
         iconSize: 22,
     });
+
+    const emit = defineEmits(['update', 'delete'])
 
     const { t } = useI18n();
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { NAlert } from 'naive-ui'
 
-    interface IProps {
+    interface Props {
         bordered?: boolean;
         closable?: boolean;
         showIcon?: boolean;
@@ -11,7 +11,7 @@
         preformattedMessage?: boolean;
     }
 
-    const props = withDefaults(defineProps<IProps>(), {
+    const props = withDefaults(defineProps<Props>(), {
         bordered: true,
         closable: false,
         showIcon: true,
