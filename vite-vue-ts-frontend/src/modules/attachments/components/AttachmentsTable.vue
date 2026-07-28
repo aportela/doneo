@@ -90,21 +90,21 @@
         }
     };
 
-    const uploadCount = ref<number>(0);
+    const uploadedFilesCount = ref<number>(0);
 
     const showUploadModal = ref<boolean>(false);
 
 
     watch(showUploadModal, (newValue) => {
         if (!newValue) {
-            if (uploadCount.value > 0) {
+            if (uploadedFilesCount.value > 0) {
                 onRefresh();
             }
         }
     });
 
     const onShowUploadModal = () => {
-        uploadCount.value = 0;
+        uploadedFilesCount.value = 0;
         showUploadModal.value = true;
     };
 
@@ -496,7 +496,7 @@
         :current-index="currentPDFPreviewIndex" />
 
     <UploadDialog v-if="props.projectId && !props.readOnly" v-model:show="showUploadModal" :project-id="props.projectId"
-        v-model:upload-count="uploadCount" />
+        v-model:uploadedFilesCount="uploadedFilesCount" />
 
     <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="localFilteredItems"
         :row-key="row => row.id" :columns="columns" :order="currentOrder"

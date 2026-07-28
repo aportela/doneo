@@ -11,11 +11,11 @@
 
     const props = defineProps<Props>();
 
-    const sessionStore = useSessionStore();
-
     const show = defineModel<boolean>("show");
 
-    const uploadCount = defineModel<number>("uploadCount", { default: 0 });
+    const uploadedFilesCount = defineModel<number>("uploadedFilesCount", { default: 0 });
+
+    const sessionStore = useSessionStore();
 
     const uploadFile = async ({
         file,
@@ -64,10 +64,10 @@
         }
 
         xhr.send(formData)
-    }
+    };
 
     const onUploadFinish = () => {
-        uploadCount.value++;
+        uploadedFilesCount.value++;
     };
 </script>
 
