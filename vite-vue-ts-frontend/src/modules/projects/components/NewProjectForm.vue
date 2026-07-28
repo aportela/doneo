@@ -35,7 +35,6 @@
             required: true,
             validator: (_rule: FormItemRule, value: string) => {
                 if (state.ajaxRunning) {
-                    console.log("es runing");
                     return true;
                 }
                 if (!value?.trim()) {
@@ -194,7 +193,6 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    console.log("Falidate");
                     newProjectFormRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
