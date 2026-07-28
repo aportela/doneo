@@ -114,7 +114,7 @@
 </script>
 
 <template>
-    <n-spin :show="state.ajaxRunning">
+    <n-spin :show="state.ajaxRunning" style="height: 100vh;">
         <div v-show="!state.ajaxRunning">
             <h3>{{ task.summary }}</h3>
 
