@@ -73,3 +73,5 @@ check project type/priority/status & task use before deleting
 check (backend) unique index on project/task status/priority
 
 selected menu option dissapears after collapse/expand (ex: workspace projects)
+
+src/api/client can be removed ?????
