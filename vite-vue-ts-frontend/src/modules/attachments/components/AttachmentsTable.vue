@@ -31,7 +31,7 @@
     import type { TimestampRange } from '../../../shared/composables/timestamps.ts';
     import { renderIcon, renderLabel } from '../../../shared/composables/naive-ui-helpers.ts';
 
-    import UploadDialog from './UploadDialog.vue';
+    import UploadModal from './UploadModal.vue';
     import { bgDownload } from '../../../shared/composables/axios.ts';
     import ImagePreview from '../../../shared/components/widgets/preview/ImagePreview.vue';
     import AudioPreview from '../../../shared/components/widgets/preview/AudioPreview.vue';
@@ -495,7 +495,7 @@
     <PDFPreview v-model:show="showPDFPreviewModal" :project-id="props.projectId" :items="pdfSources"
         :current-index="currentPDFPreviewIndex" />
 
-    <UploadDialog v-if="props.projectId && !props.readOnly" v-model:show="showUploadModal" :project-id="props.projectId"
+    <UploadModal v-if="props.projectId && !props.readOnly" v-model:show="showUploadModal" :project-id="props.projectId"
         v-model:uploadedFilesCount="uploadedFilesCount" />
 
     <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="localFilteredItems"
