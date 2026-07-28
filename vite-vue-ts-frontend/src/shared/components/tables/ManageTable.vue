@@ -4,7 +4,7 @@
 
     import { NTable, type TableSize, NFlex, NIcon, NDrawer, NDrawerContent, NCollapse, NCollapseItem, NButton, NButtonGroup, NEmpty } from 'naive-ui';
 
-    import { DONEO_ICON_ACTION_ADD, DONEO_ICON_ACTION_CLEAR_FILTERS, DONEO_ICON_ACTION_DOWN, DONEO_ICON_ACTION_HIDE, DONEO_ICON_ACTION_REFRESH, DONEO_ICON_ACTION_SETTINGS, DONEO_ICON_ACTION_SHOW, DONEO_ICON_ACTION_UP, DONEO_ICON_FILTERED, DONEO_ICON_TOGGLE_SORT_ASCENDING, DONEO_ICON_TOGGLE_SORT_DESCENDING } from '../../types/icons.ts';
+    import { DONEO_ICON_ACTION_ADD, DONEO_ICON_ACTION_CANCEL, DONEO_ICON_ACTION_CLEAR_FILTERS, DONEO_ICON_ACTION_DOWN, DONEO_ICON_ACTION_HIDE, DONEO_ICON_ACTION_REFRESH, DONEO_ICON_ACTION_SETTINGS, DONEO_ICON_ACTION_SHOW, DONEO_ICON_ACTION_UP, DONEO_ICON_FILTERED, DONEO_ICON_TOGGLE_SORT_ASCENDING, DONEO_ICON_TOGGLE_SORT_DESCENDING } from '../../types/icons.ts';
 
     import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
 
@@ -139,7 +139,14 @@
 
 <template>
     <n-drawer v-if="props.id" v-model:show="showSettingsDrawer" placement="right" class="doneo-disable-user-select">
-        <n-drawer-content :title="t('shared.components.tables.ManageTable.components.settingsDrawer.title')">
+        <n-drawer-content>
+            <template #header>
+                <n-flex align="center" justify="space-between">
+                    {{ t('shared.components.tables.ManageTable.components.settingsDrawer.title') }}
+                    <n-icon :component="DONEO_ICON_ACTION_CANCEL" class="doneo-cursor-pointer"
+                        @click="showSettingsDrawer = false;" />
+                </n-flex>
+            </template>
             <n-collapse default-expanded-names="columnVisibility">
                 <n-collapse-item title="Column settings" name="columnVisibility">
                     <n-button-group size="tiny">
