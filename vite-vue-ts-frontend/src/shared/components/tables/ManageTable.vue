@@ -140,8 +140,8 @@
 <template>
     <n-drawer v-if="props.id" v-model:show="showSettingsDrawer" placement="right" class="doneo-disable-user-select">
         <n-drawer-content :title="t('shared.components.tables.ManageTable.components.settingsDrawer.title')">
-            <n-collapse accordion default-expanded-names="columnVisibility">
-                <n-collapse-item title="Column settings" key="columnVisibility">
+            <n-collapse default-expanded-names="columnVisibility">
+                <n-collapse-item title="Column settings" name="columnVisibility">
                     <n-button-group size="tiny">
                         <n-button @click="onShowAllColumns">{{
                             t("shared.components.tables.ManageTable.components.settingsDrawer.buttons.showAllColumns.label")
