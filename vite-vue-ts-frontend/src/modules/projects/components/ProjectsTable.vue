@@ -421,26 +421,25 @@
         @refresh="onRefresh" @add="onAdd" @pager-changed="onPagerChanged" @clear-filters="onClearFilters">
         <template #thead-column-filters="{ columns }">
             <th v-for="column in columns">
-                <TextFilterInput v-if="column.field === 'slug'" clearable :disabled="state.ajaxRunning" size="small"
+                <TextFilterInput v-if="column.field === 'slug'" clearable :disabled="state.ajaxRunning"
                     :placeholder="t('modules.project.components.ProjectsTable.header.filters.slug.placeholder')"
                     v-model:value="filters.slug" @keydown-enter="onRefresh" />
-                <ProjectTypeSelector v-else-if="column.field === 'type'" :disabled="state.ajaxRunning" size="small"
-                    v-model:id="filters.typeId" :hide-prefix="true" clearable
+                <ProjectTypeSelector v-else-if="column.field === 'type'" :disabled="state.ajaxRunning"
+                    v-model:id="filters.typeId" clearable
                     :placeholder="t('modules.project.components.ProjectsTable.header.filters.type.placeholder')" />
                 <ProjectPrioritySelector v-else-if="column.field === 'priority'" :disabled="state.ajaxRunning"
                     size="small" v-model:id="filters.priorityId" :hide-prefix="true" clearable
                     :placeholder="t('modules.project.components.ProjectsTable.header.filters.priority.placeholder')" />
-                <ProjectStatusSelector v-else-if="column.field === 'status'" :disabled="state.ajaxRunning" size="small"
+                <ProjectStatusSelector v-else-if="column.field === 'status'" :disabled="state.ajaxRunning"
                     v-model:id="filters.statusId" :hide-prefix="true" clearable
                     :placeholder="t('modules.project.components.ProjectsTable.header.filters.status.placeholder')" />
                 <TextFilterInput v-else-if="column.field === 'summary'" clearable :disabled="state.ajaxRunning"
-                    size="small"
                     :placeholder="t('modules.project.components.ProjectsTable.header.filters.summary.placeholder')"
                     v-model:value="filters.summary" @keydown-enter="onRefresh" />
                 <DateFilterSelect v-else-if="column.field === 'createdAt'" clearable ref="createdAtFilterRef"
-                    size="small" :disabled="state.ajaxRunning" v-model:range="filters.createdAt" />
+                    :disabled="state.ajaxRunning" v-model:range="filters.createdAt" />
                 <UserSelector v-else-if="column.field === 'createdBy'" clearable :disabled="state.ajaxRunning"
-                    size="small" v-model:id="filters.createdByUserId"
+                    v-model:id="filters.createdByUserId"
                     :placeholder="t('modules.project.components.ProjectsTable.header.filters.creator.placeholder')" />
             </th>
         </template>

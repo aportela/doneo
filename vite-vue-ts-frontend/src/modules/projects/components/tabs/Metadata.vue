@@ -211,7 +211,7 @@
                 </n-form-item>
                 <n-form-item label="Type">
                     <ProjectTypeSelector v-model:id="project.type.id" :disabled="props.disabled || state.ajaxRunning"
-                        :read-only="props.readOnly || readOnlyMode" />
+                        :read-only="props.readOnly || readOnlyMode" showPrefixIcon />
                 </n-form-item>
                 <n-form-item label="Priority">
                     <ProjectPrioritySelector v-model:id="project.priority.id"

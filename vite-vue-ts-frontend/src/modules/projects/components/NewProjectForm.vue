@@ -255,7 +255,7 @@
                 path="type.id">
                 <ProjectTypeSelector v-model:id="project.type.id"
                     :placeholder="t('modules.project.components.NewProjectForm.selectors.projectType.placeholder')"
-                    :disabled="state.ajaxRunning" />
+                    :disabled="state.ajaxRunning" showPrefixIcon />
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.selectors.projectPriority.label')"
                 path="priority.id">
