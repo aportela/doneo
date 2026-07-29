@@ -108,7 +108,6 @@
         taskPermissionSelectorRef.value = null;
     };
 
-
     const nameFilterLowerCase = computed(() => filters.name.toLowerCase());
 
     // we have all results, use local filtering for avoiding server load
