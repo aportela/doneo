@@ -32,4 +32,6 @@ export {
   ExternalLink as DONEO_ICON_ACTION_OPEN,
   Download as DONEO_ICON_ACTION_DOWNLOAD,
   ScanEye as DONEO_ICON_ACTION_PREVIEW,
+  CircleUser as DONEO_ICON_CIRCLE_USER,
+  TriangleAlert as DONEO_ICON_ALERT,
 } from "@lucide/vue";
