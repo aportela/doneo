@@ -17,7 +17,7 @@
         disabled?: boolean;
         placeholder?: string;
         autoFocus?: boolean;
-        hideAvatar?: boolean;
+        showSelectedAvatar?: boolean;
     }
 
     const props = defineProps<Props>();
@@ -96,7 +96,7 @@
 
 <template>
     <n-input-group>
-        <div v-if="!props.hideAvatar">
+        <div v-if="props.showSelectedAvatar">
             <n-avatar v-if="avatarURL" :src="avatarURL" color="transparent" />
             <n-button disabled class="doneo-cursor-default doneo-disable-opacity" v-else>
                 <template #icon>

@@ -514,8 +514,8 @@
                     :placeholder="t('modules.projectAttachment.components.projectAttachmentsTable.filters.contentType.placeholder')" />
                 <DateFilterSelect v-else-if="column.field === 'createdAt'" clearable v-model:range="filters.createdAt"
                     ref="createdAtFilterRef" :disabled="state.ajaxRunning" />
-                <UserSelector v-else-if="column.field === 'createdBy'" hideAvatar clearable
-                    :disabled="state.ajaxRunning" size="small" v-model:id="filters.createdByUserId"
+                <UserSelector v-else-if="column.field === 'createdBy'" clearable :disabled="state.ajaxRunning"
+                    size="small" v-model:id="filters.createdByUserId"
                     :placeholder="t('modules.projectAttachment.components.projectAttachmentsTable.filters.user.placeholder')" />
             </th>
         </template>

@@ -351,7 +351,7 @@
         :buttons="props.readOnly ? ['refresh', 'settings'] : ['refresh', 'add', 'settings']">
         <template #thead-column-filters="{ columns }">
             <th v-for="column in columns">
-                <UserSelector v-if="column.field === 'user'" hideAvatar clearable :disabled="state.ajaxRunning"
+                <UserSelector v-if="column.field === 'user'" clearable :disabled="state.ajaxRunning"
                     v-model:id="filters.userId"
                     :placeholder="t('modules.projectPermission.components.ProjectPermissionsTable.filters.user.placeholder')" />
                 <RoleSelector v-else-if="column.field === 'role'" clearable :disabled="state.ajaxRunning"

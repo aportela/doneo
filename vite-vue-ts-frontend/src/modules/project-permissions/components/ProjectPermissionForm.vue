@@ -171,7 +171,7 @@
             :disabled="state.ajaxRunning">
             <n-form-item :label="t('modules.projectPermission.components.ProjectPermissionForm.inputs.user.label')"
                 path="user.id">
-                <UserSelector auto-focus v-model:id="projectPermission.user.id"
+                <UserSelector auto-focus v-model:id="projectPermission.user.id" show-selected-avatar
                     :placeholder="t('modules.projectPermission.components.ProjectPermissionForm.inputs.user.placeholder')"
                     :disabled="state.ajaxRunning" />
             </n-form-item>

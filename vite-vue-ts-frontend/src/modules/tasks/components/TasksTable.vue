@@ -417,8 +417,8 @@
                     v-model:value="filters.summary" @keydown-enter="onRefresh" />
                 <DateFilterSelect v-else-if="column.field === 'createdAt'" clearable ref="createdAtFilterRef"
                     :disabled="state.ajaxRunning" size="small" v-model:range="filters.createdAt" />
-                <UserSelector v-else-if="column.field === 'createdBy'" hideAvatar clearable
-                    :disabled="state.ajaxRunning" size="small" v-model:id="filters.createdByUserId"
+                <UserSelector v-else-if="column.field === 'createdBy'" clearable :disabled="state.ajaxRunning"
+                    size="small" v-model:id="filters.createdByUserId"
                     :placeholder="t('modules.task.components.TasksTable.header.filters.creator.placeholder')" />
             </th>
         </template>
