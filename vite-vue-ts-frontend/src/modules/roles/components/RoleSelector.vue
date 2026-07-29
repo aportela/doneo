@@ -1,7 +1,7 @@
 <script setup lang="ts">
-    import { ref, shallowRef, reactive, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
+    import { ref, shallowRef, reactive, computed, onMounted, onBeforeUnmount } from 'vue';
 
-    import { NInputGroup, NButton, NSelect, NIcon, type SelectOption, type SelectInst } from 'naive-ui';
+    import { NInputGroup, NButton, NSelect, NIcon, type SelectOption } from 'naive-ui';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { roleService } from '../services/role';
@@ -24,20 +24,11 @@
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    const selectInstRef = ref<SelectInst | null>(null)
-
     const isDisabled = computed(() => props.disabled || state.ajaxRunning);
 
     const roleId = defineModel<string | null>('id');
 
     const options = shallowRef<SelectOption[]>([]);
-
-    const focus = async () => {
-        await nextTick();
-        selectInstRef.value?.focus();
-    };
-
-    defineExpose({ focus });
 
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
@@ -93,7 +84,7 @@
 
 <template>
     <n-input-group>
-        <n-select filterable ref="selectInstRef" :clearable="props.clearable" v-model:value="roleId" :options="options"
+        <n-select filterable :clearable="props.clearable" v-model:value="roleId" :options="options"
             :placeholder="props.placeholder" :disabled="isDisabled" />
         <n-button disabled class="doneo-cursor-default doneo-disable-opacity" v-if="state.ajaxErrors">
             <template #icon>
