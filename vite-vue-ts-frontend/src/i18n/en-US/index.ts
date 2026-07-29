@@ -678,11 +678,6 @@ export default {
             nameAlreadyExists: "Name already exists",
           },
         },
-        ManageRolesPage: {
-          header: {
-            title: "Manage roles",
-          },
-        },
         RolesTable: {
           header: {
             columns: {
