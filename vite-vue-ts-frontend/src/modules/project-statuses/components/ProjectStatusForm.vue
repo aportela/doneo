@@ -17,21 +17,21 @@
         projectStatusId?: string;
     }
 
-    const emit = defineEmits(['add', 'update', 'cancel'])
-
     const props = defineProps<Props>();
 
+    const emit = defineEmits(['add', 'update', 'cancel'])
+
     const { t } = useI18n();
+
+    const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
     const projectStatus = ref<ProjectStatus>(new ProjectStatus());
 
     projectStatus.value.hexColor = generateRandomSoftHexColor();
 
-    const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
-
     const serverErrors = ref<Record<string, string>>({});
 
-    const projectStatusFormRef = ref<FormInst | null>(null);
+    const formRef = ref<FormInst | null>(null);
 
     const projectStatusFormRules: FormRules =
     {
@@ -73,16 +73,15 @@
     watch(() => projectStatus.value.name, () => { delete serverErrors.value.name });
     watch(() => projectStatus.value.index, () => { delete serverErrors.value.index });
 
-
     const isSaveDisabled = computed<boolean>(() => {
         return !projectStatus.value.name || state.ajaxRunning;
     });
 
     const onSave = async () => {
         serverErrors.value = {};
-        projectStatusFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         try {
-            await projectStatusFormRef.value?.validate();
+            await formRef.value?.validate();
             if (!props.projectStatusId) {
                 await onAdd();
             } else {
@@ -100,7 +99,7 @@
 
     const onGet = async (id: string) => {
         serverErrors.value = {};
-        projectStatusFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const response: ProjectStatusResponse = await projectStatusService.get(id);
@@ -143,7 +142,7 @@
 
     const onAdd = async () => {
         serverErrors.value = {};
-        projectStatusFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const addedProjectStatus: ProjectStatusResponse = await projectStatusService.add(projectStatus.value.toAddProjectStatusRequestPayload());
@@ -185,7 +184,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    projectStatusFormRef.value?.validate().then(() => { }).catch(() => { });
+                    formRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -193,7 +192,7 @@
 
     const onUpdate = async () => {
         serverErrors.value = {};
-        projectStatusFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const updatedProjectStatus: ProjectStatusResponse = await projectStatusService.update(projectStatus.value.toUpdateProjectStatusRequestPayload());
@@ -238,7 +237,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    projectStatusFormRef.value?.validate().then(() => { }).catch(() => { });
+                    formRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -285,8 +284,7 @@
         <template #header-extra>
             <n-spin v-if="state.ajaxRunning" size="small" />
         </template>
-        <n-form ref="projectStatusFormRef" :model="projectStatus" :rules="projectStatusFormRules"
-            :disabled="state.ajaxRunning">
+        <n-form ref="formRef" :model="projectStatus" :rules="projectStatusFormRules" :disabled="state.ajaxRunning">
             <n-form-item :label="t('modules.projectStatus.components.ProjectStatusForm.inputs.name.label')" path="name"
                 show-feedback>
                 <n-input type="text"
@@ -385,8 +383,7 @@
             </n-flex>
             <n-form-item :label="t('modules.projectStatus.components.ProjectStatusForm.inputs.preview.label')">
                 <n-flex style="width: 100%" align="center" :wrap="false">
-                    <n-tag :color="getNaiveUITagColorProperty(projectStatus.hexColor ?? '#888888')"
-                        style="width: 100%;">
+                    <n-tag :color="getNaiveUITagColorProperty(projectStatus.hexColor)" style="width: 100%;">
                         {{ projectStatus.name }}
                     </n-tag>
                     <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="projectStatus.hexColor"

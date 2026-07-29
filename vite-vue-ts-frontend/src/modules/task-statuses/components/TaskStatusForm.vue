@@ -17,19 +17,19 @@
         taskStatusId?: string;
     }
 
-    const emit = defineEmits(['add', 'update', 'cancel'])
-
     const props = defineProps<Props>();
 
+    const emit = defineEmits(['add', 'update', 'cancel'])
+
     const { t } = useI18n();
+
+    const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
     const taskStatus = ref<TaskStatus>(new TaskStatus());
 
     taskStatus.value.hexColor = generateRandomSoftHexColor();
 
-    const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
-
-    const taskStatusFormRef = ref<FormInst | null>(null);
+    const formRef = ref<FormInst | null>(null);
 
     const taskStatusFormRules: FormRules =
     {
@@ -79,9 +79,9 @@
 
     const onSave = async () => {
         serverErrors.value = {};
-        taskStatusFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         try {
-            await taskStatusFormRef.value?.validate();
+            await formRef.value?.validate();
             if (!props.taskStatusId) {
                 await onAdd();
             } else {
@@ -99,7 +99,7 @@
 
     const onGet = async (id: string) => {
         serverErrors.value = {};
-        taskStatusFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const response: TaskStatusResponse = await taskStatusService.get(id);
@@ -142,7 +142,7 @@
 
     const onAdd = async () => {
         serverErrors.value = {};
-        taskStatusFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const addedTaskStatus: TaskStatusResponse = await taskStatusService.add(taskStatus.value.toAddTaskStatusRequestPayload());
@@ -184,7 +184,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    taskStatusFormRef.value?.validate().then(() => { }).catch(() => { });
+                    formRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -192,7 +192,7 @@
 
     const onUpdate = async () => {
         serverErrors.value = {};
-        taskStatusFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const updatedTaskStatus: TaskStatusResponse = await taskStatusService.update(taskStatus.value.toUpdateTaskStatusRequestPayload());
@@ -237,7 +237,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    taskStatusFormRef.value?.validate().then(() => { }).catch(() => { });
+                    formRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -266,7 +266,7 @@
         stopBusReauthListener();
     });
 
-    const flagIconSize = 22;
+    const FLAG_ICON_SIZE = 22;
 </script>
 
 <template>
@@ -283,7 +283,7 @@
         <template #header-extra>
             <n-spin v-if="state.ajaxRunning" size="small" />
         </template>
-        <n-form ref="taskStatusFormRef" :model="taskStatus" :rules="taskStatusFormRules" :disabled="state.ajaxRunning">
+        <n-form ref="formRef" :model="taskStatus" :rules="taskStatusFormRules" :disabled="state.ajaxRunning">
             <n-form-item :label="t('modules.taskStatus.components.TaskStatusForm.inputs.name.label')" path="name"
                 show-feedback>
                 <n-input type="text"
@@ -306,7 +306,7 @@
                 <n-form-item :label="t('modules.taskStatus.components.TaskStatusForm.inputs.flags.label')">
                     <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :component="DONEO_ICON_STAR" :size="flagIconSize" class="doneo-cursor-help"
+                            <n-icon :component="DONEO_ICON_STAR" :size="FLAG_ICON_SIZE" class="doneo-cursor-help"
                                 :class="{ 'doneo-disabled-icon': !taskStatus.flags.defaultStatusOnCreation }"
                                 @click="taskStatus.flags.defaultStatusOnCreation = !taskStatus.flags.defaultStatusOnCreation" />
                         </template>
@@ -318,7 +318,7 @@
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :component="DONEO_ICON_FILL_EMTPY_DATE" :size="flagIconSize"
+                            <n-icon :component="DONEO_ICON_FILL_EMTPY_DATE" :size="FLAG_ICON_SIZE"
                                 class="doneo-cursor-help"
                                 :class="{ 'doneo-disabled-icon': !taskStatus.flags.fillEmptyStartDate }"
                                 @click="taskStatus.flags.fillEmptyStartDate = !taskStatus.flags.fillEmptyStartDate" />
@@ -331,7 +331,7 @@
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :component="DONEO_ICON_FILL_DATE" :size="flagIconSize" class="doneo-cursor-help"
+                            <n-icon :component="DONEO_ICON_FILL_DATE" :size="FLAG_ICON_SIZE" class="doneo-cursor-help"
                                 :class="{ 'doneo-disabled-icon': !taskStatus.flags.setStartDate }"
                                 @click="taskStatus.flags.setStartDate = !taskStatus.flags.setStartDate" />
                         </template>
@@ -343,7 +343,7 @@
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :component="DONEO_ICON_FILL_EMTPY_DATE" :size="flagIconSize"
+                            <n-icon :component="DONEO_ICON_FILL_EMTPY_DATE" :size="FLAG_ICON_SIZE"
                                 class="doneo-cursor-help"
                                 :class="{ 'doneo-disabled-icon': !taskStatus.flags.fillEmptyFinishDate }"
                                 @click="taskStatus.flags.fillEmptyFinishDate = !taskStatus.flags.fillEmptyFinishDate" />
@@ -356,7 +356,7 @@
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :component="DONEO_ICON_FILL_DATE" :size="flagIconSize" class="doneo-cursor-help"
+                            <n-icon :component="DONEO_ICON_FILL_DATE" :size="FLAG_ICON_SIZE" class="doneo-cursor-help"
                                 :class="{ 'doneo-disabled-icon': !taskStatus.flags.setFinishDate }"
                                 @click="taskStatus.flags.setFinishDate = !taskStatus.flags.setFinishDate" />
                         </template>
@@ -368,7 +368,7 @@
                     </n-tooltip>
                     <n-tooltip trigger="hover">
                         <template #trigger>
-                            <n-icon :component="DONEO_ICON_CLEAR_DATE" :size="flagIconSize" class="doneo-cursor-help"
+                            <n-icon :component="DONEO_ICON_CLEAR_DATE" :size="FLAG_ICON_SIZE" class="doneo-cursor-help"
                                 :class="{ 'doneo-disabled-icon': !taskStatus.flags.unsetFinishDateOnLeave }"
                                 @click="taskStatus.flags.unsetFinishDateOnLeave = !taskStatus.flags.unsetFinishDateOnLeave" />
                         </template>
@@ -382,7 +382,7 @@
             </n-flex>
             <n-form-item :label="t('modules.taskStatus.components.TaskStatusForm.inputs.preview.label')">
                 <n-flex style="width: 100%" align="center" :wrap="false">
-                    <n-tag :color="getNaiveUITagColorProperty(taskStatus.hexColor ?? '#888888')" style="width: 100%;">
+                    <n-tag :color="getNaiveUITagColorProperty(taskStatus.hexColor)" style="width: 100%;">
                         {{ taskStatus.name }}
                     </n-tag>
                     <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="taskStatus.hexColor"

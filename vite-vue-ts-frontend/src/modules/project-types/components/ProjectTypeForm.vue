@@ -17,21 +17,21 @@
         projectTypeId?: string;
     }
 
-    const emit = defineEmits(['add', 'update', 'cancel'])
-
     const props = defineProps<Props>();
 
+    const emit = defineEmits(['add', 'update', 'cancel'])
+
     const { t } = useI18n();
+
+    const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
     const projectType = ref<ProjectType>(new ProjectType());
 
     projectType.value.hexColor = generateRandomSoftHexColor();
 
-    const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
-
     const serverErrors = ref<Record<string, string>>({});
 
-    const projectTypeFormRef = ref<FormInst | null>(null)
+    const formRef = ref<FormInst | null>(null)
 
     const projectTypeFormRules: FormRules =
     {
@@ -64,9 +64,9 @@
 
     const onSave = async () => {
         serverErrors.value = {};
-        projectTypeFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         try {
-            await projectTypeFormRef.value?.validate();
+            await formRef.value?.validate();
             if (!props.projectTypeId) {
                 await onAdd();
             } else {
@@ -84,7 +84,7 @@
 
     const onGet = async (id: string) => {
         serverErrors.value = {};
-        projectTypeFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const response: ProjectTypeResponse = await projectTypeService.get(id);
@@ -127,7 +127,7 @@
 
     const onAdd = async () => {
         serverErrors.value = {};
-        projectTypeFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const addedProjectType: ProjectTypeResponse = await projectTypeService.add(projectType.value.toAddProjectTypeRequestPayload());
@@ -167,7 +167,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    projectTypeFormRef.value?.validate().then(() => { }).catch(() => { });
+                    formRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -175,7 +175,7 @@
 
     const onUpdate = async () => {
         serverErrors.value = {};
-        projectTypeFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const updatedProjectType: ProjectTypeResponse = await projectTypeService.update(projectType.value.toUpdateProjectTypeRequestPayload());
@@ -218,7 +218,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    projectTypeFormRef.value?.validate().then(() => { }).catch(() => { });
+                    formRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -262,8 +262,7 @@
         <template #header-extra>
             <n-spin v-if="state.ajaxRunning" size="small" />
         </template>
-        <n-form ref="projectTypeFormRef" :model="projectType" :rules="projectTypeFormRules"
-            :disabled="state.ajaxRunning">
+        <n-form ref="formRef" :model="projectType" :rules="projectTypeFormRules" :disabled="state.ajaxRunning">
             <n-form-item :label="t('modules.projectType.components.ProjectTypeForm.inputs.name.label')" path="name"
                 show-feedback>
                 <n-input type="text"
@@ -277,7 +276,7 @@
             </n-form-item>
             <n-form-item :label="t('Preview')">
                 <n-flex style="width: 100%" align="center" :wrap="false">
-                    <n-tag :color="getNaiveUITagColorProperty(projectType.hexColor ?? '#888888')" style="width: 100%;">
+                    <n-tag :color="getNaiveUITagColorProperty(projectType.hexColor)" style="width: 100%;">
                         {{ projectType.name }}
                     </n-tag>
                     <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="projectType.hexColor"

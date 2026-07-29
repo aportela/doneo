@@ -17,21 +17,21 @@
         projectPriorityId?: string;
     }
 
-    const emit = defineEmits(['add', 'update', 'cancel'])
-
     const props = defineProps<Props>();
 
+    const emit = defineEmits(['add', 'update', 'cancel'])
+
     const { t } = useI18n();
+
+    const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
     const projectPriority = ref<ProjectPriority>(new ProjectPriority());
 
     projectPriority.value.hexColor = generateRandomSoftHexColor();
 
-    const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
-
     const serverErrors = ref<Record<string, string>>({});
 
-    const projectPriorityFormRef = ref<FormInst | null>(null)
+    const formRef = ref<FormInst | null>(null)
 
     const projectPriorityFormRules: FormRules =
     {
@@ -79,9 +79,9 @@
 
     const onSave = async () => {
         serverErrors.value = {};
-        projectPriorityFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         try {
-            await projectPriorityFormRef.value?.validate();
+            await formRef.value?.validate();
             if (!props.projectPriorityId) {
                 await onAdd();
             } else {
@@ -99,7 +99,7 @@
 
     const onGet = async (id: string) => {
         serverErrors.value = {};
-        projectPriorityFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const response: ProjectPriorityResponse = await projectPriorityService.get(id);
@@ -142,7 +142,7 @@
 
     const onAdd = async () => {
         serverErrors.value = {};
-        projectPriorityFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const addedProjectPriority: ProjectPriorityResponse = await projectPriorityService.add(projectPriority.value.toAddProjectPriorityRequestPayload());
@@ -187,7 +187,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    projectPriorityFormRef.value?.validate().then(() => { }).catch(() => { });
+                    formRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -195,7 +195,7 @@
 
     const onUpdate = async () => {
         serverErrors.value = {};
-        projectPriorityFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const updatedProjectPriority: ProjectPriorityResponse = await projectPriorityService.update(projectPriority.value.toUpdateProjectPriorityRequestPayload());
@@ -237,7 +237,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    projectPriorityFormRef.value?.validate().then(() => { }).catch(() => { });
+                    formRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -282,8 +282,7 @@
         <template #header-extra>
             <n-spin v-if="state.ajaxRunning" size="small" />
         </template>
-        <n-form ref="projectPriorityFormRef" :model="projectPriority" :rules="projectPriorityFormRules"
-            :disabled="state.ajaxRunning">
+        <n-form ref="formRef" :model="projectPriority" :rules="projectPriorityFormRules" :disabled="state.ajaxRunning">
             <n-form-item :label="t('modules.projectPriority.components.ProjectPriorityForm.inputs.name.label')"
                 path="name" show-feedback>
                 <n-input type="text"
@@ -304,8 +303,7 @@
             </n-form-item>
             <n-form-item :label="t('modules.projectPriority.components.ProjectPriorityForm.inputs.preview.label')">
                 <n-flex style="width: 100%" align="center" :wrap="false">
-                    <n-tag :color="getNaiveUITagColorProperty(projectPriority.hexColor ?? '#888888')"
-                        style="width: 100%;">
+                    <n-tag :color="getNaiveUITagColorProperty(projectPriority.hexColor)" style="width: 100%;">
                         {{ projectPriority.name }}
                     </n-tag>
                     <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="projectPriority.hexColor"

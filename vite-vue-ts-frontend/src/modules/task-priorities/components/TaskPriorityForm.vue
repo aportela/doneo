@@ -17,19 +17,19 @@
         taskPriorityId?: string;
     }
 
-    const emit = defineEmits(['add', 'update', 'cancel'])
-
     const props = defineProps<Props>();
 
+    const emit = defineEmits(['add', 'update', 'cancel'])
+
     const { t } = useI18n();
+
+    const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
     const taskPriority = ref<TaskPriority>(new TaskPriority());
 
     taskPriority.value.hexColor = generateRandomSoftHexColor();
 
-    const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
-
-    const taskPriorityFormRef = ref<FormInst | null>(null);
+    const formRef = ref<FormInst | null>(null);
 
     const taskPriorityFormRules: FormRules =
     {
@@ -79,9 +79,9 @@
 
     const onSave = async () => {
         serverErrors.value = {};
-        taskPriorityFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         try {
-            await taskPriorityFormRef.value?.validate();
+            await formRef.value?.validate();
             if (!props.taskPriorityId) {
                 await onAdd();
             } else {
@@ -99,7 +99,7 @@
 
     const onGet = async (id: string) => {
         serverErrors.value = {};
-        taskPriorityFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const response: TaskPriorityResponse = await taskPriorityService.get(id);
@@ -139,7 +139,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    taskPriorityFormRef.value?.validate().then(() => { }).catch(() => { });
+                    formRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -147,7 +147,7 @@
 
     const onAdd = async () => {
         serverErrors.value = {};
-        taskPriorityFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const addedTaskPriority: TaskPriorityResponse = await taskPriorityService.add(taskPriority.value.toAddTaskPriorityRequestPayload());
@@ -189,7 +189,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    taskPriorityFormRef.value?.validate().then(() => { }).catch(() => { });
+                    formRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -197,7 +197,7 @@
 
     const onUpdate = async () => {
         serverErrors.value = {};
-        taskPriorityFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const updatedTaskPriority: TaskPriorityResponse = await taskPriorityService.update(taskPriority.value.toUpdateTaskPriorityRequestPayload());
@@ -242,7 +242,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    taskPriorityFormRef.value?.validate().then(() => { }).catch(() => { });
+                    formRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -287,8 +287,7 @@
         <template #header-extra>
             <n-spin v-if="state.ajaxRunning" size="small" />
         </template>
-        <n-form ref="taskPriorityFormRef" :model="taskPriority" :rules="taskPriorityFormRules"
-            :disabled="state.ajaxRunning">
+        <n-form ref="formRef" :model="taskPriority" :rules="taskPriorityFormRules" :disabled="state.ajaxRunning">
             <n-form-item :label="t('modules.taskPriority.components.TaskPriorityForm.inputs.name.label')" path="name"
                 show-feedback>
                 <n-input type="text"
@@ -309,7 +308,7 @@
             </n-form-item>
             <n-form-item :label="t('modules.taskPriority.components.TaskPriorityForm.inputs.preview.label')">
                 <n-flex style="width: 100%" align="center" :wrap="false">
-                    <n-tag :color="getNaiveUITagColorProperty(taskPriority.hexColor ?? '#888888')" style="width: 100%;">
+                    <n-tag :color="getNaiveUITagColorProperty(taskPriority.hexColor)" style="width: 100%;">
                         {{ taskPriority.name }}
                     </n-tag>
                     <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="taskPriority.hexColor"
