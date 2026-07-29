@@ -4,14 +4,16 @@
     import { NAvatar } from 'naive-ui';
 
     interface Props {
-        userId: string | null;
-        userName: string | null;
+        userId: string;
+        userName: string;
         avatarSize?: "tiny" | "small" | "normal";
     };
 
     const props = withDefaults(defineProps<Props>(), {
         avatarSize: "tiny",
     });
+
+    const avatarURL = computed(() => `/api/wc/avatars/user/${props.userId}`);
 
     const avatarPixelSize = computed(() => {
         switch (props.avatarSize) {
@@ -24,14 +26,12 @@
         }
     });
 
-    const avatarURL = computed(() => `/api/wc/avatars/user/${props.userId}`);
 </script>
 
 <template>
     <div class="doneo-flex-center-align" style="gap: 8px;">
         <slot name="before"></slot>
-        <n-avatar v-if="props.userId" :src="avatarURL" class="doneo-avatar-username" :size="avatarPixelSize"
-            color="transparent" />
+        <n-avatar :src="avatarURL" class="doneo-avatar-username" :size="avatarPixelSize" color="transparent" />
         {{ props.userName }}
         <slot name="after"></slot>
     </div>
