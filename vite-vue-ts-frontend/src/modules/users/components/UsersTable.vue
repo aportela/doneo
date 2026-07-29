@@ -499,9 +499,10 @@
 </script>
 
 <template>
-    <n-modal v-model:show="showFormModal" v-if="showFormModal">
-        <UserForm class="user-form" :user-id="tmpItem.id" @add="onUserAdded" @update="onUserUpdated"
-            @cancel="hideFormModal" />
+    <n-modal v-model:show="showFormModal">
+        <UserForm class="doneo-user-form" :user-id="tmpItem.id" @add="onUserAdded" @update="onUserUpdated"
+            @cancel="hideFormModal" v-if="showFormModal" />
+        <span v-else />
     </n-modal>
     <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="items" :row-key="row => row.id"
         :columns="columns" :order="currentOrder" :pager-data="currentPagination" pager-position="both"
@@ -558,7 +559,7 @@
 </template>
 
 <style lang="css" scoped>
-    .user-form {
+    .doneo-user-form {
         width: 95%;
         max-width: 640px;
     }
