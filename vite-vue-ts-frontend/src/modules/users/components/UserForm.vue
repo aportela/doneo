@@ -326,7 +326,7 @@
             <n-form-item :label="t('modules.user.components.UserForm.inputs.name.label')" path="name" show-feedback>
                 <n-input type="text" :placeholder="t('modules.user.components.UserForm.inputs.name.placeholder')"
                     v-model:value="user.name" :maxlength="MAX_NAME_LENGTH" :show-count="true"
-                    :disabled="state.ajaxRunning" clearable required autofocus>
+                    :disabled="state.ajaxRunning" clearable autofocus>
                     <template #prefix>
                         <n-icon :component="DONEO_ICON_USER" />
                     </template>
@@ -335,7 +335,7 @@
             <n-form-item :label="t('modules.user.components.UserForm.inputs.email.label')" path="email" show-feedback>
                 <n-input type="text" :placeholder="t('modules.user.components.UserForm.inputs.email.placeholder')"
                     v-model:value="user.email" :maxlength="MAX_EMAIL_LENGTH" :show-count="true"
-                    :disabled="state.ajaxRunning" clearable required autofocus>
+                    :disabled="state.ajaxRunning" clearable autofocus>
                     <template #prefix>
                         <n-icon :component="DONEO_ICON_EMAIL" />
                     </template>

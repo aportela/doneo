@@ -190,7 +190,7 @@
                 show-feedback>
                 <n-input type="text" :placeholder="t('modules.task.components.NewTaskForm.inputs.summary.placeholder')"
                     :size="DEFAULT_INPUT_SIZE" v-model:value="task.summary" :maxlength="MAX_SUMMARY_LENGTH"
-                    :show-count="true" clearable required>
+                    :show-count="true" clearable>
                 </n-input>
             </n-form-item>
             <n-form-item :label="t('modules.task.components.NewTaskForm.inputs.description.label')" path="description"
@@ -204,14 +204,14 @@
                 <n-grid-item>
                     <n-form-item :label="t('modules.task.components.NewTaskForm.selectors.taskPriority.label')"
                         path="priority.id">
-                        <TaskPrioritySelector required v-model:id="task.priority.id"
+                        <TaskPrioritySelector v-model:id="task.priority.id"
                             :placeholder="t('modules.task.components.NewTaskForm.selectors.taskPriority.placeholder')" />
                     </n-form-item>
                 </n-grid-item>
                 <n-grid-item>
                     <n-form-item :label="t('modules.task.components.NewTaskForm.selectors.taskStatus.label')"
                         path="status.id">
-                        <TaskStatusSelector required v-model:id="task.status.id" set-default-value-on-start
+                        <TaskStatusSelector v-model:id="task.status.id" set-default-value-on-start
                             :placeholder="t('modules.task.components.NewTaskForm.selectors.taskStatus.placeholder')" />
                     </n-form-item>
                 </n-grid-item>

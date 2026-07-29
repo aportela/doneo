@@ -294,7 +294,7 @@
                 <n-input type="text"
                     :placeholder="t('modules.taskPriority.components.TaskPriorityForm.inputs.name.placeholder')"
                     v-model:value="taskPriority.name" :maxlength="MAX_NAME_LENGTH" :show-count="true"
-                    :disabled="state.ajaxRunning" clearable required autofocus>
+                    :disabled="state.ajaxRunning" clearable autofocus>
                     <template #prefix>
                         <n-icon :component="DONEO_ICON_NAME" />
                     </template>
@@ -304,7 +304,7 @@
                 show-feedback>
                 <n-input-number :min="0"
                     :placeholder="t('modules.taskPriority.components.TaskPriorityForm.inputs.index.placeholder')"
-                    v-model:value="taskPriority.index" :disabled="state.ajaxRunning" required>
+                    v-model:value="taskPriority.index" :disabled="state.ajaxRunning">
                 </n-input-number>
             </n-form-item>
             <n-form-item :label="t('modules.taskPriority.components.TaskPriorityForm.inputs.preview.label')">

@@ -269,7 +269,7 @@
                 <n-input type="text"
                     :placeholder="t('modules.projectType.components.ProjectTypeForm.inputs.name.placeholder')"
                     v-model:value="projectType.name" :maxlength="MAX_NAME_LENGTH" :show-count="true"
-                    :disabled="state.ajaxRunning" clearable required autofocus>
+                    :disabled="state.ajaxRunning" clearable autofocus>
                     <template #prefix>
                         <n-icon :component="DONEO_ICON_NAME" />
                     </template>

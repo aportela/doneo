@@ -292,7 +292,7 @@
                 <n-input type="text"
                     :placeholder="t('modules.projectStatus.components.ProjectStatusForm.inputs.name.placeholder')"
                     v-model:value="projectStatus.name" :maxlength="MAX_NAME_LENGTH" :show-count="true"
-                    :disabled="state.ajaxRunning" clearable required autofocus>
+                    :disabled="state.ajaxRunning" clearable autofocus>
                     <template #prefix>
                         <n-icon :component="DONEO_ICON_NAME" />
                     </template>
@@ -303,7 +303,7 @@
                     path="index" show-feedback>
                     <n-input-number :min="0"
                         :placeholder="t('modules.projectStatus.components.ProjectStatusForm.inputs.index.placeholder')"
-                        v-model:value="projectStatus.index" required :disabled="state.ajaxRunning">
+                        v-model:value="projectStatus.index" :disabled="state.ajaxRunning">
                     </n-input-number>
                 </n-form-item>
                 <n-form-item :label="t('modules.projectStatus.components.ProjectStatusForm.inputs.flags.label')">

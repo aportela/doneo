@@ -289,7 +289,7 @@
                 <n-input type="text"
                     :placeholder="t('modules.taskStatus.components.TaskStatusForm.inputs.name.placeholder')"
                     v-model:value="taskStatus.name" :maxlength="MAX_NAME_LENGTH" :show-count="true"
-                    :disabled="state.ajaxRunning" clearable required autofocus>
+                    :disabled="state.ajaxRunning" clearable autofocus>
                     <template #prefix>
                         <n-icon :component="DONEO_ICON_NAME" />
                     </template>

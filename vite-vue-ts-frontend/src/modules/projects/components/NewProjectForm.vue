@@ -232,7 +232,7 @@
                 <n-input type="text"
                     :placeholder="t('modules.project.components.NewProjectForm.inputs.slug.placeholder')"
                     :size="DEFAULT_INPUT_SIZE" v-model:value="project.slug" :maxlength="MAX_SLUG_LENGTH"
-                    :show-count="true" clearable required autofocus :disabled="state.ajaxRunning">
+                    :show-count="true" clearable autofocus :disabled="state.ajaxRunning">
                 </n-input>
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.inputs.summary.label')" path="summary"
@@ -240,7 +240,7 @@
                 <n-input type="text"
                     :placeholder="t('modules.project.components.NewProjectForm.inputs.summary.placeholder')"
                     :size="DEFAULT_INPUT_SIZE" v-model:value="project.summary" :maxlength="MAX_SUMMARY_LENGTH"
-                    :show-count="true" clearable required :disabled="state.ajaxRunning">
+                    :show-count="true" clearable :disabled="state.ajaxRunning">
                 </n-input>
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.inputs.description.label')"
@@ -253,19 +253,19 @@
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.selectors.projectType.label')"
                 path="type.id">
-                <ProjectTypeSelector required v-model:id="project.type.id"
+                <ProjectTypeSelector v-model:id="project.type.id"
                     :placeholder="t('modules.project.components.NewProjectForm.selectors.projectType.placeholder')"
                     :disabled="state.ajaxRunning" />
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.selectors.projectPriority.label')"
                 path="priority.id">
-                <ProjectPrioritySelector required v-model:id="project.priority.id"
+                <ProjectPrioritySelector v-model:id="project.priority.id"
                     :placeholder="t('modules.project.components.NewProjectForm.selectors.projectPriority.placeholder')"
                     :disabled="state.ajaxRunning" />
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.selectors.projectStatus.label')"
                 path="status.id">
-                <ProjectStatusSelector required v-model:id="project.status.id" set-default-value-on-start
+                <ProjectStatusSelector v-model:id="project.status.id" set-default-value-on-start
                     :placeholder="t('modules.project.components.NewProjectForm.selectors.projectStatus.placeholder')"
                     :disabled="state.ajaxRunning" />
             </n-form-item>

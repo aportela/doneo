@@ -289,7 +289,7 @@
                 <n-input type="text"
                     :placeholder="t('modules.projectPriority.components.ProjectPriorityForm.inputs.name.placeholder')"
                     v-model:value="projectPriority.name" :maxlength="MAX_NAME_LENGTH" :show-count="true"
-                    :disabled="state.ajaxRunning" clearable required autofocus>
+                    :disabled="state.ajaxRunning" clearable autofocus>
                     <template #prefix>
                         <n-icon :component="DONEO_ICON_NAME" />
                     </template>
@@ -299,7 +299,7 @@
                 path="index" show-feedback>
                 <n-input-number :min="0"
                     :placeholder="t('modules.projectPriority.components.ProjectPriorityForm.inputs.index.placeholder')"
-                    v-model:value="projectPriority.index" :disabled="state.ajaxRunning" required>
+                    v-model:value="projectPriority.index" :disabled="state.ajaxRunning">
                 </n-input-number>
             </n-form-item>
             <n-form-item :label="t('modules.projectPriority.components.ProjectPriorityForm.inputs.preview.label')">
