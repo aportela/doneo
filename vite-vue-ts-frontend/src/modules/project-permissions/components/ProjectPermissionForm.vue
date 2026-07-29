@@ -171,13 +171,13 @@
             :disabled="state.ajaxRunning">
             <n-form-item :label="t('modules.projectPermission.components.ProjectPermissionForm.inputs.user.label')"
                 path="user.id">
-                <UserSelector auto-focus required v-model:id="projectPermission.user.id"
+                <UserSelector auto-focus v-model:id="projectPermission.user.id"
                     :placeholder="t('modules.projectPermission.components.ProjectPermissionForm.inputs.user.placeholder')"
                     :disabled="state.ajaxRunning" />
             </n-form-item>
             <n-form-item :label="t('modules.projectPermission.components.ProjectPermissionForm.inputs.role.label')"
                 path="role.id">
-                <RoleSelector required v-model:id="projectPermission.role.id"
+                <RoleSelector v-model:id="projectPermission.role.id"
                     :placeholder="t('modules.projectPermission.components.ProjectPermissionForm.inputs.role.placeholder')"
                     :disabled="state.ajaxRunning" />
             </n-form-item>
