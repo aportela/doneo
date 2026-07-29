@@ -1,8 +1,7 @@
 <script setup lang="ts">
     import { ref, shallowRef, reactive, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
 
-    import { NInputGroup, NButton, NSelect, NIcon, type SelectOption, type SelectSize, type SelectInst } from 'naive-ui';
-    import { IconAlertCircle } from '@tabler/icons-vue';
+    import { NInputGroup, NButton, NSelect, NIcon, type SelectOption, type SelectInst } from 'naive-ui';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { roleService } from '../services/role';
@@ -10,13 +9,15 @@
     import { appBus } from '../../../shared/composables/bus';
     import { handleAPIError } from '../../../api/client/errorHandler';
 
+    import { DONEO_ICON_ALERT } from '../../../shared/types/icons';
+
+    // TODO: add cache ???
+
     interface Props {
-        autoFocus?: boolean;
-        required?: boolean;
-        placeholder?: string;
         clearable?: boolean;
-        size?: SelectSize;
         disabled?: boolean;
+        placeholder?: string;
+        autoFocus?: boolean;
     }
 
     const props = defineProps<Props>();
@@ -29,8 +30,14 @@
 
     const roleId = defineModel<string | null>('id');
 
-
     const options = shallowRef<SelectOption[]>([]);
+
+    const focus = async () => {
+        await nextTick();
+        selectInstRef.value?.focus();
+    };
+
+    defineExpose({ focus });
 
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
@@ -61,20 +68,12 @@
         }
         finally {
             state.ajaxRunning = false;
+            if (!state.ajaxErrors && props.autoFocus) {
+                focus();
+            }
         }
     };
 
-    const focus = () => {
-        nextTick(() => {
-            selectInstRef.value?.focus();
-        });
-    };
-
-    const reset = () => {
-        roleId.value = null;
-    }
-
-    defineExpose({ reset });
 
     let stopBusReauthListener: () => void;
 
@@ -94,13 +93,11 @@
 
 <template>
     <n-input-group>
-        <n-select filterable ref="selectInstRef" :required="props.required" :clearable="props.clearable"
-            v-model:value="roleId" :options="options" :placeholder="props.placeholder" :size="props.size"
-            :disabled="isDisabled" />
-        <n-button secondary :disabled="true" class="doneo-cursor-default doneo-disable-opacity" v-if="state.ajaxErrors">
+        <n-select filterable ref="selectInstRef" :clearable="props.clearable" v-model:value="roleId" :options="options"
+            :placeholder="props.placeholder" :disabled="isDisabled" />
+        <n-button disabled class="doneo-cursor-default doneo-disable-opacity" v-if="state.ajaxErrors">
             <template #icon>
-                <n-icon color="red" :component="IconAlertCircle">
-                </n-icon>
+                <n-icon color="red" :component="DONEO_ICON_ALERT" />
             </template>
         </n-button>
     </n-input-group>
