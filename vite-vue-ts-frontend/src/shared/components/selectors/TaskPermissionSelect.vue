@@ -84,12 +84,6 @@
         });
     };
 
-    const reset = () => {
-        selectedValue.value = null;
-    }
-
-    defineExpose({ reset });
-
     onMounted(() => {
         if (props.autoFocus) {
             focus();
