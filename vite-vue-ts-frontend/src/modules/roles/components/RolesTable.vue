@@ -4,31 +4,33 @@
 
     import { NModal, useDialog, NIcon, NButton, NButtonGroup } from 'naive-ui';
 
+    import { DONEO_ICON_ACTION_DELETE, DONEO_ICON_ACTION_EDIT } from '../../../shared/types/icons.ts';
+
     import { useLoadingStore } from '../../../stores/loading';
     import { useCacheStore } from '../../../stores/cache.ts';
+    import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
 
     import { useNotify } from '../../../shared/composables/notification';
     import { appBus } from '../../../shared/composables/bus';
 
-    import type { Order } from '../../../shared/types/order.ts';
-    import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
 
     import { Role } from '../models/role';
 
-    import { useTableSettingsStore } from '../../../stores/tableSettings.ts';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
+    import { PAGER_DEFAULT_RESULTS_PAGE_NO_PAGINATION, type Pagination } from '../../../shared/types/pager.ts';
+    import type { Order } from '../../../shared/types/order.ts';
     import { roleService } from '../services/role.ts';
     import { handleAPIError } from '../../../api/client/errorHandler';
+    import type { RoleResponse, SearchRequest } from '../types/dto.ts';
 
+    import RoleForm from './RoleForm.vue';
+    import type { TableHeaderColumn } from '../../../shared/types/table-header-column';
     import ManageTable from '../../../shared/components/tables/ManageTable.vue';
     import TextFilterInput from '../../../shared/components/form-blocks/TextFilterInput.vue';
     import ProjectPermissionSelect from '../../../shared/components/selectors/ProjectPermissionSelect.vue';
     import TaskPermissionSelect from '../../../shared/components/selectors/TaskPermissionSelect.vue';
     import type { ProjectPermissionSelectValue } from '../../../shared/types/project-permission-select-value.ts';
     import type { TaskPermissionSelectValue } from '../../../shared/types/task-permission-select-value.ts';
-    import type { RoleResponse, SearchRequest } from '../types/dto.ts';
-    import RoleForm from './RoleForm.vue';
-    import { DONEO_ICON_ACTION_DELETE, DONEO_ICON_ACTION_EDIT } from '../../../shared/types/icons.ts';
     import { renderIcon, renderLabel, renderProjectPermissionIcons, renderTaskPermissionIcons } from '../../../shared/composables/naive-ui-helpers.ts';
 
     interface Props {
@@ -77,6 +79,8 @@
         }
     };
 
+    const currentPagination = reactive<Pagination>({ enabled: false, currentPage: 1, resultsPage: PAGER_DEFAULT_RESULTS_PAGE_NO_PAGINATION, totalPages: 1, totalResults: 0 });
+
     const projectPermissionSelectorRef = ref<InstanceType<typeof ProjectPermissionSelect>[] | null>(null);
     const taskPermissionSelectorRef = ref<InstanceType<typeof TaskPermissionSelect>[] | null>(null);
 
@@ -100,12 +104,8 @@
 
     const onClearFilters = () => {
         filters.name = "";
-        if (projectPermissionSelectorRef.value) {
-            projectPermissionSelectorRef.value[0]?.reset();
-        }
-        if (taskPermissionSelectorRef.value) {
-            taskPermissionSelectorRef.value[0]?.reset();
-        }
+        projectPermissionSelectorRef.value = null;
+        taskPermissionSelectorRef.value = null;
     };
 
 
@@ -140,7 +140,6 @@
             );
         });
     });
-
 
     const columnDefinitions = reactive<TableHeaderColumn<Role>[]>([
         {
@@ -260,17 +259,11 @@
         showNoItemsWarningMessage.value = false;
         try {
             const payload: SearchRequest = {
-                pager: {
-                    enabled: false,
-                    currentPage: 1,
-                    resultsPage: 0,
-                },
-                order: {
-                    field: currentOrder.field,
-                    direction: currentOrder.direction,
-                },
+                pager: currentPagination,
+                order: currentOrder,
                 filter: {
-                    //name: filters.name.length > 0 ? filters.name : undefined,
+                    // disabled (local filtering)
+                    //name: filters.name !== "" ? filters.name : undefined,
                 }
             };
             const response = await roleService.search(payload);
@@ -360,9 +353,9 @@
 </script>
 
 <template>
-    <n-modal v-model:show="showFormModal" v-if="showFormModal">
-        <RoleForm class="role-form" :role-id="tmpItem.id" @add="onRoleAdded" @update="onRoleUpdated"
-            @cancel="hideFormModal" />
+    <n-modal v-model:show="showFormModal">
+        <RoleForm class="doneo-role-form" :role-id="tmpItem.id" @add="onRoleAdded" @update="onRoleUpdated"
+            @cancel="hideFormModal" v-if="showFormModal" />
     </n-modal>
     <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="localFilteredItems"
         :row-key="row => row.id" :columns="columns" :order="currentOrder"
@@ -371,17 +364,17 @@
         @refresh="onRefresh" @add="onAdd" @clear-filters="onClearFilters">
         <template #thead-column-filters="{ columns }">
             <th v-for="column in columns">
-                <TextFilterInput v-if="column.field === 'name'" clearable :disabled="state.ajaxRunning" size="small"
+                <TextFilterInput v-if="column.field === 'name'" clearable :disabled="state.ajaxRunning"
                     :placeholder="t('modules.role.components.RolesTable.filters.name.placeholder')"
                     v-model:value="filters.name" />
-                <ProjectPermissionSelect v-else-if="column.field == 'projectPermissions'"
-                    v-model:permission="filters.projectPermission"
-                    :placeholder="t('shared.components.selectors.ProjectPermissionSelect.placeholder')" clearable
-                    ref="projectPermissionSelectorRef" />
-                <TaskPermissionSelect v-else-if="column.field === 'taskPermissions'"
-                    v-model:permission="filters.taskPermission"
-                    :placeholder="t('shared.components.selectors.TaskPermissionSelect.placeholder')" clearable
-                    ref="taskPermissionSelectorRef" />
+                <ProjectPermissionSelect v-else-if="column.field == 'projectPermissions'" clearable
+                    :disabled="state.ajaxRunning"
+                    :placeholder="t('shared.components.selectors.ProjectPermissionSelect.placeholder')"
+                    v-model:permission="filters.projectPermission" ref="projectPermissionSelectorRef" />
+                <TaskPermissionSelect v-else-if="column.field === 'taskPermissions'" clearable
+                    :disabled="state.ajaxRunning"
+                    :placeholder="t('shared.components.selectors.TaskPermissionSelect.placeholder')"
+                    v-model:permission="filters.taskPermission" ref="taskPermissionSelectorRef" />
             </th>
         </template>
         <template #rowactions="{ row }">
@@ -405,7 +398,7 @@
 </template>
 
 <style lang="css" scoped>
-    .role-form {
+    .doneo-role-form {
         width: 95%;
         max-width: 640px;
     }
