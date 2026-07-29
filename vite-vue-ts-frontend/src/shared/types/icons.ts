@@ -36,3 +36,7 @@ export {
   CircleUser as DONEO_ICON_CIRCLE_USER,
   TriangleAlert as DONEO_ICON_ALERT,
 } from "@lucide/vue";
+
+export { default as DONEO_ICON_SQUARE } from "../components/icons/Square.vue";
+
+export { default as DONEO_ICON_SQUARE_FILLED } from "../components/icons/SquareFilled.vue";
