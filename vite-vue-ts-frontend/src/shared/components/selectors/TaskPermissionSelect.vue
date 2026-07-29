@@ -1,100 +1,55 @@
 <script setup lang="ts">
-    import { ref, computed, watch, onMounted, nextTick } from 'vue';
+    import { computed } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSelect, type SelectOption, type SelectSize, type SelectInst } from 'naive-ui';
+    import { NSelect, type SelectOption } from 'naive-ui';
 
     import type { TaskPermissionSelectValue } from '../../types/task-permission-select-value';
 
     interface Props {
-        autoFocus?: boolean;
-        required?: boolean;
-        placeholder?: string;
         clearable?: boolean;
-        size?: SelectSize;
         disabled?: boolean;
+        placeholder?: string;
     }
 
     const props = defineProps<Props>();
 
     const { t } = useI18n();
 
-    const selectInstRef = ref<SelectInst | null>(null)
-
-    const selectedValue = ref<number | null>(null);
-
     const permission = defineModel<TaskPermissionSelectValue | null>("permission", { default: null });
 
     const options = computed<SelectOption[]>(() => [
         {
             label: t("shared.components.selectors.TaskPermissionSelect.options.updateTaskAllowed"),
-            value: 1
+            value: "updateTaskAllowed",
         },
         {
             label: t("shared.components.selectors.TaskPermissionSelect.options.updateTaskDenied"),
-            value: 2
+            value: "updateTaskDenied",
         },
         {
             label: t("shared.components.selectors.TaskPermissionSelect.options.deleteTaskAllowed"),
-            value: 3
+            value: "deleteTaskAllowed",
         },
         {
             label: t("shared.components.selectors.TaskPermissionSelect.options.deleteTaskDenied"),
-            value: 4
+            value: "deleteTaskDenied",
         },
         {
             label: t("shared.components.selectors.TaskPermissionSelect.options.viewTaskAllowed"),
-            value: 5
+            value: "viewTaskAllowed",
         },
         {
             label: t("shared.components.selectors.TaskPermissionSelect.options.viewTaskDenied"),
-            value: 6
+            value: "viewTaskDenied",
         },
     ]);
 
-    watch(selectedValue, (newValue: number | null) => {
-        switch (newValue) {
-            case 1:
-                permission.value = "updateTaskAllowed"
-                break;
-            case 2:
-                permission.value = "updateTaskDenied"
-                break;
-            case 3:
-                permission.value = "deleteTaskAllowed"
-                break;
-            case 4:
-                permission.value = "deleteTaskDenied"
-                break;
-            case 5:
-                permission.value = "viewTaskAllowed"
-                break;
-            case 6:
-                permission.value = "viewTaskDenied"
-                break;
-            default:
-                permission.value = null;
-                break;
-        }
-    });
-
-    const focus = () => {
-        nextTick(() => {
-            selectInstRef.value?.focus();
-        });
-    };
-
-    onMounted(() => {
-        if (props.autoFocus) {
-            focus();
-        }
-    });
 </script>
 
 <template>
-    <n-select filterable ref="selectInstRef" :required="props.required" :clearable="props.clearable"
-        v-model:value="selectedValue" :options="options" :placeholder="props.placeholder" :size="props.size"
-        :disabled="props.disabled" />
+    <n-select filterable :clearable="props.clearable" v-model:value="permission" :options="options"
+        :placeholder="props.placeholder" :disabled="props.disabled" />
 </template>
 
 <style lang="css" scoped></style>
