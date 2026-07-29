@@ -4,52 +4,41 @@
 
     import { NSelect } from 'naive-ui';
     import type { SelectMixedOption } from "naive-ui/es/select/src/interface";
-    import type { SelectSize } from "naive-ui";
 
     import { UserPermissionFilterValue, type UserPermissionFilter } from "../types/user-admin-permission-filter";
 
     interface Props {
-        disabled?: boolean;
-        size?: SelectSize,
-        placeholder?: string;
         clearable?: boolean;
+        disabled?: boolean;
+        placeholder?: string;
     }
+
+    const props = defineProps<Props>();
 
     const { t } = useI18n();
 
-    const props = withDefaults(defineProps<Props>(), {
-        disabled: false,
-        size: "medium",
-        clearable: false,
-    });
-
-    const options = computed<SelectMixedOption[]>(() => [
+    const options = computed(() => [
         { label: t("modules.user.components.UserPermissionsFilterSelector.options.any"), value: UserPermissionFilterValue.Any },
         { label: t("modules.user.components.UserPermissionsFilterSelector.options.onlyAdministrators"), value: UserPermissionFilterValue.OnlyAdministrators },
         { label: t("modules.user.components.UserPermissionsFilterSelector.options.onlyUsers"), value: UserPermissionFilterValue.OnlyUsers }
-    ]);
-
+    ] satisfies SelectMixedOption[]);
 
     const model = defineModel<UserPermissionFilter>('value', { default: UserPermissionFilterValue.Any });
 
-
-    const permission = computed({
+    const selectedPermission = computed({
         get() {
             return model.value;
         },
-        set(value) {
-            if (value !== null) {
-                model.value = value;
-            } else {
-                model.value = UserPermissionFilterValue.Any;
-            }
+        set(value: UserPermissionFilter | null) {
+            model.value = value ?? UserPermissionFilterValue.Any;
         }
     });
+
 </script>
 
 <template>
-    <n-select :size="props.size" :disabled="props.disabled" :options="options" v-model:value="permission"
-        :placeholder="props.placeholder" :clearable="props.clearable" />
+    <n-select :clearable="props.clearable" :disabled="props.disabled" :options="options"
+        :placeholder="props.placeholder" v-model:value="selectedPermission" />
 </template>
 
 <style lang="css" scoped></style>
