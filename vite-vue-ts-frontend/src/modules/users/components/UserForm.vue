@@ -17,9 +17,9 @@
         userId?: string;
     }
 
-    const emit = defineEmits(['add', 'update', 'cancel'])
-
     const props = defineProps<Props>();
+
+    const emit = defineEmits(['add', 'update', 'cancel'])
 
     const { t } = useI18n();
 
