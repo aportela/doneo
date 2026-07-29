@@ -510,25 +510,26 @@
         @refresh="onRefresh" @add="onAdd" @pager-changed="onPagerChanged" @clear-filters="onClearFilters">
         <template #thead-column-filters="{ columns }">
             <th v-for="column in columns">
-                <UserPermissionsFilterSelector v-if="column.field === 'permissions'" size="small" clearable
-                    v-model:value="filters.permissions" :disabled="state.ajaxRunning"
-                    :placeholder="t('modules.user.components.UsersTable.header.filters.permissions.placeholder')" />
-                <TextFilterInput v-else-if="column.field === 'name'" clearable size="small"
+                <UserPermissionsFilterSelector v-if="column.field === 'permissions'" clearable
+                    :disabled="state.ajaxRunning"
+                    :placeholder="t('modules.user.components.UsersTable.header.filters.permissions.placeholder')"
+                    v-model:value="filters.permissions" />
+                <TextFilterInput v-else-if="column.field === 'name'" clearable :disabled="state.ajaxRunning"
                     :placeholder="t('modules.user.components.UsersTable.header.filters.name.placeholder')"
-                    v-model:value="filters.name" @keydown-enter="onRefresh" :disabled="state.ajaxRunning" />
-                <TextFilterInput v-else-if="column.field === 'email'" clearable size="small"
+                    v-model:value="filters.name" @keydown-enter="onRefresh" />
+                <TextFilterInput v-else-if="column.field === 'email'" clearable :disabled="state.ajaxRunning"
                     :placeholder="t('modules.user.components.UsersTable.header.filters.email.placeholder')"
-                    v-model:value="filters.email" @keydown-enter="onRefresh" :disabled="state.ajaxRunning" />
-                <DateFilterSelect v-else-if="column.field === 'createdAt'" clearable v-model:range="filters.createdAt"
-                    ref="createdAtFilterRef" :disabled="state.ajaxRunning" />
-                <DateFilterSelect v-else-if="column.field === 'updatedAt'" clearable v-model:range="filters.updatedAt"
-                    ref="updatedAtFilterRef" :disabled="state.ajaxRunning" />
-                <DateFilterSelect v-else-if="column.field === 'deletedAt'" clearable v-model:range="filters.deletedAt"
-                    ref="deletedAtFilterRef" :disabled="state.ajaxRunning" />
+                    v-model:value="filters.email" @keydown-enter="onRefresh" />
+                <DateFilterSelect v-else-if="column.field === 'createdAt'" clearable :disabled="state.ajaxRunning"
+                    v-model:range="filters.createdAt" ref="createdAtFilterRef" />
+                <DateFilterSelect v-else-if="column.field === 'updatedAt'" clearable :disabled="state.ajaxRunning"
+                    v-model:range="filters.updatedAt" ref="updatedAtFilterRef" />
+                <DateFilterSelect v-else-if="column.field === 'deletedAt'" clearable :disabled="state.ajaxRunning"
+                    v-model:range="filters.deletedAt" ref="deletedAtFilterRef" />
             </th>
         </template>
         <template #rowactions="{ row }">
-            <n-button-group class="doneo-table-actions-button-group" size="small">
+            <n-button-group class="doneo-table-actions-button-group">
                 <n-button @click="onUpdate(row)" :disabled="state.ajaxRunning || row.deletedAt?.hasValue()"
                     class="doneo-table-actions-button">
                     {{ t("shared.buttons.Edit.label") }}
