@@ -3,7 +3,7 @@
     import { useI18n } from "vue-i18n";
 
     import { NSelect } from 'naive-ui';
-    import type { SelectMixedOption } from "naive-ui/es/select/src/interface";
+    import type { SelectOption } from "naive-ui/es/select/src/interface";
 
     import { UserPermissionFilterValue, type UserPermissionFilter } from "../types/user-admin-permission-filter";
 
@@ -21,7 +21,7 @@
         { label: t("modules.user.components.UserPermissionsFilterSelector.options.any"), value: UserPermissionFilterValue.Any },
         { label: t("modules.user.components.UserPermissionsFilterSelector.options.onlyAdministrators"), value: UserPermissionFilterValue.OnlyAdministrators },
         { label: t("modules.user.components.UserPermissionsFilterSelector.options.onlyUsers"), value: UserPermissionFilterValue.OnlyUsers }
-    ] satisfies SelectMixedOption[]);
+    ] satisfies SelectOption[]);
 
     const model = defineModel<UserPermissionFilter>('value', { default: UserPermissionFilterValue.Any });
 
