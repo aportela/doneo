@@ -35,9 +35,6 @@
         try {
             const response = await roleService.searchBase();
             options.value = response.roles.map((role: RoleBaseResponse) => ({ label: role.name, value: role.id }));
-            if (props.autoFocus) {
-                focus();
-            }
         } catch (error: unknown) {
             options.value.length = 0;
             state.ajaxErrors = true;
@@ -59,9 +56,6 @@
         }
         finally {
             state.ajaxRunning = false;
-            if (!state.ajaxErrors && props.autoFocus) {
-                focus();
-            }
         }
     };
 
