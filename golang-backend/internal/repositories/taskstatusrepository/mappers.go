@@ -52,6 +52,8 @@ func mapSQLiteError(err error) error {
 	case sqlite3.SQLITE_CONSTRAINT_UNIQUE:
 		if strings.Contains(sqlErr.Error(), "task_statuses.name") {
 			return &domain.AlreadyExistsError{Field: "name"}
+		} else if strings.Contains(sqlErr.Error(), "task_statuses.item_index") {
+			return &domain.AlreadyExistsError{Field: "index"}
 		}
 	case sqlite3.SQLITE_CONSTRAINT_CHECK:
 		if strings.Contains(sqlErr.Error(), "length(name)") {
