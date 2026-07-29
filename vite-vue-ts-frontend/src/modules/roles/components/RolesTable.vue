@@ -81,9 +81,6 @@
 
     const currentPagination = reactive<Pagination>({ enabled: false, currentPage: 1, resultsPage: PAGER_DEFAULT_RESULTS_PAGE_NO_PAGINATION, totalPages: 1, totalResults: 0 });
 
-    const projectPermissionSelectorRef = ref<InstanceType<typeof ProjectPermissionSelect>[] | null>(null);
-    const taskPermissionSelectorRef = ref<InstanceType<typeof TaskPermissionSelect>[] | null>(null);
-
     interface RolesTableFilters {
         name: string;
         projectPermission: ProjectPermissionSelectValue | null;
@@ -104,8 +101,8 @@
 
     const onClearFilters = () => {
         filters.name = "";
-        projectPermissionSelectorRef.value = null;
-        taskPermissionSelectorRef.value = null;
+        filters.projectPermission = null;
+        filters.taskPermission = null;
     };
 
     const nameFilterLowerCase = computed(() => filters.name.toLowerCase());

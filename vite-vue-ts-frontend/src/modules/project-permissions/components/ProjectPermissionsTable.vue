@@ -84,9 +84,6 @@
         }
     };
 
-    const projectPermissionSelectorRef = ref<InstanceType<typeof ProjectPermissionSelect>[] | null>(null);
-    const taskPermissionSelectorRef = ref<InstanceType<typeof ProjectPermissionSelect>[] | null>(null);
-
     interface ProjectPermissionsTableFilters {
         userId: string | null;
         roleId: string | null;
@@ -111,12 +108,8 @@
     const onClearFilters = () => {
         filters.userId = null;
         filters.roleId = null;
-        if (projectPermissionSelectorRef.value) {
-            projectPermissionSelectorRef.value[0]?.reset();
-        }
-        if (taskPermissionSelectorRef.value) {
-            taskPermissionSelectorRef.value[0]?.reset();
-        }
+        filters.projectPermission = null;
+        filters.taskPermission = null;
     };
 
     const localFilteredItems = computed(() => {
