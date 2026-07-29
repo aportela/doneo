@@ -637,7 +637,7 @@ export default {
         RoleForm: {
           headers: {
             addRole: "Add role",
-            updateRole: "Update role",
+            editRole: "Edit role",
             rolePermissions: "Role permissions",
             projectPermissions: "Project permissions",
             taskPermissions: "Task permissions",

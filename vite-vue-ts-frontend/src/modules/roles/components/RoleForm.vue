@@ -3,7 +3,7 @@
     import { useI18n } from "vue-i18n";
 
     import { NSpin, NCard, NInput, NFlex, NButton, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NGrid, NGi, NSwitch } from 'naive-ui';
-    import { DONEO_ICON_ACTION_CANCEL, DONEO_ICON_ACTION_SAVE, DONEO_ICON_ADD, DONEO_ICON_EDIT, DONEO_ICON_USER } from '../../../shared/types/icons';
+    import { DONEO_ICON_ACTION_CANCEL, DONEO_ICON_ACTION_SAVE, DONEO_ICON_ADD, DONEO_ICON_EDIT, DONEO_ICON_ROLE } from '../../../shared/types/icons';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { Role, MAX_NAME_LENGTH } from '../models/role';
@@ -16,21 +16,19 @@
         roleId?: string;
     }
 
-    const emit = defineEmits(['add', 'update', 'cancel'])
-
     const props = defineProps<Props>();
+
+    const emit = defineEmits(['add', 'update', 'cancel'])
 
     const { t } = useI18n();
 
-    const role = ref<Role>(new Role());
-
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    const showPasswordField = ref<boolean>(true);
+    const role = ref<Role>(new Role());
 
     const serverErrors = ref<Record<string, string>>({});
 
-    const roleFormRef = ref<FormInst | null>(null);
+    const formRef = ref<FormInst | null>(null);
 
     const roleFormRules: FormRules =
     {
@@ -63,9 +61,9 @@
 
     const onSave = async () => {
         serverErrors.value = {};
-        roleFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         try {
-            await roleFormRef.value?.validate();
+            await formRef.value?.validate();
             if (!props.roleId) {
                 await onAdd();
             } else {
@@ -83,15 +81,11 @@
 
     const onGet = async (id: string) => {
         serverErrors.value = {};
-        roleFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const response: RoleResponse = await roleService.get(id);
-            if (response.id === id) {
-                role.value = new Role(response);
-            } else {
-                state.ajaxErrorMessage = t("modules.role.components.RoleForm.errors.loadError");
-            }
+            role.value = new Role(response);
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -123,7 +117,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    roleFormRef.value?.validate().then(() => { }).catch(() => { });
+                    formRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -131,7 +125,7 @@
 
     const onAdd = async () => {
         serverErrors.value = {};
-        roleFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const addedRole: RoleResponse = await roleService.add(role.value.toAddRoleRequestPayload());
@@ -171,7 +165,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    roleFormRef.value?.validate().then(() => { }).catch(() => { });
+                    formRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -179,7 +173,7 @@
 
     const onUpdate = async () => {
         serverErrors.value = {};
-        roleFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const updatedRole: RoleResponse = await roleService.update(role.value.toUpdateRoleRequestPayload());
@@ -222,7 +216,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    roleFormRef.value?.validate().then(() => { }).catch(() => { });
+                    formRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -243,7 +237,6 @@
             }
         });
         if (props.roleId) {
-            showPasswordField.value = false;
             onGet(props.roleId);
         }
     });
@@ -260,21 +253,21 @@
                 <n-icon class="doneo-mr-4px" :component="!props.roleId ? DONEO_ICON_ADD : DONEO_ICON_EDIT" />
                 {{
                     t(!props.roleId ? "modules.role.components.RoleForm.headers.addRole" :
-                        "modules.role.components.RoleForm.headers.updateRole")
+                        "modules.role.components.RoleForm.headers.editRole")
                 }}
             </div>
         </template>
         <template #header-extra>
             <n-spin v-if="state.ajaxRunning" size="small" />
         </template>
-        <n-form ref="roleFormRef" :model="role" :rules="state.ajaxRunning ? {} : roleFormRules"
+        <n-form ref="formRef" :model="role" :rules="state.ajaxRunning ? {} : roleFormRules"
             :disabled="state.ajaxRunning">
             <n-form-item :label="t('modules.role.components.RoleForm.inputs.name.label')" path="name" show-feedback>
                 <n-input type="text" :placeholder="t('modules.role.components.RoleForm.inputs.name.placeholder')"
                     v-model:value="role.name" :maxlength="MAX_NAME_LENGTH" :show-count="true"
                     :disabled="state.ajaxRunning" clearable required autofocus>
                     <template #prefix>
-                        <n-icon :component="DONEO_ICON_USER" />
+                        <n-icon :component="DONEO_ICON_ROLE" />
                     </template>
                 </n-input>
             </n-form-item>
@@ -284,7 +277,7 @@
                 <n-gi>
                     <h4 class="doneo-permission-group-header">{{
                         t("modules.role.components.RoleForm.headers.projectPermissions")
-                        }}</h4>
+                    }}</h4>
                     <n-switch v-model:value="role.permissions.allowUpdateProject" class="doneo-permission-switch"
                         :disabled="state.ajaxRunning">
                         <template #checked>
@@ -316,7 +309,7 @@
                 <n-gi>
                     <h4 class="doneo-permission-group-header">{{
                         t("modules.role.components.RoleForm.headers.taskPermissions")
-                        }}
+                    }}
                     </h4>
                     <n-switch v-model:value="role.permissions.allowAddTask" class="doneo-permission-switch"
                         :disabled="state.ajaxRunning">
