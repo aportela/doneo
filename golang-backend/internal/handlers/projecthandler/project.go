@@ -243,6 +243,21 @@ func (handler *projectHandler) Search(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
+		if request.Filter.DeletedAt != nil {
+			filter.DeletedAt = &domain.TimestampFilter{From: nil, To: nil, Filled: nil, Empty: nil}
+			if request.Filter.DeletedAt.Filled != nil {
+				filter.DeletedAt.Filled = request.Filter.DeletedAt.Filled
+			} else if request.Filter.DeletedAt.Empty != nil {
+				filter.DeletedAt.Empty = request.Filter.DeletedAt.Empty
+			} else {
+				if request.Filter.DeletedAt.From != nil {
+					filter.DeletedAt.From = request.Filter.DeletedAt.From
+				}
+				if request.Filter.DeletedAt.To != nil {
+					filter.DeletedAt.To = request.Filter.DeletedAt.To
+				}
+			}
+		}
 	}
 	projects, pagerResult, err := handler.service.Search(r.Context(),
 		browser.PagerQuery{

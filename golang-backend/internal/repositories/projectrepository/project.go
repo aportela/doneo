@@ -348,7 +348,6 @@ func (repository *projectRepository) Search(ctx context.Context, dbExecutor data
 		filterArgs = append(filterArgs, domain.PermissionViewProject)
 		filterArgs = append(filterArgs, domain.PermissionViewProject)
 	}
-
 	if filterDTO.Slug != nil && len(*filterDTO.Slug) > 0 {
 		sqlWhereConditions = append(sqlWhereConditions, "P.slug LIKE ?")
 		filterArgs = append(filterArgs, "%"+*filterDTO.Slug+"%")
@@ -369,6 +368,10 @@ func (repository *projectRepository) Search(ctx context.Context, dbExecutor data
 		sqlWhereConditions = append(sqlWhereConditions, "P.status_id = ?")
 		filterArgs = append(filterArgs, *filterDTO.StatusID)
 	}
+	if filterDTO.CreatedByUserID != nil && len(*filterDTO.CreatedByUserID) > 0 {
+		sqlWhereConditions = append(sqlWhereConditions, "P.creator_id = ?")
+		filterArgs = append(filterArgs, *filterDTO.CreatedByUserID)
+	}
 	if filterDTO.CreatedAt != nil {
 		if filterDTO.CreatedAt.Empty != nil && *filterDTO.CreatedAt.Empty {
 			sqlWhereConditions = append(sqlWhereConditions, "P.created_at IS NULL")
@@ -385,11 +388,106 @@ func (repository *projectRepository) Search(ctx context.Context, dbExecutor data
 			}
 		}
 	}
-	// TODO: updatedat, deletedat, startedat, finishedat, dueat
-	if filterDTO.CreatedByUserID != nil && len(*filterDTO.CreatedByUserID) > 0 {
-		sqlWhereConditions = append(sqlWhereConditions, "P.creator_id = ?")
-		filterArgs = append(filterArgs, *filterDTO.CreatedByUserID)
+	if filterDTO.UpdatedAt != nil {
+		if filterDTO.UpdatedAt.Empty != nil && *filterDTO.UpdatedAt.Empty {
+			sqlWhereConditions = append(sqlWhereConditions, "P.updated_at IS NULL")
+		} else if filterDTO.UpdatedAt.Filled != nil && *filterDTO.UpdatedAt.Filled {
+			sqlWhereConditions = append(sqlWhereConditions, "P.updated_at IS NOT NULL")
+		} else {
+			if filterDTO.UpdatedAt.From != nil && *filterDTO.UpdatedAt.From > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "P.updated_at >= ?")
+				filterArgs = append(filterArgs, filterDTO.UpdatedAt.From)
+			}
+			if filterDTO.UpdatedAt.To != nil && *filterDTO.UpdatedAt.To > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "P.updated_at <= ?")
+				filterArgs = append(filterArgs, filterDTO.UpdatedAt.To)
+			}
+		}
 	}
+	if filterDTO.StartedAt != nil {
+		if filterDTO.StartedAt.Empty != nil && *filterDTO.StartedAt.Empty {
+			sqlWhereConditions = append(sqlWhereConditions, "P.started_at IS NULL")
+		} else if filterDTO.StartedAt.Filled != nil && *filterDTO.StartedAt.Filled {
+			sqlWhereConditions = append(sqlWhereConditions, "P.started_at IS NOT NULL")
+		} else {
+			if filterDTO.StartedAt.From != nil && *filterDTO.StartedAt.From > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "P.started_at >= ?")
+				filterArgs = append(filterArgs, filterDTO.StartedAt.From)
+			}
+			if filterDTO.StartedAt.To != nil && *filterDTO.StartedAt.To > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "P.started_at <= ?")
+				filterArgs = append(filterArgs, filterDTO.StartedAt.To)
+			}
+		}
+	}
+	if filterDTO.FinishedAt != nil {
+		if filterDTO.FinishedAt.Empty != nil && *filterDTO.FinishedAt.Empty {
+			sqlWhereConditions = append(sqlWhereConditions, "P.finished_at IS NULL")
+		} else if filterDTO.FinishedAt.Filled != nil && *filterDTO.FinishedAt.Filled {
+			sqlWhereConditions = append(sqlWhereConditions, "P.finished_at IS NOT NULL")
+		} else {
+			if filterDTO.FinishedAt.From != nil && *filterDTO.FinishedAt.From > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "P.finished_at >= ?")
+				filterArgs = append(filterArgs, filterDTO.FinishedAt.From)
+			}
+			if filterDTO.FinishedAt.To != nil && *filterDTO.FinishedAt.To > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "P.finished_at <= ?")
+				filterArgs = append(filterArgs, filterDTO.FinishedAt.To)
+			}
+		}
+	}
+	if filterDTO.DueAt != nil {
+		if filterDTO.DueAt.Empty != nil && *filterDTO.DueAt.Empty {
+			sqlWhereConditions = append(sqlWhereConditions, "P.due_at IS NULL")
+		} else if filterDTO.DueAt.Filled != nil && *filterDTO.DueAt.Filled {
+			sqlWhereConditions = append(sqlWhereConditions, "P.due_at IS NOT NULL")
+		} else {
+			if filterDTO.DueAt.From != nil && *filterDTO.DueAt.From > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "P.due_at >= ?")
+				filterArgs = append(filterArgs, filterDTO.DueAt.From)
+			}
+			if filterDTO.DueAt.To != nil && *filterDTO.DueAt.To > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "P.due_at <= ?")
+				filterArgs = append(filterArgs, filterDTO.DueAt.To)
+			}
+		}
+	}
+	if filterDTO.ArchivedAt != nil {
+		if filterDTO.ArchivedAt.Empty != nil && *filterDTO.ArchivedAt.Empty {
+			sqlWhereConditions = append(sqlWhereConditions, "P.archived_at IS NULL")
+		} else if filterDTO.ArchivedAt.Filled != nil && *filterDTO.ArchivedAt.Filled {
+			sqlWhereConditions = append(sqlWhereConditions, "P.archived_at IS NOT NULL")
+		} else {
+			if filterDTO.ArchivedAt.From != nil && *filterDTO.ArchivedAt.From > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "P.archived_at >= ?")
+				filterArgs = append(filterArgs, filterDTO.ArchivedAt.From)
+			}
+			if filterDTO.ArchivedAt.To != nil && *filterDTO.ArchivedAt.To > 0 {
+				sqlWhereConditions = append(sqlWhereConditions, "P.archived_at <= ?")
+				filterArgs = append(filterArgs, filterDTO.ArchivedAt.To)
+			}
+		}
+	}
+	/*
+		if filterDTO.DeletedAt != nil {
+			if filterDTO.DeletedAt.Empty != nil && *filterDTO.DeletedAt.Empty {
+				sqlWhereConditions = append(sqlWhereConditions, "P.deleted_at IS NULL")
+			} else if filterDTO.DeletedAt.Filled != nil && *filterDTO.DeletedAt.Filled {
+				sqlWhereConditions = append(sqlWhereConditions, "P.deleted_at IS NOT NULL")
+			} else {
+				if filterDTO.DeletedAt.From != nil && *filterDTO.DeletedAt.From > 0 {
+					sqlWhereConditions = append(sqlWhereConditions, "P.deleted_at >= ?")
+					filterArgs = append(filterArgs, filterDTO.DeletedAt.From)
+				}
+				if filterDTO.DeletedAt.To != nil && *filterDTO.DeletedAt.To > 0 {
+					sqlWhereConditions = append(sqlWhereConditions, "P.deleted_at <= ?")
+					filterArgs = append(filterArgs, filterDTO.DeletedAt.To)
+				}
+			}
+		}
+	*/
+	// TODO: FOR NOW always hide deleted projects, in future admins can list/restore deleted projects ?
+	sqlWhereConditions = append(sqlWhereConditions, "P.deleted_at IS NULL")
 	if len(sqlWhereConditions) > 0 {
 		sqlWhere = " WHERE " + strings.Join(sqlWhereConditions, " AND ")
 	}

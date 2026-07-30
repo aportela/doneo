@@ -51,4 +51,5 @@ type searchFilterDTO struct {
 	FinishedAt      *repositories.TimestampFilter
 	DueAt           *repositories.TimestampFilter
 	ArchivedAt      *repositories.TimestampFilter
+	DeletedAt       *repositories.TimestampFilter
 }

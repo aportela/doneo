@@ -91,6 +91,8 @@ func toFilterDTO(filter domain.SearchProjectFilter) searchFilterDTO {
 		StartedAt:       repositories.TimestampFilterToDTO(filter.StartedAt),
 		FinishedAt:      repositories.TimestampFilterToDTO(filter.FinishedAt),
 		DueAt:           repositories.TimestampFilterToDTO(filter.DueAt),
+		ArchivedAt:      repositories.TimestampFilterToDTO(filter.ArchivedAt),
+		DeletedAt:       repositories.TimestampFilterToDTO(filter.DeletedAt),
 	}
 }
 

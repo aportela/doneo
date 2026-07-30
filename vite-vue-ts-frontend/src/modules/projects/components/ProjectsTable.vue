@@ -89,6 +89,7 @@
 
     const createdAtFilterRef = ref<InstanceType<typeof DateFilterSelect>[] | null>(null);
     const updatedAtFilterRef = ref<InstanceType<typeof DateFilterSelect>[] | null>(null);
+    const startedAtFilterRef = ref<InstanceType<typeof DateFilterSelect>[] | null>(null);
     const finishedAtFilterRef = ref<InstanceType<typeof DateFilterSelect>[] | null>(null);
     const dueAtFilterRef = ref<InstanceType<typeof DateFilterSelect>[] | null>(null);
     const archivedAtFilterRef = ref<InstanceType<typeof DateFilterSelect>[] | null>(null);
@@ -102,6 +103,7 @@
         createdAt: TimestampRange;
         createdByUserId: string | null;
         updatedAt: TimestampRange;
+        startedAt: TimestampRange;
         finishedAt: TimestampRange;
         dueAt: TimestampRange;
         archivedAt: TimestampRange;
@@ -120,6 +122,10 @@
                 to: null,
             },
             updatedAt: {
+                from: null,
+                to: null,
+            },
+            startedAt: {
                 from: null,
                 to: null,
             },
@@ -150,6 +156,8 @@
             filters.createdAt.to,
             filters.updatedAt.from,
             filters.updatedAt.to,
+            filters.startedAt.from,
+            filters.startedAt.to,
             filters.finishedAt.from,
             filters.finishedAt.to,
             filters.dueAt.from,
@@ -170,6 +178,7 @@
     const isFilteredByCreator = computed<boolean>(() => filters.createdByUserId !== null);
     const isFilteredByCreationDate = computed<boolean>(() => filters.createdAt.from != null || filters.createdAt.to != null);
     const isFilteredByUpdateDate = computed<boolean>(() => filters.updatedAt.from != null || filters.updatedAt.to != null);
+    const isFilteredByStartDate = computed<boolean>(() => filters.startedAt.from != null || filters.startedAt.to != null);
     const isFilteredByFinishDate = computed<boolean>(() => filters.finishedAt.from != null || filters.finishedAt.to != null);
     const isFilteredByDueAtDate = computed<boolean>(() => filters.dueAt.from != null || filters.dueAt.to != null);
     const isFilteredByArchivedDate = computed<boolean>(() => filters.archivedAt.from != null || filters.archivedAt.to != null);
@@ -187,6 +196,9 @@
         }
         if (updatedAtFilterRef.value) {
             updatedAtFilterRef.value[0]?.reset();
+        }
+        if (startedAtFilterRef.value) {
+            startedAtFilterRef.value[0]?.reset();
         }
         if (finishedAtFilterRef.value) {
             finishedAtFilterRef.value[0]?.reset();
@@ -268,6 +280,14 @@
             render: (row: Project) => renderLabel(row.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) ?? ""),
         },
         {
+            label: t("modules.project.components.ProjectsTable.header.columns.startedAt"),
+            field: "startedAt",
+            visible: false,
+            sortable: true,
+            isFiltered: () => isFilteredByStartDate.value,
+            render: (row: Project) => renderLabel(row.startedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) ?? ""),
+        },
+        {
             label: t("modules.project.components.ProjectsTable.header.columns.finishedAt"),
             field: "finishedAt",
             visible: false,
@@ -331,6 +351,7 @@
                     createdByUserId: filters.createdByUserId !== null ? filters.createdByUserId : undefined,
                     createdAt: filters.createdAt,
                     updatedAt: filters.updatedAt,
+                    startedAt: filters.startedAt,
                     finishedAt: filters.finishedAt,
                     dueAt: filters.dueAt,
                     archivedAt: filters.archivedAt,
@@ -527,6 +548,8 @@
                     :disabled="state.ajaxRunning" v-model:range="filters.createdAt" />
                 <DateFilterSelect v-else-if="column.field === 'updatedAt'" clearable ref="updatedAtFilterRef"
                     :disabled="state.ajaxRunning" v-model:range="filters.updatedAt" />
+                <DateFilterSelect v-else-if="column.field === 'startedAt'" clearable ref="startedAtFilterRef"
+                    :disabled="state.ajaxRunning" v-model:range="filters.startedAt" />
                 <DateFilterSelect v-else-if="column.field === 'finishedAt'" clearable ref="finishedAtFilterRef"
                     :disabled="state.ajaxRunning" v-model:range="filters.finishedAt" />
                 <DateFilterSelect v-else-if="column.field === 'dueAt'" clearable ref="dueAtFilterRef"

@@ -42,4 +42,5 @@ type SearchProjectFilter struct {
 	FinishedAt      *TimestampFilter
 	DueAt           *TimestampFilter
 	ArchivedAt      *TimestampFilter
+	DeletedAt       *TimestampFilter
 }

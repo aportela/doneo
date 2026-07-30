@@ -62,6 +62,7 @@ type filterRequest struct {
 	FinishedAt      *handlers.TimestampFilter `json:"finishedAt"`
 	DueAt           *handlers.TimestampFilter `json:"dueAt"`
 	ArchivedAt      *handlers.TimestampFilter `json:"archivedAt"`
+	DeletedAt       *handlers.TimestampFilter `json:"deletedAt"`
 }
 
 type searchRequest struct {

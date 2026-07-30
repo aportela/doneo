@@ -58,6 +58,7 @@ type SearchRequestFilter = {
   createdByUserId?: string;
   createdAt?: TimestampRange;
   updatedAt?: TimestampRange;
+  startedAt?: TimestampRange;
   finishedAt?: TimestampRange;
   dueAt?: TimestampRange;
   archivedAt?: TimestampRange;
