@@ -2,17 +2,17 @@
     import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSpin, NCard, NInput, NInputNumber, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
+    import { NSpin, NCard, NInput, NInputNumber, NInputGroup, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
     import { DONEO_ICON_ACTION_CANCEL, DONEO_ICON_ACTION_SAVE, DONEO_ICON_ADD, DONEO_ICON_EDIT, DONEO_ICON_NAME, DONEO_ICON_PALETTE } from '../../../shared/types/icons';
 
     import { TaskPriority, MAX_NAME_LENGTH } from '../models/task-priority';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { taskPriorityService } from '../services/task-priority';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import { getNaiveUITagColorProperty } from '../../../shared/composables/naive-ui-helpers';
     import { generateRandomSoftHexColor } from '../../../shared/composables/color';
     import type { TaskPriorityResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
+    import { ColorPickerSwatches, getNaiveUITagColorProperty } from '../../../shared/composables/naive-ui-helpers';
 
     interface Props {
         taskPriorityId?: string;
@@ -28,7 +28,7 @@
 
     const taskPriority = ref<TaskPriority>(new TaskPriority());
 
-    taskPriority.value.hexColor = generateRandomSoftHexColor();
+    taskPriority.value.hexColor = !props.taskPriorityId ? generateRandomSoftHexColor() : "#666666";
 
     const formRef = ref<FormInst | null>(null);
 
@@ -90,7 +90,7 @@
             }
         }
         catch (error: any) {
-            console.warn("Warning", { file: "ProjectPriorityForm.vue", method: "onSave", details: "form validation error", error: error });
+            console.warn("Warning", { file: "TaskPriorityForm.vue", method: "onSave", details: "form validation error", error: error });
         }
     };
 
@@ -104,11 +104,7 @@
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const response: TaskPriorityResponse = await taskPriorityService.get(id);
-            if (response.id === id) {
-                taskPriority.value = new TaskPriority(response);
-            } else {
-                state.ajaxErrorMessage = t("modules.taskPriority.components.TaskPriorityForm.errors.loadError");
-            }
+            taskPriority.value = new TaskPriority(response);
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -116,7 +112,7 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPriorityForm.onGet" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TaskPriorityForm.onGet" } });
                             break;
                         case 403:
                             state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
@@ -131,7 +127,7 @@
                 },
                 (fatalError) => {
                     state.ajaxErrorMessage = t("modules.taskPriority.components.TaskPriorityForm.errors.loadError");
-                    console.error("Unhandled API error", { file: "ProjectPriorityForm.vue", method: "onGet" }, { err: fatalError });
+                    console.error("Unhandled API error", { file: "TaskPriorityForm.vue", method: "onGet" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
@@ -160,7 +156,7 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPriorityForm.onAdd" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TaskPriorityForm.onAdd" } });
                             break;
                         case 403:
                             state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
@@ -181,7 +177,7 @@
                 },
                 (fatalError) => {
                     state.ajaxErrorMessage = t("modules.taskPriority.components.TaskPriorityForm.errors.addError");
-                    console.error("Unhandled API error", { file: "ProjectPriorityForm.vue", method: "onAdd" }, { err: fatalError });
+                    console.error("Unhandled API error", { file: "TaskPriorityForm.vue", method: "onAdd" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
@@ -210,7 +206,7 @@
                     switch (apiError.response?.status) {
                         case 401:
                             state.ajaxErrors = false;
-                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectPriorityForm.onUpdate" } });
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "TaskPriorityForm.onUpdate" } });
                             break;
                         case 403:
                             state.ajaxErrorMessage = t("shared.errorMessages.unauthorizedOperation");
@@ -234,7 +230,7 @@
                 },
                 (fatalError) => {
                     state.ajaxErrorMessage = t("modules.taskPriority.components.TaskPriorityForm.errors.updateError");
-                    console.error("Unhandled API error", { file: "ProjectPriorityForm.vue", method: "onUpdate" }, { err: fatalError });
+                    console.error("Unhandled API error", { file: "TaskPriorityForm.vue", method: "onUpdate" }, { err: fatalError });
                 });
         } finally {
             state.ajaxRunning = false;
@@ -253,13 +249,13 @@
 
     onMounted(() => {
         stopBusReauthListener = appBus.on("reauthValidNotify", async (payload) => {
-            if (payload.to.includes("ProjectPriorityForm.onGet")) {
+            if (payload.to.includes("TaskPriorityForm.onGet")) {
                 if (props.taskPriorityId) {
                     onGet(props.taskPriorityId);
                 }
-            } else if (payload.to.includes("ProjectPriorityForm.onAdd")) {
+            } else if (payload.to.includes("TaskPriorityForm.onAdd")) {
                 onAdd();
-            } else if (payload.to.includes("ProjectPriorityForm.onUpdate")) {
+            } else if (payload.to.includes("TaskPriorityForm.onUpdate")) {
                 onUpdate()
             }
         });
@@ -281,7 +277,7 @@
                 {{
                     t(!props.taskPriorityId ?
                         "modules.taskPriority.components.TaskPriorityForm.headers.addTaskPriority" :
-                        "modules.taskPriority.components.TaskPriorityForm.headers.updateTaskPriority")
+                        "modules.taskPriority.components.TaskPriorityForm.headers.editTaskPriority")
                 }}
             </div>
         </template>
@@ -307,22 +303,24 @@
                     v-model:value="taskPriority.index" :disabled="state.ajaxRunning">
                 </n-input-number>
             </n-form-item>
-            <n-form-item :label="t('modules.taskPriority.components.TaskPriorityForm.inputs.preview.label')">
-                <n-flex style="width: 100%" align="center" :wrap="false">
-                    <n-tag :color="getNaiveUITagColorProperty(taskPriority.hexColor)" style="width: 100%;">
+            <n-form-item :label="t('modules.taskPriority.components.TaskPriorityForm.inputs.preview.label')"
+                path="hexColor">
+                <n-input-group>
+                    <n-tag :color="getNaiveUITagColorProperty(taskPriority.hexColor)" style="width: 100%;" size="large">
                         {{ taskPriority.name }}
                     </n-tag>
-                    <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="taskPriority.hexColor"
-                        :disabled="state.ajaxRunning">
+                    <n-color-picker :modes="['hex']" :show-alpha="false" show-preview
+                        v-model:value="taskPriority.hexColor" :disabled="state.ajaxRunning"
+                        :swatches="ColorPickerSwatches">
                         <template #trigger="{ onClick, ref: triggerRef }">
-                            <n-button :ref="triggerRef" quaternary @click="onClick">
+                            <n-button :ref="triggerRef" @click="onClick" type="primary">
                                 <template #icon>
                                     <n-icon :component="DONEO_ICON_PALETTE" />
                                 </template>
                             </n-button>
                         </template>
                     </n-color-picker>
-                </n-flex>
+                </n-input-group>
             </n-form-item>
         </n-form>
         <template #action>

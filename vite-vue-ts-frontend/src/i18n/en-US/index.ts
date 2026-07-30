@@ -765,7 +765,7 @@ export default {
         ProjectPriorityForm: {
           headers: {
             addProjectPriority: "Add project priority",
-            updateProjectPriority: "Update project priority",
+            editProjectPriority: "Edit project priority",
           },
           inputs: {
             name: {
@@ -846,7 +846,7 @@ export default {
         ProjectStatusForm: {
           headers: {
             addProjectStatus: "Add project status",
-            updateProjectStatus: "Update project status",
+            editProjectStatus: "Edit project status",
           },
           inputs: {
             name: {
@@ -1396,7 +1396,7 @@ export default {
         TaskStatusForm: {
           headers: {
             addTaskStatus: "Add task status",
-            updateTaskStatus: "Update task status",
+            editTaskStatus: "Edit task status",
           },
           inputs: {
             name: {
@@ -1504,7 +1504,7 @@ export default {
         TaskPriorityForm: {
           headers: {
             addTaskPriority: "Add task priority",
-            updateTaskPriority: "Update task priority",
+            editTaskPriority: "Edit task priority",
           },
           inputs: {
             name: {

@@ -2,16 +2,17 @@
     import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSpin, NCard, NInput, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
+    import { NSpin, NCard, NInput, NInputGroup, NButton, NColorPicker, NTag, NForm, NFormItem, NFlex, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
     import { DONEO_ICON_ACTION_CANCEL, DONEO_ICON_ACTION_SAVE, DONEO_ICON_ADD, DONEO_ICON_EDIT, DONEO_ICON_NAME, DONEO_ICON_PALETTE } from '../../../shared/types/icons';
 
     import { ProjectType, MAX_NAME_LENGTH } from '../models/project-type';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { projectTypeService } from '../services/project-type';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import { generateRandomSoftHexColor, getNaiveUITagColorProperty } from '../../../shared/composables/color';
+    import { generateRandomSoftHexColor } from '../../../shared/composables/color';
     import type { ProjectTypeResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
+    import { ColorPickerSwatches, getNaiveUITagColorProperty } from '../../../shared/composables/naive-ui-helpers';
 
     interface Props {
         projectTypeId?: string;
@@ -270,22 +271,24 @@
                     </template>
                 </n-input>
             </n-form-item>
-            <n-form-item :label="t('modules.projectType.components.ProjectTypeForm.inputs.preview.label')">
-                <n-flex style="width: 100%" align="center" :wrap="false">
-                    <n-tag :color="getNaiveUITagColorProperty(projectType.hexColor)" style="width: 100%;">
+            <n-form-item :label="t('modules.projectType.components.ProjectTypeForm.inputs.preview.label')"
+                path="hexColor">
+                <n-input-group>
+                    <n-tag :color="getNaiveUITagColorProperty(projectType.hexColor)" style="width: 100%;" size="large">
                         {{ projectType.name }}
                     </n-tag>
-                    <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="projectType.hexColor"
-                        :disabled="state.ajaxRunning">
+                    <n-color-picker :modes="['hex']" :show-alpha="false" show-preview
+                        v-model:value="projectType.hexColor" :disabled="state.ajaxRunning"
+                        :swatches="ColorPickerSwatches">
                         <template #trigger="{ onClick, ref: triggerRef }">
-                            <n-button :ref="triggerRef" quaternary @click="onClick">
+                            <n-button :ref="triggerRef" @click="onClick" type="primary">
                                 <template #icon>
                                     <n-icon :component="DONEO_ICON_PALETTE" />
                                 </template>
                             </n-button>
                         </template>
                     </n-color-picker>
-                </n-flex>
+                </n-input-group>
             </n-form-item>
         </n-form>
         <template #action>

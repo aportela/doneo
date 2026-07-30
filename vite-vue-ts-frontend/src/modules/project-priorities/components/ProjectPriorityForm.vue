@@ -2,16 +2,17 @@
     import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSpin, NCard, NInput, NInputNumber, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
+    import { NSpin, NCard, NInput, NInputNumber, NInputGroup, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon } from 'naive-ui';
     import { DONEO_ICON_ACTION_CANCEL, DONEO_ICON_ACTION_SAVE, DONEO_ICON_ADD, DONEO_ICON_EDIT, DONEO_ICON_NAME, DONEO_ICON_PALETTE } from '../../../shared/types/icons';
 
     import { ProjectPriority, MAX_NAME_LENGTH } from '../models/project-priority';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { projectPriorityService } from '../services/project-priority';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import { generateRandomSoftHexColor, getNaiveUITagColorProperty } from '../../../shared/composables/color';
+    import { generateRandomSoftHexColor } from '../../../shared/composables/color';
     import type { ProjectPriorityResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
+    import { ColorPickerSwatches, getNaiveUITagColorProperty } from '../../../shared/composables/naive-ui-helpers';
 
     interface Props {
         projectPriorityId?: string;
@@ -27,7 +28,7 @@
 
     const projectPriority = ref<ProjectPriority>(new ProjectPriority());
 
-    projectPriority.value.hexColor = generateRandomSoftHexColor();
+    projectPriority.value.hexColor = !props.projectPriorityId ? generateRandomSoftHexColor() : "#666666";
 
     const serverErrors = ref<Record<string, string>>({});
 
@@ -103,11 +104,7 @@
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const response: ProjectPriorityResponse = await projectPriorityService.get(id);
-            if (response.id === id) {
-                projectPriority.value = new ProjectPriority(response);
-            } else {
-                state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.loadError");
-            }
+            projectPriority.value = new ProjectPriority(response);
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -275,7 +272,7 @@
                 {{
                     t(!props.projectPriorityId ?
                         "modules.projectPriority.components.ProjectPriorityForm.headers.addProjectPriority" :
-                        "modules.projectPriority.components.ProjectPriorityForm.headers.updateProjectPriority")
+                        "modules.projectPriority.components.ProjectPriorityForm.headers.editProjectPriority")
                 }}
             </div>
         </template>
@@ -301,22 +298,25 @@
                     v-model:value="projectPriority.index" :disabled="state.ajaxRunning">
                 </n-input-number>
             </n-form-item>
-            <n-form-item :label="t('modules.projectPriority.components.ProjectPriorityForm.inputs.preview.label')">
-                <n-flex style="width: 100%" align="center" :wrap="false">
-                    <n-tag :color="getNaiveUITagColorProperty(projectPriority.hexColor)" style="width: 100%;">
+            <n-form-item :label="t('modules.projectPriority.components.ProjectPriorityForm.inputs.preview.label')"
+                path="hexColor">
+                <n-input-group>
+                    <n-tag :color="getNaiveUITagColorProperty(projectPriority.hexColor)" style="width: 100%;"
+                        size="large">
                         {{ projectPriority.name }}
                     </n-tag>
-                    <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="projectPriority.hexColor"
-                        :disabled="state.ajaxRunning">
+                    <n-color-picker :modes="['hex']" :show-alpha="false" show-preview
+                        v-model:value="projectPriority.hexColor" :disabled="state.ajaxRunning"
+                        :swatches="ColorPickerSwatches">
                         <template #trigger="{ onClick, ref: triggerRef }">
-                            <n-button :ref="triggerRef" quaternary @click="onClick">
+                            <n-button :ref="triggerRef" @click="onClick" type="primary">
                                 <template #icon>
                                     <n-icon :component="DONEO_ICON_PALETTE" />
                                 </template>
                             </n-button>
                         </template>
                     </n-color-picker>
-                </n-flex>
+                </n-input-group>
             </n-form-item>
         </n-form>
         <template #action>

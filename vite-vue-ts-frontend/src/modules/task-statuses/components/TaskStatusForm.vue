@@ -2,17 +2,17 @@
     import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NSpin, NCard, NInput, NInputNumber, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NTooltip } from 'naive-ui';
+    import { NSpin, NCard, NInput, NInputNumber, NInputGroup, NFlex, NButton, NColorPicker, NTag, NForm, NFormItem, type FormItemRule, type FormInst, type FormRules, NIcon, NTooltip } from 'naive-ui';
     import { DONEO_ICON_ACTION_CANCEL, DONEO_ICON_ACTION_SAVE, DONEO_ICON_ADD, DONEO_ICON_CLEAR_DATE, DONEO_ICON_EDIT, DONEO_ICON_FILL_DATE, DONEO_ICON_FILL_EMTPY_DATE, DONEO_ICON_NAME, DONEO_ICON_PALETTE, DONEO_ICON_STAR } from '../../../shared/types/icons';
 
     import { TaskStatus, MAX_NAME_LENGTH } from '../models/task-status';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { taskStatusService } from '../services/task-status';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import { getNaiveUITagColorProperty } from '../../../shared/composables/naive-ui-helpers';
     import { generateRandomSoftHexColor } from '../../../shared/composables/color';
     import type { TaskStatusResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
+    import { ColorPickerSwatches, getNaiveUITagColorProperty } from '../../../shared/composables/naive-ui-helpers';
 
     interface Props {
         taskStatusId?: string;
@@ -28,7 +28,7 @@
 
     const taskStatus = ref<TaskStatus>(new TaskStatus());
 
-    taskStatus.value.hexColor = generateRandomSoftHexColor();
+    taskStatus.value.hexColor = !props.taskStatusId ? generateRandomSoftHexColor() : "#666666";
 
     const formRef = ref<FormInst | null>(null);
 
@@ -104,11 +104,7 @@
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const response: TaskStatusResponse = await taskStatusService.get(id);
-            if (response.id === id) {
-                taskStatus.value = new TaskStatus(response);
-            } else {
-                state.ajaxErrorMessage = t("modules.taskStatus.components.TaskStatusForm.errors.loadError");
-            }
+            taskStatus.value = new TaskStatus(response);
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -277,7 +273,7 @@
                 <n-icon class="doneo-mr-4px" :component="!props.taskStatusId ? DONEO_ICON_ADD : DONEO_ICON_EDIT" />
                 {{
                     t(!props.taskStatusId ? "modules.taskStatus.components.TaskStatusForm.headers.addTaskStatus"
-                        : "modules.taskStatus.components.TaskStatusForm.headers.updateTaskStatus")
+                        : "modules.taskStatus.components.TaskStatusForm.headers.editTaskStatus")
                 }}
             </div>
         </template>
@@ -381,22 +377,24 @@
                     </n-tooltip>
                 </n-form-item>
             </n-flex>
-            <n-form-item :label="t('modules.taskStatus.components.TaskStatusForm.inputs.preview.label')">
-                <n-flex style="width: 100%" align="center" :wrap="false">
-                    <n-tag :color="getNaiveUITagColorProperty(taskStatus.hexColor)" style="width: 100%;">
+            <n-form-item :label="t('modules.taskStatus.components.TaskStatusForm.inputs.preview.label')"
+                path="hexColor">
+                <n-input-group>
+                    <n-tag :color="getNaiveUITagColorProperty(taskStatus.hexColor)" style="width: 100%;" size="large">
                         {{ taskStatus.name }}
                     </n-tag>
-                    <n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="taskStatus.hexColor"
-                        :disabled="state.ajaxRunning">
+                    <n-color-picker :modes="['hex']" :show-alpha="false" show-preview
+                        v-model:value="taskStatus.hexColor" :disabled="state.ajaxRunning"
+                        :swatches="ColorPickerSwatches">
                         <template #trigger="{ onClick, ref: triggerRef }">
-                            <n-button :ref="triggerRef" quaternary @click="onClick">
+                            <n-button :ref="triggerRef" @click="onClick" type="primary">
                                 <template #icon>
                                     <n-icon :component="DONEO_ICON_PALETTE" />
                                 </template>
                             </n-button>
                         </template>
                     </n-color-picker>
-                </n-flex>
+                </n-input-group>
             </n-form-item>
         </n-form>
         <template #action>
