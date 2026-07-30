@@ -13,7 +13,7 @@
         avatarSize: "tiny",
     });
 
-    const avatarURL = computed(() => `/api/wc/avatars/user/${props.userId}`);
+    const avatarURL = computed(() => props.userId ? `/api/wc/avatars/user/${props.userId}` : undefined);
 
     const avatarPixelSize = computed(() => {
         switch (props.avatarSize) {
