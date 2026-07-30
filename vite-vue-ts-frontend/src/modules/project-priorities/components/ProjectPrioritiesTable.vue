@@ -308,9 +308,10 @@
 </script>
 
 <template>
-    <n-modal v-model:show="showFormModal" v-if="showFormModal">
+    <n-modal v-model:show="showFormModal">
         <ProjectPriorityForm class="project-priority-form" :project-priority-id="tmpItem.id"
-            @add="onProjectPriorityAdded" @update="onProjectPriorityUpdated" @cancel="hideFormModal" />
+            @add="onProjectPriorityAdded" @update="onProjectPriorityUpdated" @cancel="hideFormModal"
+            v-if="showFormModal" />
     </n-modal>
     <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="localFilteredItems"
         :row-key="row => row.id" :columns="columns" :order="currentOrder"

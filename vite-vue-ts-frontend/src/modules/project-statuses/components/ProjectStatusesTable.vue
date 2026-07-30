@@ -388,9 +388,9 @@
 </script>
 
 <template>
-    <n-modal v-model:show="showFormModal" v-if="showFormModal">
+    <n-modal v-model:show="showFormModal">
         <ProjectStatusForm class="project-status-form" :project-status-id="tmpItem.id" @add="onProjectStatusAdded"
-            @update="onProjectStatusUpdated" @cancel="hideFormModal" />
+            @update="onProjectStatusUpdated" @cancel="hideFormModal" v-if="showFormModal" />
     </n-modal>
     <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="localFilteredItems"
         :row-key="row => row.id" :columns="columns" :order="currentOrder"

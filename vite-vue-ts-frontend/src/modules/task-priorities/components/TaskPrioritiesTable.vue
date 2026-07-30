@@ -308,9 +308,9 @@
 </script>
 
 <template>
-    <n-modal v-model:show="showFormModal" v-if="showFormModal">
+    <n-modal v-model:show="showFormModal">
         <TaskPriorityForm class="task-priority-form" :task-priority-id="tmpItem.id" @add="onTaskPriorityAdded"
-            @update="onTaskPriorityUpdated" @cancel="hideFormModal" />
+            @update="onTaskPriorityUpdated" @cancel="hideFormModal" v-if="showFormModal" />
     </n-modal>
     <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="localFilteredItems"
         :row-key="row => row.id" :columns="columns" :order="currentOrder"
