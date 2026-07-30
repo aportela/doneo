@@ -1,8 +1,7 @@
 <script setup lang="ts">
-    import { ref, shallowRef, reactive, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
+    import { ref, shallowRef, reactive, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 
-    import { NInputGroup, NInput, NButton, NSelect, NIcon, type SelectOption, type SelectSize, type SelectInst } from 'naive-ui';
-    import { IconSquare, IconSquareFilled, IconAlertCircle } from '@tabler/icons-vue';
+    import { NInputGroup, NInput, NButton, NSelect, NIcon, type SelectOption } from 'naive-ui';
 
     import { useCacheStore } from '../../../stores/cache';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
@@ -10,35 +9,21 @@
     import type { TaskPriorityResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import { DEFAULT_BUTTON_ICON_SIZE, DEFAULT_SELECTOR_SIZE } from '../../../constants';
+    import { DONEO_ICON_ALERT, DONEO_ICON_SQUARE, DONEO_ICON_SQUARE_FILLED } from '../../../shared/types/icons';
 
     interface Props {
-        autoFocus?: boolean;
-        required?: boolean;
-        placeholder?: string;
         clearable?: boolean;
-        size?: SelectSize;
-        iconSize?: number;
-        hidePrefix?: boolean;
         disabled?: boolean;
+        placeholder?: string;
         readOnly?: boolean;
+        showPrefixIcon?: boolean;
     };
 
-    const props = withDefaults(defineProps<Props>(), {
-        autoFocus: false,
-        required: false,
-        clearable: false,
-        size: DEFAULT_SELECTOR_SIZE,
-        iconSize: DEFAULT_BUTTON_ICON_SIZE,
-        disabled: false,
-        readOnly: false,
-    });
+    const props = defineProps<Props>();
 
     const cacheStore = useCacheStore();
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
-
-    const selectInstRef = ref<SelectInst | null>(null)
 
     const isDisabled = computed(() => props.disabled || state.ajaxRunning);
 
@@ -46,26 +31,21 @@
 
     const taskPriorities = ref<TaskPriorityResponse[]>([]);
 
-
     const options = shallowRef<SelectOption[]>([]);
 
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
         try {
-            if (cacheStore.taskPriorities.length > 0) {
-                taskPriorities.value = cacheStore.taskPriorities;
-            } else {
+            if (cacheStore.taskPriorities.length === 0) {
                 const response = await taskPriorityService.searchBase();
                 taskPriorities.value = response.taskPriorities;
                 cacheStore.setTaskPrioritiesCache(taskPriorities.value);
             }
+            taskPriorities.value = cacheStore.taskPriorities;
             if (taskPriorityId.value) {
                 selectedColor.value = taskPriorities.value.find((taskPriority) => taskPriority.id === taskPriorityId.value)?.hexColor
             }
             options.value = taskPriorities.value.map((taskPriority: TaskPriorityResponse) => ({ label: taskPriority.name, value: taskPriority.id }));
-            if (props.autoFocus) {
-                focus();
-            }
         } catch (error: unknown) {
             options.value.length = 0;
             state.ajaxErrors = true;
@@ -104,18 +84,6 @@
         }
     });
 
-    const focus = () => {
-        nextTick(() => {
-            selectInstRef.value?.focus();
-        });
-    };
-
-    const reset = () => {
-        taskPriorityId.value = null;
-    };
-
-    defineExpose({ reset });
-
     let stopBusReauthListener: () => void;
 
     onMounted(() => {
@@ -134,21 +102,18 @@
 
 <template>
     <n-input-group>
-        <n-button :size="props.size" secondary :disabled="true" class="doneo-cursor-default doneo-disable-opacity"
-            v-if="!props.hidePrefix">
-            <template #icon v-if="!state.ajaxErrors">
-                <n-icon :size="props.iconSize" :color="selectedColor"
-                    :component="selectedColor ? IconSquareFilled : IconSquare" />
+        <n-button secondary disabled class="doneo-cursor-default doneo-disable-opacity" v-if="props.showPrefixIcon">
+            <template #icon>
+                <n-icon :color="selectedColor"
+                    :component="selectedColor ? DONEO_ICON_SQUARE_FILLED : DONEO_ICON_SQUARE" />
             </template>
         </n-button>
-        <n-select filterable ref="selectInstRef" :required="props.required" :clearable="props.clearable"
-            v-model:value="taskPriorityId" :options="options" :placeholder="props.placeholder" :size="props.size"
-            :disabled="isDisabled" v-if="!props.readOnly" />
-        <n-input v-else :size="props.size" placeholder="" v-model:value="readOnlyLabel" readonly />
-        <n-button secondary :size="props.size" :disabled="true" class="doneo-cursor-default doneo-disable-opacity"
-            v-if="state.ajaxErrors">
+        <n-select filterable ref="selectInstRef" :clearable="props.clearable" v-model:value="taskPriorityId"
+            :options="options" :placeholder="props.placeholder" :disabled="isDisabled" v-if="!props.readOnly" />
+        <n-input v-else placeholder="" v-model:value="readOnlyLabel" readonly />
+        <n-button secondary disabled class="doneo-cursor-default doneo-disable-opacity" v-if="state.ajaxErrors">
             <template #icon>
-                <n-icon :size="props.iconSize" color="red" :component="IconAlertCircle" />
+                <n-icon color="red" :component="DONEO_ICON_ALERT" />
             </template>
         </n-button>
     </n-input-group>

@@ -111,7 +111,7 @@
         <n-select filterable :clearable="props.clearable" v-model:value="projectTypeId" :options="options"
             :placeholder="props.placeholder" :disabled="isDisabled" v-if="!props.readOnly" />
         <n-input v-else placeholder="" v-model:value="readOnlyLabel" readonly />
-        <n-button secondary :disabled="true" class="doneo-cursor-default doneo-disable-opacity" v-if="state.ajaxErrors">
+        <n-button secondary disabled class="doneo-cursor-default doneo-disable-opacity" v-if="state.ajaxErrors">
             <template #icon>
                 <n-icon color="red" :component="DONEO_ICON_ALERT" />
             </template>

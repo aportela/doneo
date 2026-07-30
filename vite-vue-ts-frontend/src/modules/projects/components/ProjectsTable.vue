@@ -428,10 +428,10 @@
                     v-model:id="filters.typeId" clearable
                     :placeholder="t('modules.project.components.ProjectsTable.header.filters.type.placeholder')" />
                 <ProjectPrioritySelector v-else-if="column.field === 'priority'" :disabled="state.ajaxRunning"
-                    size="small" v-model:id="filters.priorityId" :hide-prefix="true" clearable
+                    size="small" v-model:id="filters.priorityId" clearable
                     :placeholder="t('modules.project.components.ProjectsTable.header.filters.priority.placeholder')" />
                 <ProjectStatusSelector v-else-if="column.field === 'status'" :disabled="state.ajaxRunning"
-                    v-model:id="filters.statusId" :hide-prefix="true" clearable
+                    v-model:id="filters.statusId" clearable
                     :placeholder="t('modules.project.components.ProjectsTable.header.filters.status.placeholder')" />
                 <TextFilterInput v-else-if="column.field === 'summary'" clearable :disabled="state.ajaxRunning"
                     :placeholder="t('modules.project.components.ProjectsTable.header.filters.summary.placeholder')"
