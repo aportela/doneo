@@ -71,7 +71,14 @@
         :auto-focus="props.autoFocus" @paste="onPaste" :toolbars-exclude="excludedMDEditorToolBars" :footers="[]"
         :preview="!props.hidePreview" :placeholder="props.placeholder" />
     <MdPreview v-else id="mdeditor" v-model:model-value="markDown" no-img-zoom-in
-        :theme="userSettingsStore.darkTheme ? 'dark' : 'light'" language="en-US" :code-foldable="false" />
+        :theme="userSettingsStore.darkTheme ? 'dark' : 'light'" language="en-US" :code-foldable="false"
+        class="doneo-markdown-preview-container" />
 </template>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+    .doneo-markdown-preview-container {
+        border: 1px solid #e0e0e6;
+        border-radius: 3px;
+        padding: 0em 1em;
+    }
+</style>
