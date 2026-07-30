@@ -43,7 +43,12 @@ type searchFilterDTO struct {
 	TypeID          *string
 	PriorityID      *string
 	StatusID        *string
-	CreatedAt       *repositories.TimestampFilter
-	CreatedByUserID *string
 	ViewByUserID    *string
+	CreatedByUserID *string
+	CreatedAt       *repositories.TimestampFilter
+	UpdatedAt       *repositories.TimestampFilter
+	StartedAt       *repositories.TimestampFilter
+	FinishedAt      *repositories.TimestampFilter
+	DueAt           *repositories.TimestampFilter
+	ArchivedAt      *repositories.TimestampFilter
 }

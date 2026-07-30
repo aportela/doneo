@@ -34,7 +34,12 @@ type SearchProjectFilter struct {
 	TypeID          *string
 	StatusID        *string
 	PriorityID      *string
-	CreatedAt       *TimestampFilter
-	CreatedByUserID *string
 	ViewByUserID    *string
+	CreatedByUserID *string
+	CreatedAt       *TimestampFilter
+	UpdatedAt       *TimestampFilter
+	StartedAt       *TimestampFilter
+	FinishedAt      *TimestampFilter
+	DueAt           *TimestampFilter
+	ArchivedAt      *TimestampFilter
 }

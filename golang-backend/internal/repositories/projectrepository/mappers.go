@@ -84,9 +84,13 @@ func toFilterDTO(filter domain.SearchProjectFilter) searchFilterDTO {
 		TypeID:          filter.TypeID,
 		PriorityID:      filter.PriorityID,
 		StatusID:        filter.StatusID,
-		CreatedAt:       repositories.TimestampFilterToDTO(filter.CreatedAt),
-		CreatedByUserID: filter.CreatedByUserID,
 		ViewByUserID:    filter.ViewByUserID,
+		CreatedByUserID: filter.CreatedByUserID,
+		CreatedAt:       repositories.TimestampFilterToDTO(filter.CreatedAt),
+		UpdatedAt:       repositories.TimestampFilterToDTO(filter.UpdatedAt),
+		StartedAt:       repositories.TimestampFilterToDTO(filter.StartedAt),
+		FinishedAt:      repositories.TimestampFilterToDTO(filter.FinishedAt),
+		DueAt:           repositories.TimestampFilterToDTO(filter.DueAt),
 	}
 }
 

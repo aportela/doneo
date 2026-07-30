@@ -55,8 +55,13 @@ type filterRequest struct {
 	TypeID          *string                   `json:"typeId"`
 	PriorityID      *string                   `json:"priorityId"`
 	StatusID        *string                   `json:"statusId"`
-	CreatedAt       *handlers.TimestampFilter `json:"createdAt"`
 	CreatedByUserID *string                   `json:"createdByUserId"`
+	CreatedAt       *handlers.TimestampFilter `json:"createdAt"`
+	UpdatedAt       *handlers.TimestampFilter `json:"updatedAt"`
+	StartedAt       *handlers.TimestampFilter `json:"startedAt"`
+	FinishedAt      *handlers.TimestampFilter `json:"finishedAt"`
+	DueAt           *handlers.TimestampFilter `json:"dueAt"`
+	ArchivedAt      *handlers.TimestampFilter `json:"archivedAt"`
 }
 
 type searchRequest struct {
