@@ -161,9 +161,9 @@
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
-                                serverErrors.value.name = "modules.projectPriority.components.ProjectPriorityForm.warnings.nameAlreadyExists";
+                                serverErrors.value.name = "modules.projectPriority.components.ProjectPriorityForm.inputs.name.errors.alreadyExists";
                             } else if (apiError.details?.field === "index") {
-                                serverErrors.value.index = "modules.projectPriority.components.ProjectPriorityForm.warnings.indexAlreadyExists";
+                                serverErrors.value.index = "modules.projectPriority.components.ProjectPriorityForm.inputs.index.errors.alreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.addError");
                             }
@@ -211,9 +211,9 @@
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
-                                serverErrors.value.name = "modules.projectPriority.components.ProjectPriorityForm.warnings.nameAlreadyExists";
+                                serverErrors.value.name = "modules.projectPriority.components.ProjectPriorityForm.inputs.name.errors.alreadyExists";
                             } else if (apiError.details?.field === "index") {
-                                serverErrors.value.index = "modules.projectPriority.components.ProjectPriorityForm.warnings.indexAlreadyExists";
+                                serverErrors.value.index = "modules.projectPriority.components.ProjectPriorityForm.inputs.index.errors.alreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPriorityForm.errors.updateError");
                             }

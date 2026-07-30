@@ -143,7 +143,7 @@
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
-                                serverErrors.value.name = "modules.projectType.components.ProjectTypeForm.warnings.nameAlreadyExists";
+                                serverErrors.value.name = "modules.projectType.components.ProjectTypeForm.inputs.name.errors.alreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("modules.projectType.components.ProjectTypeForm.errors.addError");
                             }
@@ -194,7 +194,7 @@
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
-                                serverErrors.value.name = "modules.projectType.components.ProjectTypeForm.warnings.nameAlreadyExists";
+                                serverErrors.value.name = "modules.projectType.components.ProjectTypeForm.inputs.name.errors.alreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("modules.projectType.components.ProjectTypeForm.errors.updateError");
                             }

@@ -158,9 +158,9 @@
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
-                                serverErrors.value.name = "modules.taskStatus.components.TaskStatusForm.warnings.nameAlreadyExists";
+                                serverErrors.value.name = "modules.taskStatus.components.TaskStatusForm.inputs.name.errors.alreadyExists";
                             } else if (apiError.details?.field === "index") {
-                                serverErrors.value.index = "modules.taskStatus.components.TaskStatusForm.warnings.indexAlreadyExists";
+                                serverErrors.value.index = "modules.taskStatus.components.TaskStatusForm.inputs.index.errors.alreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("modules.taskStatus.components.TaskStatusForm.errors.addError");
                             }
@@ -211,9 +211,9 @@
                             break;
                         case 409:
                             if (apiError.details?.field === "name") {
-                                serverErrors.value.name = "modules.taskStatus.components.TaskStatusForm.warnings.nameAlreadyExists";
+                                serverErrors.value.name = "modules.taskStatus.components.TaskStatusForm.inputs.name.errors.alreadyExists";
                             } else if (apiError.details?.field === "index") {
-                                serverErrors.value.index = "modules.taskStatus.components.TaskStatusForm.warnings.indexAlreadyExists";
+                                serverErrors.value.index = "modules.taskStatus.components.TaskStatusForm.inputs.index.errors.alreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("modules.taskStatus.components.TaskStatusForm.errors.updateError");
                             }

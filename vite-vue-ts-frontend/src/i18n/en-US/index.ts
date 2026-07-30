@@ -782,7 +782,7 @@ export default {
               label: "Index",
               placeholder: "Enter project priority index",
               errors: {
-                alreadyExists: "Index",
+                alreadyExists: "Index already exists",
               },
             },
           },
@@ -795,10 +795,6 @@ export default {
               "There was a problem while adding the project priority data",
             updateError:
               "There was a problem while updating the project priority data",
-          },
-          warnings: {
-            nameAlreadyExists: "Name already exists",
-            indexAlreadyExists: "Index already exists",
           },
         },
         ProjectPrioritiesTable: {
@@ -863,7 +859,7 @@ export default {
               label: "Index",
               placeholder: "Enter project status index",
               errors: {
-                alreadyExists: "Index",
+                alreadyExists: "Index already exists",
               },
             },
             flags: {
@@ -879,10 +875,6 @@ export default {
               "There was a problem while adding the project status data",
             updateError:
               "There was a problem while updating the project status data",
-          },
-          warnings: {
-            nameAlreadyExists: "Name already exists",
-            indexAlreadyExists: "Index already exists",
           },
         },
         ProjectStatusesTable: {
@@ -979,9 +971,6 @@ export default {
             addError: "There was a problem while adding the project type data",
             updateError:
               "There was a problem while updating the project type data",
-          },
-          warnings: {
-            nameAlreadyExists: "Name already exists",
           },
         },
         ProjectTypesTable: {
@@ -1413,7 +1402,7 @@ export default {
               label: "Index",
               placeholder: "Enter task status index",
               errors: {
-                alreadyExists: "Index",
+                alreadyExists: "Index already exists",
               },
             },
             flags: {
@@ -1427,10 +1416,6 @@ export default {
             addError: "There was a problem while adding the task status data",
             updateError:
               "There was a problem while updating the task status data",
-          },
-          warnings: {
-            nameAlreadyExists: "Name already exists",
-            indexAlreadyExists: "Index already exists",
           },
         },
         TaskStatusesTable: {
@@ -1521,7 +1506,7 @@ export default {
               label: "Index",
               placeholder: "Enter task priority index",
               errors: {
-                alreadyExists: "Index",
+                alreadyExists: "Index already exists",
               },
             },
           },
@@ -1533,10 +1518,6 @@ export default {
             addError: "There was a problem while adding the task priority data",
             updateError:
               "There was a problem while updating the task priority data",
-          },
-          warnings: {
-            nameAlreadyExists: "Name already exists",
-            indexAlreadyExists: "Index already exists",
           },
         },
         TaskPrioritiesTable: {
