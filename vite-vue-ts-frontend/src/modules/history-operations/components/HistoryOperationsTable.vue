@@ -59,8 +59,7 @@
 
     const showNoItemsWarningMessage = ref<boolean>(false);
 
-
-    const currentOrder = reactive<Order>({ field: "name", direction: "ASC" });
+    const currentOrder = reactive<Order>({ field: "createdAt", direction: "DESC" });
 
     const onSort = (newOrder: Order) => {
         currentOrder.field = newOrder.field;
@@ -107,7 +106,6 @@
         }
     };
 
-
     const localFilteredItems = computed(() => {
         return items.value.filter((historyOperation: HistoryOperation) => {
             return (
@@ -134,7 +132,7 @@
                 visible: true,
                 sortable: true,
                 isFiltered: () => isFilteredByOperationType.value,
-                render: (row: HistoryOperation) => renderLabel(row.getOperationTypeLabel()),
+                render: (row: HistoryOperation) => renderLabel(t(row.getOperationTypeLabel())),
             },
             {
                 label: t("modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.header.columns.user"),
@@ -272,7 +270,6 @@
         @sort="onSort" @refresh="onRefresh" @clear-filters="onClearFilters" :buttons="['refresh', 'settings']">
         <template #thead-column-filters="{ columns }">
             <th v-for="column in columns">
-
                 <DateFilterSelect v-if="column.field === 'createdAt'" clearable v-model:range="filters.createdAt"
                     ref="createdAtFilterRef" :disabled="state.ajaxRunning" />
                 <HistoryOperationSelect v-else-if="column.field === 'operationType'"
