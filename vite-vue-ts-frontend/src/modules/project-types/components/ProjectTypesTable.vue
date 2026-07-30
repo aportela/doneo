@@ -107,7 +107,7 @@
             label: t("modules.projectType.components.ProjectTypesTable.header.columns.name"),
             field: "name",
             visible: true,
-            sortable: false,
+            sortable: true,
             isFiltered: () => isFilteredByName.value,
             render: (row: ProjectType) => renderColoredTag(row.name, row.hexColor, true),
         },
