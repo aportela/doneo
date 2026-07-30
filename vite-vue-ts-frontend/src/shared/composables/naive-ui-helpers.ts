@@ -3,7 +3,7 @@ import { useI18n } from "vue-i18n";
 
 import { NIcon, NTag, NTooltip } from "naive-ui";
 
-import { getNaiveUITagColorProperty } from "./color";
+import { getNaiveUITagColorProperty, oklchToHex } from "./color";
 import type { IconProps } from "@tabler/icons-vue";
 import type { Role } from "../../modules/roles/models/role";
 import {
@@ -163,3 +163,18 @@ export const renderTaskPermissionIcons = (
     t,
   );
 };
+
+const COLOR_PICKER_SWATCHES_COUNT = 32;
+const COLOR_PICKER_SWATCHES_START_HUE = 15;
+
+export const ColorPickerSwatches = Array.from(
+  { length: COLOR_PICKER_SWATCHES_COUNT },
+  (_, i) =>
+    oklchToHex(
+      0.72, // luminosity
+      0.14, // color intensity
+      (COLOR_PICKER_SWATCHES_START_HUE +
+        (i * 360) / COLOR_PICKER_SWATCHES_COUNT) %
+        360,
+    ),
+);
