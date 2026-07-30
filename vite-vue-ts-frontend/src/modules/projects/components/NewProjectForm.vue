@@ -261,13 +261,13 @@
                 path="priority.id">
                 <ProjectPrioritySelector v-model:id="project.priority.id"
                     :placeholder="t('modules.project.components.NewProjectForm.selectors.projectPriority.placeholder')"
-                    :disabled="state.ajaxRunning" />
+                    :disabled="state.ajaxRunning" showPrefixIcon />
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.selectors.projectStatus.label')"
                 path="status.id">
                 <ProjectStatusSelector v-model:id="project.status.id" set-default-value-on-start
                     :placeholder="t('modules.project.components.NewProjectForm.selectors.projectStatus.placeholder')"
-                    :disabled="state.ajaxRunning" />
+                    :disabled="state.ajaxRunning" showPrefixIcon />
             </n-form-item>
         </n-form>
         <template #action>
