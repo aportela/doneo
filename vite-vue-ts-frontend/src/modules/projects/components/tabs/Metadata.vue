@@ -215,14 +215,15 @@
                 </n-form-item>
                 <n-form-item label="Priority">
                     <ProjectPrioritySelector v-model:id="project.priority.id"
-                        :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly || readOnlyMode" />
+                        :disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly || readOnlyMode"
+                        showPrefixIcon />
                 </n-form-item>
                 <n-form-item label="Status">
                     <ProjectStatusSelector v-model:id="project.status.id"
                         ::disabled="props.disabled || state.ajaxRunning" :read-only="props.readOnly || readOnlyMode"
                         @fill-empty-start-date="onFillEmptyStartDate" @set-start-date="onSetStartDate"
                         @fill-empty-finish-date="onFillEmptyFinishDate" @set-finish-date="onSetFinishDate"
-                        @unset-finish-date-on-leave="onUnsetFinishDateOnLeave" />
+                        @unset-finish-date-on-leave="onUnsetFinishDateOnLeave" showPrefixIcon />
                 </n-form-item>
             </n-flex>
             <n-form-item label="Summary">
