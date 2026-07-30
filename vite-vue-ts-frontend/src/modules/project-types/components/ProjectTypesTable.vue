@@ -304,6 +304,7 @@
     <n-modal v-model:show="showFormModal">
         <ProjectTypeForm class="project-type-form" :project-type-id="tmpItem.id" @add="onProjectTypeAdded"
             @update="onProjectTypeUpdated" @cancel="hideFormModal" v-if="showFormModal" />
+        <span v-else />
     </n-modal>
     <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="localFilteredItems"
         :row-key="row => row.id" :columns="columns" :order="currentOrder"

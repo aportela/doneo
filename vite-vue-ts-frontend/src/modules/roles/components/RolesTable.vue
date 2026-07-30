@@ -352,6 +352,7 @@
     <n-modal v-model:show="showFormModal">
         <RoleForm class="doneo-role-form" :role-id="tmpItem.id" @add="onRoleAdded" @update="onRoleUpdated"
             @cancel="hideFormModal" v-if="showFormModal" />
+        <span v-else />
     </n-modal>
     <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="localFilteredItems"
         :row-key="row => row.id" :columns="columns" :order="currentOrder"

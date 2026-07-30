@@ -391,6 +391,7 @@
     <n-modal v-model:show="showFormModal">
         <TaskStatusForm class="task-status-form" :task-status-id="tmpItem.id" @add="onTaskStatusAdded"
             @update="onTaskStatusUpdated" @cancel="hideFormModal" v-if="showFormModal" />
+        <span v-else />
     </n-modal>
     <ManageTable :id="props.id" size="small" :disabled="state.ajaxRunning" :rows="localFilteredItems"
         :row-key="row => row.id" :columns="columns" :order="currentOrder"
