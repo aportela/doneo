@@ -69,7 +69,7 @@
 
     const showNoItemsWarningMessage = ref<boolean>(false);
 
-    const currentOrder = reactive<Order>({ field: "name", direction: "ASC" });
+    const currentOrder = reactive<Order>({ field: "createdAt", direction: "DESC" });
 
     const onSort = (newOrder: Order) => {
         currentOrder.field = newOrder.field;
