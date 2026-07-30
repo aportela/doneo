@@ -511,8 +511,12 @@
             <template #header>
                 <n-flex align="center" justify="space-between">
                     Project {{ currentProject.slug }}
-                    <n-icon :component="DONEO_ICON_ACTION_CANCEL" class="doneo-cursor-pointer"
-                        @click="showDrawer = false;" />
+                    <div>
+                        <n-icon :component="DONEO_ICON_ACTION_EDIT" class="doneo-cursor-pointer"
+                            @click="showDrawer = false; OpenProject(currentProject)" />
+                        <n-icon :component="DONEO_ICON_ACTION_CANCEL" class="doneo-cursor-pointer"
+                            @click="showDrawer = false;" />
+                    </div>
                 </n-flex>
             </template>
             <ProjectResumeFloatingCard v-if="showDrawer && currentProject.id" :project-id="currentProject.id" />
