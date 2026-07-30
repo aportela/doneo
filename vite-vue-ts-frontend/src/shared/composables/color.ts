@@ -76,3 +76,47 @@ export const generateRandomSoftHexColor = (): string => {
 
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 };
+
+export const oklchToHex = (l: number, c: number, h: number): string => {
+  const hRad = (h * Math.PI) / 180;
+
+  const a = c * Math.cos(hRad);
+  const b = c * Math.sin(hRad);
+
+  // OKLCH -> OKLab
+  const l_ = l + 0.3963377774 * a + 0.2158037573 * b;
+  const m_ = l - 0.1055613458 * a - 0.0638541728 * b;
+  const s_ = l - 0.0894841775 * a - 1.291485548 * b;
+
+  const l3 = l_ ** 3;
+  const m3 = m_ ** 3;
+  const s3 = s_ ** 3;
+
+  // OKLab -> XYZ
+  const x = 1.2268798734 * l3 - 0.5578149965 * m3 + 0.2813910502 * s3;
+  const y = -0.0405757626 * l3 + 1.1122868294 * m3 - 0.0717110667 * s3;
+  const z = -0.0763729497 * l3 - 0.4214933239 * m3 + 1.5869240244 * s3;
+
+  // XYZ -> RGB
+  let r = 3.2404542 * x - 1.5371385 * y - 0.4985314 * z;
+  let g = -0.969266 * x + 1.8760108 * y + 0.041556 * z;
+  let b2 = 0.0556434 * x - 0.2040259 * y + 1.0572252 * z;
+
+  const gamma = (v: number) =>
+    v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055;
+
+  r = Math.min(1, Math.max(0, gamma(r)));
+  g = Math.min(1, Math.max(0, gamma(g)));
+  b2 = Math.min(1, Math.max(0, gamma(b2)));
+
+  return (
+    "#" +
+    [r, g, b2]
+      .map((v) =>
+        Math.round(v * 255)
+          .toString(16)
+          .padStart(2, "0"),
+      )
+      .join("")
+  );
+};
