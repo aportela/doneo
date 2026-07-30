@@ -801,11 +801,6 @@ export default {
             indexAlreadyExists: "Index already exists",
           },
         },
-        ManageProjectPrioritiesPage: {
-          header: {
-            title: "Manage project priorities",
-          },
-        },
         ProjectPrioritiesTable: {
           header: {
             columns: {
@@ -888,11 +883,6 @@ export default {
           warnings: {
             nameAlreadyExists: "Name already exists",
             indexAlreadyExists: "Index already exists",
-          },
-        },
-        ManageProjectStatusesPage: {
-          header: {
-            title: "Manage project statuses",
           },
         },
         ProjectStatusesTable: {
@@ -992,11 +982,6 @@ export default {
           },
           warnings: {
             nameAlreadyExists: "Name already exists",
-          },
-        },
-        ManageProjectTypesPage: {
-          header: {
-            title: "Manage project types",
           },
         },
         ProjectTypesTable: {
@@ -1448,11 +1433,6 @@ export default {
             indexAlreadyExists: "Index already exists",
           },
         },
-        ManageTaskStatusesPage: {
-          header: {
-            title: "Manage task statuses",
-          },
-        },
         TaskStatusesTable: {
           header: {
             columns: {
@@ -1557,11 +1537,6 @@ export default {
           warnings: {
             nameAlreadyExists: "Name already exists",
             indexAlreadyExists: "Index already exists",
-          },
-        },
-        ManageTaskPrioritiesPage: {
-          header: {
-            title: "Manage task priorities",
           },
         },
         TaskPrioritiesTable: {
