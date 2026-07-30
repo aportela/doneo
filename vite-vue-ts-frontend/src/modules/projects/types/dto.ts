@@ -55,8 +55,12 @@ type SearchRequestFilter = {
   typeId?: string;
   priorityId?: string;
   statusId?: string;
-  createdAt?: TimestampRange;
   createdByUserId?: string;
+  createdAt?: TimestampRange;
+  updatedAt?: TimestampRange;
+  finishedAt?: TimestampRange;
+  dueAt?: TimestampRange;
+  archivedAt?: TimestampRange;
 };
 
 export type SearchRequest = {

@@ -88,6 +88,10 @@
     };
 
     const createdAtFilterRef = ref<InstanceType<typeof DateFilterSelect>[] | null>(null);
+    const updatedAtFilterRef = ref<InstanceType<typeof DateFilterSelect>[] | null>(null);
+    const finishedAtFilterRef = ref<InstanceType<typeof DateFilterSelect>[] | null>(null);
+    const dueAtFilterRef = ref<InstanceType<typeof DateFilterSelect>[] | null>(null);
+    const archivedAtFilterRef = ref<InstanceType<typeof DateFilterSelect>[] | null>(null);
 
     interface ProjectsTableFilters {
         slug: string;
@@ -97,6 +101,10 @@
         summary: string;
         createdAt: TimestampRange;
         createdByUserId: string | null;
+        updatedAt: TimestampRange;
+        finishedAt: TimestampRange;
+        dueAt: TimestampRange;
+        archivedAt: TimestampRange;
     }
 
     const filters = reactive<ProjectsTableFilters>(
@@ -106,11 +114,27 @@
             priorityId: null,
             statusId: null,
             summary: "",
+            createdByUserId: null,
             createdAt: {
                 from: null,
                 to: null,
             },
-            createdByUserId: null,
+            updatedAt: {
+                from: null,
+                to: null,
+            },
+            finishedAt: {
+                from: null,
+                to: null,
+            },
+            dueAt: {
+                from: null,
+                to: null,
+            },
+            archivedAt: {
+                from: null,
+                to: null,
+            },
         }
     );
 
@@ -121,9 +145,17 @@
             filters.priorityId,
             filters.statusId,
             filters.summary,
+            filters.createdByUserId,
             filters.createdAt.from,
             filters.createdAt.to,
-            filters.createdByUserId,
+            filters.updatedAt.from,
+            filters.updatedAt.to,
+            filters.finishedAt.from,
+            filters.finishedAt.to,
+            filters.dueAt.from,
+            filters.dueAt.to,
+            filters.archivedAt.from,
+            filters.archivedAt.to,
         ],
         () => {
             resetPager.value = true;
@@ -135,8 +167,12 @@
     const isFilteredByPriority = computed<boolean>(() => filters.priorityId !== null);
     const isFilteredByStatus = computed<boolean>(() => filters.statusId !== null);
     const isFilteredBySummary = computed<boolean>(() => filters.summary !== "");
-    const isFilteredByCreationDate = computed<boolean>(() => filters.createdAt.from != null || filters.createdAt.to != null);
     const isFilteredByCreator = computed<boolean>(() => filters.createdByUserId !== null);
+    const isFilteredByCreationDate = computed<boolean>(() => filters.createdAt.from != null || filters.createdAt.to != null);
+    const isFilteredByUpdateDate = computed<boolean>(() => filters.updatedAt.from != null || filters.updatedAt.to != null);
+    const isFilteredByFinishDate = computed<boolean>(() => filters.finishedAt.from != null || filters.finishedAt.to != null);
+    const isFilteredByDueAtDate = computed<boolean>(() => filters.dueAt.from != null || filters.dueAt.to != null);
+    const isFilteredByArchivedDate = computed<boolean>(() => filters.archivedAt.from != null || filters.archivedAt.to != null);
 
     const onClearFilters = () => {
         filters.slug = "";
@@ -144,10 +180,23 @@
         filters.priorityId = null;
         filters.statusId = null;
         filters.summary = "";
+        filters.createdByUserId = null;
+
         if (createdAtFilterRef.value) {
             createdAtFilterRef.value[0]?.reset();
         }
-        filters.createdByUserId = null;
+        if (updatedAtFilterRef.value) {
+            updatedAtFilterRef.value[0]?.reset();
+        }
+        if (finishedAtFilterRef.value) {
+            finishedAtFilterRef.value[0]?.reset();
+        }
+        if (dueAtFilterRef.value) {
+            dueAtFilterRef.value[0]?.reset();
+        }
+        if (archivedAtFilterRef.value) {
+            archivedAtFilterRef.value[0]?.reset();
+        }
     };
 
 
@@ -193,14 +242,6 @@
             render: (row: Project) => renderLabel(row.summary),
         },
         {
-            label: t("modules.project.components.ProjectsTable.header.columns.createdAt"),
-            field: "createdAt",
-            visible: true,
-            sortable: true,
-            isFiltered: () => isFilteredByCreationDate.value,
-            render: (row: Project) => renderLabel(row.createdAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) ?? ""),
-        },
-        {
             label: t("modules.project.components.ProjectsTable.header.columns.createdBy"),
             field: "createdBy",
             visible: true,
@@ -209,6 +250,46 @@
             render: (row: Project) => {
                 return h(AvatarUserName, { userId: row.createdBy.id, userName: row.createdBy.name });
             }
+        },
+        {
+            label: t("modules.project.components.ProjectsTable.header.columns.createdAt"),
+            field: "createdAt",
+            visible: true,
+            sortable: true,
+            isFiltered: () => isFilteredByCreationDate.value,
+            render: (row: Project) => renderLabel(row.createdAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) ?? ""),
+        },
+        {
+            label: t("modules.project.components.ProjectsTable.header.columns.updatedAt"),
+            field: "updatedAt",
+            visible: true,
+            sortable: true,
+            isFiltered: () => isFilteredByUpdateDate.value,
+            render: (row: Project) => renderLabel(row.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) ?? ""),
+        },
+        {
+            label: t("modules.project.components.ProjectsTable.header.columns.finishedAt"),
+            field: "finishedAt",
+            visible: false,
+            sortable: true,
+            isFiltered: () => isFilteredByFinishDate.value,
+            render: (row: Project) => renderLabel(row.finishedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) ?? ""),
+        },
+        {
+            label: t("modules.project.components.ProjectsTable.header.columns.dueAt"),
+            field: "dueAt",
+            visible: false,
+            sortable: true,
+            isFiltered: () => isFilteredByDueAtDate.value,
+            render: (row: Project) => renderLabel(row.dueAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) ?? ""),
+        },
+        {
+            label: t("modules.project.components.ProjectsTable.header.columns.archivedAt"),
+            field: "archivedAt",
+            visible: false,
+            sortable: true,
+            isFiltered: () => isFilteredByArchivedDate.value,
+            render: (row: Project) => renderLabel(row.archivedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) ?? ""),
         },
     ]);
 
@@ -247,8 +328,12 @@
                     typeId: filters.typeId !== null ? filters.typeId : undefined,
                     priorityId: filters.priorityId !== null ? filters.priorityId : undefined,
                     statusId: filters.statusId !== null ? filters.statusId : undefined,
-                    createdAt: filters.createdAt,
                     createdByUserId: filters.createdByUserId !== null ? filters.createdByUserId : undefined,
+                    createdAt: filters.createdAt,
+                    updatedAt: filters.updatedAt,
+                    finishedAt: filters.finishedAt,
+                    dueAt: filters.dueAt,
+                    archivedAt: filters.archivedAt,
                 }
             };
             const response = await projectService.search(payload);
@@ -294,7 +379,6 @@
         tmpItem.value = new Project();
         showFormModal.value = true;
     };
-
 
     const onProjectAdded = (project: ProjectResponse) => {
         showFormModal.value = false;
@@ -436,11 +520,19 @@
                 <TextFilterInput v-else-if="column.field === 'summary'" clearable :disabled="state.ajaxRunning"
                     :placeholder="t('modules.project.components.ProjectsTable.header.filters.summary.placeholder')"
                     v-model:value="filters.summary" @keydown-enter="onRefresh" />
-                <DateFilterSelect v-else-if="column.field === 'createdAt'" clearable ref="createdAtFilterRef"
-                    :disabled="state.ajaxRunning" v-model:range="filters.createdAt" />
                 <UserSelector v-else-if="column.field === 'createdBy'" clearable :disabled="state.ajaxRunning"
                     v-model:id="filters.createdByUserId"
                     :placeholder="t('modules.project.components.ProjectsTable.header.filters.creator.placeholder')" />
+                <DateFilterSelect v-else-if="column.field === 'createdAt'" clearable ref="createdAtFilterRef"
+                    :disabled="state.ajaxRunning" v-model:range="filters.createdAt" />
+                <DateFilterSelect v-else-if="column.field === 'updatedAt'" clearable ref="updatedAtFilterRef"
+                    :disabled="state.ajaxRunning" v-model:range="filters.updatedAt" />
+                <DateFilterSelect v-else-if="column.field === 'finishedAt'" clearable ref="finishedAtFilterRef"
+                    :disabled="state.ajaxRunning" v-model:range="filters.finishedAt" />
+                <DateFilterSelect v-else-if="column.field === 'dueAt'" clearable ref="dueAtFilterRef"
+                    :disabled="state.ajaxRunning" v-model:range="filters.dueAt" />
+                <DateFilterSelect v-else-if="column.field === 'archivedAt'" clearable ref="archivedAtFilterRef"
+                    :disabled="state.ajaxRunning" v-model:range="filters.archivedAt" />
             </th>
         </template>
         <template #rowactions="{ row }">

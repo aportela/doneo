@@ -1285,11 +1285,6 @@ export default {
             slugAlreadyExists: "Slug already exists",
           },
         },
-        ManageProjectsPage: {
-          header: {
-            title: "Manage projects",
-          },
-        },
         ProjectsTable: {
           header: {
             columns: {
@@ -1300,6 +1295,11 @@ export default {
               summary: "Summary",
               createdAt: "Created at",
               createdBy: "Created by",
+              updatedAt: "Updated at",
+              startedAt: "Started at",
+              finishedAt: "Finished at",
+              dueAt: "Due at",
+              archivedAt: "Archived at",
             },
             filters: {
               slug: {
