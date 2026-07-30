@@ -23,14 +23,6 @@ export const hexToRgba = (hex: string, alphaOverride?: number) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-export const getNaiveUITagColorProperty = (base: string) => {
-  return {
-    color: hexToRgba(base, 0.2),
-    textColor: hexToRgba(base, 1),
-    borderColor: hexToRgba(base, 0.5),
-  };
-};
-
 const clamp = (v: number): number => {
   if (v < 0) return 0;
   if (v > 255) return 255;

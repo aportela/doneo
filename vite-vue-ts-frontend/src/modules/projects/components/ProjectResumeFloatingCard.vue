@@ -14,7 +14,7 @@
     import { Project } from '../models/project';
     import { type ProjectResponse } from '../types/dto';
 
-    import { getNaiveUITagColorProperty } from '../../../shared/composables/color.ts';
+    import { getNaiveUITagColorProperty } from '../../../shared/composables/naive-ui-helpers.ts';
     import AvatarUserName from '../../../shared/components/AvatarUserName.vue';
     import ToggleMarkDownEditor from '../../../shared/components/form-blocks/ToggleMarkDownEditor.vue';
     import NoteItem from '../../notes/components/NoteItem.vue';

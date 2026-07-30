@@ -9,7 +9,8 @@
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { taskStatusService } from '../services/task-status';
     import { handleAPIError } from '../../../api/client/errorHandler';
-    import { generateRandomSoftHexColor, getNaiveUITagColorProperty } from '../../../shared/composables/color';
+    import { getNaiveUITagColorProperty } from '../../../shared/composables/naive-ui-helpers';
+    import { generateRandomSoftHexColor } from '../../../shared/composables/color';
     import type { TaskStatusResponse } from '../types/dto';
     import { appBus } from '../../../shared/composables/bus';
 

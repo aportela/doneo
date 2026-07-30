@@ -3,7 +3,7 @@ import { useI18n } from "vue-i18n";
 
 import { NIcon, NTag, NTooltip } from "naive-ui";
 
-import { getNaiveUITagColorProperty, oklchToHex } from "./color";
+import { hexToRgba, oklchToHex } from "./color";
 import type { IconProps } from "@tabler/icons-vue";
 import type { Role } from "../../modules/roles/models/role";
 import {
@@ -14,6 +14,14 @@ import {
 } from "../types/icons";
 
 type TFunction = ReturnType<typeof useI18n>["t"];
+
+export const getNaiveUITagColorProperty = (base: string) => {
+  return {
+    color: hexToRgba(base, 0.2),
+    textColor: hexToRgba(base, 1),
+    borderColor: hexToRgba(base, 0.5),
+  };
+};
 
 export const renderColoredTag = (
   name: string,
