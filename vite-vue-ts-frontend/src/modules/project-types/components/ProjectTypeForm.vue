@@ -27,7 +27,7 @@
 
     const projectType = ref<ProjectType>(new ProjectType());
 
-    projectType.value.hexColor = generateRandomSoftHexColor();
+    projectType.value.hexColor = !props.projectTypeId ? generateRandomSoftHexColor() : "#666666";
 
     const serverErrors = ref<Record<string, string>>({});
 
@@ -88,11 +88,7 @@
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const response: ProjectTypeResponse = await projectTypeService.get(id);
-            if (response.id === id) {
-                projectType.value = new ProjectType(response);
-            } else {
-                state.ajaxErrorMessage = t("modules.projectType.components.ProjectTypeForm.errors.loadError");
-            }
+            projectType.value = new ProjectType(response);
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -255,7 +251,7 @@
                 <n-icon class="doneo-mr-4px" :component="!props.projectTypeId ? DONEO_ICON_ADD : DONEO_ICON_EDIT" />
                 {{
                     t(!props.projectTypeId ? "modules.projectType.components.ProjectTypeForm.headers.addProjectType" :
-                        "modules.projectType.components.ProjectTypeForm.headers.updateProjectType")
+                        "modules.projectType.components.ProjectTypeForm.headers.editProjectType")
                 }}
             </div>
         </template>
@@ -274,7 +270,7 @@
                     </template>
                 </n-input>
             </n-form-item>
-            <n-form-item :label="t('Preview')">
+            <n-form-item :label="t('modules.projectType.components.ProjectTypeForm.inputs.preview.label')">
                 <n-flex style="width: 100%" align="center" :wrap="false">
                     <n-tag :color="getNaiveUITagColorProperty(projectType.hexColor)" style="width: 100%;">
                         {{ projectType.name }}

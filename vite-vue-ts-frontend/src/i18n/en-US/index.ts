@@ -957,7 +957,7 @@ export default {
         ProjectTypeForm: {
           headers: {
             addProjectType: "Add project type",
-            updateProjectType: "Update project type",
+            editProjectType: "Edit project type",
           },
           inputs: {
             name: {
