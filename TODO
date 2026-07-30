@@ -79,3 +79,5 @@ src/api/client can be removed ?????
 tableheadercolumn right align
 
 check/add/remove doneo-user-select-none class
+
+reset saved (corrupt?) store settings from profile button
