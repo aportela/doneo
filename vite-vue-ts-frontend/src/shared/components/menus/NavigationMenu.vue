@@ -41,7 +41,7 @@
     import type { Project } from '../../../modules/projects/models/project';
     import Doneo from '../icons/Doneo.vue';
     import Github from '../icons/Github.vue';
-    import { DONEO_FILE_SETTINGS, DONEO_FOLDER_SETTINGS } from '../../types/icons.ts';
+    import { DONEO_ICON_FILE_SETTINGS, DONEO_ICON_FOLDER_SETTINGS } from '../../types/icons.ts';
 
     interface Props {
         collapsed?: boolean;
@@ -305,7 +305,7 @@
                     {
                         key: "projectSettings",
                         label: t("shared.components.menus.NavigationMenu.items.projectSettings"),
-                        icon: () => h(NIcon, null, { default: () => h(DONEO_FOLDER_SETTINGS) }),
+                        icon: () => h(NIcon, null, { default: () => h(DONEO_ICON_FOLDER_SETTINGS) }),
                         disabled: false,
                         show: true,
                         children: [
@@ -360,7 +360,7 @@
                     {
                         key: "taskSettings",
                         label: t("shared.components.menus.NavigationMenu.items.taskSettings"),
-                        icon: () => h(NIcon, null, { default: () => h(DONEO_FILE_SETTINGS) }),
+                        icon: () => h(NIcon, null, { default: () => h(DONEO_ICON_FILE_SETTINGS) }),
                         disabled: false,
                         show: true,
                         children: [

@@ -35,8 +35,8 @@ export {
   ScanEye as DONEO_ICON_ACTION_PREVIEW,
   CircleUser as DONEO_ICON_CIRCLE_USER,
   TriangleAlert as DONEO_ICON_ALERT,
-  FolderCog as DONEO_FOLDER_SETTINGS,
-  FileCog as DONEO_FILE_SETTINGS,
+  FolderCog as DONEO_ICON_FOLDER_SETTINGS,
+  FileCog as DONEO_ICON_FILE_SETTINGS,
 } from "@lucide/vue";
 
 export { default as DONEO_ICON_SQUARE } from "../components/icons/Square.vue";

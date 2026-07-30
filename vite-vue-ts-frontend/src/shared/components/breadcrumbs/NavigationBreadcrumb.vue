@@ -8,7 +8,7 @@
     import { Bookmark, CircleUser, FolderKanban, Form, Goal, Home, LibraryBig, ListTodo, Notebook, Route, Settings, UserCog, UserKey, Users } from '@lucide/vue';
 
     import { useSessionStore } from '../../../stores/session';
-    import { DONEO_FILE_SETTINGS, DONEO_FOLDER_SETTINGS } from '../../types/icons';
+    import { DONEO_ICON_FILE_SETTINGS, DONEO_ICON_FOLDER_SETTINGS } from '../../types/icons';
 
     type AppRouteName =
         | 'manageProjects'
@@ -76,31 +76,31 @@
 
         manageProjectTypes: [
             { id: "settings", label: () => 'Settings', icon: Settings, clickable: false },
-            { id: "projectSettings", label: () => 'Project settings', icon: DONEO_FOLDER_SETTINGS },
+            { id: "projectSettings", label: () => 'Project settings', icon: DONEO_ICON_FOLDER_SETTINGS },
             { id: "manageProjectTypes", label: () => 'Project types', icon: Bookmark }
         ],
 
         manageProjectPriorities: [
             { id: "settings", label: () => 'Settings', icon: Settings, clickable: false },
-            { id: "projectSettings", label: () => 'Project settings', icon: DONEO_FOLDER_SETTINGS },
+            { id: "projectSettings", label: () => 'Project settings', icon: DONEO_ICON_FOLDER_SETTINGS },
             { id: "manageProjectPriorities", label: () => 'Project priorities', icon: Goal }
         ],
 
         manageProjectStatuses: [
             { id: "settings", label: () => 'Settings', icon: Settings, clickable: false },
-            { id: "projectSettings", label: () => 'Project settings', icon: DONEO_FOLDER_SETTINGS },
+            { id: "projectSettings", label: () => 'Project settings', icon: DONEO_ICON_FOLDER_SETTINGS },
             { id: "manageProjectStatuses", label: () => 'Project statuses', icon: Route }
         ],
 
         manageTaskPriorities: [
             { id: "settings", label: () => 'Settings', icon: Settings, clickable: false },
-            { id: "taskSettings", label: () => 'Task settings', icon: DONEO_FILE_SETTINGS },
+            { id: "taskSettings", label: () => 'Task settings', icon: DONEO_ICON_FILE_SETTINGS },
             { id: "manageTaskPriorities", label: () => 'Task priorities', icon: Goal }
         ],
 
         manageTaskStatuses: [
             { id: "settings", label: () => 'Settings', icon: Settings, clickable: false },
-            { id: "taskSettings", label: () => 'Task settings', icon: DONEO_FILE_SETTINGS },
+            { id: "taskSettings", label: () => 'Task settings', icon: DONEO_ICON_FILE_SETTINGS },
             { id: "manageTaskStatuses", label: () => 'Task statuses', icon: Route }
         ],
 
