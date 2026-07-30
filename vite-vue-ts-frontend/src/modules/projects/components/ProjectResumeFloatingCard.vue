@@ -117,9 +117,11 @@
 <template>
     <n-spin :show="state.ajaxRunning" style="height: 100vh;">
         <div v-show="!state.ajaxRunning">
-            <h3>{{ project.summary }}</h3>
+            <h3>Summary: {{ project.summary }}</h3>
 
-            <p>Description: {{ project.description }}</p>
+            <h3>Description:</h3>
+            <ToggleMarkDownEditor read-only v-model:value="project.description"
+                style="max-height: 32vh; overflow-y: scroll;" />
 
             <n-button-group size="tiny" style="margin-top: 16px;">
                 <n-button round><template #icon><n-icon :component="IconPaperclip" /></template> Add
