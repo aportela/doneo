@@ -81,3 +81,5 @@ tableheadercolumn right align
 check/add/remove doneo-user-select-none class
 
 reset saved (corrupt?) store settings from profile button
+
+upload modal global on layout with events
