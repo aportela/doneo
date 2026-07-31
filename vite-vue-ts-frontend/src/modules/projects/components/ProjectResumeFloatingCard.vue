@@ -3,7 +3,7 @@
     import { useI18n } from "vue-i18n";
 
     import { NCollapse, NCollapseItem, NButton, NButtonGroup, NTag, NSpin, NIcon, NTimeline, NTimelineItem, NDivider, NFlex, NDropdown } from 'naive-ui';
-    import { IconAlertTriangle, IconCalendarBolt, IconCalendarCheck, IconCalendarDue, IconCalendarTime, IconFilter2, IconMessage2, IconPaperclip, IconSortDescending, IconStatusChange, IconUser } from '@tabler/icons-vue';
+    import { IconAlertTriangle, IconBookmark, IconCalendarBolt, IconCalendarCheck, IconCalendarDue, IconCalendarTime, IconFilter2, IconMessage2, IconPaperclip, IconSortDescending, IconStatusChange, IconUser } from '@tabler/icons-vue';
     import { ListTodo } from '@lucide/vue';
 
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
@@ -28,6 +28,9 @@
     import { Task } from '../../tasks/models/tasks.ts';
     import type { SearchRequest } from '../../tasks/types/dto.ts';
     import { taskService } from '../../tasks/services/task.ts';
+    import { HistoryOperation } from '../../history-operations/models/history-operation.ts';
+    import { historyOperationsService } from '../../history-operations/services/history-operations.ts';
+    import { noteService } from '../../notes/services/note.ts';
 
     interface Props {
         projectId: string;
@@ -57,6 +60,12 @@
             }
             if (project.value.tasksCount > 0) {
                 getProjectTasks();
+            }
+            if (project.value.historyOperationsCount > 0) {
+                getProjectHistoryOperations();
+            }
+            if (project.value.notesCount > 0) {
+                getProjectNotes();
             }
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -170,6 +179,72 @@
         }
     };
 
+    const historyOperations = shallowRef<HistoryOperation[]>([]);
+
+    const getProjectHistoryOperations = async () => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const results = await historyOperationsService.getProjectHistoryOperations(props.projectId);
+            historyOperations.value = results.historyOperations.map((operation) => new HistoryOperation(operation));
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "HistoryOperationsTable.onRefresh" } });
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
+                    console.error("Unhandled API error", { file: "HistoryOperationsTable.vue", method: "onRefresh" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
+        }
+    };
+
+    const notes = shallowRef<Note[]>([]);
+
+    const getProjectNotes = async () => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const results = await noteService.getProjectNotes(props.projectId);
+            notes.value = results.notes.map((note) => new Note(note));
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ProjectNotes.onRefresh" } });
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.projectPermission.components.projectPermissions.errors.refreshError");
+                    console.error("Unhandled API error", { file: "ProjectNotes.vue", method: "onRefresh" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
+        }
+    };
+
     onMounted(() => {
         if (props.projectId) {
             onGet(props.projectId);
@@ -197,6 +272,31 @@
 
     const hasDetails = computed(() => project.value.attachmentsCount > 0 || project.value.tasksCount > 0);
 
+    type TimelineItem =
+        | {
+            type: 'historyOperation'
+            createdAt: IDate | null
+            item: HistoryOperation
+        }
+        | {
+            type: 'note'
+            createdAt: IDate | null
+            item: Note
+        };
+
+
+    const timeline = computed<TimelineItem[]>(() => [
+        ...historyOperations.value.map(h => ({
+            type: 'historyOperation' as const,
+            createdAt: h.createdAt,
+            item: h
+        })),
+        ...notes.value.map(n => ({
+            type: 'note' as const,
+            createdAt: n.createdAt,
+            item: n
+        }))
+    ].sort((a, b) => (b.createdAt?.msTimestamp ?? 0) - (a.createdAt?.msTimestamp ?? 0)))
 </script>
 
 <template>
@@ -212,7 +312,8 @@
                 <n-button round><template #icon><n-icon :component="IconPaperclip" /></template> Add
                     attachment</n-button>
 
-                <n-button round><template #icon><n-icon :component="IconMessage2" tag="a" href="#aa" /></template> Add
+                <n-button round tag="a" href="#new_note"><template #icon><n-icon :component="IconMessage2" /></template>
+                    Add
                     note</n-button>
                 <n-button round><template #icon><n-icon :component="ListTodo" /></template> Add
                     task</n-button>
@@ -265,13 +366,32 @@
             </n-collapse>
             <n-divider />
             <h4>Properties</h4>
-            <p><n-icon :component="IconStatusChange" /> State:
-                <n-tag size="tiny" :color="getNaiveUITagColorProperty(project.status.hexColor ?? '#888888')">{{
-                    project.status.name }}</n-tag>
+            <p>
+                <n-icon :component="IconBookmark" />
+                Type:
+                <n-tag size="small" :color="getNaiveUITagColorProperty(project.type.hexColor ?? '#888888')">
+                    {{
+                        project.type.name
+                    }}
+                </n-tag>
             </p>
-            <p><n-icon :component="IconAlertTriangle" />Priority:
-                <n-tag size="tiny" :color="getNaiveUITagColorProperty(project.priority.hexColor ?? '#888888')">{{
-                    project.priority.name }}</n-tag>
+            <p>
+                <n-icon :component="IconStatusChange" />
+                State:
+                <n-tag size="small" :color="getNaiveUITagColorProperty(project.status.hexColor ?? '#888888')">
+                    {{
+                        project.status.name
+                    }}
+                </n-tag>
+            </p>
+            <p>
+                <n-icon :component="IconAlertTriangle" />
+                Priority:
+                <n-tag size="small" :color="getNaiveUITagColorProperty(project.priority.hexColor ?? '#888888')">
+                    {{
+                        project.priority.name
+                    }}
+                </n-tag>
             </p>
             <p><n-icon :component="IconUser" />Asignee: John doe</p>
             <p><n-icon :component="IconCalendarBolt" /> Created at: {{ project.createdAt.toLocaleString() }}
@@ -297,8 +417,25 @@
                 </n-button-group>
             </n-flex>
 
-            <ToggleMarkDownEditor v-model:value="noteBody" hide-preview placeholder="Add comment" />
+            <ToggleMarkDownEditor v-model:value="noteBody" hide-preview placeholder="Add note" id="new_note" />
+            <n-divider />
             <n-timeline>
+                <n-timeline-item v-for="tt in timeline" type="default" :key="tt.item.id ?? ''">
+                    <template #icon v-if="tt.type === 'historyOperation'">
+                        <n-icon :component="IconAlertTriangle" size="20" />
+                    </template>
+                    <template #icon v-else>
+                        <n-icon :component="IconMessage2" size="22" />
+                    </template>
+                    <template #default v-if="tt.type === 'historyOperation'">
+                        {{ t(tt.item.getOperationTypeLabel()) }} by {{ tt.item.createdBy.name }} on {{
+                            tt.item.createdAt.toLocaleString() }}
+                    </template>
+                    <template #default v-else>
+                        <NoteItem :note="tt.item" />
+                    </template>
+                </n-timeline-item>
+                <!--
                 <n-timeline-item type="default">
                     <template #icon>
                         <n-icon :component="IconAlertTriangle" size="20" />
@@ -313,6 +450,7 @@
                         <NoteItem :note="defaultNote" />
                     </template>
                 </n-timeline-item>
+            -->
             </n-timeline>
         </div>
     </n-spin>
