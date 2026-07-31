@@ -212,7 +212,7 @@ func (repository *projectRepository) Get(ctx context.Context, dbExecutor databas
 				SELECT project_id, COUNT(*) as tasks_count
 				FROM tasks
 				GROUP BY project_id
-			) PT ON PHO.project_id = P.id
+			) PT ON PT.project_id = P.id
             WHERE
 				P.id = ?
 			GROUP
