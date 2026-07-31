@@ -401,11 +401,15 @@
         showFormModal.value = true;
     };
 
-    const onProjectAdded = (project: ProjectResponse) => {
+    const onProjectAdded = (project: ProjectResponse, openProjectAfterCreate: boolean) => {
         showFormModal.value = false;
         tmpItem.value = new Project();
-        notify('success', t("modules.user.components.ProjectsTable.notifications.projectAdded", { name: project.summary }));
-        onRefresh();
+        notify('success', t("modules.project.components.ProjectsTable.notifications.projectAdded", { summary: project.summary }));
+        if (openProjectAfterCreate) {
+            OpenProject(new Project(project));
+        } else {
+            onRefresh();
+        }
     };
 
     const hideFormModal = () => {
