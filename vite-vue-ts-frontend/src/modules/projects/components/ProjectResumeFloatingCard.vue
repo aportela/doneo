@@ -309,13 +309,17 @@
                 style="max-height: 32vh; overflow-y: scroll;" />
 
             <n-button-group size="tiny" style="margin-top: 16px;">
-                <n-button round><template #icon><n-icon :component="IconPaperclip" /></template> Add
+                <n-button round :disabled="!project.allowedOperations.updateProject"><template #icon><n-icon
+                            :component="IconPaperclip" /></template>
+                    Add
                     attachment</n-button>
 
-                <n-button round tag="a" href="#new_note"><template #icon><n-icon :component="IconMessage2" /></template>
+                <n-button round tag="a" href="#new_note" :disabled="!project.allowedOperations.updateProject"><template
+                        #icon><n-icon :component="IconMessage2" /></template>
                     Add
                     note</n-button>
-                <n-button round><template #icon><n-icon :component="ListTodo" /></template> Add
+                <n-button round :disabled="!project.allowedOperations.addTask"><template #icon><n-icon
+                            :component="ListTodo" /></template> Add
                     task</n-button>
             </n-button-group>
             <n-divider v-if="hasDetails" />
