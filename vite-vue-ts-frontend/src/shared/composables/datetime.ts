@@ -10,7 +10,7 @@ export const geti18nTimeParts = (seconds: number) => {
   ].filter(({ count }) => count > 0);
 };
 
-export const defaultDateTimeMask = "YYYY-MM-DD HH:MM:ss";
+export const defaultDateTimeMask = "YYYY-MM-DD HH:mm:ss";
 
 export const formatDuration = (spentTime: number): string => {
   if (spentTime > 0) {
