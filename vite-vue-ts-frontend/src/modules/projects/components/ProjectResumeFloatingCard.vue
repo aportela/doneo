@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, reactive, onMounted, computed } from 'vue';
+    import { ref, reactive, onMounted, computed, shallowRef } from 'vue';
     import { useI18n } from "vue-i18n";
 
     import { NCollapse, NCollapseItem, NButton, NButtonGroup, NTag, NSpin, NIcon, NTimeline, NTimelineItem, NDivider, NFlex, NDropdown } from 'naive-ui';
@@ -20,6 +20,14 @@
     import NoteItem from '../../notes/components/NoteItem.vue';
     import { IDate } from '../../../shared/types/idate.ts';
     import { Note } from '../../notes/models/note.ts';
+    import type { SearchResponse } from '../../attachments/types/dto.ts';
+    import { Attachment } from '../../attachments/models/attachment.ts';
+    import { attachmentService } from '../../attachments/services/attachment.ts';
+    import { formatBytes } from '../../../shared/composables/format.ts';
+    import { DONEO_ICON_ACTION_DOWNLOAD, DONEO_ICON_ACTION_OPEN, DONEO_ICON_ACTION_PREVIEW } from '../../../shared/types/icons.ts';
+    import { Task } from '../../tasks/models/tasks.ts';
+    import type { SearchRequest } from '../../tasks/types/dto.ts';
+    import { taskService } from '../../tasks/services/task.ts';
 
     interface Props {
         projectId: string;
@@ -43,10 +51,12 @@
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const response: ProjectResponse = await projectService.get(projectId);
-            if (response.id === projectId) {
-                project.value = new Project(response);
-            } else {
-                state.ajaxErrorMessage = t("modules.task.components.TaskPage.errors.loadError");
+            project.value = new Project(response);
+            if (project.value.attachmentsCount > 0) {
+                getProjectAttachments();
+            }
+            if (project.value.tasksCount > 0) {
+                getProjectTasks();
             }
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -86,6 +96,80 @@
         }
     };
 
+    const attachments = shallowRef<Attachment[]>([]);
+
+    const getProjectAttachments = async () => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const response: SearchResponse = await attachmentService.getProjectAttachments(props.projectId);
+            attachments.value = response.attachments.map((attachment) => new Attachment(attachment));
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "AttachmentsTable.onRefresh" } });
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.projectAttachment.components.AttachmentsTable.errors.refreshError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.projectAttachment.components.AttachmentsTable.errors.refreshError");
+                    console.error("Unhandled API error", { file: "AttachmentsTable.vue", method: "onRefresh" }, { err: fatalError });
+                });
+        } finally {
+            state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
+        }
+    };
+
+    const tasks = shallowRef<Task[]>([]);
+
+    const getProjectTasks = async () => {
+        Object.assign(state, defaultAjaxStateRunning);
+        try {
+            const payload: SearchRequest = {
+                pager: { enabled: false, currentPage: 1, resultsPage: 0 },
+                order: { field: "creationDate", direction: "DESC" },
+                filter: {
+                    projectId: props.projectId,
+                }
+            };
+            const response = await taskService.search(null, payload);
+            tasks.value = response.tasks.map((task) => new Task(task));
+        } catch (error: unknown) {
+            state.ajaxErrors = true;
+            handleAPIError(error,
+                (apiError) => {
+                    switch (apiError.response?.status) {
+                        case 401:
+                            state.ajaxErrors = false;
+                            appBus.emit({ type: "reauthRequired", payload: { emitter: "ManageTasksPage.onRefresh" } });
+                            break;
+                        default:
+                            state.ajaxErrorMessage = t("modules.project.components.ManageTasksPage.errors.refreshError");
+                            break;
+                    }
+                },
+                (fatalError) => {
+                    state.ajaxErrorMessage = t("modules.project.components.ManageTasksPage.errors.refreshError");
+                    console.error("Unhandled API error", { file: "ManageTasksPage.vue", method: "onRefresh" }, { err: fatalError });
+                });
+        }
+        finally {
+            state.ajaxRunning = false;
+            if (state.ajaxErrorMessage) {
+                appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
+            }
+        }
+    };
+
     onMounted(() => {
         if (props.projectId) {
             onGet(props.projectId);
@@ -112,6 +196,7 @@
     defaultNote.body = "We recommend configuring it at the project entry point, such as in main.js for projects created with Vite. Avoid calling config within components!";
 
     const hasDetails = computed(() => project.value.attachmentsCount > 0 || project.value.tasksCount > 0);
+
 </script>
 
 <template>
@@ -134,21 +219,48 @@
             </n-button-group>
             <n-divider v-if="hasDetails" />
             <n-collapse class="doneo-disable-user-select" v-if="hasDetails">
-                <n-collapse-item title="Attachments" key="attachments" v-if="project.attachmentsCount > 0">
+                <n-collapse-item title="Attachments" key="attachments" name="attachments"
+                    v-if="project.attachmentsCount > 0">
                     <template #header>
                         <n-icon :component="IconPaperclip" /> Attachments
                     </template>
                     <template #header-extra>
                         ({{ project.attachmentsCount }})
                     </template>
+                    <p v-for="attachment in attachments" :key="attachment.id"
+                        style="display: flex; align-items: center;">
+                        <n-button size="tiny" style="margin-right: 4px;">
+                            <template #icon>
+                                <n-icon :component="DONEO_ICON_ACTION_DOWNLOAD" />
+                            </template>
+                        </n-button>
+                        <n-button size="tiny" style="margin-right: 4px;">
+                            <template #icon>
+                                <n-icon :component="DONEO_ICON_ACTION_PREVIEW" />
+                            </template>
+                        </n-button>
+                        <span>
+                            <strong>{{ attachment.name }}</strong> ({{ formatBytes(attachment.size) }})
+                        </span>
+                    </p>
                 </n-collapse-item>
-                <n-collapse-item title="Tasks" key="tasks" v-if="project.tasksCount > 0">
+                <n-collapse-item title="Tasks" key="tasks" name="tasks" v-if="project.tasksCount > 0">
                     <template #header>
                         <n-icon :component="ListTodo" /> Tasks
                     </template>
                     <template #header-extra>
                         ({{ project.tasksCount }})
                     </template>
+                    <p v-for="task in tasks" :key="task.id" style="display: flex; align-items: center;">
+                        <n-button size="tiny" style="margin-right: 4px;">
+                            <template #icon>
+                                <n-icon :component="DONEO_ICON_ACTION_OPEN" />
+                            </template>
+                        </n-button>
+                        <span>
+                            <strong>{{ task.slug }}</strong> - {{ task.summary }}
+                        </span>
+                    </p>
                 </n-collapse-item>
             </n-collapse>
             <n-divider />
