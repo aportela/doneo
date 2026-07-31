@@ -27,7 +27,7 @@
 
     const state: AjaxStateInterface = reactive({ ...defaultAjaxState });
 
-    const newProjectFormRef = ref<FormInst | null>(null)
+    const formRef = ref<FormInst | null>(null)
 
     const newProjectFormRules: FormRules =
     {
@@ -42,7 +42,6 @@
                 } else if (value.length > MAX_SLUG_LENGTH) {
                     return new Error(t("shared.warningMessages.fieldExceedsMaxLength"));
                 } else if (serverErrors.value.slug) {
-                    console.log("slug");
                     return new Error(t(serverErrors.value.slug));
                 } else {
                     return true;
@@ -130,9 +129,9 @@
 
     const onSave = async () => {
         serverErrors.value = {};
-        newProjectFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         try {
-            await newProjectFormRef.value?.validate();
+            await formRef.value?.validate();
             await onAdd();
         }
         catch (error: any) {
@@ -147,7 +146,7 @@
 
     const onAdd = async () => {
         serverErrors.value = {};
-        newProjectFormRef.value?.restoreValidation();
+        formRef.value?.restoreValidation();
         Object.assign(state, defaultAjaxStateRunning);
         try {
             const payload: AddRequest = {
@@ -171,8 +170,7 @@
                             break;
                         case 409:
                             if (apiError.details?.field === "slug") {
-                                // TODO: not working on duplicated slugs
-                                serverErrors.value.slug = "modules.project.components.NewProjectForm.warnings.slugAlreadyExists";
+                                serverErrors.value.slug = "modules.project.components.NewProjectForm.inputs.slug.errors.alreadyExists";
                             } else {
                                 state.ajaxErrorMessage = t("modules.project.components.NewProjectForm.errors.addError");
                             }
@@ -193,7 +191,7 @@
                     appBus.emit({ type: "remoteAPIError", payload: { errorMessage: state.ajaxErrorMessage } });
                 } else {
                     await nextTick();
-                    newProjectFormRef.value?.validate().then(() => { }).catch(() => { });
+                    formRef.value?.validate().then(() => { }).catch(() => { });
                 }
             }
         }
@@ -226,7 +224,7 @@
         <template #header-extra>
             <n-spin v-if="state.ajaxRunning" size="small" />
         </template>
-        <n-form ref="projectTypeFormRef" :model="project" :rules="newProjectFormRules" :disabled="state.ajaxRunning">
+        <n-form ref="formRef" :model="project" :rules="newProjectFormRules" :disabled="state.ajaxRunning">
             <n-form-item :label="t('modules.project.components.NewProjectForm.inputs.slug.label')" path="slug"
                 show-feedback>
                 <n-input type="text"

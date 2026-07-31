@@ -1238,6 +1238,9 @@ export default {
             slug: {
               label: "Slug",
               placeholder: "Enter project slug",
+              errors: {
+                alreadyExists: "Slug already exists",
+              },
             },
             summary: {
               label: "Summary",
@@ -1269,9 +1272,6 @@ export default {
           },
           errors: {
             addError: "There was a problem while adding the project data",
-          },
-          warnings: {
-            slugAlreadyExists: "Slug already exists",
           },
         },
         ProjectsTable: {
