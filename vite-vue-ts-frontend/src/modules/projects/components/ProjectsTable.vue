@@ -592,6 +592,6 @@
 <style lang="css" scoped>
     .project-form {
         width: 95%;
-        max-width: 640px;
+        max-width: 768px;
     }
 </style>
