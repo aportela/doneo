@@ -115,7 +115,7 @@
                     <template #after>
                         <span>commented on: {{
                             props.note.createdAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask)
-                            }}</span>
+                        }}</span>
                         <span v-if="props.note.updatedAt">(comment updated on: {{
                             props.note.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) }})
                         </span>
@@ -148,7 +148,7 @@
             </n-flex>
         </div>
         <n-form-item>
-            <ToggleMarkDownEditor v-model:value="body" hide-preview placeholder="Add note"
+            <ToggleMarkDownEditor v-model:value="body" hide-preview simple-toolbars placeholder="Add note"
                 :read-only="currentMode === 'view'" auto-focus />
         </n-form-item>
     </n-card>
