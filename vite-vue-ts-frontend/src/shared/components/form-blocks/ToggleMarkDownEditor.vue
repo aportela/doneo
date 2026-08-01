@@ -16,6 +16,7 @@
         placeholder?: string;
         autoFocus?: boolean;
         noUploadImg?: boolean;
+        simpleToolbars?: boolean;
     };
 
     const props = withDefaults(defineProps<Props>(), {
@@ -60,16 +61,37 @@
         }));
     };
 
-    const excludedMDEditorToolBars: ToolbarNames[] = ["save", "previewOnly", "htmlPreview", "catalog", "github"];
-
+    //const excludedMDEditorToolBars: ToolbarNames[] = ["save", "previewOnly", "htmlPreview", "catalog", "github", "mermaid", "katex", "revoke", "sub", "sup", "prettier", "pageFullscreen", "fullscreen"];
+    const simpleToolbarItems: ToolbarNames[] = [
+        'bold',
+        'underline',
+        'italic',
+        '-',
+        'title',
+        'strikeThrough',
+        'sub',
+        'sup',
+        'quote',
+        'unorderedList',
+        'orderedList',
+        'task',
+        '-',
+        'codeRow',
+        'code',
+        'link',
+        'image',
+        'table',
+        '-',
+        'preview',
+    ];
 </script>
 
 <template>
     <MdEditor ref="editorRef" v-model="markDown" :max-length="props.maxLength"
         :theme="userSettingsStore.darkTheme ? 'dark' : 'light'" language="en-US" :disabled="props.disabled"
         :read-only="props.readOnly" v-if="!props.readOnly" :no-upload-img="props.noUploadImg"
-        :auto-focus="props.autoFocus" @paste="onPaste" :toolbars-exclude="excludedMDEditorToolBars" :footers="[]"
-        :preview="!props.hidePreview" :placeholder="props.placeholder" />
+        :auto-focus="props.autoFocus" @paste="onPaste" :toolbars="props.simpleToolbars ? simpleToolbarItems : undefined"
+        :footers="[]" :preview="!props.hidePreview" :placeholder="props.placeholder" />
     <MdPreview v-else id="mdeditor" v-model:model-value="markDown" no-img-zoom-in
         :theme="userSettingsStore.darkTheme ? 'dark' : 'light'" language="en-US" :code-foldable="false"
         class="doneo-markdown-preview-container" />
