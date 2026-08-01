@@ -16,6 +16,7 @@
     import ProjectStatusSelector from '../../project-statuses/components/ProjectStatusSelector.vue';
 
     import { DEFAULT_INPUT_SIZE } from '../../../constants.ts';
+    import ToggleMarkDownEditor from '../../../shared/components/form-blocks/ToggleMarkDownEditor.vue';
 
     const emit = defineEmits(['add', 'cancel'])
 
@@ -243,11 +244,15 @@
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.inputs.description.label')"
                 path="description" show-feedback>
+                <!--
                 <n-input type="textarea"
                     :placeholder="t('modules.project.components.NewProjectForm.inputs.description.placeholder')"
                     :size="DEFAULT_INPUT_SIZE" v-model:value="project.description" clearable
                     :disabled="state.ajaxRunning">
                 </n-input>
+            -->
+                <ToggleMarkDownEditor v-model:value="project.description" :disabled="state.ajaxRunning" simple-toolbars
+                    hide-preview style="max-height: 200px;" />
             </n-form-item>
             <n-form-item :label="t('modules.project.components.NewProjectForm.selectors.projectType.label')"
                 path="type.id">
