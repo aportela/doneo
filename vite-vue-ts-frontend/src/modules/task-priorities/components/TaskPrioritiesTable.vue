@@ -167,6 +167,9 @@
                             case 404:
                                 state.ajaxErrorMessage = t("modules.taskPriority.components.TaskPrioritiesTable.errors.notFoundError");
                                 break;
+                            case 409:
+                                state.ajaxErrorMessage = t("modules.taskPriority.components.TaskPrioritiesTable.errors.deleteUsedError", { name: taskPriority.name });
+                                break;
                             default:
                                 state.ajaxErrorMessage = t("modules.taskPriority.components.TaskPrioritiesTable.errors.deleteError");
                                 break;

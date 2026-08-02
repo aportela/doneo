@@ -93,7 +93,7 @@ func (repository *projectStatusRepository) Delete(ctx context.Context, dbExecuto
 		projectStatusID,
 	)
 	if err != nil {
-		return err
+		return mapSQLiteError(err)
 	}
 	count, err := result.RowsAffected()
 	if err != nil {

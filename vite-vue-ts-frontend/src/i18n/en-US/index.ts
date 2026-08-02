@@ -831,6 +831,8 @@ export default {
               "There was a problem while refreshing the project priority list",
             deleteError:
               "There was a problem while deleting the project priority",
+            deleteUsedError:
+              'The project priority "{name}" cannot be deleted because it is currently in use',
             // TODO: deduplicate
             notFoundError: "We couldn’t find the specified project priority",
           },
@@ -938,6 +940,8 @@ export default {
               "There was a problem while refreshing the project status list",
             deleteError:
               "There was a problem while deleting the project status",
+            deleteUsedError:
+              'The project status "{name}" cannot be deleted because it is currently in use',
             // TODO: deduplicate
             notFoundError: "We couldn’t find the specified project status",
           },
@@ -1003,6 +1007,8 @@ export default {
             refreshError:
               "There was a problem while refreshing the project type list",
             deleteError: "There was a problem while deleting the project type",
+            deleteUsedError:
+              'The project type "{name}" cannot be deleted because it is currently in use',
             // TODO: deduplicate
             notFoundError: "We couldn’t find the specified project type",
           },
@@ -1478,6 +1484,8 @@ export default {
             refreshError:
               "There was a problem while refreshing the task status list",
             deleteError: "There was a problem while deleting the task status",
+            deleteUsedError:
+              'The task status "{name}" cannot be deleted because it is currently in use',
             // TODO: deduplicate
             notFoundError: "We couldn’t find the specified task status",
           },
@@ -1551,6 +1559,8 @@ export default {
             refreshError:
               "There was a problem while refreshing the task priority list",
             deleteError: "There was a problem while deleting the task priority",
+            deleteUsedError:
+              'The task priority "{name}" cannot be deleted because it is currently in use',
             // TODO: deduplicate
             notFoundError: "We couldn’t find the specified task priority",
           },

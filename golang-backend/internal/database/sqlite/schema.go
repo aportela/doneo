@@ -94,10 +94,10 @@ var schemaQueries = []schemaMigration{
 					status_id TEXT NOT NULL CHECK(length(status_id) == 36),
 					type_id TEXT NOT NULL CHECK(length(type_id) == 36),
 					PRIMARY KEY (id),
-					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE,
-					FOREIGN KEY(priority_id) REFERENCES project_priorities(id) ON DELETE CASCADE,
-					FOREIGN KEY(status_id) REFERENCES project_statuses(id) ON DELETE CASCADE,
-					FOREIGN KEY(type_id) REFERENCES project_types(id) ON DELETE CASCADE
+					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE RESTRICT,
+					FOREIGN KEY(priority_id) REFERENCES project_priorities(id) ON DELETE RESTRICT,
+					FOREIGN KEY(status_id) REFERENCES project_statuses(id) ON DELETE RESTRICT,
+					FOREIGN KEY(type_id) REFERENCES project_types(id) ON DELETE RESTRICT
 				) STRICT;
 			`,
 			`
@@ -150,7 +150,7 @@ var schemaQueries = []schemaMigration{
 					creator_id TEXT NOT NULL CHECK(length(creator_id) == 36),
 					created_at INTEGER NOT NULL,
 					PRIMARY KEY (id),
-					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE
+					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE RESTRICT
 				) STRICT;
 			`,
 			`
@@ -180,7 +180,7 @@ var schemaQueries = []schemaMigration{
 					PRIMARY KEY (id),
 					FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE,
 					FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
-					FOREIGN KEY(operation_user_id) REFERENCES users(id) ON DELETE CASCADE
+					FOREIGN KEY(operation_user_id) REFERENCES users(id) ON DELETE RESTRICT
 				) STRICT;
 			`,
 			`
@@ -219,9 +219,9 @@ var schemaQueries = []schemaMigration{
 					status_id TEXT NOT NULL CHECK(length(status_id) == 36),
 					cover_attachment_id TEXT CHECK(length(cover_attachment_id) == 36),
 					PRIMARY KEY (id),
-					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE,
-					FOREIGN KEY(priority_id) REFERENCES task_priorities(id) ON DELETE CASCADE,
-					FOREIGN KEY(status_id) REFERENCES task_statuses(id) ON DELETE CASCADE,
+					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE RESTRICT,
+					FOREIGN KEY(priority_id) REFERENCES task_priorities(id) ON DELETE RESTRICT,
+					FOREIGN KEY(status_id) REFERENCES task_statuses(id) ON DELETE RESTRICT,
 					UNIQUE(project_id, task_index)
 				) STRICT;
 			`,
@@ -272,7 +272,7 @@ var schemaQueries = []schemaMigration{
 					body TEXT NOT NULL,
 					PRIMARY KEY (id),
 					FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
-					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE
+					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE RESTRICT
 				) STRICT;
 			`,
 			`
@@ -302,7 +302,7 @@ var schemaQueries = []schemaMigration{
 					spent_time INTEGER NOT NULL,
 					PRIMARY KEY (id),
 					FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
-					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE
+					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE RESTRICT
 				) STRICT;
 			`,
 			`
@@ -320,7 +320,8 @@ var schemaQueries = []schemaMigration{
 					updated_at INTEGER,
 					deleted_at INTEGER,
 					PRIMARY KEY (id),
-					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE CASCADE
+					FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE,
+					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE RESTRICT
 				) STRICT;
 			`,
 		},

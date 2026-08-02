@@ -87,7 +87,7 @@ func (repository *projectPriorityRepository) Delete(ctx context.Context, dbExecu
 		projectPriorityID,
 	)
 	if err != nil {
-		return err
+		return mapSQLiteError(err)
 	}
 	count, err := result.RowsAffected()
 	if err != nil {

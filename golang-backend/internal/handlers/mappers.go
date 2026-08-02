@@ -39,6 +39,11 @@ func mapError(err error) (int, string, any) {
 		}
 	}
 
+	var resourceInUseError *domain.ResourceInUseError
+	if errors.As(err, &resourceInUseError) {
+		return http.StatusConflict, "resource is used", map[string]string{}
+	}
+
 	var sqlErr *sqlite.Error
 	if !errors.As(err, &sqlErr) {
 		// print SQL to console

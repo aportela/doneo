@@ -248,6 +248,9 @@
                             case 404:
                                 state.ajaxErrorMessage = t("modules.taskStatus.components.TaskStatusesTable.errors.notFoundError");
                                 break;
+                            case 409:
+                                state.ajaxErrorMessage = t("modules.taskStatus.components.TaskStatusesTable.errors.deleteUsedError", { name: taskStatus.name });
+                                break;
                             default:
                                 state.ajaxErrorMessage = t("modules.taskStatus.components.TaskStatusesTable.errors.deleteError");
                                 break;

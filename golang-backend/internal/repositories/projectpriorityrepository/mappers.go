@@ -57,6 +57,8 @@ func mapSQLiteError(err error) error {
 		if strings.Contains(sqlErr.Error(), "length(name)") {
 			return &domain.ValidationError{Field: "name"}
 		}
+	case sqlite3.SQLITE_CONSTRAINT_TRIGGER:
+		return &domain.ResourceInUseError{}
 	}
 	return err
 }

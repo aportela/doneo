@@ -167,6 +167,9 @@
                             case 404:
                                 state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPrioritiesTable.errors.notFoundError");
                                 break;
+                            case 409:
+                                state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPrioritiesTable.errors.deleteUsedError", { name: projectPriority.name });
+                                break;
                             default:
                                 state.ajaxErrorMessage = t("modules.projectPriority.components.ProjectPrioritiesTable.errors.deleteError");
                                 break;

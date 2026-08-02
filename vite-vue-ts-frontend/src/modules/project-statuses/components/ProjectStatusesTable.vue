@@ -248,6 +248,9 @@
                             case 404:
                                 state.ajaxErrorMessage = t("modules.projectStatus.components.ProjectStatusesTable.errors.notFoundError");
                                 break;
+                            case 409:
+                                state.ajaxErrorMessage = t("modules.projectStatus.components.ProjectStatusesTable.errors.deleteUsedError", { name: projectStatus.name });
+                                break;
                             default:
                                 state.ajaxErrorMessage = t("modules.projectStatus.components.ProjectStatusesTable.errors.deleteError");
                                 break;

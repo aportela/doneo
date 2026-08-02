@@ -25,3 +25,10 @@ type ValidationError struct {
 func (e *ValidationError) Error() string {
 	return "field not valid: " + e.Field
 }
+
+type ResourceInUseError struct {
+}
+
+func (e *ResourceInUseError) Error() string {
+	return "resource is used"
+}

@@ -91,7 +91,7 @@ func (repository *taskStatusRepository) Delete(ctx context.Context, dbExecutor d
 		taskStatusID,
 	)
 	if err != nil {
-		return err
+		return mapSQLiteError(err)
 	}
 	count, err := result.RowsAffected()
 	if err != nil {
