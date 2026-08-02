@@ -9,8 +9,8 @@ export class HistoryOperation {
   operationType: number;
 
   constructor(data?: HistoryOperationDTO) {
-    ((this.id = data?.id ?? ""),
-      (this.createdBy = new UserBase(data?.createdBy)));
+    (this.id = data?.id ?? ""),
+      (this.createdBy = new UserBase(data?.createdBy));
     this.createdAt = new IDate(data?.createdAt ?? null);
     this.operationType = data?.operationType ?? 0;
   }
@@ -46,6 +46,12 @@ export class HistoryOperation {
         return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.projectPermissionAdded";
       case 132:
         return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.projectPermissionDeleted";
+      case 140:
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.projectPageAdded";
+      case 141:
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.projectPageUpdated";
+      case 142:
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.projectPageDeleted";
       case 200:
         return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.taskCreated";
       case 201:
