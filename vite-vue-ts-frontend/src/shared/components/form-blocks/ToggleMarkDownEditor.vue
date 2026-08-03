@@ -26,6 +26,8 @@
         noUploadImg: true,
     });
 
+    const emit = defineEmits(['save'])
+
     const userSettingsStore = useUserSettingsStore();
     const { toMarkdown } = useMarkdown();
 
@@ -84,6 +86,10 @@
         '-',
         'preview',
     ];
+
+    const onSave = () => {
+        emit("save");
+    };
 </script>
 
 <template>
@@ -91,7 +97,7 @@
         :theme="userSettingsStore.darkTheme ? 'dark' : 'light'" language="en-US" :disabled="props.disabled"
         :read-only="props.readOnly" v-if="!props.readOnly" :no-upload-img="props.noUploadImg"
         :auto-focus="props.autoFocus" @paste="onPaste" :toolbars="props.simpleToolbars ? simpleToolbarItems : undefined"
-        :footers="[]" :preview="!props.hidePreview" :placeholder="props.placeholder" />
+        :footers="[]" :preview="!props.hidePreview" :placeholder="props.placeholder" @save="onSave" />
     <MdPreview v-else id="mdeditor" v-model:model-value="markDown" no-img-zoom-in
         :theme="userSettingsStore.darkTheme ? 'dark' : 'light'" language="en-US" :code-foldable="false"
         class="doneo-markdown-preview-container" />
