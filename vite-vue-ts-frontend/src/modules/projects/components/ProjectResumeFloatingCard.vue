@@ -31,6 +31,7 @@
     import { HistoryOperation } from '../../history-operations/models/history-operation.ts';
     import { historyOperationsService } from '../../history-operations/services/history-operations.ts';
     import { noteService } from '../../notes/services/note.ts';
+    import type { AddRequest } from '../../notes/types/dto.ts';
 
     interface Props {
         projectId: string;
@@ -296,7 +297,18 @@
             createdAt: n.createdAt,
             item: n
         }))
-    ].sort((a, b) => (b.createdAt?.msTimestamp ?? 0) - (a.createdAt?.msTimestamp ?? 0)))
+    ].sort((a, b) => (b.createdAt?.msTimestamp ?? 0) - (a.createdAt?.msTimestamp ?? 0)));
+
+    const onAddNote = async () => {
+        try {
+            const payload: AddRequest = {
+                body: noteBody.value,
+            };
+            await noteService.addProjectNote(props.projectId, payload);
+            noteBody.value = "";
+            await getProjectNotes();
+        } catch { }
+    }
 </script>
 
 <template>
@@ -421,7 +433,8 @@
                 </n-button-group>
             </n-flex>
 
-            <ToggleMarkDownEditor v-model:value="noteBody" hide-preview placeholder="Add note" id="new_note" />
+            <ToggleMarkDownEditor v-model:value="noteBody" hide-preview placeholder="Add note" id="new_note"
+                @save="onAddNote" style="max-height: 32vh; overflow-y: scroll;" />
             <n-divider />
             <n-timeline>
                 <n-timeline-item v-for="tt in timeline" type="default" :key="tt.item.id ?? ''">
@@ -436,7 +449,7 @@
                             tt.item.createdAt.toLocaleString() }}
                     </template>
                     <template #default v-else>
-                        <NoteItem :note="tt.item" />
+                        <NoteItem :note="tt.item" style="max-height: 32vh; overflow-y: scroll;" />
                     </template>
                 </n-timeline-item>
                 <!--
