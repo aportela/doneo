@@ -274,7 +274,7 @@
         {
             label: t("modules.project.components.ProjectsTable.header.columns.updatedAt"),
             field: "updatedAt",
-            visible: true,
+            visible: false,
             sortable: true,
             isFiltered: () => isFilteredByUpdateDate.value,
             render: (row: Project) => renderLabel(row.updatedAt?.toCustomMaskString(userSettingsStore.currentDatetimeMask) ?? ""),
