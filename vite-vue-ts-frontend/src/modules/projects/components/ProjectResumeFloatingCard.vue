@@ -187,6 +187,7 @@
         try {
             const results = await historyOperationsService.getProjectHistoryOperations(props.projectId);
             historyOperations.value = results.historyOperations.map((operation) => new HistoryOperation(operation));
+            project.value.historyOperationsCount = historyOperations.value.length;
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -220,6 +221,7 @@
         try {
             const results = await noteService.getProjectNotes(props.projectId);
             notes.value = results.notes.map((note) => new Note(note));
+            project.value.notesCount = notes.value.length;
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
