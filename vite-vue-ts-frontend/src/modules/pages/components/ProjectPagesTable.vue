@@ -199,10 +199,12 @@
 
     const onRefresh = async () => {
         Object.assign(state, defaultAjaxStateRunning);
+        showNoItemsWarningMessage.value = false;
         try {
             const results: SearchResponse = await pageService.getProjectPages(props.projectId);
             items.value = results.pages.map((page) => new Page(page));
             itemCount.value = items.value?.length ?? 0;
+            showNoItemsWarningMessage.value = items.value.length === 0;
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,

@@ -267,6 +267,7 @@
             const results: SearchResponse = await projectPermissionService.search(props.projectId);
             items.value = results.projectPermissions.map((permission) => new ProjectPermission(permission));
             itemCount.value = items.value?.length ?? 0;
+            showNoItemsWarningMessage.value = items.value.length === 0;
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,

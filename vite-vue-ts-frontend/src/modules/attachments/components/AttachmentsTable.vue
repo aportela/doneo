@@ -380,10 +380,12 @@
     const onRefreshTaskAttachments = async () => {
         if (props.taskId) {
             Object.assign(state, defaultAjaxStateRunning);
+            showNoItemsWarningMessage.value = false;
             try {
                 const results: SearchResponse = await attachmentService.getTaskAttachments(props.projectId, props.taskId);
                 items.value = results.attachments.map((attachment) => new Attachment(attachment));
                 itemCount.value = items.value?.length ?? 0;
+                showNoItemsWarningMessage.value = items.value.length === 0;
             } catch (error: unknown) {
                 state.ajaxErrors = true;
                 handleAPIError(error,
@@ -413,10 +415,12 @@
 
     const onRefreshProjectAttachments = async () => {
         Object.assign(state, defaultAjaxStateRunning);
+        showNoItemsWarningMessage.value = false;
         try {
             const results: SearchResponse = await attachmentService.getProjectAttachments(props.projectId);
             items.value = results.attachments.map((attachment) => new Attachment(attachment));
             itemCount.value = items.value?.length ?? 0;
+            showNoItemsWarningMessage.value = items.value.length === 0;
             refreshContentItemsOptions();
         } catch (error: unknown) {
             state.ajaxErrors = true;
@@ -443,7 +447,6 @@
             }
         }
     };
-
 
     const onDownload = (attachment: Attachment) => {
         if (props.taskId) {
