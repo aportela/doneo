@@ -104,6 +104,19 @@ doneo-table tfoot th:last-of-type {
     margin-right: 4px;
 }
 
+.doneo-spin-animation {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes doneo-spin-animation {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (max-width: 768px) {
     .mobile-hidden {
         display: none;
