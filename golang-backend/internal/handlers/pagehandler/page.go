@@ -16,6 +16,12 @@ type PageHandler interface {
 	DeleteProjectPage(w http.ResponseWriter, r *http.Request)
 	GetProjectPage(w http.ResponseWriter, r *http.Request)
 	GetProjectPages(w http.ResponseWriter, r *http.Request)
+
+	AddTaskPage(w http.ResponseWriter, r *http.Request)
+	UpdateTaskPage(w http.ResponseWriter, r *http.Request)
+	DeleteTaskPage(w http.ResponseWriter, r *http.Request)
+	GetTaskPage(w http.ResponseWriter, r *http.Request)
+	GetTaskPages(w http.ResponseWriter, r *http.Request)
 }
 
 type pageHandler struct {
@@ -85,5 +91,72 @@ func (handler *pageHandler) GetProjectPages(w http.ResponseWriter, r *http.Reque
 	w.Header().Set("Content-Type", "application/json")
 	projectID := chi.URLParam(r, "project_id")
 	pages, err := handler.service.GetProjectPages(r.Context(), projectID)
+	handlers.ToHandlerJSONResponse(w, toSearchResponse(pages), err)
+}
+
+func (handler *pageHandler) AddTaskPage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var request addRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[PageHandler] invalid request payload: %w", err))
+		return
+	}
+	page := addRequestToDomain(request)
+	projectID := chi.URLParam(r, "project_id")
+	taskID := chi.URLParam(r, "task_id")
+	if page, err := handler.service.AddTaskPage(r.Context(), projectID, taskID, page); err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[PageHandler] failed to add page: %w", err))
+		return
+	} else {
+		handlers.ToHandlerJSONResponse(w, domainToResponse(page), nil, http.StatusCreated)
+	}
+}
+
+func (handler *pageHandler) UpdateTaskPage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var request updateRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[PageHandler] invalid request payload: %w", err))
+		return
+	}
+	page := updateRequestToDomain(request)
+	page.ID = chi.URLParam(r, "page_id")
+	projectID := chi.URLParam(r, "project_id")
+	taskID := chi.URLParam(r, "task_id")
+	if page, err := handler.service.UpdateTaskPage(r.Context(), projectID, taskID, page); err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[PageHandler] failed to update page: %w", err))
+		return
+	} else {
+		handlers.ToHandlerJSONResponse(w, domainToResponse(page), nil)
+	}
+}
+
+func (handler *pageHandler) DeleteTaskPage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	projectID := chi.URLParam(r, "project_id")
+	taskID := chi.URLParam(r, "task_id")
+	pageID := chi.URLParam(r, "page_id")
+	if err := handler.service.DeleteTaskPage(r.Context(), projectID, taskID, pageID); err != nil {
+		handlers.ToHandlerJSONResponse(w, nil, fmt.Errorf("[PageHandler] failed to delete page: %w", err))
+		return
+	} else {
+		handlers.ToHandlerJSONResponse(w, handlers.ToEmptyResponse(), nil)
+	}
+}
+
+func (handler *pageHandler) GetTaskPage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	projectID := chi.URLParam(r, "project_id")
+	taskID := chi.URLParam(r, "task_id")
+	pageID := chi.URLParam(r, "page_id")
+	page, err := handler.service.GetTaskPage(r.Context(), projectID, taskID, pageID)
+	handlers.ToHandlerJSONResponse(w, domainToResponse(page), err)
+}
+
+func (handler *pageHandler) GetTaskPages(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	projectID := chi.URLParam(r, "project_id")
+	taskID := chi.URLParam(r, "task_id")
+	pages, err := handler.service.GetTaskPages(r.Context(), projectID, taskID)
 	handlers.ToHandlerJSONResponse(w, toSearchResponse(pages), err)
 }

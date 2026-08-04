@@ -197,6 +197,12 @@ func NewRouter(app *app.App) http.Handler {
 		r.Delete("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/time_trackings/{task_time_tracking_id:"+uuidPattern+"}", app.TaskTimeTrackingHandler.Delete)
 
 		r.Get("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/history_operations", app.HistoryOperationHandler.SearchTaskHistoryOperations)
+
+		r.Get("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/pages", app.PageHandler.GetTaskPages)
+		r.Get("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/pages/{page_id:"+uuidPattern+"}", app.PageHandler.GetTaskPage)
+		r.Post("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/pages", app.PageHandler.AddTaskPage)
+		r.Put("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/pages/{page_id:"+uuidPattern+"}", app.PageHandler.UpdateTaskPage)
+		r.Delete("/{project_id:"+uuidPattern+"}/tasks/{task_id:"+uuidPattern+"}/pages/{page_id:"+uuidPattern+"}", app.PageHandler.DeleteTaskPage)
 	})
 
 	apiRouter.Route("/tasks", func(r chi.Router) {

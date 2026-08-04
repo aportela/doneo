@@ -324,6 +324,21 @@ var schemaQueries = []schemaMigration{
 					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE RESTRICT
 				) STRICT;
 			`,
+			`
+				CREATE TABLE IF NOT EXISTS task_pages (
+					id TEXT NOT NULL CHECK(length(id) == 36),
+					task_id TEXT NOT NULL CHECK(length(task_id) == 36),
+					title TEXT NOT NULL CHECK(length(title) BETWEEN 1 AND 128),
+					body TEXT,
+					creator_id TEXT NOT NULL CHECK(length(creator_id) == 36),
+					created_at INTEGER NOT NULL,
+					updated_at INTEGER,
+					deleted_at INTEGER,
+					PRIMARY KEY (id),
+					FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+					FOREIGN KEY(creator_id) REFERENCES users(id) ON DELETE RESTRICT
+				) STRICT;
+			`,
 		},
 	},
 }

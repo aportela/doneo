@@ -238,7 +238,8 @@
                     </n-flex>
                 </template>
                 <ToggleMarkDownEditor v-if="true" :read-only="props.readOnly || readOnlyMode"
-                    v-model:value="project.description" />
+                    v-model:value="project.description"
+                    style="min-height: 16vh; max-height: 48vh; overflow-y: scroll;" />
             </n-form-item>
         </n-form>
         <n-button-group v-if="!props.readOnly && !readOnlyMode && project.allowedOperations.updateProject">

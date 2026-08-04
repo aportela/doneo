@@ -52,6 +52,12 @@ export class HistoryOperation {
         return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.projectPageUpdated";
       case 142:
         return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.projectPageDeleted";
+      case 150:
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.taskPageAdded";
+      case 151:
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.taskPageUpdated";
+      case 152:
+        return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.taskPageDeleted";
       case 200:
         return "modules.projectHistoryOperation.components.ProjectHistoryOperationsTable.body.columns.operationType.taskCreated";
       case 201:

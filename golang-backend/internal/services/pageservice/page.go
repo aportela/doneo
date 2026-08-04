@@ -20,6 +20,12 @@ type PageService interface {
 	DeleteProjectPage(ctx context.Context, projectID string, pageID string) error
 	GetProjectPage(ctx context.Context, projectID string, pageID string) (domain.Page, error)
 	GetProjectPages(ctx context.Context, projectID string) ([]domain.Page, error)
+
+	AddTaskPage(ctx context.Context, projectID string, taskID string, page domain.Page) (domain.Page, error)
+	UpdateTaskPage(ctx context.Context, projectID string, taskID string, page domain.Page) (domain.Page, error)
+	DeleteTaskPage(ctx context.Context, projectID string, taskID string, pageID string) error
+	GetTaskPage(ctx context.Context, projectID string, taskID string, pageID string) (domain.Page, error)
+	GetTaskPages(ctx context.Context, projectID string, taskID string) ([]domain.Page, error)
 }
 
 type pageService struct {
@@ -143,6 +149,121 @@ func (service *pageService) GetProjectPages(ctx context.Context, projectID strin
 	}
 	if notes, err := service.pageRepository.GetProjectPages(ctx, service.db, projectID); err != nil {
 		return nil, fmt.Errorf("[PageService] failed to get project pages: %w", err)
+	} else {
+		return notes, nil
+	}
+}
+
+func (service *pageService) AddTaskPage(ctx context.Context, projectID string, taskID string, page domain.Page) (domain.Page, error) {
+	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
+		return domain.Page{}, err
+	} else {
+		page.ID = utils.UUID()
+		page.CreatedBy.ID = contextUser.ID
+		page.CreatedBy.Name = contextUser.Name
+		page.CreatedAt = time.Now()
+		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+			if err := service.pageRepository.AddTaskPage(ctx, tx, taskID, page); err != nil {
+				return err
+			}
+			if _, err := service.historyOperationService.AddProjectHistoryOperation(
+				ctx,
+				tx,
+				projectID,
+				domain.HistoryOperation{
+					ID:            utils.UUID(),
+					CreatedBy:     domain.UserBase{ID: contextUser.ID},
+					CreatedAt:     page.CreatedAt,
+					OperationType: domain.EventTaskPageAdded,
+				},
+			); err != nil {
+				return err
+			}
+			return nil
+		}); err != nil {
+			return domain.Page{}, err
+		}
+		return page, nil
+	}
+}
+
+func (service *pageService) UpdateTaskPage(ctx context.Context, projectID string, taskID string, page domain.Page) (domain.Page, error) {
+	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
+		return domain.Page{}, err
+	} else {
+		page.UpdatedAt = utils.CurrentTimePtr()
+		if err := database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+			if err := service.pageRepository.UpdateTaskPage(ctx, tx, taskID, page); err != nil {
+				return err
+			}
+			if _, err := service.historyOperationService.AddProjectHistoryOperation(
+				ctx,
+				tx,
+				projectID,
+				domain.HistoryOperation{
+					ID: utils.UUID(),
+					CreatedBy: domain.UserBase{
+						ID: contextUser.ID,
+					},
+					CreatedAt:     *page.UpdatedAt,
+					OperationType: domain.EventTaskPageUpdated,
+				},
+			); err != nil {
+				return err
+			}
+			return nil
+		}); err != nil {
+			return domain.Page{}, err
+		}
+		return page, nil
+	}
+}
+
+func (service *pageService) DeleteTaskPage(ctx context.Context, projectID string, taskID string, pageID string) error {
+	if contextUser, err := service.authorizationService.RequireTaskUpdatePermission(ctx, projectID); err != nil {
+		return err
+	} else {
+		return database.WithTx(ctx, service.db, func(tx *sql.Tx) error {
+			if err := service.pageRepository.DeleteTaskPage(ctx, tx, taskID, pageID); err != nil {
+				return err
+			}
+			if _, err := service.historyOperationService.AddProjectHistoryOperation(
+				ctx,
+				tx,
+				projectID,
+				domain.HistoryOperation{
+					ID: utils.UUID(),
+					CreatedBy: domain.UserBase{
+						ID: contextUser.ID,
+					},
+					CreatedAt:     time.Now(),
+					OperationType: domain.EventTaskPageDeleted,
+				},
+			); err != nil {
+				return err
+			}
+			return nil
+		})
+	}
+}
+
+func (service *pageService) GetTaskPage(ctx context.Context, projectID string, taskID string, pageID string) (domain.Page, error) {
+	if _, err := service.authorizationService.RequireTaskViewPermission(ctx, projectID); err != nil {
+		return domain.Page{}, err
+	}
+	if notes, err := service.pageRepository.GetTaskPage(ctx, service.db, taskID, pageID); err != nil {
+		return domain.Page{}, fmt.Errorf("[PageService] failed to get project page: %w", err)
+	} else {
+		return notes, nil
+	}
+}
+
+func (service *pageService) GetTaskPages(ctx context.Context, projectID string, taskID string) ([]domain.Page, error) {
+	if _, err := service.authorizationService.RequireProjectViewPermission(ctx, projectID); err != nil {
+		return nil, err
+	}
+	if notes, err := service.pageRepository.GetTaskPages(ctx, service.db, taskID); err != nil {
+		return nil, fmt.Errorf("[PageService] failed to get task pages: %w", err)
 	} else {
 		return notes, nil
 	}
