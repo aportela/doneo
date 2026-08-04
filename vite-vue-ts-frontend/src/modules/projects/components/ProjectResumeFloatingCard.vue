@@ -2,10 +2,11 @@
     import { ref, reactive, onMounted, computed, shallowRef } from 'vue';
     import { useI18n } from "vue-i18n";
 
-    import { NCollapse, NCollapseItem, NButton, NButtonGroup, NTag, NSpin, NIcon, NTimeline, NTimelineItem, NDivider, NFlex, NDropdown } from 'naive-ui';
+    import { NCollapse, NCollapseItem, NButton, NButtonGroup, NTag, NSpin, NIcon, NTimeline, NTimelineItem, NDivider, NFlex, NDropdown, NUpload, type UploadCustomRequestOptions, type UploadInst } from 'naive-ui';
     import { IconAlertTriangle, IconBookmark, IconCalendarBolt, IconCalendarCheck, IconCalendarDue, IconCalendarTime, IconFilter2, IconMessage2, IconPaperclip, IconSortDescending, IconStatusChange, IconUser } from '@tabler/icons-vue';
     import { ListTodo } from '@lucide/vue';
 
+    import { useSessionStore } from '../../../stores/session.ts';
     import { type AjaxStateInterface, defaultAjaxState, defaultAjaxStateRunning } from '../../../shared/types/ajaxState';
     import { projectService } from '../services/project.ts';
     import { handleAPIError } from '../../../api/client/errorHandler.ts';
@@ -24,7 +25,7 @@
     import { Attachment } from '../../attachments/models/attachment.ts';
     import { attachmentService } from '../../attachments/services/attachment.ts';
     import { formatBytes } from '../../../shared/composables/format.ts';
-    import { DONEO_ICON_ACTION_DOWNLOAD, DONEO_ICON_ACTION_OPEN, DONEO_ICON_ACTION_PREVIEW } from '../../../shared/types/icons.ts';
+    import { DONEO_ICON_ACTION_DOWNLOAD, DONEO_ICON_ACTION_OPEN, DONEO_ICON_ACTION_PREVIEW, DONEO_ICON_LOADER } from '../../../shared/types/icons.ts';
     import { Task } from '../../tasks/models/tasks.ts';
     import type { SearchRequest } from '../../tasks/types/dto.ts';
     import { taskService } from '../../tasks/services/task.ts';
@@ -40,6 +41,8 @@
     const props = defineProps<Props>();
 
     const { t } = useI18n();
+
+    const sessionStore = useSessionStore();
 
     const project = ref<Project>(new Project());
 
@@ -113,6 +116,7 @@
         try {
             const response: SearchResponse = await attachmentService.getProjectAttachments(props.projectId);
             attachments.value = response.attachments.map((attachment) => new Attachment(attachment));
+            project.value.attachmentsCount = attachments.value.length;
         } catch (error: unknown) {
             state.ajaxErrors = true;
             handleAPIError(error,
@@ -248,6 +252,54 @@
         }
     };
 
+    const uploadFile = async ({
+        file,
+        headers,
+        onProgress,
+        onFinish,
+        onError
+    }: UploadCustomRequestOptions) => {
+        const formData = new FormData()
+        formData.append('file', file.file as Blob)
+
+        const xhr = new XMLHttpRequest()
+        xhr.open('POST', `/api/projects/${props.projectId}/attachments`)
+
+        const headerObj = typeof headers === 'function' ? headers({ file }) : headers
+        if (headerObj) {
+            for (const key in headerObj) {
+                xhr.setRequestHeader(key, headerObj[key])
+            }
+        }
+
+        xhr.setRequestHeader('Authorization', `Bearer ${sessionStore.accessToken}`)
+
+        xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+                const percent = (event.loaded / event.total) * 100
+                onProgress({ percent })
+            }
+        }
+
+        xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                onFinish()
+            } else {
+                onError()
+            }
+        }
+
+        xhr.onerror = () => {
+            onError()
+        }
+
+        xhr.send(formData)
+    };
+
+    const onUploadFinish = () => {
+        getProjectAttachments();
+    };
+
     onMounted(() => {
         if (props.projectId) {
             onGet(props.projectId);
@@ -311,10 +363,18 @@
             await getProjectNotes();
         } catch { }
     }
+
+    const uploadRef = ref<UploadInst | null>(null);
+
+    const onFileUpload = () => {
+        uploadRef.value?.openOpenFileDialog();
+    };
+
 </script>
 
 <template>
     <n-spin :show="state.ajaxRunning" style="height: 100vh;">
+        <n-upload :show-file-list="false" :custom-request="uploadFile" ref="uploadRef" @finish="onUploadFinish" />
         <div v-show="!state.ajaxRunning">
             <h3>Summary: {{ project.summary }}</h3>
 
@@ -323,8 +383,8 @@
                 style="max-height: 32vh; overflow-y: scroll;" />
 
             <n-button-group size="tiny" style="margin-top: 16px;">
-                <n-button round :disabled="!project.allowedOperations.updateProject"><template #icon><n-icon
-                            :component="IconPaperclip" /></template>
+                <n-button round :disabled="!project.allowedOperations.updateProject" @click="onFileUpload"><template
+                        #icon><n-icon :component="IconPaperclip" /></template>
                     Add
                     attachment</n-button>
 
