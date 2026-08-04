@@ -25,7 +25,7 @@
     import { Attachment } from '../../attachments/models/attachment.ts';
     import { attachmentService } from '../../attachments/services/attachment.ts';
     import { formatBytes } from '../../../shared/composables/format.ts';
-    import { DONEO_ICON_ACTION_DOWNLOAD, DONEO_ICON_ACTION_OPEN, DONEO_ICON_ACTION_PREVIEW, DONEO_ICON_LOADER } from '../../../shared/types/icons.ts';
+    import { DONEO_ICON_ACTION_DOWNLOAD, DONEO_ICON_ACTION_OPEN, DONEO_ICON_ACTION_PREVIEW } from '../../../shared/types/icons.ts';
     import { Task } from '../../tasks/models/tasks.ts';
     import type { SearchRequest } from '../../tasks/types/dto.ts';
     import { taskService } from '../../tasks/services/task.ts';
